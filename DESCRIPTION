@@ -1,0 +1,30 @@
+Package: ldfreq
+Type: Package
+Title: Reproducible Lexical Diversity Profiles
+Version: 0.1.0.9000
+Authors@R:
+    person(
+        given = "Ryuya",
+        email = "komuro.4121@gmail.com",
+        role = c("aut", "cre")
+    )
+Description: Computes explicitly versioned lexical-diversity metrics from
+    ordered pre-tokenized text. Provides canonical long-form results, bounded
+    parameter profiles, multi-document adapters, and non-censoring token-length
+    screens while retaining method, parameter, schema, and contract provenance
+    in ordinary columns. The initial development release intentionally performs
+    no tokenization, normalization, lemmatization, or lexical-resource lookup.
+License: MIT + file LICENSE
+URL: https://github.com/Ryuya-dot-com/ldfreq
+BugReports: https://github.com/Ryuya-dot-com/ldfreq/issues
+Depends:
+    R (>= 4.1.0)
+Encoding: UTF-8
+Suggests:
+    jsonlite,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+Config/ldfreq/status: experimental

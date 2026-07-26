@@ -1,0 +1,335 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Language-independent lexical-diversity measurement contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "contract_id",
+    "contract_version",
+    "status",
+    "reviewed_on",
+    "normative",
+    "input_contract",
+    "output_contract",
+    "r_profile_contract",
+    "metrics",
+    "open_design_gates"
+  ],
+  "properties": {
+    "$schema": {"type": "string"},
+    "contract_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$"},
+    "contract_version": {"type": "string"},
+    "status": {
+      "enum": ["draft", "release-candidate", "normative", "superseded"]
+    },
+    "reviewed_on": {"type": "string", "format": "date"},
+    "normative": {"type": "boolean"},
+    "normative_authority": {"type": "string"},
+    "input_contract": {
+      "type": "object",
+      "required": [
+        "unit",
+        "order",
+        "normalization",
+        "type_equivalence",
+        "missing_token_policy",
+        "empty_token_policy",
+        "encoding_policy",
+        "binding_profiles",
+        "raw_text_adapter"
+      ],
+      "additionalProperties": true
+    },
+    "output_contract": {
+      "type": "object",
+      "required": [
+        "result_fields",
+        "result_schema_id",
+        "result_schema_version",
+        "batch_envelope",
+        "statuses",
+        "missing_reasons",
+        "request_validation_policy",
+        "short_text_policy",
+        "parameter_reporting",
+        "floating_point"
+      ],
+      "additionalProperties": true
+    },
+    "r_profile_contract": {"$ref": "#/$defs/rProfileContract"},
+    "metrics": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/metric"}
+    },
+    "open_design_gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "metrics", "question", "exit_evidence"],
+        "additionalProperties": true
+      }
+    }
+  },
+  "$defs": {
+    "metric": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "metric_id",
+        "method_id",
+        "label",
+        "stability",
+        "construct",
+        "definition",
+        "parameters",
+        "computational_domain",
+        "quality_floor_tokens",
+        "scale",
+        "direction"
+      ],
+      "properties": {
+        "metric_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "method_id": {"type": "string", "minLength": 1},
+        "label": {"type": "string", "minLength": 1},
+        "stability": {"enum": ["freeze-ready", "design-review"]},
+        "construct": {"type": "string", "minLength": 1},
+        "definition": {"type": "object"},
+        "parameters": {"type": "object"},
+        "computational_domain": {"type": "object"},
+        "quality_floor_tokens": {"type": "integer", "minimum": 1},
+        "scale": {"type": "object"},
+        "direction": {"enum": ["higher", "lower"]}
+      }
+    },
+    "rProfileContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "admitted_stability",
+        "identity_model",
+        "specification",
+        "request_plan",
+        "grid_builder",
+        "presets",
+        "mtld_length_screen_policy",
+        "profile_envelope",
+        "screen_result"
+      ],
+      "properties": {
+        "scope": {"type": "string", "minLength": 1},
+        "admitted_stability": {
+          "type": "array",
+          "prefixItems": [{"const": "freeze-ready"}],
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "identity_model": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["metric_id", "method_id", "specification_id", "request_id"],
+          "properties": {
+            "metric_id": {"type": "string", "minLength": 1},
+            "method_id": {"type": "string", "minLength": 1},
+            "specification_id": {"type": "string", "minLength": 1},
+            "request_id": {"type": "string", "minLength": 1}
+          }
+        },
+        "specification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fields",
+            "normalization",
+            "identity_key_fields",
+            "identity_key_serialization",
+            "parameter_serialization",
+            "specification_id_algorithm",
+            "hash_role"
+          ],
+          "properties": {
+            "fields": {"$ref": "#/$defs/nonEmptyStringArray"},
+            "normalization": {"type": "string", "minLength": 1},
+            "identity_key_fields": {"$ref": "#/$defs/nonEmptyStringArray"},
+            "identity_key_serialization": {"type": "string", "minLength": 1},
+            "parameter_serialization": {"type": "string", "minLength": 1},
+            "specification_id_algorithm": {"type": "string", "minLength": 1},
+            "hash_role": {"type": "string", "minLength": 1}
+          }
+        },
+        "request_plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_id",
+            "schema_version",
+            "fields",
+            "minimum_specifications",
+            "default_max_specs",
+            "maximum_input_candidates",
+            "candidate_bound_policy",
+            "expansion_order",
+            "deduplication",
+            "request_id_policy",
+            "request_id_uniqueness",
+            "hash_record",
+            "hash_input",
+            "hash_algorithm",
+            "construction_metadata_identity"
+          ],
+          "properties": {
+            "schema_id": {"const": "lexdiv-r-request-plan"},
+            "schema_version": {"const": "0.1.0-draft.1"},
+            "fields": {"$ref": "#/$defs/nonEmptyStringArray"},
+            "minimum_specifications": {"type": "integer", "minimum": 1},
+            "default_max_specs": {"type": "integer", "minimum": 1},
+            "maximum_input_candidates": {"type": "integer", "minimum": 1},
+            "candidate_bound_policy": {"type": "string", "minLength": 1},
+            "expansion_order": {"type": "string", "minLength": 1},
+            "deduplication": {"type": "string", "minLength": 1},
+            "request_id_policy": {"type": "string", "minLength": 1},
+            "request_id_uniqueness": {"type": "string", "minLength": 1},
+            "hash_record": {"type": "string", "minLength": 1},
+            "hash_input": {"type": "string", "minLength": 1},
+            "hash_algorithm": {"type": "string", "minLength": 1},
+            "construction_metadata_identity": {"type": "string", "minLength": 1}
+          }
+        },
+        "grid_builder": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_id",
+            "dimensionality",
+            "expansion",
+            "default_max_values",
+            "bound_policy",
+            "deduplication"
+          ],
+          "properties": {
+            "schema_id": {"type": "null"},
+            "dimensionality": {"type": "string", "minLength": 1},
+            "expansion": {"type": "string", "minLength": 1},
+            "default_max_values": {"type": "integer", "minimum": 1},
+            "bound_policy": {"type": "string", "minLength": 1},
+            "deduplication": {"type": "string", "minLength": 1}
+          }
+        },
+        "presets": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {"$ref": "#/$defs/profilePreset"}
+        },
+        "mtld_length_screen_policy": {"type": "string", "minLength": 1},
+        "profile_envelope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_id",
+            "schema_version",
+            "envelope_fields",
+            "composition",
+            "single_document_order",
+            "batch_composition",
+            "batch_order",
+            "batch_default_max_rows",
+            "batch_bound_policy",
+            "quality_floor_semantics"
+          ],
+          "properties": {
+            "schema_id": {"const": "lexdiv-r-profile-result"},
+            "schema_version": {"const": "0.1.0-draft.1"},
+            "envelope_fields": {"$ref": "#/$defs/nonEmptyStringArray"},
+            "composition": {"type": "string", "minLength": 1},
+            "single_document_order": {"type": "string", "minLength": 1},
+            "batch_composition": {"type": "string", "minLength": 1},
+            "batch_order": {"type": "string", "minLength": 1},
+            "batch_default_max_rows": {"type": "integer", "minimum": 1},
+            "batch_bound_policy": {"type": "string", "minLength": 1},
+            "quality_floor_semantics": {"type": "string", "minLength": 1}
+          }
+        },
+        "screen_result": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_id",
+            "schema_version",
+            "default_max_rows",
+            "bound_policy",
+            "fields",
+            "batch_prefix_fields",
+            "expansion_order",
+            "screen_identity",
+            "pass_rule",
+            "unknown_rule",
+            "no_value_policy",
+            "effect_policy",
+            "label_semantics"
+          ],
+          "properties": {
+            "schema_id": {"const": "lexdiv-r-screen-result"},
+            "schema_version": {"const": "0.1.0-draft.1"},
+            "default_max_rows": {"type": "integer", "minimum": 1},
+            "bound_policy": {"type": "string", "minLength": 1},
+            "fields": {"$ref": "#/$defs/nonEmptyStringArray"},
+            "batch_prefix_fields": {"$ref": "#/$defs/nonEmptyStringArray"},
+            "expansion_order": {"type": "string", "minLength": 1},
+            "screen_identity": {"type": "string", "minLength": 1},
+            "pass_rule": {"type": "string", "minLength": 1},
+            "unknown_rule": {"type": "string", "minLength": 1},
+            "no_value_policy": {"type": "string", "minLength": 1},
+            "effect_policy": {"type": "string", "minLength": 1},
+            "label_semantics": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "profilePreset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preset_id",
+        "preset_version",
+        "specification_count",
+        "resolution",
+        "additions"
+      ],
+      "properties": {
+        "preset_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "preset_version": {"const": "0.1.0-draft.1"},
+        "specification_count": {"type": "integer", "minimum": 1},
+        "resolution": {"type": "string", "minLength": 1},
+        "additions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/profilePresetAddition"}
+        }
+      }
+    },
+    "profilePresetAddition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "metric_id", "method_id", "parameters"],
+      "properties": {
+        "request_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"},
+        "metric_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "method_id": {"type": "string", "minLength": 1},
+        "parameters": {"type": "object"}
+      }
+    },
+    "nonEmptyStringArray": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}

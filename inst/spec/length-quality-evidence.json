@@ -1,0 +1,89 @@
+{
+  "schema_version": "0.1.0",
+  "reviewed_on": "2026-07-25",
+  "status": "context-specific-evidence-not-universal-cutoffs",
+  "policy": {
+    "computational_domain": "Determined by the frozen method contract and reported as status/missing_reason.",
+    "estimation_parameter": "A value such as MATTR window or MSTTR segment that changes the numerical estimate and belongs in specification_id.",
+    "quality_screen": "A non-censoring interpretation of N that never changes a value or effective parameter.",
+    "prefix_sensitivity": "Truncating a document to 50 or 100 tokens is a separate sampling design, not a quality screen.",
+    "universal_floor_claimed": false
+  },
+  "descriptive_screen_profiles": [
+    {
+      "screen_id": "tokens_50",
+      "floor_tokens": 50,
+      "role": "descriptive_length_sensitivity",
+      "interpretation": "Reports whether N is at least 50; it is not by itself a validity claim."
+    },
+    {
+      "screen_id": "tokens_100",
+      "floor_tokens": 100,
+      "role": "descriptive_length_sensitivity",
+      "interpretation": "Reports whether N is at least 100; it is not by itself a validity claim."
+    }
+  ],
+  "evidence_records": [
+    {
+      "evidence_id": "koizumi_2012_mtld_spoken_l2_100",
+      "metric_id": "mtld",
+      "method_scope": "raw bidirectional MTLD as calculated by Gramulator 5.0; not asserted byte-for-byte identical to the target method",
+      "floor_tokens": 100,
+      "claim_type": "context_specific_recommendation",
+      "population": "20 lower-intermediate Japanese adolescent learners of English",
+      "modality_genre": "tape-mediated spoken responses on familiar topics",
+      "observed_segment_lengths": "50 to 200 tokens",
+      "finding": "MTLD was least affected by length; the study recommended at least 100 tokens under its design.",
+      "generalization_limit": "The authors requested replication across more spoken and written genres, more samples, and longer texts.",
+      "source_type": "peer_reviewed_open_article",
+      "doi": "10.7820/vli.v01.1.koizumi",
+      "url": "https://www.castledown.com/journals/vli/article/download/vli.v01.1.koizumi/213"
+    },
+    {
+      "evidence_id": "zenker_kyle_2021_mtld_original_written_l2_50",
+      "metric_id": "mtld",
+      "method_scope": "MTLD Original",
+      "floor_tokens": 50,
+      "claim_type": "minimum_observed_stable_length",
+      "population": "4,542 L2 English argumentative essays from ICNALE",
+      "modality_genre": "written argumentative essays",
+      "observed_segment_lengths": "50 to 200 tokens",
+      "finding": "MTLD Original was highly stable across all tested lengths, including 50 tokens.",
+      "generalization_limit": "Fifty was the minimum tested length, not evidence for texts below 50 or a universal computational cutoff.",
+      "source_type": "peer_reviewed_article",
+      "doi": "10.1016/j.asw.2020.100505",
+      "url": "https://www.sciencedirect.com/science/article/pii/S1075293520300660"
+    },
+    {
+      "evidence_id": "zenker_kyle_2021_mattr_written_l2_50",
+      "metric_id": "mattr",
+      "method_scope": "MATTR with a 50-token window",
+      "floor_tokens": 50,
+      "claim_type": "minimum_observed_stable_length",
+      "population": "4,542 L2 English argumentative essays from ICNALE",
+      "modality_genre": "written argumentative essays",
+      "observed_segment_lengths": "50 to 200 tokens",
+      "finding": "MATTR was highly stable across all tested lengths.",
+      "generalization_limit": "Window size and document evidence floor are related at N=50 but remain conceptually distinct.",
+      "source_type": "peer_reviewed_article",
+      "doi": "10.1016/j.asw.2020.100505",
+      "url": "https://www.sciencedirect.com/science/article/pii/S1075293520300660"
+    },
+    {
+      "evidence_id": "taaled_0_32_tool_guidance",
+      "metric_id": "multiple",
+      "method_scope": "TAALED 0.32 user guidance: MATTR 50, MTLD Original 50, HD-D 50, Maas 100",
+      "floor_tokens": null,
+      "claim_type": "tool_author_guidance",
+      "population": "not a single validation population",
+      "modality_genre": "general user guidance with linked studies",
+      "observed_segment_lengths": "not applicable",
+      "finding": "The documentation labels MATTR/MTLD Original as use-with-confidence at 50, and HD-D 50/Maas 100 as use-with-caution.",
+      "generalization_limit": "Tool guidance is recorded separately from primary empirical evidence and is not copied as the package's universal policy.",
+      "source_type": "versioned_tool_documentation",
+      "version": "0.32",
+      "license": "CC BY-NC-SA 4.0",
+      "url": "https://pypi.org/project/taaled/"
+    }
+  ]
+}
