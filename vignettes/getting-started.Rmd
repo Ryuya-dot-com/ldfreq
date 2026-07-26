@@ -1,0 +1,71 @@
+---
+title: "Getting started with ldfreq"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with ldfreq}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+`ldfreq` begins at an assumption-transparent boundary: an ordered character
+vector of tokens. The package does not guess how raw prose should be tokenized,
+normalized, or lemmatized.
+
+```{r}
+library(ldfreq)
+
+tokens <- c("the", "cat", "saw", "the", "other", "cat")
+result <- lexdiv_metrics(tokens, metrics = c("ttr", "rttr", "yule_k"))
+result
+```
+
+## Reading results
+
+Each requested metric receives one row. The `status` and `reason` columns state
+whether a value is available; `requested_parameters` and
+`effective_parameters` are list-columns. Contract and schema identifiers are
+ordinary columns so that they survive row binding and tabular serialization.
+
+Short documents do not cause the requested method to change. For example, an
+MATTR window larger than the document yields a structured missing result rather
+than a smaller implicit window.
+
+```{r}
+lexdiv_metrics(tokens, metrics = "mattr", window_length = 50L)
+```
+
+## Multiple documents
+
+Batch input must carry explicit, unique document identifiers.
+
+```{r}
+documents <- list(
+  document_a = c("one", "two", "one"),
+  document_b = c("alpha", "beta", "gamma", "delta")
+)
+
+lexdiv_metrics_batch(documents, metrics = c("ttr", "hdd"))
+```
+
+## Explicit method profiles
+
+A profile plan records parameter variants before computation. The
+`length_50_100` preset adds MSTTR and MATTR settings without duplicating MTLD or
+turning descriptive token floors into alternative metric values.
+
+```{r}
+plan <- lexdiv_plan(presets = "length_50_100")
+profile <- lexdiv_profile(tokens, plan)
+head(profile)
+
+screen <- lexdiv_screen(profile)
+head(screen)
+```
+
+Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the frozen registries.
+The design-review `expected_ttr_d` candidate is intentionally absent from the
+public method set.

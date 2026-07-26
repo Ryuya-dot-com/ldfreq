@@ -1,0 +1,158 @@
+{
+  "schema_version": "0.1.0",
+  "contract_id": "ldfreq-lexical-diversity-core",
+  "contract_version": "0.1.0-draft.5",
+  "status": "hand-calculated-freeze-ready-metrics-only",
+  "license": "CC0-1.0",
+  "numeric_tolerance": {"absolute": 1e-12, "relative": 1e-12},
+  "cases": [
+    {
+      "id": "mixed-four",
+      "tokens": ["a", "a", "b", "c"],
+      "sufficient_statistics": {"N": 4, "V": 3, "M2": 6},
+      "assertions": [
+        {"metric_id": "ttr", "parameters": {}, "status": "ok", "value": 0.75, "exact": "3/4"},
+        {"metric_id": "rttr", "parameters": {}, "status": "ok", "value": 1.5, "exact": "3/sqrt(4)"},
+        {"metric_id": "cttr", "parameters": {}, "status": "ok", "value": 1.0606601717798212, "exact": "3/sqrt(8)"},
+        {"metric_id": "herdan", "parameters": {}, "status": "ok", "value": 0.7924812503605782, "exact": "ln(3)/ln(4)"},
+        {"metric_id": "maas", "parameters": {}, "status": "ok", "value": 0.14969313549813612, "exact": "(ln(4)-ln(3))/ln(4)^2"},
+        {"metric_id": "msttr", "parameters": {"segment_length": 2}, "status": "ok", "value": 0.75, "exact": "mean(1/2,2/2)"},
+        {"metric_id": "mattr", "parameters": {"window_length": 2}, "status": "ok", "value": 0.8333333333333334, "exact": "mean(1/2,2/2,2/2)"},
+        {"metric_id": "hdd", "parameters": {"sample_size": 2}, "status": "ok", "value": 0.9166666666666667, "exact": "((1-C(2,2)/C(4,2))+2*(1-C(3,2)/C(4,2)))/2 = 11/12"},
+        {"metric_id": "yule_k", "parameters": {}, "status": "ok", "value": 1250, "exact": "10000*(6-4)/4^2"},
+        {"metric_id": "yule_i", "parameters": {}, "status": "ok", "value": 3, "exact": "3^2/(6-3)"}
+      ]
+    },
+    {
+      "id": "all-identical-four",
+      "tokens": ["a", "a", "a", "a"],
+      "sufficient_statistics": {"N": 4, "V": 1, "M2": 16},
+      "assertions": [
+        {"metric_id": "ttr", "parameters": {}, "status": "ok", "value": 0.25, "exact": "1/4"},
+        {"metric_id": "rttr", "parameters": {}, "status": "ok", "value": 0.5, "exact": "1/sqrt(4)"},
+        {"metric_id": "cttr", "parameters": {}, "status": "ok", "value": 0.35355339059327373, "exact": "1/sqrt(8)"},
+        {"metric_id": "herdan", "parameters": {}, "status": "ok", "value": 0, "exact": "ln(1)/ln(4)"},
+        {"metric_id": "maas", "parameters": {}, "status": "ok", "value": 0.7213475204444817, "exact": "1/ln(4)"},
+        {"metric_id": "msttr", "parameters": {"segment_length": 2}, "status": "ok", "value": 0.5, "exact": "mean(1/2,1/2)"},
+        {"metric_id": "mattr", "parameters": {"window_length": 2}, "status": "ok", "value": 0.5, "exact": "mean(1/2,1/2,1/2)"},
+        {"metric_id": "hdd", "parameters": {"sample_size": 2}, "status": "ok", "value": 0.5, "exact": "1 expected type / 2 sampled tokens"},
+        {"metric_id": "yule_k", "parameters": {}, "status": "ok", "value": 7500, "exact": "10000*(16-4)/4^2"},
+        {"metric_id": "yule_i", "parameters": {}, "status": "ok", "value": 0.06666666666666667, "exact": "1/(16-1)"}
+      ]
+    },
+    {
+      "id": "all-hapax-four",
+      "tokens": ["a", "b", "c", "d"],
+      "sufficient_statistics": {"N": 4, "V": 4, "M2": 4},
+      "assertions": [
+        {"metric_id": "ttr", "parameters": {}, "status": "ok", "value": 1, "exact": "4/4"},
+        {"metric_id": "rttr", "parameters": {}, "status": "ok", "value": 2, "exact": "4/sqrt(4)"},
+        {"metric_id": "cttr", "parameters": {}, "status": "ok", "value": 1.414213562373095, "exact": "4/sqrt(8)"},
+        {"metric_id": "herdan", "parameters": {}, "status": "ok", "value": 1, "exact": "ln(4)/ln(4)"},
+        {"metric_id": "maas", "parameters": {}, "status": "ok", "value": 0, "exact": "(ln(4)-ln(4))/ln(4)^2"},
+        {"metric_id": "msttr", "parameters": {"segment_length": 2}, "status": "ok", "value": 1, "exact": "mean(2/2,2/2)"},
+        {"metric_id": "mattr", "parameters": {"window_length": 2}, "status": "ok", "value": 1, "exact": "mean(2/2,2/2,2/2)"},
+        {"metric_id": "hdd", "parameters": {"sample_size": 2}, "status": "ok", "value": 1, "exact": "2 expected types / 2 sampled tokens"},
+        {"metric_id": "yule_k", "parameters": {}, "status": "ok", "value": 0, "exact": "10000*(4-4)/4^2"},
+        {"metric_id": "yule_i", "parameters": {}, "status": "missing", "value": null, "missing_reason": "zero_denominator", "exact": "4^2/(4-4) is undefined"}
+      ]
+    },
+    {
+      "id": "remainder-and-overlap",
+      "tokens": ["a", "b", "a", "b", "c"],
+      "sufficient_statistics": {"N": 5, "V": 3, "M2": 9},
+      "assertions": [
+        {"metric_id": "msttr", "parameters": {"segment_length": 2}, "status": "ok", "value": 1, "exact": "mean(TTR(a,b),TTR(a,b)); final c discarded"},
+        {"metric_id": "mattr", "parameters": {"window_length": 3}, "status": "ok", "value": 0.7777777777777778, "exact": "mean(2/3,2/3,3/3)=7/9"}
+      ]
+    },
+    {
+      "id": "strict-short-parameter",
+      "tokens": ["a", "b", "c"],
+      "sufficient_statistics": {"N": 3, "V": 3, "M2": 3},
+      "assertions": [
+        {"metric_id": "msttr", "parameters": {"segment_length": 4}, "status": "missing", "value": null, "missing_reason": "too_short_for_requested_parameter", "exact": "N=3 < 4; do not shrink"},
+        {"metric_id": "mattr", "parameters": {"window_length": 4}, "status": "missing", "value": null, "missing_reason": "too_short_for_requested_parameter", "exact": "N=3 < 4; do not shrink"},
+        {"metric_id": "hdd", "parameters": {"sample_size": 4}, "status": "missing", "value": null, "missing_reason": "too_short_for_requested_parameter", "exact": "N=3 < 4; do not shrink"}
+      ]
+    },
+    {
+      "id": "singleton-domain",
+      "tokens": ["a"],
+      "sufficient_statistics": {"N": 1, "V": 1, "M2": 1},
+      "assertions": [
+        {"metric_id": "ttr", "parameters": {}, "status": "ok", "value": 1, "exact": "1/1"},
+        {"metric_id": "herdan", "parameters": {}, "status": "missing", "value": null, "missing_reason": "insufficient_tokens_for_formula", "exact": "ln(1) denominator is zero"},
+        {"metric_id": "maas", "parameters": {}, "status": "missing", "value": null, "missing_reason": "insufficient_tokens_for_formula", "exact": "ln(1)^2 denominator is zero"},
+        {"metric_id": "yule_i", "parameters": {}, "status": "missing", "value": null, "missing_reason": "zero_denominator", "exact": "1^2/(1-1) is undefined"}
+      ]
+    },
+    {
+      "id": "empty-document",
+      "tokens": [],
+      "sufficient_statistics": {"N": 0, "V": 0, "M2": 0},
+      "assertions": [
+        {"metric_id": "ttr", "parameters": {}, "status": "missing", "value": null, "missing_reason": "empty_input", "exact": "V/N is undefined"},
+        {"metric_id": "herdan", "parameters": {}, "status": "missing", "value": null, "missing_reason": "empty_input", "exact": "empty-input reason takes precedence"},
+        {"metric_id": "hdd", "parameters": {"sample_size": 2}, "status": "missing", "value": null, "missing_reason": "empty_input", "exact": "empty-input reason takes precedence"},
+        {"metric_id": "yule_k", "parameters": {}, "status": "missing", "value": null, "missing_reason": "empty_input", "exact": "division by N^2 is undefined"}
+      ]
+    },
+    {
+      "id": "mtld-nine-too-short",
+      "tokens": ["a", "a", "a", "a", "a", "a", "a", "a", "a"],
+      "sufficient_statistics": {"N": 9, "V": 1, "M2": 81},
+      "assertions": [
+        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "missing", "value": null, "missing_reason": "insufficient_tokens_for_formula", "exact": "the initial ten-token factor cannot be formed"}
+      ]
+    },
+    {
+      "id": "mtld-ten-hapax-no-factor",
+      "tokens": ["u1", "u2", "u3", "u4", "u5", "u6", "u7", "u8", "u9", "u10"],
+      "sufficient_statistics": {"N": 10, "V": 10, "M2": 10},
+      "assertions": [
+        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "missing", "value": null, "missing_reason": "no_factor", "exact": "tail TTR=1 gives zero tail credit in both directions"}
+      ]
+    },
+    {
+      "id": "mtld-ordinary-tail",
+      "tokens": ["u1", "u2", "u3", "u4", "u5", "u6", "u7", "u8", "u1", "u2"],
+      "sufficient_statistics": {"N": 10, "V": 8, "M2": 14},
+      "assertions": [
+        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 14, "exact": "tail credit=(1-8/10)/(1-18/25)=5/7; 10/(5/7)=14"}
+      ]
+    },
+    {
+      "id": "mtld-minimum-ten-gate",
+      "tokens": ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"],
+      "sufficient_statistics": {"N": 50, "V": 1, "M2": 2500},
+      "assertions": [
+        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 10, "exact": "five complete ten-token factors; a no-minimum variant would return 2"}
+      ]
+    },
+    {
+      "id": "mtld-uncapped-short-tail",
+      "tokens": ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "b", "b"],
+      "sufficient_statistics": {"N": 12, "V": 2, "M2": 104},
+      "assertions": [
+        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 4.3076923076923075, "exact": "tail credit=(1-1/2)/(1-18/25)=25/14; 12/(1+25/14)=56/13", "expected_diagnostics": {"forward_tail_credit": 1.7857142857142858, "reverse_tail_credit": 1.7857142857142858}}
+      ]
+    },
+    {
+      "id": "mtld-directional-mean",
+      "tokens": ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "b", "c", "d", "e"],
+      "sufficient_statistics": {"N": 14, "V": 5, "M2": 104},
+      "assertions": [
+        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 8.902912621359222, "exact": "mean(forward 14, reverse 392/103)=917/103", "expected_diagnostics": {"forward_score": 14, "reverse_score": 3.8058252427184467}}
+      ]
+    },
+    {
+      "id": "mtld-strict-threshold-boundary",
+      "tokens": ["u1", "u2", "u3", "u4", "u5", "u6", "u7", "u8", "u9", "u10", "u11", "u12", "u13", "u14", "u15", "u16", "u17", "u18", "u1", "u1", "u1", "u1", "u1", "u1", "u1", "x", "x"],
+      "sufficient_statistics": {"N": 27, "V": 19, "M2": 85},
+      "assertions": [
+        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 27, "exact": "at token 25 TTR=18/25=.72 and strict < does not close; legacy <= gives 477/26"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+citHeader("To cite ldfreq in publications, use:")
+
+bibentry(
+  bibtype = "Manual",
+  title = "ldfreq: Reproducible Lexical Diversity Profiles",
+  author = person(given = "Ryuya"),
+  year = "2026",
+  note = "R package version 0.1.0.9000",
+  url = "https://github.com/Ryuya-dot-com/ldfreq"
+)

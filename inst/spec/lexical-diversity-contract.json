@@ -1,0 +1,499 @@
+{
+  "$schema": "lexical-diversity-contract.schema.json",
+  "contract_id": "ldfreq-lexical-diversity-core",
+  "contract_version": "0.1.0-draft.5",
+  "status": "draft",
+  "reviewed_on": "2026-07-25",
+  "normative": false,
+  "normative_authority": "Once accepted, this contract and its hand fixtures are authoritative; no Python, R, Java, Web, koRpus, or quanteda implementation is the sole oracle.",
+  "input_contract": {
+    "unit": "one document represented as an ordered sequence of already-tokenized Unicode strings",
+    "order": "preserve input token order exactly",
+    "normalization": "none in the metric core",
+    "type_equivalence": "exact equality of Unicode scalar sequences; canonically equivalent spellings are distinct unless an identified adapter normalized them before entry",
+    "missing_token_policy": "reject the document as invalid_input; do not silently drop NA",
+    "empty_token_policy": "reject the document as invalid_input; a zero-length vector is an empty document, not an empty token",
+    "encoding_policy": "tokens are already-decoded Unicode scalar sequences; reject ambiguous or ill-formed byte input, and do not treat differences in runtime encoding representation as type differences",
+    "binding_profiles": {
+      "r": {
+        "representation": "plain, unclassed, one-dimensional character vector",
+        "rejected_encoding_markers": ["bytes", "latin1"],
+        "unknown_marker_policy": "after validUTF8 succeeds, interpret non-ASCII bytes with an unknown marker as UTF-8 and mark a local copy as UTF-8 before equality/counting",
+        "mutation": "do not mutate the caller's vector",
+        "normalization": "encoding-marker canonicalization only; do not perform Unicode normalization"
+      }
+    },
+    "raw_text_adapter": "separate, versioned, non-normative for this core draft",
+    "count_symbols": {
+      "N": "number of tokens",
+      "V": "number of distinct exact token strings",
+      "f_t": "frequency of type t",
+      "V_m": "number of types occurring exactly m times",
+      "M2": "sum_t(f_t^2), equivalently sum_m(m^2 * V_m)"
+    }
+  },
+  "output_contract": {
+    "result_fields": [
+      "metric_id",
+      "method_id",
+      "metric_contract_id",
+      "metric_contract_version",
+      "result_schema_id",
+      "result_schema_version",
+      "value",
+      "status",
+      "missing_reason",
+      "requested_parameters",
+      "effective_parameters",
+      "N",
+      "V",
+      "below_quality_floor",
+      "diagnostics"
+    ],
+    "result_schema_id": "lexdiv-core-metric-result",
+    "result_schema_version": "0.1.0-draft.1",
+    "batch_envelope": {
+      "schema_id": "lexdiv-r-batch-result",
+      "schema_version": "0.1.0-draft.1",
+      "envelope_fields": [
+        "document_id",
+        "batch_schema_id",
+        "batch_schema_version"
+      ],
+      "composition": "envelope_fields followed by result_fields",
+      "order": "input document order, then requested metric order"
+    },
+    "statuses": ["ok", "missing", "invalid_input", "design_gate_open"],
+    "missing_reasons": [
+      "empty_input",
+      "invalid_token",
+      "insufficient_tokens_for_formula",
+      "too_short_for_requested_parameter",
+      "zero_denominator",
+      "no_factor",
+      "non_convergence",
+      "boundary_censored",
+      "unbounded_high",
+      "method_not_frozen"
+    ],
+    "missing_reason_precedence": [
+      "invalid_token",
+      "empty_input",
+      "method_not_frozen",
+      "metric-specific domain reason"
+    ],
+    "request_validation_policy": "metric selection and parameters for every requested metric are structural API inputs and are validated before document-token state; parameters belonging only to unrequested metrics are ignored",
+    "short_text_policy": "strict: never silently reduce a requested segment, window, draw, or fitting range to N",
+    "parameter_reporting": "requested and effective parameters must both be emitted; for an ok result they are identical in this draft",
+    "quality_floor_policy": "quality_floor_tokens is an advisory screening flag, not the computational domain and not a justification for changing parameters",
+    "floating_point": {
+      "model": "IEEE-754 binary64",
+      "intermediate_rounding": "none",
+      "serialization": "at least 15 significant decimal digits",
+      "fixture_absolute_tolerance": 1e-12,
+      "fixture_relative_tolerance": 1e-12
+    }
+  },
+  "r_profile_contract": {
+    "scope": "optional R orchestration over the freeze-ready core methods; it does not admit design-review methods or change a core metric result",
+    "admitted_stability": ["freeze-ready"],
+    "identity_model": {
+      "metric_id": "construct or metric family",
+      "method_id": "formula, scale, boundary, tail, and aggregation identity fixed by a metric contract entry",
+      "specification_id": "method identity plus normalized user parameters and metric-contract identity",
+      "request_id": "plan-local join label excluded from computational identity"
+    },
+    "specification": {
+      "fields": [
+        "request_id",
+        "specification_id",
+        "metric_id",
+        "method_id",
+        "parameters",
+        "default_quality_floor_tokens",
+        "identity_key"
+      ],
+      "normalization": "materialize every user-settable default in method-defined parameter order; store positive integer-valued parameters as canonical R integers when they do not exceed .Machine$integer.max and as finite doubles otherwise, while non-integer parameters remain finite binary64 numeric scalars",
+      "identity_key_fields": [
+        "metric_contract_id",
+        "metric_contract_version",
+        "method_id",
+        "normalized_parameters"
+      ],
+      "identity_key_serialization": "metric_contract_id|metric_contract_version|method_id|parameter_text encoded as UTF-8 without a trailing newline",
+      "parameter_serialization": "{} for no parameters; otherwise {name=%a;...} in method-defined order, where %a is R sprintf hexadecimal binary64 formatting",
+      "specification_id_algorithm": "metric_id followed by '-' and the lowercase MD5 hex digest of identity_key UTF-8 bytes",
+      "hash_role": "deterministic reproducibility label, not authentication; request_id and default_quality_floor_tokens are excluded"
+    },
+    "request_plan": {
+      "schema_id": "lexdiv-r-request-plan",
+      "schema_version": "0.1.0-draft.1",
+      "fields": [
+        "plan_schema_id",
+        "plan_schema_version",
+        "plan_md5",
+        "presets",
+        "specifications",
+        "max_specs"
+      ],
+      "minimum_specifications": 1,
+      "default_max_specs": 128,
+      "maximum_input_candidates": 1024,
+      "candidate_bound_policy": "reject the total preset, custom-specification, and expanded-grid candidate count above maximum_input_candidates before specification normalization",
+      "expansion_order": "selected presets in request order, then custom specifications, then grids in request order and value order",
+      "deduplication": "collapse equal identity_key values before execution; first occurrence wins and order is otherwise preserved",
+      "request_id_policy": "after deduplication, replace a missing request_id with specification_id",
+      "request_id_uniqueness": "distinct resolved specifications must have distinct request_id values",
+      "hash_record": "one-based request_index|request_id|identity_key",
+      "hash_input": "schema_id, schema_version, and the ordered hash records joined with LF, with one LF between each of the three parts and no trailing LF",
+      "hash_algorithm": "lowercase MD5 hex digest of the hash_input UTF-8 bytes",
+      "construction_metadata_identity": "presets and max_specs are retained construction metadata but are excluded from plan_md5; the resolved specifications, request IDs, and order are authoritative"
+    },
+    "grid_builder": {
+      "schema_id": null,
+      "dimensionality": "one user-settable method parameter per grid",
+      "expansion": "one specification per supplied value in input order; no implicit Cartesian product",
+      "default_max_values": 128,
+      "bound_policy": "reject length(values) greater than max_values before specification expansion; max_values is a positive finite integer and must be raised explicitly by the caller",
+      "deduplication": "deferred to request-plan normalization"
+    },
+    "presets": [
+      {
+        "preset_id": "canonical",
+        "preset_version": "0.1.0-draft.1",
+        "specification_count": 11,
+        "resolution": "one default specification for every freeze-ready metric in contract order",
+        "additions": []
+      },
+      {
+        "preset_id": "length_50_100",
+        "preset_version": "0.1.0-draft.1",
+        "specification_count": 13,
+        "resolution": "canonical followed by the two additions in listed order",
+        "additions": [
+          {
+            "request_id": "msttr_100",
+            "metric_id": "msttr",
+            "method_id": "msttr_nonoverlap_complete_drop_v1",
+            "parameters": {"segment_length": 100}
+          },
+          {
+            "request_id": "mattr_100",
+            "metric_id": "mattr",
+            "method_id": "mattr_sliding_step1_v1",
+            "parameters": {"window_length": 100}
+          }
+        ]
+      }
+    ],
+    "mtld_length_screen_policy": "50 and 100 tokens are quality or evidence screens, not MTLD estimation parameters; length_50_100 contains exactly one MTLD specification",
+    "profile_envelope": {
+      "schema_id": "lexdiv-r-profile-result",
+      "schema_version": "0.1.0-draft.1",
+      "envelope_fields": [
+        "profile_schema_id",
+        "profile_schema_version",
+        "plan_md5",
+        "request_index",
+        "request_id",
+        "specification_id",
+        "default_quality_floor_tokens"
+      ],
+      "composition": "envelope_fields followed by the unchanged core result_fields",
+      "single_document_order": "one result per resolved specification in one-based request_index order",
+      "batch_composition": "batch envelope_fields followed by profile envelope_fields followed by core result_fields",
+      "batch_order": "input document order, then request_index order",
+      "batch_default_max_rows": 1000000,
+      "batch_bound_policy": "reject document count multiplied by resolved specification count above max_rows before profile computation; max_rows is a positive finite integer",
+      "quality_floor_semantics": "default_quality_floor_tokens equals the metric contract entry and is advisory; changing a user parameter does not change this field"
+    },
+    "screen_result": {
+      "schema_id": "lexdiv-r-screen-result",
+      "schema_version": "0.1.0-draft.1",
+      "default_max_rows": 2000000,
+      "bound_policy": "reject source-row count multiplied by screen count above max_rows before allocating result rows; max_rows is a positive finite integer",
+      "fields": [
+        "screen_schema_id",
+        "screen_schema_version",
+        "profile_schema_id",
+        "profile_schema_version",
+        "plan_md5",
+        "request_index",
+        "request_id",
+        "specification_id",
+        "metric_id",
+        "method_id",
+        "N",
+        "screen_id",
+        "minimum_tokens",
+        "passes_screen"
+      ],
+      "batch_prefix_fields": ["document_id"],
+      "expansion_order": "source profile row order, then caller-supplied screen order",
+      "screen_identity": "screen_id values are unique plain identifiers and minimum_tokens values are positive finite integers",
+      "pass_rule": "passes_screen is N >= minimum_tokens when N is known",
+      "unknown_rule": "passes_screen is missing if and only if N is missing",
+      "no_value_policy": "screen results contain no metric value column",
+      "effect_policy": "screening never changes, suppresses, or duplicates a metric value, parameter, status, or source profile row",
+      "label_semantics": "caller-supplied screen labels are descriptive thresholds and do not by themselves assert empirical validity or evidence compatibility"
+    }
+  },
+  "metrics": [
+    {
+      "metric_id": "ttr",
+      "method_id": "ttr_v_over_n_v1",
+      "label": "Type-token ratio",
+      "stability": "freeze-ready",
+      "construct": "observed lexical variety relative to tokens",
+      "definition": {"formula": "V / N"},
+      "parameters": {},
+      "computational_domain": {"condition": "N >= 1", "otherwise": "empty_input"},
+      "quality_floor_tokens": 1,
+      "scale": {"lower_bound": 0, "upper_bound": 1, "bounded": true},
+      "direction": "higher"
+    },
+    {
+      "metric_id": "rttr",
+      "method_id": "rttr_guiraud_v_over_sqrt_n_v1",
+      "label": "Root TTR (Guiraud)",
+      "stability": "freeze-ready",
+      "construct": "length-adjusted observed lexical variety",
+      "definition": {"formula": "V / sqrt(N)"},
+      "parameters": {},
+      "computational_domain": {"condition": "N >= 1", "otherwise": "empty_input"},
+      "quality_floor_tokens": 1,
+      "scale": {"lower_bound": 0, "upper_bound": null, "bounded": false},
+      "direction": "higher"
+    },
+    {
+      "metric_id": "cttr",
+      "method_id": "cttr_v_over_sqrt_2n_v1",
+      "label": "Corrected TTR",
+      "stability": "freeze-ready",
+      "construct": "length-adjusted observed lexical variety",
+      "definition": {"formula": "V / sqrt(2 * N)"},
+      "parameters": {},
+      "computational_domain": {"condition": "N >= 1", "otherwise": "empty_input"},
+      "quality_floor_tokens": 1,
+      "scale": {"lower_bound": 0, "upper_bound": null, "bounded": false},
+      "direction": "higher"
+    },
+    {
+      "metric_id": "herdan",
+      "method_id": "herdan_c_logv_over_logn_v1",
+      "label": "Herdan's C",
+      "stability": "freeze-ready",
+      "construct": "log-scaled lexical variety",
+      "definition": {"formula": "ln(V) / ln(N)", "log_base": "any common base; the ratio is invariant"},
+      "parameters": {},
+      "computational_domain": {"condition": "N > 1 and V >= 1", "otherwise": "insufficient_tokens_for_formula"},
+      "quality_floor_tokens": 2,
+      "scale": {"lower_bound": 0, "upper_bound": 1, "bounded": true},
+      "direction": "higher"
+    },
+    {
+      "metric_id": "maas",
+      "method_id": "maas_a2_ln_v1",
+      "label": "Maas a-squared",
+      "stability": "freeze-ready",
+      "construct": "log-scaled lexical repetition",
+      "definition": {
+        "formula": "(ln(N) - ln(V)) / (ln(N)^2)",
+        "log_base": "e",
+        "variant": "a-squared; do not take the square root"
+      },
+      "parameters": {},
+      "computational_domain": {"condition": "N > 1 and V >= 1", "otherwise": "insufficient_tokens_for_formula"},
+      "quality_floor_tokens": 2,
+      "scale": {"lower_bound": 0, "upper_bound": null, "bounded": false},
+      "direction": "lower"
+    },
+    {
+      "metric_id": "msttr",
+      "method_id": "msttr_nonoverlap_complete_drop_v1",
+      "label": "Mean segmental TTR",
+      "stability": "freeze-ready",
+      "construct": "mean local variety in fixed non-overlapping segments",
+      "definition": {
+        "algorithm": [
+          "start the first segment at token 1",
+          "partition into consecutive non-overlapping segments of segment_length",
+          "retain complete segments only",
+          "discard the final remainder without shifting or padding",
+          "return the arithmetic mean of segment TTR values"
+        ]
+      },
+      "parameters": {
+        "segment_length": {"type": "integer", "minimum": 1, "default": 50}
+      },
+      "computational_domain": {"condition": "N >= requested segment_length", "otherwise": "too_short_for_requested_parameter"},
+      "quality_floor_tokens": 50,
+      "scale": {"lower_bound": 0, "upper_bound": 1, "bounded": true},
+      "direction": "higher"
+    },
+    {
+      "metric_id": "mattr",
+      "method_id": "mattr_sliding_step1_v1",
+      "label": "Moving-average TTR",
+      "stability": "freeze-ready",
+      "construct": "mean local variety in all fixed overlapping windows",
+      "definition": {
+        "algorithm": [
+          "use every consecutive window of window_length",
+          "advance exactly one token per window",
+          "include both the first and last possible complete window",
+          "return the arithmetic mean of the N-window_length+1 window TTR values"
+        ]
+      },
+      "parameters": {
+        "window_length": {"type": "integer", "minimum": 1, "default": 50}
+      },
+      "computational_domain": {"condition": "N >= requested window_length", "otherwise": "too_short_for_requested_parameter"},
+      "quality_floor_tokens": 50,
+      "scale": {"lower_bound": 0, "upper_bound": 1, "bounded": true},
+      "direction": "higher"
+    },
+    {
+      "metric_id": "mtld",
+      "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+      "label": "Measure of textual lexical diversity",
+      "stability": "freeze-ready",
+      "construct": "mean tokens per sequential factor at a TTR threshold",
+      "definition": {
+        "directional_algorithm": [
+          "scan non-overlapping sequential factors from the first token",
+          "close a complete factor only when its length is at least 10 and its unrounded running TTR is strictly less than threshold",
+          "after closure start an empty factor at the next token",
+          "for a non-empty final tail add tail_credit=(1-tail_TTR)/(1-threshold) without rounding or clamping",
+          "directional score is N/(complete_factors+tail_credit) when the denominator is positive"
+        ],
+        "bidirectional_aggregation": "compute N/F separately in forward and reversed order, then take their arithmetic mean; do not pool factor counts",
+        "variant_boundaries": "the current Python <= variant and koRpus no-minimum variant are distinct methods",
+        "taa_led_identity_limit": "this corresponds to the direction-score form commonly exposed as mtldo; any TAALED compatibility claim must pin the exact function/version"
+      },
+      "parameters": {
+        "threshold": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1, "default": 0.72},
+        "threshold_comparator": {"value": "<", "user_settable": false},
+        "minimum_complete_factor_length": {"value": 10, "user_settable": false},
+        "tail_credit_clamp": {"value": "none", "user_settable": false}
+      },
+      "computational_domain": {
+        "condition": "N >= 10 and both directional factor denominators are positive",
+        "N_below_10": "insufficient_tokens_for_formula",
+        "zero_factor_denominator": "no_factor"
+      },
+      "diagnostics": [
+        "forward_score", "reverse_score", "forward_complete_factors",
+        "reverse_complete_factors", "forward_tail_credit", "reverse_tail_credit"
+      ],
+      "quality_floor_tokens": 50,
+      "scale": {"lower_bound": 0, "upper_bound": null, "bounded": false},
+      "direction": "higher"
+    },
+    {
+      "metric_id": "hdd",
+      "method_id": "hdd_expected_ttr_scaled_v1",
+      "label": "HD-D on expected-TTR scale",
+      "stability": "freeze-ready",
+      "construct": "expected TTR of a uniform sample without replacement",
+      "definition": {
+        "formula": "sum_t(1 - choose(N - f_t, sample_size) / choose(N, sample_size)) / sample_size",
+        "zero_combination_convention": "choose(a,b)=0 when b>a for non-negative integers",
+        "variant": "divide expected types by sample_size; this is not raw expected-types HD-D"
+      },
+      "parameters": {
+        "sample_size": {"type": "integer", "minimum": 1, "default": 42}
+      },
+      "computational_domain": {"condition": "N >= requested sample_size", "otherwise": "too_short_for_requested_parameter"},
+      "quality_floor_tokens": 42,
+      "scale": {"lower_bound": 0, "upper_bound": 1, "bounded": true},
+      "direction": "higher"
+    },
+    {
+      "metric_id": "expected_ttr_d",
+      "method_id": "expected_ttr_d_hypergeom_fit_v1",
+      "label": "Deterministic expected-TTR D fit",
+      "stability": "design-review",
+      "construct": "D parameter fitted to a sample-size/TTR curve",
+      "definition": {
+        "expected_curve": "y_n = sum_t(1 - choose(N-f_t,n)/choose(N,n)) / n",
+        "probability_evaluation": "group types by increasing integer frequency; for each frequency compute the absent probability by multiplying ((N-f-i)/(N-i)) for i=0,...,n-1 in increasing order; accumulate spectrum_count*(1-absent) in increasing frequency order",
+        "model_stable_form": "g(n,D) = 2 / (sqrt(1 + 2*n/D) + 1)",
+        "objective": "unweighted sum over requested sample sizes of (g(n,D)-y_n)^2",
+        "domain_for_D": "0 < D < infinity; no arbitrary [1,200] censoring",
+        "optimizer": [
+          "for each 0<y_n<1 compute D_n = n*y_n*y_n/(2*(1-y_n)) in the written operation order",
+          "bracket log(D) by log(min(D_n)) and log(max(D_n))",
+          "bisect the analytic derivative with respect to log(D) exactly 100 times",
+          "iterate sample sizes in increasing order and accumulate terms left to right",
+          "a zero derivative moves the upper bound, selecting the smaller D in a tie",
+          "return exp(lower + (upper-lower)/2)"
+        ],
+        "legacy_variant": "vocd_d_mc_python_v0 uses Python random.Random/random.sample, sizes 35:50, 100 trials, three seeds, and a censored grid; it is a distinct historical compatibility method",
+        "identity_limit": "this is a D-curve fit to an exact finite-population hypergeometric expected-TTR curve; it is neither CLAN VOCD nor claimed to be the infinite-repetition limit of CLAN output",
+        "validation_tolerance": "absolute 1e-12 plus relative 1e-12 for binary64 reference values"
+      },
+      "parameters": {
+        "sample_sizes": {"type": "strictly_increasing_integer_vector", "minimum_element": 2, "default": [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]},
+        "rng": {"value": "none"},
+        "optimizer_iterations": {"value": 100, "user_settable": false}
+      },
+      "computational_domain": {
+        "condition": "N >= max(requested sample_sizes), all requested expected TTR values are in (0,1), and the finite stationary solution is unique",
+        "short_document": "too_short_for_requested_parameter",
+        "all_hapax": "unbounded_high",
+        "design_status": "method_not_frozen until G2 exits"
+      },
+      "diagnostics": ["fit_sse", "fit_rmse", "sample_sizes", "near_saturation"],
+      "quality_floor_tokens": 50,
+      "scale": {"lower_bound": 0, "upper_bound": null, "bounded": false},
+      "direction": "higher"
+    },
+    {
+      "metric_id": "yule_k",
+      "method_id": "yule_k_m2_tokens_v1",
+      "label": "Yule's K",
+      "stability": "freeze-ready",
+      "construct": "concentration of repeated lexical types",
+      "definition": {"formula": "10000 * (M2 - N) / (N^2)"},
+      "parameters": {},
+      "computational_domain": {"condition": "N >= 1", "otherwise": "empty_input"},
+      "quality_floor_tokens": 100,
+      "scale": {"lower_bound": 0, "upper_bound": 10000, "upper_bound_inclusive": false, "bounded": true},
+      "direction": "lower"
+    },
+    {
+      "metric_id": "yule_i",
+      "method_id": "yule_i_types_v2_over_m2_minus_v_v1",
+      "label": "Yule's I",
+      "stability": "freeze-ready",
+      "construct": "inverse type-based lexical concentration",
+      "definition": {
+        "formula": "V^2 / (M2 - V)",
+        "variant": "type-based denominator M2-V; not an algebraic inverse of Yule K"
+      },
+      "parameters": {},
+      "computational_domain": {"condition": "N >= 1 and M2 > V", "otherwise": "zero_denominator"},
+      "quality_floor_tokens": 100,
+      "scale": {"lower_bound": 0, "upper_bound": null, "bounded": false},
+      "direction": "higher"
+    }
+  ],
+  "open_design_gates": [
+    {
+      "id": "G2-expected-ttr-d-admission",
+      "metrics": ["expected_ttr_d"],
+      "question": "Promote expected_ttr_d_hypergeom_fit_v1 as an optional twelfth v0.1 metric, or defer it and release the eleven freeze-ready metrics?",
+      "recommended_direction": "admit expected_ttr_d_hypergeom_fit_v1 only if its construct value justifies the added surface; otherwise defer it without blocking v0.1 and keep vocd_d_mc_python_v0 historical",
+      "exit_evidence": [
+        "analytic cases and the independent R/Python reference implementations",
+        "an arbitrary-precision oracle for expected curves, fitted D, derivative residual, and boundary status",
+        "either a single-crossing proof for every admissible frequency spectrum or a deterministic global-minimum fallback with an explicit smaller-D tie rule",
+        "comparison with the current Python Monte Carlo distribution across multiple fixed documents",
+        "a preregistered construct-redundancy and admission analysis relative to HD-D, MATTR, and MTLD, including length and near-hapax strata",
+        "machine-readable Windows UCRT x86-64, Linux x86-64, and macOS arm64 results recording R version, architecture, compiler/libm, script hash, expected curve, D, SSE, status, and 1e-12 absolute-plus-relative tolerance",
+        "a frozen definition and interpretation for fit_rmse and near_saturation diagnostics"
+      ]
+    }
+  ]
+}
