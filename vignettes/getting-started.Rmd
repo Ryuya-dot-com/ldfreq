@@ -25,8 +25,8 @@ result
 
 ## Reading results
 
-Each requested metric receives one row. The `status` and `reason` columns state
-whether a value is available; `requested_parameters` and
+Each requested metric receives one row. The `status` and `missing_reason`
+columns state whether a value is available; `requested_parameters` and
 `effective_parameters` are list-columns. Contract and schema identifiers are
 ordinary columns so that they survive row binding and tabular serialization.
 
