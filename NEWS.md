@@ -36,4 +36,12 @@
 - Added the lookup contract and schema to source, platform-package, and
   installed-package inventory audits while retaining zero release-approved
   resources and no public lexical-resource API.
+- Added a byte-pinned TUBELEX release-admission candidate and a non-exported,
+  fail-closed evaluator for strict independent-review records. It rejects
+  missing approval, self-approval, candidate/commit drift, incomplete scope,
+  reviewer rejection, and altered evidence without network or fallback.
+- Added a repository command wrapper and source/platform/installed membership
+  auditing for the admission contract. A valid record can pass only the
+  resource-admission gate; package release readiness remains false and no
+  approval record is bundled.
 - Added introductory documentation and cross-platform R package checks.

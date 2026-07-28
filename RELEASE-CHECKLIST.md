@@ -33,6 +33,14 @@ It does not imply that the current development version is release-ready.
 - [ ] For every admitted lexical resource, record its canonical source,
       version, cryptographic hash, redistribution terms, required notice,
       lookup contract, coverage diagnostics, and offline failure behavior.
+- [ ] For TUBELEX, verify the installed byte-pinned admission candidate first,
+      then evaluate the independent review DCF and preserved evidence bytes
+      against the exact reviewed repository commit with
+      `experiments/resource-admission/validate-tubelex-admission.R`. Reject
+      self-approval, commit/candidate drift, incomplete distribution scope,
+      reviewer rejection, or evidence-hash mismatch. Treat a structurally valid
+      record as admission evidence only, not reviewer authentication, signature
+      verification, public-API approval, or package release readiness.
 - [ ] Include each admitted resource's required license, copyright, notice, and
       manifest files under the appropriate `inst/` path, then verify their
       contents and hashes in the source, installed, and binary packages.

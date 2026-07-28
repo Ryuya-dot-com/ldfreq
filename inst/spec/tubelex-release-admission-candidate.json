@@ -1,0 +1,83 @@
+{
+  "$schema": "tubelex-release-admission-candidate.schema.json",
+  "schema_version": "0.1.0",
+  "candidate_id": "tubelex-en-treebank-slim-7cb5fb36-admission-v1",
+  "candidate_state": "pending-independent-review",
+  "resource": {
+    "resource_id": "tubelex-en-treebank-slim",
+    "resource_version": "7cb5fb36-slim-v1",
+    "upstream_commit": "7cb5fb36add76b83a266d1967536e1a1d3faa513",
+    "upstream_source_sha256": "4096022259d5eaa7261c3bf22c3b0af9fd58ae8eebe17894c0b34a163954f936",
+    "manifest_sha256": "35dd3a7537174a462aa22ea41e470a0fc1dfc4b7fe7c28765465d040bf24bd04",
+    "artifact_sha256": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d",
+    "content_sha256": "423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916",
+    "license_spdx": "BSD-3-Clause",
+    "notice_path": "licenses/tubelex/NOTICE.md",
+    "notice_sha256": "e65a1f5d0d6e7806e31e92d78bf3b903115e610c36bd9f2406269700441ecdd3"
+  },
+  "distribution_scope": {
+    "package_component_state": "internal-development-candidate",
+    "raw_source_bundled": false,
+    "raw_subtitles_or_identifiers_included": false,
+    "runtime_network_access": false,
+    "implicit_download_or_fallback": false,
+    "public_api": false,
+    "release_approved": false
+  },
+  "contract_refs": {
+    "loader_contract_id": "ldfreq-lexical-sophistication-profile",
+    "loader_contract_version": "0.1.0-draft.2",
+    "lookup_contract_id": "ldfreq-lexical-resource-lookup",
+    "lookup_contract_version": "0.1.0-draft.1",
+    "lookup_result_schema_id": "lexres-frequency-prevalence-result",
+    "lookup_result_schema_version": "0.1.0-draft.1"
+  },
+  "approval_policy": {
+    "independent_reviewer_required": true,
+    "candidate_author_or_builder_may_approve": false,
+    "approval_record_bundled": false,
+    "unsigned_local_claim_is_not_proof": true,
+    "disallowed_approver_logins": [
+      "Ryuya-dot-com"
+    ]
+  },
+  "approval_record_contract": {
+    "format": "strict-single-record-dcf",
+    "schema_id": "ldfreq-resource-release-approval",
+    "schema_version": "0.1.0",
+    "fields": [
+      "Approval-Schema-ID",
+      "Approval-Schema-Version",
+      "Approval-ID",
+      "Candidate-ID",
+      "Candidate-SHA256",
+      "Reviewed-Repository-Commit",
+      "Reviewer-Name",
+      "Reviewer-Affiliation",
+      "Reviewer-GitHub-Login",
+      "Reviewed-On",
+      "Decision",
+      "Independence-Attested",
+      "Not-Candidate-Author-Or-Builder",
+      "Redistribution-Terms",
+      "Notice-And-Attribution",
+      "Source-And-Artifact-Identity",
+      "Package-Distribution-Scope",
+      "Public-API-Scope",
+      "Evidence-URL",
+      "Evidence-Locator-ID",
+      "Evidence-SHA256"
+    ],
+    "approved_scope_values": {
+      "redistribution_terms": "approved",
+      "notice_and_attribution": "approved",
+      "source_and_artifact_identity": "approved",
+      "package_distribution_scope": "approved",
+      "public_api_scope": "not-reviewed"
+    }
+  },
+  "remaining_gates_after_resource_approval": [
+    "public lookup and result contract",
+    "final release-candidate source, installed, and binary inventory audit"
+  ]
+}

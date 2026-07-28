@@ -2,12 +2,15 @@ library(ldfreq)
 
 internal_names <- c(
   ".lexres_decode_gzip_bounded",
+  ".lexres_evaluate_tubelex_admission",
+  ".lexres_load_tubelex_admission_candidate",
   ".lexres_load_resource_impl",
   ".lexres_load_tubelex",
   ".lexres_lookup_loaded_tubelex",
   ".lexres_lookup_tubelex",
   ".lexres_sha256_bytes",
   ".lexres_tubelex_expectation",
+  ".lexres_tubelex_admission_candidate_sha256",
   ".lexres_tubelex_manifest_sha256",
   ".lexres_tubelex_paths"
 )
@@ -54,11 +57,20 @@ lookup_contract_schema_path <- system.file(
   "spec", "lexical-resource-lookup-contract.schema.json",
   package = "ldfreq"
 )
+admission_candidate_path <- system.file(
+  "spec", "tubelex-release-admission-candidate.json",
+  package = "ldfreq"
+)
+admission_candidate_schema_path <- system.file(
+  "spec", "tubelex-release-admission-candidate.schema.json",
+  package = "ldfreq"
+)
 
 for (path in c(
   manifest_path, artifact_path, provenance_path, notice_path, copyrights_path,
   inventory_path, inventory_schema_path, lookup_contract_path,
-  lookup_contract_schema_path
+  lookup_contract_schema_path, admission_candidate_path,
+  admission_candidate_schema_path
 )) {
   check(nzchar(path) && file.exists(path), sprintf("Installed file missing: %s", path))
   check(isTRUE(file_test("-f", path)), sprintf("Installed member is not regular: %s", path))
@@ -204,6 +216,33 @@ check(
     identical(lookup$diagnostics$download_attempted, FALSE) &&
     all(is.na(lookup$results[!lookup$results$matched, 5:10])),
   "The installed lookup normalized, fabricated, downloaded, or fell back."
+)
+
+admission_candidate <- .lexres_load_tubelex_admission_candidate()
+admission_pending <- .lexres_evaluate_tubelex_admission()
+check(
+  identical(admission_candidate$status, "candidate_ok") &&
+    identical(
+      admission_candidate$diagnostics$candidate_sha256,
+      .lexres_tubelex_admission_candidate_sha256
+    ) &&
+    identical(admission_candidate$diagnostics$candidate_bytes, 3113),
+  "The installed TUBELEX admission candidate changed."
+)
+check(
+  identical(admission_pending$status, "pending_independent_review") &&
+    identical(admission_pending$failure_reason, "approval_missing") &&
+    identical(admission_pending$admission_gate_passed, FALSE) &&
+    identical(admission_pending$package_release_ready, FALSE) &&
+    identical(admission_pending$diagnostics$release_approved_resource_count, 0),
+  "The installed TUBELEX candidate overstated admission or release readiness."
+)
+check(
+  identical(admission_pending$diagnostics$fallback_attempted, FALSE) &&
+    identical(admission_pending$diagnostics$download_attempted, FALSE) &&
+    identical(admission_pending$diagnostics$approval_authenticity_proven, FALSE) &&
+    identical(admission_pending$diagnostics$cryptographic_signature_verified, FALSE),
+  "The installed admission gate gained fallback or overstated evidence."
 )
 
 known_rows <- list(
@@ -362,6 +401,8 @@ check(
 
 loader_functions <- list(
   .lexres_decode_gzip_bounded,
+  .lexres_evaluate_tubelex_admission,
+  .lexres_load_tubelex_admission_candidate,
   .lexres_load_resource_impl,
   .lexres_load_tubelex,
   .lexres_lookup_loaded_tubelex,

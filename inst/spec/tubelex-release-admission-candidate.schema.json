@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/inst/spec/tubelex-release-admission-candidate.schema.json",
+  "title": "ldfreq TUBELEX release-admission candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "candidate_id",
+    "candidate_state",
+    "resource",
+    "distribution_scope",
+    "contract_refs",
+    "approval_policy",
+    "approval_record_contract",
+    "remaining_gates_after_resource_approval"
+  ],
+  "properties": {
+    "$schema": {"const": "tubelex-release-admission-candidate.schema.json"},
+    "schema_version": {"const": "0.1.0"},
+    "candidate_id": {"const": "tubelex-en-treebank-slim-7cb5fb36-admission-v1"},
+    "candidate_state": {"const": "pending-independent-review"},
+    "resource": {"$ref": "#/$defs/resource"},
+    "distribution_scope": {"$ref": "#/$defs/distributionScope"},
+    "contract_refs": {"$ref": "#/$defs/contractRefs"},
+    "approval_policy": {"$ref": "#/$defs/approvalPolicy"},
+    "approval_record_contract": {"$ref": "#/$defs/approvalRecordContract"},
+    "remaining_gates_after_resource_approval": {
+      "type": "array",
+      "prefixItems": [
+        {"const": "public lookup and result contract"},
+        {"const": "final release-candidate source, installed, and binary inventory audit"}
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resource_id",
+        "resource_version",
+        "upstream_commit",
+        "upstream_source_sha256",
+        "manifest_sha256",
+        "artifact_sha256",
+        "content_sha256",
+        "license_spdx",
+        "notice_path",
+        "notice_sha256"
+      ],
+      "properties": {
+        "resource_id": {"const": "tubelex-en-treebank-slim"},
+        "resource_version": {"const": "7cb5fb36-slim-v1"},
+        "upstream_commit": {"const": "7cb5fb36add76b83a266d1967536e1a1d3faa513"},
+        "upstream_source_sha256": {"$ref": "#/$defs/sha256"},
+        "manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "artifact_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "license_spdx": {"const": "BSD-3-Clause"},
+        "notice_path": {"const": "licenses/tubelex/NOTICE.md"},
+        "notice_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "distributionScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package_component_state",
+        "raw_source_bundled",
+        "raw_subtitles_or_identifiers_included",
+        "runtime_network_access",
+        "implicit_download_or_fallback",
+        "public_api",
+        "release_approved"
+      ],
+      "properties": {
+        "package_component_state": {"const": "internal-development-candidate"},
+        "raw_source_bundled": {"const": false},
+        "raw_subtitles_or_identifiers_included": {"const": false},
+        "runtime_network_access": {"const": false},
+        "implicit_download_or_fallback": {"const": false},
+        "public_api": {"const": false},
+        "release_approved": {"const": false}
+      }
+    },
+    "contractRefs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "loader_contract_id",
+        "loader_contract_version",
+        "lookup_contract_id",
+        "lookup_contract_version",
+        "lookup_result_schema_id",
+        "lookup_result_schema_version"
+      ],
+      "properties": {
+        "loader_contract_id": {"const": "ldfreq-lexical-sophistication-profile"},
+        "loader_contract_version": {"const": "0.1.0-draft.2"},
+        "lookup_contract_id": {"const": "ldfreq-lexical-resource-lookup"},
+        "lookup_contract_version": {"const": "0.1.0-draft.1"},
+        "lookup_result_schema_id": {"const": "lexres-frequency-prevalence-result"},
+        "lookup_result_schema_version": {"const": "0.1.0-draft.1"}
+      }
+    },
+    "approvalPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "independent_reviewer_required",
+        "candidate_author_or_builder_may_approve",
+        "approval_record_bundled",
+        "unsigned_local_claim_is_not_proof",
+        "disallowed_approver_logins"
+      ],
+      "properties": {
+        "independent_reviewer_required": {"const": true},
+        "candidate_author_or_builder_may_approve": {"const": false},
+        "approval_record_bundled": {"const": false},
+        "unsigned_local_claim_is_not_proof": {"const": true},
+        "disallowed_approver_logins": {
+          "type": "array",
+          "prefixItems": [{"const": "Ryuya-dot-com"}],
+          "items": false,
+          "minItems": 1,
+          "maxItems": 1
+        }
+      }
+    },
+    "approvalRecordContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "schema_id",
+        "schema_version",
+        "fields",
+        "approved_scope_values"
+      ],
+      "properties": {
+        "format": {"const": "strict-single-record-dcf"},
+        "schema_id": {"const": "ldfreq-resource-release-approval"},
+        "schema_version": {"const": "0.1.0"},
+        "fields": {
+          "type": "array",
+          "minItems": 21,
+          "maxItems": 21,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "approved_scope_values": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "redistribution_terms",
+            "notice_and_attribution",
+            "source_and_artifact_identity",
+            "package_distribution_scope",
+            "public_api_scope"
+          ],
+          "properties": {
+            "redistribution_terms": {"const": "approved"},
+            "notice_and_attribution": {"const": "approved"},
+            "source_and_artifact_identity": {"const": "approved"},
+            "package_distribution_scope": {"const": "approved"},
+            "public_api_scope": {"const": "not-reviewed"}
+          }
+        }
+      }
+    }
+  }
+}
