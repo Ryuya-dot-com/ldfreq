@@ -1,0 +1,2 @@
+# These fixtures are byte-pinned inputs. Never rewrite their line endings.
+tests/fixtures/resource-loader/* -text

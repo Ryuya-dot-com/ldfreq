@@ -87,6 +87,14 @@ TUBELEX-EN, and Open English WordNet support will be admitted only after
 resource identity, redistribution rights, failure behavior, and cross-platform
 packaging are verified end to end.
 
+A non-exported local-resource loader now provides the integrity boundary for
+that future work. It reads an exact manifest and each declared artifact once,
+hashes those same bytes before decoding, rejects unavailable, mismatched,
+unsupported-version, and schema-invalid inputs in a fixed order, and never
+downloads or searches for a fallback. Only project-authored synthetic fixtures
+and an internal synthetic TSV adapter are currently admitted; this is not yet a
+resource-backed user feature.
+
 ## License
 
 The R source code is licensed under the MIT License. Any lexical resources added
