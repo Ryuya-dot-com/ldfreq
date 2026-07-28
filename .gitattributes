@@ -8,4 +8,5 @@ inst/extdata/tubelex/7cb5fb36/* -text
 inst/extdata/tubelex/7cb5fb36/build-provenance.json whitespace=-blank-at-eof
 inst/licenses/tubelex/NOTICE.md -text
 inst/spec/ldfreq-resource-inventory*.json -text
+inst/spec/tubelex-release-admission-candidate*.json -text
 legal/tubelex/NOTICE.md -text
