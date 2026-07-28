@@ -53,6 +53,33 @@ jobs:
         with:
           args: 'c("--no-manual")'
 
+      - name: Audit source, platform, and installed resource inventories
+        if: ${{ matrix.config.r == 'release' }}
+        shell: Rscript {0}
+        run: |
+          audit_path <- file.path(
+            Sys.getenv("RUNNER_TEMP"),
+            "ldfreq-package-resource-inventory"
+          )
+          status <- system2(
+            file.path(R.home("bin"), "Rscript"),
+            args = c(
+              "--vanilla",
+              shQuote(file.path(
+                "experiments", "package-resource-inventory",
+                "validate-package-resource-inventory.R"
+              )),
+              shQuote(normalizePath(".", mustWork = TRUE)),
+              shQuote(audit_path)
+            )
+          )
+          if (!identical(status, 0L)) quit(status = status)
+          evidence_path <- file.path(
+            audit_path,
+            "package-resource-inventory-evidence.json"
+          )
+          cat(readLines(evidence_path, warn = FALSE), sep = "\n")
+
   tubelex-build-audit:
     name: ${{ matrix.os }} / TUBELEX builder
     runs-on: ${{ matrix.os }}

@@ -84,8 +84,14 @@ a noncooperating process. The pinned upstream source itself is not bundled.
 Every ordinary package check loads the installed TUBELEX candidate and verifies
 its manifest, compressed and decoded hashes, NOTICE, provenance, inventory,
 row/totals invariants, bounded expansion, mutation failure, and absence of
-runtime network or fallback. A final release still requires independent review
-and explicit platform-binary inventory evidence.
+runtime network or fallback. In addition, every release-R job on Ubuntu, macOS,
+and Windows builds a fresh source archive and platform package, installs it in a
+clean library, and verifies that all declared resource/legal/inventory members
+remain byte-identical across the source tree, source archive, platform archive,
+and installation. The audit rejects undeclared `extdata` and emits a
+run-specific JSON evidence record. A final release still requires independent
+review and a preserved rerun against the named release candidate; development
+CI output alone is not release approval or durable release evidence.
 
 ## Independent numerical audit
 
