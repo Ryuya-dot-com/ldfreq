@@ -7,10 +7,12 @@ schema, and contract provenance with every result.
 
 ## Current status
 
-The public API is experimental. The resource-independent lexical-diversity core
-is implemented and heavily tested; lexical-resource profiles and raw-text
-tokenization are deliberately deferred until their lookup and licensing
-contracts are complete.
+The public API is experimental and remains a resource-independent lexical-
+diversity core. One separately licensed, byte-pinned TUBELEX aggregate is now
+installed as an internal development candidate so its packaging and failure
+behavior can be verified end to end. It is not exposed as a user feature;
+lexical-resource profiles and raw-text tokenization remain deferred until their
+lookup and licensing contracts are complete.
 
 The implemented metric set is:
 
@@ -81,23 +83,29 @@ fields.
 
 ## Scope
 
-This repository currently contains no production lexical resource, learner
-corpus, Python or Java runtime, or network-dependent calculation. NGSL,
-TUBELEX-EN, and Open English WordNet support will be admitted only after
-resource identity, redistribution rights, failure behavior, and cross-platform
-packaging are verified end to end.
+This repository contains no learner corpus, raw subtitle text, source document
+identifier, Python or Java runtime, or runtime network-dependent calculation.
+It contains one third-party resource development candidate: the slim TUBELEX-EN
+Treebank aggregate at commit `7cb5fb36`. Its exact manifest, 2.55 MB gzip
+artifact, canonical-content hash, build provenance, BSD 3-Clause notice, and
+COPYRIGHTS entry are installed together. The machine-readable inventory still
+records zero release-approved resources and no public resource API. NGSL and
+Open English WordNet remain excluded until their complete artifact and notice
+units pass the same gates.
 
-A non-exported local-resource loader now provides the integrity boundary for
-that future work. It reads an exact manifest and each declared artifact once,
-hashes those same bytes before decoding, rejects unavailable, mismatched,
-unsupported-version, and schema-invalid inputs in a fixed order, and never
-downloads or searches for a fallback. Only project-authored synthetic fixtures
-and an internal synthetic TSV adapter are currently admitted; this is not yet a
-resource-backed user feature.
+A non-exported local-resource loader provides the integrity boundary. It reads
+an exact manifest and each declared artifact once, hashes those same bytes
+before decoding, rejects unavailable, mismatched, unsupported-version, and
+schema-invalid inputs in a fixed order, and never downloads or searches for a
+fallback. In addition to project-authored synthetic fixtures, the internal
+TUBELEX path performs bounded streaming gzip expansion and validates the fixed
+515,292-row four-column schema. This is still not a resource-backed user
+feature.
 
 ## License
 
-The R source code is licensed under the MIT License. Any lexical resources added
-in future releases will retain their own component-level licenses, notices, and
-provenance; placement in this repository will not relicense those resources as
-MIT.
+The R source code is licensed under the MIT License. The installed TUBELEX
+candidate remains BSD-3-Clause material under its component-level NOTICE and
+COPYRIGHTS entry; placement in this repository does not relicense it as MIT.
+Any later lexical resource must retain the same separation of license, notice,
+and provenance.

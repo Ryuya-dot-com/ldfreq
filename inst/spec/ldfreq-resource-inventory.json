@@ -1,0 +1,100 @@
+{
+  "$schema": "ldfreq-resource-inventory.schema.json",
+  "schema_version": "0.1.0",
+  "reviewed_on": "2026-07-28",
+  "package_scope": "public-api-resource-independent-development-candidate",
+  "policy": {
+    "release_requires_independent_approval": true,
+    "uncertainty_default": "exclude",
+    "runtime_network_access": false,
+    "implicit_download_or_fallback": false
+  },
+  "release_approved_resource_count": 0,
+  "included_resources": [
+    {
+      "resource_id": "tubelex-en-treebank-slim",
+      "resource_version": "7cb5fb36-slim-v1",
+      "distribution_state": "development-candidate",
+      "runtime_state": "internal-only",
+      "release_approved": false,
+      "public_api": false,
+      "license_spdx": "BSD-3-Clause",
+      "source_commit": "7cb5fb36add76b83a266d1967536e1a1d3faa513",
+      "source_sha256": "4096022259d5eaa7261c3bf22c3b0af9fd58ae8eebe17894c0b34a163954f936",
+      "raw_source_bundled": false,
+      "raw_subtitles_or_identifiers_included": false,
+      "manifest_sha256": "35dd3a7537174a462aa22ea41e470a0fc1dfc4b7fe7c28765465d040bf24bd04",
+      "artifact_sha256": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d",
+      "content_sha256": "423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916",
+      "package_members": [
+        {
+          "path": "extdata/tubelex/7cb5fb36/resource.manifest.dcf",
+          "bytes": 972,
+          "sha256": "35dd3a7537174a462aa22ea41e470a0fc1dfc4b7fe7c28765465d040bf24bd04"
+        },
+        {
+          "path": "extdata/tubelex/7cb5fb36/tubelex_en_treebank_7cb5fb36_slim.csv.gz",
+          "bytes": 2549714,
+          "sha256": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d"
+        },
+        {
+          "path": "extdata/tubelex/7cb5fb36/build-provenance.json",
+          "bytes": 6158,
+          "sha256": "e95a9b0d4cad0c466fe875958ab8037d0738ff4d9f9a38c56583a38fe39cc785"
+        },
+        {
+          "path": "licenses/tubelex/NOTICE.md",
+          "bytes": 4193,
+          "sha256": "e65a1f5d0d6e7806e31e92d78bf3b903115e610c36bd9f2406269700441ecdd3"
+        },
+        {
+          "path": "COPYRIGHTS",
+          "bytes": 655,
+          "sha256": "f4a1e6cf65a5c535ba8e844c9cf9929182e5ea0608b070c1bd7068bdec5c89fe"
+        }
+      ],
+      "open_gates": [
+        "independent release approval",
+        "public lookup and result contract",
+        "final release-candidate source, installed, and binary inventory audit"
+      ]
+    }
+  ],
+  "not_included": [
+    {
+      "resource_id": "ngsl-1.2",
+      "decision": "defer",
+      "reason": "Exact ranked, research-form, and supplementary source bytes plus the CC-BY-SA notice unit are not yet co-promoted."
+    },
+    {
+      "resource_id": "oewn-2025",
+      "decision": "defer",
+      "reason": "The OEWN and Princeton WordNet cumulative notice and artifact unit is not yet co-promoted."
+    },
+    {
+      "resource_id": "nj8",
+      "decision": "exclude",
+      "reason": "Durable CRAN, commercial, transformation, and downstream redistribution permission is unresolved."
+    },
+    {
+      "resource_id": "ngsl-31k-workbook",
+      "decision": "exclude",
+      "reason": "Schema, rank, corpus-version, and unlabelled-tail rights scope remain unresolved."
+    },
+    {
+      "resource_id": "coca",
+      "decision": "exclude",
+      "reason": "No distributable corpus or derived runtime payload is approved for this package."
+    },
+    {
+      "resource_id": "ellipse-corpus",
+      "decision": "research-only",
+      "reason": "The non-commercial corpus is excluded from package runtime, examples, tests, and downloads."
+    },
+    {
+      "resource_id": "python-resource-derived-golden-outputs",
+      "decision": "exclude",
+      "reason": "Generated-output and component-license scope is not established for the R package."
+    }
+  ]
+}

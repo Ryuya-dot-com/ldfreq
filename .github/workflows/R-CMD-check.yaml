@@ -53,10 +53,79 @@ jobs:
         with:
           args: 'c("--no-manual")'
 
+  tubelex-build-audit:
+    name: ${{ matrix.os }} / TUBELEX builder
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        with:
+          r-version: "release"
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        with:
+          extra-packages: |
+            any::digest
+            any::jsonlite
+            any::stringi
+
+      - name: Download the byte-pinned aggregate source
+        shell: Rscript {0}
+        run: |
+          source_path <- file.path(
+            Sys.getenv("RUNNER_TEMP"),
+            "tubelex-en-treebank.tsv.xz"
+          )
+          download.file(
+            paste0(
+              "https://raw.githubusercontent.com/naist-nlp/tubelex/",
+              "7cb5fb36add76b83a266d1967536e1a1d3faa513/",
+              "frequencies/tubelex-en-treebank.tsv.xz"
+            ),
+            source_path,
+            mode = "wb",
+            quiet = TRUE
+          )
+
+      - name: Reproduce and stress the release unit
+        shell: Rscript {0}
+        run: |
+          source_path <- file.path(
+            Sys.getenv("RUNNER_TEMP"),
+            "tubelex-en-treebank.tsv.xz"
+          )
+          audit_path <- file.path(Sys.getenv("RUNNER_TEMP"), "tubelex-audit")
+          status <- system2(
+            file.path(R.home("bin"), "Rscript"),
+            args = c(
+              "--vanilla",
+              shQuote(file.path(
+                "experiments", "tubelex-source-build",
+                "validate-tubelex-release-unit.R"
+              )),
+              shQuote(source_path),
+              shQuote(audit_path)
+            )
+          )
+          if (!identical(status, 0L)) quit(status = status)
+
   required:
     name: R-CMD-check required
     if: ${{ always() }}
-    needs: check
+    needs: [check, tubelex-build-audit]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions: {}
@@ -64,8 +133,13 @@ jobs:
       - name: Require every matrix check to pass
         env:
           CHECK_RESULT: ${{ needs.check.result }}
+          TUBELEX_RESULT: ${{ needs.tubelex-build-audit.result }}
         run: |
           if [ "${CHECK_RESULT}" != "success" ]; then
             echo "::error::R-CMD-check matrix result: ${CHECK_RESULT}"
+            exit 1
+          fi
+          if [ "${TUBELEX_RESULT}" != "success" ]; then
+            echo "::error::TUBELEX builder matrix result: ${TUBELEX_RESULT}"
             exit 1
           fi

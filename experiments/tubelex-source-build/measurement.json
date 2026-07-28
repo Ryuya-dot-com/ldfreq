@@ -1,0 +1,103 @@
+{
+  "schema_version": "0.1.0",
+  "measured_on": "2026-07-25",
+  "status": "direct-source-r-build-candidate-not-production",
+  "source": {
+    "commit": "7cb5fb36add76b83a266d1967536e1a1d3faa513",
+    "asset": "tubelex-en-treebank.tsv.xz",
+    "bytes": 4152940,
+    "sha256": "4096022259d5eaa7261c3bf22c3b0af9fd58ae8eebe17894c0b34a163954f936",
+    "decompressed_bytes": 28941612,
+    "decompressed_sha256": "5ccfde4184698c1fa8049ba7c761d253d039fa5ad4e93e15239644fe6034b5c1",
+    "observed_max_physical_line_bytes": 1172,
+    "physical_rows": 613311,
+    "word_rows": 613309,
+    "total_tokens": 171805865,
+    "total_videos": 105733,
+    "total_channels": 68405
+  },
+  "lookup_filter": {
+    "r_expression": "NFKC/trim/root-lower equality, <=64 code points, ^'?(?:\\p{L}+)(?:['-]\\p{L}+)*$",
+    "source_rows": 613309,
+    "retained_rows": 515292,
+    "excluded_rows": 98017,
+    "retained_token_mass": 169889910,
+    "full_set_comparison_to_reviewed_python_artifact": {
+      "r_only_words": 0,
+      "reviewed_artifact_only_words": 0
+    },
+    "rejected_candidate": {
+      "expression": "ICU derived property Alphabetic instead of general category L*",
+      "retained_rows": 515511,
+      "extra_rows": 219,
+      "reason": "ICU Alphabetic admits combining marks and other code points that Python str.isalpha() rejects"
+    }
+  },
+  "reviewed_reference": {
+    "id": "tubelex-en-treebank-7cb5fb36-frequency-index",
+    "format": "reviewed 19-column deterministic gzip CSV",
+    "bytes": 4572297,
+    "sha256": "3731f23f3385ed630777ff56b5edbed5db46eee256ededceb0ac213016f31675",
+    "local_path_recorded": false,
+    "projection_measurement": "../tubelex-slim/measurement.json",
+    "audit_script": "audit-unicode-filter.R",
+    "audit_result": "retained sets identical: R-only 0, reviewed-reference-only 0",
+    "audit_engine": {
+      "stringi": "1.8.7",
+      "icu": "71.1",
+      "unicode": "14.0"
+    }
+  },
+  "artifact": {
+    "columns": ["word", "count", "videos", "channels"],
+    "word_rows": 515292,
+    "canonical_bytes": 8260448,
+    "canonical_sha256": "423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916",
+    "gzip_bytes": 2549714,
+    "gzip_sha256": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d",
+    "independent_runs": 2,
+    "runs_byte_identical": true,
+    "gzip_roundtrip_matched_canonical_hash": true,
+    "semantic_identity": "matched the reviewed four-column projection exactly",
+    "retained_in_repository": false
+  },
+  "release_unit": {
+    "wrapper": "promote-tubelex-release.R",
+    "promotion": "cooperative sibling lock plus two target checks; fresh sibling staging directory promoted with one base R directory rename",
+    "no_replace_scope": {
+      "concurrent_compliant_wrappers": true,
+      "noncooperating_process_in_check_to_rename_interval": false
+    },
+    "members": [
+      {"file": "tubelex_en_treebank_7cb5fb36_slim.csv.gz", "bytes": 2549714, "sha256": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d"},
+      {"file": "NOTICE.md", "bytes": 4193, "sha256": "e65a1f5d0d6e7806e31e92d78bf3b903115e610c36bd9f2406269700441ecdd3"},
+      {"file": "manifest.json", "bytes": 6158, "sha256": "013a2f4d44e8789f23157ed89fb11343deb462eee677f207359710d4ca3ae42d"}
+    ],
+    "independent_runs": 2,
+    "all_members_byte_identical": true,
+    "regular_file_mode": "0644",
+    "preexisting_destination_refusal_test": "passed",
+    "concurrent_compliant_wrapper_test": "one success and one lock refusal; winning unit matched independent runs",
+    "forced_builder_failure_cleanup_test": "passed; no target, lock, or staging directory remained",
+    "staged_notice_identity_rechecked_after_copy": true,
+    "manifest_contract_fail_closed": true,
+    "builder_and_wrapper_hashes_recorded_in_manifest": true,
+    "private_builder_manifest_finalized_without_existing-file_replacement": true
+  },
+  "build_environment": {
+    "r": "R version 4.6.0 (2026-04-24)",
+    "platform": "aarch64-apple-darwin23",
+    "zlib": "1.2.12",
+    "r_linked_icu": "78.1",
+    "stringi": "1.8.7",
+    "stringi_icu": "71.1",
+    "stringi_unicode": "14.0",
+    "stringi_icu_system": true
+  },
+  "release_gates_remaining": [
+    "Integrate the measured three-file fresh-directory promotion into the final package-data build and audit the built tarball.",
+    "Run the final builder, cooperative-lock, failure-cleanup, and package checks on Linux and Windows in addition to macOS.",
+    "For the controlled build workflow, document the cooperative/single-writer scope or adopt a platform-specific atomic rename-no-replace primitive; do not claim protection against a noncooperating process in the check-to-rename interval.",
+    "Re-measure the complete package after real code, documentation, tests, and cleared resources are present."
+  ]
+}

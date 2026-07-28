@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/inst/spec/ldfreq-resource-inventory.schema.json",
+  "title": "ldfreq installed resource inventory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "reviewed_on",
+    "package_scope",
+    "policy",
+    "release_approved_resource_count",
+    "included_resources",
+    "not_included"
+  ],
+  "properties": {
+    "$schema": {"const": "ldfreq-resource-inventory.schema.json"},
+    "schema_version": {"const": "0.1.0"},
+    "reviewed_on": {"type": "string", "format": "date"},
+    "package_scope": {"type": "string", "minLength": 1},
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "release_requires_independent_approval",
+        "uncertainty_default",
+        "runtime_network_access",
+        "implicit_download_or_fallback"
+      ],
+      "properties": {
+        "release_requires_independent_approval": {"const": true},
+        "uncertainty_default": {"const": "exclude"},
+        "runtime_network_access": {"const": false},
+        "implicit_download_or_fallback": {"const": false}
+      }
+    },
+    "release_approved_resource_count": {"type": "integer", "minimum": 0},
+    "included_resources": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/includedResource"}
+    },
+    "not_included": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/excludedResource"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "packageMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "includedResource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resource_id",
+        "resource_version",
+        "distribution_state",
+        "runtime_state",
+        "release_approved",
+        "public_api",
+        "license_spdx",
+        "source_commit",
+        "source_sha256",
+        "raw_source_bundled",
+        "raw_subtitles_or_identifiers_included",
+        "manifest_sha256",
+        "artifact_sha256",
+        "content_sha256",
+        "package_members",
+        "open_gates"
+      ],
+      "properties": {
+        "resource_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+        "resource_version": {"type": "string", "minLength": 1},
+        "distribution_state": {"enum": ["development-candidate", "release"]},
+        "runtime_state": {"enum": ["internal-only", "public"]},
+        "release_approved": {"type": "boolean"},
+        "public_api": {"type": "boolean"},
+        "license_spdx": {"type": "string", "minLength": 1},
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "raw_source_bundled": {"type": "boolean"},
+        "raw_subtitles_or_identifiers_included": {"type": "boolean"},
+        "manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "artifact_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "package_members": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/packageMember"}
+        },
+        "open_gates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "excludedResource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resource_id", "decision", "reason"],
+      "properties": {
+        "resource_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+        "decision": {"enum": ["defer", "exclude", "research-only"]},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
