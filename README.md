@@ -99,8 +99,12 @@ before decoding, rejects unavailable, mismatched, unsupported-version, and
 schema-invalid inputs in a fixed order, and never downloads or searches for a
 fallback. In addition to project-authored synthetic fixtures, the internal
 TUBELEX path performs bounded streaming gzip expansion and validates the fixed
-515,292-row four-column schema. This is still not a resource-backed user
-feature.
+515,292-row four-column schema. A second non-exported layer now provides a
+versioned exact-match result contract for development testing: it applies no
+query normalization, preserves order and duplicates, returns token/type
+coverage diagnostics, and keeps unmatched measurements missing rather than
+coercing them to zero. This remains an internal development path, not a
+resource-backed user feature or release approval.
 
 ## License
 

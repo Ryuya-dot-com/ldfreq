@@ -4,6 +4,8 @@ internal_names <- c(
   ".lexres_decode_gzip_bounded",
   ".lexres_load_resource_impl",
   ".lexres_load_tubelex",
+  ".lexres_lookup_loaded_tubelex",
+  ".lexres_lookup_tubelex",
   ".lexres_sha256_bytes",
   ".lexres_tubelex_expectation",
   ".lexres_tubelex_manifest_sha256",
@@ -44,10 +46,19 @@ inventory_schema_path <- system.file(
   "spec", "ldfreq-resource-inventory.schema.json",
   package = "ldfreq"
 )
+lookup_contract_path <- system.file(
+  "spec", "lexical-resource-lookup-contract.json",
+  package = "ldfreq"
+)
+lookup_contract_schema_path <- system.file(
+  "spec", "lexical-resource-lookup-contract.schema.json",
+  package = "ldfreq"
+)
 
 for (path in c(
   manifest_path, artifact_path, provenance_path, notice_path, copyrights_path,
-  inventory_path, inventory_schema_path
+  inventory_path, inventory_schema_path, lookup_contract_path,
+  lookup_contract_schema_path
 )) {
   check(nzchar(path) && file.exists(path), sprintf("Installed file missing: %s", path))
   check(isTRUE(file_test("-f", path)), sprintf("Installed member is not regular: %s", path))
@@ -168,6 +179,33 @@ check(
   "The TUBELEX count/prevalence ordering invariant failed."
 )
 
+lookup <- .lexres_lookup_loaded_tubelex(
+  c("apple", "not-in-the-fixed-resource", "apple", "Apple"),
+  loaded
+)
+check(
+  identical(lookup$status, "ok") &&
+    identical(lookup$results$matched, c(TRUE, FALSE, TRUE, FALSE)) &&
+    identical(lookup$results$count, c(7403, NA_real_, 7403, NA_real_)),
+  "The installed TUBELEX exact lookup contract changed."
+)
+check(
+  identical(lookup$coverage$input_tokens, 4) &&
+    identical(lookup$coverage$input_types, 3) &&
+    identical(lookup$coverage$matched_tokens, 2) &&
+    identical(lookup$coverage$matched_types, 1) &&
+    identical(lookup$coverage$token_coverage, 0.5) &&
+    identical(lookup$coverage$type_coverage, 1 / 3),
+  "The installed TUBELEX coverage contract changed."
+)
+check(
+  identical(lookup$diagnostics$normalization_applied, FALSE) &&
+    identical(lookup$diagnostics$fallback_attempted, FALSE) &&
+    identical(lookup$diagnostics$download_attempted, FALSE) &&
+    all(is.na(lookup$results[!lookup$results$matched, 5:10])),
+  "The installed lookup normalized, fabricated, downloaded, or fell back."
+)
+
 known_rows <- list(
   the = c(count = 7448605, videos = 103830, channels = 60433),
   apple = c(count = 7403, videos = 3027, channels = 2563),
@@ -254,6 +292,20 @@ check(
 )
 
 inventory <- jsonlite::read_json(inventory_path, simplifyVector = FALSE)
+lookup_contract <- jsonlite::read_json(
+  lookup_contract_path,
+  simplifyVector = FALSE
+)
+check(
+  identical(lookup_contract$contract_id, "ldfreq-lexical-resource-lookup") &&
+    identical(lookup_contract$contract_version, "0.1.0-draft.1") &&
+    identical(lookup_contract$status, "internal-development-candidate") &&
+    identical(lookup_contract$public_api, FALSE) &&
+    identical(lookup_contract$release_approved, FALSE) &&
+    identical(lookup_contract$runtime_policy$network_access, FALSE) &&
+    identical(lookup_contract$runtime_policy$fallback, FALSE),
+  "The installed internal lookup-contract boundary changed."
+)
 check(
   identical(inventory$schema_version, "0.1.0") &&
     identical(inventory$reviewed_on, "2026-07-28") &&
@@ -312,6 +364,8 @@ loader_functions <- list(
   .lexres_decode_gzip_bounded,
   .lexres_load_resource_impl,
   .lexres_load_tubelex,
+  .lexres_lookup_loaded_tubelex,
+  .lexres_lookup_tubelex,
   .lexres_tubelex_paths
 )
 loader_calls <- unique(unlist(lapply(

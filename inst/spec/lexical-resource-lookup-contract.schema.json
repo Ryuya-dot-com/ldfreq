@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/inst/spec/lexical-resource-lookup-contract.schema.json",
+  "title": "ldfreq internal lexical-resource lookup contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "contract_id",
+    "contract_version",
+    "status",
+    "public_api",
+    "release_approved",
+    "resource",
+    "input_contract",
+    "matching_contract",
+    "result_contract",
+    "coverage_contract",
+    "formulas",
+    "failure_contract",
+    "runtime_policy"
+  ],
+  "properties": {
+    "$schema": {"const": "lexical-resource-lookup-contract.schema.json"},
+    "contract_id": {"const": "ldfreq-lexical-resource-lookup"},
+    "contract_version": {"const": "0.1.0-draft.1"},
+    "status": {"const": "internal-development-candidate"},
+    "public_api": {"const": false},
+    "release_approved": {"const": false},
+    "resource": {"$ref": "#/$defs/resource"},
+    "input_contract": {"$ref": "#/$defs/inputContract"},
+    "matching_contract": {"$ref": "#/$defs/matchingContract"},
+    "result_contract": {"$ref": "#/$defs/resultContract"},
+    "coverage_contract": {"$ref": "#/$defs/coverageContract"},
+    "formulas": {"$ref": "#/$defs/formulas"},
+    "failure_contract": {"$ref": "#/$defs/failureContract"},
+    "runtime_policy": {"$ref": "#/$defs/runtimePolicy"}
+  },
+  "$defs": {
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resource_id",
+        "resource_version",
+        "lookup_unit",
+        "resource_key_normalization_id"
+      ],
+      "properties": {
+        "resource_id": {"const": "tubelex-en-treebank-slim"},
+        "resource_version": {"const": "7cb5fb36-slim-v1"},
+        "lookup_unit": {"const": "surface-form"},
+        "resource_key_normalization_id": {"const": "nfkc-trim-root-lower-filtered-source-keys-v1"}
+      }
+    },
+    "inputContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "container",
+        "encoding",
+        "empty_vector",
+        "missing_or_empty_term",
+        "query_normalization_id",
+        "normalization_applied"
+      ],
+      "properties": {
+        "container": {"const": "plain-unclassed-character-vector"},
+        "encoding": {"const": "valid-utf8-not-bytes-or-latin1"},
+        "empty_vector": {"const": "valid-zero-row-result"},
+        "missing_or_empty_term": {"const": "atomic-invalid-input"},
+        "query_normalization_id": {"const": "identity-valid-utf8-v1"},
+        "normalization_applied": {"const": false}
+      }
+    },
+    "matchingContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "matching_id",
+        "comparison",
+        "input_order",
+        "duplicates",
+        "unmatched_measurements"
+      ],
+      "properties": {
+        "matching_id": {"const": "exact-unicode-scalar-sequence-v1"},
+        "comparison": {"const": "case-sensitive-and-normalization-sensitive"},
+        "input_order": {"const": "preserved"},
+        "duplicates": {"const": "one-result-row-per-input-token"},
+        "unmatched_measurements": {"const": "missing-not-zero"}
+      }
+    },
+    "resultContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_id", "schema_version", "columns"],
+      "properties": {
+        "schema_id": {"const": "lexres-frequency-prevalence-result"},
+        "schema_version": {"const": "0.1.0-draft.1"},
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "type", "role"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "type": {"type": "string", "minLength": 1},
+              "role": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "coverageContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eligible",
+        "token_denominator",
+        "type_denominator",
+        "zero_denominator",
+        "fields"
+      ],
+      "properties": {
+        "eligible": {"type": "string", "minLength": 1},
+        "token_denominator": {"type": "string", "minLength": 1},
+        "type_denominator": {"type": "string", "minLength": 1},
+        "zero_denominator": {"const": "missing"},
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "formulas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["zipf", "video_prevalence", "channel_prevalence", "parameters"],
+      "properties": {
+        "zipf": {"type": "string", "minLength": 1},
+        "video_prevalence": {"type": "string", "minLength": 1},
+        "channel_prevalence": {"type": "string", "minLength": 1},
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "token_total",
+            "source_vocabulary_size",
+            "video_total",
+            "channel_total"
+          ],
+          "properties": {
+            "token_total": {"const": 171805865},
+            "source_vocabulary_size": {"const": 613309},
+            "video_total": {"const": 105733},
+            "channel_total": {"const": 68405}
+          }
+        }
+      }
+    },
+    "failureContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "invalid_input_reason",
+        "resource_failure_reasons",
+        "resource_failure_rows",
+        "precedence"
+      ],
+      "properties": {
+        "invalid_input_reason": {"const": "invalid_term"},
+        "resource_failure_reasons": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "resource_failure_rows": {"type": "string", "minLength": 1},
+        "precedence": {"const": "validate-input-before-loading-resource"}
+      }
+    },
+    "runtimePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "network_access",
+        "download",
+        "fallback",
+        "implicit_normalization"
+      ],
+      "properties": {
+        "network_access": {"const": false},
+        "download": {"const": false},
+        "fallback": {"const": false},
+        "implicit_normalization": {"const": false}
+      }
+    }
+  }
+}
