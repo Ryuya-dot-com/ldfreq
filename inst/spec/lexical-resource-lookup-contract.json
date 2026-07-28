@@ -1,0 +1,91 @@
+{
+  "$schema": "lexical-resource-lookup-contract.schema.json",
+  "contract_id": "ldfreq-lexical-resource-lookup",
+  "contract_version": "0.1.0-draft.1",
+  "status": "internal-development-candidate",
+  "public_api": false,
+  "release_approved": false,
+  "resource": {
+    "resource_id": "tubelex-en-treebank-slim",
+    "resource_version": "7cb5fb36-slim-v1",
+    "lookup_unit": "surface-form",
+    "resource_key_normalization_id": "nfkc-trim-root-lower-filtered-source-keys-v1"
+  },
+  "input_contract": {
+    "container": "plain-unclassed-character-vector",
+    "encoding": "valid-utf8-not-bytes-or-latin1",
+    "empty_vector": "valid-zero-row-result",
+    "missing_or_empty_term": "atomic-invalid-input",
+    "query_normalization_id": "identity-valid-utf8-v1",
+    "normalization_applied": false
+  },
+  "matching_contract": {
+    "matching_id": "exact-unicode-scalar-sequence-v1",
+    "comparison": "case-sensitive-and-normalization-sensitive",
+    "input_order": "preserved",
+    "duplicates": "one-result-row-per-input-token",
+    "unmatched_measurements": "missing-not-zero"
+  },
+  "result_contract": {
+    "schema_id": "lexres-frequency-prevalence-result",
+    "schema_version": "0.1.0-draft.1",
+    "columns": [
+      {"name": "query_index", "type": "integer", "role": "one-based-input-position"},
+      {"name": "term", "type": "character", "role": "unchanged-query-term"},
+      {"name": "matched", "type": "logical", "role": "exact-match-state"},
+      {"name": "resource_word", "type": "character-or-missing", "role": "matched-resource-key"},
+      {"name": "count", "type": "double-or-missing", "role": "token-count"},
+      {"name": "videos", "type": "double-or-missing", "role": "video-document-count"},
+      {"name": "channels", "type": "double-or-missing", "role": "channel-document-count"},
+      {"name": "zipf", "type": "double-or-missing", "role": "smoothed-zipf-score"},
+      {"name": "video_prevalence", "type": "double-or-missing", "role": "smoothed-log-video-prevalence"},
+      {"name": "channel_prevalence", "type": "double-or-missing", "role": "smoothed-log-channel-prevalence"}
+    ]
+  },
+  "coverage_contract": {
+    "eligible": "every-term-in-a-valid-input",
+    "token_denominator": "eligible-input-token-count",
+    "type_denominator": "distinct-eligible-input-terms-by-exact-comparison",
+    "zero_denominator": "missing",
+    "fields": [
+      "input_tokens",
+      "input_types",
+      "eligible_tokens",
+      "eligible_types",
+      "matched_tokens",
+      "unmatched_tokens",
+      "matched_types",
+      "unmatched_types",
+      "token_coverage",
+      "type_coverage"
+    ]
+  },
+  "formulas": {
+    "zipf": "log10(1e9 * (count + 1) / (token_total + source_vocabulary_size))",
+    "video_prevalence": "log10((videos + 1) / (video_total + 2))",
+    "channel_prevalence": "log10((channels + 1) / (channel_total + 2))",
+    "parameters": {
+      "token_total": 171805865,
+      "source_vocabulary_size": 613309,
+      "video_total": 105733,
+      "channel_total": 68405
+    }
+  },
+  "failure_contract": {
+    "invalid_input_reason": "invalid_term",
+    "resource_failure_reasons": [
+      "resource_unavailable",
+      "hash_mismatch",
+      "unsupported_resource_version",
+      "schema_mismatch"
+    ],
+    "resource_failure_rows": "input-preserved-measurements-unresolved",
+    "precedence": "validate-input-before-loading-resource"
+  },
+  "runtime_policy": {
+    "network_access": false,
+    "download": false,
+    "fallback": false,
+    "implicit_normalization": false
+  }
+}

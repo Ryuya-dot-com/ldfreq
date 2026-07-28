@@ -48,12 +48,16 @@ code-owner approval for workflow changes.
 NGSL and Open English WordNet remain separate future work. TUBELEX-EN is now
 included only as an internal development candidate: its exact source, manifest,
 artifact/content hashes, provenance, BSD notice, and installed paths are fixed,
-but it has no public lookup/profile API and is not release-approved. The exact
-state and every explicitly deferred or excluded resource are recorded in
-`inst/spec/ldfreq-resource-inventory.json`. A resource-backed feature is not
-complete until its lookup contract, coverage diagnostics, offline behavior,
-public lifecycle, and source/installed/platform-binary membership have all been
-verified and independently approved.
+but it has no public lookup/profile API and is not release-approved. A
+non-exported exact-match lookup now exercises the candidate through a versioned
+internal result contract. It preserves valid UTF-8 query terms without case or
+Unicode normalization, retains input order and duplicates, reports token/type
+coverage separately, and leaves unmatched measurements missing rather than
+inventing zero counts. The exact state and every explicitly deferred or
+excluded resource are recorded in `inst/spec/ldfreq-resource-inventory.json`.
+A resource-backed feature is not complete until its lookup contract, coverage
+diagnostics, offline behavior, public lifecycle, and source/installed/platform-
+binary membership have all been verified and independently approved.
 
 The current non-exported loader establishes only the common integrity and
 failure boundary. It consumes exact local paths, hashes the same raw bytes that
@@ -83,15 +87,16 @@ a noncooperating process. The pinned upstream source itself is not bundled.
 
 Every ordinary package check loads the installed TUBELEX candidate and verifies
 its manifest, compressed and decoded hashes, NOTICE, provenance, inventory,
-row/totals invariants, bounded expansion, mutation failure, and absence of
-runtime network or fallback. In addition, every release-R job on Ubuntu, macOS,
-and Windows builds a fresh source archive and platform package, installs it in a
-clean library, and verifies that all declared resource/legal/inventory members
-remain byte-identical across the source tree, source archive, platform archive,
-and installation. The audit rejects undeclared `extdata` and emits a
-run-specific JSON evidence record. A final release still requires independent
-review and a preserved rerun against the named release candidate; development
-CI output alone is not release approval or durable release evidence.
+row/totals invariants, exact lookup and coverage behavior, bounded expansion,
+mutation failure, and absence of runtime network or fallback. In addition,
+every release-R job on Ubuntu, macOS, and Windows builds a fresh source archive
+and platform package, installs it in a clean library, and verifies that all
+declared resource/legal/inventory and lookup-contract members remain byte-
+identical across the source tree, source archive, platform archive, and
+installation. The audit rejects undeclared `extdata` and emits a run-specific
+JSON evidence record. A final release still requires independent review and a
+preserved rerun against the named release candidate; development CI output
+alone is not release approval or durable release evidence.
 
 ## Independent numerical audit
 

@@ -29,4 +29,11 @@
   macOS, and Windows. The audit byte-compares every declared TUBELEX, legal,
   provenance, and inventory member, rejects undeclared `extdata`, and emits
   run-specific JSON evidence without claiming reproducible ordinary archives.
+- Added a versioned, non-exported TUBELEX exact-match and result contract with
+  input-preserving rows, explicit unmatched values, frozen frequency/prevalence
+  transformations, token/type coverage diagnostics, structured propagation of
+  resource failures, and no normalization, network, download, or fallback.
+- Added the lookup contract and schema to source, platform-package, and
+  installed-package inventory audits while retaining zero release-approved
+  resources and no public lexical-resource API.
 - Added introductory documentation and cross-platform R package checks.

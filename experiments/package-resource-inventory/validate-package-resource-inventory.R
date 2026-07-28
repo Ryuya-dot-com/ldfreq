@@ -170,7 +170,9 @@ for (index in seq_along(member_paths)) {
 
 metadata_paths <- c(
   "spec/ldfreq-resource-inventory.json",
-  "spec/ldfreq-resource-inventory.schema.json"
+  "spec/ldfreq-resource-inventory.schema.json",
+  "spec/lexical-resource-lookup-contract.json",
+  "spec/lexical-resource-lookup-contract.schema.json"
 )
 all_audited_paths <- c(member_paths, metadata_paths)
 check(!anyDuplicated(all_audited_paths), "Audited package paths overlap.")
