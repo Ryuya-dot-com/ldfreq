@@ -45,17 +45,24 @@ code-owner approval for workflow changes.
 
 ## Resource admission
 
-NGSL, TUBELEX-EN, and Open English WordNet remain separate future work. A
-resource-backed feature is not complete until its exact source, version, hash,
-license, notice, lookup contract, coverage diagnostics, offline behavior, and
-source/installed/binary package membership have all been verified.
+NGSL and Open English WordNet remain separate future work. TUBELEX-EN is now
+included only as an internal development candidate: its exact source, manifest,
+artifact/content hashes, provenance, BSD notice, and installed paths are fixed,
+but it has no public lookup/profile API and is not release-approved. The exact
+state and every explicitly deferred or excluded resource are recorded in
+`inst/spec/ldfreq-resource-inventory.json`. A resource-backed feature is not
+complete until its lookup contract, coverage diagnostics, offline behavior,
+public lifecycle, and source/installed/platform-binary membership have all been
+verified and independently approved.
 
 The current non-exported loader establishes only the common integrity and
 failure boundary. It consumes exact local paths, hashes the same raw bytes that
 it later decodes, enforces per-file and aggregate limits, and has no network,
 shell, `latest`, or sibling-file fallback. Its four ordered failure classes are
 `resource_unavailable`, `hash_mismatch`, `unsupported_resource_version`, and
-`schema_mismatch`. Compression and all real-resource adapters remain
+`schema_mismatch`. Gzip is registered only through a bounded raw-connection
+decoder, and the sole real-resource content adapter accepts only the fixed
+TUBELEX four-column schema. Other compression and real-resource adapters remain
 unregistered and therefore fail closed.
 
 SHA-256 uses `digest` with serialization disabled so the package can retain its
@@ -63,6 +70,22 @@ declared R 4.1 minimum. This hash is a content-identity and corruption check,
 not a signature or proof that a manifest is approved. The repository matrix
 therefore includes an explicit R 4.1 job in addition to current R, R-devel,
 macOS, and Windows.
+
+The TUBELEX runtime never downloads. A separate development-CI builder job on
+Ubuntu and Windows downloads only the fixed upstream aggregate source, whose
+size and compressed/decompressed hashes are checked before parsing. The R-only
+builder then verifies the full 19-column source, reproduces the canonical
+four-column content hash, and stress-tests two clean builds, existing-target
+and cooperative-lock refusal, forced-failure cleanup, and one-winner concurrent
+promotion. Its directory-rename policy protects cooperating builders in a
+controlled single-writer workflow; it does not claim atomic no-replace against
+a noncooperating process. The pinned upstream source itself is not bundled.
+
+Every ordinary package check loads the installed TUBELEX candidate and verifies
+its manifest, compressed and decoded hashes, NOTICE, provenance, inventory,
+row/totals invariants, bounded expansion, mutation failure, and absence of
+runtime network or fallback. A final release still requires independent review
+and explicit platform-binary inventory evidence.
 
 ## Independent numerical audit
 

@@ -1,0 +1,164 @@
+{
+  "schema_version": "0.2.0-experiment",
+  "status": "direct-source-r-build-candidate-not-production",
+  "id": "tubelex-en-treebank-7cb5fb36-slim-r-direct-v1",
+  "source": {
+    "project": "TUBELEX",
+    "repository": "https://github.com/naist-nlp/tubelex",
+    "commit": "7cb5fb36add76b83a266d1967536e1a1d3faa513",
+    "asset": "tubelex-en-treebank.tsv.xz",
+    "url": "https://raw.githubusercontent.com/naist-nlp/tubelex/7cb5fb36add76b83a266d1967536e1a1d3faa513/frequencies/tubelex-en-treebank.tsv.xz",
+    "bytes": 4152940,
+    "sha256": "4096022259d5eaa7261c3bf22c3b0af9fd58ae8eebe17894c0b34a163954f936",
+    "decompressed_sha256": "5ccfde4184698c1fa8049ba7c761d253d039fa5ad4e93e15239644fe6034b5c1",
+    "physical_rows": 613311,
+    "word_rows": 613309,
+    "local_path_recorded": false,
+    "bundled_in_output": false,
+    "decompressed_bytes": 28941612,
+    "verified_before_parsing": true
+  },
+  "reviewed_reference": {
+    "id": "tubelex-en-treebank-7cb5fb36-frequency-index",
+    "role": "audit-only reviewed 19-column artifact; not used as a build input and not bundled in the release unit",
+    "bytes": 4572297,
+    "sha256": "3731f23f3385ed630777ff56b5edbed5db46eee256ededceb0ac213016f31675",
+    "used_as_build_input": false,
+    "local_path_recorded": false,
+    "projection_measurement": "experiments/tubelex-slim/measurement.json",
+    "set_equivalence_audit": "experiments/tubelex-source-build/audit-unicode-filter.R",
+    "retained_set_result": "R-only 0; reviewed-reference-only 0",
+    "expected_projection_canonical_sha256": "423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916"
+  },
+  "artifact": {
+    "file": "tubelex_en_treebank_7cb5fb36_slim.csv.gz",
+    "format": "deterministic gzip-compressed UTF-8 CSV",
+    "bytes": 2549714,
+    "sha256": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d",
+    "canonical_bytes": 8260448,
+    "canonical_sha256": "423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916",
+    "canonical_identity_gate": "matched-reviewed-r-projection",
+    "columns": [
+      "word",
+      "count",
+      "videos",
+      "channels"
+    ],
+    "word_rows": 515292,
+    "physical_rows_including_header_and_total": 515294,
+    "total_row": "[TOTAL]"
+  },
+  "validation": {
+    "exact_header": true,
+    "canonical_integers": true,
+    "row_count": true,
+    "unique_words": true,
+    "channels_le_videos_le_count": true,
+    "category_row_sums": true,
+    "complete_declared_totals": true,
+    "compressed_and_decompressed_hashes": true,
+    "observed_max_decompressed_line_bytes": 1172,
+    "utf8": true,
+    "line_and_size_limits": true,
+    "gzip_roundtrip_to_canonical_hash": true
+  },
+  "lookup_filter": {
+    "method": "NFKC + trim + Unicode lowercase equality; <=64 code points; optional leading ASCII apostrophe; Unicode Letter (L*) components separated by ASCII apostrophes or hyphens",
+    "r_engine": "stringi/ICU",
+    "regex": "^'?(?:\\p{L}+)(?:['-]\\p{L}+)*$",
+    "source_rows": 613309,
+    "retained_rows": 515292,
+    "excluded_rows": 98017,
+    "retained_token_mass": 169889910,
+    "retained_token_mass_ratio": 0.988848139730271
+  },
+  "totals": {
+    "count": 171805865,
+    "videos": 105733,
+    "channels": 68405,
+    "source_vocabulary_size": 613309
+  },
+  "formulas": {
+    "zipf": "log10(1e9 * (count + 1) / (N + source_V))",
+    "video_prevalence": "log10((videos + 1) / (D_video + 2))",
+    "channel_prevalence": "log10((channels + 1) / (D_channel + 2))"
+  },
+  "transformation": {
+    "builder": "experiments/tubelex-source-build/build-tubelex-from-source.R",
+    "network_access": false,
+    "removed_columns": [
+      "count:howto",
+      "count:gaming",
+      "count:entertainment",
+      "count:education",
+      "count:science",
+      "count:sports",
+      "count:nonprofits",
+      "count:autos",
+      "count:people",
+      "count:music",
+      "count:news",
+      "count:film",
+      "count:travel",
+      "count:comedy",
+      "count:pets"
+    ],
+    "ordering": "ascending Unicode code-point order under C collation",
+    "line_endings": "LF",
+    "gzip_mtime": 0,
+    "compressed_hash_portability": "not used as the cross-platform identity gate; zlib output may differ while canonical CSV bytes remain identical"
+  },
+  "license": {
+    "spdx": "BSD-3-Clause",
+    "copyright": "Copyright (c) 2022-4, Adam Nohejl",
+    "attribution_and_disclaimer_required": true,
+    "raw_subtitles_or_identifiers_included": false
+  },
+  "build_environment": {
+    "r": "R version 4.6.1 (2026-06-24)",
+    "platform": "aarch64-apple-darwin23",
+    "zlib": "1.2.12",
+    "r_linked_icu": "78.1",
+    "stringi": "1.8.7",
+    "stringi_icu": "71.1",
+    "stringi_unicode": "14.0",
+    "stringi_icu_system": true
+  },
+  "release_unit": {
+    "promotion_policy": "cooperative sibling lock and two existing-target checks; fresh sibling staging directory renamed as one unit with base R file.rename",
+    "content_promotion_primitive": "one sibling-directory file.rename call",
+    "atomic_no_replace_against_compliant_wrappers": true,
+    "atomic_no_replace_against_noncooperating_processes": false,
+    "notice_identity_verified_after_copy": true,
+    "build_tools": [
+      {
+        "file": "experiments/tubelex-source-build/build-tubelex-from-source.R",
+        "sha256": "f880b97fa159b89e2faadafc420df055f113ee2449049dbd2f0d33f4f30f23e6"
+      },
+      {
+        "file": "experiments/tubelex-source-build/promote-tubelex-release.R",
+        "sha256": "6ba5f8d314130691860e772a633a159477bbc130ad09d401c81cc0786926c20b"
+      }
+    ],
+    "files": [
+      {
+        "file": "tubelex_en_treebank_7cb5fb36_slim.csv.gz",
+        "role": "runtime aggregate data",
+        "bytes": 2549714,
+        "sha256": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d"
+      },
+      {
+        "file": "NOTICE.md",
+        "role": "upstream license, attribution, and change statement",
+        "bytes": 4193,
+        "sha256": "e65a1f5d0d6e7806e31e92d78bf3b903115e610c36bd9f2406269700441ecdd3"
+      },
+      {
+        "file": "manifest.json",
+        "role": "provenance and validation record",
+        "self_hash_recorded": false
+      }
+    ]
+  }
+}
+

@@ -1,0 +1,14 @@
+ldfreq package source code
+Copyright: 2026 Ryuya
+License: MIT
+Files: R source, documentation, and package infrastructure except where noted
+
+TUBELEX English frequency/prevalence index
+Copyright: Copyright (c) 2022-4, Adam Nohejl
+License: BSD-3-Clause
+Files: extdata/tubelex/7cb5fb36/tubelex_en_treebank_7cb5fb36_slim.csv.gz
+Notice: licenses/tubelex/NOTICE.md
+Source: https://github.com/naist-nlp/tubelex/tree/7cb5fb36add76b83a266d1967536e1a1d3faa513
+Changes: The package candidate filters the published aggregate table to the
+ canonical four-column lookup index described in the installed notice. No raw
+ subtitle text or source identifiers are included.

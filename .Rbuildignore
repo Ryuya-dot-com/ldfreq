@@ -6,3 +6,5 @@
 ^DEVELOPMENT\.md$
 ^RELEASE-CHECKLIST\.md$
 ^_pkgdown\.yml$
+^experiments$
+^legal$

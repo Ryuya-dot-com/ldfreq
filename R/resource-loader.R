@@ -7,6 +7,8 @@
 .lexres_contract_version <- "0.1.0-draft.2"
 .lexres_manifest_schema_id <- "lexsoph-resource-manifest"
 .lexres_manifest_schema_version <- "0.1.0-draft.2"
+.lexres_tubelex_manifest_sha256 <-
+  "35dd3a7537174a462aa22ea41e470a0fc1dfc4b7fe7c28765465d040bf24bd04"
 .lexres_failures <- c(
   "resource_unavailable",
   "hash_mismatch",
@@ -212,6 +214,40 @@
     serialize(output, connection = NULL, version = 3L)
   )
   structure(output, class = "lexsoph_resource_expectation")
+}
+
+.lexres_tubelex_expectation <- function() {
+  .lexres_expectation(
+    resource_id = "tubelex-en-treebank-slim",
+    resource_version = "7cb5fb36-slim-v1",
+    manifest_sha256 = .lexres_tubelex_manifest_sha256,
+    manifest_locator_id = "extdata/tubelex/7cb5fb36/resource.manifest.dcf",
+    max_manifest_bytes = 2048,
+    max_artifact_bytes = 3145728,
+    max_content_bytes = 9437184,
+    max_artifacts = 1,
+    max_total_artifact_bytes = 3145728,
+    max_total_content_bytes = 9437184
+  )
+}
+
+.lexres_tubelex_paths <- function() {
+  bundle_dir <- system.file(
+    "extdata", "tubelex", "7cb5fb36",
+    package = "ldfreq"
+  )
+  if (!nzchar(bundle_dir)) {
+    .lexres_stop("The installed TUBELEX resource bundle is unavailable.")
+  }
+  list(
+    manifest_path = file.path(bundle_dir, "resource.manifest.dcf"),
+    artifact_paths = c(
+      "tubelex_en_treebank_7cb5fb36_slim.csv.gz" = file.path(
+        bundle_dir,
+        "tubelex_en_treebank_7cb5fb36_slim.csv.gz"
+      )
+    )
+  )
 }
 
 .lexres_validate_expectation <- function(expectation) {
@@ -975,18 +1011,261 @@
   )
 }
 
+.lexres_decode_gzip_bounded <- function(bytes, max_bytes) {
+  if (
+    length(bytes) < 2L ||
+      !identical(bytes[1:2], as.raw(c(0x1f, 0x8b)))
+  ) {
+    return(list(
+      ok = FALSE,
+      limit_exceeded = FALSE,
+      violation = "gzip_header",
+      bytes = NULL
+    ))
+  }
+  raw_connection <- rawConnection(bytes, open = "rb")
+  gzip_connection <- tryCatch(
+    gzcon(raw_connection, allowNonCompressed = FALSE, text = FALSE),
+    error = base::identity
+  )
+  if (inherits(gzip_connection, "error")) {
+    try(close(raw_connection), silent = TRUE)
+    return(list(
+      ok = FALSE,
+      limit_exceeded = FALSE,
+      violation = "gzip_stream",
+      bytes = NULL
+    ))
+  }
+  on.exit(try(close(gzip_connection), silent = TRUE), add = TRUE)
+
+  chunks <- list()
+  total <- 0
+  decoded <- tryCatch({
+    repeat {
+      request <- min(1048576, max_bytes - total + 1)
+      chunk <- readBin(
+        gzip_connection,
+        what = "raw",
+        n = as.integer(request)
+      )
+      if (!length(chunk)) break
+      total <- total + length(chunk)
+      if (total > max_bytes) {
+        return(list(
+          ok = FALSE,
+          limit_exceeded = TRUE,
+          violation = "content_size_limit_exceeded",
+          bytes = NULL
+        ))
+      }
+      chunks[[length(chunks) + 1L]] <- chunk
+    }
+    if (!length(chunks)) raw() else do.call(c, chunks)
+  }, error = base::identity)
+  if (is.list(decoded) && identical(decoded$limit_exceeded, TRUE)) {
+    return(decoded)
+  }
+  if (inherits(decoded, "error")) {
+    return(list(
+      ok = FALSE,
+      limit_exceeded = FALSE,
+      violation = "gzip_stream",
+      bytes = NULL
+    ))
+  }
+  list(
+    ok = TRUE,
+    limit_exceeded = FALSE,
+    violation = NA_character_,
+    bytes = decoded
+  )
+}
+
+.lexres_decode_compression <- function(bytes, compression, max_bytes) {
+  if (identical(compression, "none")) {
+    if (length(bytes) > max_bytes) {
+      return(list(
+        ok = FALSE,
+        limit_exceeded = TRUE,
+        violation = "content_size_limit_exceeded",
+        bytes = NULL
+      ))
+    }
+    return(list(
+      ok = TRUE,
+      limit_exceeded = FALSE,
+      violation = NA_character_,
+      bytes = bytes
+    ))
+  }
+  if (identical(compression, "gzip")) {
+    return(.lexres_decode_gzip_bounded(bytes, max_bytes))
+  }
+  list(
+    ok = FALSE,
+    limit_exceeded = FALSE,
+    violation = "compression_adapter_unregistered",
+    bytes = NULL
+  )
+}
+
+.lexres_decode_tubelex_frequency <- function(bytes) {
+  failure <- function(violations) {
+    list(
+      ok = FALSE,
+      observed_schema_id = "tubelex-frequency-prevalence-csv",
+      observed_schema_version = "1",
+      violations = .lexres_plain_unique(violations),
+      resource = NULL
+    )
+  }
+  if (!length(bytes) || any(bytes == as.raw(0L))) {
+    return(failure(if (!length(bytes)) "empty_content" else "nul_byte"))
+  }
+  if (any(bytes == as.raw(13L)) || !identical(bytes[[length(bytes)]], as.raw(10L))) {
+    return(failure("line_endings"))
+  }
+  if (
+    length(bytes) > 1L &&
+      any(
+        bytes[-length(bytes)] == as.raw(10L) &
+          bytes[-1L] == as.raw(10L)
+      )
+  ) {
+    return(failure("blank_line"))
+  }
+  text <- tryCatch(rawToChar(bytes), error = base::identity)
+  if (inherits(text, "error") || !validUTF8(text)) {
+    return(failure("invalid_utf8"))
+  }
+  Encoding(text) <- "UTF-8"
+  connection <- textConnection(text, open = "r", local = TRUE)
+  table <- tryCatch(
+    utils::read.table(
+      connection,
+      header = TRUE,
+      sep = ",",
+      quote = "",
+      comment.char = "",
+      colClasses = rep.int("character", 4L),
+      check.names = FALSE,
+      stringsAsFactors = FALSE,
+      blank.lines.skip = TRUE,
+      fill = FALSE,
+      strip.white = FALSE
+    ),
+    error = base::identity
+  )
+  try(close(connection), silent = TRUE)
+  if (inherits(table, "error")) return(failure("csv_decode"))
+
+  expected_columns <- c("word", "count", "videos", "channels")
+  violations <- character()
+  if (!identical(names(table), expected_columns)) {
+    return(failure("unexpected_header"))
+  }
+  if (!identical(nrow(table), 515293L)) {
+    violations <- c(violations, "row_count")
+  }
+  fields <- unname(as.list(table))
+  if (any(vapply(fields, anyNA, logical(1L))) ||
+      any(vapply(fields, function(field) any(!nzchar(field)), logical(1L)))) {
+    violations <- c(violations, "empty_field")
+  }
+
+  words <- table[["word"]]
+  if (length(words)) Encoding(words) <- "UTF-8"
+  if (
+    !length(words) ||
+      !identical(words[[length(words)]], "[TOTAL]") ||
+      any(words[-length(words)] == "[TOTAL]")
+  ) {
+    violations <- c(violations, "total_row")
+  }
+  lexical_words <- if (length(words)) words[-length(words)] else character()
+  if (
+    any(!validUTF8(lexical_words)) ||
+      any(grepl("[[:cntrl:],]", lexical_words)) ||
+      any(nchar(lexical_words, type = "chars") > 64L)
+  ) {
+    violations <- c(violations, "word_format")
+  }
+  if (anyDuplicated(lexical_words)) {
+    violations <- c(violations, "duplicate_word")
+  }
+
+  numeric_text <- table[c("count", "videos", "channels")]
+  canonical_numeric <- vapply(
+    numeric_text,
+    function(field) all(grepl("^(0|[1-9][0-9]*)$", field)),
+    logical(1L)
+  )
+  numeric_values <- lapply(
+    numeric_text,
+    function(field) suppressWarnings(as.double(field))
+  )
+  if (!all(canonical_numeric) ||
+      any(vapply(numeric_values, function(field) {
+        any(!is.finite(field) | field > 9007199254740991)
+      }, logical(1L)))) {
+    violations <- c(violations, "numeric_format")
+  }
+  counts <- numeric_values[["count"]]
+  videos <- numeric_values[["videos"]]
+  channels <- numeric_values[["channels"]]
+  if (length(counts) && any(channels > videos | videos > counts)) {
+    violations <- c(violations, "count_order")
+  }
+  if (
+    length(counts) &&
+      !identical(
+        c(count = counts[[length(counts)]],
+          videos = videos[[length(videos)]],
+          channels = channels[[length(channels)]]),
+        c(count = 171805865, videos = 105733, channels = 68405)
+      )
+  ) {
+    violations <- c(violations, "total_values")
+  }
+  if (length(violations)) return(failure(violations))
+
+  row_indexes <- seq_len(length(words) - 1L)
+  list(
+    ok = TRUE,
+    observed_schema_id = "tubelex-frequency-prevalence-csv",
+    observed_schema_version = "1",
+    violations = character(),
+    resource = list(
+      word = lexical_words,
+      count = counts[row_indexes],
+      videos = videos[row_indexes],
+      channels = channels[row_indexes],
+      totals = list(
+        count = counts[[length(counts)]],
+        videos = videos[[length(videos)]],
+        channels = channels[[length(channels)]]
+      )
+    )
+  )
+}
+
 .lexres_decode_content <- function(bytes, schema_id, schema_version) {
   adapter_key <- paste(schema_id, schema_version, sep = "::")
-  if (!identical(adapter_key, "synthetic-term-count-tsv::1")) {
-    return(list(
+  switch(
+    adapter_key,
+    "synthetic-term-count-tsv::1" =
+      .lexres_decode_synthetic_term_count(bytes),
+    "tubelex-frequency-prevalence-csv::1" =
+      .lexres_decode_tubelex_frequency(bytes),
+    list(
       ok = FALSE,
       observed_schema_id = NA_character_,
       observed_schema_version = NA_character_,
       violations = "content_adapter_unregistered",
       resource = NULL
-    ))
-  }
-  .lexres_decode_synthetic_term_count(bytes)
+    )
+  )
 }
 
 .lexres_load_resource_impl <- function(
@@ -1140,21 +1419,7 @@
         manifest = manifest
       ))
     }
-    if (!identical(artifact$compression, "none")) {
-      return(.lexres_schema_failure(
-        expectation,
-        artifact$artifact_locator_id,
-        artifact$artifact_id,
-        artifact$content_schema_id,
-        artifact$content_schema_version,
-        NA_character_,
-        NA_character_,
-        "compression_adapter_unregistered",
-        manifest = manifest
-      ))
-    }
-    content_bytes <- artifact_bytes
-    if (length(content_bytes) > expectation_fields$max_content_bytes) {
+    if (artifact$content_bytes > expectation_fields$max_content_bytes) {
       return(.lexres_unavailable(
         expectation,
         artifact$artifact_locator_id,
@@ -1163,6 +1428,35 @@
         manifest = manifest
       ))
     }
+    compression_result <- .lexres_decode_compression(
+      artifact_bytes,
+      artifact$compression,
+      expectation_fields$max_content_bytes
+    )
+    if (!isTRUE(compression_result$ok) &&
+        isTRUE(compression_result$limit_exceeded)) {
+      return(.lexres_unavailable(
+        expectation,
+        artifact$artifact_locator_id,
+        artifact$artifact_id,
+        "content_size_limit_exceeded",
+        manifest = manifest
+      ))
+    }
+    if (!isTRUE(compression_result$ok)) {
+      return(.lexres_schema_failure(
+        expectation,
+        artifact$artifact_locator_id,
+        artifact$artifact_id,
+        artifact$content_schema_id,
+        artifact$content_schema_version,
+        NA_character_,
+        NA_character_,
+        compression_result$violation,
+        manifest = manifest
+      ))
+    }
+    content_bytes <- compression_result$bytes
     content_hash <- .lexres_sha256_bytes(content_bytes)
     if (!identical(content_hash, artifact$content_sha256)) {
       return(.lexres_hash_failure(
@@ -1215,6 +1509,7 @@
       artifact_bytes = as.double(length(artifact_bytes)),
       content_sha256 = content_hash,
       content_bytes = as.double(length(content_bytes)),
+      compression = artifact$compression,
       content_schema_id = decoded_content$observed_schema_id,
       content_schema_version = decoded_content$observed_schema_version
     )
@@ -1250,5 +1545,14 @@
     expectation = expectation,
     artifact_paths = artifact_paths,
     reader = .lexres_read_raw_once
+  )
+}
+
+.lexres_load_tubelex <- function() {
+  paths <- .lexres_tubelex_paths()
+  .lexres_load_resource(
+    paths$manifest_path,
+    .lexres_tubelex_expectation(),
+    paths$artifact_paths
   )
 }
