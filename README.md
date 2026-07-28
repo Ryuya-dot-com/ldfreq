@@ -106,6 +106,14 @@ coverage diagnostics, and keeps unmatched measurements missing rather than
 coercing them to zero. This remains an internal development path, not a
 resource-backed user feature or release approval.
 
+A byte-pinned admission candidate and non-exported evidence evaluator now make
+the remaining independent-review boundary executable. The current installed
+state deliberately returns `pending_independent_review`; no approval record is
+bundled. Any later record must bind an independent reviewer, the exact candidate
+and repository commit, explicit distribution-scope decisions, and preserved
+review-evidence bytes. Passing that structural gate would still leave the public
+API and final release audits open.
+
 ## License
 
 The R source code is licensed under the MIT License. The installed TUBELEX

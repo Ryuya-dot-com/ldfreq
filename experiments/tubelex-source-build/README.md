@@ -107,10 +107,15 @@ checks exercise the installed resource and its machine-readable inventory.
 
 Release approval still requires:
 
-1. an independent legal/provenance approval of this exact candidate;
-2. platform binary-package membership and byte-identity audits; and
-3. a final release-candidate build and check after all approved resources are
-   frozen.
+1. an independent legal/provenance approval record and preserved evidence for
+   the byte-pinned admission candidate;
+2. a public lookup and result contract decision; and
+3. a final source, installed, and platform-binary audit against the named
+   release candidate after all approved resources are frozen.
+
+Development CI already exercises source/platform/installed byte identity. That
+evidence does not substitute for the final named-candidate rerun or independent
+approval.
 
 The artifact contains published aggregate frequencies only. It contains no raw
 subtitle text, contiguous passages, video IDs, channel IDs, document names, or

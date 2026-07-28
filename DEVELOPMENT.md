@@ -59,6 +59,17 @@ A resource-backed feature is not complete until its lookup contract, coverage
 diagnostics, offline behavior, public lifecycle, and source/installed/platform-
 binary membership have all been verified and independently approved.
 
+The installed release-admission candidate is separately byte-pinned and still
+states `pending-independent-review`. Its non-exported evaluator accepts only a
+strict single-record DCF approval bound to the exact candidate hash, reviewed
+repository commit, reviewer identity and independence attestations, approved
+distribution scope, and a preserved evidence-file hash. Missing approval,
+self-approval, commit drift, incomplete scope, rejection, and altered evidence
+all fail closed without search, download, or fallback. A structurally valid
+record closes only this admission-record gate: the evaluator always leaves
+`package_release_ready` false, does not authenticate the reviewer or verify a
+signature, and does not approve the public API or final release.
+
 The current non-exported loader establishes only the common integrity and
 failure boundary. It consumes exact local paths, hashes the same raw bytes that
 it later decodes, enforces per-file and aggregate limits, and has no network,
@@ -87,16 +98,17 @@ a noncooperating process. The pinned upstream source itself is not bundled.
 
 Every ordinary package check loads the installed TUBELEX candidate and verifies
 its manifest, compressed and decoded hashes, NOTICE, provenance, inventory,
-row/totals invariants, exact lookup and coverage behavior, bounded expansion,
-mutation failure, and absence of runtime network or fallback. In addition,
+row/totals invariants, exact lookup and coverage behavior, the fail-closed
+pending admission state, bounded expansion, mutation failure, and absence of
+runtime network or fallback. In addition,
 every release-R job on Ubuntu, macOS, and Windows builds a fresh source archive
 and platform package, installs it in a clean library, and verifies that all
-declared resource/legal/inventory and lookup-contract members remain byte-
-identical across the source tree, source archive, platform archive, and
-installation. The audit rejects undeclared `extdata` and emits a run-specific
-JSON evidence record. A final release still requires independent review and a
-preserved rerun against the named release candidate; development CI output
-alone is not release approval or durable release evidence.
+declared resource/legal/inventory, lookup-contract, and admission-candidate
+members remain byte-identical across the source tree, source archive, platform
+archive, and installation. The audit rejects undeclared `extdata` and emits a
+run-specific JSON evidence record. A final release still requires independent
+review and a preserved rerun against the named release candidate; development
+CI output alone is not release approval or durable release evidence.
 
 ## Independent numerical audit
 
