@@ -49,3 +49,18 @@ NGSL, TUBELEX-EN, and Open English WordNet remain separate future work. A
 resource-backed feature is not complete until its exact source, version, hash,
 license, notice, lookup contract, coverage diagnostics, offline behavior, and
 source/installed/binary package membership have all been verified.
+
+## Independent numerical audit
+
+Every `R CMD check` runs `tests/differential-audit.R` against the installed
+public API. The audit compares 500 deterministic random MTLD documents with a
+separately written reference implementation, compares 1,000 deterministic
+random documents with direct formula, window, and hypergeometric calculations,
+and exhaustively checks 73,809 MSTTR, MATTR, and HD-D results over every
+three-type sequence through length seven and every local length through
+`N + 1`.
+
+This is a cross-platform implementation check, not evidence that one
+implementation is a normative oracle or that the measures are valid for every
+population and task. The hand fixtures and versioned method contract remain
+independent required evidence.
