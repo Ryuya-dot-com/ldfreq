@@ -25,4 +25,8 @@
 - Added installed-package tamper/membership audits and Ubuntu/Windows
   reproduction of the fixed-source R builder, cleanup, lock, and cooperative
   concurrency invariants as inputs to the required CI aggregate.
+- Added release-R source/platform/installed package inventory audits on Ubuntu,
+  macOS, and Windows. The audit byte-compares every declared TUBELEX, legal,
+  provenance, and inventory member, rejects undeclared `extdata`, and emits
+  run-specific JSON evidence without claiming reproducible ordinary archives.
 - Added introductory documentation and cross-platform R package checks.
