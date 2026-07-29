@@ -44,4 +44,7 @@
   auditing for the admission contract. A valid record can pass only the
   resource-admission gate; package release readiness remains false and no
   approval record is bundled.
+- Added a human-reviewer handoff, evidence worksheet, and strict DCF template
+  for the TUBELEX admission gate. Automation may support the review but cannot
+  supply the required independent identity, attestations, or decision.
 - Added introductory documentation and cross-platform R package checks.
