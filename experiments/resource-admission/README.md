@@ -17,6 +17,14 @@ It does not authenticate the reviewer or verify a cryptographic signature. The
 record and evidence must still be independently checked and preserved under the
 release checklist.
 
+The approver is an independent human reviewer; CI and AI-assisted analysis may
+support that person but cannot supply the identity, independence attestation,
+or accountable judgment required by this gate. Give the reviewer the
+[`REVIEWER-GUIDE.md`](REVIEWER-GUIDE.md) handoff. It uses
+[`review-evidence-template.md`](review-evidence-template.md) for durable findings
+and [`approval-record.template.dcf`](approval-record.template.dcf) for the
+strict, externally supplied decision record.
+
 After installing the package built from the candidate checkout, verify the
 current fail-closed state with:
 
