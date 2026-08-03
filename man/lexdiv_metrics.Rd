@@ -85,8 +85,8 @@ parameters, and diagnostics are returned beside each value.
 The current frozen set contains TTR, RTTR/Guiraud, CTTR, Herdan's C, natural-log
 Maas a-squared, complete non-overlapping MSTTR, step-one MATTR, bidirectional
 MTLD, expected-TTR-scale HD-D, Yule's K, and type-based Yule's I. The separately
-named expected-TTR D method remains under a design gate and is not accepted by
-this API.
+named expected-TTR D method is deferred from v0.1 and is not accepted by this
+API.
 
 An invalid token anywhere has precedence over empty-input and metric-specific
 domain conditions. Invalid documents return \code{status = "invalid_input"},
