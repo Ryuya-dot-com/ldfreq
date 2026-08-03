@@ -1,11 +1,11 @@
 {
   "$schema": "lexical-diversity-contract.schema.json",
   "contract_id": "ldfreq-lexical-diversity-core",
-  "contract_version": "0.1.0-draft.5",
-  "status": "draft",
-  "reviewed_on": "2026-07-25",
-  "normative": false,
-  "normative_authority": "Once accepted, this contract and its hand fixtures are authoritative; no Python, R, Java, Web, koRpus, or quanteda implementation is the sole oracle.",
+  "contract_version": "0.1.0",
+  "status": "normative",
+  "reviewed_on": "2026-08-03",
+  "normative": true,
+  "normative_authority": "This contract and its hand fixtures are authoritative for the eleven-method core; no Python, R, Java, Web, koRpus, or quanteda implementation is the sole oracle.",
   "input_contract": {
     "unit": "one document represented as an ordered sequence of already-tokenized Unicode strings",
     "order": "preserve input token order exactly",
@@ -23,7 +23,7 @@
         "normalization": "encoding-marker canonicalization only; do not perform Unicode normalization"
       }
     },
-    "raw_text_adapter": "separate, versioned, non-normative for this core draft",
+    "raw_text_adapter": "separate and versioned; no raw-text adapter is part of this normative pre-tokenized core",
     "count_symbols": {
       "N": "number of tokens",
       "V": "number of distinct exact token strings",
@@ -51,10 +51,10 @@
       "diagnostics"
     ],
     "result_schema_id": "lexdiv-core-metric-result",
-    "result_schema_version": "0.1.0-draft.1",
+    "result_schema_version": "0.1.0",
     "batch_envelope": {
       "schema_id": "lexdiv-r-batch-result",
-      "schema_version": "0.1.0-draft.1",
+      "schema_version": "0.1.0",
       "envelope_fields": [
         "document_id",
         "batch_schema_id",
@@ -95,7 +95,7 @@
     }
   },
   "r_profile_contract": {
-    "scope": "optional R orchestration over the freeze-ready core methods; it does not admit design-review methods or change a core metric result",
+    "scope": "optional R orchestration over the eleven normative core methods; it does not admit deferred experimental methods or change a core metric result",
     "admitted_stability": ["freeze-ready"],
     "identity_model": {
       "metric_id": "construct or metric family",
@@ -127,7 +127,7 @@
     },
     "request_plan": {
       "schema_id": "lexdiv-r-request-plan",
-      "schema_version": "0.1.0-draft.1",
+      "schema_version": "0.1.0",
       "fields": [
         "plan_schema_id",
         "plan_schema_version",
@@ -160,14 +160,14 @@
     "presets": [
       {
         "preset_id": "canonical",
-        "preset_version": "0.1.0-draft.1",
+        "preset_version": "0.1.0",
         "specification_count": 11,
         "resolution": "one default specification for every freeze-ready metric in contract order",
         "additions": []
       },
       {
         "preset_id": "length_50_100",
-        "preset_version": "0.1.0-draft.1",
+        "preset_version": "0.1.0",
         "specification_count": 13,
         "resolution": "canonical followed by the two additions in listed order",
         "additions": [
@@ -189,7 +189,7 @@
     "mtld_length_screen_policy": "50 and 100 tokens are quality or evidence screens, not MTLD estimation parameters; length_50_100 contains exactly one MTLD specification",
     "profile_envelope": {
       "schema_id": "lexdiv-r-profile-result",
-      "schema_version": "0.1.0-draft.1",
+      "schema_version": "0.1.0",
       "envelope_fields": [
         "profile_schema_id",
         "profile_schema_version",
@@ -209,7 +209,7 @@
     },
     "screen_result": {
       "schema_id": "lexdiv-r-screen-result",
-      "schema_version": "0.1.0-draft.1",
+      "schema_version": "0.1.0",
       "default_max_rows": 2000000,
       "bound_policy": "reject source-row count multiplied by screen count above max_rows before allocating result rows; max_rows is a positive finite integer",
       "fields": [
@@ -410,46 +410,6 @@
       "direction": "higher"
     },
     {
-      "metric_id": "expected_ttr_d",
-      "method_id": "expected_ttr_d_hypergeom_fit_v1",
-      "label": "Deterministic expected-TTR D fit",
-      "stability": "design-review",
-      "construct": "D parameter fitted to a sample-size/TTR curve",
-      "definition": {
-        "expected_curve": "y_n = sum_t(1 - choose(N-f_t,n)/choose(N,n)) / n",
-        "probability_evaluation": "group types by increasing integer frequency; for each frequency compute the absent probability by multiplying ((N-f-i)/(N-i)) for i=0,...,n-1 in increasing order; accumulate spectrum_count*(1-absent) in increasing frequency order",
-        "model_stable_form": "g(n,D) = 2 / (sqrt(1 + 2*n/D) + 1)",
-        "objective": "unweighted sum over requested sample sizes of (g(n,D)-y_n)^2",
-        "domain_for_D": "0 < D < infinity; no arbitrary [1,200] censoring",
-        "optimizer": [
-          "for each 0<y_n<1 compute D_n = n*y_n*y_n/(2*(1-y_n)) in the written operation order",
-          "bracket log(D) by log(min(D_n)) and log(max(D_n))",
-          "bisect the analytic derivative with respect to log(D) exactly 100 times",
-          "iterate sample sizes in increasing order and accumulate terms left to right",
-          "a zero derivative moves the upper bound, selecting the smaller D in a tie",
-          "return exp(lower + (upper-lower)/2)"
-        ],
-        "legacy_variant": "vocd_d_mc_python_v0 uses Python random.Random/random.sample, sizes 35:50, 100 trials, three seeds, and a censored grid; it is a distinct historical compatibility method",
-        "identity_limit": "this is a D-curve fit to an exact finite-population hypergeometric expected-TTR curve; it is neither CLAN VOCD nor claimed to be the infinite-repetition limit of CLAN output",
-        "validation_tolerance": "absolute 1e-12 plus relative 1e-12 for binary64 reference values"
-      },
-      "parameters": {
-        "sample_sizes": {"type": "strictly_increasing_integer_vector", "minimum_element": 2, "default": [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]},
-        "rng": {"value": "none"},
-        "optimizer_iterations": {"value": 100, "user_settable": false}
-      },
-      "computational_domain": {
-        "condition": "N >= max(requested sample_sizes), all requested expected TTR values are in (0,1), and the finite stationary solution is unique",
-        "short_document": "too_short_for_requested_parameter",
-        "all_hapax": "unbounded_high",
-        "design_status": "method_not_frozen until G2 exits"
-      },
-      "diagnostics": ["fit_sse", "fit_rmse", "sample_sizes", "near_saturation"],
-      "quality_floor_tokens": 50,
-      "scale": {"lower_bound": 0, "upper_bound": null, "bounded": false},
-      "direction": "higher"
-    },
-    {
       "metric_id": "yule_k",
       "method_id": "yule_k_m2_tokens_v1",
       "label": "Yule's K",
@@ -479,21 +439,5 @@
       "direction": "higher"
     }
   ],
-  "open_design_gates": [
-    {
-      "id": "G2-expected-ttr-d-admission",
-      "metrics": ["expected_ttr_d"],
-      "question": "Promote expected_ttr_d_hypergeom_fit_v1 as an optional twelfth v0.1 metric, or defer it and release the eleven freeze-ready metrics?",
-      "recommended_direction": "admit expected_ttr_d_hypergeom_fit_v1 only if its construct value justifies the added surface; otherwise defer it without blocking v0.1 and keep vocd_d_mc_python_v0 historical",
-      "exit_evidence": [
-        "analytic cases and the independent R/Python reference implementations",
-        "an arbitrary-precision oracle for expected curves, fitted D, derivative residual, and boundary status",
-        "either a single-crossing proof for every admissible frequency spectrum or a deterministic global-minimum fallback with an explicit smaller-D tie rule",
-        "comparison with the current Python Monte Carlo distribution across multiple fixed documents",
-        "a preregistered construct-redundancy and admission analysis relative to HD-D, MATTR, and MTLD, including length and near-hapax strata",
-        "machine-readable Windows UCRT x86-64, Linux x86-64, and macOS arm64 results recording R version, architecture, compiler/libm, script hash, expected curve, D, SSE, status, and 1e-12 absolute-plus-relative tolerance",
-        "a frozen definition and interpretation for fit_rmse and near_saturation diagnostics"
-      ]
-    }
-  ]
+  "open_design_gates": []
 }

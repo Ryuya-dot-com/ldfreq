@@ -2,6 +2,12 @@
 
 ## Initial public development baseline
 
+- Froze the eleven-method public API, promoted its metric and orchestration
+  identities from draft versions to normative `0.1.0`, and added lifecycle
+  rules without changing numerical methods or result shapes.
+- Deferred the separately named deterministic expected-TTR D candidate from
+  v0.1 while preserving its design evidence outside the installed normative
+  contract.
 - Added eleven contract-backed lexical-diversity metrics for pre-tokenized input.
 - Added narrow multi-document batch processing with explicit document identity.
 - Added bounded method specifications, request plans, profiles, and independent

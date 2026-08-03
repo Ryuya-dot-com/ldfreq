@@ -1,7 +1,7 @@
 {
   "schema_version": "0.1.0",
   "contract_id": "ldfreq-lexical-diversity-core",
-  "contract_version": "0.1.0-draft.5",
+  "contract_version": "0.1.0",
   "status": "hand-calculated-freeze-ready-metrics-only",
   "license": "CC0-1.0",
   "numeric_tolerance": {"absolute": 1e-12, "relative": 1e-12},

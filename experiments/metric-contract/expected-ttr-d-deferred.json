@@ -1,0 +1,69 @@
+{
+  "record_id": "ldfreq-expected-ttr-d-deferred-v1",
+  "recorded_on": "2026-08-03",
+  "decision": "defer-from-0.1.0-core",
+  "source_contract": {
+    "contract_id": "ldfreq-lexical-diversity-core",
+    "contract_version": "0.1.0-draft.5",
+    "repository_commit": "d10bcae4ffed6c09506b5e9ddd0771633f4f3703",
+    "contract_sha256": "a3ae6ae2fd3b19ee30f9df93bae5f67c3cae5a285d909d53a7f66d5be880a0c9"
+  },
+  "candidate": {
+    "metric_id": "expected_ttr_d",
+    "method_id": "expected_ttr_d_hypergeom_fit_v1",
+    "label": "Deterministic expected-TTR D fit",
+    "stability": "deferred-design-review",
+    "construct": "D parameter fitted to a sample-size/TTR curve",
+    "definition": {
+      "expected_curve": "y_n = sum_t(1 - choose(N-f_t,n)/choose(N,n)) / n",
+      "probability_evaluation": "group types by increasing integer frequency; for each frequency compute the absent probability by multiplying ((N-f-i)/(N-i)) for i=0,...,n-1 in increasing order; accumulate spectrum_count*(1-absent) in increasing frequency order",
+      "model_stable_form": "g(n,D) = 2 / (sqrt(1 + 2*n/D) + 1)",
+      "objective": "unweighted sum over requested sample sizes of (g(n,D)-y_n)^2",
+      "domain_for_D": "0 < D < infinity; no arbitrary [1,200] censoring",
+      "optimizer": [
+        "for each 0<y_n<1 compute D_n = n*y_n*y_n/(2*(1-y_n)) in the written operation order",
+        "bracket log(D) by log(min(D_n)) and log(max(D_n))",
+        "bisect the analytic derivative with respect to log(D) exactly 100 times",
+        "iterate sample sizes in increasing order and accumulate terms left to right",
+        "a zero derivative moves the upper bound, selecting the smaller D in a tie",
+        "return exp(lower + (upper-lower)/2)"
+      ],
+      "legacy_variant": "vocd_d_mc_python_v0 uses Python random.Random/random.sample, sizes 35:50, 100 trials, three seeds, and a censored grid; it is a distinct historical compatibility method",
+      "identity_limit": "this is a D-curve fit to an exact finite-population hypergeometric expected-TTR curve; it is neither CLAN VOCD nor claimed to be the infinite-repetition limit of CLAN output",
+      "validation_tolerance": "absolute 1e-12 plus relative 1e-12 for binary64 reference values"
+    },
+    "parameters": {
+      "sample_sizes": {
+        "type": "strictly_increasing_integer_vector",
+        "minimum_element": 2,
+        "default": [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
+      },
+      "rng": {"value": "none"},
+      "optimizer_iterations": {"value": 100, "user_settable": false}
+    },
+    "computational_domain": {
+      "condition": "N >= max(requested sample_sizes), all requested expected TTR values are in (0,1), and the finite stationary solution is unique",
+      "short_document": "too_short_for_requested_parameter",
+      "all_hapax": "unbounded_high"
+    },
+    "diagnostics": ["fit_sse", "fit_rmse", "sample_sizes", "near_saturation"],
+    "quality_floor_tokens": 50,
+    "scale": {"lower_bound": 0, "upper_bound": null, "bounded": false},
+    "direction": "higher"
+  },
+  "completed_evidence": [
+    "matched independent R and Python reference implementations",
+    "five analytic fixtures",
+    "zero numerical crossing failures across 5232 frequency spectra"
+  ],
+  "open_admission_evidence": [
+    "an arbitrary-precision oracle for expected curves, fitted D, derivative residual, and boundary status",
+    "either a single-crossing proof for every admissible frequency spectrum or a deterministic global-minimum fallback with an explicit smaller-D tie rule",
+    "a preregistered construct-redundancy and admission analysis relative to HD-D, MATTR, and MTLD, including length and near-hapax strata",
+    "machine-readable Windows UCRT x86-64, Linux x86-64, and macOS arm64 results",
+    "a frozen definition and interpretation for fit_rmse and near_saturation diagnostics"
+  ],
+  "public_api": false,
+  "installed_normative_contract": false,
+  "blocks_eleven_method_core": false
+}

@@ -1,7 +1,7 @@
 # Narrow batch adapter for the pre-tokenized lexical-diversity API.
 
 .lex_batch_schema_id <- "lexdiv-r-batch-result"
-.lex_batch_schema_version <- "0.1.0-draft.1"
+.lex_batch_schema_version <- "0.1.0"
 
 .lex_batch_scalar_name <- function(value, argument) {
   if (

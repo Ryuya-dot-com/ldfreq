@@ -7,8 +7,9 @@ schema, and contract provenance with every result.
 
 ## Current status
 
-The public API is experimental and remains a resource-independent lexical-
-diversity core. One separately licensed, byte-pinned TUBELEX aggregate is now
+The public API is a frozen development candidate for the resource-independent
+eleven-method lexical-diversity core. One separately licensed, byte-pinned
+TUBELEX aggregate is now
 installed as an internal development candidate so its packaging and failure
 behavior can be verified end to end. It is not exposed as a user feature;
 lexical-resource profiles and raw-text tokenization remain deferred until their
@@ -23,8 +24,9 @@ The implemented metric set is:
 - HD-D
 - Yule K and Yule I
 
-The design-review `expected_ttr_d` candidate is not part of the public metric
-set.
+The `expected_ttr_d` candidate is deferred from v0.1 and is not part of the
+public metric set. Its design evidence remains separate from the installed
+normative core.
 
 ## Installation
 
@@ -69,6 +71,9 @@ lexdiv_screen(profile)
 
 See `vignette("getting-started", package = "ldfreq")` for the result contract,
 batch inputs, profiles, and token-length screens.
+
+See [`LIFECYCLE.md`](LIFECYCLE.md) for the method, schema, deprecation, and
+future-surface rules frozen for the `0.1.x` line.
 
 ## Reproducibility boundary
 

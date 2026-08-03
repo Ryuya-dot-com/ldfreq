@@ -62,7 +62,7 @@
 #' Frozen lexical-diversity metric identifiers
 #'
 #' Returns the metric identifiers admitted to the current core implementation.
-#' The design-review `expected_ttr_d` candidate is deliberately absent.
+#' The deferred `expected_ttr_d` candidate is deliberately absent from v0.1.
 #'
 #' @return A character vector in the default result order.
 #' @export

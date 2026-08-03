@@ -164,19 +164,19 @@ test_that("plans resolve presets, collapse semantic duplicates, and hash order",
   expect_false(identical(augmented$plan_md5, reversed_custom$plan_md5))
 })
 
-test_that("draft.5 specification and plan fingerprints are golden", {
+test_that("normative specification and plan fingerprints are golden", {
   canonical <- plan_function()
   length_plan <- plan_function("length_50_100")
 
-  expect_identical(canonical$plan_md5, "e47650df2045d217af9db701a2154830")
-  expect_identical(length_plan$plan_md5, "98f9598072d9ffe9f359f60851056fcd")
+  expect_identical(canonical$plan_md5, "c53708f117b7a47ab74079ba148ea0b6")
+  expect_identical(length_plan$plan_md5, "46c29afcb1a93066ad35b3949247c5f9")
 
   expected <- c(
-    msttr_50 = "msttr-730b7112303bbeb5b6720740c4df81be",
-    msttr_100 = "msttr-0b6210602feed0f43bd2623f5f3e7ac1",
-    mattr_50 = "mattr-03c69eb18487b047d5f0d82dbfa8352c",
-    mattr_100 = "mattr-10e30e588dd99f4fd62666c75cd4d74a",
-    mtld_072 = "mtld-d4675d20183df0f25f29560f961fb9b2"
+    msttr_50 = "msttr-e8b0ba53c13227379e413949e0127ef3",
+    msttr_100 = "msttr-c8fc0569c5e1c28de5b93b754ffc55d6",
+    mattr_50 = "mattr-a35378d8f29e55b1f068a78202c4bfe3",
+    mattr_100 = "mattr-b12a0ee45722bca079d668a3be14e569",
+    mtld_072 = "mtld-c927b02b01a3d4e8e10c6ce5fb689ee6"
   )
   observed <- c(
     msttr_50 = spec_function(
@@ -301,7 +301,7 @@ test_that("canonical profiles preserve core records under a separate envelope", 
     c(1, 1, 1, 2, 2, 50, 50, 50, 42, 100, 100)
   )
   expect_true(all(result$profile_schema_id == "lexdiv-r-profile-result"))
-  expect_true(all(result$profile_schema_version == "0.1.0-draft.1"))
+  expect_true(all(result$profile_schema_version == "0.1.0"))
   expect_true(all(result$plan_md5 == plan$plan_md5))
   expect_identical(attr(result, "plan_md5"), plan$plan_md5)
   expect_identical(attr(result, "contract_id"), attr(core, "contract_id"))

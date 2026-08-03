@@ -32,4 +32,4 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-Config/ldfreq/status: experimental
+Config/ldfreq/status: development-api-frozen

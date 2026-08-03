@@ -30,7 +30,7 @@ test_that("all frozen hand assertions pass through the package API", {
   )
   expect_identical(fixture$contract_id, contract$contract_id)
   expect_identical(fixture$contract_version, contract$contract_version)
-  expect_identical(fixture$contract_version, "0.1.0-draft.5")
+  expect_identical(fixture$contract_version, "0.1.0")
   contract_fields <- unlist(
     contract$output_contract$result_fields,
     use.names = FALSE

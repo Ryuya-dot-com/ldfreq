@@ -60,8 +60,8 @@
     "r_profile_contract": {"$ref": "#/$defs/rProfileContract"},
     "metrics": {
       "type": "array",
-      "minItems": 12,
-      "maxItems": 12,
+      "minItems": 11,
+      "maxItems": 11,
       "uniqueItems": true,
       "items": {"$ref": "#/$defs/metric"}
     },
@@ -98,7 +98,7 @@
         },
         "method_id": {"type": "string", "minLength": 1},
         "label": {"type": "string", "minLength": 1},
-        "stability": {"enum": ["freeze-ready", "design-review"]},
+        "stability": {"const": "freeze-ready"},
         "construct": {"type": "string", "minLength": 1},
         "definition": {"type": "object"},
         "parameters": {"type": "object"},
@@ -186,7 +186,7 @@
           ],
           "properties": {
             "schema_id": {"const": "lexdiv-r-request-plan"},
-            "schema_version": {"const": "0.1.0-draft.1"},
+            "schema_version": {"const": "0.1.0"},
             "fields": {"$ref": "#/$defs/nonEmptyStringArray"},
             "minimum_specifications": {"type": "integer", "minimum": 1},
             "default_max_specs": {"type": "integer", "minimum": 1},
@@ -246,7 +246,7 @@
           ],
           "properties": {
             "schema_id": {"const": "lexdiv-r-profile-result"},
-            "schema_version": {"const": "0.1.0-draft.1"},
+            "schema_version": {"const": "0.1.0"},
             "envelope_fields": {"$ref": "#/$defs/nonEmptyStringArray"},
             "composition": {"type": "string", "minLength": 1},
             "single_document_order": {"type": "string", "minLength": 1},
@@ -277,7 +277,7 @@
           ],
           "properties": {
             "schema_id": {"const": "lexdiv-r-screen-result"},
-            "schema_version": {"const": "0.1.0-draft.1"},
+            "schema_version": {"const": "0.1.0"},
             "default_max_rows": {"type": "integer", "minimum": 1},
             "bound_policy": {"type": "string", "minLength": 1},
             "fields": {"$ref": "#/$defs/nonEmptyStringArray"},
@@ -305,7 +305,7 @@
       ],
       "properties": {
         "preset_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
-        "preset_version": {"const": "0.1.0-draft.1"},
+        "preset_version": {"const": "0.1.0"},
         "specification_count": {"type": "integer", "minimum": 1},
         "resolution": {"type": "string", "minLength": 1},
         "additions": {

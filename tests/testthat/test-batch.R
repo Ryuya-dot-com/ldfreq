@@ -38,11 +38,11 @@ test_that("named-list batches preserve document and metric order", {
     c("document_id", "batch_schema_id", "batch_schema_version")
   )
   expect_true(all(result$batch_schema_id == "lexdiv-r-batch-result"))
-  expect_true(all(result$batch_schema_version == "0.1.0-draft.1"))
+  expect_true(all(result$batch_schema_version == "0.1.0"))
   expect_s3_class(result, "lexdiv_batch_results")
   expect_true(inherits(result, "lexdiv_results"))
   expect_identical(attr(result, "batch_schema_id"), "lexdiv-r-batch-result")
-  expect_identical(attr(result, "batch_schema_version"), "0.1.0-draft.1")
+  expect_identical(attr(result, "batch_schema_version"), "0.1.0")
   expect_identical(attr(result, "contract_id"), attr(single, "contract_id"))
   expect_identical(
     attr(result, "contract_version"),
@@ -188,7 +188,7 @@ test_that("zero-document inputs return the typed long-form prototype", {
   expect_s3_class(from_list, "lexdiv_batch_results")
   expect_true(inherits(from_list, "lexdiv_results"))
   expect_identical(attr(from_list, "batch_schema_id"), "lexdiv-r-batch-result")
-  expect_identical(attr(from_list, "batch_schema_version"), "0.1.0-draft.1")
+  expect_identical(attr(from_list, "batch_schema_version"), "0.1.0")
   expect_identical(attr(from_list, "contract_id"), attr(single, "contract_id"))
   expect_identical(
     attr(from_list, "contract_version"),
