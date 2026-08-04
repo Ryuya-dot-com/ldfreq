@@ -25,7 +25,9 @@
     "sha256": "3731f23f3385ed630777ff56b5edbed5db46eee256ededceb0ac213016f31675",
     "used_as_build_input": false,
     "local_path_recorded": false,
-    "projection_measurement": "experiments/tubelex-slim/measurement.json",
+    "projection_measurement": null,
+    "projection_measurement_retained": false,
+    "retained_set_equivalence_measurement": "experiments/tubelex-source-build/measurement.json",
     "set_equivalence_audit": "experiments/tubelex-source-build/audit-unicode-filter.R",
     "retained_set_result": "R-only 0; reviewed-reference-only 0",
     "expected_projection_canonical_sha256": "423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916"
@@ -133,7 +135,7 @@
     "build_tools": [
       {
         "file": "experiments/tubelex-source-build/build-tubelex-from-source.R",
-        "sha256": "f880b97fa159b89e2faadafc420df055f113ee2449049dbd2f0d33f4f30f23e6"
+        "sha256": "42ce12b2a0a8a29a4c6009092c4453677ad73460c58fe7b56f2bfd7279dd00a6"
       },
       {
         "file": "experiments/tubelex-source-build/promote-tubelex-release.R",
@@ -161,4 +163,3 @@
     ]
   }
 }
-

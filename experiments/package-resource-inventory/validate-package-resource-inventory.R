@@ -5,11 +5,11 @@
 # claim that ordinary R package builds are reproducible.
 
 arguments <- commandArgs(trailingOnly = TRUE)
-if (length(arguments) != 2L) {
+if (!length(arguments) %in% c(2L, 3L)) {
   stop(
     paste(
       "Usage: validate-package-resource-inventory.R",
-      "/path/to/package /new/audit/directory"
+      "/path/to/package /new/audit/directory [exact-source.tar.gz]"
     ),
     call. = FALSE
   )
@@ -17,6 +17,11 @@ if (length(arguments) != 2L) {
 
 package_root <- normalizePath(arguments[[1L]], mustWork = TRUE)
 audit_root_requested <- arguments[[2L]]
+provided_source_archive <- if (length(arguments) == 3L) {
+  normalizePath(arguments[[3L]], mustWork = TRUE)
+} else {
+  NULL
+}
 if (file.exists(audit_root_requested) || dir.exists(audit_root_requested)) {
   stop("The audit directory must not already exist.", call. = FALSE)
 }
@@ -251,20 +256,30 @@ extract_archive <- function(path, destination, label) {
   names
 }
 
-source_work <- file.path(audit_root, "source-build")
-check(dir.create(source_work, mode = "0755"), "Could not create source build directory.")
-run_r_command(
-  c("CMD", "build", shQuote(package_root)),
-  source_work,
-  "build"
-)
-source_archives <- list.files(
-  source_work,
-  pattern = paste0("^", package_name, "_.*[.]tar[.]gz$"),
-  full.names = TRUE
-)
-check(length(source_archives) == 1L, "R CMD build did not create one source archive.")
-source_archive <- source_archives[[1L]]
+if (is.null(provided_source_archive)) {
+  source_work <- file.path(audit_root, "source-build")
+  check(dir.create(source_work, mode = "0755"), "Could not create source build directory.")
+  run_r_command(
+    c("CMD", "build", shQuote(package_root)),
+    source_work,
+    "build"
+  )
+  source_archives <- list.files(
+    source_work,
+    pattern = paste0("^", package_name, "_.*[.]tar[.]gz$"),
+    full.names = TRUE
+  )
+  check(length(source_archives) == 1L, "R CMD build did not create one source archive.")
+  source_archive <- source_archives[[1L]]
+  source_archive_origin <- "built-by-inventory-audit"
+} else {
+  source_archive <- provided_source_archive
+  check(
+    identical(basename(source_archive), paste0(package_name, "_", package_version, ".tar.gz")),
+    "The provided source archive name does not match package identity."
+  )
+  source_archive_origin <- "provided-exact-release-candidate"
+}
 source_extract <- file.path(audit_root, "source-extracted")
 source_archive_names <- extract_archive(source_archive, source_extract, "source")
 check(
@@ -273,6 +288,44 @@ check(
   "Repository-only experiment or legal directories leaked into the source package."
 )
 source_package_root <- file.path(source_extract, package_name)
+comparison_authority <- if (is.null(provided_source_archive)) {
+  "source-tree-built-archive"
+} else {
+  "provided-exact-source-archive"
+}
+
+if (!is.null(provided_source_archive)) {
+  archive_inventory <- jsonlite::read_json(
+    file.path(
+      source_package_root,
+      "inst",
+      "spec",
+      "ldfreq-resource-inventory.json"
+    ),
+    simplifyVector = FALSE
+  )
+  check(
+    identical(archive_inventory, inventory),
+    "The provided source archive resource inventory differs from the checkout."
+  )
+  archive_inst_root <- file.path(source_package_root, "inst")
+  for (path in all_audited_paths) {
+    source_member_bytes[[path]] <- read_bytes(file.path(archive_inst_root, path))
+  }
+  for (index in seq_along(member_paths)) {
+    member <- inventory_members[[index]]
+    path <- member_paths[[index]]
+    bytes <- source_member_bytes[[path]]
+    check(
+      identical(as.double(length(bytes)), as.double(member$bytes)),
+      sprintf("Source archive member byte count differs from inventory: %s", path)
+    )
+    check(
+      identical(sha256_bytes(bytes), member$sha256),
+      sprintf("Source archive member SHA-256 differs from inventory: %s", path)
+    )
+  }
+}
 
 binary_work <- file.path(audit_root, "platform-build")
 library_root <- file.path(audit_root, "library")
@@ -323,7 +376,12 @@ for (layer_name in names(layer_roots)) {
     observed <- read_bytes(file.path(root, path))
     check(
       identical(observed, source_member_bytes[[path]]),
-      sprintf("%s member differs from the source tree: %s", layer_name, path)
+      sprintf(
+        "%s member differs from comparison authority (%s): %s",
+        layer_name,
+        comparison_authority,
+        path
+      )
     )
   }
   check(
@@ -364,6 +422,8 @@ evidence <- list(
     "Run identity only; ordinary R package archive hashes are not a",
     "reproducible-build claim."
   ),
+  source_archive_origin = source_archive_origin,
+  comparison_authority = comparison_authority,
   source_archive = archive_record(source_archive),
   platform_archive = archive_record(platform_archive),
   audited_members = member_records,

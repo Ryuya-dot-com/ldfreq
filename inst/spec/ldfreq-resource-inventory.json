@@ -1,8 +1,8 @@
 {
   "$schema": "ldfreq-resource-inventory.schema.json",
   "schema_version": "0.1.0",
-  "reviewed_on": "2026-07-28",
-  "package_scope": "public-api-resource-independent-development-candidate",
+  "reviewed_on": "2026-08-04",
+  "package_scope": "public-api-resource-independent-release-candidate",
   "policy": {
     "release_requires_independent_approval": true,
     "uncertainty_default": "exclude",
@@ -39,8 +39,8 @@
         },
         {
           "path": "extdata/tubelex/7cb5fb36/build-provenance.json",
-          "bytes": 6158,
-          "sha256": "e95a9b0d4cad0c466fe875958ab8037d0738ff4d9f9a38c56583a38fe39cc785"
+          "bytes": 6261,
+          "sha256": "dd7d98dac8eb6aaf27f2ea91eda440113d678e149cb2fbfc3f1cf23aaca1e26e"
         },
         {
           "path": "licenses/tubelex/NOTICE.md",
@@ -49,8 +49,8 @@
         },
         {
           "path": "COPYRIGHTS",
-          "bytes": 655,
-          "sha256": "f4a1e6cf65a5c535ba8e844c9cf9929182e5ea0608b070c1bd7068bdec5c89fe"
+          "bytes": 662,
+          "sha256": "ff23657be2f005ed360951d604b55d4624543f2a80d7a3e201ba9231c6ecb085"
         }
       ],
       "open_gates": [

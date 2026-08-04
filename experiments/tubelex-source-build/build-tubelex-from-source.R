@@ -539,7 +539,10 @@ main <- function() {
       sha256 = "3731f23f3385ed630777ff56b5edbed5db46eee256ededceb0ac213016f31675",
       used_as_build_input = FALSE,
       local_path_recorded = FALSE,
-      projection_measurement = "experiments/tubelex-slim/measurement.json",
+      projection_measurement = NULL,
+      projection_measurement_retained = FALSE,
+      retained_set_equivalence_measurement =
+        "experiments/tubelex-source-build/measurement.json",
       set_equivalence_audit = "experiments/tubelex-source-build/audit-unicode-filter.R",
       retained_set_result = "R-only 0; reviewed-reference-only 0",
       expected_projection_canonical_sha256 = expected_canonical_sha256

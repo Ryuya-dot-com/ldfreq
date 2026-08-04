@@ -8,3 +8,5 @@
 ^_pkgdown\.yml$
 ^experiments$
 ^legal$
+^LIFECYCLE\.md$
+^RELEASE-CANDIDATE\.md$

@@ -1,7 +1,7 @@
 Package: ldfreq
 Type: Package
 Title: Reproducible Lexical Diversity Profiles
-Version: 0.1.0.9000
+Version: 0.1.0
 Authors@R:
     person(
         given = "Ryuya",
@@ -13,7 +13,7 @@ Description: Computes explicitly versioned lexical-diversity metrics from
     ordered pre-tokenized text. Provides canonical long-form results, bounded
     parameter profiles, multi-document adapters, and non-censoring token-length
     screens while retaining method, parameter, schema, and contract provenance
-    in ordinary columns. The initial development release intentionally performs
+    in ordinary columns. The initial release intentionally performs
     no tokenization, normalization, lemmatization, or public lexical-resource
     lookup. A byte-pinned TUBELEX aggregate is included only as a separately
     licensed, non-exported development candidate and is not exposed as a user
@@ -33,4 +33,4 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-Config/ldfreq/status: development-api-frozen
+Config/ldfreq/status: release-candidate

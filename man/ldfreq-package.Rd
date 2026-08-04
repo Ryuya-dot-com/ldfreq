@@ -9,7 +9,7 @@ metrics from ordered pre-tokenized character vectors. It returns canonical
 long-form records with method, parameter, schema, and contract provenance.
 }
 \details{
-The initial development release performs no tokenization, normalization,
+The initial release performs no tokenization, normalization,
 lemmatization, or lexical-resource lookup. Start with \code{lexdiv_metrics()}
 for one document, \code{lexdiv_metrics_batch()} for multiple documents, or
 \code{lexdiv_profile()} for explicit parameter variants.

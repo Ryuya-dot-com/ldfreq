@@ -86,8 +86,8 @@ identities <- list(
     sha256 = "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d"
   ),
   provenance = c(
-    bytes = 6158,
-    sha256 = "e95a9b0d4cad0c466fe875958ab8037d0738ff4d9f9a38c56583a38fe39cc785"
+    bytes = 6261,
+    sha256 = "dd7d98dac8eb6aaf27f2ea91eda440113d678e149cb2fbfc3f1cf23aaca1e26e"
   ),
   notice = c(
     bytes = 4193,
@@ -347,7 +347,7 @@ check(
 )
 check(
   identical(inventory$schema_version, "0.1.0") &&
-    identical(inventory$reviewed_on, "2026-07-28") &&
+    identical(inventory$reviewed_on, "2026-08-04") &&
     identical(inventory$policy$release_requires_independent_approval, TRUE) &&
     identical(inventory$policy$uncertainty_default, "exclude") &&
     identical(inventory$policy$runtime_network_access, FALSE) &&

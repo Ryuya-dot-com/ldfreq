@@ -1,6 +1,17 @@
-# ldfreq 0.1.0.9000
+# ldfreq 0.1.0
 
-## Initial public development baseline
+## Initial public release
+
+- Synchronized the package, NEWS, and citation versions for the 0.1.0 release
+  candidate; added exact-artifact `--as-cran` checks and machine-readable
+  package BOM, dependency SBOM, resource BOM, and provenance evidence.
+- Made the release-candidate aggregate fail closed on upstream job failures,
+  exact NOTE contents, recorded job environments, named evidence identities,
+  and all three current-R resource-inventory audits; validated the SPDX creator
+  shape and retained the declared R constraint.
+- Corrected a stale TUBELEX measurement locator, synchronized the reproducing
+  builder identity, and distinguished the PyPI TAALED 0.32 sdist's unknown
+  license metadata from the linked repository's license statement.
 
 - Recorded Komuro Ryuya as the package author and maintainer and aligned the
   package copyright notice with that full name.

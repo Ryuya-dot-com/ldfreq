@@ -39,7 +39,9 @@
     "bytes": 4572297,
     "sha256": "3731f23f3385ed630777ff56b5edbed5db46eee256ededceb0ac213016f31675",
     "local_path_recorded": false,
-    "projection_measurement": "../tubelex-slim/measurement.json",
+    "projection_measurement": null,
+    "projection_measurement_retained": false,
+    "retained_set_equivalence_measurement": "measurement.json",
     "audit_script": "audit-unicode-filter.R",
     "audit_result": "retained sets identical: R-only 0, reviewed-reference-only 0",
     "audit_engine": {
