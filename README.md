@@ -86,6 +86,55 @@ Short documents never cause requested window, segment, or sample sizes to be
 silently reduced. Non-computable requests return structured status and reason
 fields.
 
+## Interpreting values
+
+Direction and scale are properties of an exact `method_id`, not of a metric name
+in the abstract. The v0.1 contract records:
+
+| Metric ID | Contract scale | More lexical diversity |
+|---|---:|---|
+| `ttr` | [0, 1] | higher |
+| `rttr` | >= 0; no finite upper bound | higher |
+| `cttr` | >= 0; no finite upper bound | higher |
+| `herdan` | [0, 1] | higher |
+| `maas` | >= 0; no finite upper bound | lower |
+| `msttr` | [0, 1] | higher |
+| `mattr` | [0, 1] | higher |
+| `mtld` | >= 0; no finite upper bound | higher |
+| `hdd` | [0, 1] | higher |
+| `yule_k` | [0, 10,000) | lower |
+| `yule_i` | >= 0; no finite upper bound | higher |
+
+Use a direction only within the same method, parameters, tokenization,
+normalization, sampling design, and meaningfully comparable texts. Raw values
+from different metric IDs are not interchangeable because their scales and
+length sensitivities differ.
+
+These measurements describe lexical-distribution properties of the supplied
+tokens. They are not direct measures of language proficiency, writing quality,
+reader response, or communicative effectiveness. Such interpretations require a
+separate validated study design and cannot be inferred from one score or a
+quality-floor flag.
+
+`below_quality_floor` and `lexdiv_screen()` are advisory token-count screens.
+They do not change values, parameters, status, or document membership. Passing a
+screen does not establish validity or reliability; failing one does not erase an
+otherwise computable value. Always inspect `status`, `missing_reason`, `N`, `V`,
+method identity, and requested/effective parameters together.
+
+## Offline installed-package smoke test
+
+After installation, the bundled smoke script exercises single-document, batch,
+profile, profile-batch, and screen workflows without network access or an
+external runtime:
+
+```r
+library(ldfreq)
+smoke_path <- system.file("examples", "offline-smoke.R", package = "ldfreq")
+stopifnot(nzchar(smoke_path))
+source(smoke_path, local = TRUE)
+```
+
 ## Scope
 
 This repository contains no learner corpus, raw subtitle text, source document

@@ -56,3 +56,7 @@
   TUBELEX admission. Automation may support review but cannot supply the
   required independent identity, attestations, or decision.
 - Added introductory documentation and cross-platform R package checks.
+- Added a contract-derived direction and scale table, explicit interpretation
+  nonclaims, and clearer advisory quality-screen guidance.
+- Added direct executable examples for every export and an installed offline
+  smoke script covering single, batch, profile, profile-batch, and screen flows.

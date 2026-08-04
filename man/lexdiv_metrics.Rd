@@ -99,9 +99,18 @@ structural and are checked before document-token state.
 
 \code{below_quality_floor} is an advisory screening flag. It is deliberately
 separate from mathematical computability and never changes a requested
-parameter or suppresses an otherwise computable value. Unicode encoding-marker
-canonicalization is not Unicode normalization: canonically equivalent but
-scalar-distinct strings remain distinct types.
+parameter or suppresses an otherwise computable value. Passing the floor does
+not establish validity or reliability, and falling below it does not erase an
+otherwise computable value. Unicode encoding-marker canonicalization is not
+Unicode normalization: canonically equivalent but scalar-distinct strings
+remain distinct types.
+
+Maas a-squared and Yule's K use lower values for more lexical diversity; the
+other nine v0.1 methods use higher values. Direction applies only within the
+same method, parameters, preprocessing, and sampling design. The metrics are not
+direct measures of language proficiency, writing quality, reader response, or
+communicative effectiveness, and raw values from different metric IDs are not
+interchangeable.
 
 The batch adapter does not infer IDs, tokenize raw strings, recycle parameters
 by document, or accept one-token-per-row long tables. Invalid token vectors are
@@ -112,6 +121,8 @@ document by requested metric order. Batch-envelope and core-record schemas have
 separate explicit IDs and versions.
 }
 \examples{
+lexdiv_metric_ids()
+
 tokens <- c("a", "a", "b", "c")
 lexdiv_metrics(tokens, metrics = c("ttr", "hdd"), sample_size = 2)
 
