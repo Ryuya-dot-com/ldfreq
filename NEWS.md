@@ -1,6 +1,10 @@
-# ldfreq 0.1.0.9000
+# ldfreq 0.1.0
 
-## Initial public development baseline
+## Initial public release
+
+- Synchronized the package, NEWS, and citation versions for the 0.1.0 release
+  candidate; added exact-artifact `--as-cran` checks and machine-readable
+  package BOM, dependency SBOM, resource BOM, and provenance evidence.
 
 - Recorded Komuro Ryuya as the package author and maintainer and aligned the
   package copyright notice with that full name.

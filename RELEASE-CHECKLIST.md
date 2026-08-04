@@ -1,7 +1,13 @@
 # Release checklist
 
 This checklist defines the minimum evidence for an `ldfreq` release candidate.
-It does not imply that the current development version is release-ready.
+It does not imply that the candidate version is approved for publication.
+
+The repository-only `Release candidate` workflow and the tools under
+`experiments/release-candidate/` build and check one exact source archive and
+generate the technical BOM/SBOM/provenance inputs. Their output does not replace
+the independent review, durable archival, signature/attestation, or publication
+steps below.
 
 ## 1. Identify the candidate
 
@@ -64,6 +70,9 @@ resource-independent core rather than leaving the resource inventory blank.
       `--no-manual` CI as release evidence.
 - [ ] Treat every package-check error or warning as blocking. Resolve each note,
       or record its technical justification and independent disposition.
+- [ ] If CRAN incoming reports the exact single NOTE `New submission`, retain it
+      in every raw log and record its explicit disposition; do not generalize
+      this exception to any other NOTE.
 - [ ] Treat an external service, runner, or infrastructure failure as an invalid
       run that must be repeated, not as an exception to a package-check result.
 - [ ] Check the built archive's file list, sizes, license files, vignettes,

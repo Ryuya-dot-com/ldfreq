@@ -1,13 +1,13 @@
 # ldfreq
 
 `ldfreq` provides explicitly versioned lexical-diversity measurements for R.
-The current development release computes eleven independently specified metrics
-from ordered, pre-tokenized character vectors and returns method, parameter,
-schema, and contract provenance with every result.
+The current 0.1.0 release candidate computes eleven independently specified
+metrics from ordered, pre-tokenized character vectors and returns method,
+parameter, schema, and contract provenance with every result.
 
 ## Current status
 
-The public API is a frozen development candidate for the resource-independent
+The public API is frozen for the 0.1.0 resource-independent
 eleven-method lexical-diversity core. One separately licensed, byte-pinned
 TUBELEX aggregate is now
 installed as a non-exported development candidate so its packaging and failure
@@ -30,7 +30,7 @@ normative core.
 
 ## Installation
 
-Install the development version from GitHub with `pak`:
+Install the release candidate from GitHub with `pak`:
 
 ```r
 pak::pak("Ryuya-dot-com/ldfreq")
@@ -72,8 +72,10 @@ lexdiv_screen(profile)
 See `vignette("getting-started", package = "ldfreq")` for the result contract,
 batch inputs, profiles, and token-length screens.
 
-See [`LIFECYCLE.md`](LIFECYCLE.md) for the method, schema, deprecation, and
-future-surface rules frozen for the `0.1.x` line.
+See the repository
+[`LIFECYCLE.md`](https://github.com/Ryuya-dot-com/ldfreq/blob/main/LIFECYCLE.md)
+for the method, schema, deprecation, and future-surface rules frozen for the
+`0.1.x` line.
 
 ## Reproducibility boundary
 

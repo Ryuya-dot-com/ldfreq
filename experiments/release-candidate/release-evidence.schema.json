@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/experiments/release-candidate/release-evidence.schema.json",
+  "title": "ldfreq release-candidate provenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "repository",
+    "candidate",
+    "artifact",
+    "manual",
+    "environment",
+    "evidence",
+    "resource_boundary",
+    "go_no_go"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "status": {"const": "technical-evidence-generated"},
+    "repository": {"type": "object"},
+    "candidate": {"type": "object"},
+    "artifact": {"type": "object"},
+    "manual": {"type": "object"},
+    "environment": {"type": "object"},
+    "evidence": {"type": "object"},
+    "resource_boundary": {"type": "object"},
+    "go_no_go": {"type": "object"}
+  }
+}

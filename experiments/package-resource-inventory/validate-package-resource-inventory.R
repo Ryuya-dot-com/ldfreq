@@ -5,11 +5,11 @@
 # claim that ordinary R package builds are reproducible.
 
 arguments <- commandArgs(trailingOnly = TRUE)
-if (length(arguments) != 2L) {
+if (!length(arguments) %in% c(2L, 3L)) {
   stop(
     paste(
       "Usage: validate-package-resource-inventory.R",
-      "/path/to/package /new/audit/directory"
+      "/path/to/package /new/audit/directory [exact-source.tar.gz]"
     ),
     call. = FALSE
   )
@@ -17,6 +17,11 @@ if (length(arguments) != 2L) {
 
 package_root <- normalizePath(arguments[[1L]], mustWork = TRUE)
 audit_root_requested <- arguments[[2L]]
+provided_source_archive <- if (length(arguments) == 3L) {
+  normalizePath(arguments[[3L]], mustWork = TRUE)
+} else {
+  NULL
+}
 if (file.exists(audit_root_requested) || dir.exists(audit_root_requested)) {
   stop("The audit directory must not already exist.", call. = FALSE)
 }
@@ -251,20 +256,30 @@ extract_archive <- function(path, destination, label) {
   names
 }
 
-source_work <- file.path(audit_root, "source-build")
-check(dir.create(source_work, mode = "0755"), "Could not create source build directory.")
-run_r_command(
-  c("CMD", "build", shQuote(package_root)),
-  source_work,
-  "build"
-)
-source_archives <- list.files(
-  source_work,
-  pattern = paste0("^", package_name, "_.*[.]tar[.]gz$"),
-  full.names = TRUE
-)
-check(length(source_archives) == 1L, "R CMD build did not create one source archive.")
-source_archive <- source_archives[[1L]]
+if (is.null(provided_source_archive)) {
+  source_work <- file.path(audit_root, "source-build")
+  check(dir.create(source_work, mode = "0755"), "Could not create source build directory.")
+  run_r_command(
+    c("CMD", "build", shQuote(package_root)),
+    source_work,
+    "build"
+  )
+  source_archives <- list.files(
+    source_work,
+    pattern = paste0("^", package_name, "_.*[.]tar[.]gz$"),
+    full.names = TRUE
+  )
+  check(length(source_archives) == 1L, "R CMD build did not create one source archive.")
+  source_archive <- source_archives[[1L]]
+  source_archive_origin <- "built-by-inventory-audit"
+} else {
+  source_archive <- provided_source_archive
+  check(
+    identical(basename(source_archive), paste0(package_name, "_", package_version, ".tar.gz")),
+    "The provided source archive name does not match package identity."
+  )
+  source_archive_origin <- "provided-exact-release-candidate"
+}
 source_extract <- file.path(audit_root, "source-extracted")
 source_archive_names <- extract_archive(source_archive, source_extract, "source")
 check(
@@ -364,6 +379,7 @@ evidence <- list(
     "Run identity only; ordinary R package archive hashes are not a",
     "reproducible-build claim."
   ),
+  source_archive_origin = source_archive_origin,
   source_archive = archive_record(source_archive),
   platform_archive = archive_record(platform_archive),
   audited_members = member_records,
