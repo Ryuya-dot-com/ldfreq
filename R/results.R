@@ -14,8 +14,7 @@
   "no_factor",
   "non_convergence",
   "boundary_censored",
-  "unbounded_high",
-  "method_not_frozen"
+  "unbounded_high"
 )
 
 .lex_input_state <- function(tokens) {
@@ -215,7 +214,7 @@
   ) {
     stop("Internal error: unknown missing reason.", call. = FALSE)
   }
-  if (!(status %in% c("missing", "invalid_input", "design_gate_open"))) {
+  if (!(status %in% c("missing", "invalid_input"))) {
     stop("Internal error: invalid non-ok status.", call. = FALSE)
   }
   .lex_result(

@@ -41,6 +41,6 @@ is called out prominently.
 
 Raw-text tokenization and resource-backed lookup/results use separate functions
 and contracts. They do not overload or silently preprocess
-`lexdiv_metrics()`. Experimental or internally installed resource code is not a
-public API until its own lifecycle, rights, identity, coverage, and failure
+`lexdiv_metrics()`. Experimental or non-exported installed resource code is not
+a public API until its own lifecycle, rights, identity, coverage, and failure
 gates pass.

@@ -63,7 +63,7 @@
       "composition": "envelope_fields followed by result_fields",
       "order": "input document order, then requested metric order"
     },
-    "statuses": ["ok", "missing", "invalid_input", "design_gate_open"],
+    "statuses": ["ok", "missing", "invalid_input"],
     "missing_reasons": [
       "empty_input",
       "invalid_token",
@@ -73,18 +73,16 @@
       "no_factor",
       "non_convergence",
       "boundary_censored",
-      "unbounded_high",
-      "method_not_frozen"
+      "unbounded_high"
     ],
     "missing_reason_precedence": [
       "invalid_token",
       "empty_input",
-      "method_not_frozen",
       "metric-specific domain reason"
     ],
     "request_validation_policy": "metric selection and parameters for every requested metric are structural API inputs and are validated before document-token state; parameters belonging only to unrequested metrics are ignored",
     "short_text_policy": "strict: never silently reduce a requested segment, window, draw, or fitting range to N",
-    "parameter_reporting": "requested and effective parameters must both be emitted; for an ok result they are identical in this draft",
+    "parameter_reporting": "requested and effective parameters must both be emitted; for an ok result they are identical",
     "quality_floor_policy": "quality_floor_tokens is an advisory screening flag, not the computational domain and not a justification for changing parameters",
     "floating_point": {
       "model": "IEEE-754 binary64",

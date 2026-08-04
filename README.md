@@ -10,7 +10,7 @@ schema, and contract provenance with every result.
 The public API is a frozen development candidate for the resource-independent
 eleven-method lexical-diversity core. One separately licensed, byte-pinned
 TUBELEX aggregate is now
-installed as an internal development candidate so its packaging and failure
+installed as a non-exported development candidate so its packaging and failure
 behavior can be verified end to end. It is not exposed as a user feature;
 lexical-resource profiles and raw-text tokenization remain deferred until their
 lookup and licensing contracts are complete.
@@ -102,13 +102,13 @@ A non-exported local-resource loader provides the integrity boundary. It reads
 an exact manifest and each declared artifact once, hashes those same bytes
 before decoding, rejects unavailable, mismatched, unsupported-version, and
 schema-invalid inputs in a fixed order, and never downloads or searches for a
-fallback. In addition to project-authored synthetic fixtures, the internal
+fallback. In addition to project-authored synthetic fixtures, the non-exported
 TUBELEX path performs bounded streaming gzip expansion and validates the fixed
 515,292-row four-column schema. A second non-exported layer now provides a
 versioned exact-match result contract for development testing: it applies no
 query normalization, preserves order and duplicates, returns token/type
 coverage diagnostics, and keeps unmatched measurements missing rather than
-coercing them to zero. This remains an internal development path, not a
+coercing them to zero. This remains a development-only path, not a
 resource-backed user feature or release approval.
 
 A byte-pinned admission candidate and non-exported evidence evaluator now make

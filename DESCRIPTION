@@ -14,8 +14,8 @@ Description: Computes explicitly versioned lexical-diversity metrics from
     screens while retaining method, parameter, schema, and contract provenance
     in ordinary columns. The initial development release intentionally performs
     no tokenization, normalization, lemmatization, or public lexical-resource
-    lookup. A byte-pinned internal TUBELEX aggregate is included only as a
-    separately licensed development candidate and is not exposed as a user
+    lookup. A byte-pinned TUBELEX aggregate is included only as a separately
+    licensed, non-exported development candidate and is not exposed as a user
     feature.
 License: MIT + file LICENSE
 URL: https://github.com/Ryuya-dot-com/ldfreq
