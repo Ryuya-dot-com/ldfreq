@@ -30,7 +30,36 @@ test_that("all frozen hand assertions pass through the package API", {
   )
   expect_identical(fixture$contract_id, contract$contract_id)
   expect_identical(fixture$contract_version, contract$contract_version)
-  expect_identical(fixture$contract_version, "0.1.0-draft.5")
+  expect_identical(fixture$contract_version, "0.1.0")
+  expected_statuses <- c("ok", "missing", "invalid_input")
+  expected_missing_reasons <- c(
+    "empty_input",
+    "invalid_token",
+    "insufficient_tokens_for_formula",
+    "too_short_for_requested_parameter",
+    "zero_denominator",
+    "no_factor",
+    "non_convergence",
+    "boundary_censored",
+    "unbounded_high"
+  )
+  expect_identical(
+    unlist(contract$output_contract$statuses, use.names = FALSE),
+    expected_statuses
+  )
+  expect_identical(
+    unlist(contract$output_contract$missing_reasons, use.names = FALSE),
+    expected_missing_reasons
+  )
+  expect_identical(
+    getFromNamespace(".lex_missing_reasons", "ldfreq"),
+    expected_missing_reasons
+  )
+  expect_false(grepl(
+    "\\bdraft\\b",
+    contract$output_contract$parameter_reporting,
+    ignore.case = TRUE
+  ))
   contract_fields <- unlist(
     contract$output_contract$result_fields,
     use.names = FALSE

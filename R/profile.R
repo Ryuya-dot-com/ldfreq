@@ -1,11 +1,11 @@
 # Bounded request-plan and profile layer for the frozen v0.1 method set.
 
 .lex_profile_schema_id <- "lexdiv-r-profile-result"
-.lex_profile_schema_version <- "0.1.0-draft.1"
+.lex_profile_schema_version <- "0.1.0"
 .lex_plan_schema_id <- "lexdiv-r-request-plan"
-.lex_plan_schema_version <- "0.1.0-draft.1"
+.lex_plan_schema_version <- "0.1.0"
 .lex_screen_schema_id <- "lexdiv-r-screen-result"
-.lex_screen_schema_version <- "0.1.0-draft.1"
+.lex_screen_schema_version <- "0.1.0"
 .lex_plan_max_candidates <- 1024L
 
 .profile_scalar_identifier <- function(value, argument, allow_null = FALSE) {
@@ -589,7 +589,7 @@ lexdiv_methods <- function() {
 lexdiv_presets <- function() {
   data.frame(
     preset_id = c("canonical", "length_50_100"),
-    preset_version = rep.int("0.1.0-draft.1", 2L),
+    preset_version = rep.int("0.1.0", 2L),
     specification_count = c(11L, 13L),
     description = c(
       "The eleven frozen methods at their canonical defaults.",

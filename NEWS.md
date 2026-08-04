@@ -2,6 +2,14 @@
 
 ## Initial public development baseline
 
+- Froze the eleven-method public API, promoted its metric and orchestration
+  identities from draft versions to normative `0.1.0`, and added lifecycle
+  rules without changing numerical methods or result shapes.
+- Deferred the separately named deterministic expected-TTR D candidate from
+  v0.1 while preserving its design evidence outside the installed normative
+  contract.
+- Removed the unreachable design-gate status and missing-reason vocabulary from
+  the normative v0.1 result contract.
 - Added eleven contract-backed lexical-diversity metrics for pre-tokenized input.
 - Added narrow multi-document batch processing with explicit document identity.
 - Added bounded method specifications, request plans, profiles, and independent
@@ -44,7 +52,7 @@
   auditing for the admission contract. A valid record can pass only the
   resource-admission gate; package release readiness remains false and no
   approval record is bundled.
-- Added a human-reviewer handoff, evidence worksheet, and strict DCF template
-  for the TUBELEX admission gate. Automation may support the review but cannot
-  supply the required independent identity, attestations, or decision.
+- Defined evidence and decision-record requirements for possible future
+  TUBELEX admission. Automation may support review but cannot supply the
+  required independent identity, attestations, or decision.
 - Added introductory documentation and cross-platform R package checks.

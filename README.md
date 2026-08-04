@@ -7,9 +7,10 @@ schema, and contract provenance with every result.
 
 ## Current status
 
-The public API is experimental and remains a resource-independent lexical-
-diversity core. One separately licensed, byte-pinned TUBELEX aggregate is now
-installed as an internal development candidate so its packaging and failure
+The public API is a frozen development candidate for the resource-independent
+eleven-method lexical-diversity core. One separately licensed, byte-pinned
+TUBELEX aggregate is now
+installed as a non-exported development candidate so its packaging and failure
 behavior can be verified end to end. It is not exposed as a user feature;
 lexical-resource profiles and raw-text tokenization remain deferred until their
 lookup and licensing contracts are complete.
@@ -23,8 +24,9 @@ The implemented metric set is:
 - HD-D
 - Yule K and Yule I
 
-The design-review `expected_ttr_d` candidate is not part of the public metric
-set.
+The `expected_ttr_d` candidate is deferred from v0.1 and is not part of the
+public metric set. Its design evidence remains separate from the installed
+normative core.
 
 ## Installation
 
@@ -70,6 +72,9 @@ lexdiv_screen(profile)
 See `vignette("getting-started", package = "ldfreq")` for the result contract,
 batch inputs, profiles, and token-length screens.
 
+See [`LIFECYCLE.md`](LIFECYCLE.md) for the method, schema, deprecation, and
+future-surface rules frozen for the `0.1.x` line.
+
 ## Reproducibility boundary
 
 Every metric row carries ordinary columns identifying the metric contract and
@@ -97,13 +102,13 @@ A non-exported local-resource loader provides the integrity boundary. It reads
 an exact manifest and each declared artifact once, hashes those same bytes
 before decoding, rejects unavailable, mismatched, unsupported-version, and
 schema-invalid inputs in a fixed order, and never downloads or searches for a
-fallback. In addition to project-authored synthetic fixtures, the internal
+fallback. In addition to project-authored synthetic fixtures, the non-exported
 TUBELEX path performs bounded streaming gzip expansion and validates the fixed
 515,292-row four-column schema. A second non-exported layer now provides a
 versioned exact-match result contract for development testing: it applies no
 query normalization, preserves order and duplicates, returns token/type
 coverage diagnostics, and keeps unmatched measurements missing rather than
-coercing them to zero. This remains an internal development path, not a
+coercing them to zero. This remains a development-only path, not a
 resource-backed user feature or release approval.
 
 A byte-pinned admission candidate and non-exported evidence evaluator now make

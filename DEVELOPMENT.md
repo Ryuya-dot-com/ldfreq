@@ -8,10 +8,10 @@ same-named variant without an explicit crosswalk.
 ## Before version 0.1.0
 
 - exercise the package on R-release and R-devel across Linux, macOS, and Windows;
-- freeze the public API and lifecycle policy;
+- preserve the frozen eleven-method public API and lifecycle policy;
 - complete an online `R CMD check --as-cran` with release metadata;
 - review documentation, examples, spelling, URLs, and package contents;
-- decide whether the design-review expected-TTR D candidate is deferred;
+- preserve the recorded deferral of expected-TTR D from v0.1;
 - complete the steps in [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md) and
   archive the resulting release evidence.
 

@@ -67,5 +67,5 @@ head(screen)
 ```
 
 Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the frozen registries.
-The design-review `expected_ttr_d` candidate is intentionally absent from the
-public method set.
+The `expected_ttr_d` candidate is deferred from v0.1 and intentionally absent
+from the public method set.
