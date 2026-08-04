@@ -40,12 +40,15 @@ lexdiv_metrics(tokens, metrics = "mattr", window_length = 50L)
 
 ## Interpreting values
 
-Maas a-squared and Yule's K use lower values for more lexical diversity. TTR,
-RTTR, CTTR, Herdan's C, MSTTR, MATTR, MTLD, HD-D, and Yule's I use higher values.
-This direction is meaningful only within the same method, parameters,
-tokenization, normalization, sampling design, and comparable texts. Scores from
-different metric IDs are not interchangeable because their scales and length
-sensitivities differ.
+Within the same exact method and design, Maas a-squared and Yule's K
+conventionally decrease as repetition decreases. TTR, RTTR, CTTR, Herdan's C,
+MSTTR, MATTR, MTLD, HD-D, and Yule's I conventionally increase with observed
+lexical variety or lower repetition. These methods primarily operationalize
+lexical variety and repetition rather than the full multidimensional
+lexical-diversity construct. Direction is meaningful only within the same
+method, parameters, tokenization, normalization, sampling design, and comparable
+texts. Scores from different metric IDs are not interchangeable because their
+scales and length sensitivities differ.
 
 The metrics describe lexical-distribution properties of the supplied tokens.
 They are not direct measures of language proficiency, writing quality, reader
@@ -80,10 +83,11 @@ screen <- lexdiv_screen(profile)
 head(screen)
 ```
 
-Quality floors and requested screens are advisory token-count checks. They do
-not change values or parameters, censor documents, or establish validity or
-reliability. Read them together with `status`, `missing_reason`, `N`, `V`, and
-the method and parameter identities.
+The frozen `below_quality_floor` field and requested screens are advisory
+token-count evidence checks. Here, `quality` does not mean writing quality,
+measurement validity, or reliability. The screens do not change values or
+parameters or censor documents. Read them together with `status`,
+`missing_reason`, `N`, `V`, and the method and parameter identities.
 
 Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the frozen registries.
 The `expected_ttr_d` candidate is deferred from v0.1 and intentionally absent

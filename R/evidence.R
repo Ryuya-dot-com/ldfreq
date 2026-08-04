@@ -36,7 +36,7 @@ lexdiv_length_evidence <- function() {
       "MATTR with a 50-token window",
       "TAALED 0.32 MATTR",
       "TAALED 0.32 MTLD Original",
-      "TAALED 0.32 expected-TTR-scaled HD-D",
+      "TAALED 0.32 HD-D normalized by sample size to the TTR scale",
       "TAALED 0.32 Maas variant"
     ),
     floor_tokens = c(100, 50, 50, 50, 50, 50, 100),
@@ -76,7 +76,7 @@ lexdiv_length_evidence <- function() {
       "https://www.castledown.com/journals/vli/article/download/vli.v01.1.koizumi/213",
       "https://www.sciencedirect.com/science/article/pii/S1075293520300660",
       "https://www.sciencedirect.com/science/article/pii/S1075293520300660",
-      rep.int("https://pypi.org/project/taaled/", 4L)
+      rep.int("https://pypi.org/project/taaled/0.32/", 4L)
     ),
     stringsAsFactors = FALSE,
     check.names = FALSE

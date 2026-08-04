@@ -23,15 +23,16 @@ tokens, or lemmatize. Batch inputs must carry explicit unique document IDs.
 Metric results are long-form data frames. Read \code{status} and
 \code{missing_reason} before \code{value}. Each row records the method, metric
 contract, result schema, requested and effective parameters, token/type counts,
-quality-floor flag, and method diagnostics. Batch, profile, and screen layers
-add separate envelopes without changing the core record.
+the frozen \code{below_quality_floor} field, and method diagnostics. Batch,
+profile, and screen layers add separate envelopes without changing the core
+record.
 }
 \section{Direction and contract scale}{
 Direction applies only within the exact method, parameters, preprocessing, and
 sampling design. Values from different metric IDs are not interchangeable.
 
 \tabular{lll}{
-Metric ID \tab Contract scale \tab More lexical diversity \cr
+Metric ID \tab Contract scale \tab Conventional score direction \cr
 \code{ttr} \tab 0 to 1 \tab higher \cr
 \code{rttr} \tab 0 or greater; no finite upper bound \tab higher \cr
 \code{cttr} \tab 0 or greater; no finite upper bound \tab higher \cr
@@ -46,17 +47,22 @@ Metric ID \tab Contract scale \tab More lexical diversity \cr
 }
 }
 \section{Interpretation boundary}{
-The metrics describe lexical-distribution properties of the supplied tokens.
+The methods primarily operationalize lexical variety and repetition. They are
+indices used within the lexical-diversity research domain, but no single score
+represents the full multidimensional lexical-diversity construct. The metrics
+describe lexical-distribution properties of the supplied tokens.
 They are not direct measures of language proficiency, writing quality, reader
 response, or communicative effectiveness. Inferring those constructs requires a
-separate validated study design and cannot be justified by one score or by a
-quality-floor flag.
+separate validated study design and cannot be justified by one score or by the
+frozen \code{below_quality_floor} field.
 }
 \section{Quality screens}{
 \code{below_quality_floor} and \code{lexdiv_screen()} are advisory token-count
-screens. They never change a value, effective parameter, status, or document
-membership. Passing a screen does not establish validity or reliability;
-failing one does not erase an otherwise computable value.
+evidence screens. Here, quality is a frozen field name; it does not mean writing
+quality, measurement validity, or reliability. The screens never change a value,
+effective parameter, status, or document membership. Passing a screen does not
+establish validity or reliability; failing one does not erase an otherwise
+computable value.
 }
 \section{Deferred surfaces}{
 Raw-text tokenization, public lexical-resource lookup, and the separately named

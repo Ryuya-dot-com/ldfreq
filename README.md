@@ -91,7 +91,7 @@ fields.
 Direction and scale are properties of an exact `method_id`, not of a metric name
 in the abstract. The v0.1 contract records:
 
-| Metric ID | Contract scale | More lexical diversity |
+| Metric ID | Contract scale | Conventional within-method score direction |
 |---|---:|---|
 | `ttr` | [0, 1] | higher |
 | `rttr` | >= 0; no finite upper bound | higher |
@@ -110,13 +110,19 @@ normalization, sampling design, and meaningfully comparable texts. Raw values
 from different metric IDs are not interchangeable because their scales and
 length sensitivities differ.
 
+These methods primarily operationalize lexical variety and repetition. They are
+indices used within the lexical-diversity research domain, but no single score
+represents the full multidimensional construct of lexical diversity.
+
 These measurements describe lexical-distribution properties of the supplied
 tokens. They are not direct measures of language proficiency, writing quality,
 reader response, or communicative effectiveness. Such interpretations require a
-separate validated study design and cannot be inferred from one score or a
-quality-floor flag.
+separate validated study design and cannot be inferred from one score or the
+frozen `below_quality_floor` field.
 
-`below_quality_floor` and `lexdiv_screen()` are advisory token-count screens.
+`below_quality_floor` and `lexdiv_screen()` are advisory token-count evidence
+screens. Here, `quality` is a frozen field name; it does not mean writing quality,
+measurement validity, or reliability.
 They do not change values, parameters, status, or document membership. Passing a
 screen does not establish validity or reliability; failing one does not erase an
 otherwise computable value. Always inspect `status`, `missing_reason`, `N`, `V`,
