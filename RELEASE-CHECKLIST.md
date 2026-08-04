@@ -34,8 +34,9 @@ steps below.
 - [ ] Inspect the candidate tree and all reachable refs for accidental corpus,
       credential, generated-result, cache, or local-environment files.
 - [ ] Confirm that no COCA or ELLIPSE payload, no redistributability-restricted
-      TAALES resource, and no result derived from an unapproved resource is in
-      the repository, package, release assets, examples, or vignettes.
+      lexical resource distributed with or used by TAALES, and no result
+      derived from an unapproved resource is in the repository, package,
+      release assets, examples, or vignettes.
 - [ ] For every admitted lexical resource, record its canonical source,
       version, cryptographic hash, redistribution terms, required notice,
       lookup contract, coverage diagnostics, and offline failure behavior.

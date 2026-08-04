@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1.0",
-  "reviewed_on": "2026-07-25",
+  "reviewed_on": "2026-08-04",
   "status": "context-specific-evidence-not-universal-cutoffs",
   "policy": {
     "computational_domain": "Determined by the frozen method contract and reported as status/missing_reason.",
@@ -82,7 +82,12 @@
       "generalization_limit": "Tool guidance is recorded separately from primary empirical evidence and is not copied as the package's universal policy.",
       "source_type": "versioned_tool_documentation",
       "version": "0.32",
-      "license": "CC BY-NC-SA 4.0",
+      "license": "UNKNOWN (PyPI 0.32 sdist metadata)",
+      "license_note": "The linked repository states CC BY-NC-SA 4.0, but the published sdist contains no license file and declares License: UNKNOWN.",
+      "sdist_sha256": "6184c36cdf1841e74b2e37322568659472b6f4a5d1373d01635032bb2ab6b1ee",
+      "repository_url": "https://github.com/LCR-ADS-Lab/TAALED",
+      "repository_license_commit": "27b19e1cda26e6f4d869d36afea6874f08825618",
+      "repository_license_file_url": "https://github.com/LCR-ADS-Lab/TAALED/blob/27b19e1cda26e6f4d869d36afea6874f08825618/License_CC-A-NC-SA-4.0.txt",
       "url": "https://pypi.org/project/taaled/0.32/"
     }
   ]

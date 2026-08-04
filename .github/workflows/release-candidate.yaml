@@ -249,6 +249,15 @@ jobs:
     timeout-minutes: 10
     permissions: {}
     steps:
+      - name: Require successful source and matrix jobs
+        shell: bash
+        env:
+          BUILD_SOURCE_RESULT: ${{ needs.build-source.result }}
+          CHECK_ARTIFACT_RESULT: ${{ needs.check-artifact.result }}
+        run: |
+          test "$BUILD_SOURCE_RESULT" = "success"
+          test "$CHECK_ARTIFACT_RESULT" = "success"
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}

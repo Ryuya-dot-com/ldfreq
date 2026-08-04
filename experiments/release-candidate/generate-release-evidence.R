@@ -195,21 +195,45 @@ package_bom <- list(
 package_bom_path <- file.path(output_root, "package-file-bom.json")
 write_json(package_bom, package_bom_path)
 
+split_dependency_entries <- function(value) {
+  if (length(value) == 0L || is.na(value) || !nzchar(value)) {
+    return(data.frame(
+      package = character(), requirement = character(),
+      stringsAsFactors = FALSE
+    ))
+  }
+  requirements <- trimws(strsplit(value, ",", fixed = TRUE)[[1L]])
+  packages <- trimws(sub("[[:space:]]*\\(.*$", "", requirements))
+  keep <- nzchar(packages)
+  data.frame(
+    package = packages[keep],
+    requirement = requirements[keep],
+    stringsAsFactors = FALSE
+  )
+}
+
 split_dependencies <- function(value) {
-  if (length(value) == 0L || is.na(value) || !nzchar(value)) return(character())
-  values <- trimws(strsplit(value, ",", fixed = TRUE)[[1L]])
-  values <- trimws(sub("[[:space:]]*\\(.*$", "", values))
-  values[nzchar(values)]
+  split_dependency_entries(value)$package
 }
 
 dependency_fields <- c("Depends", "Imports", "LinkingTo", "Suggests", "Enhances")
 direct <- do.call(rbind, lapply(dependency_fields, function(field) {
   value <- if (field %in% colnames(description)) description[[1L, field]] else NA_character_
-  packages <- split_dependencies(value)
-  if (!length(packages)) return(NULL)
-  data.frame(package = packages, scope = field, stringsAsFactors = FALSE)
+  entries <- split_dependency_entries(value)
+  if (!nrow(entries)) return(NULL)
+  data.frame(
+    package = entries$package,
+    scope = field,
+    requirement = entries$requirement,
+    stringsAsFactors = FALSE
+  )
 }))
-if (is.null(direct)) direct <- data.frame(package = character(), scope = character())
+if (is.null(direct)) {
+  direct <- data.frame(
+    package = character(), scope = character(), requirement = character(),
+    stringsAsFactors = FALSE
+  )
+}
 
 installed <- utils::installed.packages(noCache = TRUE)
 installed_names <- rownames(installed)
@@ -242,6 +266,11 @@ resolved <- sort(unique(resolved), method = "radix")
 
 spdx_id <- function(name) paste0("SPDXRef-Package-", gsub("[^A-Za-z0-9.-]", "-", name))
 root_id <- spdx_id(package_name)
+root_license <- unname(description[[1L, "License"]])
+check(
+  identical(root_license, "MIT + file LICENSE"),
+  "The release-evidence SPDX declaration must be reviewed for a changed package license."
+)
 spdx_packages <- list(list(
   name = package_name,
   SPDXID = root_id,
@@ -249,9 +278,25 @@ spdx_packages <- list(list(
   downloadLocation = "NOASSERTION",
   filesAnalyzed = FALSE,
   licenseConcluded = "NOASSERTION",
-  licenseDeclared = "NOASSERTION",
-  comment = paste("Source package license field:", description[[1L, "License"]])
+  licenseDeclared = "MIT",
+  comment = paste("Source package DESCRIPTION license field:", root_license)
 ))
+r_requirement <- direct$requirement[direct$package == "R"]
+check(length(r_requirement) == 1L, "DESCRIPTION must declare exactly one R requirement.")
+r_id <- spdx_id("R")
+spdx_packages[[length(spdx_packages) + 1L]] <- list(
+  name = "R",
+  SPDXID = r_id,
+  versionInfo = as.character(getRversion()),
+  downloadLocation = "https://www.r-project.org/",
+  filesAnalyzed = FALSE,
+  licenseConcluded = "NOASSERTION",
+  licenseDeclared = "NOASSERTION",
+  comment = paste(
+    "Build-source runner R version; DESCRIPTION requirement:",
+    r_requirement[[1L]]
+  )
+)
 for (name in resolved) {
   row <- installed[name, , drop = FALSE]
   raw_license <- if ("License" %in% colnames(row)) row[[1L, "License"]] else NA_character_
@@ -273,12 +318,14 @@ relationships <- list(list(
   relatedSpdxElement = root_id
 ))
 for (index in seq_len(nrow(direct))) {
-  if (identical(direct$package[[index]], "R")) next
   relationships[[length(relationships) + 1L]] <- list(
     spdxElementId = root_id,
     relationshipType = "DEPENDS_ON",
     relatedSpdxElement = spdx_id(direct$package[[index]]),
-    comment = paste("DESCRIPTION field:", direct$scope[[index]])
+    comment = paste(
+      "DESCRIPTION", direct$scope[[index]], "requirement:",
+      direct$requirement[[index]]
+    )
   )
 }
 for (edge in edges) {
@@ -299,15 +346,53 @@ dependency_sbom <- list(
     "https://github.com/Ryuya-dot-com/ldfreq/release-evidence/",
     commit, "/", archive_record$sha256
   ),
+  comment = paste(
+    "Dependency inventory from the release-R build-source runner.",
+    "The five check environments remain separately recorded in their raw logs",
+    "and check-result records; this document does not claim a cross-platform lockfile."
+  ),
   creationInfo = list(
     created = created,
-    creators = c("Tool: ldfreq-generate-release-evidence-1.0.0")
+    creators = list("Tool: ldfreq-generate-release-evidence-1.1.0")
   ),
   packages = spdx_packages,
   relationships = relationships
 )
 dependency_sbom_path <- file.path(output_root, "dependency-sbom.spdx.json")
 write_json(dependency_sbom, dependency_sbom_path)
+written_sbom <- jsonlite::read_json(
+  dependency_sbom_path,
+  simplifyVector = FALSE
+)
+check(
+  is.list(written_sbom$creationInfo$creators) &&
+    length(written_sbom$creationInfo$creators) == 1L,
+  "SPDX creationInfo.creators must serialize as an array."
+)
+written_package_names <- vapply(
+  written_sbom$packages,
+  function(value) value$name,
+  character(1L)
+)
+check(
+  all(c(package_name, "R") %in% written_package_names),
+  "The SPDX document omitted the package or R runtime."
+)
+written_root <- written_sbom$packages[[match(package_name, written_package_names)]]
+check(
+  identical(written_root$licenseDeclared, "MIT"),
+  "The SPDX package license declaration changed."
+)
+written_r_relationships <- Filter(function(value) {
+  identical(value$spdxElementId, root_id) &&
+    identical(value$relationshipType, "DEPENDS_ON") &&
+    identical(value$relatedSpdxElement, r_id)
+}, written_sbom$relationships)
+check(
+  length(written_r_relationships) == 1L &&
+    grepl("R \\(>= 4[.]1[.]0\\)$", written_r_relationships[[1L]]$comment),
+  "The SPDX document omitted or changed the DESCRIPTION R constraint."
+)
 
 resource_inventory_path <- file.path(
   package_extract, "inst", "spec", "ldfreq-resource-inventory.json"

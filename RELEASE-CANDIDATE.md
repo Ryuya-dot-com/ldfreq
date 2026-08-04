@@ -12,16 +12,23 @@ on the declared R 4.1 minimum. It also builds the PDF reference manual and
 generates:
 
 - a file-level package BOM;
-- an SPDX 2.3 dependency SBOM;
+- an SPDX 2.3 dependency SBOM for the release-R build-source environment,
+  including the declared R constraint (the five check environments remain in
+  their separate logs and result records);
 - a resource BOM derived from the installed resource inventory;
 - release provenance bound to the repository commit, tree, archive, manual,
   environment, and evidence hashes;
 - per-platform `R CMD check --as-cran --no-manual` logs and result records; and
-- a run index that fails unless every matrix job examined the same tarball.
+- a run index that fails unless every matrix job examined the same tarball and
+  all three current-R resource-inventory audits succeeded.
 
 These outputs are technical evidence. A workflow defined by the candidate
 cannot independently approve itself, and expiring Actions artifacts are not the
 durable archive required for publication.
+
+Multiple independent automated analyses are useful as an additional
+quality-control layer, but they do not supply the independent human identity or
+decision required by the current resource-admission and publication policy.
 
 CRAN incoming checks report `New submission` until the package has a prior CRAN
 version. The check runner accepts only that exact single NOTE as explained; any

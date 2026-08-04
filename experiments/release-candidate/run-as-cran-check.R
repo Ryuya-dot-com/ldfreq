@@ -50,10 +50,34 @@ check_lines <- if (!is.na(check_log) && file.exists(check_log)) {
 }
 status_lines <- grep("^Status:", check_lines, value = TRUE)
 check_status <- if (length(status_lines)) tail(status_lines, 1L) else "Status: unavailable"
-note_steps <- grep("^\\* checking .* NOTE$", check_lines, value = TRUE)
+note_positions <- grep("^\\* checking .* NOTE$", check_lines)
+note_steps <- check_lines[note_positions]
+note_detail <- character()
+if (length(note_positions) == 1L) {
+  next_check_positions <- grep("^\\* checking ", check_lines)
+  next_check_positions <- next_check_positions[
+    next_check_positions > note_positions[[1L]]
+  ]
+  note_end <- if (length(next_check_positions)) {
+    next_check_positions[[1L]] - 1L
+  } else {
+    length(check_lines)
+  }
+  if (note_end > note_positions[[1L]]) {
+    note_detail <- check_lines[seq.int(note_positions[[1L]] + 1L, note_end)]
+  }
+}
+note_detail <- trimws(note_detail)
+note_detail <- note_detail[nzchar(note_detail)]
+maintainer_pattern <- paste0(
+  "^Maintainer: [‘']?[^<>[:cntrl:]]+ ",
+  "<[^<>[:space:]]+@[^<>[:space:]]+>[’']?[[:space:]]*$"
+)
 new_submission_note <- identical(check_status, "Status: 1 NOTE") &&
   length(note_steps) == 1L &&
-  any(check_lines == "New submission")
+  length(note_detail) == 2L &&
+  grepl(maintainer_pattern, note_detail[[1L]]) &&
+  identical(note_detail[[2L]], "New submission")
 effective_status <- if (identical(check_status, "Status: OK")) {
   "PASS"
 } else if (new_submission_note) {
@@ -80,6 +104,8 @@ result <- list(
   } else {
     list()
   },
+  note_stage = if (length(note_steps) == 1L) note_steps[[1L]] else NULL,
+  note_detail = as.list(note_detail),
   started_at_utc = started,
   finished_at_utc = finished,
   environment = list(
