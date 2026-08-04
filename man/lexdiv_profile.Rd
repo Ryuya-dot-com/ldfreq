@@ -130,7 +130,9 @@ Profile rows make the method's advisory default floor explicit as
 non-censoring: they do not change a metric value, effective parameter, status, or
 document membership. A 50- or 100-token screen is therefore not an MTLD method
 variant, and truncating a document to one of those lengths would be a separate
-sampling design.
+sampling design. Passing a screen does not establish measurement validity,
+reliability, proficiency, or writing quality; failing one does not invalidate an
+otherwise computable metric row.
 
 The profile and screen schemas are distinct from the core metric and batch
 schemas. Third-party implementation names are not compatibility presets; such a
@@ -138,7 +140,14 @@ preset requires an exact, version-pinned method contract and boundary fixtures.
 }
 \examples{
 methods <- lexdiv_methods()
+lexdiv_presets()
 mattr_method <- methods$method_id[methods$metric_id == "mattr"]
+
+mattr_25 <- lexdiv_spec(
+  mattr_method,
+  parameters = list(window_length = 25),
+  request_id = "mattr_25"
+)
 
 grid <- lexdiv_grid(
   mattr_method,
@@ -146,7 +155,7 @@ grid <- lexdiv_grid(
   values = c(50, 100),
   request_id_prefix = "mattr"
 )
-plan <- lexdiv_plan(presets = character(), grids = grid)
+plan <- lexdiv_plan(presets = character(), specs = mattr_25, grids = grid)
 
 tokens <- rep(c("a", "b", "a", "c", "d"), 25)
 profile <- lexdiv_profile(tokens, plan)
@@ -154,6 +163,10 @@ profile[, c("request_id", "metric_id", "value", "status")]
 
 screens <- lexdiv_screen(profile)
 screens[, c("request_id", "screen_id", "minimum_tokens", "passes_screen")]
+
+documents <- list(document_a = tokens, document_b = rev(tokens))
+batch_profile <- lexdiv_profile_batch(documents, plan)
+head(batch_profile[, c("document_id", "request_id", "metric_id", "status")])
 
 all_lengths <- lexdiv_plan("length_50_100")
 length(all_lengths$specifications)

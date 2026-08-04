@@ -5,6 +5,7 @@ Version: 0.1.0.9000
 Authors@R:
     person(
         given = "Ryuya",
+        family = "Komuro",
         email = "komuro.4121@gmail.com",
         role = c("aut", "cre")
     )

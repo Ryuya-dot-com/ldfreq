@@ -72,7 +72,7 @@
     {
       "evidence_id": "taaled_0_32_tool_guidance",
       "metric_id": "multiple",
-      "method_scope": "TAALED 0.32 user guidance: MATTR 50, MTLD Original 50, HD-D 50, Maas 100",
+      "method_scope": "TAALED 0.32 versioned usage guidance: MATTR 50, MTLD Original 50, HD-D 50, Maas 100",
       "floor_tokens": null,
       "claim_type": "tool_author_guidance",
       "population": "not a single validation population",
@@ -83,7 +83,7 @@
       "source_type": "versioned_tool_documentation",
       "version": "0.32",
       "license": "CC BY-NC-SA 4.0",
-      "url": "https://pypi.org/project/taaled/"
+      "url": "https://pypi.org/project/taaled/0.32/"
     }
   ]
 }

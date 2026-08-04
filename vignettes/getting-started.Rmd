@@ -38,6 +38,23 @@ than a smaller implicit window.
 lexdiv_metrics(tokens, metrics = "mattr", window_length = 50L)
 ```
 
+## Interpreting values
+
+Within the same exact method and design, Maas a-squared and Yule's K
+conventionally decrease as repetition decreases. TTR, RTTR, CTTR, Herdan's C,
+MSTTR, MATTR, MTLD, HD-D, and Yule's I conventionally increase with observed
+lexical variety or lower repetition. These methods primarily operationalize
+lexical variety and repetition rather than the full multidimensional
+lexical-diversity construct. Direction is meaningful only within the same
+method, parameters, tokenization, normalization, sampling design, and comparable
+texts. Scores from different metric IDs are not interchangeable because their
+scales and length sensitivities differ.
+
+The metrics describe lexical-distribution properties of the supplied tokens.
+They are not direct measures of language proficiency, writing quality, reader
+response, or communicative effectiveness. A separate validated study design is
+needed to make claims about those constructs.
+
 ## Multiple documents
 
 Batch input must carry explicit, unique document identifiers.
@@ -66,6 +83,23 @@ screen <- lexdiv_screen(profile)
 head(screen)
 ```
 
+The frozen `below_quality_floor` field and requested screens are advisory
+token-count evidence checks. Here, `quality` does not mean writing quality,
+measurement validity, or reliability. The screens do not change values or
+parameters or censor documents. Read them together with `status`,
+`missing_reason`, `N`, `V`, and the method and parameter identities.
+
 Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the frozen registries.
 The `expected_ttr_d` candidate is deferred from v0.1 and intentionally absent
 from the public method set.
+
+## Offline installed-package check
+
+An installed smoke script exercises the public workflows without network access
+or an external runtime:
+
+```{r}
+smoke_path <- system.file("examples", "offline-smoke.R", package = "ldfreq")
+stopifnot(nzchar(smoke_path))
+source(smoke_path, local = TRUE)
+```

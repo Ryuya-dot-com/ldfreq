@@ -19,7 +19,7 @@ domains, suppress values, or claim universal validity cutoffs.
 The 100-token MTLD record concerns Koizumi's study of 20 lower-intermediate
 Japanese adolescent L2 English speakers. The 50-token records from Zenker and
 Kyle concern 4,542 written L2 argumentative essays and use 50 as the minimum
-observed segment length. TAALED 0.32 recommendations are identified separately
+observed segment length. TAALED 0.32 versioned usage guidance is identified separately
 as versioned tool guidance rather than primary empirical evidence.
 
 Method equivalence is not inferred from a shared metric label. In particular,

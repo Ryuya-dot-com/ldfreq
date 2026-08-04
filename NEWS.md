@@ -2,6 +2,8 @@
 
 ## Initial public development baseline
 
+- Recorded Komuro Ryuya as the package author and maintainer and aligned the
+  package copyright notice with that full name.
 - Froze the eleven-method public API, promoted its metric and orchestration
   identities from draft versions to normative `0.1.0`, and added lifecycle
   rules without changing numerical methods or result shapes.
@@ -56,3 +58,13 @@
   TUBELEX admission. Automation may support review but cannot supply the
   required independent identity, attestations, or decision.
 - Added introductory documentation and cross-platform R package checks.
+- Added a contract-derived direction and scale table, explicit interpretation
+  nonclaims, and clearer advisory quality-screen guidance.
+- Refined public terminology after a TAALED/TAALES literature audit: the eleven
+  methods are described primarily as lexical-variety/repetition operationalizations,
+  direction is limited to the exact method and design, and the frozen quality field
+  name is explicitly separated from writing quality, validity, and reliability.
+- Pinned TAALED usage-guidance links to version 0.32 and clarified that normalized
+  hypergeometric HD-D is distinct from the deferred expected-TTR curve-fit D candidate.
+- Added direct executable examples for every export and an installed offline
+  smoke script covering single, batch, profile, profile-batch, and screen flows.
