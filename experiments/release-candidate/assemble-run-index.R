@@ -39,8 +39,17 @@ record <- function(path, root) {
   )
 }
 
-provenance_path <- file.path(source_root, "release-provenance.json")
-check(file.exists(provenance_path), "release-provenance.json is missing.")
+provenance_paths <- list.files(
+  source_root,
+  pattern = "^release-provenance[.]json$",
+  full.names = TRUE,
+  recursive = TRUE
+)
+check(
+  length(provenance_paths) == 1L,
+  "Exactly one release-provenance.json file is required."
+)
+provenance_path <- provenance_paths[[1L]]
 provenance <- jsonlite::read_json(provenance_path, simplifyVector = FALSE)
 result_paths <- list.files(
   check_root,

@@ -288,6 +288,44 @@ check(
   "Repository-only experiment or legal directories leaked into the source package."
 )
 source_package_root <- file.path(source_extract, package_name)
+comparison_authority <- if (is.null(provided_source_archive)) {
+  "source-tree-built-archive"
+} else {
+  "provided-exact-source-archive"
+}
+
+if (!is.null(provided_source_archive)) {
+  archive_inventory <- jsonlite::read_json(
+    file.path(
+      source_package_root,
+      "inst",
+      "spec",
+      "ldfreq-resource-inventory.json"
+    ),
+    simplifyVector = FALSE
+  )
+  check(
+    identical(archive_inventory, inventory),
+    "The provided source archive resource inventory differs from the checkout."
+  )
+  archive_inst_root <- file.path(source_package_root, "inst")
+  for (path in all_audited_paths) {
+    source_member_bytes[[path]] <- read_bytes(file.path(archive_inst_root, path))
+  }
+  for (index in seq_along(member_paths)) {
+    member <- inventory_members[[index]]
+    path <- member_paths[[index]]
+    bytes <- source_member_bytes[[path]]
+    check(
+      identical(as.double(length(bytes)), as.double(member$bytes)),
+      sprintf("Source archive member byte count differs from inventory: %s", path)
+    )
+    check(
+      identical(sha256_bytes(bytes), member$sha256),
+      sprintf("Source archive member SHA-256 differs from inventory: %s", path)
+    )
+  }
+}
 
 binary_work <- file.path(audit_root, "platform-build")
 library_root <- file.path(audit_root, "library")
@@ -338,7 +376,12 @@ for (layer_name in names(layer_roots)) {
     observed <- read_bytes(file.path(root, path))
     check(
       identical(observed, source_member_bytes[[path]]),
-      sprintf("%s member differs from the source tree: %s", layer_name, path)
+      sprintf(
+        "%s member differs from comparison authority (%s): %s",
+        layer_name,
+        comparison_authority,
+        path
+      )
     )
   }
   check(
@@ -380,6 +423,7 @@ evidence <- list(
     "reproducible-build claim."
   ),
   source_archive_origin = source_archive_origin,
+  comparison_authority = comparison_authority,
   source_archive = archive_record(source_archive),
   platform_archive = archive_record(platform_archive),
   audited_members = member_records,
