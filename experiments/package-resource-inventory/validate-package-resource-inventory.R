@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 
 # Build and audit source, platform-packaged, and installed resource inventories.
-# This is development evidence. Archive hashes identify one run and are not a
-# claim that ordinary R package builds are reproducible.
+# This is technical candidate evidence. Archive hashes identify one run and
+# are not a claim that ordinary R package builds are reproducible.
 
 arguments <- commandArgs(trailingOnly = TRUE)
 if (!length(arguments) %in% c(2L, 3L)) {
@@ -421,7 +421,7 @@ member_records <- lapply(all_audited_paths, function(path) {
 })
 
 evidence <- list(
-  schema_version = "0.1.0-development-evidence",
+  schema_version = "1.0.0",
   status = "source-platform-installed-resource-inventory-ok",
   package = package_name,
   package_version = package_version,

@@ -27,7 +27,7 @@ public metric set.
 
 ## Installation
 
-Install the development version from GitHub with `pak`:
+Install the current GitHub release candidate with `pak`:
 
 ```r
 pak::pak("Ryuya-dot-com/ldfreq")

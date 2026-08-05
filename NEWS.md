@@ -1,6 +1,6 @@
-# ldfreq 0.1.0.9000
+# ldfreq 0.1.0
 
-## Development version
+## Initial release
 
 - Added eleven versioned lexical-diversity metrics for ordered,
   pre-tokenized input: TTR, RTTR/Guiraud, CTTR, Herdan's C, Maas

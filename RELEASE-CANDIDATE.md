@@ -1,12 +1,12 @@
-# Superseded core release-candidate boundary
+# ldfreq 0.1.0 release-candidate boundary
 
-The immutable core-only version `0.1.0` candidate was not published. Development
-version `0.1.0.9000` adds raw-text preprocessing and a TUBELEX public-profile
-candidate, a caller-supplied New JACET 8000 level-profile surface, plus a
-separately contracted Maas/MTLD variant surface, so the
-earlier candidate artifacts and go/no-go decision cannot be reused for tagging
-or CRAN submission. A new immutable commit must pass the technical, resource,
-and maintainer decision gates in `RELEASE-CHECKLIST.md`.
+The earlier immutable core-only version `0.1.0` candidate was not published,
+and its artifacts and go/no-go decision cannot be reused. This replacement
+candidate adds raw-text preprocessing, a TUBELEX public-profile candidate, a
+caller-supplied New JACET 8000 level-profile surface, and a separately
+contracted Maas/MTLD variant surface. The exact replacement commit must pass
+the technical, resource, and maintainer decision gates in
+`RELEASE-CHECKLIST.md` before tagging or CRAN submission.
 
 ## Automated evidence
 

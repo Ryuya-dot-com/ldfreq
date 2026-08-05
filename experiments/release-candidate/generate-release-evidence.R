@@ -457,7 +457,7 @@ provenance <- list(
     decision_authority = "package-maintainer",
     resource_decision_recorded_on = "2026-08-06",
     known_limitations = c(
-      "Raw-text preprocessing is a separately versioned development API.",
+      "Raw-text preprocessing is governed by a separate versioned public contract.",
       paste(
         "Maas and MTLD comparisons are a separately contracted sensitivity",
         "API, not official TAALED compatibility."
