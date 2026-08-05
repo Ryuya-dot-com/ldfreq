@@ -2,9 +2,9 @@
   "$schema": "lexical-resource-lookup-contract.schema.json",
   "contract_id": "ldfreq-lexical-resource-lookup",
   "contract_version": "0.1.0-draft.1",
-  "status": "internal-development-candidate",
+  "status": "internal-release-candidate",
   "public_api": false,
-  "release_approved": false,
+  "release_approved": true,
   "resource": {
     "resource_id": "tubelex-en-treebank-slim",
     "resource_version": "7cb5fb36-slim-v1",

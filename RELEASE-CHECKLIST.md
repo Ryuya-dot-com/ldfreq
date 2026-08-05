@@ -6,8 +6,8 @@ It does not imply that the candidate version is approved for publication.
 The repository-only `Release candidate` workflow and the tools under
 `experiments/release-candidate/` build and check one exact source archive and
 generate the technical BOM/SBOM/provenance inputs. Their output does not replace
-the independent review, durable archival, signature/attestation, or publication
-steps below.
+the maintainer's final release decision, durable archival,
+signature/attestation, or publication steps below.
 
 ## 1. Identify the candidate
 
@@ -22,9 +22,8 @@ steps below.
       request.
 - [ ] Record the active `main` ruleset and verify the repository gate described
       in [`DEVELOPMENT.md`](DEVELOPMENT.md).
-- [ ] Record an independent approval of the exact workflow definition, or the
-      identity of the separately administered workflow/application that anchors
-      the required result. A same-branch job name alone is insufficient.
+- [ ] Record the exact workflow definition hash and the protected required-check
+      configuration. A same-branch job name alone is insufficient.
 - [ ] Confirm that `R-CMD-check required` succeeded for the exact candidate
       commit. Record the workflow and job IDs, conclusions, definition hash,
       downloaded logs, and log hashes; links alone are not durable evidence.
@@ -39,7 +38,8 @@ steps below.
       release assets, examples, or vignettes.
 - [ ] Confirm that no New JACET 8000 list bytes or reconstructable full-list
       output is bundled. Exercise `new_jacet8000_profile()` only with
-      project-authored synthetic fixtures or a reviewer-authorized local copy.
+      project-authored synthetic fixtures or a legitimately obtained
+      caller-authorized local copy.
 - [ ] Confirm that no AntBNC payload, full mapping, or derived reconstructable
       list is bundled. Exercise `lexdiv_flemmatize()` in installed examples and
       checks only with project-authored synthetic fixtures; local research runs
@@ -47,15 +47,12 @@ steps below.
 - [ ] For every admitted lexical resource, record its canonical source,
       version, cryptographic hash, redistribution terms, required notice,
       lookup contract, coverage diagnostics, and offline failure behavior.
-- [ ] For TUBELEX, verify the installed byte-pinned admission candidate first,
-      then evaluate the independent review DCF and preserved evidence bytes
-      against the exact reviewed repository commit with
-      `experiments/resource-admission/validate-tubelex-admission.R`. Reject
-      self-approval, commit/candidate drift, incomplete distribution scope,
-      reviewer rejection, or evidence-hash mismatch. Treat a structurally valid
-      record as resource and public-profile admission evidence only, not
-      reviewer authentication, signature verification, or package release
-      readiness.
+- [ ] For TUBELEX, run
+      `experiments/resource-admission/validate-tubelex-admission.R` against the
+      installed package. Confirm the byte-pinned maintainer decision, upstream
+      BSD-3-Clause and README URLs, approved scopes, risk controls, and one
+      release-approved resource. Treat this as resource and public-profile
+      admission evidence only, not final package release readiness.
 - [ ] Include each admitted resource's required license, copyright, notice, and
       manifest files under the appropriate `inst/` path, then verify their
       contents and hashes in the source, installed, and binary packages.
@@ -80,7 +77,7 @@ it as internal-only evidence.
 - [ ] Build and inspect the PDF reference manual; do not treat routine
       `--no-manual` CI as release evidence.
 - [ ] Treat every package-check error or warning as blocking. Resolve each note,
-      or record its technical justification and independent disposition.
+      or record its technical justification and maintainer disposition.
 - [ ] If CRAN incoming reports the exact single NOTE `New submission`, retain it
       in every raw log and record its explicit disposition; do not generalize
       this exception to any other NOTE.
@@ -125,9 +122,9 @@ claim must name and verify a separate controlled build procedure.
 
 ## 5. Publish and archive
 
-- [ ] Obtain an independent review of the candidate evidence. A
-      single-maintainer exception may be recorded for development snapshots,
-      but it does not close the release gate.
+- [ ] Record the maintainer's final go/no-go decision for the exact candidate,
+      including known limitations and rollback action. Optional third-party
+      review may be retained as supporting evidence but is not a release gate.
 - [ ] Create the release tag only after all blocking items above pass, and
       verify that the tag resolves to the recorded candidate commit.
 - [ ] Publish release notes that distinguish implemented features, deferred
@@ -138,7 +135,7 @@ claim must name and verify a separate controlled build procedure.
       version; repository, commit, tree, tag, and package version; workflow and
       ruleset evidence; commands and exit codes; environments and dependencies;
       resource inventory; BOM/SBOM; artifact and log paths, sizes, and SHA-256
-      digests; reviewer decision; storage location; and retention policy.
+      digests; maintainer decision; storage location; and retention policy.
 - [ ] Make the manifest and artifact identities tamper-evident with a signature
       or verifiable attestation, and preserve the evidence outside expiring
       Actions logs.

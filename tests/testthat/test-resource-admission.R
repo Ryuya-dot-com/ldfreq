@@ -6,7 +6,10 @@ admission_evaluate_function <- getFromNamespace(
   ".lexres_evaluate_tubelex_admission",
   "ldfreq"
 )
-admission_sha256_function <- getFromNamespace(".lexres_sha256_bytes", "ldfreq")
+admission_semantics_function <- getFromNamespace(
+  ".lexres_admission_candidate_semantics",
+  "ldfreq"
+)
 admission_candidate_id <- getFromNamespace(
   ".lexres_tubelex_admission_candidate_id",
   "ldfreq"
@@ -15,81 +18,8 @@ admission_candidate_sha256 <- getFromNamespace(
   ".lexres_tubelex_admission_candidate_sha256",
   "ldfreq"
 )
-admission_fields <- getFromNamespace(
-  ".lexres_admission_approval_fields",
-  "ldfreq"
-)
 
-admission_repository_commit <- paste(rep.int("a", 40L), collapse = "")
-admission_evidence_bytes <- charToRaw(
-  "preserved independent review evidence\n"
-)
-
-write_test_bytes <- function(bytes, stem, extension) {
-  path <- tempfile(stem, fileext = extension)
-  connection <- file(path, open = "wb")
-  on.exit(close(connection), add = TRUE)
-  writeBin(bytes, connection)
-  path
-}
-
-admission_values <- function(overrides = list()) {
-  values <- c(
-    "Approval-Schema-ID" = "ldfreq-resource-release-approval",
-    "Approval-Schema-Version" = "0.1.0",
-    "Approval-ID" = "independent-tubelex-public-profile-review-v2",
-    "Candidate-ID" = admission_candidate_id,
-    "Candidate-SHA256" = admission_candidate_sha256,
-    "Reviewed-Repository-Commit" = admission_repository_commit,
-    "Reviewer-Name" = "Independent Reviewer",
-    "Reviewer-Affiliation" = "Independent Language Resources Group",
-    "Reviewer-GitHub-Login" = "independent-reviewer",
-    "Reviewed-On" = "2026-07-29",
-    "Decision" = "approved",
-    "Independence-Attested" = "true",
-    "Not-Candidate-Author-Or-Builder" = "true",
-    "Redistribution-Terms" = "approved",
-    "Notice-And-Attribution" = "approved",
-    "Source-And-Artifact-Identity" = "approved",
-    "Package-Distribution-Scope" = "approved",
-    "Public-API-Scope" = "approved",
-    "Evidence-URL" =
-      "https://github.com/example/review-evidence/pull/1#pullrequestreview-1",
-    "Evidence-Locator-ID" = "reviews/tubelex-independent-review.txt",
-    "Evidence-SHA256" = admission_sha256_function(admission_evidence_bytes)
-  )
-  for (name in names(overrides)) values[[name]] <- overrides[[name]]
-  values
-}
-
-write_approval <- function(values = admission_values()) {
-  stopifnot(identical(names(values), admission_fields))
-  text <- paste0(
-    paste0(names(values), ": ", unname(values), collapse = "\n"),
-    "\n"
-  )
-  write_test_bytes(charToRaw(text), "tubelex-approval-", ".dcf")
-}
-
-write_evidence <- function(bytes = admission_evidence_bytes) {
-  write_test_bytes(bytes, "tubelex-review-evidence-", ".txt")
-}
-
-evaluate_approval <- function(
-    values = admission_values(),
-    evidence_bytes = admission_evidence_bytes,
-    repository_commit = admission_repository_commit) {
-  approval_path <- write_approval(values)
-  evidence_path <- write_evidence(evidence_bytes)
-  on.exit(unlink(c(approval_path, evidence_path)), add = TRUE)
-  admission_evaluate_function(
-    approval_path = approval_path,
-    evidence_path = evidence_path,
-    repository_commit = repository_commit
-  )
-}
-
-test_that("the installed candidate is byte-pinned and remains unapproved", {
+test_that("the installed candidate pins a maintainer-approved decision", {
   candidate <- admission_candidate_function()
 
   expect_identical(candidate$status, "candidate_ok")
@@ -99,30 +29,32 @@ test_that("the installed candidate is byte-pinned and remains unapproved", {
     candidate$candidate_ref$candidate_sha256,
     admission_candidate_sha256
   )
+  expect_identical(candidate$candidate_ref$candidate_state, "maintainer-approved")
   expect_identical(
     candidate$candidate$distribution_scope$release_approved,
-    FALSE
-  )
-  expect_identical(candidate$candidate$distribution_scope$public_api, TRUE)
-  expect_identical(
-    candidate$candidate$approval_policy$approval_record_bundled,
-    FALSE
+    TRUE
   )
   expect_identical(
-    unlist(
-      candidate$candidate$approval_record_contract$fields,
-      use.names = FALSE
-    ),
-    admission_fields
+    candidate$candidate$admission_policy$independent_reviewer_required,
+    FALSE
+  )
+  expect_identical(
+    candidate$candidate$admission_policy$optional_independent_review_permitted,
+    TRUE
+  )
+  expect_identical(
+    candidate$candidate$maintainer_decision$decided_by$github_login,
+    "Ryuya-dot-com"
+  )
+  expect_identical(
+    candidate$candidate$maintainer_decision$legal_basis$license_spdx,
+    "BSD-3-Clause"
   )
 })
 
-test_that("missing approval remains a deterministic fail-closed state", {
+test_that("the maintainer decision passes only the resource admission gate", {
   first <- admission_evaluate_function()
   second <- admission_evaluate_function()
-  unavailable <- admission_evaluate_function(
-    approval_path = tempfile("missing-approval-record-")
-  )
 
   expect_identical(first, second)
   expect_identical(
@@ -130,169 +62,79 @@ test_that("missing approval remains a deterministic fail-closed state", {
     c(
       "status", "admission_gate_passed", "package_release_ready",
       "failure_reason", "admission_ref", "candidate_ref", "resource_ref",
-      "approval_ref", "remaining_gates", "diagnostics"
+      "decision_ref", "remaining_gates", "diagnostics"
     )
   )
-  expect_identical(first$status, "pending_independent_review")
-  expect_identical(first$admission_gate_passed, FALSE)
+  expect_identical(first$status, "maintainer_decision_valid")
+  expect_identical(first$admission_gate_passed, TRUE)
   expect_identical(first$package_release_ready, FALSE)
-  expect_identical(first$failure_reason, "approval_missing")
-  expect_null(first$approval_ref)
-  expect_identical(first$diagnostics$approval_record_present, FALSE)
-  expect_identical(first$diagnostics$release_approved_resource_count, 0)
-  expect_identical(first$diagnostics$fallback_attempted, FALSE)
-  expect_identical(first$diagnostics$download_attempted, FALSE)
-  expect_identical(unavailable$status, "approval_error")
-  expect_identical(unavailable$failure_reason, "approval_unavailable")
-  expect_identical(unavailable$diagnostics$approval_state, "missing")
-})
-
-test_that("a complete independent record passes only the admission gate", {
-  result <- evaluate_approval()
-
-  expect_identical(result$status, "approval_record_valid")
-  expect_identical(result$admission_gate_passed, TRUE)
-  expect_identical(result$package_release_ready, FALSE)
-  expect_identical(result$failure_reason, NA_character_)
+  expect_identical(first$failure_reason, NA_character_)
   expect_identical(
-    result$approval_ref$approval_id,
-    "independent-tubelex-public-profile-review-v2"
+    first$decision_ref$decision_id,
+    "tubelex-maintainer-redistribution-decision-2026-08-06"
   )
-  expect_identical(result$approval_ref$decision, "approved")
+  expect_identical(first$decision_ref$authority, "package-maintainer")
+  expect_identical(first$diagnostics$release_approved_resource_count, 1)
+  expect_identical(first$diagnostics$independent_reviewer_required, FALSE)
   expect_identical(
-    result$diagnostics$reviewed_repository_commit,
-    admission_repository_commit
+    first$diagnostics$optional_independent_review_permitted,
+    TRUE
   )
   expect_identical(
-    result$diagnostics$reviewer_github_login,
-    "independent-reviewer"
-  )
-  expect_identical(result$diagnostics$independence_attestation_recorded, TRUE)
-  expect_identical(result$diagnostics$approval_authenticity_proven, FALSE)
-  expect_identical(result$diagnostics$cryptographic_signature_verified, FALSE)
-  expect_identical(
-    result$diagnostics$approval_authenticity_scope,
-    "record-and-evidence-identity-only"
+    first$diagnostics$independent_legal_opinion_obtained,
+    FALSE
   )
   expect_identical(
-    result$remaining_gates,
+    first$remaining_gates,
     "final release-candidate source, installed, and binary inventory audit"
   )
 })
 
-test_that("candidate identity and repository commit cannot drift", {
-  candidate_mismatch <- evaluate_approval(admission_values(list(
-    "Candidate-SHA256" = paste(rep.int("0", 64L), collapse = "")
-  )))
-  commit_mismatch <- evaluate_approval(
-    repository_commit = paste(rep.int("b", 40L), collapse = "")
-  )
-
-  expect_identical(
-    candidate_mismatch$failure_reason,
-    "approval_candidate_mismatch"
-  )
-  expect_identical(candidate_mismatch$admission_gate_passed, FALSE)
-  expect_identical(commit_mismatch$failure_reason, "repository_commit_mismatch")
-  expect_identical(commit_mismatch$admission_gate_passed, FALSE)
-})
-
-test_that("self-approval and absent independence attestations are rejected", {
-  self_approval <- evaluate_approval(admission_values(list(
-    "Reviewer-GitHub-Login" = "ryuya-DOT-com"
-  )))
-  no_attestation <- evaluate_approval(admission_values(list(
-    "Independence-Attested" = "false"
-  )))
-  builder <- evaluate_approval(admission_values(list(
-    "Not-Candidate-Author-Or-Builder" = "false"
-  )))
-
-  for (result in list(self_approval, no_attestation, builder)) {
-    expect_identical(result$status, "approval_error")
-    expect_identical(result$failure_reason, "reviewer_not_independent")
-    expect_identical(result$admission_gate_passed, FALSE)
-    expect_identical(result$package_release_ready, FALSE)
+test_that("missing and modified candidate bytes fail closed", {
+  missing_reader <- function(path, max_bytes) {
+    list(ok = FALSE, observed_state = "missing", bytes = NULL)
   }
+  candidate_path <- getFromNamespace(
+    ".lexres_tubelex_admission_paths",
+    "ldfreq"
+  )()$candidate_path
+  bytes <- readBin(candidate_path, what = "raw", n = file.info(candidate_path)$size)
+  bytes[[100L]] <- as.raw(bitwXor(as.integer(bytes[[100L]]), 1L))
+  modified_reader <- function(path, max_bytes) {
+    list(ok = TRUE, observed_state = "available", bytes = bytes)
+  }
+
+  missing <- admission_evaluate_function(reader = missing_reader)
+  modified <- admission_evaluate_function(reader = modified_reader)
+
+  expect_identical(missing$status, "candidate_error")
+  expect_identical(missing$failure_reason, "candidate_unavailable")
+  expect_identical(missing$admission_gate_passed, FALSE)
+  expect_identical(modified$status, "candidate_error")
+  expect_identical(modified$failure_reason, "candidate_hash_mismatch")
+  expect_identical(modified$admission_gate_passed, FALSE)
+  expect_identical(modified$diagnostics$fallback_attempted, FALSE)
+  expect_identical(modified$diagnostics$download_attempted, FALSE)
 })
 
-test_that("review evidence is exact and never searched by locator", {
-  tampered <- evaluate_approval(
-    evidence_bytes = charToRaw("changed evidence\n")
-  )
-  approval_path <- write_approval()
-  on.exit(unlink(approval_path), add = TRUE)
-  missing_evidence <- admission_evaluate_function(
-    approval_path = approval_path,
-    evidence_path = tempfile("missing-review-evidence-"),
-    repository_commit = admission_repository_commit
-  )
+test_that("candidate semantics require the approved scope and risk boundary", {
+  path <- getFromNamespace(".lexres_tubelex_admission_paths", "ldfreq")()$candidate_path
+  candidate <- jsonlite::read_json(path, simplifyVector = FALSE)
+  changed_scope <- candidate
+  changed_scope$maintainer_decision$approved_scopes$public_api_scope <- FALSE
+  changed_boundary <- candidate
+  changed_boundary$distribution_scope$raw_subtitles_or_identifiers_included <- TRUE
 
-  expect_identical(tampered$failure_reason, "evidence_hash_mismatch")
-  expect_identical(tampered$admission_gate_passed, FALSE)
-  expect_identical(missing_evidence$failure_reason, "evidence_unavailable")
-  expect_identical(missing_evidence$diagnostics$evidence_state, "missing")
-  expect_identical(missing_evidence$diagnostics$fallback_attempted, FALSE)
-  expect_identical(missing_evidence$diagnostics$download_attempted, FALSE)
-})
-
-test_that("incomplete scope and reviewer rejection remain blocking", {
-  incomplete <- evaluate_approval(admission_values(list(
-    "Notice-And-Attribution" = "not-approved"
-  )))
-  rejected <- evaluate_approval(admission_values(list(
-    "Decision" = "rejected",
-    "Redistribution-Terms" = "not-approved"
-  )))
-
-  expect_identical(incomplete$failure_reason, "approval_scope_incomplete")
-  expect_identical(incomplete$admission_gate_passed, FALSE)
-  expect_identical(rejected$status, "independent_review_rejected")
-  expect_identical(rejected$failure_reason, "approval_rejected")
-  expect_identical(rejected$admission_gate_passed, FALSE)
-})
-
-test_that("public API scope must be reviewed and approved", {
-  not_approved <- evaluate_approval(admission_values(list(
-    "Public-API-Scope" = "not-approved"
-  )))
-  legacy_unreviewed <- evaluate_approval(admission_values(list(
-    "Public-API-Scope" = "not-reviewed"
-  )))
-
-  expect_identical(not_approved$failure_reason, "approval_scope_incomplete")
-  expect_identical(not_approved$admission_gate_passed, FALSE)
-  expect_identical(legacy_unreviewed$failure_reason, "approval_schema_mismatch")
-})
-
-test_that("malformed approval records fail before evidence interpretation", {
-  values <- admission_values()
-  malformed_text <- paste0(
-    paste0(names(values), ": ", unname(values), collapse = "\n"),
-    "\nDecision: approved\n"
-  )
-  approval_path <- write_test_bytes(
-    charToRaw(malformed_text),
-    "malformed-tubelex-approval-",
-    ".dcf"
-  )
-  evidence_path <- write_evidence()
-  on.exit(unlink(c(approval_path, evidence_path)), add = TRUE)
-
-  result <- admission_evaluate_function(
-    approval_path = approval_path,
-    evidence_path = evidence_path,
-    repository_commit = admission_repository_commit
-  )
-  expect_identical(result$failure_reason, "approval_schema_mismatch")
-  expect_identical(result$admission_gate_passed, FALSE)
+  expect_true(admission_semantics_function(candidate))
+  expect_false(admission_semantics_function(changed_scope))
+  expect_false(admission_semantics_function(changed_boundary))
 })
 
 test_that("the admission path has no network, shell, or fallback calls", {
   functions <- list(
     admission_candidate_function,
     admission_evaluate_function,
-    getFromNamespace(".lexres_parse_admission_approval", "ldfreq")
+    admission_semantics_function
   )
   calls <- unique(unlist(lapply(
     functions,

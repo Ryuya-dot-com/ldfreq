@@ -141,8 +141,8 @@ computable value.
 \section{Candidate and deferred surfaces}{
 The raw-text, lexical-level, and TUBELEX functions are separately versioned
 public-API candidates and do not redefine the frozen v0.1 core. The new TUBELEX
-public API scope remains non-release-approved until independent review and final
-package inventory gates pass. The separately named expected-TTR D candidate
+public API scope is covered by a byte-pinned maintainer decision; final package
+inventory checks remain open. The separately named expected-TTR D candidate
 remains deferred.
 }
 \section{Offline smoke test}{

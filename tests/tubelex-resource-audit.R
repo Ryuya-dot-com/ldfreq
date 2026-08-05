@@ -219,30 +219,30 @@ check(
 )
 
 admission_candidate <- .lexres_load_tubelex_admission_candidate()
-admission_pending <- .lexres_evaluate_tubelex_admission()
+admission_decision <- .lexres_evaluate_tubelex_admission()
 check(
   identical(admission_candidate$status, "candidate_ok") &&
     identical(
       admission_candidate$diagnostics$candidate_sha256,
       .lexres_tubelex_admission_candidate_sha256
     ) &&
-    identical(admission_candidate$diagnostics$candidate_bytes, 3210),
+    identical(admission_candidate$diagnostics$candidate_bytes, 3659),
   "The installed TUBELEX admission candidate changed."
 )
 check(
-  identical(admission_pending$status, "pending_independent_review") &&
-    identical(admission_pending$failure_reason, "approval_missing") &&
-    identical(admission_pending$admission_gate_passed, FALSE) &&
-    identical(admission_pending$package_release_ready, FALSE) &&
-    identical(admission_pending$diagnostics$release_approved_resource_count, 0),
-  "The installed TUBELEX candidate overstated admission or release readiness."
+  identical(admission_decision$status, "maintainer_decision_valid") &&
+    is.na(admission_decision$failure_reason) &&
+    identical(admission_decision$admission_gate_passed, TRUE) &&
+    identical(admission_decision$package_release_ready, FALSE) &&
+    identical(admission_decision$diagnostics$release_approved_resource_count, 1),
+  "The installed TUBELEX maintainer decision or release boundary changed."
 )
 check(
-  identical(admission_pending$diagnostics$fallback_attempted, FALSE) &&
-    identical(admission_pending$diagnostics$download_attempted, FALSE) &&
-    identical(admission_pending$diagnostics$approval_authenticity_proven, FALSE) &&
-    identical(admission_pending$diagnostics$cryptographic_signature_verified, FALSE),
-  "The installed admission gate gained fallback or overstated evidence."
+  identical(admission_decision$diagnostics$fallback_attempted, FALSE) &&
+    identical(admission_decision$diagnostics$download_attempted, FALSE) &&
+    identical(admission_decision$diagnostics$independent_reviewer_required, FALSE) &&
+    identical(admission_decision$diagnostics$independent_legal_opinion_obtained, FALSE),
+  "The installed admission gate gained fallback or misstated review scope."
 )
 
 known_rows <- list(
@@ -338,37 +338,38 @@ lookup_contract <- jsonlite::read_json(
 check(
   identical(lookup_contract$contract_id, "ldfreq-lexical-resource-lookup") &&
     identical(lookup_contract$contract_version, "0.1.0-draft.1") &&
-    identical(lookup_contract$status, "internal-development-candidate") &&
+    identical(lookup_contract$status, "internal-release-candidate") &&
     identical(lookup_contract$public_api, FALSE) &&
-    identical(lookup_contract$release_approved, FALSE) &&
+    identical(lookup_contract$release_approved, TRUE) &&
     identical(lookup_contract$runtime_policy$network_access, FALSE) &&
     identical(lookup_contract$runtime_policy$fallback, FALSE),
   "The installed internal lookup-contract boundary changed."
 )
 check(
   identical(inventory$schema_version, "0.1.0") &&
-    identical(inventory$reviewed_on, "2026-08-05") &&
+    identical(inventory$reviewed_on, "2026-08-06") &&
     identical(
       inventory$package_scope,
-      "public-api-resource-candidate-development"
+      "public-api-resource-release-candidate"
     ) &&
-    identical(inventory$policy$release_requires_independent_approval, TRUE) &&
+    identical(inventory$policy$release_requires_independent_approval, FALSE) &&
+    identical(inventory$policy$release_requires_maintainer_license_decision, TRUE) &&
     identical(inventory$policy$uncertainty_default, "exclude") &&
     identical(inventory$policy$runtime_network_access, FALSE) &&
     identical(inventory$policy$implicit_download_or_fallback, FALSE),
   "The installed resource-inventory policy changed."
 )
 check(
-  identical(as.numeric(inventory$release_approved_resource_count), 0) &&
+  identical(as.numeric(inventory$release_approved_resource_count), 1) &&
     length(inventory$included_resources) == 1L,
   "The installed inventory overstated release approval or resource count."
 )
 inventory_resource <- inventory$included_resources[[1L]]
 check(
   identical(inventory_resource$resource_id, "tubelex-en-treebank-slim") &&
-    identical(inventory_resource$distribution_state, "development-candidate") &&
+    identical(inventory_resource$distribution_state, "release-candidate") &&
     identical(inventory_resource$runtime_state, "public") &&
-    identical(inventory_resource$release_approved, FALSE) &&
+    identical(inventory_resource$release_approved, TRUE) &&
     identical(inventory_resource$public_api, TRUE) &&
     identical(inventory_resource$license_spdx, "BSD-3-Clause") &&
     identical(inventory_resource$raw_source_bundled, FALSE) &&

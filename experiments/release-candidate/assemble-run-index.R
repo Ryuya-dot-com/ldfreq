@@ -256,7 +256,7 @@ for (index in seq_along(inventories)) {
     paste("Resource inventory artifact drift:", inventory_label)
   )
   check(
-    identical(as.numeric(inventory_record$release_approved_resource_count), 0) &&
+    identical(as.numeric(inventory_record$release_approved_resource_count), 1) &&
       identical(inventory_record$undeclared_extdata_observed, FALSE),
     paste("Resource boundary changed:", inventory_label)
   )
@@ -306,10 +306,10 @@ index <- list(
   ],
   evidence_files = list(source = source_records, checks = check_records),
   go_no_go = list(
-    decision = "PENDING_INDEPENDENT_REVIEW",
+    decision = "PENDING_MAINTAINER_RELEASE_DECISION",
     reason = paste(
-      "Technical completion cannot replace independent review of the exact",
-      "candidate commit, workflow definition, evidence, and release scope."
+      "The technical matrix and recorded resource decision do not replace the",
+      "maintainer's final go/no-go judgment for the exact release candidate."
     )
   )
 )

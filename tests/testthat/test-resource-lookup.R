@@ -264,9 +264,9 @@ test_that("the installed contract records the internal and offline boundary", {
 
   expect_identical(contract$contract_id, "ldfreq-lexical-resource-lookup")
   expect_identical(contract$contract_version, "0.1.0-draft.1")
-  expect_identical(contract$status, "internal-development-candidate")
+  expect_identical(contract$status, "internal-release-candidate")
   expect_identical(contract$public_api, FALSE)
-  expect_identical(contract$release_approved, FALSE)
+  expect_identical(contract$release_approved, TRUE)
   expect_identical(contract$input_contract$normalization_applied, FALSE)
   expect_identical(
     contract$matching_contract$unmatched_measurements,

@@ -17,10 +17,9 @@ explicit. It supersedes the earlier
 immutable 0.1.0 release-candidate evidence; a new cross-platform candidate and
 go/no-go review are required before tagging or CRAN submission.
 
-The TUBELEX bytes and license unit are bundled and technically validated. The
-new public API scope remains explicitly non-release-approved until a new
-independent review record and final source/installed/binary inventory audit are
-complete.
+The TUBELEX bytes, BSD-3-Clause notice, and public profile are technically
+validated and maintainer-approved for the release candidate. The exact
+source/installed/binary inventory audit remains a final package-level gate.
 
 The implemented metric set is:
 
@@ -344,7 +343,7 @@ downloads a fallback.
 It contains the slim TUBELEX-EN Treebank aggregate at commit `7cb5fb36`. Its
 exact manifest, 2.55 MB gzip artifact, canonical-content hash, build provenance,
 BSD 3-Clause notice, and COPYRIGHTS entry are installed together. The new
-frequency-profile API is a development candidate and does not turn TUBELEX
+frequency-profile API is a release candidate and does not turn TUBELEX
 frequency into context-independent lexical sophistication. NGSL and Open
 English WordNet remain excluded until their complete artifact, contract, and
 notice units pass the same gates.
@@ -359,16 +358,14 @@ TUBELEX path performs bounded streaming gzip expansion and validates the fixed
 normalization option while retaining both original and lookup terms. It
 preserves order and duplicates, returns token/type coverage diagnostics, and
 keeps unmatched measurements missing rather than coercing them to zero. The
-wrapper's public-API scope is a new review target and is not a release approval.
+wrapper's public-API scope is covered by the byte-pinned maintainer decision.
 
-A byte-pinned admission candidate and non-exported evidence evaluator now make
-the remaining independent-review boundary executable. The current installed
-state deliberately returns `pending_independent_review`; no approval record is
-bundled. Any later record must bind an independent reviewer, the exact candidate
-and repository commit, explicit distribution-scope decisions, and preserved
-review-evidence bytes. Because candidate v2 includes the public-profile scope,
-passing that structural gate would leave only the final named-release source,
-installed, and binary inventory audit open.
+A byte-pinned admission candidate records the maintainer's BSD-3-Clause,
+provenance, distribution, and public-profile decision together with explicit
+risk controls. The non-exported evaluator returns
+`maintainer_decision_valid` only when those exact bytes and scopes remain
+intact. Independent review is optional; the remaining blocking gate is the
+final named-release source, installed, and binary inventory audit.
 
 ## License
 

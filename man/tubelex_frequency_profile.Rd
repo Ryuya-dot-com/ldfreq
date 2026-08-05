@@ -39,12 +39,15 @@ The lossless \code{lookup} table contains:
   \item{\code{count}}{Raw token occurrences in the pinned TUBELEX aggregate.}
   \item{\code{videos}, \code{channels}}{Numbers of source videos and channels
   containing the matched resource entry.}
-  \item{\code{zipf}}{Smoothed per-billion token frequency:
-  \code{log10(1e9 * (count + 1) / (token_total + source_vocabulary_size))}.}
-  \item{\code{video_prevalence}}{Smoothed log video proportion:
-  \code{log10((videos + 1) / (video_total + 2))}.}
-  \item{\code{channel_prevalence}}{Smoothed log channel proportion:
-  \code{log10((channels + 1) / (channel_total + 2))}.}
+  \item{\code{zipf}}{Smoothed per-billion token frequency. It is the base-10
+  logarithm of \code{1e9 * (count + 1) / D}, where \code{D} equals
+  \code{token_total + source_vocabulary_size}.}
+  \item{\code{video_prevalence}}{Smoothed log video proportion. It is
+  \code{log10((videos + 1) / Dv)}, where \code{Dv} equals
+  \code{video_total + 2}.}
+  \item{\code{channel_prevalence}}{Smoothed log channel proportion. It is
+  \code{log10((channels + 1) / Dc)}, where \code{Dc} equals
+  \code{channel_total + 2}.}
 }
 
 The four denominators are stored in
@@ -61,9 +64,9 @@ The public profile contract is installed as
 \file{tubelex-frequency-profile-contract.json}; exact lookup formulas and
 field roles are installed as \file{lexical-resource-lookup-contract.json}.
 Locate either with \code{system.file("spec", filename, package = "ldfreq")}.
-The current public profile contract remains a development candidate pending
-independent resource readmission; that state is separate from the byte-level
-integrity checks performed at runtime.
+The public profile is a maintainer-approved release candidate. Its byte-pinned
+admission decision is separate from both runtime integrity checks and the final
+named-package inventory and go/no-go decision.
 }
 \value{
 A \code{tubelex_frequency_profile} list containing \code{status},

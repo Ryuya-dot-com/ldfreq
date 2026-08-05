@@ -12,20 +12,20 @@
     "resource",
     "distribution_scope",
     "contract_refs",
-    "approval_policy",
-    "approval_record_contract",
+    "admission_policy",
+    "maintainer_decision",
     "remaining_gates_after_resource_approval"
   ],
   "properties": {
     "$schema": {"const": "tubelex-release-admission-candidate.schema.json"},
-    "schema_version": {"const": "0.2.0"},
-    "candidate_id": {"const": "tubelex-en-treebank-slim-7cb5fb36-public-profile-admission-v2"},
-    "candidate_state": {"const": "pending-independent-review"},
+    "schema_version": {"const": "0.3.0"},
+    "candidate_id": {"const": "tubelex-en-treebank-slim-7cb5fb36-public-profile-admission-v3"},
+    "candidate_state": {"const": "maintainer-approved"},
     "resource": {"$ref": "#/$defs/resource"},
     "distribution_scope": {"$ref": "#/$defs/distributionScope"},
     "contract_refs": {"$ref": "#/$defs/contractRefs"},
-    "approval_policy": {"$ref": "#/$defs/approvalPolicy"},
-    "approval_record_contract": {"$ref": "#/$defs/approvalRecordContract"},
+    "admission_policy": {"$ref": "#/$defs/admissionPolicy"},
+    "maintainer_decision": {"$ref": "#/$defs/maintainerDecision"},
     "remaining_gates_after_resource_approval": {
       "type": "array",
       "prefixItems": [
@@ -79,13 +79,13 @@
         "release_approved"
       ],
       "properties": {
-        "package_component_state": {"const": "public-api-development-candidate"},
+        "package_component_state": {"const": "release-candidate"},
         "raw_source_bundled": {"const": false},
         "raw_subtitles_or_identifiers_included": {"const": false},
         "runtime_network_access": {"const": false},
         "implicit_download_or_fallback": {"const": false},
         "public_api": {"const": true},
-        "release_approved": {"const": false}
+        "release_approved": {"const": true}
       }
     },
     "contractRefs": {
@@ -112,52 +112,71 @@
         "public_profile_contract_version": {"const": "0.1.0-draft.1"}
       }
     },
-    "approvalPolicy": {
+    "admissionPolicy": {
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "decision_authority",
         "independent_reviewer_required",
-        "candidate_author_or_builder_may_approve",
-        "approval_record_bundled",
-        "unsigned_local_claim_is_not_proof",
-        "disallowed_approver_logins"
+        "optional_independent_review_permitted",
+        "automated_identity_checks_required",
+        "final_inventory_audit_required"
       ],
       "properties": {
-        "independent_reviewer_required": {"const": true},
-        "candidate_author_or_builder_may_approve": {"const": false},
-        "approval_record_bundled": {"const": false},
-        "unsigned_local_claim_is_not_proof": {"const": true},
-        "disallowed_approver_logins": {
-          "type": "array",
-          "prefixItems": [{"const": "Ryuya-dot-com"}],
-          "items": false,
-          "minItems": 1,
-          "maxItems": 1
-        }
+        "decision_authority": {"const": "package-maintainer"},
+        "independent_reviewer_required": {"const": false},
+        "optional_independent_review_permitted": {"const": true},
+        "automated_identity_checks_required": {"const": true},
+        "final_inventory_audit_required": {"const": true}
       }
     },
-    "approvalRecordContract": {
+    "maintainerDecision": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "format",
-        "schema_id",
-        "schema_version",
-        "fields",
-        "approved_scope_values"
+        "decision_id",
+        "decision",
+        "decided_on",
+        "decided_by",
+        "legal_basis",
+        "approved_scopes",
+        "risk_controls"
       ],
       "properties": {
-        "format": {"const": "strict-single-record-dcf"},
-        "schema_id": {"const": "ldfreq-resource-release-approval"},
-        "schema_version": {"const": "0.1.0"},
-        "fields": {
-          "type": "array",
-          "minItems": 21,
-          "maxItems": 21,
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
+        "decision_id": {"const": "tubelex-maintainer-redistribution-decision-2026-08-06"},
+        "decision": {"const": "approved"},
+        "decided_on": {"const": "2026-08-06"},
+        "decided_by": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "github_login", "role"],
+          "properties": {
+            "name": {"const": "Komuro Ryuya"},
+            "github_login": {"const": "Ryuya-dot-com"},
+            "role": {"const": "package-maintainer"}
+          }
         },
-        "approved_scope_values": {
+        "legal_basis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "upstream_repository",
+            "pinned_license_url",
+            "upstream_readme_url",
+            "cran_policy_url",
+            "license_spdx",
+            "interpretation"
+          ],
+          "properties": {
+            "upstream_repository": {"const": "https://github.com/naist-nlp/tubelex"},
+            "pinned_license_url": {"type": "string", "format": "uri"},
+            "upstream_readme_url": {"type": "string", "format": "uri"},
+            "cran_policy_url": {"const": "https://cran.r-project.org/web/packages/policies.html"},
+            "license_spdx": {"const": "BSD-3-Clause"},
+            "interpretation": {"type": "string", "minLength": 1}
+          }
+        },
+        "approved_scopes": {
           "type": "object",
           "additionalProperties": false,
           "required": [
@@ -168,11 +187,31 @@
             "public_api_scope"
           ],
           "properties": {
-            "redistribution_terms": {"const": "approved"},
-            "notice_and_attribution": {"const": "approved"},
-            "source_and_artifact_identity": {"const": "approved"},
-            "package_distribution_scope": {"const": "approved"},
-            "public_api_scope": {"const": "approved"}
+            "redistribution_terms": {"const": true},
+            "notice_and_attribution": {"const": true},
+            "source_and_artifact_identity": {"const": true},
+            "package_distribution_scope": {"const": true},
+            "public_api_scope": {"const": true}
+          }
+        },
+        "risk_controls": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "raw_subtitles_or_identifiers_included",
+            "upstream_commit_and_source_hash_pinned",
+            "bsd_notice_and_disclaimer_installed",
+            "transformation_disclosed",
+            "runtime_download_or_fallback",
+            "independent_legal_opinion_obtained"
+          ],
+          "properties": {
+            "raw_subtitles_or_identifiers_included": {"const": false},
+            "upstream_commit_and_source_hash_pinned": {"const": true},
+            "bsd_notice_and_disclaimer_installed": {"const": true},
+            "transformation_disclosed": {"const": true},
+            "runtime_download_or_fallback": {"const": false},
+            "independent_legal_opinion_obtained": {"const": false}
           }
         }
       }

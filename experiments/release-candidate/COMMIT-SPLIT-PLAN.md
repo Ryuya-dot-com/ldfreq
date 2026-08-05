@@ -3,8 +3,7 @@
 Audit date: 2026-08-05
 
 This document records the intended split of the current uncommitted release
-work. It is not a release approval record and does not assert that an external
-review has occurred.
+work. It is not final 0.1.0 release evidence.
 
 ## Audited starting point
 
@@ -49,9 +48,7 @@ R/variant-metrics.R
 experiments/package-resource-inventory/validate-package-resource-inventory.R
 experiments/release-candidate/generate-release-evidence.R
 experiments/resource-admission/README.md
-experiments/resource-admission/REVIEWER-GUIDE.md
-experiments/resource-admission/approval-record.template.dcf
-experiments/resource-admission/review-evidence-template.md
+experiments/resource-admission/OPTIONAL-REVIEW.md
 experiments/tubelex-source-build/README.md
 inst/spec/ldfreq-preprocessing-contract.json
 inst/spec/ldfreq-preprocessing-contract.schema.json
@@ -151,12 +148,11 @@ Suggested subject:
 Freeze ldfreq 0.1.0 release candidate
 ```
 
-The independent TUBELEX admission record must name the reviewer, decision,
-candidate ID, candidate SHA-256, exact reviewed commit, evidence location, and
-evidence SHA-256. A conversational statement of approval is not enough to
-manufacture those fields. Until a complete external DCF record is supplied and
-validated, the package status remains `pending-independent-review` and the
-inventory keeps `release_approved` false.
+The byte-pinned TUBELEX admission candidate contains the maintainer's explicit
+license and distribution decision, upstream URLs, approved scopes, and risk
+controls. Independent review is optional. The final freeze must retain that
+decision, reproduce the candidate and resource identities, and pass the exact
+source/installed/binary inventory audits.
 
 ## Candidate gates after the split
 
@@ -171,10 +167,10 @@ From the exact freeze commit and an unmodified checkout:
 4. Build and inspect the PDF manual and vignettes.
 5. Install the exact tarball and run the offline smoke example.
 6. Verify that conditional suggested backends remain conditional when absent.
-7. Validate and bind the independent resource-admission DCF to the exact
-   reviewed commit and evidence bundle.
+7. Validate the bundled maintainer resource-admission decision and its exact
+   candidate bytes.
 8. Merge through the protected-branch review workflow; do not bypass required
-   CI or reviewer gates.
+   CI gates.
 
 Any evidence generated before these commits is useful only as pre-commit
 diagnostic evidence. It must not be presented as evidence for the later frozen

@@ -128,13 +128,17 @@ inventory <- jsonlite::read_json(inventory_source_path, simplifyVector = FALSE)
 inventory_schema <- jsonlite::read_json(schema_source_path, simplifyVector = FALSE)
 check(
   identical(inventory$schema_version, "0.1.0") &&
-    identical(inventory$policy$release_requires_independent_approval, TRUE),
+    identical(inventory$policy$release_requires_independent_approval, FALSE) &&
+    identical(
+      inventory$policy$release_requires_maintainer_license_decision,
+      TRUE
+    ),
   "Resource inventory policy changed."
 )
 check(
-  identical(as.numeric(inventory$release_approved_resource_count), 0) &&
+  identical(as.numeric(inventory$release_approved_resource_count), 1) &&
     length(inventory$included_resources) == 1L,
-  "The development inventory must retain zero release-approved resources."
+  "The inventory must retain one maintainer-approved bundled resource."
 )
 check(
   identical(inventory_schema$title, "ldfreq installed resource inventory") &&
@@ -436,7 +440,7 @@ evidence <- list(
   platform_archive = archive_record(platform_archive),
   audited_members = member_records,
   extdata_members = expected_extdata,
-  release_approved_resource_count = 0,
+  release_approved_resource_count = 1,
   undeclared_extdata_observed = FALSE,
   assertions = assertions
 )

@@ -13,9 +13,9 @@
     "$schema": {"const": "tubelex-frequency-profile-contract.schema.json"},
     "contract_id": {"const": "ldfreq-tubelex-frequency-profile"},
     "contract_version": {"const": "0.1.0-draft.1"},
-    "status": {"const": "public-api-candidate-pending-resource-readmission"},
+    "status": {"const": "public-api-release-candidate"},
     "public_api": {"const": true},
-    "release_approved": {"const": false},
+    "release_approved": {"const": true},
     "resource": {"type": "object"},
     "query_normalization": {"type": "object"},
     "lookup_columns": {
@@ -29,7 +29,7 @@
     "runtime_policy": {"type": "object"},
     "remaining_release_gates": {
       "type": "array",
-      "minItems": 2,
+      "minItems": 1,
       "items": {"type": "string"}
     }
   }

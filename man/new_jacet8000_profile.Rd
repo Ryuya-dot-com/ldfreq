@@ -196,7 +196,7 @@ resource-boundary rules are installed in
 \file{lexical-level-profile-contract.json}. Locate it with
 \code{system.file("spec", "lexical-level-profile-contract.json", package =
 "ldfreq")}. The contract records that the resource is caller supplied and not
-release-approved for redistribution by this package.
+redistributed by this package; the adapter API itself is release-approved.
 }
 \value{
 \code{new_jacet8000_profile()} returns a list of class

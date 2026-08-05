@@ -177,10 +177,10 @@ test_that("the installed TUBELEX profile contract records the conditional releas
   expect_identical(contract$contract_version, "0.1.0-draft.1")
   expect_identical(
     contract$status,
-    "public-api-candidate-pending-resource-readmission"
+    "public-api-release-candidate"
   )
   expect_identical(contract$public_api, TRUE)
-  expect_identical(contract$release_approved, FALSE)
+  expect_identical(contract$release_approved, TRUE)
   expect_identical(
     unlist(contract$lookup_columns, use.names = FALSE),
     names(empty$lookup)

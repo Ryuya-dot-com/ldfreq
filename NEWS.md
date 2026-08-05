@@ -38,9 +38,12 @@
 - Added `new_jacet8000_profile_batch()` with explicit document identity, a
   one-read shared-resource path, document-major lossless lookup and profile
   tables, separate preprocessing provenance, and a pre-computation row bound.
-- Added public preprocessing and TUBELEX-profile candidate contracts. The new
-  TUBELEX public API scope is not release-approved until it receives a new
-  independent review and final source/installed/binary inventory audit.
+- Added public preprocessing, New JACET, and TUBELEX-profile candidate
+  contracts. The TUBELEX resource and public profile are maintainer-approved in
+  a byte-pinned decision that records the upstream BSD-3-Clause basis, approved
+  scopes, and risk controls; independent review is optional. The caller-supplied
+  New JACET API is also release-approved without redistributing its word list.
+  Final source/installed/binary inventory checks remain open.
 - Made New JACET rank-entry and flemma-override canonical hashes invariant to
   source row order, and made tokenization consumers reject corrupted offsets
   or number flags before computing downstream results.
@@ -87,13 +90,13 @@
 - Added strict handling of invalid, empty, and short documents.
 - Added a non-exported, byte-pinned local-resource loader with fixed failure
   precedence, one-read hashing/decoding, bounded inventories, and no network or
-  fallback behavior. Only CC0 synthetic fixtures are admitted at this stage.
+  fallback behavior.
 - Added `digest` as the portable raw-byte SHA-256 backend and an explicit R 4.1
   CI lane to verify the declared minimum R version.
-- Added the separately licensed slim TUBELEX-EN aggregate as a non-exported
-  development candidate with a byte-pinned DCF manifest, build provenance,
+- Added the separately licensed slim TUBELEX-EN aggregate as a byte-pinned
+  release candidate with a DCF manifest, build provenance,
   BSD-3-Clause NOTICE/COPYRIGHTS records, and a machine-readable package
-  inventory that still reports zero release-approved resources.
+  inventory that reports one maintainer-approved resource.
 - Added bounded one-read gzip decoding and a strict 515,292-row TUBELEX
   frequency/prevalence adapter. The runtime has no download or fallback path.
 - Added installed-package tamper/membership audits and Ubuntu/Windows
@@ -108,19 +111,16 @@
   transformations, token/type coverage diagnostics, structured propagation of
   resource failures, and no normalization, network, download, or fallback.
 - Added the lookup contract and schema to source, platform-package, and
-  installed-package inventory audits while retaining zero release-approved
-  resources and no public lexical-resource API.
+  installed-package inventory audits together with the public
+  lexical-resource profile boundary.
 - Added a byte-pinned TUBELEX release-admission candidate and a non-exported,
-  fail-closed evaluator for strict independent-review records. It rejects
-  missing approval, self-approval, candidate/commit drift, incomplete scope,
-  reviewer rejection, and altered evidence without network or fallback.
+  fail-closed evaluator for the maintainer's license and distribution decision.
+  It rejects missing, modified, or semantically weakened candidate bytes
+  without network or fallback.
 - Added a repository command wrapper and source/platform/installed membership
-  auditing for the admission contract. A valid record can pass only the
-  resource-admission gate; package release readiness remains false and no
-  approval record is bundled.
-- Defined evidence and decision-record requirements for possible future
-  TUBELEX admission. Automation may support review but cannot supply the
-  required independent identity, attestations, or decision.
+  auditing for the admission contract. A valid decision passes only the
+  resource-admission gate; final package release readiness remains false until
+  the named-candidate inventory and maintainer go/no-go steps pass.
 - Added introductory documentation and cross-platform R package checks.
 - Added a contract-derived direction and scale table, explicit interpretation
   nonclaims, and clearer advisory quality-screen guidance.

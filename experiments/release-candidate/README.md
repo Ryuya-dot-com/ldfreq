@@ -29,4 +29,5 @@ current-R source/platform/installed resource-inventory records, and their exact
 source-artifact identity before writing a single run index. It also binds job
 labels to their recorded OS/R environments and rechecks every source, manual,
 BOM, SBOM, and resource-BOM identity named by provenance. It deliberately leaves
-the human go/no-go decision pending.
+the final maintainer go/no-go decision pending after recording resource
+admission.

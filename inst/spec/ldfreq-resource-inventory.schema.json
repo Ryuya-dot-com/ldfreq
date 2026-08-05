@@ -24,12 +24,14 @@
       "additionalProperties": false,
       "required": [
         "release_requires_independent_approval",
+        "release_requires_maintainer_license_decision",
         "uncertainty_default",
         "runtime_network_access",
         "implicit_download_or_fallback"
       ],
       "properties": {
-        "release_requires_independent_approval": {"const": true},
+        "release_requires_independent_approval": {"const": false},
+        "release_requires_maintainer_license_decision": {"const": true},
         "uncertainty_default": {"const": "exclude"},
         "runtime_network_access": {"const": false},
         "implicit_download_or_fallback": {"const": false}
@@ -81,7 +83,7 @@
       "properties": {
         "resource_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
         "resource_version": {"type": "string", "minLength": 1},
-        "distribution_state": {"enum": ["development-candidate", "release"]},
+        "distribution_state": {"enum": ["development-candidate", "release-candidate", "release"]},
         "runtime_state": {"enum": ["internal-only", "public"]},
         "release_approved": {"type": "boolean"},
         "public_api": {"type": "boolean"},

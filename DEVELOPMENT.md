@@ -38,8 +38,7 @@ resolution.
 
 ## Repository gate
 
-Before a release is tagged, the GitHub rules for `main` must be independently
-verified to:
+Before a release is tagged, the GitHub rules for `main` must be verified to:
 
 - require pull requests and an up-to-date branch;
 - require the exact status check `R-CMD-check required`, with GitHub Actions as
@@ -54,22 +53,19 @@ candidate. The matrix jobs retain platform-specific diagnostics; the stable
 `R-CMD-check required` job is the single branch-rule interface and passes only
 when every matrix job passes.
 
-A status job defined in the same pull request is not a trust anchor: the pull
-request could weaken the workflow and emit the same successful job name. Before
-a release, changes under `.github/workflows/` must therefore require an
-independent code-owner approval, or the required result must come from a
-separately administered workflow or application whose definition the candidate
-cannot change. A zero-review rule may avoid deadlock during single-maintainer
-development, but it leaves this exception unresolved and does not satisfy the
-release gate. Once an independent maintainer is available, require at least one
-code-owner approval for workflow changes.
+A status job defined in the same pull request is not by itself a trust anchor:
+the pull request could weaken the workflow and emit the same successful job
+name. The final maintainer decision must therefore record and inspect the exact
+workflow-definition hash together with the protected ruleset and check logs.
+Independent code-owner review or a separately administered workflow is welcome
+as additional assurance but is not required for a single-maintainer release.
 
 ## Resource admission
 
 NGSL and Open English WordNet remain separate future work. TUBELEX-EN is
-included as a public-API development candidate: its exact source, manifest,
-artifact/content hashes, provenance, BSD notice, and installed paths are fixed,
-but it is not release-approved. The exported `tubelex_frequency_profile()`
+included as a maintainer-approved public-API release candidate: its exact
+source, manifest, artifact/content hashes, provenance, BSD notice, and installed
+paths are fixed. The exported `tubelex_frequency_profile()`
 wrapper applies an explicit identity or TUBELEX-oriented query transform,
 retains original and lookup terms, reports token/type coverage and
 normalization collisions, and leaves unmatched measurements missing rather
@@ -86,19 +82,18 @@ availability is not treated as downstream redistribution permission, and only
 caller-authorized local input is read without a network path.
 A resource-backed feature is not complete until its lookup contract, coverage
 diagnostics, offline behavior, public lifecycle, and source/installed/platform-
-binary membership have all been verified and independently approved.
+binary membership have all been verified and the maintainer's admission
+decision has been recorded.
 
-The installed release-admission candidate is separately byte-pinned and still
-states `pending-independent-review`. Its non-exported evaluator accepts only a
-strict single-record DCF approval bound to the exact candidate hash, reviewed
-repository commit, reviewer identity and independence attestations, approved
-distribution and public-profile scopes, and a preserved evidence-file hash.
-Missing approval,
-self-approval, commit drift, incomplete scope, rejection, and altered evidence
-all fail closed without search, download, or fallback. A structurally valid
-record closes only this admission-record gate: the evaluator always leaves
-`package_release_ready` false and does not authenticate the reviewer, verify a
-signature, or approve the final release.
+The installed release-admission candidate is separately byte-pinned and states
+`maintainer-approved`. It records the pinned upstream BSD-3-Clause license and
+README, CRAN policy basis, maintainer identity and date, approved distribution
+and public-profile scopes, and explicit risk controls. Missing, modified, or
+semantically weakened candidate bytes fail closed without search, download, or
+fallback. A valid decision closes only the resource-admission gate: the
+evaluator always leaves `package_release_ready` false until the final exact
+source, installed, and binary inventory audit passes. Independent review is an
+optional additional check, not a release prerequisite.
 
 The current non-exported loader establishes only the common integrity and
 failure boundary. It consumes exact local paths, hashes the same raw bytes that
@@ -128,17 +123,17 @@ a noncooperating process. The pinned upstream source itself is not bundled.
 
 Every ordinary package check loads the installed TUBELEX candidate and verifies
 its manifest, compressed and decoded hashes, NOTICE, provenance, inventory,
-row/totals invariants, exact lookup and coverage behavior, the fail-closed
-pending admission state, bounded expansion, mutation failure, and absence of
+row/totals invariants, exact lookup and coverage behavior, the byte-pinned
+maintainer admission decision, bounded expansion, mutation failure, and absence of
 runtime network or fallback. In addition,
 every release-R job on Ubuntu, macOS, and Windows builds a fresh source archive
 and platform package, installs it in a clean library, and verifies that all
 declared resource/legal/inventory, lookup-contract, and admission-candidate
 members remain byte-identical across the source tree, source archive, platform
 archive, and installation. The audit rejects undeclared `extdata` and emits a
-run-specific JSON evidence record. A final release still requires independent
-review and a preserved rerun against the named release candidate; development
-CI output alone is not release approval or durable release evidence.
+run-specific JSON evidence record. A final release still requires a preserved
+rerun and maintainer go/no-go decision against the named release candidate;
+development CI output alone is not durable release evidence.
 
 ## Independent numerical audit
 

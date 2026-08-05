@@ -75,4 +75,4 @@ a third-party implementation.
 
 An exported resource profile is not release-approved merely because its code is
 public. Its lifecycle, rights, artifact identity, coverage/failure behavior,
-independent public-scope review, and final package inventory must all pass.
+maintainer admission decision, and final package inventory must all pass.
