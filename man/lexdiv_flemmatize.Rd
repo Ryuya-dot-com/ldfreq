@@ -57,10 +57,37 @@ resource identity, parser identity, match/override/fallback counts, and
 coverage.
 }
 \examples{
-\dontrun{
-tokens <- lexdiv_tokenize("Interesting studies went outside.")
+fixture <- tempfile(fileext = ".txt")
+writeLines(
+  c(
+    "cat\t->\tcat\tcats",
+    "see\t->\tsaw\tsee",
+    "the\t->\tthe"
+  ),
+  fixture,
+  useBytes = TRUE
+)
+
+tokens <- lexdiv_tokenize("The cats saw an unknownword.", case = "lower")
 flemmas <- lexdiv_flemmatize(
   tokens,
+  fixture,
+  resource_version = "synthetic-help-fixture"
+)
+unlink(fixture)
+
+flemmas$tokens[, c(
+  "surface", "flemma", "flemma_matched", "flemma_match_rule"
+)]
+flemmas$provenance$flemma_annotation[c(
+  "resource_source_file", "resource_source_sha256", "matched_coverage"
+)]
+lexdiv_metrics_text(flemmas, unit = "flemma", metrics = "ttr")
+
+\dontrun{
+# Replace the synthetic fixture with a legitimately obtained AntBNC list.
+real_flemmas <- lexdiv_flemmatize(
+  lexdiv_tokenize("Interesting studies went outside."),
   "/path/to/antbnc_lemmas_ver_004.txt",
   overrides = data.frame(
     form = "interesting",
@@ -69,7 +96,7 @@ flemmas <- lexdiv_flemmatize(
   resource_version = "004"
 )
 
-lexdiv_metrics_text(flemmas, unit = "flemma", metrics = "ttr")
+lexdiv_metrics_text(real_flemmas, unit = "flemma", metrics = "ttr")
 }
 }
 \seealso{

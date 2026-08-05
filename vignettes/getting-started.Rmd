@@ -68,6 +68,21 @@ lemma_content$token_audit
 lemma_content$preprocessing
 ```
 
+For a quick English lemma baseline, the optional `textstem` backend can be
+selected explicitly. It supplies lemmas only; it does not infer UPOS tags, so a
+content-word analysis still needs tags from a separately identified source.
+
+```{r}
+if (requireNamespace("textstem", quietly = TRUE)) {
+  automatic_lemmas <- lexdiv_lemmatize(
+    lexdiv_tokenize("The cats were running and studies.", case = "lower"),
+    method = "textstem"
+  )
+  automatic_lemmas$tokens[, c("surface", "lemma")]
+  automatic_lemmas$provenance$annotation
+}
+```
+
 This separation is deliberate: changing forms to lemmas or restricting the
 denominator to content words changes the measurement. It is not merely a file
 cleaning step.
@@ -141,6 +156,17 @@ Each requested metric receives one row. The `status` and `missing_reason`
 columns state whether a value is available; `requested_parameters` and
 `effective_parameters` are list-columns. Contract and schema identifiers are
 ordinary columns so that they survive row binding and tabular serialization.
+
+| `status` | Meaning |
+|---|---|
+| `ok` | The requested method produced a value. |
+| `missing` | The document was valid, but the method's frozen domain or requested parameter did not permit a value. |
+| `invalid_input` | At least one invalid token made the document invalid; it was not silently deleted. |
+
+Common `missing_reason` values distinguish empty input, insufficient tokens for
+a formula, a document shorter than the requested window/segment/sample, a zero
+denominator, and a missing MTLD factor. Structural request errors such as an
+unknown metric ID stop the call instead of creating a result row.
 
 Short documents do not cause the requested method to change. For example, an
 MATTR window larger than the document yields a structured missing result rather
@@ -227,6 +253,28 @@ variant_results[, c(
 The comparison-scope column is part of interpretation. A formula-level
 TAALED-relevant row is not an official preprocessing or full-pipeline
 compatibility claim.
+
+## Auditing the formal contracts
+
+The help pages explain ordinary use. Exact formulas, domains, normalization
+rules, result schemas, and resource boundaries are installed as JSON contracts:
+
+```{r}
+contract_files <- c(
+  "lexical-diversity-contract.json",
+  "ldfreq-preprocessing-contract.json",
+  "lexical-diversity-variant-contract.json",
+  "lexical-level-profile-contract.json",
+  "tubelex-frequency-profile-contract.json"
+)
+contract_paths <- system.file("spec", contract_files, package = "ldfreq")
+stopifnot(all(nzchar(contract_paths)))
+basename(contract_paths)
+```
+
+Use `jsonlite::read_json(contract_paths[[1]], simplifyVector = FALSE)` when an
+R list representation is convenient. Reading the files does not run a metric,
+download a resource, or expose caller file paths.
 
 ## Offline installed-package check
 

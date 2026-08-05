@@ -26,7 +26,9 @@ and one. Each requested MTLD method is expanded over these thresholds.}
 \details{
 The Maas rows distinguish \eqn{a} from \eqn{a^2} and natural-log from
 base-10 definitions. These transformations are not numerically
-interchangeable, even where they preserve rank order.
+interchangeable, even where they preserve rank order. For either selected log
+base, \code{a_squared = (log(N) - log(V)) / log(N)^2}; the \eqn{a} rows return
+its square root. The method ID records both scale and log base.
 
 The MTLD rows distinguish the frozen \pkg{ldfreq} directional-score mean from
 three final-tail factorization and mean-factor-length aggregations. Factor
@@ -37,6 +39,14 @@ formula, factorization, and aggregation scope. They do not assert official or
 end-to-end TAALED compatibility: preprocessing, invalid-input policy,
 short-text handling, and licensed source-code identity remain outside that
 claim. No third-party code is included or translated.
+}
+\section{Formal contract}{
+Every formula, log base, minimum-length rule, MTLD final-token rule,
+factorization, and aggregation identity is installed in
+\file{lexical-diversity-variant-contract.json}. Locate it with
+\code{system.file("spec", "lexical-diversity-variant-contract.json", package
+= "ldfreq")}. The \code{reference_label} and \code{comparison_scope} columns
+must remain attached when results are reported.
 }
 \value{
 \code{lexdiv_variant_ids()} returns a method catalog.
@@ -57,6 +67,12 @@ variants <- lexdiv_variant_metrics(
   mtld_thresholds = c(0.72, 0.92)
 )
 variants[, c("family", "method_id", "value", "status")]
+
+contract_path <- system.file(
+  "spec", "lexical-diversity-variant-contract.json", package = "ldfreq"
+)
+stopifnot(nzchar(contract_path))
+basename(contract_path)
 }
 \seealso{\code{\link{lexdiv_metrics}}, \code{\link{lexdiv_preprocessing}}}
 \keyword{text}

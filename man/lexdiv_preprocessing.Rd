@@ -56,7 +56,10 @@ or one raw character string.}
 \code{"textstem"} backend.}
 \item{lemmas}{An aligned character vector of lemmas for the supplied method.
 Missing values are allowed and are later reported as exclusions.}
-\item{upos}{Optional aligned Universal POS tags. Missing values are allowed.}
+\item{upos}{Optional aligned Universal POS tags. Missing values are allowed.
+The \pkg{textstem} backend supplies lemmas only and does not infer UPOS. Supply
+tags explicitly when a later \code{word_inclusion = "content"} analysis is
+required.}
 \item{backend_id, backend_version}{Required non-empty provenance strings for
 caller-supplied annotations. The textstem identity is recorded automatically.}
 \item{unit}{One of \code{"surface"}, \code{"lemma"}, or \code{"flemma"}.}
@@ -78,7 +81,12 @@ case transformation.
 The package does not silently choose or download a lemmatization model.
 \code{lexdiv_lemmatize(method = "supplied")} accepts annotations created by
 any documented external workflow and requires its identity and version.
-\code{method = "textstem"} is an optional convenience backend.
+\code{method = "textstem"} is an optional English lemma convenience backend.
+It records the installed \pkg{textstem} version but does not create UPOS tags.
+Consequently, it can be used directly for \code{unit = "lemma"} with
+\code{word_inclusion = "all"}; content-word selection additionally requires
+caller-supplied UPOS annotations. Missing lemmas or UPOS tags are excluded and
+reported in the token audit rather than imputed.
 \code{lexdiv_flemmatize()} is a separate caller-supplied AntBNC adapter because
 flemma counting does not preserve POS distinctions and is not synonymous with
 ordinary lemmatization.
@@ -89,6 +97,13 @@ audit and a separately versioned preprocessing record. This allows
 surface/lemma/flemma
 and all/content-word analyses to be compared without treating one choice as a
 universal default.
+}
+\section{Formal contract}{
+The installed \file{ldfreq-preprocessing-contract.json} file fixes tokenizer,
+normalization, annotation, lexical-unit, and result-boundary behavior. Locate
+it with \code{system.file("spec", "ldfreq-preprocessing-contract.json",
+package = "ldfreq")}. The contract is ordinary JSON and can be inspected
+without running a preprocessing backend.
 }
 \value{
 \code{lexdiv_tokenize()}, \code{lexdiv_lemmatize()}, and
@@ -118,6 +133,20 @@ lemma_content <- lexdiv_metrics_text(
 )
 lemma_content$results
 lemma_content$token_audit
+
+if (requireNamespace("textstem", quietly = TRUE)) {
+  textstem_tokens <- lexdiv_tokenize(
+    "The cats were running and studies.",
+    case = "lower"
+  )
+  textstem_lemmas <- lexdiv_lemmatize(
+    textstem_tokens,
+    method = "textstem"
+  )
+  textstem_lemmas$tokens[, c("surface", "lemma")]
+  textstem_lemmas$provenance$annotation
+  lexdiv_metrics_text(textstem_lemmas, unit = "lemma", metrics = "ttr")
+}
 }
 \seealso{\code{\link{lexdiv_flemmatize}}, \code{\link{lexdiv_metrics}},
 \code{\link{tubelex_frequency_profile}}}

@@ -94,18 +94,34 @@ downloaded. Unknown forms use normalized-surface identity fallback so they
 remain visible as off-list items, and explicit overrides take precedence over
 the raw AntBNC mapping.
 
-```{r, eval=FALSE}
+```{r}
+antbnc_fixture <- tempfile(fileext = ".txt")
+writeLines(
+  c(
+    "cat\t->\tcat\tcats",
+    "run\t->\tran\trun",
+    "the\t->\tthe"
+  ),
+  antbnc_fixture,
+  useBytes = TRUE
+)
+
 flemma_annotations <- lexdiv_flemmatize(
   tokenization,
-  "/path/to/antbnc_lemmas_ver_004.txt",
-  overrides = data.frame(
-    form = c("interesting", "interested"),
-    flemma = c("interesting", "interested")
-  ),
-  resource_version = "004"
+  antbnc_fixture,
+  resource_version = "synthetic-vignette-fixture"
 )
+unlink(antbnc_fixture)
+
+flemma_annotations$tokens[, c(
+  "surface", "flemma", "flemma_matched", "flemma_match_rule"
+)]
 lexdiv_metrics_text(flemma_annotations, unit = "flemma", metrics = "ttr")
 ```
+
+For a real analysis, replace the synthetic fixture with a legitimately
+obtained local AntBNC file and record its version. The result retains its
+basename and SHA-256, not its absolute directory.
 
 This is an explicit approximation boundary. NWLC reports using a manually
 modified AntBNC mapping aligned to its selected word lists. Raw AntBNC can map
@@ -191,12 +207,30 @@ as frequency and prevalence, not as an unqualified sophistication score.
 frequency <- tubelex_frequency_profile(tokenization)
 frequency$summary
 frequency$coverage
+frequency$provenance$formula_parameters
 ```
 
 The conditional means answer: "Among terms found in this TUBELEX resource,
 what is their average frequency or prevalence?" Coverage answers the separate
 question: "How much of this text did the resource measure?" Neither should be
 reported without the other.
+
+The lookup values are deliberately inspectable. `count`, `videos`, and
+`channels` are raw resource counts. Derived scores use the following base-10
+formulas, with the four denominators stored in
+`frequency$provenance$formula_parameters`:
+
+```text
+zipf = log10(1e9 * (count + 1) /
+             (token_total + source_vocabulary_size))
+video_prevalence = log10((videos + 1) / (video_total + 2))
+channel_prevalence = log10((channels + 1) / (channel_total + 2))
+```
+
+Video and channel prevalence are log proportions, so negative values are
+expected; values closer to zero denote wider prevalence. Summary means use
+matched rows only and must not be interpreted as though unmatched terms had a
+frequency of zero.
 
 ## Frequency bands are profiles, not mean corpus frequencies
 

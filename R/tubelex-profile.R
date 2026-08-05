@@ -183,6 +183,12 @@
 #' coverage is returned beside those conditional means. Unmatched terms remain
 #' missing and are never converted to artificial zero-frequency observations.
 #'
+#' The lookup table retains raw token, video, and channel counts. Derived
+#' values are base-10 log scores: `zipf` is a smoothed per-billion token score,
+#' while video and channel prevalence are smoothed log proportions and can
+#' therefore be negative. Exact formulas and denominators are returned in
+#' provenance and in the installed lexical-resource lookup contract.
+#'
 #' @param terms A plain character vector of ordered terms, or an object returned
 #'   by [lexdiv_tokenize()]. Order and duplicates are retained in the lookup
 #'   table.

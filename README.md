@@ -49,6 +49,12 @@ pak::pak("Ryuya-dot-com/ldfreq")
 The frozen core still accepts only explicit tokens and performs no hidden case
 conversion, Unicode normalization, token deletion, or lemmatization.
 
+Here, a **token** is one word occurrence and a **type** is one distinct form.
+A **lemma** is an annotation-provided base form; an AntBNC **flemma** is a word-
+family grouping that does not preserve part-of-speech distinctions. **Coverage**
+reports how many eligible tokens or types received an annotation or reference-
+resource match. It is not a proficiency score.
+
 ```r
 library(ldfreq)
 
@@ -90,6 +96,22 @@ lexdiv_metrics_text(
   word_inclusion = "content",
   metrics = "ttr"
 )
+```
+
+For a quick English lemma baseline, the optional `textstem` package can supply
+lemmas while `ldfreq` records its installed version. It does not supply UPOS
+tags: `word_inclusion = "content"` therefore still requires caller-supplied
+UPOS annotations.
+
+```r
+install.packages("textstem") # once, if it is not already installed
+
+automatic_lemmas <- lexdiv_lemmatize(
+  lexdiv_tokenize("The cats were running and studies.", case = "lower"),
+  method = "textstem"
+)
+automatic_lemmas$tokens[, c("surface", "lemma")]
+lexdiv_metrics_text(automatic_lemmas, unit = "lemma", metrics = "ttr")
 ```
 
 For NWLC-oriented sensitivity analysis, a legitimately obtained local
@@ -138,6 +160,14 @@ frequency$summary
 frequency$coverage
 frequency$lookup
 ```
+
+`count`, `videos`, and `channels` are raw resource counts. `zipf` is a
+smoothed base-10 per-billion token score; `video_prevalence` and
+`channel_prevalence` are smoothed base-10 log proportions. Negative prevalence
+values are therefore expected, and values closer to zero indicate wider
+prevalence. Exact formulas and denominators are documented in
+`?tubelex_frequency_profile` and returned in
+`frequency$provenance$formula_parameters`.
 
 New JACET 8000 level profiles use a caller-supplied list. `ldfreq` does not
 bundle, reproduce, or download that JACET resource. Exact level proportions use
@@ -231,6 +261,23 @@ of provenance.
 Short documents never cause requested window, segment, or sample sizes to be
 silently reduced. Non-computable requests return structured status and reason
 fields.
+
+Exact formulas, domains, schemas, normalization rules, and resource boundaries
+are installed as JSON contracts. They can be located without relying on a
+repository checkout:
+
+```r
+contract_files <- c(
+  "lexical-diversity-contract.json",
+  "ldfreq-preprocessing-contract.json",
+  "lexical-diversity-variant-contract.json",
+  "lexical-level-profile-contract.json",
+  "tubelex-frequency-profile-contract.json"
+)
+contract_paths <- system.file("spec", contract_files, package = "ldfreq")
+stopifnot(all(nzchar(contract_paths)))
+basename(contract_paths) # avoids printing machine-specific directories
+```
 
 ## Interpreting values
 

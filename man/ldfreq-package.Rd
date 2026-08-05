@@ -23,6 +23,29 @@ levels from a caller-supplied list, or
 \code{tubelex_frequency_profile()} for coverage-aware corpus-relative
 frequency and prevalence.
 }
+\section{Start here}{
+Choose the entry point from the form of data you already have:
+\describe{
+  \item{One raw character string}{Use \code{lexdiv_metrics_text()}. It calls
+  the explicit tokenizer and returns its preprocessing audit beside the metric
+  rows.}
+  \item{One ordered token vector}{Use \code{lexdiv_metrics()}. The core will
+  not change case, remove tokens, or lemmatize.}
+  \item{Several tokenized documents}{Use \code{lexdiv_metrics_batch()} with a
+  named list or an explicit ID and token-list-column data frame.}
+  \item{A corpus-relative reference profile}{Use
+  \code{tubelex_frequency_profile()} for bundled TUBELEX frequency/prevalence,
+  or \code{new_jacet8000_profile()} with a legitimately obtained caller copy
+  of New JACET 8000.}
+}
+
+In the help pages, a \emph{token} is one occurrence and a \emph{type} is one
+distinct normalized lookup value. A \emph{lemma} is an annotation-provided
+base form. An AntBNC \emph{flemma} is a family grouping that does not preserve
+part-of-speech distinctions. \emph{Coverage} is the proportion of eligible
+tokens or types that received a usable annotation or resource match; it is not
+a proficiency score.
+}
 \section{Input boundary}{
 The public core accepts ordered, already-tokenized character vectors. It does
 not infer token boundaries, change case, normalize Unicode spelling, remove
@@ -39,6 +62,20 @@ contract, result schema, requested and effective parameters, token/type counts,
 the frozen \code{below_quality_floor} field, and method diagnostics. Batch,
 profile, and screen layers add separate envelopes without changing the core
 record.
+}
+\section{Formal contracts}{
+Human-readable help explains normal use; installed JSON contracts are the
+auditable source for exact formulas, domains, schemas, normalization rules,
+and resource boundaries. The main files are
+\file{lexical-diversity-contract.json},
+\file{ldfreq-preprocessing-contract.json},
+\file{lexical-diversity-variant-contract.json},
+\file{lexical-level-profile-contract.json}, and
+\file{tubelex-frequency-profile-contract.json}. Locate them with
+\code{system.file("spec", filename, package = "ldfreq")}; schemas and
+hand-case fixtures are installed in the same directory. Contract status is
+also returned in ordinary result or provenance fields, so users do not need to
+rely on an R attribute alone.
 }
 \section{Preprocessing and lexical units}{
 The raw-text adapter records Unicode normalization, case handling, number
@@ -128,5 +165,16 @@ head(metric_ids)
 smoke_path <- system.file("examples", "offline-smoke.R", package = "ldfreq")
 stopifnot(nzchar(smoke_path))
 source(smoke_path, local = TRUE)
+
+contract_files <- c(
+  "lexical-diversity-contract.json",
+  "ldfreq-preprocessing-contract.json",
+  "lexical-diversity-variant-contract.json",
+  "lexical-level-profile-contract.json",
+  "tubelex-frequency-profile-contract.json"
+)
+contract_paths <- system.file("spec", contract_files, package = "ldfreq")
+stopifnot(all(nzchar(contract_paths)))
+basename(contract_paths)
 }
 \keyword{package}

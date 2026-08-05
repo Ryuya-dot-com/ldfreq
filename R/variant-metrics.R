@@ -399,6 +399,9 @@ lexdiv_variant_ids <- function() {
 #' and do not claim end-to-end compatibility with its preprocessing, missing-
 #' value behavior, or licensed implementation.
 #'
+#' The installed `lexical-diversity-variant-contract.json` file records every
+#' exact Maas formula, log base, MTLD tail rule, and aggregation identity.
+#'
 #' @param tokens Input accepted by [lexdiv_metrics()].
 #' @param variants A plain, non-empty, duplicate-free vector selected from the
 #'   `method_id` column of [lexdiv_variant_ids()].

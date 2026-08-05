@@ -276,6 +276,9 @@ lexdiv_tokenize <- function(
 #' @param lemmas For `method = "supplied"`, a character vector aligned with the
 #'   token rows. Missing lemmas are allowed and later reported as exclusions.
 #' @param upos Optional aligned Universal POS tags. Missing values are allowed.
+#'   The `textstem` backend supplies lemmas only; it does not infer UPOS. Supply
+#'   tags explicitly when a later `word_inclusion = "content"` analysis is
+#'   required.
 #' @param backend_id,backend_version Required provenance strings for supplied
 #'   annotations. For `textstem`, package identity and installed version are
 #'   recorded automatically.
@@ -725,7 +728,8 @@ lexdiv_flemmatize <- function(
 #' @param x One raw character string or a `lexdiv_tokenization` object.
 #' @param unit One of `"surface"`, `"lemma"`, or `"flemma"`.
 #' @param word_inclusion Either all word tokens or the frozen UPOS content set
-#'   `ADJ`, `ADV`, `NOUN`, `PROPN`, and `VERB`.
+#'   `ADJ`, `ADV`, `NOUN`, `PROPN`, and `VERB`. Content-word selection requires
+#'   UPOS annotations; `textstem` does not create them.
 #' @inheritParams lexdiv_tokenize
 #' @inheritParams lexdiv_metrics
 #'

@@ -156,7 +156,10 @@ lexdiv_metric_ids <- function() {
 #'   list-columns for requested/effective parameters and diagnostics. Metric
 #'   contract identity and result-schema version are explicit columns as well
 #'   as convenience attributes. Invalid and empty documents return structured
-#'   rows rather than throwing; structural API errors still throw.
+#'   rows rather than throwing; structural API errors still throw. Read
+#'   `status` and `missing_reason` before interpreting `value`: `ok` means a
+#'   value was computed, `missing` means the valid input did not meet a method
+#'   domain, and `invalid_input` means the token document was invalid.
 #' @export
 lexdiv_metrics <- function(
     tokens,

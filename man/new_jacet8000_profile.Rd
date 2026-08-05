@@ -189,6 +189,14 @@ once in \code{provenance} and \code{resource_diagnostics}. An empty container
 returns typed zero-row tables and status \code{"empty"}; a named empty document
 still contributes its ordinary 18 summary rows.
 }
+\section{Formal contract}{
+The exact denominator, normalization, alias, flemma-conflict, batch, plot, and
+resource-boundary rules are installed in
+\file{lexical-level-profile-contract.json}. Locate it with
+\code{system.file("spec", "lexical-level-profile-contract.json", package =
+"ldfreq")}. The contract records that the resource is caller supplied and not
+release-approved for redistribution by this package.
+}
 \value{
 \code{new_jacet8000_profile()} returns a list of class
 \code{new_jacet8000_profile} and \code{lexical_level_profile}:
@@ -231,6 +239,12 @@ batch <- new_jacet8000_profile_batch(
   unit = "surface"
 )
 batch$coverage
+
+contract_path <- system.file(
+  "spec", "lexical-level-profile-contract.json", package = "ldfreq"
+)
+stopifnot(nzchar(contract_path))
+basename(contract_path)
 
 \dontrun{
 # A legitimately obtained official workbook can be used directly.

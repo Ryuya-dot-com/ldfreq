@@ -686,6 +686,8 @@
 #'   `lookup`, token/type `coverage`, resource provenance, and validation
 #'   diagnostics. `summary$proportion` uses all eligible items as its
 #'   denominator; `cumulative_proportion` is the rate at or below each level.
+#'   The installed `lexical-level-profile-contract.json` records the exact
+#'   denominator, normalization, conflict, and resource-boundary rules.
 #' @export
 new_jacet8000_profile <- function(
     terms,

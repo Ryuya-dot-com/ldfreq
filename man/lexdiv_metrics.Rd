@@ -124,6 +124,36 @@ Named-list and data-frame inputs preserve document order, followed within each
 document by requested metric order. Batch-envelope and core-record schemas have
 separate explicit IDs and versions.
 }
+\section{Reading status and missing reason}{
+Interpret \code{value} only after checking both fields:
+\describe{
+  \item{\code{status = "ok"}}{The requested method was computed. Its
+  \code{missing_reason} is missing.}
+  \item{\code{status = "missing"}}{The document was structurally valid, but
+  the requested method had no value under its frozen domain or parameter
+  rules.}
+  \item{\code{status = "invalid_input"}}{At least one token made the document
+  invalid. The package returns an audited row rather than silently deleting
+  that token.}
+}
+
+The frozen reason vocabulary is \code{empty_input}, \code{invalid_token},
+\code{insufficient_tokens_for_formula},
+\code{too_short_for_requested_parameter}, \code{zero_denominator},
+\code{no_factor}, \code{non_convergence}, \code{boundary_censored}, and
+\code{unbounded_high}. Some reasons are reserved for admitted or deferred
+methods and need not occur for every metric. Structural request errors, such as
+an unknown metric ID or invalid selected parameter, stop the call instead of
+returning a result row.
+}
+\section{Formal contract}{
+Exact formulas, domains, floating-point policy, method IDs, result fields, and
+the complete status vocabulary are installed in
+\file{lexical-diversity-contract.json}. Locate it with
+\code{system.file("spec", "lexical-diversity-contract.json", package =
+"ldfreq")}. The adjacent schema and hand-case fixture are installed under the
+same \file{spec} directory.
+}
 \examples{
 lexdiv_metric_ids()
 
@@ -139,4 +169,10 @@ mtld$diagnostics[[1]]
 
 documents <- list(doc_a = c("a", "a", "b"), doc_b = character())
 lexdiv_metrics_batch(documents, metrics = c("ttr", "mtld"))
+
+contract_path <- system.file(
+  "spec", "lexical-diversity-contract.json", package = "ldfreq"
+)
+stopifnot(nzchar(contract_path))
+basename(contract_path)
 }
