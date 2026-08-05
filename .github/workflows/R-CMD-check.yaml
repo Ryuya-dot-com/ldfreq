@@ -31,6 +31,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      _R_CHECK_FORCE_SUGGESTS_: ${{ matrix.config.r == '4.1' && 'false' || 'true' }}
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -46,7 +47,9 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
-          extra-packages: any::rcmdcheck
+          extra-packages: |
+            any::rcmdcheck
+            textstem=?ignore-before-r=4.4.0
           needs: check
 
       - uses: r-lib/actions/check-r-package@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
@@ -149,10 +152,48 @@ jobs:
           )
           if (!identical(status, 0L)) quit(status = status)
 
+  pdf-manual:
+    name: PDF reference manual
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        with:
+          r-version: "release"
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-tinytex@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+
+      - name: Build and verify the PDF reference manual
+        shell: Rscript {0}
+        run: |
+          manual <- file.path(Sys.getenv("RUNNER_TEMP"), "ldfreq-manual.pdf")
+          status <- system2(
+            file.path(R.home("bin"), "R"),
+            c(
+              "CMD", "Rd2pdf", "--no-preview",
+              paste0("--output=", shQuote(manual)),
+              shQuote(normalizePath(".", mustWork = TRUE))
+            )
+          )
+          if (!identical(status, 0L)) quit(status = status)
+          information <- file.info(manual)
+          stopifnot(
+            isTRUE(utils::file_test("-f", manual)),
+            is.finite(information$size[[1L]]),
+            information$size[[1L]] > 0
+          )
+
   required:
     name: R-CMD-check required
     if: ${{ always() }}
-    needs: [check, tubelex-build-audit]
+    needs: [check, tubelex-build-audit, pdf-manual]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions: {}
@@ -161,6 +202,7 @@ jobs:
         env:
           CHECK_RESULT: ${{ needs.check.result }}
           TUBELEX_RESULT: ${{ needs.tubelex-build-audit.result }}
+          PDF_MANUAL_RESULT: ${{ needs.pdf-manual.result }}
         run: |
           if [ "${CHECK_RESULT}" != "success" ]; then
             echo "::error::R-CMD-check matrix result: ${CHECK_RESULT}"
@@ -168,5 +210,9 @@ jobs:
           fi
           if [ "${TUBELEX_RESULT}" != "success" ]; then
             echo "::error::TUBELEX builder matrix result: ${TUBELEX_RESULT}"
+            exit 1
+          fi
+          if [ "${PDF_MANUAL_RESULT}" != "success" ]; then
+            echo "::error::PDF reference manual result: ${PDF_MANUAL_RESULT}"
             exit 1
           fi

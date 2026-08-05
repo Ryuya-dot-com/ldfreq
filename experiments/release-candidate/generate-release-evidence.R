@@ -399,6 +399,18 @@ resource_inventory_path <- file.path(
 )
 check(file.exists(resource_inventory_path), "The source package has no resource inventory.")
 resource_inventory <- jsonlite::read_json(resource_inventory_path, simplifyVector = FALSE)
+check(
+  identical(as.numeric(resource_inventory$release_approved_resource_count), 1) &&
+    identical(
+      resource_inventory$policy$release_requires_independent_approval,
+      FALSE
+    ) &&
+    identical(
+      resource_inventory$policy$release_requires_maintainer_license_decision,
+      TRUE
+    ),
+  "The release-evidence resource-admission policy changed."
+)
 resource_bom <- list(
   schema_version = "1.0.0",
   bom_type = "ldfreq-resource-bom",
@@ -436,21 +448,30 @@ provenance <- list(
   evidence = evidence_records,
   resource_boundary = list(
     release_approved_resource_count = resource_inventory$release_approved_resource_count,
-    public_api_resource_independent = TRUE,
-    candidate_resources_are_not_release_admitted = TRUE
+    public_resource_api_candidate = TRUE,
+    candidate_resources_are_release_admitted = TRUE,
+    decision_authority = "package-maintainer"
   ),
   go_no_go = list(
-    decision = "PENDING_INDEPENDENT_REVIEW",
-    reviewer = NULL,
-    reviewed_on = NULL,
+    decision = "PENDING_MAINTAINER_RELEASE_DECISION",
+    decision_authority = "package-maintainer",
+    resource_decision_recorded_on = "2026-08-06",
     known_limitations = c(
-      "Raw-text tokenization and public lexical-resource APIs are deferred.",
-      "The bundled TUBELEX unit is internal-only and not release-approved.",
+      "Raw-text preprocessing is a separately versioned development API.",
+      paste(
+        "Maas and MTLD comparisons are a separately contracted sensitivity",
+        "API, not official TAALED compatibility."
+      ),
+      paste(
+        "TUBELEX redistribution relies on the maintainer's documented",
+        "interpretation of the pinned repository-level BSD-3-Clause license;",
+        "no independent legal opinion was obtained."
+      ),
       "Ordinary R package archive hashes identify the tested artifact but do not establish reproducible builds."
     ),
     rollback = paste(
-      "Before publication, do not create a tag or release asset and revert or",
-      "supersede the candidate through a reviewed pull request."
+      "Before the final maintainer go/no-go decision, do not create a tag or",
+      "release asset; supersede a rejected candidate through a pull request."
     )
   )
 )

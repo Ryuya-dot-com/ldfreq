@@ -1,8 +1,15 @@
 # API and measurement lifecycle
 
 The `0.1.x` line freezes the resource-independent, pre-tokenized eleven-method
-core. Package version, metric-contract version, and result-schema versions are
-independent identities and are recorded separately.
+core. Raw-text preprocessing and resource-backed profiles are separate public
+surfaces with their own contract versions and review gates. The Maas/MTLD
+sensitivity surface also has a separate variant contract and does not add
+methods to the frozen core registry. Caller-supplied lexical-level profiles
+have a separate contract for resource input, rank bands, denominator, off-list
+handling, and plot data. Package version,
+metric-contract version, result-schema version, preprocessing-contract version,
+and resource-profile contract version are independent identities and are
+recorded separately.
 
 ## Method identity
 
@@ -37,10 +44,36 @@ removal. A replacement and migration path must be named. During the pre-1.0
 period, an unavoidable breaking change increments the minor package version and
 is called out prominently.
 
-## Separate future surfaces
+## Separate preprocessing and resource surfaces
 
 Raw-text tokenization and resource-backed lookup/results use separate functions
 and contracts. They do not overload or silently preprocess
-`lexdiv_metrics()`. Experimental or non-exported installed resource code is not
-a public API until its own lifecycle, rights, identity, coverage, and failure
-gates pass.
+`lexdiv_metrics()`. `lexdiv_metrics_text()` calls that unchanged core and keeps
+its token audit outside the metric schema. Adding or changing a tokenizer,
+normalization, content-word set, lemma backend contract, query transform,
+coverage denominator, or matched-only summary requires a new corresponding
+contract version.
+
+Flemma is a distinct lexical unit. Changing the AntBNC parser, unknown-form
+fallback, override precedence, form-family identity, path-provenance boundary,
+or cache-visible result semantics requires a new preprocessing contract
+version. Performance caching must remain result-invariant and path-free.
+
+For lexical-level profiles, changing rank-to-level mapping, entry
+normalization, alias collision policy, default lexical unit, type identity,
+cumulative denominator, or off-list handling requires a new level-profile
+contract version. Public availability of a caller-supplied list does not admit
+its bytes to the package resource inventory.
+Changing AntBNC-versus-wordlist conflict detection, its default policy, or the
+reported alternative rank/level also requires a new level-profile contract
+version.
+
+Likewise, adding a variant formula, threshold boundary, minimum factor length,
+tail rule, directional aggregation, or compatibility claim requires a new
+variant method or contract identity. Shared labels never imply equivalence with
+a third-party implementation.
+
+A normative measurement contract does not by itself establish redistribution
+rights for its reference data. Resource rights, artifact identity,
+coverage/failure behavior, installed notices, and package inventory are reviewed
+and recorded separately from the public API contract.

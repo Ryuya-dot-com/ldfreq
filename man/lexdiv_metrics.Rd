@@ -34,7 +34,9 @@ lexdiv_metrics_batch(
   \code{bytes}- or \code{latin1}-marked strings invalidate the document. A
   zero-length character vector denotes an empty document. Valid non-ASCII
   strings with an unknown encoding marker are interpreted as UTF-8 on a local
-  copy before equality and counting.}
+  copy before equality and counting. Each vector element is exactly one token;
+  a single string containing whitespace triggers a warning because it may be
+  raw prose. Use \code{lexdiv_metrics_text()} for raw text.}
   \item{metrics}{A plain, non-empty, duplicate-free character vector selected
   from \code{lexdiv_metric_ids()}.}
   \item{segment_length}{One plain finite numeric scalar with an integer value
@@ -85,9 +87,9 @@ parameters, and diagnostics are returned beside each value.
 The current frozen set contains TTR, RTTR/Guiraud, CTTR, Herdan's C, natural-log
 Maas a-squared, complete non-overlapping MSTTR, step-one MATTR, bidirectional
 MTLD, sample-size-normalized hypergeometric HD-D on the TTR scale, Yule's K,
-and type-based Yule's I. The separately named deterministic expected-TTR
-curve-fit D candidate is distinct from HD-D, is deferred from v0.1, and is not
-accepted by this API.
+and type-based Yule's I. The separately defined deterministic expected-TTR
+curve-fit D method is distinct from HD-D and is not included in the version
+0.1.0 API.
 
 An invalid token anywhere has precedence over empty-input and metric-specific
 domain conditions. Invalid documents return \code{status = "invalid_input"},
@@ -124,6 +126,36 @@ Named-list and data-frame inputs preserve document order, followed within each
 document by requested metric order. Batch-envelope and core-record schemas have
 separate explicit IDs and versions.
 }
+\section{Reading status and missing reason}{
+Interpret \code{value} only after checking both fields:
+\describe{
+  \item{\code{status = "ok"}}{The requested method was computed. Its
+  \code{missing_reason} is missing.}
+  \item{\code{status = "missing"}}{The document was structurally valid, but
+  the requested method had no value under its frozen domain or parameter
+  rules.}
+  \item{\code{status = "invalid_input"}}{At least one token made the document
+  invalid. The package returns an audited row rather than silently deleting
+  that token.}
+}
+
+The frozen reason vocabulary is \code{empty_input}, \code{invalid_token},
+\code{insufficient_tokens_for_formula},
+\code{too_short_for_requested_parameter}, \code{zero_denominator},
+\code{no_factor}, \code{non_convergence}, \code{boundary_censored}, and
+\code{unbounded_high}. Some reasons are reserved for admitted or deferred
+methods and need not occur for every metric. Structural request errors, such as
+an unknown metric ID or invalid selected parameter, stop the call instead of
+returning a result row.
+}
+\section{Formal contract}{
+Exact formulas, domains, floating-point policy, method IDs, result fields, and
+the complete status vocabulary are installed in
+\file{lexical-diversity-contract.json}. Locate it with
+\code{system.file("spec", "lexical-diversity-contract.json", package =
+"ldfreq")}. The adjacent schema and hand-case fixture are installed under the
+same \file{spec} directory.
+}
 \examples{
 lexdiv_metric_ids()
 
@@ -139,4 +171,10 @@ mtld$diagnostics[[1]]
 
 documents <- list(doc_a = c("a", "a", "b"), doc_b = character())
 lexdiv_metrics_batch(documents, metrics = c("ttr", "mtld"))
+
+contract_path <- system.file(
+  "spec", "lexical-diversity-contract.json", package = "ldfreq"
+)
+stopifnot(nzchar(contract_path))
+basename(contract_path)
 }

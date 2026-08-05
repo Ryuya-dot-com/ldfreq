@@ -1,23 +1,24 @@
 {
   "$schema": "ldfreq-resource-inventory.schema.json",
   "schema_version": "0.1.0",
-  "reviewed_on": "2026-08-04",
-  "package_scope": "public-api-resource-independent-release-candidate",
+  "reviewed_on": "2026-08-06",
+  "package_scope": "public-api-resource-release-candidate",
   "policy": {
-    "release_requires_independent_approval": true,
+    "release_requires_independent_approval": false,
+    "release_requires_maintainer_license_decision": true,
     "uncertainty_default": "exclude",
     "runtime_network_access": false,
     "implicit_download_or_fallback": false
   },
-  "release_approved_resource_count": 0,
+  "release_approved_resource_count": 1,
   "included_resources": [
     {
       "resource_id": "tubelex-en-treebank-slim",
       "resource_version": "7cb5fb36-slim-v1",
-      "distribution_state": "development-candidate",
-      "runtime_state": "internal-only",
-      "release_approved": false,
-      "public_api": false,
+      "distribution_state": "release-candidate",
+      "runtime_state": "public",
+      "release_approved": true,
+      "public_api": true,
       "license_spdx": "BSD-3-Clause",
       "source_commit": "7cb5fb36add76b83a266d1967536e1a1d3faa513",
       "source_sha256": "4096022259d5eaa7261c3bf22c3b0af9fd58ae8eebe17894c0b34a163954f936",
@@ -54,8 +55,6 @@
         }
       ],
       "open_gates": [
-        "independent release approval",
-        "public lookup and result contract",
         "final release-candidate source, installed, and binary inventory audit"
       ]
     }
@@ -74,7 +73,12 @@
     {
       "resource_id": "nj8",
       "decision": "exclude",
-      "reason": "Durable CRAN, commercial, transformation, and downstream redistribution permission is unresolved."
+      "reason": "The official workbook is publicly downloadable and permits personal research use with citation, while directing commercial users to consult JACET in advance. It does not grant an explicit downstream package-redistribution license. The list is therefore not bundled or downloaded; the public level-profile adapter accepts only a caller-supplied copy."
+    },
+    {
+      "resource_id": "antbnc-lemma-list",
+      "decision": "exclude",
+      "reason": "The AntBNC lemma list is publicly downloadable, but an explicit standalone downstream package-redistribution grant was not identified. The list is not bundled or downloaded; lexdiv_flemmatize() accepts a caller-supplied local copy and records only path-private identity and coverage."
     },
     {
       "resource_id": "ngsl-31k-workbook",

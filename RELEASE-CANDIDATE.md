@@ -1,8 +1,12 @@
-# Core release-candidate boundary
+# Superseded core release-candidate boundary
 
-Version `0.1.0` is a release candidate, not a published release. The candidate
-is acceptable for tagging only after one immutable commit on protected `main`
-has passed the technical and human gates in `RELEASE-CHECKLIST.md`.
+The immutable core-only version `0.1.0` candidate was not published. Development
+version `0.1.0.9000` adds raw-text preprocessing and a TUBELEX public-profile
+candidate, a caller-supplied New JACET 8000 level-profile surface, plus a
+separately contracted Maas/MTLD variant surface, so the
+earlier candidate artifacts and go/no-go decision cannot be reused for tagging
+or CRAN submission. A new immutable commit must pass the technical, resource,
+and maintainer decision gates in `RELEASE-CHECKLIST.md`.
 
 ## Automated evidence
 
@@ -22,13 +26,13 @@ generates:
 - a run index that fails unless every matrix job examined the same tarball and
   all three current-R resource-inventory audits succeeded.
 
-These outputs are technical evidence. A workflow defined by the candidate
-cannot independently approve itself, and expiring Actions artifacts are not the
-durable archive required for publication.
+These outputs are technical evidence. A workflow result is not the maintainer's
+final release decision, and expiring Actions artifacts are not the durable
+archive required for publication.
 
-Multiple independent automated analyses are useful as an additional
-quality-control layer, but they do not supply the independent human identity or
-decision required by the current resource-admission and publication policy.
+Additional automated or third-party analyses are useful quality-control layers,
+but they do not replace upstream rights or the maintainer's accountability for
+the release decision.
 
 CRAN incoming checks report `New submission` until the package has a prior CRAN
 version. The check runner accepts only that exact single NOTE as explained; any
@@ -36,14 +40,26 @@ additional NOTE, WARNING, ERROR, or unrecognized status remains blocking.
 
 ## Go/no-go boundary
 
-The final decision record must name the reviewer, date, candidate commit and
+The final decision record must name the maintainer, date, candidate commit and
 tree, tarball name and SHA-256, known limitations, and rollback action. It must
 also preserve the workflow definition, logs, and hashes outside expiring CI
 storage.
 
-The current TUBELEX unit remains a non-exported development candidate. Its
-inventory reports zero release-approved resources; no TUBELEX public API or
-resource admission is implied by a core-package release decision.
+The TUBELEX unit and exported profile are maintainer-approved in a byte-pinned
+admission candidate. That record documents the pinned BSD-3-Clause and README
+basis, approved scopes, absence of raw subtitle material, installed notice, and
+the fact that no independent legal opinion was obtained. The final exact
+source, installed, and binary inventory must reproduce this boundary.
+
+The New JACET 8000 level-profile API is code-only: a final candidate must verify
+that no JACET list bytes appear in the repository, source archive, installed
+library, platform archive, examples, vignettes, or generated evidence. Its
+scientific review must separately confirm the all-eligible denominator,
+off-list row, rank-to-level rule, and surface/lemma/flemma provenance.
+The caller-supplied AntBNC flemma adapter is also code-only: no AntBNC payload
+may enter package artifacts. Review must verify identity fallback, explicit
+override precedence, path-private provenance, and the documented distinction
+between raw AntBNC approximation and NWLC's manually aligned mapping.
 
 Rollback before publication means closing or reverting the candidate change and
 creating no tag or release asset. Rollback after publication means documenting

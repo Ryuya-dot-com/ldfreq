@@ -39,6 +39,32 @@
   "ok"
 }
 
+.lex_warn_likely_raw_text <- function(
+    value,
+    argument,
+    function_name,
+    alternative) {
+  if (
+    is.character(value) && !is.object(value) && is.null(dim(value)) &&
+      is.null(attributes(value)) && length(value) == 1L &&
+      !is.na(value) && grepl("[[:space:]]", value)
+  ) {
+    warning(
+      sprintf(
+        paste0(
+          "%s contains one string with whitespace; %s() treats each vector ",
+          "element as one lexical unit. If this is raw prose, %s."
+        ),
+        argument,
+        function_name,
+        alternative
+      ),
+      call. = FALSE
+    )
+  }
+  invisible(NULL)
+}
+
 .lex_canonicalize_encoding <- function(tokens) {
   if (!is.character(tokens) || is.object(tokens) || !is.null(dim(tokens))) {
     stop("Internal error: encoding canonicalization requires plain character input.", call. = FALSE)
@@ -277,16 +303,23 @@
 
 #' @export
 print.lexdiv_results <- function(x, ...) {
+  contract_version <- attr(x, "contract_version", exact = TRUE)
+  if (!is.character(contract_version) || length(contract_version) != 1L) {
+    contract_version <- "unknown"
+  }
   cat(sprintf(
     "<lexdiv_results: %d metric%s; contract %s>\n",
     nrow(x),
     if (nrow(x) == 1L) "" else "s",
-    attr(x, "contract_version", exact = TRUE)
+    contract_version
   ))
-  visible <- x[c(
-    "metric_id", "value", "status", "missing_reason", "N", "V",
-    "below_quality_floor"
-  )]
-  print.data.frame(visible, ...)
+  visible_names <- intersect(
+    c(
+      "metric_id", "value", "status", "missing_reason", "N", "V",
+      "below_quality_floor"
+    ),
+    names(x)
+  )
+  print.data.frame(x[visible_names], ...)
   invisible(x)
 }

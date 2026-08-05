@@ -1,0 +1,323 @@
+---
+title: "Preprocessing, parameter sensitivity, and frequency coverage"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Preprocessing, parameter sensitivity, and frequency coverage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r}
+library(ldfreq)
+```
+
+## What `ldfreq` adds to the R ecosystem
+
+R already has mature lexical-diversity implementations. In particular,
+`quanteda.textstats::textstat_lexdiv()` integrates with `quanteda` tokens and
+document-feature matrices, while `koRpus::lex.div()` includes raw-character,
+lemma, HD-D, MTLD, and MTLD-MA workflows. `ldfreq` does not claim that these
+metrics were absent from R.
+
+The narrower contribution of `ldfreq` is an auditable measurement boundary:
+
+| Question | `ldfreq` representation |
+|---|---|
+| Which formula and boundary variant ran? | `method_id` and metric contract |
+| Which window, segment, or sample was requested? | requested and effective parameter list-columns |
+| Was a short-text request computable? | structured `status` and `missing_reason` |
+| Did a screen change or censor a value? | no; screens are separate rows |
+| Which raw-text decisions created the units? | preprocessing contract and token audit |
+| Which resource produced a frequency value? | version, manifest hash, formula, and lookup identity |
+| How much of the text matched that resource? | adjacent token/type coverage |
+
+This makes `ldfreq` complementary to broad text-processing ecosystems rather
+than a replacement for them.
+
+## Why preprocessing is a measurement decision
+
+Caltabellotta, Van Steendam, Noreillie, and Peters (2026,
+<https://doi.org/10.1016/j.asw.2026.101039>) found that lemmatization and the
+inclusion of all words versus content words materially changed MATTR and
+frequency-based sophistication results. Their empirical best-performing choice
+in one English/French study should not be converted into a universal software
+default. `ldfreq` therefore exposes the alternatives and their coverage.
+
+```{r}
+tokenization <- lexdiv_tokenize("Cats and cat ran run.")
+annotated <- lexdiv_lemmatize(
+  tokenization,
+  lemmas = c("cat", "and", "cat", "run", "run"),
+  upos = c("NOUN", "CCONJ", "NOUN", "VERB", "VERB"),
+  backend_id = "vignette-fixture",
+  backend_version = "1"
+)
+
+surface <- lexdiv_metrics_text(tokenization, metrics = "ttr")
+lemma_all <- lexdiv_metrics_text(
+  annotated,
+  unit = "lemma",
+  metrics = "ttr"
+)
+lemma_content <- lexdiv_metrics_text(
+  annotated,
+  unit = "lemma",
+  word_inclusion = "content",
+  metrics = "ttr"
+)
+
+data.frame(
+  operationalization = c("surface/all", "lemma/all", "lemma/content"),
+  N = c(surface$results$N, lemma_all$results$N, lemma_content$results$N),
+  V = c(surface$results$V, lemma_all$results$V, lemma_content$results$V),
+  TTR = c(
+    surface$results$value,
+    lemma_all$results$value,
+    lemma_content$results$value
+  )
+)
+```
+
+The point is not that TTR is preferred. The example demonstrates that the
+lexical unit and denominator change the estimand before any diversity formula
+is selected.
+
+### Flemma as a caller-supplied resource transformation
+
+For NWLC-oriented sensitivity analysis, `lexdiv_flemmatize()` reads a local
+AntBNC lemma-list file supplied by the analyst. The payload is never bundled or
+downloaded. Unknown forms use normalized-surface identity fallback so they
+remain visible as off-list items, and explicit overrides take precedence over
+the raw AntBNC mapping.
+
+```{r}
+antbnc_fixture <- tempfile(fileext = ".txt")
+writeLines(
+  c(
+    "cat\t->\tcat\tcats",
+    "run\t->\tran\trun",
+    "the\t->\tthe"
+  ),
+  antbnc_fixture,
+  useBytes = TRUE
+)
+
+flemma_annotations <- lexdiv_flemmatize(
+  tokenization,
+  antbnc_fixture,
+  resource_version = "synthetic-vignette-fixture"
+)
+unlink(antbnc_fixture)
+
+flemma_annotations$tokens[, c(
+  "surface", "flemma", "flemma_matched", "flemma_match_rule"
+)]
+lexdiv_metrics_text(flemma_annotations, unit = "flemma", metrics = "ttr")
+```
+
+For a real analysis, replace the synthetic fixture with a legitimately
+obtained local AntBNC file and record its version. The result retains its
+basename and SHA-256, not its absolute directory.
+
+This is an explicit approximation boundary. NWLC reports using a manually
+modified AntBNC mapping aligned to its selected word lists. Raw AntBNC can map
+a surface form that is an independent New JACET headword to a different family
+lemma. `new_jacet8000_profile()` records these conflicts and lets an analysis
+retain AntBNC, prefer the word-list headword, or stop for explicit review.
+
+## Length and parameter sensitivity
+
+Bestgen (2024, <https://doi.org/10.1111/lang.12630>) distinguishes ordinary
+text-length dependence from sensitivity to the reduction or window parameter.
+Bestgen (2025, <https://doi.org/10.1016/j.rmal.2024.100168>) further shows why
+MATTR is useful for within-text fluctuation but should not be treated as a
+parameter-free universal score.
+
+`lexdiv_plan()` and `lexdiv_profile()` preserve parameter variants as different
+requests:
+
+```{r}
+long_tokens <- rep(
+  c("one", "two", "three", "one", "four", "five", "one", "six"),
+  20
+)
+plan <- lexdiv_plan(presets = "length_50_100")
+profile <- lexdiv_profile(long_tokens, plan)
+profile[profile$metric_id %in% c("mattr", "msttr"), c(
+  "request_id", "metric_id", "value", "status", "N", "V"
+)]
+```
+
+A downstream study may combine several indices, fit a PCA, or optimize a
+window for a target population. Such sample-dependent modeling is not embedded
+as a universal package score.
+
+## Maas and MTLD are variant families, not single formulas
+
+The version-pinned [TAALED 0.32 documentation](https://pypi.org/project/taaled/0.32/)
+exposes distinctions that a shared label can hide. Its Maas calculation uses
+the base-10, a-squared form, whereas the frozen `ldfreq` core uses natural logs
+and a-squared. The base-10 value equals the natural-log value multiplied by
+`log(10)`: rankings may be unchanged while coefficients, cutoffs, and raw-scale
+comparisons are not.
+
+For sequential MTLD, the frozen core reports the arithmetic mean of forward
+and reverse tokens-per-factor scores. TAALED 0.32 exposes a pooled adjusted
+mean-factor-length value, a mean of the two directional mean-factor-length
+values, and an Original-style directional score mean. The final-token rule and
+zero-denominator policy also matter. A label such as `MTLD` therefore does not
+identify a method on its own.
+
+`lexdiv_variant_metrics()` expands these choices in a separate contract:
+
+```{r}
+variant_tokens <- rep(
+  c("one", "two", "three", "one", "four", "five"),
+  12
+)
+variant_results <- lexdiv_variant_metrics(
+  variant_tokens,
+  mtld_thresholds = c(0.72, 0.92)
+)
+variant_results[, c(
+  "family", "method_id", "reference_label", "value", "status",
+  "comparison_scope"
+)]
+```
+
+This is a sensitivity crosswalk, not a translation of TAALED code or an
+official compatibility layer. The TAALED-relevant rows fix only the stated
+formula, sequential factorization, and aggregation. Exact end-to-end comparison
+still requires the same token sequence and a separately version-pinned TAALED
+run; preprocessing, short-input, and missing-value policies must be compared
+independently.
+
+## Frequency is relative to a corpus
+
+Bottini and Le Foll (2025, <https://doi.org/10.1075/ijlcr.23029.bot>) show that
+mean-frequency measures can be influenced more by the reference corpus's mode
+and register than by learner proficiency. The TUBELEX output is therefore named
+as frequency and prevalence, not as an unqualified sophistication score.
+
+```{r}
+frequency <- tubelex_frequency_profile(tokenization)
+frequency$summary
+frequency$coverage
+frequency$provenance$formula_parameters
+```
+
+The conditional means answer: "Among terms found in this TUBELEX resource,
+what is their average frequency or prevalence?" Coverage answers the separate
+question: "How much of this text did the resource measure?" Neither should be
+reported without the other.
+
+The lookup values are deliberately inspectable. `count`, `videos`, and
+`channels` are raw resource counts. Derived scores use the following base-10
+formulas. The four normalization constants used to form the three denominators
+are stored in `frequency$provenance$formula_parameters`:
+
+```text
+zipf = log10(1e9 * (count + 1) /
+             (token_total + source_vocabulary_size))
+video_prevalence = log10((videos + 1) / (video_total + 2))
+channel_prevalence = log10((channels + 1) / (channel_total + 2))
+```
+
+Video and channel prevalence are log proportions, so negative values are
+expected; values closer to zero denote wider prevalence. Summary means use
+matched rows only and must not be interpreted as though unmatched terms had a
+frequency of zero.
+
+## Frequency bands are profiles, not mean corpus frequencies
+
+[JACET announced New JACET 8000 as a 2016 publication](https://www.jacet.org/info/%E2%96%A0%E3%80%8E%E5%A4%A7%E5%AD%A6%E8%8B%B1%E8%AA%9E%E6%95%99%E8%82%B2%E5%AD%A6%E4%BC%9A%E5%9F%BA%E6%9C%AC%E8%AA%9E%E3%83%AA%E3%82%B9%E3%83%88-%E6%96%B0jacet8000%E3%80%8F-%E5%88%8A%E8%A1%8C%EF%BC%81/).
+The [Ishikawa Laboratory vocabulary page](https://language.sakura.ne.jp/s/voc.html)
+links the official `j8_2016.xlsx` workbook and explains that compilation used
+BNC and COCA evidence plus Japanese educational materials. The workbook labels
+the entries as representative lemmas. This is a ranked pedagogical list, not
+the same estimand as a TUBELEX mean frequency.
+
+`new_jacet8000_profile()` accepts a list supplied by the user; `ldfreq` does
+not bundle or download it. The example below uses a small synthetic fixture,
+not the JACET list.
+
+The downloaded workbook can be passed directly as
+`new_jacet8000_profile(annotated, "j8_2016.xlsx", unit = "lemma")` when
+`readxl` is installed. Its embedded notice permits personal research use
+with citation and asks commercial users to consult JACET in advance. Public
+download availability does not itself grant a downstream redistribution
+license, so the file stays outside the package.
+
+```{r}
+synthetic_nj8 <- data.frame(
+  NJ8 = c(1L, 1001L, 6001L, 8000L),
+  Word = c("the", "develop", "rare", "extreme")
+)
+level_profile <- new_jacet8000_profile(
+  c("The", "develop", "rare", "outside", "the"),
+  synthetic_nj8
+)
+level_profile$summary
+level_profile$coverage
+```
+
+The corpus adapter keeps document identity explicit and processes the external
+list once. The following synthetic example uses surface units so both documents
+share the same input contract without inventing lemma annotations.
+
+```{r}
+level_batch <- new_jacet8000_profile_batch(
+  list(
+    document_a = c("The", "develop", "rare"),
+    document_b = c("extreme", "outside")
+  ),
+  synthetic_nj8,
+  unit = "surface"
+)
+level_batch$coverage
+level_batch$document_diagnostics
+```
+
+The returned `lookup` remains token-lossless and receives a `document_id`.
+`max_rows` bounds the combined lookup and summary size before the list is
+processed. Shared list provenance is stored once; document-specific
+preprocessing provenance remains separate.
+
+```{r, fig.width=7, fig.height=4.5}
+plot(level_profile, weighting = "token")
+```
+
+The bars are the proportions occurring in each band. The line is the
+cumulative proportion at or below each level. Both use all eligible items as
+the denominator, including off-list items; therefore the Level 8 cumulative
+rate equals list coverage. The off-list bar is deliberately not appended to
+the cumulative line. Token and type plots answer different questions, and
+surface, lemma, and flemma input can materially change both. With flemma input,
+the selected conflict policy and alternative surface-headword rank/level should
+also be reported.
+
+Type-weighted off-list rates are especially preprocessing-sensitive: inflected
+forms, spelling variants, and learner errors are distinct surface types but may
+be collapsed or retained differently by a lemma/flemma backend. A token- and a
+type-weighted profile are therefore parallel estimands, not interchangeable
+replications of one score.
+
+## Recommended reporting unit
+
+For reproducible research, retain at least:
+
+1. the core metric rows;
+2. preprocessing provenance and token-level exclusions;
+3. exact method and parameter identities;
+4. resource identity and normalization method for frequency profiles;
+5. exact/cumulative level-profile denominator and surface/lemma/flemma unit;
+6. token/type coverage and unmatched counts.
+
+Factor analysis, PCA, dominance analysis, proficiency prediction, and other
+population-dependent models belong in downstream analysis or a research
+vignette. They do not change the meaning of the package's frozen measurement
+records.

@@ -31,6 +31,22 @@ test_that("all frozen hand assertions pass through the package API", {
   expect_identical(fixture$contract_id, contract$contract_id)
   expect_identical(fixture$contract_version, contract$contract_version)
   expect_identical(fixture$contract_version, "0.1.0")
+  maas_contract <- contract$metrics[[match(
+    "maas",
+    vapply(contract$metrics, `[[`, character(1L), "metric_id")
+  )]]
+  expect_identical(maas_contract$scale$bounded, TRUE)
+  expect_equal(maas_contract$scale$upper_bound, 1 / log(2), tolerance = 1e-15)
+  expect_identical(maas_contract$scale$upper_bound_expression, "1/ln(2)")
+  methods <- lexdiv_methods()
+  expect_identical(
+    methods$label,
+    vapply(contract$metrics, `[[`, character(1L), "label")
+  )
+  expect_identical(
+    methods$direction,
+    vapply(contract$metrics, `[[`, character(1L), "direction")
+  )
   expected_statuses <- c("ok", "missing", "invalid_input")
   expected_missing_reasons <- c(
     "empty_input",

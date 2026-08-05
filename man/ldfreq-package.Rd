@@ -2,22 +2,61 @@
 \alias{ldfreq}
 \alias{ldfreq-package}
 \docType{package}
-\title{Reproducible Lexical Diversity Profiles}
+\title{Reproducible Lexical Diversity and Frequency Profiles}
 \description{
 The \pkg{ldfreq} package computes explicitly versioned lexical-diversity
-metrics from ordered pre-tokenized character vectors. It returns canonical
-long-form records with method, parameter, schema, and contract provenance.
+metrics from ordered tokens and provides separate auditable raw-text,
+annotation, lexical-unit, Maas/MTLD sensitivity, and TUBELEX frequency-profile
+surfaces. It also provides a caller-supplied New JACET 8000 level-profile
+surface without bundling that list. Metric rows retain method, parameter,
+schema, and contract provenance.
 }
 \details{
-The initial release performs no tokenization, normalization,
-lemmatization, or lexical-resource lookup. Start with \code{lexdiv_metrics()}
-for one document, \code{lexdiv_metrics_batch()} for multiple documents, or
-\code{lexdiv_profile()} for explicit parameter variants.
+Start with \code{lexdiv_metrics()} for explicit tokens,
+\code{lexdiv_metrics_text()} for one raw or annotated text,
+\code{lexdiv_metrics_batch()} for multiple tokenized documents,
+\code{lexdiv_profile()} for explicit parameter variants,
+\code{lexdiv_variant_metrics()} for separately contracted Maas/MTLD
+sensitivity variants, or
+\code{new_jacet8000_profile()} for exact and cumulative pedagogical frequency
+levels from a caller-supplied list, or
+\code{tubelex_frequency_profile()} for coverage-aware corpus-relative
+frequency and prevalence.
+}
+\section{Start here}{
+Choose the entry point from the form of data you already have:
+\describe{
+  \item{One raw character string}{Use \code{lexdiv_metrics_text()}. It calls
+  the explicit tokenizer and returns its preprocessing audit beside the metric
+  rows.}
+  \item{One ordered token vector}{Use \code{lexdiv_metrics()}. The core will
+  not change case, remove tokens, or lemmatize.}
+  \item{Several tokenized documents}{Use \code{lexdiv_metrics_batch()} with a
+  named list or an explicit ID and token-list-column data frame.}
+  \item{A corpus-relative reference profile}{Use
+  \code{tubelex_frequency_profile()} for bundled TUBELEX frequency/prevalence,
+  or \code{new_jacet8000_profile()} with a legitimately obtained caller copy
+  of New JACET 8000.}
+}
+
+In the help pages, a \emph{token} is one occurrence. In core metric results, a
+\emph{type} is one distinct, exactly equal token string supplied to the core;
+Unicode-equivalent spellings remain different unless preprocessing normalized
+them first. In a resource profile, a \emph{type} is instead one distinct
+effective lookup term after that profile's recorded normalization. A
+\emph{lemma} is an annotation-provided base form. An AntBNC \emph{flemma} is a
+family grouping that does not preserve part-of-speech distinctions.
+\emph{Coverage} is the proportion of eligible tokens or types that received a
+usable annotation or resource match; it is not a proficiency score.
 }
 \section{Input boundary}{
 The public core accepts ordered, already-tokenized character vectors. It does
 not infer token boundaries, change case, normalize Unicode spelling, remove
 tokens, or lemmatize. Batch inputs must carry explicit unique document IDs.
+\code{lexdiv_tokenize()}, \code{lexdiv_lemmatize()}, and
+\code{lexdiv_flemmatize()} form a separate
+preprocessing contract so that these choices cannot silently change core
+methods.
 }
 \section{Results and provenance}{
 Metric results are long-form data frames. Read \code{status} and
@@ -26,6 +65,47 @@ contract, result schema, requested and effective parameters, token/type counts,
 the frozen \code{below_quality_floor} field, and method diagnostics. Batch,
 profile, and screen layers add separate envelopes without changing the core
 record.
+}
+\section{Formal contracts}{
+Human-readable help explains normal use; installed JSON contracts are the
+auditable source for exact formulas, domains, schemas, normalization rules,
+and resource boundaries. The main files are:
+\itemize{
+  \item \file{lexical-diversity-contract.json}
+  \item \file{ldfreq-preprocessing-contract.json}
+  \item \file{lexical-diversity-variant-contract.json}
+  \item \file{lexical-level-profile-contract.json}
+  \item \file{tubelex-frequency-profile-contract.json}
+}
+Locate them with
+\code{system.file("spec", filename, package = "ldfreq")}; schemas and
+hand-case fixtures are installed in the same directory. Contract status is
+also returned in ordinary result or provenance fields, so users do not need to
+rely on an R attribute alone.
+}
+\section{Preprocessing and lexical units}{
+The raw-text adapter records Unicode normalization, case handling, number
+retention, offsets, and source/processed text hashes. Lemma analyses record the
+annotation backend and version. Caller-supplied AntBNC flemma analyses also
+record exact resource identity, matching rules, overrides, and identity
+fallback. Surface/lemma/flemma and all/content-word choices are returned with
+token-level exclusion reasons and coverage in an envelope that does not alter
+the normative metric result schema.
+}
+\section{Corpus-relative frequency}{
+\code{tubelex_frequency_profile()} retains original and normalized lookup
+terms, unmatched rows, token/type coverage, and matched-only token/type-weighted
+summaries. TUBELEX values are relative to a general YouTube subtitle corpus.
+They are not direct measures of proficiency, writing quality, academic
+register, or context-independent lexical sophistication.
+}
+\section{Lexical frequency levels}{
+\code{new_jacet8000_profile()} maps caller-supplied ranks to Levels 1--8 and
+reports exact and cumulative token/type proportions beside off-list coverage.
+The Level 8 cumulative proportion equals matched coverage because off-list
+items remain in the denominator. The package does not bundle or download the
+New JACET 8000 list. Flemma input exposes conflicts between AntBNC families and
+New JACET headwords instead of silently choosing one mapping.
 }
 \section{Direction and contract scale}{
 Direction applies only within the exact method, parameters, preprocessing, and
@@ -37,7 +117,7 @@ Metric ID \tab Contract scale \tab Conventional score direction \cr
 \code{rttr} \tab 0 or greater; no finite upper bound \tab higher \cr
 \code{cttr} \tab 0 or greater; no finite upper bound \tab higher \cr
 \code{herdan} \tab 0 to 1 \tab higher \cr
-\code{maas} \tab 0 or greater; no finite upper bound \tab lower \cr
+\code{maas} \tab 0 to \eqn{1 / \ln(2)} (about 1.4427) \tab lower \cr
 \code{msttr} \tab 0 to 1 \tab higher \cr
 \code{mattr} \tab 0 to 1 \tab higher \cr
 \code{mtld} \tab 0 or greater; no finite upper bound \tab higher \cr
@@ -64,20 +144,25 @@ effective parameter, status, or document membership. Passing a screen does not
 establish validity or reliability; failing one does not erase an otherwise
 computable value.
 }
-\section{Deferred surfaces}{
-Raw-text tokenization, public lexical-resource lookup, and the separately named
-expected-TTR D candidate are not part of the v0.1 public core. The installed
-TUBELEX development candidate has no exported lookup API and records zero
-release-approved resources.
+\section{Versioned surfaces}{
+The core metrics, raw-text preprocessing, variant metrics, lexical-level
+profiles, and TUBELEX profile have separate versioned contracts. This keeps a
+change in tokenization or resource matching from silently redefining a core
+metric. The separately named expected-TTR D method is not included in version
+0.1.0.
 }
 \section{Offline smoke test}{
 After loading \pkg{ldfreq}, run the installed script returned by
 \code{system.file("examples", "offline-smoke.R", package = "ldfreq")}. It
-exercises single, batch, profile, profile-batch, and screen workflows without a
-network connection or external runtime.
+exercises single, batch, profile, profile-batch, lexical-level, and screen
+workflows without a network connection or external runtime.
 }
 \seealso{
-\code{\link{lexdiv_metrics}}, \code{\link{lexdiv_profile}}
+\code{\link{lexdiv_metrics}}, \code{\link{lexdiv_preprocessing}},
+\code{\link{lexdiv_flemmatize}},
+\code{\link{lexdiv_profile}}, \code{\link{lexdiv_variant_metrics}},
+\code{\link{new_jacet8000_profile}},
+\code{\link{tubelex_frequency_profile}}
 }
 \examples{
 metric_ids <- lexdiv_metric_ids()
@@ -86,5 +171,16 @@ head(metric_ids)
 smoke_path <- system.file("examples", "offline-smoke.R", package = "ldfreq")
 stopifnot(nzchar(smoke_path))
 source(smoke_path, local = TRUE)
+
+contract_files <- c(
+  "lexical-diversity-contract.json",
+  "ldfreq-preprocessing-contract.json",
+  "lexical-diversity-variant-contract.json",
+  "lexical-level-profile-contract.json",
+  "tubelex-frequency-profile-contract.json"
+)
+contract_paths <- system.file("spec", contract_files, package = "ldfreq")
+stopifnot(all(nzchar(contract_paths)))
+basename(contract_paths)
 }
 \keyword{package}

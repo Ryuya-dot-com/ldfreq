@@ -62,7 +62,7 @@
 #' Frozen lexical-diversity metric identifiers
 #'
 #' Returns the metric identifiers admitted to the current core implementation.
-#' The deferred `expected_ttr_d` candidate is deliberately absent from v0.1.
+#' The separately defined `expected_ttr_d` method is not included in v0.1.
 #'
 #' @return A character vector in the default result order.
 #' @export
@@ -141,6 +141,9 @@ lexdiv_metric_ids <- function() {
 #'   marked `bytes` or `latin1` make the whole document invalid. A zero-length
 #'   character vector is an empty document. Valid non-ASCII strings whose
 #'   encoding marker is unknown are interpreted as UTF-8 on a local copy.
+#'   Each vector element is counted as exactly one token; a single string that
+#'   contains whitespace triggers a warning because it may be un-tokenized
+#'   prose. Use [lexdiv_metrics_text()] for raw text.
 #' @param metrics Plain, non-empty, duplicate-free character vector selected
 #'   from [lexdiv_metric_ids()].
 #' @param segment_length Requested complete non-overlapping segment length for
@@ -156,7 +159,10 @@ lexdiv_metric_ids <- function() {
 #'   list-columns for requested/effective parameters and diagnostics. Metric
 #'   contract identity and result-schema version are explicit columns as well
 #'   as convenience attributes. Invalid and empty documents return structured
-#'   rows rather than throwing; structural API errors still throw.
+#'   rows rather than throwing; structural API errors still throw. Read
+#'   `status` and `missing_reason` before interpreting `value`: `ok` means a
+#'   value was computed, `missing` means the valid input did not meet a method
+#'   domain, and `invalid_input` means the token document was invalid.
 #' @export
 lexdiv_metrics <- function(
     tokens,
@@ -182,7 +188,10 @@ lexdiv_metrics <- function(
   if (length(unknown) > 0L) {
     stop(
       sprintf(
-        "Unknown or non-frozen metric ID(s): %s.",
+        paste0(
+          "Unknown or non-frozen metric ID(s): %s. ",
+          "Use lexdiv_metric_ids() to list valid metric IDs."
+        ),
         paste(unknown, collapse = ", ")
       ),
       call. = FALSE
@@ -204,6 +213,13 @@ lexdiv_metrics <- function(
       parameters = parameters_by_metric[[index]]
     )
   }
+
+  .lex_warn_likely_raw_text(
+    tokens,
+    "tokens",
+    "lexdiv_metrics",
+    "use lexdiv_metrics_text() instead"
+  )
 
   input_state <- .lex_input_state(tokens)
   if (identical(input_state, "ok")) {

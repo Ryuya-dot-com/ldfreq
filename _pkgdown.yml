@@ -4,11 +4,21 @@ template:
   bootstrap: 5
 
 reference:
+  - title: Overview
+    contents:
+      - ldfreq-package
   - title: Core metrics
     contents:
       - lexdiv_metrics
       - lexdiv_metric_ids
       - lexdiv_metrics_batch
+  - title: Raw text and lexical units
+    contents:
+      - lexdiv_preprocessing
+      - lexdiv_flemmatize
+  - title: Formula variants
+    contents:
+      - lexdiv_variant_metrics
   - title: Profiles and screens
     contents:
       - lexdiv_spec
@@ -19,6 +29,10 @@ reference:
       - lexdiv_profile
       - lexdiv_profile_batch
       - lexdiv_screen
+  - title: Reference-resource profiles
+    contents:
+      - new_jacet8000_profile
+      - tubelex_frequency_profile
   - title: Evidence
     contents:
       - lexdiv_length_evidence

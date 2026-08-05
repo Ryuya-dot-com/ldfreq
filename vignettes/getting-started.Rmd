@@ -11,9 +11,10 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-`ldfreq` begins at an assumption-transparent boundary: an ordered character
-vector of tokens. The package does not guess how raw prose should be tokenized,
-normalized, or lemmatized.
+There are two common starting points. If you already have one character value
+per token, use `lexdiv_metrics()`. If you have ordinary prose, use
+`lexdiv_metrics_text()`. The second route records how the text was tokenized,
+normalized, and optionally lemmatized before it calls the same metric core.
 
 ```{r}
 library(ldfreq)
@@ -23,12 +24,159 @@ result <- lexdiv_metrics(tokens, metrics = c("ttr", "rttr", "yule_k"))
 result
 ```
 
+## Raw text without hidden preprocessing
+
+The shortest raw-text workflow is a direct call to `lexdiv_metrics_text()`.
+Normalization, case, and number handling are explicit arguments rather than
+global options.
+
+```{r}
+raw_result <- lexdiv_metrics_text(
+  "Cats and cat ran run.",
+  normalization = "NFC",
+  case = "preserve",
+  metrics = "ttr"
+)
+raw_result
+```
+
+Call `lexdiv_tokenize()` separately when you want to inspect or annotate the
+tokens first. Its offsets refer to the processed text, and its provenance keeps
+source and processed text hashes without storing the source text itself.
+
+```{r}
+tokenization <- lexdiv_tokenize(
+  "Cats and cat ran run.",
+  normalization = "NFC",
+  case = "preserve"
+)
+tokenization
+```
+
+Lemma and content-word analyses require an explicit annotation source. The
+example annotations are project-authored fixtures, not a recommended universal
+lemmatizer. Missing annotations would be excluded and counted in
+`unit_coverage` rather than imputed.
+
+```{r}
+annotated <- lexdiv_lemmatize(
+  tokenization,
+  lemmas = c("cat", "and", "cat", "run", "run"),
+  upos = c("NOUN", "CCONJ", "NOUN", "VERB", "VERB"),
+  backend_id = "vignette-fixture",
+  backend_version = "1"
+)
+
+lemma_content <- lexdiv_metrics_text(
+  annotated,
+  unit = "lemma",
+  word_inclusion = "content",
+  metrics = "ttr"
+)
+lemma_content$results
+lemma_content$token_audit
+lemma_content$preprocessing
+```
+
+For a quick English lemma baseline, the optional `textstem` backend can be
+selected explicitly. It supplies lemmas only; it does not infer UPOS tags, so a
+content-word analysis still needs tags from a separately identified source.
+
+```{r}
+if (requireNamespace("textstem", quietly = TRUE)) {
+  automatic_lemmas <- lexdiv_lemmatize(
+    lexdiv_tokenize("The cats were running and studies.", case = "lower"),
+    method = "textstem"
+  )
+  automatic_lemmas$tokens[, c("surface", "lemma")]
+  automatic_lemmas$provenance$annotation
+}
+```
+
+This separation is deliberate: changing forms to lemmas or restricting the
+denominator to content words changes the measurement. It is not merely a file
+cleaning step.
+
+Flemma is a separate lexical unit because it groups forms without preserving
+POS distinctions. `lexdiv_flemmatize()` accepts a caller-supplied local AntBNC
+file; it neither bundles nor downloads that resource. Unknown forms retain a
+normalized identity value, while token rows record AntBNC, override, or
+identity matching.
+
+```{r, eval=FALSE}
+flemmas <- lexdiv_flemmatize(
+  tokenization,
+  "/path/to/antbnc_lemmas_ver_004.txt",
+  resource_version = "004"
+)
+lexdiv_metrics_text(flemmas, unit = "flemma", metrics = "ttr")
+```
+
+The raw AntBNC mapping approximates, but does not reproduce, New Word Level
+Checker. NWLC documents manual word-list alignment. New JACET profiles
+therefore expose AntBNC-versus-headword conflicts and accept explicit upstream
+overrides.
+
+## Corpus-relative frequency with coverage
+
+`tubelex_frequency_profile()` applies either an explicit source-aligned query
+normalization or identity matching. It returns original terms, lookup terms,
+unmatched rows, token/type coverage, and matched-only conditional summaries.
+
+```{r}
+frequency <- tubelex_frequency_profile(tokenization)
+frequency$summary
+frequency$coverage
+frequency$lookup
+```
+
+TUBELEX is a general YouTube subtitle frequency space. Its values describe
+frequency and prevalence relative to that corpus; they are not direct measures
+of proficiency, writing quality, academic register, or context-independent
+lexical sophistication.
+
+## Caller-supplied lexical frequency levels
+
+`new_jacet8000_profile()` maps ranks in a caller-supplied New JACET 8000 table
+to eight 1,000-rank levels. The package contains no copy of the list and never
+downloads one. Exact and cumulative token/type rates keep off-list items in the
+denominator. The official `j8_2016.xlsx` workbook can be passed directly; its
+`新J8` sheet and Japanese rank/lemma column names are detected automatically.
+
+```{r}
+synthetic_nj8 <- data.frame(
+  NJ8 = c(1L, 1001L, 6001L, 8000L),
+  Word = c("the", "develop", "rare", "extreme")
+)
+levels <- new_jacet8000_profile(annotated, synthetic_nj8, unit = "lemma")
+levels$summary
+levels$coverage
+```
+
+Use `plot(levels)` for token proportions and their cumulative curve, or
+`plot(levels, weighting = "type")` for normalized types.
+
+For an object created by `lexdiv_flemmatize()`, set `unit = "flemma"` and use
+`flemma_conflict = "antbnc"`, `"wordlist"`, or `"error"`. The lossless lookup
+retains the chosen resolution and the alternative surface-headword rank/level.
+
 ## Reading results
 
 Each requested metric receives one row. The `status` and `missing_reason`
 columns state whether a value is available; `requested_parameters` and
 `effective_parameters` are list-columns. Contract and schema identifiers are
 ordinary columns so that they survive row binding and tabular serialization.
+
+| `status` | Meaning |
+|---|---|
+| `ok` | The requested method produced a value. |
+| `missing` | The document was valid, but the method's frozen domain or requested parameter did not permit a value. |
+| `invalid_input` | At least one invalid token made the document invalid; it was not silently deleted. |
+
+Common `missing_reason` values distinguish empty input, insufficient tokens for
+a formula, a document shorter than the requested window/segment/sample, a zero
+denominator, and a missing MTLD factor. Structural request errors such as an
+unknown metric ID stop the call instead of creating a result row.
 
 Short documents do not cause the requested method to change. For example, an
 MATTR window larger than the document yields a structured missing result rather
@@ -89,9 +237,54 @@ measurement validity, or reliability. The screens do not change values or
 parameters or censor documents. Read them together with `status`,
 `missing_reason`, `N`, `V`, and the method and parameter identities.
 
-Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the frozen registries.
-The `expected_ttr_d` candidate is deferred from v0.1 and intentionally absent
-from the public method set.
+Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the versioned
+registries. The separately defined `expected_ttr_d` method is not included in
+the version 0.1.0 public method set.
+
+## Definition sensitivity outside the frozen core
+
+Maas and sequential MTLD have same-name formula and aggregation variants. The
+separate variant surface makes those choices comparable without changing the
+canonical registry or silently replacing a method.
+
+```{r}
+variant_catalog <- lexdiv_variant_ids()
+variant_catalog
+
+variant_results <- lexdiv_variant_metrics(
+  rep(tokens, 10),
+  mtld_thresholds = c(0.72, 0.92)
+)
+variant_results[, c(
+  "family", "method_id", "reference_label", "value", "status"
+)]
+```
+
+The comparison-scope column is part of interpretation. A formula-level
+TAALED-relevant row is not an official preprocessing or full-pipeline
+compatibility claim.
+
+## Auditing the formal contracts
+
+The help pages explain ordinary use. Exact formulas, domains, normalization
+rules, result schemas, and resource boundaries are installed as JSON contracts:
+
+```{r}
+contract_files <- c(
+  "lexical-diversity-contract.json",
+  "ldfreq-preprocessing-contract.json",
+  "lexical-diversity-variant-contract.json",
+  "lexical-level-profile-contract.json",
+  "tubelex-frequency-profile-contract.json"
+)
+contract_paths <- system.file("spec", contract_files, package = "ldfreq")
+stopifnot(all(nzchar(contract_paths)))
+basename(contract_paths)
+```
+
+Use `jsonlite::read_json(contract_paths[[1]], simplifyVector = FALSE)` when an
+R list representation is convenient. Reading the files does not run a metric,
+download a resource, or expose caller file paths.
 
 ## Offline installed-package check
 

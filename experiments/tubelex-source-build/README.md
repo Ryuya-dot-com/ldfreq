@@ -1,7 +1,7 @@
 # Direct-source R build of the TUBELEX slim artifact
 
 Created: 2026-07-25
-Status: integrated internal development candidate; no public API or release approval
+Status: integrated release candidate with a maintainer-approved public API
 
 ## Result
 
@@ -30,8 +30,8 @@ because gzip OS bytes and deflate output may differ across zlib versions.
 
 Full evidence is in [measurement.json](measurement.json). The upstream source is
 deliberately not retained in this repository. The 2.55 MB output is installed as
-an internal development candidate together with its manifest, build provenance,
-reviewed notice, and package copyright declaration.
+a release candidate together with its manifest, build provenance, reviewed
+notice, and package copyright declaration.
 
 ## Unicode audit finding
 
@@ -105,17 +105,14 @@ passed locally on macOS. The package workflow repeats the builder, cooperative
 lock, cleanup, and identity checks on Ubuntu and Windows, while ordinary package
 checks exercise the installed resource and its machine-readable inventory.
 
-Release approval still requires:
-
-1. an independent legal/provenance approval record and preserved evidence for
-   the byte-pinned admission candidate;
-2. a public lookup and result contract decision; and
-3. a final source, installed, and platform-binary audit against the named
-   release candidate after all approved resources are frozen.
+The byte-pinned admission candidate records the maintainer's license,
+provenance, distribution, and public-profile decision. Independent review is
+optional. Release still requires a final source, installed, and platform-binary
+audit against the named release candidate after all approved resources are
+frozen.
 
 Development CI already exercises source/platform/installed byte identity. That
-evidence does not substitute for the final named-candidate rerun or independent
-approval.
+evidence does not substitute for the final named-candidate rerun.
 
 The artifact contains published aggregate frequencies only. It contains no raw
 subtitle text, contiguous passages, video IDs, channel IDs, document names, or

@@ -76,6 +76,17 @@ test_that("named-list batches preserve document and metric order", {
   expect_identical(first_document, single)
 })
 
+test_that("printing a batch column subset remains safe", {
+  result <- lexdiv_metrics_batch(
+    list(doc_a = c("a", "a")),
+    metrics = "ttr"
+  )
+  expect_output(
+    print(result[, c("document_id", "value", "status")]),
+    "document_id"
+  )
+})
+
 test_that("named-list and data-frame inputs are identical", {
   documents <- list(
     doc_b = c("a", "b", "a"),

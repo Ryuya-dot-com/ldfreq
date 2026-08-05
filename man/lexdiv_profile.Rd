@@ -95,7 +95,10 @@ lexdiv_screen(
 \code{lexdiv_plan()} returns a deduplicated \code{lexdiv_plan} with an MD5
 fingerprint over normalized request identity and order.
 
-\code{lexdiv_methods()} and \code{lexdiv_presets()} return metadata data frames.
+\code{lexdiv_methods()} returns a metadata data frame with human-readable
+labels and definitions, conventional within-method direction, contract scale,
+exact method identity, parameters, and advisory token floors.
+\code{lexdiv_presets()} returns a preset metadata data frame.
 \code{lexdiv_profile()} returns one core metric row per plan request with a
 separate profile envelope. \code{lexdiv_profile_batch()} adds the existing batch
 envelope and returns document-major, request-minor long form.

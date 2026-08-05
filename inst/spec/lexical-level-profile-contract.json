@@ -1,0 +1,99 @@
+{
+  "$schema": "lexical-level-profile-contract.schema.json",
+  "contract_id": "ldfreq-lexical-level-profile",
+  "contract_version": "0.1.0",
+  "status": "normative",
+  "public_api": true,
+  "resource_boundary": {
+    "resource_id": "new-jacet8000",
+    "caller_supplied": true,
+    "bundled": false,
+    "downloaded": false,
+    "full_list_returned": false,
+    "redistribution_claimed": false,
+    "accepted_inputs": ["data-frame", "local-csv", "local-xlsx"],
+    "official_xlsx_sheet": "新J8",
+    "official_xlsx_columns": ["新J8順位", "代表レマ", "品詞"],
+    "observed_use_terms": "personal-research-use-with-citation; commercial-use-requires-prior-JACET-consultation",
+    "public-download-is-not-redistribution-permission": true
+  },
+  "rank_to_level": {
+    "valid_ranks": [1, 8000],
+    "level_count": 8,
+    "rule": "ceiling(rank/1000)",
+    "parenthetical_alias_default": true,
+    "normalized_collision_policy": "lowest-rank-entry-wins"
+  },
+  "lexical_unit": {
+    "resource_unit": "representative-lemma",
+    "default_input_unit": "lemma",
+    "input_unit_choices": ["surface", "lemma", "flemma"],
+    "surface_input_available_as_explicit-sensitivity-choice": true,
+    "caller-supplied-antbnc-flemma-available": true
+  },
+  "flemma_conflict": {
+    "choices": ["antbnc", "wordlist", "error"],
+    "default": "antbnc",
+    "explicit-overrides-applied-upstream": true,
+    "token-level-conflict-reported": true,
+    "alternative-wordlist-rank-reported": true
+  },
+  "query_normalization": {
+    "choices": {
+      "nfkc_lower": "nfkc-trim-en-lower-v1",
+      "identity": "identity-valid-utf8-v1"
+    },
+    "default": "nfkc_lower",
+    "same_transform_for_queries_and_entries": true
+  },
+  "lookup_columns": [
+    "query_index", "token_index", "surface_term", "term", "lookup_term",
+    "unit_match_rule", "headword_conflict", "headword_conflict_resolution",
+    "conflicting_surface_rank", "conflicting_surface_level", "matched",
+    "rank", "level"
+  ],
+  "summary_columns": [
+    "weighting", "level", "level_label", "items", "proportion",
+    "cumulative_items", "cumulative_proportion"
+  ],
+  "summary": {
+    "weightings": ["token", "type"],
+    "denominator": "all-eligible-items",
+    "off_list_in_denominator": true,
+    "off_list_separate_row": true,
+    "off_list_appended_to_cumulative_curve": false,
+    "cumulative_definition": "proportion-at-or-below-level-among-all-eligible-items"
+  },
+  "batch": {
+    "contract_id": "ldfreq-lexical-level-profile-batch",
+    "contract_version": "0.1.0",
+    "accepted_containers": ["plain-named-list", "explicit-id-and-list-column-data-frame"],
+    "document_order": "input-order",
+    "resource_read_validate_normalize_hash_count": 1,
+    "default_max_rows": 1000000,
+    "bound_definition": "combined-summary-and-token-lookup-rows",
+    "components": [
+      "summary", "lookup", "coverage", "document_diagnostics",
+      "exclusion_reasons", "document_provenance", "provenance",
+      "resource_diagnostics"
+    ],
+    "absolute_path_retained": false
+  },
+  "plot": {
+    "implementation": "base-r-graphics",
+    "default_exact_geometry": "bars",
+    "default_cumulative_geometry": "line-and-points",
+    "off_list_geometry": "separate-bar",
+    "returned_plot_data": true
+  },
+  "provenance": {
+    "local_file_sha256": true,
+    "canonical_rank_entry_sha256": true,
+    "preprocessing_reference_retained": true,
+    "resource_version_recorded": true,
+    "source_filename_only": true,
+    "absolute_path_retained": false,
+    "absolute_path_printed": false,
+    "absolute_path_echoed_in_errors": false
+  }
+}

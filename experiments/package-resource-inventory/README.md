@@ -34,4 +34,4 @@ package check. The required aggregate therefore fails if any platform package
 changes or omits a declared member. The generated archive hashes identify that
 individual run; ordinary `R CMD build` and `R CMD INSTALL --build` output is not
 claimed to be byte-reproducible. Final release evidence still requires a named
-candidate, preserved logs and artifacts, and independent review.
+candidate, preserved logs and artifacts, and the recorded maintainer decision.

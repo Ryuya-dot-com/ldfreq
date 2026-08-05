@@ -1,0 +1,58 @@
+{
+  "$schema": "tubelex-frequency-profile-contract.schema.json",
+  "contract_id": "ldfreq-tubelex-frequency-profile",
+  "contract_version": "0.1.0",
+  "status": "normative",
+  "public_api": true,
+  "resource": {
+    "resource_id": "tubelex-en-treebank-slim",
+    "resource_version": "7cb5fb36-slim-v1",
+    "lookup_unit": "surface-form",
+    "corpus_interpretation": "general-youtube-subtitle-frequency-space",
+    "not_claimed_constructs": [
+      "language-proficiency",
+      "writing-quality",
+      "academic-register",
+      "context-independent-lexical-sophistication"
+    ]
+  },
+  "query_normalization": {
+    "choices": {
+      "tubelex": "nfkc-trim-en-lower-v1",
+      "identity": "identity-valid-utf8-v1"
+    },
+    "default": "tubelex",
+    "original_and_lookup_terms_retained": true,
+    "normalization_collisions_reported": true
+  },
+  "lookup_columns": [
+    "query_index", "term", "lookup_term", "matched", "resource_word",
+    "count", "videos", "channels", "zipf", "video_prevalence",
+    "channel_prevalence"
+  ],
+  "result_status": {
+    "statuses": ["ok", "empty", "invalid_input", "resource_error"],
+    "status_semantics": {
+      "ok": "a non-empty valid input was looked up successfully",
+      "empty": "a valid zero-term input produced typed zero-row output",
+      "invalid_input": "the supplied terms failed input validation",
+      "resource_error": "the bundled resource failed an integrity or availability check"
+    }
+  },
+  "summary": {
+    "weightings": ["token", "type"],
+    "matched_only": true,
+    "unmatched_measurements": "missing-not-zero",
+    "statistics": [
+      "mean_zipf", "sd_zipf", "mean_video_prevalence",
+      "mean_channel_prevalence"
+    ],
+    "coverage_adjacent": true
+  },
+  "runtime_policy": {
+    "network_access": false,
+    "download": false,
+    "fallback": false,
+    "byte_pinned_local_resource": true
+  }
+}

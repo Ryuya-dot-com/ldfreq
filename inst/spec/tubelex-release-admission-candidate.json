@@ -1,8 +1,8 @@
 {
   "$schema": "tubelex-release-admission-candidate.schema.json",
-  "schema_version": "0.1.0",
-  "candidate_id": "tubelex-en-treebank-slim-7cb5fb36-admission-v1",
-  "candidate_state": "pending-independent-review",
+  "schema_version": "0.3.0",
+  "candidate_id": "tubelex-en-treebank-slim-7cb5fb36-public-profile-admission-v3",
+  "candidate_state": "maintainer-approved",
   "resource": {
     "resource_id": "tubelex-en-treebank-slim",
     "resource_version": "7cb5fb36-slim-v1",
@@ -16,13 +16,13 @@
     "notice_sha256": "e65a1f5d0d6e7806e31e92d78bf3b903115e610c36bd9f2406269700441ecdd3"
   },
   "distribution_scope": {
-    "package_component_state": "internal-development-candidate",
+    "package_component_state": "release-candidate",
     "raw_source_bundled": false,
     "raw_subtitles_or_identifiers_included": false,
     "runtime_network_access": false,
     "implicit_download_or_fallback": false,
-    "public_api": false,
-    "release_approved": false
+    "public_api": true,
+    "release_approved": true
   },
   "contract_refs": {
     "loader_contract_id": "ldfreq-lexical-sophistication-profile",
@@ -30,54 +30,51 @@
     "lookup_contract_id": "ldfreq-lexical-resource-lookup",
     "lookup_contract_version": "0.1.0-draft.1",
     "lookup_result_schema_id": "lexres-frequency-prevalence-result",
-    "lookup_result_schema_version": "0.1.0-draft.1"
+    "lookup_result_schema_version": "0.1.0-draft.1",
+    "public_profile_contract_id": "ldfreq-tubelex-frequency-profile",
+    "public_profile_contract_version": "0.1.0"
   },
-  "approval_policy": {
-    "independent_reviewer_required": true,
-    "candidate_author_or_builder_may_approve": false,
-    "approval_record_bundled": false,
-    "unsigned_local_claim_is_not_proof": true,
-    "disallowed_approver_logins": [
-      "Ryuya-dot-com"
-    ]
+  "admission_policy": {
+    "decision_authority": "package-maintainer",
+    "independent_reviewer_required": false,
+    "optional_independent_review_permitted": true,
+    "automated_identity_checks_required": true,
+    "final_inventory_audit_required": true
   },
-  "approval_record_contract": {
-    "format": "strict-single-record-dcf",
-    "schema_id": "ldfreq-resource-release-approval",
-    "schema_version": "0.1.0",
-    "fields": [
-      "Approval-Schema-ID",
-      "Approval-Schema-Version",
-      "Approval-ID",
-      "Candidate-ID",
-      "Candidate-SHA256",
-      "Reviewed-Repository-Commit",
-      "Reviewer-Name",
-      "Reviewer-Affiliation",
-      "Reviewer-GitHub-Login",
-      "Reviewed-On",
-      "Decision",
-      "Independence-Attested",
-      "Not-Candidate-Author-Or-Builder",
-      "Redistribution-Terms",
-      "Notice-And-Attribution",
-      "Source-And-Artifact-Identity",
-      "Package-Distribution-Scope",
-      "Public-API-Scope",
-      "Evidence-URL",
-      "Evidence-Locator-ID",
-      "Evidence-SHA256"
-    ],
-    "approved_scope_values": {
-      "redistribution_terms": "approved",
-      "notice_and_attribution": "approved",
-      "source_and_artifact_identity": "approved",
-      "package_distribution_scope": "approved",
-      "public_api_scope": "not-reviewed"
+  "maintainer_decision": {
+    "decision_id": "tubelex-maintainer-redistribution-decision-2026-08-06",
+    "decision": "approved",
+    "decided_on": "2026-08-06",
+    "decided_by": {
+      "name": "Komuro Ryuya",
+      "github_login": "Ryuya-dot-com",
+      "role": "package-maintainer"
+    },
+    "legal_basis": {
+      "upstream_repository": "https://github.com/naist-nlp/tubelex",
+      "pinned_license_url": "https://github.com/naist-nlp/tubelex/blob/7cb5fb36add76b83a266d1967536e1a1d3faa513/LICENSE",
+      "upstream_readme_url": "https://github.com/naist-nlp/tubelex/blob/7cb5fb36add76b83a266d1967536e1a1d3faa513/README.md",
+      "cran_policy_url": "https://cran.r-project.org/web/packages/policies.html",
+      "license_spdx": "BSD-3-Clause",
+      "interpretation": "The repository-level BSD-3-Clause license covers the repository-published frequency lists; the README separately withholds full corpus text while offering aggregate frequency lists for use."
+    },
+    "approved_scopes": {
+      "redistribution_terms": true,
+      "notice_and_attribution": true,
+      "source_and_artifact_identity": true,
+      "package_distribution_scope": true,
+      "public_api_scope": true
+    },
+    "risk_controls": {
+      "raw_subtitles_or_identifiers_included": false,
+      "upstream_commit_and_source_hash_pinned": true,
+      "bsd_notice_and_disclaimer_installed": true,
+      "transformation_disclosed": true,
+      "runtime_download_or_fallback": false,
+      "independent_legal_opinion_obtained": false
     }
   },
   "remaining_gates_after_resource_approval": [
-    "public lookup and result contract",
     "final release-candidate source, installed, and binary inventory audit"
   ]
 }

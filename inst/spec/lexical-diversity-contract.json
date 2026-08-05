@@ -303,7 +303,13 @@
       "parameters": {},
       "computational_domain": {"condition": "N > 1 and V >= 1", "otherwise": "insufficient_tokens_for_formula"},
       "quality_floor_tokens": 2,
-      "scale": {"lower_bound": 0, "upper_bound": null, "bounded": false},
+      "scale": {
+        "lower_bound": 0,
+        "upper_bound": 1.4426950408889634,
+        "upper_bound_expression": "1/ln(2)",
+        "upper_bound_inclusive": true,
+        "bounded": true
+      },
       "direction": "lower"
     },
     {

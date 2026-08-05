@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tubelex-frequency-profile-contract.schema.json",
+  "title": "ldfreq TUBELEX frequency profile contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema", "contract_id", "contract_version", "status", "public_api",
+    "resource", "query_normalization", "lookup_columns", "result_status",
+    "summary", "runtime_policy"
+  ],
+  "properties": {
+    "$schema": {"const": "tubelex-frequency-profile-contract.schema.json"},
+    "contract_id": {"const": "ldfreq-tubelex-frequency-profile"},
+    "contract_version": {"const": "0.1.0"},
+    "status": {"const": "normative"},
+    "public_api": {"const": true},
+    "resource": {"type": "object"},
+    "query_normalization": {"type": "object"},
+    "lookup_columns": {
+      "type": "array",
+      "minItems": 11,
+      "maxItems": 11,
+      "uniqueItems": true,
+      "items": {"type": "string"}
+    },
+    "result_status": {"type": "object"},
+    "summary": {"type": "object"},
+    "runtime_policy": {"type": "object"}
+  }
+}
