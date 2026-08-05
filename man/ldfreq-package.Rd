@@ -2,22 +2,35 @@
 \alias{ldfreq}
 \alias{ldfreq-package}
 \docType{package}
-\title{Reproducible Lexical Diversity Profiles}
+\title{Reproducible Lexical Diversity and Frequency Profiles}
 \description{
 The \pkg{ldfreq} package computes explicitly versioned lexical-diversity
-metrics from ordered pre-tokenized character vectors. It returns canonical
-long-form records with method, parameter, schema, and contract provenance.
+metrics from ordered tokens and provides separate auditable raw-text,
+annotation, lexical-unit, Maas/MTLD sensitivity, and TUBELEX frequency-profile
+surfaces. It also provides a caller-supplied New JACET 8000 level-profile
+surface without bundling that list. Metric rows retain method, parameter,
+schema, and contract provenance.
 }
 \details{
-The initial release performs no tokenization, normalization,
-lemmatization, or lexical-resource lookup. Start with \code{lexdiv_metrics()}
-for one document, \code{lexdiv_metrics_batch()} for multiple documents, or
-\code{lexdiv_profile()} for explicit parameter variants.
+Start with \code{lexdiv_metrics()} for explicit tokens,
+\code{lexdiv_metrics_text()} for one raw or annotated text,
+\code{lexdiv_metrics_batch()} for multiple tokenized documents,
+\code{lexdiv_profile()} for explicit parameter variants,
+\code{lexdiv_variant_metrics()} for separately contracted Maas/MTLD
+sensitivity variants, or
+\code{new_jacet8000_profile()} for exact and cumulative pedagogical frequency
+levels from a caller-supplied list, or
+\code{tubelex_frequency_profile()} for coverage-aware corpus-relative
+frequency and prevalence.
 }
 \section{Input boundary}{
 The public core accepts ordered, already-tokenized character vectors. It does
 not infer token boundaries, change case, normalize Unicode spelling, remove
 tokens, or lemmatize. Batch inputs must carry explicit unique document IDs.
+\code{lexdiv_tokenize()}, \code{lexdiv_lemmatize()}, and
+\code{lexdiv_flemmatize()} form a separate
+preprocessing contract so that these choices cannot silently change core
+methods.
 }
 \section{Results and provenance}{
 Metric results are long-form data frames. Read \code{status} and
@@ -26,6 +39,30 @@ contract, result schema, requested and effective parameters, token/type counts,
 the frozen \code{below_quality_floor} field, and method diagnostics. Batch,
 profile, and screen layers add separate envelopes without changing the core
 record.
+}
+\section{Preprocessing and lexical units}{
+The raw-text adapter records Unicode normalization, case handling, number
+retention, offsets, and source/processed text hashes. Lemma analyses record the
+annotation backend and version. Caller-supplied AntBNC flemma analyses also
+record exact resource identity, matching rules, overrides, and identity
+fallback. Surface/lemma/flemma and all/content-word choices are returned with
+token-level exclusion reasons and coverage in an envelope that does not alter
+the normative metric result schema.
+}
+\section{Corpus-relative frequency}{
+\code{tubelex_frequency_profile()} retains original and normalized lookup
+terms, unmatched rows, token/type coverage, and matched-only token/type-weighted
+summaries. TUBELEX values are relative to a general YouTube subtitle corpus.
+They are not direct measures of proficiency, writing quality, academic
+register, or context-independent lexical sophistication.
+}
+\section{Lexical frequency levels}{
+\code{new_jacet8000_profile()} maps caller-supplied ranks to Levels 1--8 and
+reports exact and cumulative token/type proportions beside off-list coverage.
+The Level 8 cumulative proportion equals matched coverage because off-list
+items remain in the denominator. The package does not bundle or download the
+New JACET 8000 list. Flemma input exposes conflicts between AntBNC families and
+New JACET headwords instead of silently choosing one mapping.
 }
 \section{Direction and contract scale}{
 Direction applies only within the exact method, parameters, preprocessing, and
@@ -64,20 +101,25 @@ effective parameter, status, or document membership. Passing a screen does not
 establish validity or reliability; failing one does not erase an otherwise
 computable value.
 }
-\section{Deferred surfaces}{
-Raw-text tokenization, public lexical-resource lookup, and the separately named
-expected-TTR D candidate are not part of the v0.1 public core. The installed
-TUBELEX development candidate has no exported lookup API and records zero
-release-approved resources.
+\section{Candidate and deferred surfaces}{
+The raw-text, lexical-level, and TUBELEX functions are separately versioned
+public-API candidates and do not redefine the frozen v0.1 core. The new TUBELEX
+public API scope remains non-release-approved until independent review and final
+package inventory gates pass. The separately named expected-TTR D candidate
+remains deferred.
 }
 \section{Offline smoke test}{
 After loading \pkg{ldfreq}, run the installed script returned by
 \code{system.file("examples", "offline-smoke.R", package = "ldfreq")}. It
-exercises single, batch, profile, profile-batch, and screen workflows without a
-network connection or external runtime.
+exercises single, batch, profile, profile-batch, lexical-level, and screen
+workflows without a network connection or external runtime.
 }
 \seealso{
-\code{\link{lexdiv_metrics}}, \code{\link{lexdiv_profile}}
+\code{\link{lexdiv_metrics}}, \code{\link{lexdiv_preprocessing}},
+\code{\link{lexdiv_flemmatize}},
+\code{\link{lexdiv_profile}}, \code{\link{lexdiv_variant_metrics}},
+\code{\link{new_jacet8000_profile}},
+\code{\link{tubelex_frequency_profile}}
 }
 \examples{
 metric_ids <- lexdiv_metric_ids()

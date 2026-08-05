@@ -37,6 +37,13 @@ steps below.
       lexical resource distributed with or used by TAALES, and no result
       derived from an unapproved resource is in the repository, package,
       release assets, examples, or vignettes.
+- [ ] Confirm that no New JACET 8000 list bytes or reconstructable full-list
+      output is bundled. Exercise `new_jacet8000_profile()` only with
+      project-authored synthetic fixtures or a reviewer-authorized local copy.
+- [ ] Confirm that no AntBNC payload, full mapping, or derived reconstructable
+      list is bundled. Exercise `lexdiv_flemmatize()` in installed examples and
+      checks only with project-authored synthetic fixtures; local research runs
+      may use a legitimately obtained analyst-supplied copy.
 - [ ] For every admitted lexical resource, record its canonical source,
       version, cryptographic hash, redistribution terms, required notice,
       lookup contract, coverage diagnostics, and offline failure behavior.
@@ -46,8 +53,9 @@ steps below.
       `experiments/resource-admission/validate-tubelex-admission.R`. Reject
       self-approval, commit/candidate drift, incomplete distribution scope,
       reviewer rejection, or evidence-hash mismatch. Treat a structurally valid
-      record as admission evidence only, not reviewer authentication, signature
-      verification, public-API approval, or package release readiness.
+      record as resource and public-profile admission evidence only, not
+      reviewer authentication, signature verification, or package release
+      readiness.
 - [ ] Include each admitted resource's required license, copyright, notice, and
       manifest files under the appropriate `inst/` path, then verify their
       contents and hashes in the source, installed, and binary packages.
@@ -57,7 +65,9 @@ steps below.
       SBOM; record their formats, generating tools, tool versions, and hashes.
 
 If no lexical resource is admitted, record that the candidate remains the
-resource-independent core rather than leaving the resource inventory blank.
+resource-independent core rather than leaving the resource inventory blank. If
+a public resource API is present but not admitted, block release; do not relabel
+it as internal-only evidence.
 
 ## 3. Check the package artifact
 
@@ -95,6 +105,17 @@ claim must name and verify a separate controlled build procedure.
       specification and test fixtures.
 - [ ] Confirm that parameter variants remain explicit and that short-input and
       non-computable cases retain structured status and reason fields.
+- [ ] Confirm that each Maas/MTLD sensitivity row matches its separate variant
+      contract, that reference labels identify only their declared comparison
+      scope, and that no official TAALED compatibility or code-translation
+      claim has entered documentation or metadata.
+- [ ] Confirm that New JACET 8000 level rows use `ceiling(rank / 1000)`, exact
+      and cumulative rates retain all eligible terms as the denominator,
+      off-list terms remain visible, and surface/lemma/flemma, normalization,
+      flemma match rules, and headword-conflict policy remain in provenance.
+- [ ] Confirm that raw AntBNC use is described as an NWLC approximation, not
+      compatibility; verify AntBNC/wordlist/error conflict modes, explicit
+      overrides, identity fallback, and token-level alternative ranks.
 - [ ] Separate compatibility claims from validation evidence: no comparison
       with TAALES, TAALED, CLAN VOCD, COCA, or another implementation is claimed
       unless the exact method crosswalk and legally publishable evidence are

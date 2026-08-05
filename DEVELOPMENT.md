@@ -1,9 +1,30 @@
 # Development boundary
 
-The initial public baseline is intentionally a resource-independent lexical-
-diversity core. Its public functions accept ordered pre-tokenized vectors and do
+The frozen lexical-diversity core remains resource-independent and accepts
+ordered pre-tokenized vectors. The `0.1.0.9000` development line adds separate
+raw-text preprocessing and TUBELEX profile APIs under their own versioned
+contracts. A third contract exposes selected Maas and sequential-MTLD
+sensitivity variants; a fourth defines caller-supplied lexical-level profiles.
+All leave the frozen core registry unchanged. The package does
 not claim compatibility with TAALES, TAALED, CLAN VOCD, or another package's
-same-named variant without an explicit crosswalk.
+same-named variant beyond each row's explicit comparison scope.
+
+The lexical-level profile is resource-decoupled: `new_jacet8000_profile()` and
+`new_jacet8000_profile_batch()`
+accept only a caller-supplied data frame, local CSV, or official-layout local
+XLSX, computes Level 1--8
+exact/cumulative token and type rates, and never bundles, downloads, or returns
+the full New JACET 8000 list. The batch adapter requires explicit document IDs,
+processes the external list once, and bounds its combined summary/lookup rows.
+This public measurement contract does not admit
+the underlying JACET resource into the package inventory.
+
+`lexdiv_flemmatize()` similarly reads only a caller-supplied local AntBNC text
+resource. It keeps that payload outside package artifacts, records only the
+source basename and exact hash, and describes raw AntBNC as an NWLC
+approximation rather than compatibility. New JACET integration must retain
+per-token AntBNC/override/identity rules and selectable headword-conflict
+resolution.
 
 ## Before version 0.1.0
 
@@ -45,16 +66,24 @@ code-owner approval for workflow changes.
 
 ## Resource admission
 
-NGSL and Open English WordNet remain separate future work. TUBELEX-EN is now
-included only as an internal development candidate: its exact source, manifest,
+NGSL and Open English WordNet remain separate future work. TUBELEX-EN is
+included as a public-API development candidate: its exact source, manifest,
 artifact/content hashes, provenance, BSD notice, and installed paths are fixed,
-but it has no public lookup/profile API and is not release-approved. A
-non-exported exact-match lookup now exercises the candidate through a versioned
-internal result contract. It preserves valid UTF-8 query terms without case or
-Unicode normalization, retains input order and duplicates, reports token/type
-coverage separately, and leaves unmatched measurements missing rather than
-inventing zero counts. The exact state and every explicitly deferred or
-excluded resource are recorded in `inst/spec/ldfreq-resource-inventory.json`.
+but it is not release-approved. The exported `tubelex_frequency_profile()`
+wrapper applies an explicit identity or TUBELEX-oriented query transform,
+retains original and lookup terms, reports token/type coverage and
+normalization collisions, and leaves unmatched measurements missing rather
+than inventing zero counts. Its non-exported exact-match lower layer remains
+governed by the internal lookup contract. The exact state and every explicitly
+deferred or excluded resource are recorded in
+`inst/spec/ldfreq-resource-inventory.json`.
+A New JACET 8000 adapter does not change that resource state. The list remains
+explicitly excluded from package payloads while durable CRAN and downstream
+redistribution scope remains unresolved; only caller-authorized local input is
+read at runtime, with no network or fallback path.
+The AntBNC adapter also does not admit its payload: official download
+availability is not treated as downstream redistribution permission, and only
+caller-authorized local input is read without a network path.
 A resource-backed feature is not complete until its lookup contract, coverage
 diagnostics, offline behavior, public lifecycle, and source/installed/platform-
 binary membership have all been verified and independently approved.
@@ -63,12 +92,13 @@ The installed release-admission candidate is separately byte-pinned and still
 states `pending-independent-review`. Its non-exported evaluator accepts only a
 strict single-record DCF approval bound to the exact candidate hash, reviewed
 repository commit, reviewer identity and independence attestations, approved
-distribution scope, and a preserved evidence-file hash. Missing approval,
+distribution and public-profile scopes, and a preserved evidence-file hash.
+Missing approval,
 self-approval, commit drift, incomplete scope, rejection, and altered evidence
 all fail closed without search, download, or fallback. A structurally valid
 record closes only this admission-record gate: the evaluator always leaves
-`package_release_ready` false, does not authenticate the reviewer or verify a
-signature, and does not approve the public API or final release.
+`package_release_ready` false and does not authenticate the reviewer, verify a
+signature, or approve the final release.
 
 The current non-exported loader establishes only the common integrity and
 failure boundary. It consumes exact local paths, hashes the same raw bytes that

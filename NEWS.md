@@ -1,3 +1,50 @@
+# ldfreq 0.1.0.9000
+
+## Preprocessing, variants, and frequency-profile candidate
+
+- Added `lexdiv_tokenize()` as a separate versioned Unicode raw-text adapter.
+  NFC/NFKC/no-normalization choices, case handling, pure-number retention, token
+  offsets, and source/processed text hashes remain visible in provenance.
+- Added `lexdiv_lemmatize()` for caller-supplied annotations with mandatory
+  backend identity and version, plus an optional `textstem` convenience
+  backend. Missing lemmas and UPOS tags remain explicit.
+- Added `lexdiv_flemmatize()` for deterministic form-to-family-lemma mapping
+  from a caller-supplied local AntBNC list. Exact resource hashes, per-token
+  AntBNC/override/identity rules, match coverage, and path-private provenance
+  remain visible; the resource is neither bundled nor downloaded.
+- Added `lexdiv_metrics_text()` without changing the normative eleven-method
+  result schema. Surface/lemma/flemma and all/content-word decisions are
+  returned in a
+  separate preprocessing envelope with token-level exclusion reasons and
+  coverage.
+- Added `lexdiv_variant_ids()` and `lexdiv_variant_metrics()` as a separate
+  sensitivity contract. Four Maas definitions distinguish natural/base-10 logs
+  and a/a-squared scales; four sequential-MTLD methods distinguish the frozen
+  core from final-tail and mean-factor-length aggregations. Multiple thresholds
+  expand in long form. TAALED-relevant rows are formula/factorization
+  comparators, not official end-to-end compatibility claims.
+- Added `tubelex_frequency_profile()` with explicit identity or source-aligned
+  query normalization, lossless token rows, token/type coverage, and
+  matched-only token/type-weighted frequency and prevalence summaries.
+  Unmatched terms remain missing rather than becoming fabricated zero-frequency
+  observations.
+- Added `new_jacet8000_profile()` for caller-supplied New JACET 8000 data.
+  It reports exact and cumulative Level 1--8 token/type rates, retains a
+  denominator-visible off-list category, supports surface, lemma, or flemma
+  units, exposes selectable AntBNC-versus-wordlist headword conflicts, and
+  includes a base-R bar-plus-cumulative-line plot method. The official `新J8`
+  XLSX sheet and Japanese column names are detected automatically. The package
+  neither bundles nor downloads the New JACET 8000 list.
+- Added `new_jacet8000_profile_batch()` with explicit document identity, a
+  one-read shared-resource path, document-major lossless lookup and profile
+  tables, separate preprocessing provenance, and a pre-computation row bound.
+- Added public preprocessing and TUBELEX-profile candidate contracts. The new
+  TUBELEX public API scope is not release-approved until it receives a new
+  independent review and final source/installed/binary inventory audit.
+- Superseded the earlier immutable 0.1.0 core release-candidate evidence. A new
+  exact candidate, cross-platform check matrix, and go/no-go decision are
+  required before the 0.1.0 tag or CRAN submission.
+
 # ldfreq 0.1.0
 
 ## Initial public release
