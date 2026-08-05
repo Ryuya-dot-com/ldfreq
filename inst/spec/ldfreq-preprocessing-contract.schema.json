@@ -12,8 +12,8 @@
   "properties": {
     "$schema": {"const": "ldfreq-preprocessing-contract.schema.json"},
     "contract_id": {"const": "ldfreq-preprocessing"},
-    "contract_version": {"const": "0.1.0-draft.2"},
-    "status": {"const": "public-api-candidate"},
+    "contract_version": {"const": "0.1.0"},
+    "status": {"const": "normative"},
     "public_api": {"const": true},
     "tokenizer": {"type": "object"},
     "normalization": {"type": "object"},

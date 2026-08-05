@@ -94,6 +94,43 @@
 
 .profile_method_definitions <- function() {
   metric_ids <- names(.lex_metric_registry)
+  labels <- c(
+    ttr = "Type-token ratio",
+    rttr = "Root TTR (Guiraud)",
+    cttr = "Corrected TTR",
+    herdan = "Herdan's C",
+    maas = "Maas a-squared",
+    msttr = "Mean segmental TTR",
+    mattr = "Moving-average TTR",
+    mtld = "Measure of textual lexical diversity",
+    hdd = "HD-D on expected-TTR scale",
+    yule_k = "Yule's K",
+    yule_i = "Yule's I"
+  )
+  definitions <- c(
+    ttr = "V / N",
+    rttr = "V / sqrt(N)",
+    cttr = "V / sqrt(2 * N)",
+    herdan = "ln(V) / ln(N)",
+    maas = "(ln(N) - ln(V)) / ln(N)^2",
+    msttr = "mean TTR of complete non-overlapping segments",
+    mattr = "mean TTR of all step-one overlapping windows",
+    mtld = "mean forward/reverse tokens per sequential factor",
+    hdd = "expected sample types divided by sample size",
+    yule_k = "10000 * (M2 - N) / N^2",
+    yule_i = "V^2 / (M2 - V)"
+  )
+  directions <- c(
+    ttr = "higher", rttr = "higher", cttr = "higher", herdan = "higher",
+    maas = "lower", msttr = "higher", mattr = "higher", mtld = "higher",
+    hdd = "higher", yule_k = "lower", yule_i = "higher"
+  )
+  scales <- c(
+    ttr = "[0, 1]", rttr = "[0, Inf)", cttr = "[0, Inf)",
+    herdan = "[0, 1]", maas = "[0, 1/ln(2)]", msttr = "[0, 1]",
+    mattr = "[0, 1]", mtld = "[0, Inf)", hdd = "[0, 1]",
+    yule_k = "[0, 10000)", yule_i = "[0, Inf)"
+  )
   methods <- lapply(metric_ids, function(metric_id) {
     parameter <- switch(
       metric_id,
@@ -113,6 +150,10 @@
     )
     list(
       metric_id = metric_id,
+      label = unname(labels[[metric_id]]),
+      definition = unname(definitions[[metric_id]]),
+      direction = unname(directions[[metric_id]]),
+      scale = unname(scales[[metric_id]]),
       method_id = .lex_metric_registry[[metric_id]]$method_id,
       parameter = parameter,
       default_parameters = default_parameters,
@@ -134,7 +175,16 @@
   method_ids <- vapply(methods, `[[`, character(1L), "method_id")
   index <- match(method_id, method_ids)
   if (is.na(index)) {
-    stop(sprintf("Unknown or non-frozen method_id: %s.", method_id), call. = FALSE)
+    stop(
+      sprintf(
+        paste0(
+          "Unknown or non-frozen method_id: %s. ",
+          "Use lexdiv_methods() to list valid method IDs."
+        ),
+        method_id
+      ),
+      call. = FALSE
+    )
   }
   methods[[index]]
 }
@@ -555,13 +605,18 @@ lexdiv_plan <- function(
 
 #' List the frozen v0.1 methods
 #'
-#' @return A data frame with method identity, default parameters, and the
+#' @return A data frame with a human-readable name and definition, score
+#'   direction and scale, exact method identity, default parameters, and the
 #'   method's advisory default token floor.
 #' @export
 lexdiv_methods <- function() {
   methods <- .profile_method_definitions()
   output <- data.frame(
     metric_id = vapply(methods, `[[`, character(1L), "metric_id"),
+    label = vapply(methods, `[[`, character(1L), "label"),
+    definition = vapply(methods, `[[`, character(1L), "definition"),
+    direction = vapply(methods, `[[`, character(1L), "direction"),
+    scale = vapply(methods, `[[`, character(1L), "scale"),
     method_id = vapply(methods, `[[`, character(1L), "method_id"),
     parameter = vapply(methods, `[[`, character(1L), "parameter"),
     default_quality_floor_tokens = vapply(
@@ -575,7 +630,8 @@ lexdiv_methods <- function() {
   )
   output$default_parameters <- I(lapply(methods, `[[`, "default_parameters"))
   output <- output[c(
-    "metric_id", "method_id", "parameter", "default_parameters",
+    "metric_id", "label", "definition", "direction", "scale", "method_id",
+    "parameter", "default_parameters",
     "default_quality_floor_tokens"
   )]
   row.names(output) <- NULL

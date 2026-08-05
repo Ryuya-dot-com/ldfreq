@@ -6,7 +6,7 @@
 # metric computation.
 
 .lexprep_contract_id <- "ldfreq-preprocessing"
-.lexprep_contract_version <- "0.1.0-draft.2"
+.lexprep_contract_version <- "0.1.0"
 .lexprep_tokenizer_id <- "ldfreq-unicode-word-tokenizer"
 .lexprep_tokenizer_version <- "0.1.0"
 .lexprep_antbnc_id <- "antbnc-lemma-list"
@@ -759,7 +759,10 @@ lexdiv_flemmatize <- function(
 #' core result schema remains unchanged; preprocessing is returned in a
 #' separate auditable envelope.
 #'
-#' @param x One raw character string or a `lexdiv_tokenization` object.
+#' @param x One raw character string or a `lexdiv_tokenization` object. When an
+#'   existing tokenization is supplied, its recorded `normalization`, `case`,
+#'   and `keep_numbers` choices are authoritative; supplying any of those
+#'   tokenizer arguments again is an error.
 #' @param unit One of `"surface"`, `"lemma"`, or `"flemma"`.
 #' @param word_inclusion Either all word tokens or the frozen UPOS content set
 #'   `ADJ`, `ADV`, `NOUN`, `PROPN`, and `VERB`. Content-word selection requires
@@ -782,6 +785,26 @@ lexdiv_metrics_text <- function(
     window_length = 50L,
     mtld_threshold = 0.72,
     sample_size = 42L) {
+  supplied_tokenizer_arguments <- c(
+    normalization = !missing(normalization),
+    case = !missing(case),
+    keep_numbers = !missing(keep_numbers)
+  )
+  if (
+    .lexprep_is_tokenization(x) &&
+      any(supplied_tokenizer_arguments)
+  ) {
+    stop(
+      paste0(
+        paste(names(supplied_tokenizer_arguments)[supplied_tokenizer_arguments],
+          collapse = ", "
+        ),
+        " apply only when x is raw text. A lexdiv_tokenization already records ",
+        "these choices; call lexdiv_tokenize() again to change them."
+      ),
+      call. = FALSE
+    )
+  }
   unit <- .lexprep_scalar_choice(
     unit,
     c("surface", "lemma", "flemma"),

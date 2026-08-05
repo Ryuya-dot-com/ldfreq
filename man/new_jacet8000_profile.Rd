@@ -61,7 +61,9 @@ new_jacet8000_profile_batch(
 }
 \arguments{
   \item{terms}{A plain character vector of ordered lexical units, or an object
-  returned by \code{lexdiv_tokenize()}.}
+  returned by \code{lexdiv_tokenize()}. Each character-vector element is one
+  complete lexical unit; a single value containing whitespace triggers a
+  warning because it may be raw prose.}
   \item{documents}{A plain named list of character vectors or tokenization
   objects, or a data frame containing an explicit ID column and a list-column
   of those inputs.}
@@ -196,7 +198,8 @@ resource-boundary rules are installed in
 \file{lexical-level-profile-contract.json}. Locate it with
 \code{system.file("spec", "lexical-level-profile-contract.json", package =
 "ldfreq")}. The contract records that the resource is caller supplied and not
-redistributed by this package; the adapter API itself is release-approved.
+redistributed by this package. The adapter's measurement contract is normative
+for version 0.1.0.
 }
 \value{
 \code{new_jacet8000_profile()} returns a list of class
@@ -229,7 +232,8 @@ wordlist <- data.frame(
 )
 profile <- new_jacet8000_profile(
   c("The", "develop", "unknown", "the"),
-  wordlist
+  wordlist,
+  unit = "surface"
 )
 profile$summary
 profile$coverage

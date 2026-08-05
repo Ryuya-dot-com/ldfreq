@@ -12,8 +12,8 @@
   "properties": {
     "$schema": {"const": "lexical-diversity-variant-contract.schema.json"},
     "contract_id": {"const": "ldfreq-lexical-diversity-variants"},
-    "contract_version": {"const": "0.1.0-draft.1"},
-    "status": {"const": "public-api-candidate"},
+    "contract_version": {"const": "0.1.0"},
+    "status": {"const": "normative"},
     "core_contract_changed": {"const": false},
     "default_expansion": {
       "type": "object",

@@ -109,7 +109,7 @@
         "lookup_result_schema_id": {"const": "lexres-frequency-prevalence-result"},
         "lookup_result_schema_version": {"const": "0.1.0-draft.1"},
         "public_profile_contract_id": {"const": "ldfreq-tubelex-frequency-profile"},
-        "public_profile_contract_version": {"const": "0.1.0-draft.1"}
+        "public_profile_contract_version": {"const": "0.1.0"}
       }
     },
     "admissionPolicy": {

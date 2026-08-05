@@ -226,7 +226,7 @@ check(
       admission_candidate$diagnostics$candidate_sha256,
       .lexres_tubelex_admission_candidate_sha256
     ) &&
-    identical(admission_candidate$diagnostics$candidate_bytes, 3659),
+    identical(admission_candidate$diagnostics$candidate_bytes, 3651),
   "The installed TUBELEX admission candidate changed."
 )
 check(

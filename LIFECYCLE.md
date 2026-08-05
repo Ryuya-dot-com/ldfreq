@@ -73,6 +73,7 @@ tail rule, directional aggregation, or compatibility claim requires a new
 variant method or contract identity. Shared labels never imply equivalence with
 a third-party implementation.
 
-An exported resource profile is not release-approved merely because its code is
-public. Its lifecycle, rights, artifact identity, coverage/failure behavior,
-maintainer admission decision, and final package inventory must all pass.
+A normative measurement contract does not by itself establish redistribution
+rights for its reference data. Resource rights, artifact identity,
+coverage/failure behavior, installed notices, and package inventory are reviewed
+and recorded separately from the public API contract.

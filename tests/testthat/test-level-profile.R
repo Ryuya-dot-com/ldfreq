@@ -64,6 +64,17 @@ test_that("normalization and parenthetical expansion remain explicit", {
   )
 })
 
+test_that("level profiles warn about likely raw prose", {
+  expect_warning(
+    new_jacet8000_profile(
+      "The cat sat on the mat.",
+      nj8_fixture(),
+      unit = "surface"
+    ),
+    "each vector element as one lexical unit"
+  )
+})
+
 test_that("annotated tokenizations retain lemma exclusions and token indexes", {
   tokenization <- lexdiv_tokenize("Cats missing")
   annotated <- lexdiv_lemmatize(
@@ -524,7 +535,8 @@ test_that("the installed level-profile contract matches the public result", {
   result <- new_jacet8000_profile(character(), nj8_fixture())
 
   expect_identical(contract$contract_id, "ldfreq-lexical-level-profile")
-  expect_identical(contract$contract_version, "0.1.0-draft.3")
+  expect_identical(contract$contract_version, "0.1.0")
+  expect_identical(contract$status, "normative")
   expect_identical(contract$resource_boundary$caller_supplied, TRUE)
   expect_identical(contract$resource_boundary$bundled, FALSE)
   expect_identical(contract$resource_boundary$downloaded, FALSE)
@@ -536,7 +548,7 @@ test_that("the installed level-profile contract matches the public result", {
     contract$batch$contract_id,
     "ldfreq-lexical-level-profile-batch"
   )
-  expect_identical(contract$batch$contract_version, "0.1.0-draft.1")
+  expect_identical(contract$batch$contract_version, "0.1.0")
   expect_identical(contract$batch$resource_read_validate_normalize_hash_count, 1L)
   expect_identical(contract$batch$absolute_path_retained, FALSE)
   expect_identical(

@@ -6,18 +6,17 @@
   "additionalProperties": false,
   "required": [
     "$schema", "contract_id", "contract_version", "status", "public_api",
-    "release_approved", "resource_boundary", "rank_to_level", "lexical_unit",
+    "resource_boundary", "rank_to_level", "lexical_unit",
     "flemma_conflict",
     "query_normalization", "lookup_columns", "summary_columns", "summary",
-    "batch", "plot", "provenance", "remaining_release_gates"
+    "batch", "plot", "provenance"
   ],
   "properties": {
     "$schema": {"const": "lexical-level-profile-contract.schema.json"},
     "contract_id": {"const": "ldfreq-lexical-level-profile"},
-    "contract_version": {"const": "0.1.0-draft.3"},
-    "status": {"const": "public-api-release-candidate"},
+    "contract_version": {"const": "0.1.0"},
+    "status": {"const": "normative"},
     "public_api": {"const": true},
-    "release_approved": {"const": true},
     "resource_boundary": {
       "type": "object",
       "required": [
@@ -78,18 +77,13 @@
       ],
       "properties": {
         "contract_id": {"const": "ldfreq-lexical-level-profile-batch"},
-        "contract_version": {"const": "0.1.0-draft.1"},
+        "contract_version": {"const": "0.1.0"},
         "resource_read_validate_normalize_hash_count": {"const": 1},
         "default_max_rows": {"const": 1000000},
         "absolute_path_retained": {"const": false}
       }
     },
     "plot": {"type": "object"},
-    "provenance": {"type": "object"},
-    "remaining_release_gates": {
-      "type": "array",
-      "minItems": 1,
-      "items": {"type": "string"}
-    }
+    "provenance": {"type": "object"}
   }
 }

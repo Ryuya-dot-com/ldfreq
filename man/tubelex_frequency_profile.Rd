@@ -10,7 +10,10 @@ tubelex_frequency_profile(terms, normalization = "tubelex")
 }
 \arguments{
 \item{terms}{A plain ordered character vector, or an object returned by
-\code{lexdiv_tokenize()}. Order and duplicate tokens are retained.}
+\code{lexdiv_tokenize()}. Order and duplicate tokens are retained. Each vector
+element is one complete lookup term; a single string containing whitespace
+triggers a warning because it may be raw prose. Pass raw prose through
+\code{lexdiv_tokenize()}.}
 \item{normalization}{\code{"tubelex"} applies the recorded NFKC, trim, and
 locale-fixed English lowercase query transform. \code{"identity"} performs an
 exact case- and normalization-sensitive lookup.}
@@ -50,23 +53,33 @@ The lossless \code{lookup} table contains:
   \code{channel_total + 2}.}
 }
 
-The four denominators are stored in
-\code{provenance$formula_parameters}. Video and channel prevalence values are
-normally non-positive because they are base-10 logarithms of smoothed
-proportions no greater than one; a value closer to zero denotes wider
-prevalence. The \code{summary} means and Zipf standard deviation use matched
-rows only. Read them beside \code{eligible_items}, \code{matched_items}, and
-\code{coverage}; token weighting retains repetition, whereas type weighting
-keeps the first occurrence of each distinct normalized lookup term.
+The four normalization constants used to form these three denominators are
+stored in the \code{formula_parameters} component of \code{provenance}. Video
+and channel prevalence values are normally non-positive because they are
+base-10 logarithms of smoothed proportions no greater than one; a value closer
+to zero denotes wider prevalence. The \code{summary} means and Zipf standard
+deviation use matched rows only. Read them beside \code{eligible_items},
+\code{matched_items}, and \code{coverage}; token weighting retains repetition,
+whereas type weighting keeps the first occurrence of each distinct normalized
+lookup term.
 }
-\section{Formal contracts and candidate status}{
+\section{Formal contracts}{
 The public profile contract is installed as
 \file{tubelex-frequency-profile-contract.json}; exact lookup formulas and
 field roles are installed as \file{lexical-resource-lookup-contract.json}.
 Locate either with \code{system.file("spec", filename, package = "ldfreq")}.
-The public profile is a maintainer-approved release candidate. Its byte-pinned
-admission decision is separate from both runtime integrity checks and the final
-named-package inventory and go/no-go decision.
+The public profile contract is normative for version 0.1.0. The resource's
+license, provenance, and runtime integrity records are installed separately
+from the measurement contract.
+}
+\section{Reading status}{
+\code{status = "ok"} means a non-empty valid input was looked up successfully;
+\code{"empty"} means a valid zero-term input produced typed empty output;
+\code{"invalid_input"} means the supplied terms failed validation; and
+\code{"resource_error"} means the bundled resource failed an availability or
+integrity check. \code{failure_reason} is missing for \code{"ok"} and
+\code{"empty"}, and otherwise gives the specific failure reason. Coverage is
+missing when its denominator is zero or the lookup could not be completed.
 }
 \value{
 A \code{tubelex_frequency_profile} list containing \code{status},

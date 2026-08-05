@@ -39,12 +39,15 @@ Choose the entry point from the form of data you already have:
   of New JACET 8000.}
 }
 
-In the help pages, a \emph{token} is one occurrence and a \emph{type} is one
-distinct normalized lookup value. A \emph{lemma} is an annotation-provided
-base form. An AntBNC \emph{flemma} is a family grouping that does not preserve
-part-of-speech distinctions. \emph{Coverage} is the proportion of eligible
-tokens or types that received a usable annotation or resource match; it is not
-a proficiency score.
+In the help pages, a \emph{token} is one occurrence. In core metric results, a
+\emph{type} is one distinct, exactly equal token string supplied to the core;
+Unicode-equivalent spellings remain different unless preprocessing normalized
+them first. In a resource profile, a \emph{type} is instead one distinct
+effective lookup term after that profile's recorded normalization. A
+\emph{lemma} is an annotation-provided base form. An AntBNC \emph{flemma} is a
+family grouping that does not preserve part-of-speech distinctions.
+\emph{Coverage} is the proportion of eligible tokens or types that received a
+usable annotation or resource match; it is not a proficiency score.
 }
 \section{Input boundary}{
 The public core accepts ordered, already-tokenized character vectors. It does
@@ -66,12 +69,15 @@ record.
 \section{Formal contracts}{
 Human-readable help explains normal use; installed JSON contracts are the
 auditable source for exact formulas, domains, schemas, normalization rules,
-and resource boundaries. The main files are
-\file{lexical-diversity-contract.json},
-\file{ldfreq-preprocessing-contract.json},
-\file{lexical-diversity-variant-contract.json},
-\file{lexical-level-profile-contract.json}, and
-\file{tubelex-frequency-profile-contract.json}. Locate them with
+and resource boundaries. The main files are:
+\itemize{
+  \item \file{lexical-diversity-contract.json}
+  \item \file{ldfreq-preprocessing-contract.json}
+  \item \file{lexical-diversity-variant-contract.json}
+  \item \file{lexical-level-profile-contract.json}
+  \item \file{tubelex-frequency-profile-contract.json}
+}
+Locate them with
 \code{system.file("spec", filename, package = "ldfreq")}; schemas and
 hand-case fixtures are installed in the same directory. Contract status is
 also returned in ordinary result or provenance fields, so users do not need to
@@ -111,7 +117,7 @@ Metric ID \tab Contract scale \tab Conventional score direction \cr
 \code{rttr} \tab 0 or greater; no finite upper bound \tab higher \cr
 \code{cttr} \tab 0 or greater; no finite upper bound \tab higher \cr
 \code{herdan} \tab 0 to 1 \tab higher \cr
-\code{maas} \tab 0 or greater; no finite upper bound \tab lower \cr
+\code{maas} \tab 0 to \eqn{1 / \ln(2)} (about 1.4427) \tab lower \cr
 \code{msttr} \tab 0 to 1 \tab higher \cr
 \code{mattr} \tab 0 to 1 \tab higher \cr
 \code{mtld} \tab 0 or greater; no finite upper bound \tab higher \cr
@@ -138,12 +144,12 @@ effective parameter, status, or document membership. Passing a screen does not
 establish validity or reliability; failing one does not erase an otherwise
 computable value.
 }
-\section{Candidate and deferred surfaces}{
-The raw-text, lexical-level, and TUBELEX functions are separately versioned
-public-API candidates and do not redefine the frozen v0.1 core. The new TUBELEX
-public API scope is covered by a byte-pinned maintainer decision; final package
-inventory checks remain open. The separately named expected-TTR D candidate
-remains deferred.
+\section{Versioned surfaces}{
+The core metrics, raw-text preprocessing, variant metrics, lexical-level
+profiles, and TUBELEX profile have separate versioned contracts. This keeps a
+change in tokenization or resource matching from silently redefining a core
+metric. The separately named expected-TTR D method is not included in version
+0.1.0.
 }
 \section{Offline smoke test}{
 After loading \pkg{ldfreq}, run the installed script returned by

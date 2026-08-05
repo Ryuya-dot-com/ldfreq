@@ -1,8 +1,8 @@
 {
   "$schema": "lexical-diversity-variant-contract.schema.json",
   "contract_id": "ldfreq-lexical-diversity-variants",
-  "contract_version": "0.1.0-draft.1",
-  "status": "public-api-candidate",
+  "contract_version": "0.1.0",
+  "status": "normative",
   "core_contract_changed": false,
   "default_expansion": {
     "maas_methods": 4,

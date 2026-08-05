@@ -18,6 +18,13 @@ signature/attestation, or publication steps below.
       version in `DESCRIPTION`, NEWS, and CITATION, and that the intended tag
       and archive name match it. Commit and check any version change before
       selecting the candidate SHA and tree.
+- [ ] Confirm that NEWS has one coherent heading for the intended public
+      version and does not describe an unpublished earlier build as a prior
+      public release.
+- [ ] Confirm that every exported surface intended to be stable in this release
+      reports a non-draft normative contract version. If a public surface is
+      experimental, label that status consistently in its help, lifecycle
+      policy, and returned provenance.
 - [ ] Confirm that the commit is on protected `main` and arrived through a pull
       request.
 - [ ] Record the active `main` ruleset and verify the repository gate described

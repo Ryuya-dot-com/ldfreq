@@ -26,6 +26,12 @@ test_that("the v0.1 method and preset registries are bounded and ordered", {
   )
   expect_equal(nrow(methods), 11L)
   expect_identical(anyDuplicated(methods$method_id), 0L)
+  expect_identical(methods$label[[1L]], "Type-token ratio")
+  expect_identical(methods$definition[methods$metric_id == "maas"],
+    "(ln(N) - ln(V)) / ln(N)^2"
+  )
+  expect_identical(methods$direction[methods$metric_id == "maas"], "lower")
+  expect_identical(methods$scale[methods$metric_id == "maas"], "[0, 1/ln(2)]")
   expect_identical(
     methods$parameter,
     c(

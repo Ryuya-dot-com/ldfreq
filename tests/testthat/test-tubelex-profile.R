@@ -150,7 +150,7 @@ test_that("resource failures preserve terms and unresolved measurements", {
   expect_true(all(is.na(result$summary$mean_zipf)))
 })
 
-test_that("the installed TUBELEX profile contract records the conditional release state", {
+test_that("the installed TUBELEX profile contract matches the stable public result", {
   skip_if_not_installed("jsonlite")
   contract_path <- system.file(
     "spec", "tubelex-frequency-profile-contract.json",
@@ -174,13 +174,18 @@ test_that("the installed TUBELEX profile contract records the conditional releas
     contract$contract_id,
     "ldfreq-tubelex-frequency-profile"
   )
-  expect_identical(contract$contract_version, "0.1.0-draft.1")
+  expect_identical(contract$contract_version, "0.1.0")
   expect_identical(
     contract$status,
-    "public-api-release-candidate"
+    "normative"
   )
   expect_identical(contract$public_api, TRUE)
-  expect_identical(contract$release_approved, TRUE)
+  expect_identical(empty$status, "empty")
+  expect_identical(empty$failure_reason, NA_character_)
+  expect_identical(
+    unlist(contract$result_status$statuses, use.names = FALSE),
+    c("ok", "empty", "invalid_input", "resource_error")
+  )
   expect_identical(
     unlist(contract$lookup_columns, use.names = FALSE),
     names(empty$lookup)
@@ -191,4 +196,16 @@ test_that("the installed TUBELEX profile contract records the conditional releas
     "missing-not-zero"
   )
   expect_identical(schema$properties$contract_id$const, contract$contract_id)
+})
+
+test_that("a likely raw sentence is not silently looked up as one term", {
+  expect_warning(
+    result <- profile_lookup_function(
+      "The apple and the cat.",
+      normalization = "tubelex",
+      loader = synthetic_profile_tubelex_load
+    ),
+    "each vector element as one lexical unit"
+  )
+  expect_equal(nrow(result$lookup), 1L)
 })

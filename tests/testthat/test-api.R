@@ -29,6 +29,23 @@ test_that("the public API emits the complete result contract", {
   expect_true(all(vapply(result$diagnostics, is.list, logical(1L))))
 })
 
+test_that("a likely raw sentence is not silently counted as one token", {
+  expect_warning(
+    result <- lexdiv_metrics("The cat sat on the mat.", metrics = "ttr"),
+    "each vector element as one lexical unit"
+  )
+  expect_identical(result$N, 1)
+  expect_identical(result$V, 1)
+})
+
+test_that("printing a column subset remains safe", {
+  result <- lexdiv_metrics(c("a", "a"), metrics = "maas")
+  expect_output(
+    print(result[, c("value", "status", "N", "V")]),
+    "value"
+  )
+})
+
 test_that("the core preserves exact token distinctions", {
   canonically_distinct <- api_function(
     c("\u00e9", "e\u0301"),

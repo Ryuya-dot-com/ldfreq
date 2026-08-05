@@ -366,6 +366,24 @@ test_that("raw-text structural input errors are rejected before measurement", {
   expect_error(lexdiv_tokenize("one", keep_numbers = 1), "TRUE or FALSE")
 })
 
+test_that("tokenizer arguments cannot be silently ignored for tokenized input", {
+  tokenization <- lexdiv_tokenize("Cat cat", case = "preserve")
+
+  expect_error(
+    lexdiv_metrics_text(tokenization, case = "lower", metrics = "ttr"),
+    "case apply only when x is raw text"
+  )
+  expect_error(
+    lexdiv_metrics_text(
+      tokenization,
+      normalization = "NFKC",
+      keep_numbers = TRUE,
+      metrics = "ttr"
+    ),
+    "normalization, keep_numbers apply only when x is raw text"
+  )
+})
+
 test_that("the installed preprocessing contract matches the public implementation", {
   skip_if_not_installed("jsonlite")
   contract_path <- system.file(
@@ -382,8 +400,8 @@ test_that("the installed preprocessing contract matches the public implementatio
   schema <- jsonlite::read_json(schema_path, simplifyVector = FALSE)
 
   expect_identical(contract$contract_id, "ldfreq-preprocessing")
-  expect_identical(contract$contract_version, "0.1.0-draft.2")
-  expect_identical(contract$status, "public-api-candidate")
+  expect_identical(contract$contract_version, "0.1.0")
+  expect_identical(contract$status, "normative")
   expect_identical(contract$public_api, TRUE)
   expect_identical(
     unlist(contract$lexical_units$content_upos, use.names = FALSE),
@@ -394,6 +412,10 @@ test_that("the installed preprocessing contract matches the public implementatio
     c("surface", "lemma", "flemma")
   )
   expect_identical(contract$result_boundary$metric_core_schema_changed, FALSE)
+  expect_identical(
+    contract$result_boundary$existing_tokenization_argument_policy,
+    "reject-explicit-normalization-case-or-keep_numbers"
+  )
   expect_identical(schema$properties$contract_id$const, contract$contract_id)
   expect_identical(
     schema$properties$contract_version$const,

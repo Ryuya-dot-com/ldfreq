@@ -1,7 +1,7 @@
 # Public, coverage-aware TUBELEX frequency and prevalence profile.
 
 .tubelex_profile_contract_id <- "ldfreq-tubelex-frequency-profile"
-.tubelex_profile_contract_version <- "0.1.0-draft.1"
+.tubelex_profile_contract_version <- "0.1.0"
 .tubelex_normalization_ids <- c(
   tubelex = "nfkc-trim-en-lower-v1",
   identity = "identity-valid-utf8-v1"
@@ -16,6 +16,12 @@
       preprocessing_ref = tokenization$provenance
     ))
   }
+  .lex_warn_likely_raw_text(
+    terms,
+    "terms",
+    "tubelex_frequency_profile",
+    "pass lexdiv_tokenize(text) instead"
+  )
   list(
     terms = terms,
     input_source = "character_terms",
@@ -163,7 +169,11 @@
   )
   structure(
     list(
-      status = lookup$status,
+      status = if (identical(lookup$status, "ok") && !nrow(results)) {
+        "empty"
+      } else {
+        lookup$status
+      },
       failure_reason = lookup$failure_reason,
       summary = summary,
       lookup = results,
@@ -191,7 +201,9 @@
 #'
 #' @param terms A plain character vector of ordered terms, or an object returned
 #'   by [lexdiv_tokenize()]. Order and duplicates are retained in the lookup
-#'   table.
+#'   table. Each character-vector element is one complete lookup term; a single
+#'   string containing whitespace triggers a warning because it may be raw
+#'   prose. Pass raw prose through [lexdiv_tokenize()].
 #' @param normalization `"tubelex"` applies the documented NFKC, trim, and
 #'   locale-fixed English lowercase query transform. `"identity"` performs an
 #'   exact case- and normalization-sensitive lookup. The selected transform is

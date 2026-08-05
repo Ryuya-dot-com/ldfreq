@@ -32,7 +32,7 @@
     "lookup_result_schema_id": "lexres-frequency-prevalence-result",
     "lookup_result_schema_version": "0.1.0-draft.1",
     "public_profile_contract_id": "ldfreq-tubelex-frequency-profile",
-    "public_profile_contract_version": "0.1.0-draft.1"
+    "public_profile_contract_version": "0.1.0"
   },
   "admission_policy": {
     "decision_authority": "package-maintainer",

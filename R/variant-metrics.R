@@ -5,7 +5,7 @@
 # or its result contract.
 
 .lexvariant_contract_id <- "ldfreq-lexical-diversity-variants"
-.lexvariant_contract_version <- "0.1.0-draft.1"
+.lexvariant_contract_version <- "0.1.0"
 .lexvariant_max_thresholds <- 16L
 
 .lexvariant_catalog <- list(
@@ -417,6 +417,13 @@ lexdiv_variant_metrics <- function(
     mtld_thresholds = 0.72) {
   variants <- .lexvariant_validate_methods(variants)
   thresholds <- .lexvariant_validate_thresholds(mtld_thresholds)
+
+  .lex_warn_likely_raw_text(
+    tokens,
+    "tokens",
+    "lexdiv_variant_metrics",
+    "tokenize the text with lexdiv_tokenize() first"
+  )
 
   input_state <- .lex_input_state(tokens)
   if (identical(input_state, "ok")) {

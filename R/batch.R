@@ -220,19 +220,30 @@ lexdiv_metrics_batch <- function(
 
 #' @export
 print.lexdiv_batch_results <- function(x, ...) {
-  document_count <- length(unique(x$document_id))
+  document_count <- if ("document_id" %in% names(x)) {
+    length(unique(x$document_id))
+  } else {
+    0L
+  }
+  schema_version <- attr(x, "batch_schema_version", exact = TRUE)
+  if (!is.character(schema_version) || length(schema_version) != 1L) {
+    schema_version <- "unknown"
+  }
   cat(sprintf(
     "<lexdiv_batch_results: %d document%s; %d metric record%s; schema %s>\n",
     document_count,
     if (document_count == 1L) "" else "s",
     nrow(x),
     if (nrow(x) == 1L) "" else "s",
-    attr(x, "batch_schema_version", exact = TRUE)
+    schema_version
   ))
-  visible <- x[c(
-    "document_id", "metric_id", "value", "status", "missing_reason", "N", "V",
-    "below_quality_floor"
-  )]
-  print.data.frame(visible, ...)
+  visible_names <- intersect(
+    c(
+      "document_id", "metric_id", "value", "status", "missing_reason", "N",
+      "V", "below_quality_floor"
+    ),
+    names(x)
+  )
+  print.data.frame(x[visible_names], ...)
   invisible(x)
 }

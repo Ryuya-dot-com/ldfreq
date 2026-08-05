@@ -1,8 +1,8 @@
 {
   "$schema": "ldfreq-preprocessing-contract.schema.json",
   "contract_id": "ldfreq-preprocessing",
-  "contract_version": "0.1.0-draft.2",
-  "status": "public-api-candidate",
+  "contract_version": "0.1.0",
+  "status": "normative",
   "public_api": true,
   "tokenizer": {
     "tokenizer_id": "ldfreq-unicode-word-tokenizer",
@@ -46,6 +46,7 @@
   },
   "result_boundary": {
     "metric_core_schema_changed": false,
+    "existing_tokenization_argument_policy": "reject-explicit-normalization-case-or-keep_numbers",
     "preprocessing_envelope_components": ["results", "token_audit", "preprocessing"],
     "excluded_tokens_imputed": false,
     "coverage_reported": true

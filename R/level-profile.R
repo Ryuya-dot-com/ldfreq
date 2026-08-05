@@ -1,9 +1,9 @@
 # Coverage-aware lexical level profiles from caller-supplied word lists.
 
 .level_profile_contract_id <- "ldfreq-lexical-level-profile"
-.level_profile_contract_version <- "0.1.0-draft.3"
+.level_profile_contract_version <- "0.1.0"
 .level_profile_batch_contract_id <- "ldfreq-lexical-level-profile-batch"
-.level_profile_batch_contract_version <- "0.1.0-draft.1"
+.level_profile_batch_contract_version <- "0.1.0"
 .nj8_resource_id <- "new-jacet8000"
 .nj8_expected_ranks <- 8000L
 .nj8_levels <- seq_len(8L)
@@ -44,6 +44,12 @@
       call. = FALSE
     )
   }
+  .lex_warn_likely_raw_text(
+    terms,
+    "terms",
+    "new_jacet8000_profile",
+    "tokenize and, when appropriate, lemmatize the text first"
+  )
   Encoding(terms) <- "UTF-8"
   list(
     terms = terms,
@@ -664,7 +670,9 @@
 #'
 #' @param terms A plain character vector of ordered lexical units, or an object
 #'   returned by [lexdiv_tokenize()]. For an annotated tokenization, `unit` may
-#'   select lemmas or flemmas.
+#'   select lemmas or flemmas. Each character-vector element is one complete
+#'   lexical unit; a single value containing whitespace triggers a warning
+#'   because it may be raw prose.
 #' @param wordlist A data frame containing New JACET 8000 ranks and entries, or
 #'   the path to the official local XLSX file or a local CSV file. No resource
 #'   is downloaded.

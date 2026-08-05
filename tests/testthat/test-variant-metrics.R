@@ -46,6 +46,16 @@ test_that("Maas scale and logarithm-base variants follow their formulas", {
   )
 })
 
+test_that("variant metrics warn about likely raw prose", {
+  expect_warning(
+    lexdiv_variant_metrics(
+      "The cat sat on the mat.",
+      variants = "maas_a2_ln_v1"
+    ),
+    "each vector element as one lexical unit"
+  )
+})
+
 test_that("the canonical MTLD row is unchanged in the variant surface", {
   tokens <- c(rep("a", 10L), "b", "c", "d", "e")
   method_id <- "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1"
@@ -164,7 +174,8 @@ test_that("the installed variant contract matches the public catalog", {
   )
 
   expect_identical(contract$contract_id, "ldfreq-lexical-diversity-variants")
-  expect_identical(contract$contract_version, "0.1.0-draft.1")
+  expect_identical(contract$contract_version, "0.1.0")
+  expect_identical(contract$status, "normative")
   expect_identical(contract$core_contract_changed, FALSE)
   expect_identical(contract_ids, lexdiv_variant_ids()$method_id)
   expect_identical(contract_labels, lexdiv_variant_ids()$reference_label)

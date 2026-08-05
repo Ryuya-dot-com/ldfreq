@@ -28,7 +28,10 @@ The Maas rows distinguish \eqn{a} from \eqn{a^2} and natural-log from
 base-10 definitions. These transformations are not numerically
 interchangeable, even where they preserve rank order. For either selected log
 base, \code{a_squared = (log(N) - log(V)) / log(N)^2}; the \eqn{a} rows return
-its square root. The method ID records both scale and log base.
+its square root. For valid integer counts, the natural-log \eqn{a^2} variant
+ranges from zero to \eqn{1 / \ln(2)} inclusive; changing the log base or taking
+the square root changes that numerical range. The method ID records both scale
+and log base.
 
 The MTLD rows distinguish the frozen \pkg{ldfreq} directional-score mean from
 three final-tail factorization and mean-factor-length aggregations. Factor

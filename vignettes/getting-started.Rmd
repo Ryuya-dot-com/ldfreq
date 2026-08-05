@@ -11,10 +11,10 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-The normative `ldfreq` metric core begins at an assumption-transparent boundary:
-an ordered character vector of tokens. It never guesses how raw prose was
-tokenized, normalized, or lemmatized. Separate public adapters can now record
-those decisions before the unchanged core is called.
+There are two common starting points. If you already have one character value
+per token, use `lexdiv_metrics()`. If you have ordinary prose, use
+`lexdiv_metrics_text()`. The second route records how the text was tokenized,
+normalized, and optionally lemmatized before it calls the same metric core.
 
 ```{r}
 library(ldfreq)
@@ -26,10 +26,23 @@ result
 
 ## Raw text without hidden preprocessing
 
-`lexdiv_tokenize()` uses a versioned Unicode word contract. Normalization, case,
-and number handling are parameters rather than global options. The returned
-offsets refer to the processed text, and both source and processed text hashes
-are retained without storing the source text in the result.
+The shortest raw-text workflow is a direct call to `lexdiv_metrics_text()`.
+Normalization, case, and number handling are explicit arguments rather than
+global options.
+
+```{r}
+raw_result <- lexdiv_metrics_text(
+  "Cats and cat ran run.",
+  normalization = "NFC",
+  case = "preserve",
+  metrics = "ttr"
+)
+raw_result
+```
+
+Call `lexdiv_tokenize()` separately when you want to inspect or annotate the
+tokens first. Its offsets refer to the processed text, and its provenance keeps
+source and processed text hashes without storing the source text itself.
 
 ```{r}
 tokenization <- lexdiv_tokenize(
@@ -38,9 +51,6 @@ tokenization <- lexdiv_tokenize(
   case = "preserve"
 )
 tokenization
-
-raw_result <- lexdiv_metrics_text(tokenization, metrics = "ttr")
-raw_result
 ```
 
 Lemma and content-word analyses require an explicit annotation source. The
@@ -227,9 +237,9 @@ measurement validity, or reliability. The screens do not change values or
 parameters or censor documents. Read them together with `status`,
 `missing_reason`, `N`, `V`, and the method and parameter identities.
 
-Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the frozen registries.
-The `expected_ttr_d` candidate is deferred from v0.1 and intentionally absent
-from the public method set.
+Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the versioned
+registries. The separately defined `expected_ttr_d` method is not included in
+the version 0.1.0 public method set.
 
 ## Definition sensitivity outside the frozen core
 

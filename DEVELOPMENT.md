@@ -12,7 +12,7 @@ same-named variant beyond each row's explicit comparison scope.
 The lexical-level profile is resource-decoupled: `new_jacet8000_profile()` and
 `new_jacet8000_profile_batch()`
 accept only a caller-supplied data frame, local CSV, or official-layout local
-XLSX, computes Level 1--8
+XLSX, compute Level 1--8
 exact/cumulative token and type rates, and never bundles, downloads, or returns
 the full New JACET 8000 list. The batch adapter requires explicit document IDs,
 processes the external list once, and bounds its combined summary/lookup rows.
@@ -63,9 +63,10 @@ as additional assurance but is not required for a single-maintainer release.
 ## Resource admission
 
 NGSL and Open English WordNet remain separate future work. TUBELEX-EN is
-included as a maintainer-approved public-API release candidate: its exact
+included as a maintainer-approved bundled resource: its exact
 source, manifest, artifact/content hashes, provenance, BSD notice, and installed
-paths are fixed. The exported `tubelex_frequency_profile()`
+paths are fixed. The exported `tubelex_frequency_profile()` has a normative
+0.1.0 measurement contract and
 wrapper applies an explicit identity or TUBELEX-oriented query transform,
 retains original and lookup terms, reports token/type coverage and
 normalization collisions, and leaves unmatched measurements missing rather

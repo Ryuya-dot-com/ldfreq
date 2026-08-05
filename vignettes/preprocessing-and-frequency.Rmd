@@ -217,8 +217,8 @@ reported without the other.
 
 The lookup values are deliberately inspectable. `count`, `videos`, and
 `channels` are raw resource counts. Derived scores use the following base-10
-formulas, with the four denominators stored in
-`frequency$provenance$formula_parameters`:
+formulas. The four normalization constants used to form the three denominators
+are stored in `frequency$provenance$formula_parameters`:
 
 ```text
 zipf = log10(1e9 * (count + 1) /

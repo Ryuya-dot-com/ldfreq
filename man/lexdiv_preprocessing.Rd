@@ -51,7 +51,10 @@ or \code{"none"}.}
 retained. Alphanumeric tokens remain eligible under either setting.}
 \item{x}{For \code{lexdiv_lemmatize()}, an object created by
 \code{lexdiv_tokenize()}. For \code{lexdiv_metrics_text()}, either that object
-or one raw character string.}
+or one raw character string. When an existing tokenization is supplied, its
+recorded normalization, case, and number-retention choices are authoritative;
+supplying \code{normalization}, \code{case}, or \code{keep_numbers} again is
+an error. Call \code{lexdiv_tokenize()} again to change those choices.}
 \item{method}{Lemma source: caller-\code{"supplied"} values or the optional
 \code{"textstem"} backend.}
 \item{lemmas}{An aligned character vector of lemmas for the supplied method.
@@ -97,13 +100,17 @@ audit and a separately versioned preprocessing record. This allows
 surface/lemma/flemma
 and all/content-word analyses to be compared without treating one choice as a
 universal default.
+
+The tokenizer arguments \code{normalization}, \code{case}, and
+\code{keep_numbers} apply only when \code{x} is raw text. They are never
+silently reapplied to, or ignored for, an existing tokenization object.
 }
 \section{Formal contract}{
 The installed \file{ldfreq-preprocessing-contract.json} file fixes tokenizer,
-normalization, annotation, lexical-unit, and result-boundary behavior. Locate
-it with \code{system.file("spec", "ldfreq-preprocessing-contract.json",
-package = "ldfreq")}. The contract is ordinary JSON and can be inspected
-without running a preprocessing backend.
+normalization, annotation, lexical-unit, and result-boundary behavior. Use
+\code{system.file()} with directory \code{"spec"}, that filename, and
+\code{package = "ldfreq"} to locate it. The contract is ordinary JSON and can
+be inspected without running a preprocessing backend.
 }
 \value{
 \code{lexdiv_tokenize()}, \code{lexdiv_lemmatize()}, and

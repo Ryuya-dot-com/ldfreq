@@ -1,25 +1,17 @@
 # ldfreq
 
 `ldfreq` provides explicitly versioned lexical-diversity and reference-frequency
-profiles for R. The normative core computes eleven independently specified
-metrics from ordered tokens. Separate adapters now make raw-text tokenization,
+profiles for R. The core computes eleven independently specified metrics from
+ordered tokens. Separate adapters make raw-text tokenization,
 lemma/flemma/POS annotations, lexical-unit selection, New JACET 8000 level profiles,
 and TUBELEX coverage visible rather than hiding those decisions inside a score.
 
-## Current status
+## What it computes
 
-The resource-independent eleven-method core remains frozen. Version
-`0.1.0.9000` is a new development candidate that adds separately versioned
-preprocessing, caller-supplied lexical-level, and TUBELEX frequency-profile
-surfaces without changing the core metric schema or numerical methods. A
-separate variant surface makes Maas and sequential-MTLD definition sensitivity
-explicit. It supersedes the earlier
-immutable 0.1.0 release-candidate evidence; a new cross-platform candidate and
-go/no-go review are required before tagging or CRAN submission.
-
-The TUBELEX bytes, BSD-3-Clause notice, and public profile are technically
-validated and maintainer-approved for the release candidate. The exact
-source/installed/binary inventory audit remains a final package-level gate.
+The core metrics, preprocessing adapters, formula variants, and resource
+profiles have separate versioned contracts. This makes it possible to identify
+which tokenization, lexical unit, formula, and reference resource produced a
+result.
 
 The implemented metric set is:
 
@@ -30,14 +22,12 @@ The implemented metric set is:
 - HD-D
 - Yule K and Yule I
 
-The `expected_ttr_d` candidate is deferred from v0.1 and is not part of the
-public metric set. Its design evidence remains separate from the installed
-normative core.
+The separately defined `expected_ttr_d` method is not part of the version 0.1.0
+public metric set.
 
 ## Installation
 
-Install the development version from GitHub with `pak` after this candidate is
-merged:
+Install the development version from GitHub with `pak`:
 
 ```r
 pak::pak("Ryuya-dot-com/ldfreq")
@@ -45,14 +35,17 @@ pak::pak("Ryuya-dot-com/ldfreq")
 
 ## Basic use
 
-The frozen core still accepts only explicit tokens and performs no hidden case
+The core accepts only explicit tokens and performs no hidden case
 conversion, Unicode normalization, token deletion, or lemmatization.
 
-Here, a **token** is one word occurrence and a **type** is one distinct form.
-A **lemma** is an annotation-provided base form; an AntBNC **flemma** is a word-
-family grouping that does not preserve part-of-speech distinctions. **Coverage**
-reports how many eligible tokens or types received an annotation or reference-
-resource match. It is not a proficiency score.
+Here, a **token** is one word occurrence. In the core metrics, a **type** is one
+distinct, exactly equal token string supplied to the core. In a resource
+profile, a type is one distinct effective lookup term after that profile's
+recorded normalization. A **lemma** is an annotation-provided base form; an
+AntBNC **flemma** is a word-family grouping that does not preserve
+part-of-speech distinctions. **Coverage** reports how many eligible tokens or
+types received an annotation or reference-resource match. It is not a
+proficiency score.
 
 ```r
 library(ldfreq)
@@ -62,9 +55,28 @@ tokens <- c("the", "cat", "saw", "the", "other", "cat")
 lexdiv_metrics(tokens, metrics = c("ttr", "rttr", "yule_k"))
 ```
 
-For raw text, use the separate auditable adapter. Its output retains token
-offsets, normalization/case settings, and text hashes; the core result schema is
+Use `lexdiv_methods()` to see plain-language names, short definitions, score
+direction, scale, exact method IDs, parameters, and advisory token floors:
+
+```r
+lexdiv_methods()[, c("metric_id", "label", "definition", "direction", "scale")]
+```
+
+For raw text, call `lexdiv_metrics_text()` directly. Its output retains
+normalization/case settings and text hashes; the core result schema is
 unchanged.
+
+```r
+lexdiv_metrics_text(
+  "Cats and cat ran run.",
+  normalization = "NFC",
+  case = "preserve",
+  metrics = "ttr"
+)
+```
+
+Call `lexdiv_tokenize()` separately when you want to inspect or annotate the
+tokens first:
 
 ```r
 tokenization <- lexdiv_tokenize(
@@ -73,7 +85,7 @@ tokenization <- lexdiv_tokenize(
   case = "preserve"
 )
 
-lexdiv_metrics_text(tokenization, metrics = c("ttr", "mattr"))
+tokenization
 ```
 
 Lemma analyses require an identified annotation backend. Caller-supplied
@@ -289,7 +301,7 @@ in the abstract. The v0.1 contract records:
 | `rttr` | >= 0; no finite upper bound | higher |
 | `cttr` | >= 0; no finite upper bound | higher |
 | `herdan` | [0, 1] | higher |
-| `maas` | >= 0; no finite upper bound | lower |
+| `maas` | 0 to 1 / ln(2) (about 1.4427) | lower |
 | `msttr` | [0, 1] | higher |
 | `mattr` | [0, 1] | higher |
 | `mtld` | >= 0; no finite upper bound | higher |
@@ -343,10 +355,8 @@ downloads a fallback.
 It contains the slim TUBELEX-EN Treebank aggregate at commit `7cb5fb36`. Its
 exact manifest, 2.55 MB gzip artifact, canonical-content hash, build provenance,
 BSD 3-Clause notice, and COPYRIGHTS entry are installed together. The new
-frequency-profile API is a release candidate and does not turn TUBELEX
-frequency into context-independent lexical sophistication. NGSL and Open
-English WordNet remain excluded until their complete artifact, contract, and
-notice units pass the same gates.
+frequency-profile API does not turn TUBELEX frequency into context-independent
+lexical sophistication. No NGSL or Open English WordNet data are included.
 
 A non-exported local-resource loader provides the integrity boundary. It reads
 an exact manifest and each declared artifact once, hashes those same bytes
@@ -358,19 +368,13 @@ TUBELEX path performs bounded streaming gzip expansion and validates the fixed
 normalization option while retaining both original and lookup terms. It
 preserves order and duplicates, returns token/type coverage diagnostics, and
 keeps unmatched measurements missing rather than coercing them to zero. The
-wrapper's public-API scope is covered by the byte-pinned maintainer decision.
-
-A byte-pinned admission candidate records the maintainer's BSD-3-Clause,
-provenance, distribution, and public-profile decision together with explicit
-risk controls. The non-exported evaluator returns
-`maintainer_decision_valid` only when those exact bytes and scopes remain
-intact. Independent review is optional; the remaining blocking gate is the
-final named-release source, installed, and binary inventory audit.
+installed manifest, notice, provenance, and machine-readable inventory allow
+the bundled resource and its package boundary to be audited independently.
 
 ## License
 
 The R source code is licensed under the MIT License. The installed TUBELEX
-candidate remains BSD-3-Clause material under its component-level NOTICE and
+aggregate remains BSD-3-Clause material under its component-level NOTICE and
 COPYRIGHTS entry; placement in this repository does not relicense it as MIT.
 Any later lexical resource must retain the same separation of license, notice,
 and provenance.

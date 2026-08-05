@@ -9,19 +9,15 @@ Authors@R:
         email = "komuro.4121@gmail.com",
         role = c("aut", "cre")
     )
-Description: Computes explicitly versioned lexical-diversity metrics from
-    ordered tokens and provides a separate auditable path from raw English text.
-    Tokenization, Unicode normalization, case handling, lexical-unit selection,
-    optional lemmatization and caller-supplied AntBNC flemma backends, and
-    word-inclusion decisions remain visible in preprocessing provenance.
-    Canonical long-form metric results retain
-    method, parameter, schema, and contract identity in ordinary columns. A
-    separate sensitivity surface exposes explicit Maas and sequential-MTLD
-    formula variants. Coverage-aware lexical level profiles accept a
-    caller-supplied New JACET 8000 list and report exact and cumulative token-
-    and type-weighted rates without redistributing that resource. A byte-pinned
-    TUBELEX aggregate supports a separately versioned frequency and prevalence
-    profile while retaining resource identity and coverage.
+Description: Computes versioned lexical-diversity metrics from ordered token
+    vectors and from raw English text. Results record the selected formula,
+    parameters, token and type counts, and preprocessing choices such as Unicode
+    normalization, case handling, lemmatization, and content-word selection.
+    Separate functions compare Maas and sequential-MTLD definitions. Lexical
+    level profiles use a caller-supplied New JACET 8000 list and report exact
+    and cumulative token- and type-weighted coverage without redistributing the
+    list. A bundled, versioned TUBELEX aggregate provides frequency, video
+    prevalence, and channel prevalence profiles with explicit match coverage.
 License: MIT + file LICENSE
 URL: https://github.com/Ryuya-dot-com/ldfreq
 BugReports: https://github.com/Ryuya-dot-com/ldfreq/issues
@@ -40,4 +36,3 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-Config/ldfreq/status: development-public-api-candidate

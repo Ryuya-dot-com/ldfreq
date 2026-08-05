@@ -1,10 +1,9 @@
 {
   "$schema": "tubelex-frequency-profile-contract.schema.json",
   "contract_id": "ldfreq-tubelex-frequency-profile",
-  "contract_version": "0.1.0-draft.1",
-  "status": "public-api-release-candidate",
+  "contract_version": "0.1.0",
+  "status": "normative",
   "public_api": true,
-  "release_approved": true,
   "resource": {
     "resource_id": "tubelex-en-treebank-slim",
     "resource_version": "7cb5fb36-slim-v1",
@@ -31,6 +30,15 @@
     "count", "videos", "channels", "zipf", "video_prevalence",
     "channel_prevalence"
   ],
+  "result_status": {
+    "statuses": ["ok", "empty", "invalid_input", "resource_error"],
+    "status_semantics": {
+      "ok": "a non-empty valid input was looked up successfully",
+      "empty": "a valid zero-term input produced typed zero-row output",
+      "invalid_input": "the supplied terms failed input validation",
+      "resource_error": "the bundled resource failed an integrity or availability check"
+    }
+  },
   "summary": {
     "weightings": ["token", "type"],
     "matched_only": true,
@@ -46,8 +54,5 @@
     "download": false,
     "fallback": false,
     "byte_pinned_local_resource": true
-  },
-  "remaining_release_gates": [
-    "final source, installed, and binary inventory audit"
-  ]
+  }
 }
