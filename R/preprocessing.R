@@ -136,8 +136,16 @@
     stop("x has an invalid tokenization table.", call. = FALSE)
   }
   row_count <- nrow(value$tokens)
+  positions_are_valid <-
+    is.integer(value$tokens$start) &&
+      length(value$tokens$start) == row_count &&
+      !anyNA(value$tokens$start) &&
+      is.integer(value$tokens$end) &&
+      length(value$tokens$end) == row_count &&
+      !anyNA(value$tokens$end)
   if (
     !identical(value$tokens$token_index, seq_len(row_count)) ||
+      !positions_are_valid ||
       !is.character(value$tokens$surface) ||
       length(value$tokens$surface) != row_count ||
       anyNA(value$tokens$surface) || any(!nzchar(value$tokens$surface)) ||
@@ -146,6 +154,26 @@
       !is.logical(value$tokens$is_number) || anyNA(value$tokens$is_number)
   ) {
     stop("x has an invalid tokenization table.", call. = FALSE)
+  }
+  if (row_count > 0L) {
+    offsets_are_valid <-
+      all(value$tokens$start >= 1L) &&
+        all(value$tokens$end >= value$tokens$start) &&
+        all(
+          stringi::stri_length(value$tokens$surface) ==
+            value$tokens$end - value$tokens$start + 1L
+        ) &&
+        (
+          row_count == 1L ||
+            all(value$tokens$start[-1L] > value$tokens$end[-row_count])
+        )
+    number_flags_are_valid <- identical(
+      value$tokens$is_number,
+      stringi::stri_detect_regex(value$tokens$surface, "^\\p{N}+$")
+    )
+    if (!offsets_are_valid || !number_flags_are_valid) {
+      stop("x has an invalid tokenization table.", call. = FALSE)
+    }
   }
   value
 }
@@ -532,7 +560,13 @@ lexdiv_lemmatize <- function(
       call. = FALSE
     )
   }
-  canonical_text <- paste0(form, "\t", flemma, collapse = "\n")
+  canonical_order <- order(form, method = "radix")
+  canonical_text <- paste0(
+    form[canonical_order],
+    "\t",
+    flemma[canonical_order],
+    collapse = "\n"
+  )
   list(
     mapping = data.frame(
       form = form,

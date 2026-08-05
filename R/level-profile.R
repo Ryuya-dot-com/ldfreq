@@ -303,7 +303,13 @@
   alias_table$level <- as.integer(ceiling(alias_table$rank / 1000))
   rownames(alias_table) <- NULL
 
-  canonical_text <- paste0(ranks, "\t", enc2utf8(words), collapse = "\n")
+  canonical_order <- order(ranks, method = "radix")
+  canonical_text <- paste0(
+    ranks[canonical_order],
+    "\t",
+    enc2utf8(words[canonical_order]),
+    collapse = "\n"
+  )
   canonical_sha256 <- digest::digest(
     charToRaw(enc2utf8(canonical_text)),
     algo = "sha256",

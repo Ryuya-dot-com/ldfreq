@@ -54,6 +54,34 @@ test_that("empty and punctuation-only texts return valid zero-token objects", {
   expect_identical(empty$provenance$output_tokens, 0)
 })
 
+test_that("tokenization consumers reject corrupted offsets and number flags", {
+  tokenization <- lexdiv_tokenize("one 2026 two", keep_numbers = TRUE)
+
+  overlapping <- tokenization
+  overlapping$tokens$start[[2L]] <- overlapping$tokens$start[[1L]]
+  expect_error(
+    lexdiv_metrics_text(overlapping, metrics = "ttr"),
+    "invalid tokenization table",
+    fixed = TRUE
+  )
+
+  wrong_width <- tokenization
+  wrong_width$tokens$end[[1L]] <- wrong_width$tokens$end[[1L]] + 1L
+  expect_error(
+    lexdiv_metrics_text(wrong_width, metrics = "ttr"),
+    "invalid tokenization table",
+    fixed = TRUE
+  )
+
+  wrong_number_flag <- tokenization
+  wrong_number_flag$tokens$is_number[[2L]] <- FALSE
+  expect_error(
+    lexdiv_metrics_text(wrong_number_flag, metrics = "ttr"),
+    "invalid tokenization table",
+    fixed = TRUE
+  )
+})
+
 test_that("supplied lemma and UPOS layers require explicit backend provenance", {
   tokenization <- lexdiv_tokenize("Cats and dogs ran")
   annotated <- lexdiv_lemmatize(
@@ -169,6 +197,27 @@ test_that("explicit flemma overrides take precedence over AntBNC", {
   expect_match(
     annotated$provenance$flemma_annotation$override_canonical_sha256,
     "^[0-9a-f]{64}$"
+  )
+})
+
+test_that("flemma override canonical hashes ignore row order", {
+  path <- antbnc_fixture_file()
+  on.exit(unlink(path), add = TRUE)
+  tokenization <- lexdiv_tokenize("Interesting interested saw")
+  overrides <- data.frame(
+    form = c("interesting", "interested", "saw"),
+    flemma = c("interesting", "interested", "saw"),
+    stringsAsFactors = FALSE
+  )
+  reordered <- overrides[c(3L, 1L, 2L), , drop = FALSE]
+
+  first <- lexdiv_flemmatize(tokenization, path, overrides = overrides)
+  second <- lexdiv_flemmatize(tokenization, path, overrides = reordered)
+
+  expect_identical(first$tokens, second$tokens)
+  expect_identical(
+    first$provenance$flemma_annotation$override_canonical_sha256,
+    second$provenance$flemma_annotation$override_canonical_sha256
   )
 })
 

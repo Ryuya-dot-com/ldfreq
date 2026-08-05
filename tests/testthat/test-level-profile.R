@@ -200,6 +200,27 @@ test_that("local CSV provenance is exact and version labels are deterministic", 
   expect_identical(result$provenance$resource_version, repeated$provenance$resource_version)
 })
 
+test_that("New JACET canonical identity ignores source row order", {
+  wordlist <- nj8_fixture()
+  reordered <- wordlist[c(6L, 2L, 4L, 1L, 5L, 3L), , drop = FALSE]
+
+  first <- new_jacet8000_profile(c("the", "develop", "unknown"), wordlist)
+  second <- new_jacet8000_profile(
+    c("the", "develop", "unknown"),
+    reordered
+  )
+
+  expect_identical(first$lookup, second$lookup)
+  expect_identical(
+    first$provenance$resource_canonical_sha256,
+    second$provenance$resource_canonical_sha256
+  )
+  expect_identical(
+    first$provenance$resource_version,
+    second$provenance$resource_version
+  )
+})
+
 test_that("successful results and failures do not disclose absolute paths", {
   private_directory <- file.path(tempdir(), "ldfreq-private-path", "nested")
   dir.create(private_directory, recursive = TRUE, showWarnings = FALSE)
