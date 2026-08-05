@@ -18,8 +18,8 @@
   ],
   "properties": {
     "$schema": {"const": "tubelex-release-admission-candidate.schema.json"},
-    "schema_version": {"const": "0.1.0"},
-    "candidate_id": {"const": "tubelex-en-treebank-slim-7cb5fb36-admission-v1"},
+    "schema_version": {"const": "0.2.0"},
+    "candidate_id": {"const": "tubelex-en-treebank-slim-7cb5fb36-public-profile-admission-v2"},
     "candidate_state": {"const": "pending-independent-review"},
     "resource": {"$ref": "#/$defs/resource"},
     "distribution_scope": {"$ref": "#/$defs/distributionScope"},
@@ -29,12 +29,11 @@
     "remaining_gates_after_resource_approval": {
       "type": "array",
       "prefixItems": [
-        {"const": "public lookup and result contract"},
         {"const": "final release-candidate source, installed, and binary inventory audit"}
       ],
       "items": false,
-      "minItems": 2,
-      "maxItems": 2
+      "minItems": 1,
+      "maxItems": 1
     }
   },
   "$defs": {
@@ -80,12 +79,12 @@
         "release_approved"
       ],
       "properties": {
-        "package_component_state": {"const": "internal-development-candidate"},
+        "package_component_state": {"const": "public-api-development-candidate"},
         "raw_source_bundled": {"const": false},
         "raw_subtitles_or_identifiers_included": {"const": false},
         "runtime_network_access": {"const": false},
         "implicit_download_or_fallback": {"const": false},
-        "public_api": {"const": false},
+        "public_api": {"const": true},
         "release_approved": {"const": false}
       }
     },
@@ -98,7 +97,9 @@
         "lookup_contract_id",
         "lookup_contract_version",
         "lookup_result_schema_id",
-        "lookup_result_schema_version"
+        "lookup_result_schema_version",
+        "public_profile_contract_id",
+        "public_profile_contract_version"
       ],
       "properties": {
         "loader_contract_id": {"const": "ldfreq-lexical-sophistication-profile"},
@@ -106,7 +107,9 @@
         "lookup_contract_id": {"const": "ldfreq-lexical-resource-lookup"},
         "lookup_contract_version": {"const": "0.1.0-draft.1"},
         "lookup_result_schema_id": {"const": "lexres-frequency-prevalence-result"},
-        "lookup_result_schema_version": {"const": "0.1.0-draft.1"}
+        "lookup_result_schema_version": {"const": "0.1.0-draft.1"},
+        "public_profile_contract_id": {"const": "ldfreq-tubelex-frequency-profile"},
+        "public_profile_contract_version": {"const": "0.1.0-draft.1"}
       }
     },
     "approvalPolicy": {
@@ -169,7 +172,7 @@
             "notice_and_attribution": {"const": "approved"},
             "source_and_artifact_identity": {"const": "approved"},
             "package_distribution_scope": {"const": "approved"},
-            "public_api_scope": {"const": "not-reviewed"}
+            "public_api_scope": {"const": "approved"}
           }
         }
       }

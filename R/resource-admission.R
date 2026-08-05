@@ -2,15 +2,14 @@
 #
 # This gate validates a pinned candidate, a strict external approval record,
 # and the exact bytes of its preserved review evidence. It does not authenticate
-# a reviewer, create an approval, expose a public API, or declare the package
-# release-ready.
+# a reviewer, create an approval, or declare the package release-ready.
 
 .lexres_admission_contract_id <- "ldfreq-resource-release-admission"
 .lexres_admission_contract_version <- "0.1.0-draft.1"
 .lexres_tubelex_admission_candidate_id <-
-  "tubelex-en-treebank-slim-7cb5fb36-admission-v1"
+  "tubelex-en-treebank-slim-7cb5fb36-public-profile-admission-v2"
 .lexres_tubelex_admission_candidate_sha256 <-
-  "8c8eca27e3f2810f6f1c8ed158f93acb22d8ad885d3832448cf3b6d194309de6"
+  "e32abc043802f4c17cab8ba37f610d09705432b7091bb568939f50ed9d8aa19a"
 .lexres_admission_approval_schema_id <- "ldfreq-resource-release-approval"
 .lexres_admission_approval_schema_version <- "0.1.0"
 .lexres_admission_approval_fields <- c(
@@ -37,7 +36,6 @@
   "Evidence-SHA256"
 )
 .lexres_admission_remaining_gates <- c(
-  "public lookup and result contract",
   "final release-candidate source, installed, and binary inventory audit"
 )
 
@@ -128,12 +126,12 @@
       "e65a1f5d0d6e7806e31e92d78bf3b903115e610c36bd9f2406269700441ecdd3"
   )
   expected_distribution <- list(
-    package_component_state = "internal-development-candidate",
+    package_component_state = "public-api-development-candidate",
     raw_source_bundled = FALSE,
     raw_subtitles_or_identifiers_included = FALSE,
     runtime_network_access = FALSE,
     implicit_download_or_fallback = FALSE,
-    public_api = FALSE,
+    public_api = TRUE,
     release_approved = FALSE
   )
   expected_contracts <- list(
@@ -142,7 +140,9 @@
     lookup_contract_id = .lexres_lookup_contract_id,
     lookup_contract_version = .lexres_lookup_contract_version,
     lookup_result_schema_id = .lexres_lookup_result_schema_id,
-    lookup_result_schema_version = .lexres_lookup_result_schema_version
+    lookup_result_schema_version = .lexres_lookup_result_schema_version,
+    public_profile_contract_id = .tubelex_profile_contract_id,
+    public_profile_contract_version = .tubelex_profile_contract_version
   )
   expected_policy <- list(
     independent_reviewer_required = TRUE,
@@ -160,11 +160,11 @@
     notice_and_attribution = "approved",
     source_and_artifact_identity = "approved",
     package_distribution_scope = "approved",
-    public_api_scope = "not-reviewed"
+    public_api_scope = "approved"
   )
   approval_contract <- record$approval_record_contract
   identical(record$`$schema`, "tubelex-release-admission-candidate.schema.json") &&
-    identical(record$schema_version, "0.1.0") &&
+    identical(record$schema_version, "0.2.0") &&
     identical(record$candidate_id, .lexres_tubelex_admission_candidate_id) &&
     identical(record$candidate_state, "pending-independent-review") &&
     identical(record$resource, expected_resource) &&
@@ -359,7 +359,7 @@
       !(values[["Notice-And-Attribution"]] %in% c("approved", "not-approved")) ||
       !(values[["Source-And-Artifact-Identity"]] %in% c("approved", "not-approved")) ||
       !(values[["Package-Distribution-Scope"]] %in% c("approved", "not-approved")) ||
-      !identical(values[["Public-API-Scope"]], "not-reviewed") ||
+      !(values[["Public-API-Scope"]] %in% c("approved", "not-approved")) ||
       !grepl("^https://github[.]com/[^[:space:]]+$", values[["Evidence-URL"]]) ||
       !grepl("^[0-9a-f]{64}$", values[["Evidence-SHA256"]])) {
     return(list(ok = FALSE, failure_reason = "approval_schema_mismatch"))
@@ -534,7 +534,7 @@
     "Notice-And-Attribution" = "approved",
     "Source-And-Artifact-Identity" = "approved",
     "Package-Distribution-Scope" = "approved",
-    "Public-API-Scope" = "not-reviewed"
+    "Public-API-Scope" = "approved"
   )
   if (!identical(unname(values[names(approved_scope)]), unname(approved_scope))) {
     return(.lexres_admission_failure(

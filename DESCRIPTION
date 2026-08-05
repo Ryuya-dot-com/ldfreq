@@ -1,7 +1,7 @@
 Package: ldfreq
 Type: Package
-Title: Reproducible Lexical Diversity Profiles
-Version: 0.1.0
+Title: Reproducible Lexical Diversity and Frequency Profiles
+Version: 0.1.0.9000
 Authors@R:
     person(
         given = "Ryuya",
@@ -10,27 +10,34 @@ Authors@R:
         role = c("aut", "cre")
     )
 Description: Computes explicitly versioned lexical-diversity metrics from
-    ordered pre-tokenized text. Provides canonical long-form results, bounded
-    parameter profiles, multi-document adapters, and non-censoring token-length
-    screens while retaining method, parameter, schema, and contract provenance
-    in ordinary columns. The initial release intentionally performs
-    no tokenization, normalization, lemmatization, or public lexical-resource
-    lookup. A byte-pinned TUBELEX aggregate is included only as a separately
-    licensed, non-exported development candidate and is not exposed as a user
-    feature.
+    ordered tokens and provides a separate auditable path from raw English text.
+    Tokenization, Unicode normalization, case handling, lexical-unit selection,
+    optional lemmatization and caller-supplied AntBNC flemma backends, and
+    word-inclusion decisions remain visible in preprocessing provenance.
+    Canonical long-form metric results retain
+    method, parameter, schema, and contract identity in ordinary columns. A
+    separate sensitivity surface exposes explicit Maas and sequential-MTLD
+    formula variants. Coverage-aware lexical level profiles accept a
+    caller-supplied New JACET 8000 list and report exact and cumulative token-
+    and type-weighted rates without redistributing that resource. A byte-pinned
+    TUBELEX aggregate supports a separately versioned frequency and prevalence
+    profile while retaining resource identity and coverage.
 License: MIT + file LICENSE
 URL: https://github.com/Ryuya-dot-com/ldfreq
 BugReports: https://github.com/Ryuya-dot-com/ldfreq/issues
 Depends:
     R (>= 4.1.0)
 Imports:
-    digest
+    digest,
+    stringi
 Encoding: UTF-8
 Suggests:
     jsonlite,
     knitr,
+    readxl,
     rmarkdown,
+    textstem,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-Config/ldfreq/status: release-candidate
+Config/ldfreq/status: development-public-api-candidate

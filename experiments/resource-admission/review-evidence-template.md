@@ -18,9 +18,9 @@ after calculating the SHA-256 recorded in the approval DCF.
 
 - Repository: `Ryuya-dot-com/ldfreq`
 - Reviewed repository commit: `REPLACE_LOWERCASE_40_HEX_COMMIT`
-- Candidate ID: `tubelex-en-treebank-slim-7cb5fb36-admission-v1`
+- Candidate ID: `tubelex-en-treebank-slim-7cb5fb36-public-profile-admission-v2`
 - Candidate SHA-256:
-  `8c8eca27e3f2810f6f1c8ed158f93acb22d8ad885d3832448cf3b6d194309de6`
+  `e32abc043802f4c17cab8ba37f610d09705432b7091bb568939f50ed9d8aa19a`
 - Upstream commit: `7cb5fb36add76b83a266d1967536e1a1d3faa513`
 
 ## Environment and reproduced evidence
@@ -67,8 +67,19 @@ Decision (`approved` or `not-approved`): REPLACE_DECISION
 
 Confirm whether the reviewed package contains only the declared aggregate
 resource and supporting manifest/provenance/legal files; contains no raw
-subtitle text or source identifiers; exposes no public TUBELEX API; and has no
-runtime download or fallback.
+subtitle text or source identifiers; and has no runtime download or fallback.
+
+Evidence and reasoning: REPLACE_EVIDENCE_AND_REASONING
+
+### Public API scope
+
+Decision (`approved` or `not-approved`): REPLACE_DECISION
+
+Confirm that `tubelex_frequency_profile()` exposes only the documented
+aggregate frequency/prevalence profile; records normalization, resource,
+contract, and coverage provenance; preserves unmatched terms; computes
+summaries over matched eligible terms only; and performs no network access,
+implicit download, or fallback.
 
 Evidence and reasoning: REPLACE_EVIDENCE_AND_REASONING
 
@@ -77,7 +88,7 @@ Evidence and reasoning: REPLACE_EVIDENCE_AND_REASONING
 - Blocking findings: REPLACE_NONE_OR_LIST
 - Non-blocking findings: REPLACE_NONE_OR_LIST
 - Review limitations: REPLACE_NONE_OR_LIST
-- Public API: not reviewed
+- Public API: REPLACE_APPROVED_OR_NOT_APPROVED
 - Final package release readiness: not reviewed
 
 ## Overall decision

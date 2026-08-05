@@ -179,7 +179,15 @@ metadata_paths <- c(
   "spec/lexical-resource-lookup-contract.json",
   "spec/lexical-resource-lookup-contract.schema.json",
   "spec/tubelex-release-admission-candidate.json",
-  "spec/tubelex-release-admission-candidate.schema.json"
+  "spec/tubelex-release-admission-candidate.schema.json",
+  "spec/ldfreq-preprocessing-contract.json",
+  "spec/ldfreq-preprocessing-contract.schema.json",
+  "spec/tubelex-frequency-profile-contract.json",
+  "spec/tubelex-frequency-profile-contract.schema.json",
+  "spec/lexical-diversity-variant-contract.json",
+  "spec/lexical-diversity-variant-contract.schema.json",
+  "spec/lexical-level-profile-contract.json",
+  "spec/lexical-level-profile-contract.schema.json"
 )
 all_audited_paths <- c(member_paths, metadata_paths)
 check(!anyDuplicated(all_audited_paths), "Audited package paths overlap.")

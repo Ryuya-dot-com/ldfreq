@@ -41,5 +41,6 @@ Rscript experiments/resource-admission/validate-tubelex-admission.R \
   approval path/to/approval.dcf path/to/review-evidence.txt COMMIT_SHA
 ```
 
-An `approval_record_valid` result closes only the resource-admission record
-gate. It does not approve a public API or the final package release.
+An `approval_record_valid` result closes only the resource and public-profile
+admission record gate. It does not approve the final package release; the
+named-candidate source, installed, and binary inventory audit remains open.

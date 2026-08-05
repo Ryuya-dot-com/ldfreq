@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lexical-level-profile-contract.schema.json",
+  "title": "ldfreq lexical level profile contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema", "contract_id", "contract_version", "status", "public_api",
+    "release_approved", "resource_boundary", "rank_to_level", "lexical_unit",
+    "flemma_conflict",
+    "query_normalization", "lookup_columns", "summary_columns", "summary",
+    "batch", "plot", "provenance", "remaining_release_gates"
+  ],
+  "properties": {
+    "$schema": {"const": "lexical-level-profile-contract.schema.json"},
+    "contract_id": {"const": "ldfreq-lexical-level-profile"},
+    "contract_version": {"const": "0.1.0-draft.3"},
+    "status": {"const": "public-api-development-candidate"},
+    "public_api": {"const": true},
+    "release_approved": {"const": false},
+    "resource_boundary": {
+      "type": "object",
+      "required": [
+        "resource_id", "caller_supplied", "bundled", "downloaded",
+        "full_list_returned", "redistribution_claimed", "accepted_inputs",
+        "official_xlsx_sheet", "official_xlsx_columns", "observed_use_terms",
+        "public-download-is-not-redistribution-permission"
+      ]
+    },
+    "rank_to_level": {
+      "type": "object",
+      "required": [
+        "valid_ranks", "level_count", "rule", "parenthetical_alias_default",
+        "normalized_collision_policy"
+      ]
+    },
+    "lexical_unit": {
+      "type": "object",
+      "required": [
+        "resource_unit", "default_input_unit", "input_unit_choices",
+        "surface_input_available_as_explicit-sensitivity-choice",
+        "caller-supplied-antbnc-flemma-available"
+      ]
+    },
+    "flemma_conflict": {
+      "type": "object",
+      "required": [
+        "choices", "default", "explicit-overrides-applied-upstream",
+        "token-level-conflict-reported", "alternative-wordlist-rank-reported"
+      ]
+    },
+    "query_normalization": {
+      "type": "object",
+      "required": ["choices", "default", "same_transform_for_queries_and_entries"]
+    },
+    "lookup_columns": {
+      "type": "array",
+      "minItems": 13,
+      "maxItems": 13,
+      "uniqueItems": true,
+      "items": {"type": "string"}
+    },
+    "summary_columns": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "uniqueItems": true,
+      "items": {"type": "string"}
+    },
+    "summary": {"type": "object"},
+    "batch": {
+      "type": "object",
+      "required": [
+        "contract_id", "contract_version", "accepted_containers",
+        "document_order", "resource_read_validate_normalize_hash_count",
+        "default_max_rows", "bound_definition", "components",
+        "absolute_path_retained"
+      ],
+      "properties": {
+        "contract_id": {"const": "ldfreq-lexical-level-profile-batch"},
+        "contract_version": {"const": "0.1.0-draft.1"},
+        "resource_read_validate_normalize_hash_count": {"const": 1},
+        "default_max_rows": {"const": 1000000},
+        "absolute_path_retained": {"const": false}
+      }
+    },
+    "plot": {"type": "object"},
+    "provenance": {"type": "object"},
+    "remaining_release_gates": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"type": "string"}
+    }
+  }
+}

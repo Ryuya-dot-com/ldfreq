@@ -1,8 +1,8 @@
 Approval-Schema-ID: ldfreq-resource-release-approval
 Approval-Schema-Version: 0.1.0
 Approval-ID: REPLACE_WITH_LOWERCASE_STABLE_ID
-Candidate-ID: tubelex-en-treebank-slim-7cb5fb36-admission-v1
-Candidate-SHA256: 8c8eca27e3f2810f6f1c8ed158f93acb22d8ad885d3832448cf3b6d194309de6
+Candidate-ID: tubelex-en-treebank-slim-7cb5fb36-public-profile-admission-v2
+Candidate-SHA256: e32abc043802f4c17cab8ba37f610d09705432b7091bb568939f50ed9d8aa19a
 Reviewed-Repository-Commit: REPLACE_WITH_LOWERCASE_40_HEX_COMMIT
 Reviewer-Name: REPLACE_WITH_REVIEWER_NAME
 Reviewer-Affiliation: REPLACE_WITH_AFFILIATION_OR_INDEPENDENT
@@ -15,7 +15,7 @@ Redistribution-Terms: REPLACE_WITH_approved_OR_not-approved
 Notice-And-Attribution: REPLACE_WITH_approved_OR_not-approved
 Source-And-Artifact-Identity: REPLACE_WITH_approved_OR_not-approved
 Package-Distribution-Scope: REPLACE_WITH_approved_OR_not-approved
-Public-API-Scope: not-reviewed
+Public-API-Scope: REPLACE_WITH_approved_OR_not-approved
 Evidence-URL: REPLACE_WITH_STABLE_GITHUB_URL
 Evidence-Locator-ID: REPLACE_WITH_NORMALIZED_RELATIVE_LOCATOR
 Evidence-SHA256: REPLACE_WITH_LOWERCASE_64_HEX_SHA256

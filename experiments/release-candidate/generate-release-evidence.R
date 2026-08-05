@@ -436,7 +436,7 @@ provenance <- list(
   evidence = evidence_records,
   resource_boundary = list(
     release_approved_resource_count = resource_inventory$release_approved_resource_count,
-    public_api_resource_independent = TRUE,
+    public_resource_api_candidate = TRUE,
     candidate_resources_are_not_release_admitted = TRUE
   ),
   go_no_go = list(
@@ -444,8 +444,12 @@ provenance <- list(
     reviewer = NULL,
     reviewed_on = NULL,
     known_limitations = c(
-      "Raw-text tokenization and public lexical-resource APIs are deferred.",
-      "The bundled TUBELEX unit is internal-only and not release-approved.",
+      "Raw-text preprocessing is a separately versioned development API.",
+      paste(
+        "Maas and MTLD comparisons are a separately contracted sensitivity",
+        "API, not official TAALED compatibility."
+      ),
+      "The public TUBELEX profile and bundled resource are not release-approved.",
       "Ordinary R package archive hashes identify the tested artifact but do not establish reproducible builds."
     ),
     rollback = paste(

@@ -226,7 +226,7 @@ check(
       admission_candidate$diagnostics$candidate_sha256,
       .lexres_tubelex_admission_candidate_sha256
     ) &&
-    identical(admission_candidate$diagnostics$candidate_bytes, 3113),
+    identical(admission_candidate$diagnostics$candidate_bytes, 3210),
   "The installed TUBELEX admission candidate changed."
 )
 check(
@@ -347,7 +347,11 @@ check(
 )
 check(
   identical(inventory$schema_version, "0.1.0") &&
-    identical(inventory$reviewed_on, "2026-08-04") &&
+    identical(inventory$reviewed_on, "2026-08-05") &&
+    identical(
+      inventory$package_scope,
+      "public-api-resource-candidate-development"
+    ) &&
     identical(inventory$policy$release_requires_independent_approval, TRUE) &&
     identical(inventory$policy$uncertainty_default, "exclude") &&
     identical(inventory$policy$runtime_network_access, FALSE) &&
@@ -363,9 +367,9 @@ inventory_resource <- inventory$included_resources[[1L]]
 check(
   identical(inventory_resource$resource_id, "tubelex-en-treebank-slim") &&
     identical(inventory_resource$distribution_state, "development-candidate") &&
-    identical(inventory_resource$runtime_state, "internal-only") &&
+    identical(inventory_resource$runtime_state, "public") &&
     identical(inventory_resource$release_approved, FALSE) &&
-    identical(inventory_resource$public_api, FALSE) &&
+    identical(inventory_resource$public_api, TRUE) &&
     identical(inventory_resource$license_spdx, "BSD-3-Clause") &&
     identical(inventory_resource$raw_source_bundled, FALSE) &&
     identical(inventory_resource$raw_subtitles_or_identifiers_included, FALSE),
@@ -392,7 +396,8 @@ check(
   identical(
     excluded_ids,
     c(
-      "ngsl-1.2", "oewn-2025", "nj8", "ngsl-31k-workbook",
+      "ngsl-1.2", "oewn-2025", "nj8", "antbnc-lemma-list",
+      "ngsl-31k-workbook",
       "coca", "ellipse-corpus", "python-resource-derived-golden-outputs"
     )
   ),

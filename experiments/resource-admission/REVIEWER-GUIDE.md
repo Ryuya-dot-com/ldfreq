@@ -1,9 +1,9 @@
 # Independent review guide for the TUBELEX candidate
 
 This guide is the handoff contract for the human reviewer of
-`tubelex-en-treebank-slim-7cb5fb36-admission-v1`. The review covers resource
-admission only. It does not approve a public API or declare the package ready
-for release.
+`tubelex-en-treebank-slim-7cb5fb36-public-profile-admission-v2`. The review
+covers both resource admission and the public `tubelex_frequency_profile()`
+scope. It does not declare the package ready for release.
 
 ## Reviewer eligibility
 
@@ -16,7 +16,8 @@ The reviewer must be an identifiable person who:
 - can identify themselves by name, affiliation or `Independent`, and GitHub
   login;
 - can assess data provenance, redistribution terms, attribution, artifact
-  identity, and the stated package-distribution scope; and
+  identity, the stated package-distribution scope, and the public profile API;
+  and
 - is willing to preserve their findings and explicitly attest to independence.
 
 CI, automated checks, and AI-assisted analysis may be cited as evidence, but
@@ -30,8 +31,8 @@ review a moving branch. At that commit, confirm the following pinned identity:
 
 | Property | Required value |
 |---|---|
-| Candidate ID | `tubelex-en-treebank-slim-7cb5fb36-admission-v1` |
-| Candidate SHA-256 | `8c8eca27e3f2810f6f1c8ed158f93acb22d8ad885d3832448cf3b6d194309de6` |
+| Candidate ID | `tubelex-en-treebank-slim-7cb5fb36-public-profile-admission-v2` |
+| Candidate SHA-256 | `e32abc043802f4c17cab8ba37f610d09705432b7091bb568939f50ed9d8aa19a` |
 | Upstream commit | `7cb5fb36add76b83a266d1967536e1a1d3faa513` |
 | Upstream source SHA-256 | `4096022259d5eaa7261c3bf22c3b0af9fd58ae8eebe17894c0b34a163954f936` |
 | Installed artifact SHA-256 | `ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d` |
@@ -57,10 +58,14 @@ items:
    attribution and modification notice without implying upstream endorsement.
 4. The candidate contains aggregate word statistics, not raw subtitle text or
    source identifiers, and its actual package membership matches the declared
-   internal-development distribution scope.
-5. Runtime lookup is non-exported and performs no network access, implicit
-   download, or fallback.
-6. The reproducibility and package-inventory evidence supports the identity
+   public-API development-candidate distribution scope.
+5. `tubelex_frequency_profile()` is exported, documents its normalization,
+   matching, coverage, and matched-only summary rules, and returns the pinned
+   resource and contract provenance declared in
+   `inst/spec/tubelex-frequency-profile-contract.json`.
+6. The public wrapper and its internal lookup perform no network access,
+   implicit download, or fallback; unmatched terms remain explicit.
+7. The reproducibility and package-inventory evidence supports the identity
    claims. Passing CI alone is not sufficient for approval.
 
 If specialist legal judgment is needed to decide redistribution rights, the
@@ -99,7 +104,7 @@ credentials, local private paths, or unrelated personal data into evidence.
    at a stable GitHub URL.
 2. Compute SHA-256 over those exact bytes. Do not edit the evidence afterward.
 3. Copy `approval-record.template.dcf`, retain the exact field order, and replace
-   every placeholder. Use `approved` only when all four reviewed scopes pass;
+   every placeholder. Use `approved` only when all five reviewed scopes pass;
    otherwise use `rejected` and `not-approved` where applicable.
 4. Preserve the evidence and approval record outside the installed package,
    preferably with a signed commit or another verifiable attestation. The
@@ -111,6 +116,6 @@ Rscript experiments/resource-admission/validate-tubelex-admission.R \
   approval path/to/approval.dcf path/to/review-evidence.md REVIEWED_COMMIT
 ```
 
-An `approval_record_valid` result closes only the resource-admission record
-gate. `package_release_ready` must remain `false`; public-API review and the
-final named-release inventory audit remain separate gates.
+An `approval_record_valid` result closes only the resource and public-profile
+admission record gate. `package_release_ready` must remain `false`; the final
+named-release source, installed, and binary inventory audit remains separate.

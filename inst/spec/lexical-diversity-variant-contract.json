@@ -1,0 +1,87 @@
+{
+  "$schema": "lexical-diversity-variant-contract.schema.json",
+  "contract_id": "ldfreq-lexical-diversity-variants",
+  "contract_version": "0.1.0-draft.1",
+  "status": "public-api-candidate",
+  "core_contract_changed": false,
+  "default_expansion": {
+    "maas_methods": 4,
+    "mtld_methods": 4,
+    "mtld_thresholds": [0.72],
+    "maximum_mtld_thresholds": 16
+  },
+  "maas_methods": [
+    {
+      "method_id": "maas_a2_ln_v1",
+      "formula": "(ln(N)-ln(V))/ln(N)^2",
+      "scale": "a-squared",
+      "log_base": "e",
+      "reference_label": "ldfreq-core:maas"
+    },
+    {
+      "method_id": "maas_a_ln_v1",
+      "formula": "sqrt((ln(N)-ln(V))/ln(N)^2)",
+      "scale": "a",
+      "log_base": "e",
+      "reference_label": "common-formula:maas-a-ln"
+    },
+    {
+      "method_id": "maas_a2_log10_v1",
+      "formula": "(log10(N)-log10(V))/log10(N)^2",
+      "scale": "a-squared",
+      "log_base": "10",
+      "reference_label": "TAALED-0.32:maas"
+    },
+    {
+      "method_id": "maas_a_log10_v1",
+      "formula": "sqrt((log10(N)-log10(V))/log10(N)^2)",
+      "scale": "a",
+      "log_base": "10",
+      "reference_label": "common-formula:maas-a-log10"
+    }
+  ],
+  "mtld_shared_rules": {
+    "threshold_comparison": "strict-less-than",
+    "minimum_complete_factor_length": 10,
+    "partial_factor_credit": "(1-tail_TTR)/(1-threshold)-unclamped",
+    "directions": ["forward", "reverse"]
+  },
+  "mtld_methods": [
+    {
+      "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+      "aggregation": "mean(N/forward_factor_sum,N/reverse_factor_sum)",
+      "final_token_rule": "evaluate-closure-before-tail",
+      "reference_label": "ldfreq-core:mtld",
+      "scope": "ldfreq-core-method"
+    },
+    {
+      "method_id": "mtld_seq_bidir_dirmean_lt_min10_finaltail_linear_v1",
+      "aggregation": "mean(N/forward_factor_sum,N/reverse_factor_sum)",
+      "final_token_rule": "always-record-final-sequence-as-tail",
+      "reference_label": "TAALED-0.32:mtldo",
+      "scope": "TAALED-0.32-relevant-comparator-not-official-compatibility"
+    },
+    {
+      "method_id": "mtld_seq_bidir_mfl_dirmean_lt_min10_finaltail_linear_v1",
+      "aggregation": "mean(mean(forward_length/proportion),mean(reverse_length/proportion))",
+      "final_token_rule": "always-record-final-sequence-as-tail",
+      "reference_label": "TAALED-0.32:mtldav",
+      "scope": "TAALED-0.32-relevant-comparator-not-official-compatibility"
+    },
+    {
+      "method_id": "mtld_seq_bidir_mfl_pooled_lt_min10_finaltail_linear_v1",
+      "aggregation": "mean(all_forward_and_reverse_length/proportion_values)",
+      "final_token_rule": "always-record-final-sequence-as-tail",
+      "reference_label": "TAALED-0.32:mtld",
+      "scope": "TAALED-0.32-relevant-comparator-not-official-compatibility"
+    }
+  ],
+  "compatibility_boundary": {
+    "third_party_code_included_or_translated": false,
+    "official_TAALED_compatibility_claimed": false,
+    "preprocessing_equivalence_claimed": false,
+    "missing_value_equivalence_claimed": false,
+    "reference_version": "TAALED-0.32",
+    "reference_documentation": "https://pypi.org/project/taaled/0.32/"
+  }
+}

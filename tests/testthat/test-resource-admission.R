@@ -37,7 +37,7 @@ admission_values <- function(overrides = list()) {
   values <- c(
     "Approval-Schema-ID" = "ldfreq-resource-release-approval",
     "Approval-Schema-Version" = "0.1.0",
-    "Approval-ID" = "independent-tubelex-review-v1",
+    "Approval-ID" = "independent-tubelex-public-profile-review-v2",
     "Candidate-ID" = admission_candidate_id,
     "Candidate-SHA256" = admission_candidate_sha256,
     "Reviewed-Repository-Commit" = admission_repository_commit,
@@ -52,7 +52,7 @@ admission_values <- function(overrides = list()) {
     "Notice-And-Attribution" = "approved",
     "Source-And-Artifact-Identity" = "approved",
     "Package-Distribution-Scope" = "approved",
-    "Public-API-Scope" = "not-reviewed",
+    "Public-API-Scope" = "approved",
     "Evidence-URL" =
       "https://github.com/example/review-evidence/pull/1#pullrequestreview-1",
     "Evidence-Locator-ID" = "reviews/tubelex-independent-review.txt",
@@ -103,7 +103,7 @@ test_that("the installed candidate is byte-pinned and remains unapproved", {
     candidate$candidate$distribution_scope$release_approved,
     FALSE
   )
-  expect_identical(candidate$candidate$distribution_scope$public_api, FALSE)
+  expect_identical(candidate$candidate$distribution_scope$public_api, TRUE)
   expect_identical(
     candidate$candidate$approval_policy$approval_record_bundled,
     FALSE
@@ -156,7 +156,7 @@ test_that("a complete independent record passes only the admission gate", {
   expect_identical(result$failure_reason, NA_character_)
   expect_identical(
     result$approval_ref$approval_id,
-    "independent-tubelex-review-v1"
+    "independent-tubelex-public-profile-review-v2"
   )
   expect_identical(result$approval_ref$decision, "approved")
   expect_identical(
@@ -176,10 +176,7 @@ test_that("a complete independent record passes only the admission gate", {
   )
   expect_identical(
     result$remaining_gates,
-    c(
-      "public lookup and result contract",
-      "final release-candidate source, installed, and binary inventory audit"
-    )
+    "final release-candidate source, installed, and binary inventory audit"
   )
 })
 
@@ -253,6 +250,19 @@ test_that("incomplete scope and reviewer rejection remain blocking", {
   expect_identical(rejected$status, "independent_review_rejected")
   expect_identical(rejected$failure_reason, "approval_rejected")
   expect_identical(rejected$admission_gate_passed, FALSE)
+})
+
+test_that("public API scope must be reviewed and approved", {
+  not_approved <- evaluate_approval(admission_values(list(
+    "Public-API-Scope" = "not-approved"
+  )))
+  legacy_unreviewed <- evaluate_approval(admission_values(list(
+    "Public-API-Scope" = "not-reviewed"
+  )))
+
+  expect_identical(not_approved$failure_reason, "approval_scope_incomplete")
+  expect_identical(not_approved$admission_gate_passed, FALSE)
+  expect_identical(legacy_unreviewed$failure_reason, "approval_schema_mismatch")
 })
 
 test_that("malformed approval records fail before evidence interpretation", {

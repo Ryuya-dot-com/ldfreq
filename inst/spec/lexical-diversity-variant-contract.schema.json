@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/inst/spec/lexical-diversity-variant-contract.schema.json",
+  "title": "ldfreq lexical-diversity variant contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema", "contract_id", "contract_version", "status",
+    "core_contract_changed", "default_expansion", "maas_methods",
+    "mtld_shared_rules", "mtld_methods", "compatibility_boundary"
+  ],
+  "properties": {
+    "$schema": {"const": "lexical-diversity-variant-contract.schema.json"},
+    "contract_id": {"const": "ldfreq-lexical-diversity-variants"},
+    "contract_version": {"const": "0.1.0-draft.1"},
+    "status": {"const": "public-api-candidate"},
+    "core_contract_changed": {"const": false},
+    "default_expansion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maas_methods", "mtld_methods", "mtld_thresholds",
+        "maximum_mtld_thresholds"
+      ],
+      "properties": {
+        "maas_methods": {"const": 4},
+        "mtld_methods": {"const": 4},
+        "mtld_thresholds": {
+          "type": "array", "prefixItems": [{"const": 0.72}],
+          "items": false, "minItems": 1, "maxItems": 1
+        },
+        "maximum_mtld_thresholds": {"const": 16}
+      }
+    },
+    "maas_methods": {
+      "type": "array", "minItems": 4, "maxItems": 4,
+      "items": {"$ref": "#/$defs/maasMethod"}
+    },
+    "mtld_shared_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "threshold_comparison", "minimum_complete_factor_length",
+        "partial_factor_credit", "directions"
+      ],
+      "properties": {
+        "threshold_comparison": {"const": "strict-less-than"},
+        "minimum_complete_factor_length": {"const": 10},
+        "partial_factor_credit": {"type": "string", "minLength": 1},
+        "directions": {
+          "type": "array",
+          "prefixItems": [{"const": "forward"}, {"const": "reverse"}],
+          "items": false, "minItems": 2, "maxItems": 2
+        }
+      }
+    },
+    "mtld_methods": {
+      "type": "array", "minItems": 4, "maxItems": 4,
+      "items": {"$ref": "#/$defs/mtldMethod"}
+    },
+    "compatibility_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "third_party_code_included_or_translated",
+        "official_TAALED_compatibility_claimed",
+        "preprocessing_equivalence_claimed",
+        "missing_value_equivalence_claimed", "reference_version",
+        "reference_documentation"
+      ],
+      "properties": {
+        "third_party_code_included_or_translated": {"const": false},
+        "official_TAALED_compatibility_claimed": {"const": false},
+        "preprocessing_equivalence_claimed": {"const": false},
+        "missing_value_equivalence_claimed": {"const": false},
+        "reference_version": {"const": "TAALED-0.32"},
+        "reference_documentation": {"type": "string", "format": "uri"}
+      }
+    }
+  },
+  "$defs": {
+    "maasMethod": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "method_id", "formula", "scale", "log_base", "reference_label"
+      ],
+      "properties": {
+        "method_id": {"type": "string", "pattern": "^maas_"},
+        "formula": {"type": "string", "minLength": 1},
+        "scale": {"enum": ["a", "a-squared"]},
+        "log_base": {"enum": ["e", "10"]},
+        "reference_label": {"type": "string", "minLength": 1}
+      }
+    },
+    "mtldMethod": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "method_id", "aggregation", "final_token_rule", "reference_label",
+        "scope"
+      ],
+      "properties": {
+        "method_id": {"type": "string", "pattern": "^mtld_"},
+        "aggregation": {"type": "string", "minLength": 1},
+        "final_token_rule": {
+          "enum": [
+            "evaluate-closure-before-tail",
+            "always-record-final-sequence-as-tail"
+          ]
+        },
+        "reference_label": {"type": "string", "minLength": 1},
+        "scope": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

@@ -107,10 +107,9 @@ checks exercise the installed resource and its machine-readable inventory.
 
 Release approval still requires:
 
-1. an independent legal/provenance approval record and preserved evidence for
-   the byte-pinned admission candidate;
-2. a public lookup and result contract decision; and
-3. a final source, installed, and platform-binary audit against the named
+1. an independent legal/provenance and public-profile-API approval record with
+   preserved evidence for the byte-pinned admission candidate; and
+2. a final source, installed, and platform-binary audit against the named
    release candidate after all approved resources are frozen.
 
 Development CI already exercises source/platform/installed byte identity. That
