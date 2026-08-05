@@ -44,6 +44,9 @@
 - Made New JACET rank-entry and flemma-override canonical hashes invariant to
   source row order, and made tokenization consumers reject corrupted offsets
   or number flags before computing downstream results.
+- Made the New JACET help page safe for the pdfTeX reference-manual path while
+  retaining executable Unicode identifiers, and added a required PDF-manual
+  job to ordinary pull-request CI.
 - Superseded the earlier immutable 0.1.0 core release-candidate evidence. A new
   exact candidate, cross-platform check matrix, and go/no-go decision are
   required before the 0.1.0 tag or CRAN submission.

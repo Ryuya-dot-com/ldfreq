@@ -16,7 +16,7 @@ new_jacet8000_profile(
   wordlist,
   rank_column = NULL,
   word_column = NULL,
-  sheet = "新J8",
+  sheet = "\\u65b0J8",
   unit = "lemma",
   flemma_conflict = "antbnc",
   normalization = "nfkc_lower",
@@ -29,7 +29,7 @@ new_jacet8000_profile_batch(
   wordlist,
   rank_column = NULL,
   word_column = NULL,
-  sheet = "新J8",
+  sheet = "\\u65b0J8",
   unit = "lemma",
   flemma_conflict = "antbnc",
   normalization = "nfkc_lower",
@@ -69,11 +69,12 @@ new_jacet8000_profile_batch(
   a path to the official local XLSX file or a local CSV file. Direct XLSX input
   requires the suggested \pkg{readxl} package.}
   \item{rank_column, word_column}{Optional names of the rank and entry columns.
-  \code{NULL} detects the official XLSX headers \code{"新J8順位"} and
-  \code{"代表レマ"}, or compatible CSV headers \code{"NJ8"} and
+  \code{NULL} detects the official XLSX headers
+  \code{"\\u65b0J8\\u9806\\u4f4d"} and
+  \code{"\\u4ee3\\u8868\\u30ec\\u30de"}, or compatible CSV headers \code{"NJ8"} and
   \code{"Word"}.}
   \item{sheet}{XLSX sheet containing the list. The official workbook uses
-  \code{"新J8"}. Ignored for data-frame and CSV input.}
+  \code{"\\u65b0J8"}. Ignored for data-frame and CSV input.}
   \item{unit}{One of \code{"lemma"} (the default because the official table
   contains representative lemmas), \code{"surface"}, or \code{"flemma"}.
   For a plain character vector, this labels the units already selected by the

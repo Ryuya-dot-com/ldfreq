@@ -669,10 +669,11 @@
 #'   the path to the official local XLSX file or a local CSV file. No resource
 #'   is downloaded.
 #' @param rank_column,word_column Optional names of the rank and entry columns.
-#'   `NULL` auto-detects the official Japanese rank and representative-lemma
-#'   headers, or the compatible CSV headers `"NJ8"` and `"Word"`.
+#'   `NULL` detects the official XLSX headers
+#'   `"\u65b0J8\u9806\u4f4d"` and `"\u4ee3\u8868\u30ec\u30de"`, or the
+#'   compatible CSV headers `"NJ8"` and `"Word"`.
 #' @param sheet XLSX sheet containing the list. The official workbook uses
-#'   its New JACET 8000 sheet. Ignored for data-frame and CSV input.
+#'   `"\u65b0J8"`. Ignored for data-frame and CSV input.
 #' @param unit One of `"surface"`, `"lemma"`, or `"flemma"`. With a plain
 #'   character input, this labels the units already supplied by the caller.
 #' @param flemma_conflict For flemma-annotated tokenizations, how to resolve a
