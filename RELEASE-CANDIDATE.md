@@ -35,8 +35,12 @@ but they do not replace upstream rights or the maintainer's accountability for
 the release decision.
 
 CRAN incoming checks report `New submission` until the package has a prior CRAN
-version. The check runner accepts only that exact single NOTE as explained; any
-additional NOTE, WARNING, ERROR, or unrecognized status remains blocking.
+version. The check runner accepts only that exact single NOTE by default. The
+declared minimum-R diagnostic intentionally leaves the optional `textstem`
+backend unavailable and sets `_R_CHECK_FORCE_SUGGESTS_=false`; only its exact
+package-dependency NOTE is additionally accepted, only for the labeled R 4.1
+job, and both dispositions are recorded. Any other NOTE, WARNING, ERROR, or
+unrecognized status remains blocking.
 
 ## Go/no-go boundary
 

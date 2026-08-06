@@ -86,8 +86,12 @@ it as internal-only evidence.
 - [ ] Treat every package-check error or warning as blocking. Resolve each note,
       or record its technical justification and maintainer disposition.
 - [ ] If CRAN incoming reports the exact single NOTE `New submission`, retain it
-      in every raw log and record its explicit disposition; do not generalize
-      this exception to any other NOTE.
+      in every raw log and record its explicit disposition.
+- [ ] In the labeled R 4.1 minimum-version diagnostic only, retain and explain
+      the exact additional dependency NOTE caused by deliberately unavailable
+      optional package `textstem` with `_R_CHECK_FORCE_SUGGESTS_=false`. Require
+      all other jobs to install their suggested packages, and block every other
+      NOTE rather than generalizing either disposition.
 - [ ] Treat an external service, runner, or infrastructure failure as an invalid
       run that must be repeated, not as an exception to a package-check result.
 - [ ] Check the built archive's file list, sizes, license files, vignettes,

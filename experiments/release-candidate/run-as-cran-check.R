@@ -1,9 +1,12 @@
 #!/usr/bin/env Rscript
 
 arguments <- commandArgs(trailingOnly = TRUE)
-if (length(arguments) != 3L) {
+if (!length(arguments) %in% c(3L, 4L)) {
   stop(
-    "Usage: run-as-cran-check.R /path/to/source.tar.gz /new/output/directory job-label",
+    paste(
+      "Usage: run-as-cran-check.R /path/to/source.tar.gz",
+      "/new/output/directory job-label [note-policy]"
+    ),
     call. = FALSE
   )
 }
@@ -15,7 +18,36 @@ if (!requireNamespace("digest", quietly = TRUE) ||
 source_archive <- normalizePath(arguments[[1L]], mustWork = TRUE)
 output_requested <- arguments[[2L]]
 job_label <- arguments[[3L]]
+note_policy <- if (length(arguments) == 4L) {
+  arguments[[4L]]
+} else {
+  "new-submission-only"
+}
 if (!nzchar(job_label)) stop("job-label must not be empty.", call. = FALSE)
+allowed_note_policies <- c(
+  "new-submission-only",
+  "minimum-r-optional-textstem"
+)
+if (!note_policy %in% allowed_note_policies) {
+  stop("Unrecognized check NOTE policy: ", note_policy, call. = FALSE)
+}
+if (identical(note_policy, "minimum-r-optional-textstem") &&
+    (!identical(job_label, "ubuntu-latest-r-4.1") ||
+      !grepl("^R version 4[.]1[.]", R.version.string))) {
+  stop(
+    paste(
+      "The minimum-r-optional-textstem NOTE policy is restricted to the",
+      "ubuntu-latest-r-4.1 job running R 4.1.x."
+    ),
+    call. = FALSE
+  )
+}
+script_argument <- grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)
+if (length(script_argument) != 1L) {
+  stop("Could not identify the check-runner script path.", call. = FALSE)
+}
+script_path <- normalizePath(sub("^--file=", "", script_argument), mustWork = TRUE)
+source(file.path(dirname(script_path), "check-note-policy.R"), local = TRUE)
 if (file.exists(output_requested) || dir.exists(output_requested)) {
   stop("The check output directory must not already exist.", call. = FALSE)
 }
@@ -50,62 +82,24 @@ check_lines <- if (!is.na(check_log) && file.exists(check_log)) {
 }
 status_lines <- grep("^Status:", check_lines, value = TRUE)
 check_status <- if (length(status_lines)) tail(status_lines, 1L) else "Status: unavailable"
-note_positions <- grep("^\\* checking .* NOTE$", check_lines)
-note_steps <- check_lines[note_positions]
-note_detail <- character()
-if (length(note_positions) == 1L) {
-  next_check_positions <- grep("^\\* checking ", check_lines)
-  next_check_positions <- next_check_positions[
-    next_check_positions > note_positions[[1L]]
-  ]
-  note_end <- if (length(next_check_positions)) {
-    next_check_positions[[1L]] - 1L
-  } else {
-    length(check_lines)
-  }
-  if (note_end > note_positions[[1L]]) {
-    note_detail <- check_lines[seq.int(note_positions[[1L]] + 1L, note_end)]
-  }
-}
-note_detail <- trimws(note_detail)
-note_detail <- note_detail[nzchar(note_detail)]
-maintainer_pattern <- paste0(
-  "^Maintainer: [‘']?[^<>[:cntrl:]]+ ",
-  "<[^<>[:space:]]+@[^<>[:space:]]+>[’']?[[:space:]]*$"
+note_blocks <- release_note_blocks(check_lines)
+classification <- release_classify_notes(
+  check_status,
+  note_blocks,
+  note_policy
 )
-new_submission_note <- identical(check_status, "Status: 1 NOTE") &&
-  length(note_steps) == 1L &&
-  length(note_detail) == 2L &&
-  grepl(maintainer_pattern, note_detail[[1L]]) &&
-  identical(note_detail[[2L]], "New submission")
-effective_status <- if (identical(check_status, "Status: OK")) {
-  "PASS"
-} else if (new_submission_note) {
-  "PASS_WITH_EXPLAINED_NOTE"
-} else {
-  "FAIL"
-}
+effective_status <- classification$effective_status
 
 result <- list(
-  schema_version = "1.0.0",
+  schema_version = "1.1.0",
   job_label = job_label,
   command = "R CMD check --as-cran --no-manual <exact-source-archive>",
   exit_code = as.integer(status),
   check_status = check_status,
   effective_status = effective_status,
-  explained_notes = if (new_submission_note) {
-    list(list(
-      note = "New submission",
-      disposition = paste(
-        "Expected CRAN incoming note for a package version that has not",
-        "previously been published on CRAN; no package defect is asserted."
-      )
-    ))
-  } else {
-    list()
-  },
-  note_stage = if (length(note_steps) == 1L) note_steps[[1L]] else NULL,
-  note_detail = as.list(note_detail),
+  note_policy = note_policy,
+  explained_notes = classification$explained_notes,
+  note_blocks = note_blocks,
   started_at_utc = started,
   finished_at_utc = finished,
   environment = list(
