@@ -69,6 +69,8 @@ jobs:
           extra-packages: |
             any::digest
             any::jsonlite
+            any::cpp11
+            any::progress
           needs: check
 
       - name: Verify synchronized candidate metadata
