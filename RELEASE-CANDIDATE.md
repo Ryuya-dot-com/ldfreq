@@ -1,12 +1,12 @@
-# Superseded core release-candidate boundary
+# ldfreq 0.1.0 release-candidate boundary
 
-The immutable core-only version `0.1.0` candidate was not published. Development
-version `0.1.0.9000` adds raw-text preprocessing and a TUBELEX public-profile
-candidate, a caller-supplied New JACET 8000 level-profile surface, plus a
-separately contracted Maas/MTLD variant surface, so the
-earlier candidate artifacts and go/no-go decision cannot be reused for tagging
-or CRAN submission. A new immutable commit must pass the technical, resource,
-and maintainer decision gates in `RELEASE-CHECKLIST.md`.
+The earlier immutable core-only version `0.1.0` candidate was not published,
+and its artifacts and go/no-go decision cannot be reused. This replacement
+candidate adds raw-text preprocessing, a TUBELEX public-profile candidate, a
+caller-supplied New JACET 8000 level-profile surface, and a separately
+contracted Maas/MTLD variant surface. The exact replacement commit must pass
+the technical, resource, and maintainer decision gates in
+`RELEASE-CHECKLIST.md` before tagging or CRAN submission.
 
 ## Automated evidence
 
@@ -35,8 +35,12 @@ but they do not replace upstream rights or the maintainer's accountability for
 the release decision.
 
 CRAN incoming checks report `New submission` until the package has a prior CRAN
-version. The check runner accepts only that exact single NOTE as explained; any
-additional NOTE, WARNING, ERROR, or unrecognized status remains blocking.
+version. The check runner accepts only that exact single NOTE by default. The
+declared minimum-R diagnostic intentionally leaves the optional `textstem`
+backend unavailable and sets `_R_CHECK_FORCE_SUGGESTS_=false`; only its exact
+package-dependency NOTE is additionally accepted, only for the labeled R 4.1
+job, and both dispositions are recorded. Any other NOTE, WARNING, ERROR, or
+unrecognized status remains blocking.
 
 ## Go/no-go boundary
 

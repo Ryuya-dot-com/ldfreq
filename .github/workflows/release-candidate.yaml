@@ -69,6 +69,8 @@ jobs:
           extra-packages: |
             any::digest
             any::jsonlite
+            any::cpp11
+            any::progress
           needs: check
 
       - name: Verify synchronized candidate metadata
@@ -217,6 +219,11 @@ jobs:
             full.names = TRUE
           )
           stopifnot(length(archive) == 1L)
+          note_policy <- if (identical("${{ matrix.config.r }}", "4.1")) {
+            "minimum-r-optional-textstem"
+          } else {
+            "new-submission-only"
+          }
           status <- system2(
             file.path(R.home("bin"), "Rscript"),
             c(
@@ -226,7 +233,8 @@ jobs:
               )),
               shQuote(archive),
               shQuote(file.path(Sys.getenv("RUNNER_TEMP"), "as-cran-check")),
-              shQuote("${{ matrix.config.label }}")
+              shQuote("${{ matrix.config.label }}"),
+              shQuote(note_policy)
             )
           )
           if (!identical(status, 0L)) quit(status = status)

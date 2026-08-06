@@ -1,6 +1,6 @@
 # Cross-platform package resource-inventory audit
 
-Status: development CI gate; not final release evidence
+Status: technical inventory gate; not a final maintainer release decision
 
 `validate-package-resource-inventory.R` exercises the package boundary that an
 installed-only test cannot observe. Starting from a clean package tree, it:

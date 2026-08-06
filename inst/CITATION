@@ -5,6 +5,6 @@ bibentry(
   title = "ldfreq: Reproducible Lexical Diversity and Frequency Profiles",
   author = person(given = "Ryuya", family = "Komuro"),
   year = "2026",
-  note = sprintf("R package version %s", meta$Version),
+  note = "R package version 0.1.0",
   url = "https://github.com/Ryuya-dot-com/ldfreq"
 )

@@ -110,6 +110,14 @@ maintainer_pattern <- paste0(
   "^Maintainer: [‘']?[^<>[:cntrl:]]+ ",
   "<[^<>[:space:]]+@[^<>[:space:]]+>[’']?[[:space:]]*$"
 )
+incoming_stage_pattern <- paste0(
+  "^\\* checking CRAN incoming feasibility \\.\\.\\. ",
+  "(\\[[^]]+\\] )?NOTE$"
+)
+dependency_stage_pattern <- paste0(
+  "^\\* checking package dependencies \\.\\.\\. ",
+  "(\\[[^]]+\\] )?NOTE$"
+)
 expected_environments <- list(
   "ubuntu-latest-r-release" = c("Linux", "linux"),
   "ubuntu-latest-r-devel" = c("Linux", "linux"),
@@ -127,6 +135,10 @@ r_version_number <- function(value) {
 release_r_version <- r_version_number(provenance$environment$r_version)
 check(!is.na(release_r_version), "The build-source R version is unrecognized.")
 for (result in results) {
+  check(
+    identical(result$schema_version, "1.1.0"),
+    paste("Unrecognized check-result schema:", result$job_label)
+  )
   expected_environment <- expected_environments[[result$job_label]]
   check(
     identical(result$environment$os, expected_environment[[1L]]) &&
@@ -156,29 +168,80 @@ for (result in results) {
   }
   check(identical(as.integer(result$exit_code), 0L), paste("Check failed:", result$job_label))
   check(
-    result$effective_status %in% c("PASS", "PASS_WITH_EXPLAINED_NOTE"),
+    result$effective_status %in% c(
+      "PASS", "PASS_WITH_EXPLAINED_NOTE", "PASS_WITH_EXPLAINED_NOTES"
+    ),
     paste("Blocking check status:", result$job_label)
   )
+  expected_note_policy <- if (identical(
+    result$job_label,
+    "ubuntu-latest-r-4.1"
+  )) {
+    "minimum-r-optional-textstem"
+  } else {
+    "new-submission-only"
+  }
+  check(
+    identical(result$note_policy, expected_note_policy),
+    paste("Wrong check NOTE policy:", result$job_label)
+  )
+  if (identical(result$job_label, "ubuntu-latest-r-4.1")) {
+    check(
+      identical(result$effective_status, "PASS_WITH_EXPLAINED_NOTES"),
+      "The minimum-R check did not record both expected NOTE dispositions."
+    )
+  }
   if (identical(result$effective_status, "PASS")) {
     check(
       identical(result$check_status, "Status: OK") &&
         length(result$explained_notes) == 0L &&
-        is.null(result$note_stage) &&
-        length(result$note_detail) == 0L,
+        length(result$note_blocks) == 0L,
       paste("Inconsistent passing check record:", result$job_label)
     )
-  } else {
+  } else if (identical(
+    result$effective_status,
+    "PASS_WITH_EXPLAINED_NOTE"
+  )) {
     check(
       identical(result$check_status, "Status: 1 NOTE") &&
         length(result$explained_notes) == 1L &&
         identical(result$explained_notes[[1L]]$note, "New submission") &&
-        is.character(result$note_stage) &&
-        length(result$note_stage) == 1L &&
-        grepl("^\\* checking .* NOTE$", result$note_stage) &&
-        length(result$note_detail) == 2L &&
-        grepl(maintainer_pattern, result$note_detail[[1L]]) &&
-        identical(result$note_detail[[2L]], "New submission"),
+        length(result$note_blocks) == 1L &&
+        grepl(incoming_stage_pattern, result$note_blocks[[1L]]$stage) &&
+        length(result$note_blocks[[1L]]$detail) == 2L &&
+        grepl(maintainer_pattern, result$note_blocks[[1L]]$detail[[1L]]) &&
+        identical(
+          result$note_blocks[[1L]]$detail[[2L]],
+          "New submission"
+        ),
       paste("Unrecognized note disposition:", result$job_label)
+    )
+  } else {
+    textstem_pattern <- paste0(
+      "^Package suggested but not available for checking: ",
+      "[‘']textstem[’']$"
+    )
+    check(
+      identical(result$job_label, "ubuntu-latest-r-4.1") &&
+        identical(result$check_status, "Status: 2 NOTEs") &&
+        length(result$explained_notes) == 2L &&
+        identical(result$explained_notes[[1L]]$note, "New submission") &&
+        identical(
+          result$explained_notes[[2L]]$note,
+          "Package suggested but not available for checking: textstem"
+        ) &&
+        length(result$note_blocks) == 2L &&
+        grepl(incoming_stage_pattern, result$note_blocks[[1L]]$stage) &&
+        length(result$note_blocks[[1L]]$detail) == 2L &&
+        grepl(maintainer_pattern, result$note_blocks[[1L]]$detail[[1L]]) &&
+        identical(
+          result$note_blocks[[1L]]$detail[[2L]],
+          "New submission"
+        ) &&
+        grepl(dependency_stage_pattern, result$note_blocks[[2L]]$stage) &&
+        length(result$note_blocks[[2L]]$detail) == 1L &&
+        grepl(textstem_pattern, result$note_blocks[[2L]]$detail[[1L]]),
+      paste("Unrecognized minimum-R note disposition:", result$job_label)
     )
   }
   check(
@@ -288,7 +351,7 @@ source_records <- lapply(evidence_paths[startsWith(normalizePath(evidence_paths)
 check_records <- lapply(evidence_paths[startsWith(normalizePath(evidence_paths), normalizePath(check_root))], record, root = check_root)
 
 index <- list(
-  schema_version = "1.0.0",
+  schema_version = "1.1.0",
   status = "technical-matrix-complete",
   candidate = provenance$candidate,
   artifact = provenance$artifact,
