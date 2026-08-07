@@ -77,3 +77,23 @@ A normative measurement contract does not by itself establish redistribution
 rights for its reference data. Resource rights, artifact identity,
 coverage/failure behavior, installed notices, and package inventory are reviewed
 and recorded separately from the public API contract.
+
+## Raw-text file input and planned corpus orchestration
+
+The development API adds `lexdiv_text_corpus()` as a one-row-per-document
+in-memory boundary and `lexdiv_read_texts()` as a file-input boundary, both
+separate from tokenization and metric computation. Their contracts fix explicit
+document identity, text identity, UTF-8 validation, metadata retention, byte
+bounds, deterministic directory discovery, path privacy, and failure behavior.
+Neither reinterprets `lexdiv_metrics_batch()` as a raw-text API.
+
+A future minor release may add `lexdiv_metrics_text_batch()` only after its
+separate orchestration contract fixes the accepted named container, document-ID
+rules, per-document error containment, output schema, ordering, preprocessing
+and token-audit retention, memory bounds, and behavior for empty documents.
+Workbook reading and dataset-specific row grouping remain upstream of
+`lexdiv_text_corpus()`. File discovery and character decoding likewise remain
+separate from any future batch metric-result schema. Both corpus entry paths
+return named texts and a text-free document manifest, then
+`lexdiv_metrics_text()` continues to create one independent preprocessing audit
+per document.

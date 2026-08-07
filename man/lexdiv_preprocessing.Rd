@@ -105,6 +105,17 @@ The tokenizer arguments \code{normalization}, \code{case}, and
 \code{keep_numbers} apply only when \code{x} is raw text. They are never
 silently reapplied to, or ignored for, an existing tokenization object.
 }
+\section{Multiple raw texts}{
+\code{lexdiv_metrics_text()} intentionally processes one text at a time so
+that each result retains its own token and preprocessing audits. For a named
+character vector of raw documents, use
+\code{lapply(texts, lexdiv_metrics_text, ...)}. Do not pass ordinary prose
+directly to \code{lexdiv_metrics_batch()}; that function accepts
+pre-tokenized document vectors and does not tokenize its input. Use
+\code{lexdiv_text_corpus()} for a one-row-per-document data frame, or
+\code{lexdiv_read_texts()} for explicit files or a directory of UTF-8
+\file{.txt} files, before applying this function.
+}
 \section{Formal contract}{
 The installed \file{ldfreq-preprocessing-contract.json} file fixes tokenizer,
 normalization, annotation, lexical-unit, and result-boundary behavior. Use
@@ -155,6 +166,8 @@ if (requireNamespace("textstem", quietly = TRUE)) {
   lexdiv_metrics_text(textstem_lemmas, unit = "lemma", metrics = "ttr")
 }
 }
-\seealso{\code{\link{lexdiv_flemmatize}}, \code{\link{lexdiv_metrics}},
+\seealso{\code{\link{lexdiv_text_corpus}},
+\code{\link{lexdiv_read_texts}},
+\code{\link{lexdiv_flemmatize}}, \code{\link{lexdiv_metrics}},
 \code{\link{tubelex_frequency_profile}}}
 \keyword{text}

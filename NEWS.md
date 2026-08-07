@@ -1,3 +1,20 @@
+# ldfreq (development version)
+
+- Replaced the pre-release installation instructions with a version-pinned
+  v0.1.0 installation path, a base-R fallback, and a separately labeled
+  development-version path.
+- Added a safe multiple-raw-text workflow that preserves each document's
+  preprocessing and token audit, and clarified that
+  `lexdiv_metrics_batch()` accepts pre-tokenized documents only. The beginner
+  workflow now uses `lexdiv_read_texts()` for deterministic `.txt` discovery,
+  exact UTF-8 reading, explicit document IDs, bounded input sizes, byte hashes,
+  and a path-private filename manifest.
+- Added `lexdiv_text_corpus()` as the narrow handoff from one-row-per-document
+  data frames, including explicitly reshaped Excel imports, to named raw-text
+  analysis. Text identities and caller-selected source metadata remain visible.
+- Marked the repository as post-release development and synchronized the
+  package website URL with the pkgdown configuration.
+
 # ldfreq 0.1.0
 
 ## Initial release

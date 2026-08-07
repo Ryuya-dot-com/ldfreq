@@ -14,6 +14,8 @@ schema, and contract provenance.
 \details{
 Start with \code{lexdiv_metrics()} for explicit tokens,
 \code{lexdiv_metrics_text()} for one raw or annotated text,
+\code{lexdiv_text_corpus()} for a one-row-per-document data frame,
+\code{lexdiv_read_texts()} for explicit files or a directory of UTF-8 texts,
 \code{lexdiv_metrics_batch()} for multiple tokenized documents,
 \code{lexdiv_profile()} for explicit parameter variants,
 \code{lexdiv_variant_metrics()} for separately contracted Maas/MTLD
@@ -29,6 +31,12 @@ Choose the entry point from the form of data you already have:
   \item{One raw character string}{Use \code{lexdiv_metrics_text()}. It calls
   the explicit tokenizer and returns its preprocessing audit beside the metric
   rows.}
+  \item{One or more local UTF-8 text files}{Use
+  \code{lexdiv_read_texts()}, then apply \code{lexdiv_metrics_text()} to the
+  returned named \code{texts} vector.}
+  \item{A data frame or explicitly reshaped Excel import}{Use
+  \code{lexdiv_text_corpus()} to select the document-ID and text columns and
+  retain source sheet/row columns explicitly.}
   \item{One ordered token vector}{Use \code{lexdiv_metrics()}. The core will
   not change case, remove tokens, or lemmatize.}
   \item{Several tokenized documents}{Use \code{lexdiv_metrics_batch()} with a
@@ -73,6 +81,8 @@ and resource boundaries. The main files are:
 \itemize{
   \item \file{lexical-diversity-contract.json}
   \item \file{ldfreq-preprocessing-contract.json}
+  \item \file{ldfreq-text-corpus-contract.json}
+  \item \file{ldfreq-text-file-input-contract.json}
   \item \file{lexical-diversity-variant-contract.json}
   \item \file{lexical-level-profile-contract.json}
   \item \file{tubelex-frequency-profile-contract.json}
@@ -175,6 +185,8 @@ source(smoke_path, local = TRUE)
 contract_files <- c(
   "lexical-diversity-contract.json",
   "ldfreq-preprocessing-contract.json",
+  "ldfreq-text-corpus-contract.json",
+  "ldfreq-text-file-input-contract.json",
   "lexical-diversity-variant-contract.json",
   "lexical-level-profile-contract.json",
   "tubelex-frequency-profile-contract.json"

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ldfreq-text-corpus-contract.schema.json",
+  "title": "ldfreq in-memory text-corpus contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "contract_id",
+    "contract_version",
+    "status",
+    "public_api",
+    "data_frame_input",
+    "document_identity",
+    "transformation",
+    "result"
+  ],
+  "properties": {
+    "$schema": {"const": "ldfreq-text-corpus-contract.schema.json"},
+    "contract_id": {"const": "ldfreq-text-corpus"},
+    "contract_version": {"const": "0.1.0"},
+    "status": {"const": "normative"},
+    "public_api": {"const": true},
+    "data_frame_input": {"type": "object"},
+    "document_identity": {"type": "object"},
+    "transformation": {"type": "object"},
+    "result": {"type": "object"}
+  }
+}

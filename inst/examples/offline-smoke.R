@@ -9,6 +9,18 @@ documents <- list(
 single <- lexdiv_metrics(tokens, metrics = c("ttr", "rttr", "yule_k"))
 tokenization <- lexdiv_tokenize("The cat saw the other cat.")
 raw_text <- lexdiv_metrics_text(tokenization, metrics = c("ttr", "rttr"))
+raw_corpus <- lexdiv_text_corpus(data.frame(
+  document_id = c("raw_a", "raw_b"),
+  text = c("One one two.", "Alpha beta gamma."),
+  source_row = 2:3,
+  stringsAsFactors = FALSE
+), metadata_cols = "source_row")
+raw_corpus_results <- lapply(
+  raw_corpus$texts,
+  lexdiv_metrics_text,
+  case = "lower",
+  metrics = "ttr"
+)
 antbnc_fixture <- tempfile(fileext = ".txt")
 writeLines(
   c(
@@ -71,6 +83,11 @@ stopifnot(
   identical(single$status, rep("ok", 3L)),
   identical(raw_text$results$status, rep("ok", 2L)),
   identical(raw_text$results$N, c(6, 6)),
+  identical(names(raw_corpus_results), c("raw_a", "raw_b")),
+  identical(raw_corpus$documents$source_row, 2:3),
+  all(vapply(raw_corpus_results, function(x) {
+    identical(x$results$status, "ok")
+  }, logical(1))),
   identical(flemma_text$results$status, "ok"),
   identical(flemma_text$results$N, 6),
   identical(

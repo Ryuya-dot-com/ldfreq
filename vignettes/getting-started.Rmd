@@ -205,7 +205,8 @@ needed to make claims about those constructs.
 
 ## Multiple documents
 
-Batch input must carry explicit, unique document identifiers.
+`lexdiv_metrics_batch()` accepts only pre-tokenized documents. Its input must
+carry explicit, unique document identifiers.
 
 ```{r}
 documents <- list(
@@ -214,6 +215,130 @@ documents <- list(
 )
 
 lexdiv_metrics_batch(documents, metrics = c("ttr", "hdd"))
+```
+
+Do not pass ordinary prose strings directly to `lexdiv_metrics_batch()`: each
+string would be treated as one already-tokenized item. For a corpus of raw
+texts, apply `lexdiv_metrics_text()` to each named document. Retain the full
+objects when you need the per-document token and preprocessing audits.
+
+```{r}
+texts <- c(
+  document_a = "One short document repeats one word.",
+  document_b = "Another document uses several different words."
+)
+
+raw_documents <- lapply(
+  texts,
+  lexdiv_metrics_text,
+  normalization = "NFC",
+  case = "lower",
+  metrics = c("ttr", "rttr")
+)
+
+raw_documents$document_a$results
+raw_documents$document_a$preprocessing
+```
+
+### Reading a folder of text files
+
+`lexdiv_read_texts()` reads each UTF-8 `.txt` file in a directory as one
+document. Files are ordered alphabetically, filename stems become explicit
+document IDs, and subfolders are not searched unless `recursive = TRUE`.
+Invalid UTF-8, duplicate IDs, unreadable files, embedded NUL bytes, and
+configurable byte-limit violations stop before analysis.
+
+```{r, eval = FALSE}
+essay_dir <- file.path("data", "essays")
+
+corpus <- lexdiv_read_texts(essay_dir)
+corpus$documents
+
+raw_documents <- lapply(
+  corpus$texts,
+  lexdiv_metrics_text,
+  normalization = "NFC",
+  case = "lower",
+  metrics = c("ttr", "rttr")
+)
+
+names(raw_documents)
+raw_documents[[1]]$results
+raw_documents[[1]]$preprocessing
+```
+
+The returned `lexdiv_text_corpus` contains:
+
+- `texts`: one named scalar string per file, including multiline files;
+- `documents`: the document ID, text identity, source basename, byte count,
+  and SHA-256 identity;
+  and
+- `provenance`: discovery choices, byte limits, encoding, and reader-contract
+  identity.
+
+Absolute directories are used only while reading and are not retained or
+printed. Explicit file vectors and caller-supplied `document_ids` are also
+supported; see `?lexdiv_read_texts`.
+
+### Reading essays from Excel
+
+Workbook layout is dataset-specific, so `ldfreq` does not guess which sheet,
+rows, or columns define an essay. Use `readxl` to preserve that choice
+explicitly, reshape to one row per essay, and then validate the result with
+`lexdiv_text_corpus()`.
+
+```{r, eval = FALSE}
+essay_sheet <- "Essays"
+raw_rows <- readxl::read_excel(
+  "data/essays.xlsx",
+  sheet = essay_sheet
+)
+
+essays <- data.frame(
+  document_id = as.character(raw_rows$essay_id),
+  text = as.character(raw_rows$essay_text),
+  source_sheet = essay_sheet,
+  source_row = seq_len(nrow(raw_rows)) + 1L,
+  stringsAsFactors = FALSE
+)
+essays <- essays[!is.na(essays$text), , drop = FALSE]
+
+corpus <- lexdiv_text_corpus(
+  essays,
+  metadata_cols = c("source_sheet", "source_row")
+)
+corpus$documents
+
+raw_documents <- lapply(
+  corpus$texts,
+  lexdiv_metrics_text,
+  case = "lower",
+  metrics = c("ttr", "rttr")
+)
+```
+
+If one essay spans several spreadsheet rows, join those rows explicitly before
+calling `lexdiv_text_corpus()`. Keep the original workbook unchanged and record
+source sheet/row columns in the processed table.
+
+For an ordinary rectangular analysis table, select the columns you need while
+leaving the full audited objects in `raw_documents`:
+
+```{r}
+raw_metric_rows <- do.call(rbind, lapply(names(raw_documents), function(id) {
+  rows <- raw_documents[[id]]$results
+  data.frame(
+    document_id = id,
+    metric_id = rows$metric_id,
+    value = rows$value,
+    status = rows$status,
+    N = rows$N,
+    V = rows$V,
+    stringsAsFactors = FALSE
+  )
+}))
+rownames(raw_metric_rows) <- NULL
+raw_metric_rows
 ```
 
 ## Explicit method profiles
@@ -273,6 +398,8 @@ rules, result schemas, and resource boundaries are installed as JSON contracts:
 contract_files <- c(
   "lexical-diversity-contract.json",
   "ldfreq-preprocessing-contract.json",
+  "ldfreq-text-corpus-contract.json",
+  "ldfreq-text-file-input-contract.json",
   "lexical-diversity-variant-contract.json",
   "lexical-level-profile-contract.json",
   "tubelex-frequency-profile-contract.json"

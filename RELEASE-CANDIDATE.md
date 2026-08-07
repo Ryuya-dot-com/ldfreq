@@ -1,10 +1,19 @@
-# ldfreq 0.1.0 release-candidate boundary
+# ldfreq 0.1.0 release record
+
+Version 0.1.0 has been published as an immutable
+[GitHub release](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.1.0).
+This file preserves the pre-publication candidate boundary as historical
+evidence; the language below does not describe the current development state.
+Development after that release uses version `0.1.0.9000` and package status
+`development`.
+
+## Historical candidate boundary
 
 The earlier immutable core-only version `0.1.0` candidate was not published,
 and its artifacts and go/no-go decision cannot be reused. This replacement
-candidate adds raw-text preprocessing, a TUBELEX public-profile candidate, a
+candidate added raw-text preprocessing, a TUBELEX public-profile candidate, a
 caller-supplied New JACET 8000 level-profile surface, and a separately
-contracted Maas/MTLD variant surface. The exact replacement commit must pass
+contracted Maas/MTLD variant surface. The exact replacement commit had to pass
 the technical, resource, and maintainer decision gates in
 `RELEASE-CHECKLIST.md` before tagging or CRAN submission.
 

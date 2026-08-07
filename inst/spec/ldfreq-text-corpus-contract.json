@@ -1,0 +1,40 @@
+{
+  "$schema": "ldfreq-text-corpus-contract.schema.json",
+  "contract_id": "ldfreq-text-corpus",
+  "contract_version": "0.1.0",
+  "status": "normative",
+  "public_api": true,
+  "data_frame_input": {
+    "unit": "one-row-per-document",
+    "id_column": "explicitly-selected-plain-character",
+    "text_column": "explicitly-selected-plain-valid-utf8-character",
+    "empty_text": "valid-empty-document",
+    "missing_text": "reject",
+    "implicit_id_coercion": false,
+    "implicit_text_coercion": false,
+    "input_order": "preserve",
+    "metadata_retention": "explicitly-selected-columns-only"
+  },
+  "document_identity": {
+    "requirements": ["non-empty", "unique", "valid-utf8"],
+    "duplicate_ids": "reject-before-analysis"
+  },
+  "transformation": {
+    "workbook_read": false,
+    "row_grouping": false,
+    "tokenization": false,
+    "normalization": false,
+    "text_transformation": false
+  },
+  "result": {
+    "class": "lexdiv_text_corpus",
+    "components": ["texts", "documents", "provenance"],
+    "required_document_fields": [
+      "document_id",
+      "text_bytes",
+      "text_sha256"
+    ],
+    "text_retained_in_manifest": false,
+    "text_sha256_algorithm": "sha256"
+  }
+}
