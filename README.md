@@ -27,13 +27,45 @@ public metric set.
 
 ## Installation
 
-Install the current GitHub release candidate with `pak`:
+Install the published v0.1.0 release. This command first installs `pak` from
+CRAN if needed, then installs the version-pinned GitHub release:
 
 ```r
-pak::pak("Ryuya-dot-com/ldfreq")
+install.packages("pak") # once, if it is not already installed
+pak::pak("Ryuya-dot-com/ldfreq@v0.1.0")
 ```
 
-## Basic use
+If `pak` cannot use your GitHub credentials, base R can install the same
+published source archive. Install the two required dependencies first because
+`repos = NULL` does not resolve them automatically:
+
+```r
+install.packages(c("digest", "stringi"))
+install.packages(
+  "https://github.com/Ryuya-dot-com/ldfreq/releases/download/v0.1.0/ldfreq_0.1.0.tar.gz",
+  repos = NULL,
+  type = "source"
+)
+```
+
+The changing development version is available with
+`pak::pak("Ryuya-dot-com/ldfreq")`. Use it only when you intend to test
+unreleased changes.
+
+## Choose your starting point
+
+| Your input | Start with |
+|---|---|
+| One ordinary prose string | `lexdiv_metrics_text()` |
+| One pre-tokenized character vector | `lexdiv_metrics()` |
+| Several ordinary prose strings | `lapply(texts, lexdiv_metrics_text, ...)` |
+| A folder of `.txt` files | `lexdiv_read_texts()` followed by `lapply()` |
+| An Excel/data-frame essay table | Read/reshape explicitly, then use `lexdiv_text_corpus()` |
+| Several pre-tokenized documents | `lexdiv_metrics_batch()` |
+| A TUBELEX frequency profile | Tokenize first, then use `tubelex_frequency_profile()` |
+| A New JACET 8000 level profile | Supply your local list to `new_jacet8000_profile()` |
+
+## 60-second quick start
 
 The core accepts only explicit tokens and performs no hidden case
 conversion, Unicode normalization, token deletion, or lemmatization.
@@ -74,6 +106,14 @@ lexdiv_metrics_text(
   metrics = "ttr"
 )
 ```
+
+These two calls are enough for an initial token-vector or raw-text analysis.
+The sections below add inspection, annotation, reference resources, and
+multi-document handling.
+
+## Detailed workflows
+
+### Inspecting and annotating tokens
 
 Call `lexdiv_tokenize()` separately when you want to inspect or annotate the
 tokens first:
@@ -146,6 +186,8 @@ compatibility claim. NWLC documents manually aligning AntBNC families to the
 selected word list; `ldfreq` therefore supports explicit overrides and reports
 New JACET headword conflicts rather than concealing them.
 
+### Formula-variant sensitivity
+
 Maas log base/scale and sequential-MTLD aggregation variants are a separate
 long-form sensitivity output. Multiple MTLD thresholds can be requested without
 renaming them as different constructs.
@@ -161,6 +203,8 @@ variants[, c("family", "method_id", "reference_label", "value", "status")]
 Rows marked as TAALED-relevant comparators cover only documented formula,
 factorization, and aggregation choices. They do not claim official equivalence
 of preprocessing, missingness, or the licensed Python implementation.
+
+### TUBELEX frequency profiles
 
 TUBELEX values are returned as corpus-relative frequency/prevalence
 measurements with adjacent coverage, not as a universal sophistication score.
@@ -179,6 +223,8 @@ values are therefore expected, and values closer to zero indicate wider
 prevalence. Exact formulas and denominators are documented in
 `?tubelex_frequency_profile` and returned in
 `frequency$provenance$formula_parameters`.
+
+### New JACET 8000 profiles
 
 New JACET 8000 level profiles use a caller-supplied list. `ldfreq` does not
 bundle, reproduce, or download that JACET resource. Exact level proportions use
@@ -231,7 +277,9 @@ diagnostics. Provenance retains the source basename but neither stores nor
 prints its absolute directory. The list remains outside the package; users are responsible for
 obtaining and using their copy under the applicable terms.
 
-For multiple documents, use an explicitly named list:
+### Multiple documents
+
+For multiple **pre-tokenized** documents, use an explicitly named list:
 
 ```r
 documents <- list(
@@ -240,6 +288,132 @@ documents <- list(
 )
 
 lexdiv_metrics_batch(documents, metrics = c("ttr", "hdd"))
+```
+
+Do not pass ordinary prose strings directly to `lexdiv_metrics_batch()`: each
+string would be treated as one already-tokenized item. For several raw texts,
+apply `lexdiv_metrics_text()` to each named document instead:
+
+```r
+texts <- c(
+  document_a = "One short document repeats one word.",
+  document_b = "Another document uses several different words."
+)
+
+raw_documents <- lapply(
+  texts,
+  lexdiv_metrics_text,
+  normalization = "NFC",
+  case = "lower",
+  metrics = c("ttr", "rttr")
+)
+
+# Keep these full objects: each one retains its token audit and preprocessing.
+raw_documents$document_a$results
+raw_documents$document_a$preprocessing
+```
+
+#### Reading a folder of text files
+
+`lexdiv_read_texts()` reads each UTF-8 `.txt` file in a directory as one
+document. Files are ordered alphabetically, filename stems become explicit
+document IDs, and subfolders are not searched unless `recursive = TRUE`.
+Invalid UTF-8, duplicate IDs, unreadable files, embedded NUL bytes, and
+configurable per-file or total byte-limit violations stop before analysis.
+
+```r
+essay_dir <- file.path("data", "essays")
+
+corpus <- lexdiv_read_texts(essay_dir)
+corpus$documents
+
+raw_documents <- lapply(
+  corpus$texts,
+  lexdiv_metrics_text,
+  normalization = "NFC",
+  case = "lower",
+  metrics = c("ttr", "rttr")
+)
+
+names(raw_documents)
+raw_documents[[1]]$results
+raw_documents[[1]]$preprocessing
+```
+
+The returned `lexdiv_text_corpus` contains:
+
+- `texts`: one named scalar string per file, including multiline files;
+- `documents`: the document ID, text identity, source basename, byte count,
+  and SHA-256 identity;
+  and
+- `provenance`: discovery choices, byte limits, encoding, and reader-contract
+  identity.
+
+Absolute directories are used only while reading and are not retained or
+printed. Explicit file vectors and caller-supplied `document_ids` are also
+supported; see `?lexdiv_read_texts`.
+
+#### Reading essays from Excel
+
+Workbook layout is dataset-specific, so `ldfreq` does not guess which sheet,
+rows, or columns define an essay. Use `readxl` to preserve that choice
+explicitly, reshape to one row per essay, and then validate the result with
+`lexdiv_text_corpus()`:
+
+```r
+essay_sheet <- "Essays"
+raw_rows <- readxl::read_excel(
+  "data/essays.xlsx",
+  sheet = essay_sheet
+)
+
+essays <- data.frame(
+  document_id = as.character(raw_rows$essay_id),
+  text = as.character(raw_rows$essay_text),
+  source_sheet = essay_sheet,
+  source_row = seq_len(nrow(raw_rows)) + 1L,
+  stringsAsFactors = FALSE
+)
+essays <- essays[!is.na(essays$text), , drop = FALSE]
+
+corpus <- lexdiv_text_corpus(
+  essays,
+  metadata_cols = c("source_sheet", "source_row")
+)
+corpus$documents
+
+raw_documents <- lapply(
+  corpus$texts,
+  lexdiv_metrics_text,
+  case = "lower",
+  metrics = c("ttr", "rttr")
+)
+```
+
+If one essay spans several spreadsheet rows, join those rows explicitly before
+calling `lexdiv_text_corpus()`—for example with `dplyr::group_by()` and
+`summarise(text = paste(paragraph, collapse = "\n"))`. Keep the original
+workbook unchanged and record source sheet/row columns in the processed table.
+
+For an ordinary rectangular analysis table, select the columns you need while
+leaving the full audited objects in `raw_documents`:
+
+```r
+# Optional compact table for analysis across documents.
+raw_metric_rows <- do.call(rbind, lapply(names(raw_documents), function(id) {
+  rows <- raw_documents[[id]]$results
+  data.frame(
+    document_id = id,
+    metric_id = rows$metric_id,
+    value = rows$value,
+    status = rows$status,
+    N = rows$N,
+    V = rows$V,
+    stringsAsFactors = FALSE
+  )
+}))
+rownames(raw_metric_rows) <- NULL
+raw_metric_rows
 ```
 
 Parameter variants are represented as explicit specifications rather than
@@ -281,6 +455,8 @@ repository checkout:
 contract_files <- c(
   "lexical-diversity-contract.json",
   "ldfreq-preprocessing-contract.json",
+  "ldfreq-text-corpus-contract.json",
+  "ldfreq-text-file-input-contract.json",
   "lexical-diversity-variant-contract.json",
   "lexical-level-profile-contract.json",
   "tubelex-frequency-profile-contract.json"

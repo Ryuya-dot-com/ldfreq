@@ -1,7 +1,12 @@
-# Release-candidate boundary
+# Development and release boundary
+
+Version 0.1.0 has been published. The repository now uses development version
+`0.1.0.9000`; the v0.1.0 publication instructions below are retained as a
+historical checklist rather than a statement that publication is still
+pending.
 
 The frozen lexical-diversity core remains resource-independent and accepts
-ordered pre-tokenized vectors. The `0.1.0` release candidate adds separate
+ordered pre-tokenized vectors. The published `0.1.0` release added separate
 raw-text preprocessing and TUBELEX profile APIs under their own versioned
 contracts. A third contract exposes selected Maas and sequential-MTLD
 sensitivity variants; a fourth defines caller-supplied lexical-level profiles.
@@ -26,7 +31,7 @@ approximation rather than compatibility. New JACET integration must retain
 per-token AntBNC/override/identity rules and selectable headword-conflict
 resolution.
 
-## Before publishing version 0.1.0
+## Historical v0.1.0 publication checklist
 
 - exercise the package on R-release and R-devel across Linux, macOS, and Windows;
 - preserve the frozen eleven-method public API and lifecycle policy;

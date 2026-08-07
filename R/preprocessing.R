@@ -770,6 +770,16 @@ lexdiv_flemmatize <- function(
 #' @inheritParams lexdiv_tokenize
 #' @inheritParams lexdiv_metrics
 #'
+#' @section Multiple raw texts:
+#' `lexdiv_metrics_text()` intentionally processes one text at a time so that
+#' each result retains its own token and preprocessing audits. For a named
+#' character vector of raw documents, use
+#' `lapply(texts, lexdiv_metrics_text, ...)`. Do not pass ordinary prose
+#' directly to [lexdiv_metrics_batch()]; that function accepts pre-tokenized
+#' document vectors and does not tokenize its input. Use [lexdiv_text_corpus()]
+#' for a one-row-per-document data frame, or [lexdiv_read_texts()] for explicit
+#' files or a directory of UTF-8 `.txt` files, before applying this function.
+#'
 #' @return A `lexdiv_text_results` list with `results`, `token_audit`, and
 #'   `preprocessing` components.
 #' @export

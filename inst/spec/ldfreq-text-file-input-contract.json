@@ -1,0 +1,50 @@
+{
+  "$schema": "ldfreq-text-file-input-contract.schema.json",
+  "contract_id": "ldfreq-text-file-input",
+  "contract_version": "0.1.0",
+  "status": "normative",
+  "public_api": true,
+  "selection": {
+    "input_modes": ["explicit-files", "one-directory"],
+    "directory_default_pattern": "[.]txt$",
+    "directory_ignore_case": true,
+    "directory_default_recursive": false,
+    "directory_order": "base-r-list.files-alphabetical",
+    "explicit_file_order": "caller-order",
+    "duplicate_resolved_paths": "reject"
+  },
+  "document_identity": {
+    "default": "filename-stem",
+    "explicit_ids_supported": true,
+    "requirements": ["non-empty", "unique", "valid-utf8"],
+    "duplicate_ids": "reject-before-read"
+  },
+  "decoding": {
+    "encoding": "UTF-8",
+    "newline_transformation": false,
+    "bom_transformation": false,
+    "embedded_nul": "reject",
+    "invalid_utf8": "reject"
+  },
+  "bounds": {
+    "default_max_file_bytes": 10485760,
+    "default_max_total_bytes": 104857600,
+    "violation": "reject-before-analysis"
+  },
+  "result": {
+    "class": "lexdiv_text_corpus",
+    "components": ["texts", "documents", "provenance"],
+    "file_manifest_fields": [
+      "document_id",
+      "text_bytes",
+      "text_sha256",
+      "source_file",
+      "source_bytes",
+      "source_sha256"
+    ],
+    "absolute_path_retained": false,
+    "text_tokenized": false,
+    "corpus_contract_id": "ldfreq-text-corpus",
+    "file_sha256_algorithm": "sha256"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ldfreq-text-file-input-contract.schema.json",
+  "title": "ldfreq text-file input contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "contract_id",
+    "contract_version",
+    "status",
+    "public_api",
+    "selection",
+    "document_identity",
+    "decoding",
+    "bounds",
+    "result"
+  ],
+  "properties": {
+    "$schema": {"const": "ldfreq-text-file-input-contract.schema.json"},
+    "contract_id": {"const": "ldfreq-text-file-input"},
+    "contract_version": {"const": "0.1.0"},
+    "status": {"const": "normative"},
+    "public_api": {"const": true},
+    "selection": {"type": "object"},
+    "document_identity": {"type": "object"},
+    "decoding": {"type": "object"},
+    "bounds": {"type": "object"},
+    "result": {"type": "object"}
+  }
+}
