@@ -1,13 +1,14 @@
-# Deferred metric candidates
+# Metric admission records
 
-This directory preserves design evidence that is intentionally outside the
-installed normative lexical-diversity contract.
+This directory preserves design and admission evidence for metrics whose
+lifecycle changed while the `0.1.0` contract was being frozen.
 
-`expected-ttr-d-deferred.json` records the deterministic expected-TTR D method
-that appeared as `design-review` in contract `0.1.0-draft.5`. The v0.1 core
-defers this candidate without rejecting its numerical evidence. It is not
-exported, installed as a normative method, called VOCD, or claimed compatible
-with CLAN or the historical Python Monte Carlo procedure.
+`expected-ttr-d-admission.json` records the decision to admit the deterministic
+expected-TTR D method to the recomposed `0.1.0` core. It supersedes the
+2026-08-03 deferral decision after the public implementation, frozen contract,
+independent reference values, spectrum audit, and diagnostics were completed.
+The method is not called VOCD and is not claimed compatible with CLAN or the
+historical Python Monte Carlo procedure.
 
 The exact predecessor contract remains available in Git history at commit
 `d10bcae4ffed6c09506b5e9ddd0771633f4f3703`, where its SHA-256 is

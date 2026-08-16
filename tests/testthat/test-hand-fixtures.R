@@ -113,6 +113,12 @@ test_that("all frozen hand assertions pass through the package API", {
       if (!is.null(parameters$sample_size)) {
         call$sample_size <- parameters$sample_size
       }
+      if (!is.null(parameters$sample_sizes)) {
+        call$expected_ttr_sample_sizes <- unlist(
+          parameters$sample_sizes,
+          use.names = FALSE
+        )
+      }
 
       result <- do.call(fixture_api, call)
       context <- sprintf("case=%s metric=%s", case$id, assertion$metric_id)
@@ -150,5 +156,5 @@ test_that("all frozen hand assertions pass through the package API", {
     }
   }
 
-  expect_identical(assertion_count, 50L)
+  expect_identical(assertion_count, 54L)
 })

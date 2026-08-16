@@ -1,11 +1,12 @@
 # Release-candidate boundary
 
-The frozen lexical-diversity core remains resource-independent and accepts
-ordered pre-tokenized vectors. The `0.1.0` release candidate adds separate
+The lexical-diversity core remains resource-independent and accepts ordered
+pre-tokenized vectors. The recomposed `0.1.0` release candidate freezes twelve
+methods, including the deterministic expected-TTR D fit, and adds separate
 raw-text preprocessing and TUBELEX profile APIs under their own versioned
 contracts. A third contract exposes selected Maas and sequential-MTLD
 sensitivity variants; a fourth defines caller-supplied lexical-level profiles.
-All leave the frozen core registry unchanged. The package does
+These extensions leave the twelve-method core contract unchanged. The package does
 not claim compatibility with TAALES, TAALED, CLAN VOCD, or another package's
 same-named variant beyond each row's explicit comparison scope.
 
@@ -29,10 +30,11 @@ resolution.
 ## Before publishing version 0.1.0
 
 - exercise the package on R-release and R-devel across Linux, macOS, and Windows;
-- preserve the frozen eleven-method public API and lifecycle policy;
+- preserve the frozen twelve-method public API and lifecycle policy;
 - complete an online `R CMD check --as-cran` with release metadata;
 - review documentation, examples, spelling, URLs, and package contents;
-- preserve the recorded deferral of expected-TTR D from v0.1;
+- preserve the expected-TTR D method identity, deterministic fit, diagnostics,
+  and explicit non-compatibility boundary with CLAN VOCD;
 - complete the steps in [`RELEASE-CHECKLIST.md`](RELEASE-CHECKLIST.md) and
   archive the resulting release evidence.
 

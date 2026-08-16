@@ -104,6 +104,7 @@
     mattr = "Moving-average TTR",
     mtld = "Measure of textual lexical diversity",
     hdd = "HD-D on expected-TTR scale",
+    expected_ttr_d = "Deterministic expected-TTR D fit",
     yule_k = "Yule's K",
     yule_i = "Yule's I"
   )
@@ -117,19 +118,22 @@
     mattr = "mean TTR of all step-one overlapping windows",
     mtld = "mean forward/reverse tokens per sequential factor",
     hdd = "expected sample types divided by sample size",
+    expected_ttr_d = "D fitted to exact finite-population expected TTR",
     yule_k = "10000 * (M2 - N) / N^2",
     yule_i = "V^2 / (M2 - V)"
   )
   directions <- c(
     ttr = "higher", rttr = "higher", cttr = "higher", herdan = "higher",
     maas = "lower", msttr = "higher", mattr = "higher", mtld = "higher",
-    hdd = "higher", yule_k = "lower", yule_i = "higher"
+    hdd = "higher", expected_ttr_d = "higher", yule_k = "lower",
+    yule_i = "higher"
   )
   scales <- c(
     ttr = "[0, 1]", rttr = "[0, Inf)", cttr = "[0, Inf)",
     herdan = "[0, 1]", maas = "[0, 1/ln(2)]", msttr = "[0, 1]",
     mattr = "[0, 1]", mtld = "[0, Inf)", hdd = "[0, 1]",
-    yule_k = "[0, 10000)", yule_i = "[0, Inf)"
+    expected_ttr_d = "(0, Inf)", yule_k = "[0, 10000)",
+    yule_i = "[0, Inf)"
   )
   methods <- lapply(metric_ids, function(metric_id) {
     parameter <- switch(
@@ -138,6 +142,7 @@
       mattr = "window_length",
       mtld = "threshold",
       hdd = "sample_size",
+      expected_ttr_d = "sample_sizes",
       NA_character_
     )
     default_parameters <- switch(
@@ -146,6 +151,7 @@
       mattr = list(window_length = 50L),
       mtld = list(threshold = 0.72),
       hdd = list(sample_size = 42L),
+      expected_ttr_d = list(sample_sizes = 35:50),
       list()
     )
     list(
@@ -204,6 +210,9 @@
     hdd = list(sample_size = .profile_canonical_integer(
       .hdd_sample_size(parameters)
     )),
+    expected_ttr_d = list(
+      sample_sizes = .expected_ttr_d_sample_sizes(parameters)
+    ),
     .basic_empty_parameters(parameters)
   )
 }
@@ -214,10 +223,20 @@
   }
   pieces <- vapply(names(parameters), function(parameter_name) {
     value <- parameters[[parameter_name]]
-    if (!is.numeric(value) || length(value) != 1L || !is.finite(value)) {
-      stop("Internal error: v0.1 plan parameters must be finite numeric scalars.", call. = FALSE)
+    if (
+      !is.numeric(value) || length(value) == 0L ||
+        anyNA(value) || any(!is.finite(value))
+    ) {
+      stop("Internal error: v0.1 plan parameters must be finite numeric values.", call. = FALSE)
     }
-    paste0(parameter_name, "=", sprintf("%a", as.double(value)))
+    encoded <- vapply(as.double(value), function(item) {
+      sprintf("%a", item)
+    }, character(1L))
+    if (length(encoded) == 1L) {
+      paste0(parameter_name, "=", encoded)
+    } else {
+      paste0(parameter_name, "=c(", paste(encoded, collapse = ","), ")")
+    }
   }, character(1L))
   paste0("{", paste(pieces, collapse = ";"), "}")
 }
@@ -482,7 +501,7 @@ lexdiv_plan <- function(
   custom_specs <- .profile_specs_argument(specs)
   grid_objects <- .profile_grids_argument(grids)
   preset_candidate_count <- sum(vapply(presets, function(preset_id) {
-    if (identical(preset_id, "canonical")) 11 else 13
+    if (identical(preset_id, "canonical")) 12 else 14
   }, numeric(1L)))
   grid_candidate_count <- sum(vapply(
     grid_objects,
@@ -646,9 +665,9 @@ lexdiv_presets <- function() {
   data.frame(
     preset_id = c("canonical", "length_50_100"),
     preset_version = rep.int("0.1.0", 2L),
-    specification_count = c(11L, 13L),
+    specification_count = c(12L, 14L),
     description = c(
-      "The eleven frozen methods at their canonical defaults.",
+      "The twelve frozen methods at their canonical defaults.",
       "Canonical plus MSTTR and MATTR at length 100."
     ),
     stringsAsFactors = FALSE,
@@ -664,7 +683,8 @@ lexdiv_presets <- function() {
     msttr = arguments$segment_length <- parameters$segment_length,
     mattr = arguments$window_length <- parameters$window_length,
     mtld = arguments$mtld_threshold <- parameters$threshold,
-    hdd = arguments$sample_size <- parameters$sample_size
+    hdd = arguments$sample_size <- parameters$sample_size,
+    expected_ttr_d = arguments$expected_ttr_sample_sizes <- parameters$sample_sizes
   )
   result <- do.call(lexdiv_metrics, arguments)
   if (!identical(result$method_id, specification$method_id)) {

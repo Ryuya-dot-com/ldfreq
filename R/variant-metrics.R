@@ -1,6 +1,6 @@
 # Explicit comparison variants for Maas and sequential MTLD.
 #
-# These methods live outside the frozen eleven-method core. They provide a
+# These methods live outside the frozen twelve-method core. They provide a
 # bounded sensitivity surface without changing lexdiv_metrics(), its defaults,
 # or its result contract.
 

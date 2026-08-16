@@ -1,0 +1,42 @@
+{
+  "schema_version": "0.1.0",
+  "record_id": "ldfreq-expected-ttr-d-admission-v1",
+  "recorded_on": "2026-08-16",
+  "decision": "admit-to-0.1.0-core",
+  "supersedes": {
+    "record_id": "ldfreq-expected-ttr-d-deferred-v1",
+    "recorded_on": "2026-08-03",
+    "decision": "defer-from-0.1.0-core"
+  },
+  "method": {
+    "metric_id": "expected_ttr_d",
+    "method_id": "expected_ttr_d_hypergeom_fit_v1",
+    "contract_id": "ldfreq-lexical-diversity-core",
+    "contract_version": "0.1.0",
+    "stability": "freeze-ready",
+    "public_api": true,
+    "installed_normative_contract": true
+  },
+  "definition_summary": {
+    "expected_curve": "exact finite-population expected TTR without replacement",
+    "model": "g(n,D) = 2 / (sqrt(1 + 2*n/D) + 1)",
+    "objective": "unweighted sum of squared residuals over strictly increasing requested sample sizes",
+    "optimizer": "analytic derivative with respect to log(D), bracketed by pointwise inverse solutions and bisected exactly 100 times",
+    "rng": "none",
+    "arbitrary_parameter_cap": "none"
+  },
+  "admission_evidence": [
+    "independently written R and Python reference implementations agreed",
+    "five analytic reference fixtures were recorded",
+    "5232 admissible frequency spectra produced no derivative-crossing failure",
+    "public API tests cover reference values, permutation invariance, short documents, all-hapax boundaries, and invalid parameters",
+    "the installed normative contract freezes fit residual, fitted curve, iteration, derivative, and near-saturation diagnostics"
+  ],
+  "release_evidence_required": [
+    "R-release and R-devel checks on Linux",
+    "R-release checks on macOS and Windows",
+    "exact source-archive smoke test and artifact hash verification"
+  ],
+  "identity_limit": "This is a deterministic D-curve fit to exact finite-population hypergeometric expected TTR. It is neither CLAN VOCD nor claimed compatible with CLAN or a historical Monte Carlo implementation.",
+  "maintainer_decision": "approved for the recomposed 0.1.0 candidate subject to the ordinary cross-platform release gate"
+}

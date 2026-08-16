@@ -3,9 +3,9 @@
   "contract_id": "ldfreq-lexical-diversity-core",
   "contract_version": "0.1.0",
   "status": "normative",
-  "reviewed_on": "2026-08-03",
+  "reviewed_on": "2026-08-16",
   "normative": true,
-  "normative_authority": "This contract and its hand fixtures are authoritative for the eleven-method core; no Python, R, Java, Web, koRpus, or quanteda implementation is the sole oracle.",
+  "normative_authority": "This contract and its hand fixtures are authoritative for the twelve-method core; no Python, R, Java, Web, koRpus, or quanteda implementation is the sole oracle.",
   "input_contract": {
     "unit": "one document represented as an ordered sequence of already-tokenized Unicode strings",
     "order": "preserve input token order exactly",
@@ -93,7 +93,7 @@
     }
   },
   "r_profile_contract": {
-    "scope": "optional R orchestration over the eleven normative core methods; it does not admit deferred experimental methods or change a core metric result",
+    "scope": "optional R orchestration over the twelve normative core methods; it does not change a core metric result",
     "admitted_stability": ["freeze-ready"],
     "identity_model": {
       "metric_id": "construct or metric family",
@@ -111,7 +111,7 @@
         "default_quality_floor_tokens",
         "identity_key"
       ],
-      "normalization": "materialize every user-settable default in method-defined parameter order; store positive integer-valued parameters as canonical R integers when they do not exceed .Machine$integer.max and as finite doubles otherwise, while non-integer parameters remain finite binary64 numeric scalars",
+      "normalization": "materialize every user-settable default in method-defined parameter order; store positive integer-valued scalar or vector parameters as canonical R integers when they do not exceed .Machine$integer.max and as finite doubles otherwise, while non-integer parameters remain finite binary64 numeric values",
       "identity_key_fields": [
         "metric_contract_id",
         "metric_contract_version",
@@ -119,7 +119,7 @@
         "normalized_parameters"
       ],
       "identity_key_serialization": "metric_contract_id|metric_contract_version|method_id|parameter_text encoded as UTF-8 without a trailing newline",
-      "parameter_serialization": "{} for no parameters; otherwise {name=%a;...} in method-defined order, where %a is R sprintf hexadecimal binary64 formatting",
+      "parameter_serialization": "{} for no parameters; otherwise {name=%a;...} in method-defined order, where %a is R sprintf hexadecimal binary64 formatting and a vector is serialized as c(%a,%a,...) without spaces",
       "specification_id_algorithm": "metric_id followed by '-' and the lowercase MD5 hex digest of identity_key UTF-8 bytes",
       "hash_role": "deterministic reproducibility label, not authentication; request_id and default_quality_floor_tokens are excluded"
     },
@@ -159,14 +159,14 @@
       {
         "preset_id": "canonical",
         "preset_version": "0.1.0",
-        "specification_count": 11,
+        "specification_count": 12,
         "resolution": "one default specification for every freeze-ready metric in contract order",
         "additions": []
       },
       {
         "preset_id": "length_50_100",
         "preset_version": "0.1.0",
-        "specification_count": 13,
+        "specification_count": 14,
         "resolution": "canonical followed by the two additions in listed order",
         "additions": [
           {
@@ -411,6 +411,54 @@
       "computational_domain": {"condition": "N >= requested sample_size", "otherwise": "too_short_for_requested_parameter"},
       "quality_floor_tokens": 42,
       "scale": {"lower_bound": 0, "upper_bound": 1, "bounded": true},
+      "direction": "higher"
+    },
+    {
+      "metric_id": "expected_ttr_d",
+      "method_id": "expected_ttr_d_hypergeom_fit_v1",
+      "label": "Deterministic expected-TTR D fit",
+      "stability": "freeze-ready",
+      "construct": "D parameter fitted to an exact finite-population sample-size/TTR curve",
+      "definition": {
+        "expected_curve": "y_n = sum_t(1 - choose(N-f_t,n)/choose(N,n)) / n",
+        "probability_evaluation": "group types by increasing integer frequency; for each frequency compute the absent probability by multiplying ((N-f-i)/(N-i)) for i=0,...,n-1 in increasing order; accumulate spectrum_count*(1-absent) in increasing frequency order",
+        "model_stable_form": "g(n,D) = 2 / (sqrt(1 + 2*n/D) + 1)",
+        "objective": "unweighted sum over requested sample sizes of (g(n,D)-y_n)^2",
+        "domain_for_D": "0 < D < infinity; no arbitrary upper or lower censoring",
+        "optimizer": [
+          "for each 0<y_n<1 compute D_n = n*y_n*y_n/(2*(1-y_n)) in the written operation order",
+          "bracket log(D) by log(min(D_n)) and log(max(D_n))",
+          "bisect the analytic derivative with respect to log(D) exactly 100 times",
+          "iterate sample sizes in increasing order and accumulate terms left to right",
+          "a zero derivative moves the upper bound, selecting the smaller D in a tie",
+          "return exp(lower + (upper-lower)/2)"
+        ],
+        "legacy_variant": "vocd_d_mc_python_v0 uses random subsampling and a censored grid; it is a distinct historical compatibility method",
+        "identity_limit": "this is neither CLAN VOCD nor claimed to be the infinite-repetition limit of CLAN output",
+        "validation_tolerance": "absolute 1e-12 plus relative 1e-12 for binary64 reference values"
+      },
+      "parameters": {
+        "sample_sizes": {
+          "type": "strictly_increasing_integer_vector",
+          "minimum_element": 2,
+          "default": [35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
+        },
+        "rng": {"value": "none", "user_settable": false},
+        "optimizer_iterations": {"value": 100, "user_settable": false}
+      },
+      "computational_domain": {
+        "condition": "N >= max(requested sample_sizes) and all expected TTR values are in (0,1)",
+        "short_document": "too_short_for_requested_parameter",
+        "all_hapax": "unbounded_high",
+        "invalid_numeric_fit": "non_convergence"
+      },
+      "diagnostics": [
+        "fit_sse", "fit_rmse", "sample_sizes", "expected_ttr",
+        "fitted_ttr", "optimizer_iterations", "derivative_residual",
+        "near_saturation"
+      ],
+      "quality_floor_tokens": 50,
+      "scale": {"lower_bound": 0, "lower_bound_inclusive": false, "upper_bound": null, "bounded": false},
       "direction": "higher"
     },
     {

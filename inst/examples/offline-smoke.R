@@ -7,6 +7,10 @@ documents <- list(
 )
 
 single <- lexdiv_metrics(tokens, metrics = c("ttr", "rttr", "yule_k"))
+expected_d <- lexdiv_metrics(
+  rep(tokens, 10L),
+  metrics = "expected_ttr_d"
+)
 tokenization <- lexdiv_tokenize("The cat saw the other cat.")
 raw_text <- lexdiv_metrics_text(tokenization, metrics = c("ttr", "rttr"))
 antbnc_fixture <- tempfile(fileext = ".txt")
@@ -54,6 +58,15 @@ variants <- lexdiv_variant_metrics(
   mtld_thresholds = c(0.72, 0.92)
 )
 batch <- lexdiv_metrics_batch(documents, metrics = c("ttr", "hdd"), sample_size = 2)
+tidy_documents <- lexdiv_as_documents(data.frame(
+  document_id = c("a", "a", "b"),
+  token = c("one", "two", "three"),
+  stringsAsFactors = FALSE
+))
+wide <- lexdiv_widen(
+  lexdiv_metrics_batch(tidy_documents, metrics = c("ttr", "maas")),
+  values_from = "value"
+)
 
 methods <- lexdiv_methods()
 mattr_method <- methods$method_id[methods$metric_id == "mattr"]
@@ -69,6 +82,8 @@ screen <- lexdiv_screen(profile_batch, floors = c(tokens_4 = 4L))
 
 stopifnot(
   identical(single$status, rep("ok", 3L)),
+  identical(expected_d$status, "ok"),
+  is.finite(expected_d$value),
   identical(raw_text$results$status, rep("ok", 2L)),
   identical(raw_text$results$N, c(6, 6)),
   identical(flemma_text$results$status, "ok"),
@@ -92,6 +107,8 @@ stopifnot(
   all(variants$status == "ok"),
   nrow(batch) == 4L,
   all(batch$status == "ok"),
+  identical(names(wide), c("document_id", "ttr", "maas")),
+  identical(wide$document_id, c("a", "b")),
   identical(profile$status, "ok"),
   nrow(profile_batch) == 2L,
   all(profile_batch$status == "ok"),

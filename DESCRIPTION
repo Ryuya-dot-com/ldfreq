@@ -9,7 +9,7 @@ Authors@R:
         email = "komuro.4121@gmail.com",
         role = c("aut", "cre")
     )
-Description: Computes versioned lexical-diversity metrics from ordered token
+Description: Computes twelve versioned lexical-diversity metrics from ordered token
     vectors and from raw English text. Results record the selected formula,
     parameters, token and type counts, and preprocessing choices such as Unicode
     normalization, case handling, lemmatization, and content-word selection.
@@ -18,6 +18,8 @@ Description: Computes versioned lexical-diversity metrics from ordered token
     and cumulative token- and type-weighted coverage without redistributing the
     list. A bundled, versioned TUBELEX aggregate provides frequency, video
     prevalence, and channel prevalence profiles with explicit match coverage.
+    Convenience adapters accept tidy token tables and 'quanteda' token objects;
+    deterministic wide reshaping and base-R plots support analysis workflows.
 License: MIT + file LICENSE
 URL: https://github.com/Ryuya-dot-com/ldfreq
 BugReports: https://github.com/Ryuya-dot-com/ldfreq/issues
