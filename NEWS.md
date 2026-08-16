@@ -2,9 +2,17 @@
 
 ## Initial release
 
-- Added eleven versioned lexical-diversity metrics for ordered,
+- Added twelve versioned lexical-diversity metrics for ordered,
   pre-tokenized input: TTR, RTTR/Guiraud, CTTR, Herdan's C, Maas
-  a-squared, MSTTR, MATTR, MTLD, HD-D, Yule's K, and Yule's I.
+  a-squared, MSTTR, MATTR, MTLD, HD-D, deterministic expected-TTR D,
+  Yule's K, and Yule's I.
+- Added `lexdiv_as_documents()` for named lists, tidy one-token-per-row data
+  frames, and `quanteda` tokens objects without adding a runtime dependency on
+  `quanteda`.
+- Added `lexdiv_widen()` as a deterministic, computation-free long-to-wide
+  transformation that keeps profile parameter requests distinct.
+- Added base-R plot methods for metric, batch, profile, screen, TUBELEX
+  coverage, and existing New JACET 8000 results.
 - Added `lexdiv_tokenize()` and `lexdiv_metrics_text()` for raw English text.
   Unicode normalization, case handling, number retention, token offsets, and
   lexical-unit selection are retained in preprocessing provenance.
@@ -35,5 +43,7 @@
   they are not direct measures of proficiency, writing quality, validity, or
   reliability. Resource-relative frequency and level profiles likewise require
   coverage-aware, corpus-specific interpretation.
-- Kept the separately defined expected-TTR curve-fit D method outside the
-  version 0.1.0 public metric set.
+- Added the deterministic expected-TTR curve-fit D under the explicit method
+  ID `expected_ttr_d_hypergeom_fit_v1`. It uses exact finite-population
+  expected TTR values, no random sampling, and makes no CLAN VOCD identity
+  claim.

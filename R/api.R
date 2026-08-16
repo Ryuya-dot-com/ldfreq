@@ -47,6 +47,12 @@
     quality_floor_tokens = 42,
     function_name = ".metric_hdd"
   ),
+  expected_ttr_d = list(
+    method_id = "expected_ttr_d_hypergeom_fit_v1",
+    quality_floor_tokens = 50,
+    function_name = ".metric_expected_ttr_d",
+    unavailable_diagnostics_name = ".expected_ttr_d_unavailable_diagnostics"
+  ),
   yule_k = list(
     method_id = "yule_k_m2_tokens_v1",
     quality_floor_tokens = 100,
@@ -62,7 +68,8 @@
 #' Frozen lexical-diversity metric identifiers
 #'
 #' Returns the metric identifiers admitted to the current core implementation.
-#' The separately defined `expected_ttr_d` method is not included in v0.1.
+#' The deterministic `expected_ttr_d` method fits a D curve to exact
+#' finite-population expected TTR values. It is not CLAN VOCD.
 #'
 #' @return A character vector in the default result order.
 #' @export
@@ -75,13 +82,15 @@ lexdiv_metric_ids <- function() {
     segment_length,
     window_length,
     mtld_threshold,
-    sample_size) {
+    sample_size,
+    expected_ttr_sample_sizes) {
   switch(
     metric_id,
     msttr = list(segment_length = segment_length),
     mattr = list(window_length = window_length),
     mtld = list(threshold = mtld_threshold),
     hdd = list(sample_size = sample_size),
+    expected_ttr_d = list(sample_sizes = expected_ttr_sample_sizes),
     list()
   )
 }
@@ -101,6 +110,7 @@ lexdiv_metric_ids <- function() {
     ),
     mtld = .mtld_parameters(parameters),
     hdd = .hdd_sample_size(parameters),
+    expected_ttr_d = .expected_ttr_d_sample_sizes(parameters),
     .basic_empty_parameters(parameters)
   )
   invisible(NULL)
@@ -154,6 +164,9 @@ lexdiv_metric_ids <- function() {
 #'   frozen comparator is strict `<`, with a minimum complete-factor length of 10.
 #' @param sample_size Requested without-replacement sample size for HD-D. It is
 #'   never reduced to the document length.
+#' @param expected_ttr_sample_sizes Strictly increasing sample sizes used by
+#'   the deterministic expected-TTR D curve fit. They are never reduced to the
+#'   document length. The method uses no random sampling and is not CLAN VOCD.
 #'
 #' @return A `lexdiv_results` data frame with one row per requested metric and
 #'   list-columns for requested/effective parameters and diagnostics. Metric
@@ -170,7 +183,8 @@ lexdiv_metrics <- function(
     segment_length = 50L,
     window_length = 50L,
     mtld_threshold = 0.72,
-    sample_size = 42L) {
+    sample_size = 42L,
+    expected_ttr_sample_sizes = 35:50) {
   if (
     !is.character(metrics) ||
       is.object(metrics) ||
@@ -204,7 +218,8 @@ lexdiv_metrics <- function(
       segment_length = segment_length,
       window_length = window_length,
       mtld_threshold = mtld_threshold,
-      sample_size = sample_size
+      sample_size = sample_size,
+      expected_ttr_sample_sizes = expected_ttr_sample_sizes
     )
   })
   for (index in seq_along(metrics)) {

@@ -113,10 +113,11 @@ API. The identity hierarchy is metric family, frozen method, and normalized
 method-plus-parameter specification.
 }
 \details{
-The \code{canonical} preset contains the eleven frozen methods at their default
-parameters. The \code{length_50_100} preset contains those eleven requests plus
-MSTTR at segment length 100 and MATTR at window length 100. It has thirteen
-specifications: MTLD is computed only once because a 50- versus 100-token quality
+The \code{canonical} preset contains the twelve frozen methods at their default
+parameters. The \code{length_50_100} preset contains those twelve requests plus
+MSTTR at segment length 100 and MATTR at window length 100. It has fourteen
+specifications: MTLD is
+computed only once because a 50- versus 100-token quality
 screen does not change its calculation.
 
 Duplicate normalized method/parameter specifications from presets, explicit

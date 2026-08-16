@@ -463,6 +463,10 @@ provenance <- list(
         "API, not official TAALED compatibility."
       ),
       paste(
+        "Expected-TTR D is a deterministic exact-curve fit and is not",
+        "CLAN VOCD compatibility."
+      ),
+      paste(
         "TUBELEX redistribution relies on the maintainer's documented",
         "interpretation of the pinned repository-level BSD-3-Clause license;",
         "no independent legal opinion was obtained."

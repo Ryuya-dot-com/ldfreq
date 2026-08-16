@@ -129,7 +129,8 @@ claim must name and verify a separate controlled build procedure.
       unless the exact method crosswalk and legally publishable evidence are
       archived.
 - [ ] Review lifecycle labels, README scope, vignette wording, NEWS, and the
-      deferred `expected_ttr_d` decision for consistency with the candidate.
+      admitted `expected_ttr_d` contract for consistency with the candidate;
+      verify that it remains deterministic and is not described as CLAN VOCD.
 
 ## 5. Publish and archive
 

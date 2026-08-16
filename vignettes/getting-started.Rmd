@@ -186,12 +186,22 @@ than a smaller implicit window.
 lexdiv_metrics(tokens, metrics = "mattr", window_length = 50L)
 ```
 
+Expected-TTR D fits an explicit D curve to exact finite-population expected TTR
+values. It uses no random sampling or arbitrary D cap and is not CLAN VOCD.
+
+```{r}
+lexdiv_metrics(
+  rep(c("a", "b", "a", "c"), 20),
+  metrics = "expected_ttr_d"
+)
+```
+
 ## Interpreting values
 
 Within the same exact method and design, Maas a-squared and Yule's K
 conventionally decrease as repetition decreases. TTR, RTTR, CTTR, Herdan's C,
-MSTTR, MATTR, MTLD, HD-D, and Yule's I conventionally increase with observed
-lexical variety or lower repetition. These methods primarily operationalize
+MSTTR, MATTR, MTLD, HD-D, expected-TTR D, and Yule's I conventionally increase
+with observed lexical variety or lower repetition. These methods primarily operationalize
 lexical variety and repetition rather than the full multidimensional
 lexical-diversity construct. Direction is meaningful only within the same
 method, parameters, tokenization, normalization, sampling design, and comparable
@@ -216,6 +226,30 @@ documents <- list(
 lexdiv_metrics_batch(documents, metrics = c("ttr", "hdd"))
 ```
 
+For a tidy one-token-per-row table, make the document boundary explicit before
+calling the batch API. The same adapter accepts `quanteda` tokens objects
+through their registered `as.list()` method.
+
+```{r}
+tidy_tokens <- data.frame(
+  document_id = c("a", "a", "b", "b"),
+  token = c("one", "two", "three", "three")
+)
+tidy_documents <- lexdiv_as_documents(tidy_tokens)
+tidy_long <- lexdiv_metrics_batch(
+  tidy_documents,
+  metrics = c("ttr", "maas")
+)
+lexdiv_widen(tidy_long, values_from = "value")
+```
+
+Base-R plot methods require one metric selection when several incompatible
+metric scales are present.
+
+```{r, fig.width=5, fig.height=3}
+plot(tidy_long, metric_id = "ttr")
+```
+
 ## Explicit method profiles
 
 A profile plan records parameter variants before computation. The
@@ -237,9 +271,8 @@ measurement validity, or reliability. The screens do not change values or
 parameters or censor documents. Read them together with `status`,
 `missing_reason`, `N`, `V`, and the method and parameter identities.
 
-Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the versioned
-registries. The separately defined `expected_ttr_d` method is not included in
-the version 0.1.0 public method set.
+Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the twelve versioned
+methods and their bounded presets.
 
 ## Definition sensitivity outside the frozen core
 

@@ -14,7 +14,8 @@ lexdiv_metrics(
   segment_length = 50L,
   window_length = 50L,
   mtld_threshold = 0.72,
-  sample_size = 42L
+  sample_size = 42L,
+  expected_ttr_sample_sizes = 35:50
 )
 
 lexdiv_metrics_batch(
@@ -47,6 +48,9 @@ lexdiv_metrics_batch(
   and one.}
   \item{sample_size}{One plain finite numeric scalar with an integer value at
   least one; requested without-replacement HD-D sample size.}
+  \item{expected_ttr_sample_sizes}{A non-empty, strictly increasing plain
+  integer vector with values at least two. It fixes the sample-size curve used
+  by deterministic expected-TTR D and is never resized to the document.}
   \item{documents}{Either a plain list with unique, non-empty document IDs as
   names, or a data frame with an explicit plain character ID column and a
   token-vector list-column. Zero-document inputs are accepted only when they
@@ -87,9 +91,9 @@ parameters, and diagnostics are returned beside each value.
 The current frozen set contains TTR, RTTR/Guiraud, CTTR, Herdan's C, natural-log
 Maas a-squared, complete non-overlapping MSTTR, step-one MATTR, bidirectional
 MTLD, sample-size-normalized hypergeometric HD-D on the TTR scale, Yule's K,
-and type-based Yule's I. The separately defined deterministic expected-TTR
-curve-fit D method is distinct from HD-D and is not included in the version
-0.1.0 API.
+deterministic expected-TTR curve-fit D, and type-based Yule's I. Expected-TTR D
+fits the model \eqn{2/(\sqrt{1+2n/D}+1)} to exact finite-population expected TTR
+values. It uses no random sampling or arbitrary D cap and is not CLAN VOCD.
 
 An invalid token anywhere has precedence over empty-input and metric-specific
 domain conditions. Invalid documents return \code{status = "invalid_input"},
@@ -109,7 +113,7 @@ Unicode normalization: canonically equivalent but scalar-distinct strings
 remain distinct types.
 
 Within the same exact method and design, Maas a-squared and Yule's K
-conventionally decrease as repetition decreases; the other nine v0.1 methods
+conventionally decrease as repetition decreases; the other ten v0.1 methods
 conventionally increase with observed lexical variety or lower repetition.
 These methods primarily operationalize lexical variety and repetition rather
 than the full multidimensional lexical-diversity construct. Direction applies
@@ -161,6 +165,11 @@ lexdiv_metric_ids()
 
 tokens <- c("a", "a", "b", "c")
 lexdiv_metrics(tokens, metrics = c("ttr", "hdd"), sample_size = 2)
+
+lexdiv_metrics(
+  rep(c("a", "b", "a", "c"), 20),
+  metrics = "expected_ttr_d"
+)
 
 lexdiv_metrics(character(), metrics = "ttr")
 lexdiv_metrics(c("a", NA_character_), metrics = "ttr")

@@ -1,12 +1,15 @@
 # ldfreq 0.1.0 release-candidate boundary
 
-The earlier immutable core-only version `0.1.0` candidate was not published,
-and its artifacts and go/no-go decision cannot be reused. This replacement
-candidate adds raw-text preprocessing, a TUBELEX public-profile candidate, a
+The maintainer authorized a one-time recomposition of the existing GitHub
+`0.1.0` distribution on 2026-08-16. Its previous artifacts and go/no-go
+decision cannot be reused. This replacement candidate adds raw-text
+preprocessing, deterministic expected-TTR D, tidy/`quanteda` input adapters,
+wide reshaping, base-R plots, a TUBELEX public-profile candidate, a
 caller-supplied New JACET 8000 level-profile surface, and a separately
 contracted Maas/MTLD variant surface. The exact replacement commit must pass
 the technical, resource, and maintainer decision gates in
-`RELEASE-CHECKLIST.md` before tagging or CRAN submission.
+`RELEASE-CHECKLIST.md` before the existing GitHub tag and assets are replaced
+or the package is submitted to CRAN.
 
 ## Automated evidence
 
@@ -65,7 +68,9 @@ may enter package artifacts. Review must verify identity fallback, explicit
 override precedence, path-private provenance, and the documented distinction
 between raw AntBNC approximation and NWLC's manually aligned mapping.
 
-Rollback before publication means closing or reverting the candidate change and
-creating no tag or release asset. Rollback after publication means documenting
-the defect, withdrawing the affected asset where the hosting service permits,
-and preparing a reviewed patch release without rewriting an existing tag.
+Rollback before the authorized replacement means closing or reverting the
+candidate change and leaving the existing distribution unchanged. The
+2026-08-16 replacement is the sole recorded exception to tag immutability;
+after it is published, rollback means documenting the defect, withdrawing the
+affected asset where the hosting service permits, and preparing a reviewed
+patch release without rewriting the tag again.

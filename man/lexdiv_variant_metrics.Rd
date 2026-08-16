@@ -4,7 +4,7 @@
 \title{Explicit Maas and sequential-MTLD comparison variants}
 \description{
 List or compute a bounded set of formula and aggregation variants without
-changing the frozen eleven-method \code{lexdiv_metrics()} core.
+changing the frozen twelve-method \code{lexdiv_metrics()} core.
 }
 \usage{
 lexdiv_variant_ids()

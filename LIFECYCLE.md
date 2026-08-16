@@ -1,6 +1,6 @@
 # API and measurement lifecycle
 
-The `0.1.x` line freezes the resource-independent, pre-tokenized eleven-method
+The `0.1.x` line freezes the resource-independent, pre-tokenized twelve-method
 core. Raw-text preprocessing and resource-backed profiles are separate public
 surfaces with their own contract versions and review gates. The Maas/MTLD
 sensitivity surface also has a separate variant contract and does not add

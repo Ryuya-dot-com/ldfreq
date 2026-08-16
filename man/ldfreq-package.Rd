@@ -15,6 +15,8 @@ schema, and contract provenance.
 Start with \code{lexdiv_metrics()} for explicit tokens,
 \code{lexdiv_metrics_text()} for one raw or annotated text,
 \code{lexdiv_metrics_batch()} for multiple tokenized documents,
+\code{lexdiv_as_documents()} for tidy or \pkg{quanteda} token containers,
+\code{lexdiv_widen()} for a pure wide transformation,
 \code{lexdiv_profile()} for explicit parameter variants,
 \code{lexdiv_variant_metrics()} for separately contracted Maas/MTLD
 sensitivity variants, or
@@ -33,6 +35,8 @@ Choose the entry point from the form of data you already have:
   not change case, remove tokens, or lemmatize.}
   \item{Several tokenized documents}{Use \code{lexdiv_metrics_batch()} with a
   named list or an explicit ID and token-list-column data frame.}
+  \item{One-token-per-row or \pkg{quanteda} input}{Use
+  \code{lexdiv_as_documents()} to create the explicit named-list boundary.}
   \item{A corpus-relative reference profile}{Use
   \code{tubelex_frequency_profile()} for bundled TUBELEX frequency/prevalence,
   or \code{new_jacet8000_profile()} with a legitimately obtained caller copy
@@ -122,6 +126,7 @@ Metric ID \tab Contract scale \tab Conventional score direction \cr
 \code{mattr} \tab 0 to 1 \tab higher \cr
 \code{mtld} \tab 0 or greater; no finite upper bound \tab higher \cr
 \code{hdd} \tab 0 to 1 \tab higher \cr
+\code{expected_ttr_d} \tab greater than 0; no finite upper bound \tab higher \cr
 \code{yule_k} \tab 0 inclusive to 10,000 exclusive \tab lower \cr
 \code{yule_i} \tab 0 or greater; no finite upper bound \tab higher
 }
@@ -148,8 +153,8 @@ computable value.
 The core metrics, raw-text preprocessing, variant metrics, lexical-level
 profiles, and TUBELEX profile have separate versioned contracts. This keeps a
 change in tokenization or resource matching from silently redefining a core
-metric. The separately named expected-TTR D method is not included in version
-0.1.0.
+metric. Expected-TTR D is separately named and explicitly distinguished from
+CLAN VOCD.
 }
 \section{Offline smoke test}{
 After loading \pkg{ldfreq}, run the installed script returned by
@@ -158,7 +163,8 @@ exercises single, batch, profile, profile-batch, lexical-level, and screen
 workflows without a network connection or external runtime.
 }
 \seealso{
-\code{\link{lexdiv_metrics}}, \code{\link{lexdiv_preprocessing}},
+\code{\link{lexdiv_metrics}}, \code{\link{lexdiv_convenience}},
+\code{\link{lexdiv_preprocessing}},
 \code{\link{lexdiv_flemmatize}},
 \code{\link{lexdiv_profile}}, \code{\link{lexdiv_variant_metrics}},
 \code{\link{new_jacet8000_profile}},

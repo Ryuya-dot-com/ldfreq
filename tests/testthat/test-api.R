@@ -143,7 +143,13 @@ test_that("invalid and empty token input follow precedence rules", {
 test_that("metric selection is strict and parameters are metric-local", {
   expect_error(api_function(c("a"), metrics = character()), "non-empty")
   expect_error(api_function(c("a"), metrics = c("ttr", "ttr")), "duplicates")
-  expect_error(api_function(c("a"), metrics = "expected_ttr_d"), "non-frozen")
+  expect_identical(
+    api_function(
+      rep("a", 50L),
+      metrics = "expected_ttr_d"
+    )$method_id,
+    "expected_ttr_d_hypergeom_fit_v1"
+  )
   expect_error(
     api_function(
       c("a"),

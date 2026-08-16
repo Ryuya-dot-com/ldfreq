@@ -1,7 +1,7 @@
 # ldfreq
 
 `ldfreq` provides explicitly versioned lexical-diversity and reference-frequency
-profiles for R. The core computes eleven independently specified metrics from
+profiles for R. The core computes twelve independently specified metrics from
 ordered tokens. Separate adapters make raw-text tokenization,
 lemma/flemma/POS annotations, lexical-unit selection, New JACET 8000 level profiles,
 and TUBELEX coverage visible rather than hiding those decisions inside a score.
@@ -20,10 +20,12 @@ The implemented metric set is:
 - MSTTR and MATTR
 - MTLD
 - HD-D
+- deterministic expected-TTR D
 - Yule K and Yule I
 
-The separately defined `expected_ttr_d` method is not part of the version 0.1.0
-public metric set.
+`expected_ttr_d` fits a D curve to exact finite-population expected TTR values.
+It is deterministic, uses no random sampling or arbitrary D cap, and is not a
+claim of CLAN VOCD compatibility.
 
 ## Installation
 
@@ -53,6 +55,17 @@ library(ldfreq)
 tokens <- c("the", "cat", "saw", "the", "other", "cat")
 
 lexdiv_metrics(tokens, metrics = c("ttr", "rttr", "yule_k"))
+```
+
+For the deterministic expected-TTR D fit, the default curve uses sample sizes
+35 through 50. Short inputs are reported explicitly rather than resizing that
+range:
+
+```r
+lexdiv_metrics(
+  rep(c("a", "b", "a", "c"), 20),
+  metrics = "expected_ttr_d"
+)
 ```
 
 Use `lexdiv_methods()` to see plain-language names, short definitions, score
@@ -242,6 +255,20 @@ documents <- list(
 lexdiv_metrics_batch(documents, metrics = c("ttr", "hdd"))
 ```
 
+Tidy one-token-per-row tables and `quanteda` tokens objects can be converted to
+the same explicit named-list boundary:
+
+```r
+tidy_tokens <- data.frame(
+  document_id = c("a", "a", "b", "b"),
+  token = c("one", "two", "three", "three")
+)
+documents <- lexdiv_as_documents(tidy_tokens)
+long <- lexdiv_metrics_batch(documents, metrics = c("ttr", "maas"))
+wide <- lexdiv_widen(long, values_from = "value")
+plot(long, metric_id = "ttr")
+```
+
 Parameter variants are represented as explicit specifications rather than
 silently changing defaults:
 
@@ -306,6 +333,7 @@ in the abstract. The v0.1 contract records:
 | `mattr` | [0, 1] | higher |
 | `mtld` | >= 0; no finite upper bound | higher |
 | `hdd` | [0, 1] | higher |
+| `expected_ttr_d` | > 0; no finite upper bound | higher |
 | `yule_k` | [0, 10,000) | lower |
 | `yule_i` | >= 0; no finite upper bound | higher |
 
