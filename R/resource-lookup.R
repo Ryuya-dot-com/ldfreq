@@ -5,9 +5,9 @@
 # turns an unmatched term into a fabricated zero-frequency observation.
 
 .lexres_lookup_contract_id <- "ldfreq-lexical-resource-lookup"
-.lexres_lookup_contract_version <- "0.1.0-draft.1"
+.lexres_lookup_contract_version <- "0.1.1"
 .lexres_lookup_result_schema_id <- "lexres-frequency-prevalence-result"
-.lexres_lookup_result_schema_version <- "0.1.0-draft.1"
+.lexres_lookup_result_schema_version <- "0.1.1"
 .lexres_lookup_query_normalization_id <- "identity-valid-utf8-v1"
 .lexres_lookup_matching_id <- "exact-unicode-scalar-sequence-v1"
 .lexres_tubelex_artifact_id <- "tubelex_en_treebank_slim_csv_gz"

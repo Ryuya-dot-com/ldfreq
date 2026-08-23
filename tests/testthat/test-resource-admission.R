@@ -50,6 +50,18 @@ test_that("the installed candidate pins a maintainer-approved decision", {
     candidate$candidate$maintainer_decision$legal_basis$license_spdx,
     "BSD-3-Clause"
   )
+  expect_identical(
+    candidate$candidate$contract_refs$loader_contract_version,
+    "0.1.1"
+  )
+  expect_identical(
+    candidate$candidate$contract_refs$lookup_contract_version,
+    "0.1.1"
+  )
+  expect_identical(
+    candidate$candidate$contract_refs$lookup_result_schema_version,
+    "0.1.1"
+  )
 })
 
 test_that("the maintainer decision passes only the resource admission gate", {

@@ -8,7 +8,7 @@
     "resource_version": "7cb5fb36-slim-v1",
     "upstream_commit": "7cb5fb36add76b83a266d1967536e1a1d3faa513",
     "upstream_source_sha256": "4096022259d5eaa7261c3bf22c3b0af9fd58ae8eebe17894c0b34a163954f936",
-    "manifest_sha256": "35dd3a7537174a462aa22ea41e470a0fc1dfc4b7fe7c28765465d040bf24bd04",
+    "manifest_sha256": "a0936c52cbeeccd807161e7236c8d01303819a968ee3be4d84e002966574bb1d",
     "artifact_sha256": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d",
     "content_sha256": "423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916",
     "license_spdx": "BSD-3-Clause",
@@ -26,11 +26,11 @@
   },
   "contract_refs": {
     "loader_contract_id": "ldfreq-lexical-sophistication-profile",
-    "loader_contract_version": "0.1.0-draft.2",
+    "loader_contract_version": "0.1.1",
     "lookup_contract_id": "ldfreq-lexical-resource-lookup",
-    "lookup_contract_version": "0.1.0-draft.1",
+    "lookup_contract_version": "0.1.1",
     "lookup_result_schema_id": "lexres-frequency-prevalence-result",
-    "lookup_result_schema_version": "0.1.0-draft.1",
+    "lookup_result_schema_version": "0.1.1",
     "public_profile_contract_id": "ldfreq-tubelex-frequency-profile",
     "public_profile_contract_version": "0.1.0"
   },

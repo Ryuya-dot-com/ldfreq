@@ -1,8 +1,8 @@
 {
   "$schema": "lexical-resource-lookup-contract.schema.json",
   "contract_id": "ldfreq-lexical-resource-lookup",
-  "contract_version": "0.1.0-draft.1",
-  "status": "internal-release-candidate",
+  "contract_version": "0.1.1",
+  "status": "versioned-non-exported-implementation-contract",
   "public_api": false,
   "release_approved": true,
   "resource": {
@@ -28,7 +28,7 @@
   },
   "result_contract": {
     "schema_id": "lexres-frequency-prevalence-result",
-    "schema_version": "0.1.0-draft.1",
+    "schema_version": "0.1.1",
     "columns": [
       {"name": "query_index", "type": "integer", "role": "one-based-input-position"},
       {"name": "term", "type": "character", "role": "unchanged-query-term"},

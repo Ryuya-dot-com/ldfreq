@@ -78,8 +78,8 @@ for (path in c(
 
 identities <- list(
   manifest = c(
-    bytes = 972,
-    sha256 = "35dd3a7537174a462aa22ea41e470a0fc1dfc4b7fe7c28765465d040bf24bd04"
+    bytes = 964,
+    sha256 = "a0936c52cbeeccd807161e7236c8d01303819a968ee3be4d84e002966574bb1d"
   ),
   artifact = c(
     bytes = 2549714,
@@ -133,7 +133,7 @@ check(
     loaded$resource_ref,
     list(
       contract_id = "ldfreq-lexical-sophistication-profile",
-      contract_version = "0.1.0-draft.2",
+      contract_version = "0.1.1",
       resource_id = "tubelex-en-treebank-slim",
       resource_version = "7cb5fb36-slim-v1",
       resource_manifest_sha256 = identities$manifest[["sha256"]]
@@ -142,7 +142,9 @@ check(
   "The TUBELEX resource reference changed."
 )
 check(
-  identical(loaded$manifest$bundle_variant_id, "treebank-four-column-canonical-v1") &&
+  identical(loaded$manifest$resource_manifest_schema_id, "lexsoph-resource-manifest") &&
+    identical(loaded$manifest$resource_manifest_schema_version, "0.1.1") &&
+    identical(loaded$manifest$bundle_variant_id, "treebank-four-column-canonical-v1") &&
     identical(loaded$manifest$lookup_unit, "surface-form") &&
     identical(loaded$manifest$normalization_id, "nfkc-trim-root-lower-filtered-source-keys-v1"),
   "The TUBELEX manifest semantics changed."
@@ -226,7 +228,7 @@ check(
       admission_candidate$diagnostics$candidate_sha256,
       .lexres_tubelex_admission_candidate_sha256
     ) &&
-    identical(admission_candidate$diagnostics$candidate_bytes, 3651),
+    identical(admission_candidate$diagnostics$candidate_bytes, 3627),
   "The installed TUBELEX admission candidate changed."
 )
 check(
@@ -337,13 +339,16 @@ lookup_contract <- jsonlite::read_json(
 )
 check(
   identical(lookup_contract$contract_id, "ldfreq-lexical-resource-lookup") &&
-    identical(lookup_contract$contract_version, "0.1.0-draft.1") &&
-    identical(lookup_contract$status, "internal-release-candidate") &&
+    identical(lookup_contract$contract_version, "0.1.1") &&
+    identical(
+      lookup_contract$status,
+      "versioned-non-exported-implementation-contract"
+    ) &&
     identical(lookup_contract$public_api, FALSE) &&
     identical(lookup_contract$release_approved, TRUE) &&
     identical(lookup_contract$runtime_policy$network_access, FALSE) &&
     identical(lookup_contract$runtime_policy$fallback, FALSE),
-  "The installed internal lookup-contract boundary changed."
+  "The installed non-exported lookup-contract boundary changed."
 )
 check(
   identical(inventory$schema_version, "0.1.0") &&

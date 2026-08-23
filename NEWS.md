@@ -41,6 +41,10 @@
   identity remains `0.1.0` because token boundaries did not change.
 - Replaced pre-release wording such as "frozen" with "versioned" where it
   described public methods rather than an immutable method definition.
+- Versioned the installed, non-exported lexical-resource loader, manifest,
+  lookup contract, and result schema as `0.1.1`, replacing stale draft and
+  release-candidate labels without changing loading, matching, formulas, or
+  resource behavior.
 - Kept the existing TUBELEX resource-admission state unchanged; any promotion
   still requires evidence tied to the exact release artifact.
 - Added a CC0 cross-language semantic fixture for the ten R/Python formulas

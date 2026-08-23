@@ -233,7 +233,7 @@ test_that("resource failures preserve queries without classifying them", {
   }
 })
 
-test_that("the installed contract records the internal and offline boundary", {
+test_that("the installed contract records the non-exported offline boundary", {
   skip_if_not_installed("jsonlite")
   contract_path <- system.file(
     "spec", "lexical-resource-lookup-contract.json",
@@ -261,12 +261,26 @@ test_that("the installed contract records the internal and offline boundary", {
     character(),
     loader = synthetic_tubelex_load
   )
+  runtime_ref <- lookup_ref_function()
 
   expect_identical(contract$contract_id, "ldfreq-lexical-resource-lookup")
-  expect_identical(contract$contract_version, "0.1.0-draft.1")
-  expect_identical(contract$status, "internal-release-candidate")
+  expect_identical(contract$contract_version, "0.1.1")
+  expect_identical(
+    contract$status,
+    "versioned-non-exported-implementation-contract"
+  )
   expect_identical(contract$public_api, FALSE)
   expect_identical(contract$release_approved, TRUE)
+  expect_identical(runtime_ref$contract_id, contract$contract_id)
+  expect_identical(runtime_ref$contract_version, contract$contract_version)
+  expect_identical(
+    runtime_ref$result_schema_id,
+    contract$result_contract$schema_id
+  )
+  expect_identical(
+    runtime_ref$result_schema_version,
+    contract$result_contract$schema_version
+  )
   expect_identical(contract$input_contract$normalization_applied, FALSE)
   expect_identical(
     contract$matching_contract$unmatched_measurements,
@@ -279,7 +293,7 @@ test_that("the installed contract records the internal and offline boundary", {
   expect_identical(contract$runtime_policy$fallback, FALSE)
   expect_identical(
     schema$title,
-    "ldfreq internal lexical-resource lookup contract"
+    "ldfreq versioned non-exported lexical-resource lookup contract"
   )
   expect_identical(schema$additionalProperties, FALSE)
 })

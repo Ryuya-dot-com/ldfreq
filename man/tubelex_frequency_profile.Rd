@@ -68,9 +68,11 @@ The public profile contract is installed as
 \file{tubelex-frequency-profile-contract.json}; exact lookup formulas and
 field roles are installed as \file{lexical-resource-lookup-contract.json}.
 Locate either with \code{system.file("spec", filename, package = "ldfreq")}.
-The public profile contract is normative for version 0.1.0. The resource's
-license, provenance, and runtime integrity records are installed separately
-from the measurement contract.
+The public profile contract is normative for version 0.1.0. The lookup file
+is the versioned, non-exported implementation contract for ldfreq 0.1.1; its
+installation does not make the lookup helper a supported exported API. The
+resource's license, provenance, and runtime integrity records are installed
+separately from the measurement contract.
 }
 \section{Reading status}{
 \code{status = "ok"} means a non-empty valid input was looked up successfully;

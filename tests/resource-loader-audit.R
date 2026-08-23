@@ -39,24 +39,24 @@ check_error <- function(code, pattern, message) {
 
 manifest_identities <- list(
   "valid.manifest.dcf" = c(
-    bytes = 798,
-    sha256 = "173ca3fe2a65d49769700bc56b090b6059ccb87775d1bba8cb7112821c926e66"
+    bytes = 790,
+    sha256 = "e7c109ddebf65e5ebb3248b35dba0486f9c6fad6be60978fb1941e71a743b395"
   ),
   "wrong-manifest-schema.manifest.dcf" = c(
-    bytes = 813,
-    sha256 = "4cebecde834bc6af873d719b57c176dc01ce1c6751af9bdfdfa3fc4a90a86488"
+    bytes = 805,
+    sha256 = "bf0b55acb767733a8cf83bfb0963556d647cb1402b5d3ab56ccebc2f033222f2"
   ),
   "unsupported-version.manifest.dcf" = c(
-    bytes = 812,
-    sha256 = "5b5f7dcb08f4d76ff2f1f60743eb1fb6e77d9b6cda27e2a2fa4e27bd8e044656"
+    bytes = 804,
+    sha256 = "dd9b8df6fbee4297c3117a2c5997f204f0cfd11eed5c8bb7cda7a920ae1baca1"
   ),
   "wrong-payload-schema.manifest.dcf" = c(
-    bytes = 820,
-    sha256 = "438754b1a8c0e8e1a2a31790b873dfba7f547377a8a780ef2c16a5d3bad0c2d2"
+    bytes = 812,
+    sha256 = "cb949061dc184b6039b843d93c5aeac175e5841df78f26eaa4770115177f549f"
   ),
   "malformed-payload.manifest.dcf" = c(
-    bytes = 814,
-    sha256 = "c1f705ec4c05abf779b4ea448356301edfb47d81965559d7b17d5ea0f7b15d40"
+    bytes = 806,
+    sha256 = "58249fce02c3469e28b16416bbc327dc7b92cbd8df37c0a67065654418e22488"
   )
 )
 artifact_identities <- list(
@@ -156,7 +156,7 @@ check(
     success$resource_ref,
     list(
       contract_id = "ldfreq-lexical-sophistication-profile",
-      contract_version = "0.1.0-draft.2",
+      contract_version = "0.1.1",
       resource_id = "synthetic-frequency",
       resource_version = "1",
       resource_manifest_sha256 = valid_hash
@@ -169,6 +169,10 @@ check(
     success$manifest$resource_manifest_schema_id,
     "lexsoph-resource-manifest"
   ) &&
+    identical(
+      success$manifest$resource_manifest_schema_version,
+      "0.1.1"
+    ) &&
     identical(success$manifest$bundle_variant_id, "fixture-valid") &&
     identical(length(success$manifest$artifacts), 1L) &&
     identical(
@@ -186,7 +190,7 @@ check(
 )
 check(
   identical(success$diagnostics$manifest_sha256, valid_hash) &&
-    identical(success$diagnostics$manifest_bytes, 798) &&
+    identical(success$diagnostics$manifest_bytes, 790) &&
     identical(success$diagnostics$fallback_attempted, FALSE) &&
     identical(success$diagnostics$download_attempted, FALSE),
   "Success manifest evidence or no-fallback state changed."
@@ -302,7 +306,7 @@ check(
       manifest_hash_failure$diagnostics$observed_sha256,
       unname(manifest_identities[["unsupported-version.manifest.dcf"]][["sha256"]])
     ) &&
-    identical(manifest_hash_failure$diagnostics$observed_bytes, 812),
+    identical(manifest_hash_failure$diagnostics$observed_bytes, 804),
   "Manifest hash expected/observed evidence changed."
 )
 

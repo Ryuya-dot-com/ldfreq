@@ -1,14 +1,14 @@
-# Internal, non-exported loader for byte-pinned local resource bundles.
+# Non-exported loader for byte-pinned local resource bundles.
 #
 # The loader uses SHA-256 only as a content-identity and corruption-detection
 # mechanism. Manifest approval and distribution rights remain external gates.
 
 .lexres_contract_id <- "ldfreq-lexical-sophistication-profile"
-.lexres_contract_version <- "0.1.0-draft.2"
+.lexres_contract_version <- "0.1.1"
 .lexres_manifest_schema_id <- "lexsoph-resource-manifest"
-.lexres_manifest_schema_version <- "0.1.0-draft.2"
+.lexres_manifest_schema_version <- "0.1.1"
 .lexres_tubelex_manifest_sha256 <-
-  "35dd3a7537174a462aa22ea41e470a0fc1dfc4b7fe7c28765465d040bf24bd04"
+  "a0936c52cbeeccd807161e7236c8d01303819a968ee3be4d84e002966574bb1d"
 .lexres_failures <- c(
   "resource_unavailable",
   "hash_mismatch",
