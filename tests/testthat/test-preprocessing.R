@@ -553,7 +553,7 @@ test_that("annotation and flemma version identities reject path-like values", {
       tokenization,
       lemmas = c("cat", "run"),
       upos = c("NOUN", "VERB"),
-      backend_id = "/Users/alice/private/model",
+      backend_id = "/private/example/model",
       backend_version = "1"
     ),
     "path-free identifier"
