@@ -160,7 +160,7 @@
   result
 }
 
-#' Compute frozen lexical-diversity metrics for multiple tokenized documents
+#' Compute versioned lexical-diversity metrics for multiple tokenized documents
 #'
 #' This narrow adapter accepts either a plain named list of token vectors or a
 #' data frame containing an explicit character ID column and a list-column of

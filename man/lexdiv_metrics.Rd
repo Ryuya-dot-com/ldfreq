@@ -4,7 +4,7 @@
 \alias{lexdiv_metrics_batch}
 \alias{print.lexdiv_batch_results}
 \alias{print.lexdiv_results}
-\title{Compute Frozen Lexical-Diversity Metric Variants}
+\title{Compute Versioned Lexical-Diversity Metric Variants}
 \usage{
 lexdiv_metric_ids()
 
@@ -66,7 +66,7 @@ lexdiv_metrics_batch(
   \code{print.data.frame()}.}
 }
 \value{
-\code{lexdiv_metric_ids()} returns the frozen metric IDs in default order.
+\code{lexdiv_metric_ids()} returns the versioned metric IDs in default order.
 \code{lexdiv_metrics()} returns a \code{lexdiv_results} data frame with one row
 per metric. Its columns are \code{metric_id}, \code{method_id},
 \code{metric_contract_id}, \code{metric_contract_version},
@@ -88,7 +88,7 @@ short document. Missingness, method identity, sufficient counts, quality flags,
 parameters, and diagnostics are returned beside each value.
 }
 \details{
-The current frozen set contains TTR, RTTR/Guiraud, CTTR, Herdan's C, natural-log
+The current versioned set contains TTR, RTTR/Guiraud, CTTR, Herdan's C, natural-log
 Maas a-squared, complete non-overlapping MSTTR, step-one MATTR, bidirectional
 MTLD, sample-size-normalized hypergeometric HD-D on the TTR scale, Yule's K,
 deterministic expected-TTR curve-fit D, and type-based Yule's I. Expected-TTR D
@@ -136,14 +136,14 @@ Interpret \code{value} only after checking both fields:
   \item{\code{status = "ok"}}{The requested method was computed. Its
   \code{missing_reason} is missing.}
   \item{\code{status = "missing"}}{The document was structurally valid, but
-  the requested method had no value under its frozen domain or parameter
+  the requested method had no value under its defined domain or parameter
   rules.}
   \item{\code{status = "invalid_input"}}{At least one token made the document
   invalid. The package returns an audited row rather than silently deleting
   that token.}
 }
 
-The frozen reason vocabulary is \code{empty_input}, \code{invalid_token},
+The versioned reason vocabulary is \code{empty_input}, \code{invalid_token},
 \code{insufficient_tokens_for_formula},
 \code{too_short_for_requested_parameter}, \code{zero_denominator},
 \code{no_factor}, \code{non_convergence}, \code{boundary_censored}, and

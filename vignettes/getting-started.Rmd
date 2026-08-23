@@ -58,13 +58,18 @@ example annotations are project-authored fixtures, not a recommended universal
 lemmatizer. Missing annotations would be excluded and counted in
 `unit_coverage` rather than imputed.
 
+UPOS backend ID and version are always explicit and separate from lemma backend
+ID and version, even if one documented pipeline generated both layers.
+
 ```{r}
 annotated <- lexdiv_lemmatize(
   tokenization,
   lemmas = c("cat", "and", "cat", "run", "run"),
   upos = c("NOUN", "CCONJ", "NOUN", "VERB", "VERB"),
   backend_id = "vignette-fixture",
-  backend_version = "1"
+  backend_version = "1",
+  upos_backend_id = "vignette-upos-fixture",
+  upos_backend_version = "1"
 )
 
 lemma_content <- lexdiv_metrics_text(
@@ -102,6 +107,13 @@ POS distinctions. `lexdiv_flemmatize()` accepts a caller-supplied local AntBNC
 file; it neither bundles nor downloads that resource. Unknown forms retain a
 normalized identity value, while token rows record AntBNC, override, or
 identity matching.
+
+The flemma adapter and parser identities are supplied by `ldfreq`.
+`resource_version` and any `override_version` are caller-declared, path-free
+labels; they are not file-content checks. Because the labels are returned in
+provenance and overlap comparability output, they must not contain paths,
+secrets, private hashes, or machine-specific details. Local file names and
+content hashes are not retained in public flemma provenance.
 
 ```{r, eval=FALSE}
 flemmas <- lexdiv_flemmatize(
@@ -170,7 +182,7 @@ ordinary columns so that they survive row binding and tabular serialization.
 | `status` | Meaning |
 |---|---|
 | `ok` | The requested method produced a value. |
-| `missing` | The document was valid, but the method's frozen domain or requested parameter did not permit a value. |
+| `missing` | The document was valid, but the method's defined domain or requested parameter did not permit a value. |
 | `invalid_input` | At least one invalid token made the document invalid; it was not silently deleted. |
 
 Common `missing_reason` values distinguish empty input, insufficient tokens for
@@ -265,7 +277,7 @@ screen <- lexdiv_screen(profile)
 head(screen)
 ```
 
-The frozen `below_quality_floor` field and requested screens are advisory
+The versioned `below_quality_floor` field and requested screens are advisory
 token-count evidence checks. Here, `quality` does not mean writing quality,
 measurement validity, or reliability. The screens do not change values or
 parameters or censor documents. Read them together with `status`,
@@ -274,7 +286,7 @@ parameters or censor documents. Read them together with `status`,
 Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the twelve versioned
 methods and their bounded presets.
 
-## Definition sensitivity outside the frozen core
+## Definition sensitivity outside the versioned core
 
 Maas and sequential MTLD have same-name formula and aggregation variants. The
 separate variant surface makes those choices comparable without changing the

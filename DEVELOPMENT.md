@@ -1,14 +1,15 @@
 # Release-candidate boundary
 
 The lexical-diversity core remains resource-independent and accepts ordered
-pre-tokenized vectors. The recomposed `0.1.0` release candidate freezes twelve
-methods, including the deterministic expected-TTR D fit, and adds separate
-raw-text preprocessing and TUBELEX profile APIs under their own versioned
-contracts. A third contract exposes selected Maas and sequential-MTLD
-sensitivity variants; a fourth defines caller-supplied lexical-level profiles.
-These extensions leave the twelve-method core contract unchanged. The package does
-not claim compatibility with TAALES, TAALED, CLAN VOCD, or another package's
-same-named variant beyond each row's explicit comparison scope.
+pre-tokenized vectors. The `0.1.1` patch release candidate retains the twelve
+core methods, including the deterministic expected-TTR D fit, and the separate
+versioned contracts for raw-text preprocessing, TUBELEX profiles, selected
+Maas and sequential-MTLD sensitivity variants, and caller-supplied lexical
+levels. It adds a separately contracted lexical-overlap API. These extensions
+leave the twelve-method core contract unchanged. Package version `0.1.1` does
+not imply that unchanged method contracts have been renumbered. The package
+does not claim compatibility with TAALES, TAALED, CLAN VOCD, or another
+package's same-named variant beyond each row's explicit comparison scope.
 
 The lexical-level profile is resource-decoupled: `new_jacet8000_profile()` and
 `new_jacet8000_profile_batch()`
@@ -21,13 +22,17 @@ This public measurement contract does not admit
 the underlying JACET resource into the package inventory.
 
 `lexdiv_flemmatize()` similarly reads only a caller-supplied local AntBNC text
-resource. It keeps that payload outside package artifacts, records only the
-source basename and exact hash, and describes raw AntBNC as an NWLC
-approximation rather than compatibility. New JACET integration must retain
-per-token AntBNC/override/identity rules and selectable headword-conflict
-resolution.
+resource. It keeps that payload outside package artifacts and records the
+fixed package adapter/parser identities plus optional caller-declared resource
+and override versions. Those version labels are public provenance, not content
+hashes or package verification: they must be path-free and must not contain
+secrets or private hashes. The source file name is not retained, and its byte
+hash is internal cache state only rather than public provenance or an overlap
+comparison key. Raw AntBNC remains an NWLC approximation rather than a
+compatibility claim. New JACET integration must retain per-token
+AntBNC/override/identity rules and selectable headword-conflict resolution.
 
-## Before publishing version 0.1.0
+## Before publishing version 0.1.1
 
 - exercise the package on R-release and R-devel across Linux, macOS, and Windows;
 - preserve the frozen twelve-method public API and lifecycle policy;

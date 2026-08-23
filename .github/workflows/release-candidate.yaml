@@ -32,9 +32,9 @@ jobs:
         run: |
           version="$(sed -n 's/^Version:[[:space:]]*//p' DESCRIPTION)"
           status="$(sed -n 's/^Config\/ldfreq\/status:[[:space:]]*//p' DESCRIPTION)"
-          if test "$version" = "0.1.0" && test "$status" = "release-candidate"; then
+          if test "$version" = "0.1.1" && test "$status" = "release-candidate"; then
             echo "is_candidate=true" >> "$GITHUB_OUTPUT"
-            echo "Exact 0.1.0 release-candidate metadata detected."
+            echo "Exact 0.1.1 release-candidate metadata detected."
           else
             echo "is_candidate=false" >> "$GITHUB_OUTPUT"
             echo "Development metadata detected (Version: $version; status: $status)."
@@ -78,15 +78,15 @@ jobs:
         run: |
           description <- read.dcf("DESCRIPTION")
           version <- unname(description[[1L, "Version"]])
-          stopifnot(identical(version, "0.1.0"))
+          stopifnot(identical(version, "0.1.1"))
           stopifnot(identical(
             unname(description[[1L, "Config/ldfreq/status"]]),
             "release-candidate"
           ))
-          stopifnot(identical(readLines("NEWS.md", n = 1L), "# ldfreq 0.1.0"))
+          stopifnot(identical(readLines("NEWS.md", n = 1L), "# ldfreq 0.1.1"))
           citation <- paste(readLines(file.path("inst", "CITATION")), collapse = "\n")
           stopifnot(grepl('family = "Komuro"', citation, fixed = TRUE))
-          stopifnot(grepl('R package version 0.1.0', citation, fixed = TRUE))
+          stopifnot(grepl('R package version 0.1.1', citation, fixed = TRUE))
 
       - name: Build one source archive and the PDF manual
         shell: Rscript {0}
@@ -106,11 +106,11 @@ jobs:
           if (!identical(build_status, 0L)) quit(status = build_status)
           archive <- list.files(
             output_root,
-            pattern = "^ldfreq_0[.]1[.]0[.]tar[.]gz$",
+            pattern = "^ldfreq_0[.]1[.]1[.]tar[.]gz$",
             full.names = TRUE
           )
           stopifnot(length(archive) == 1L)
-          manual <- file.path(output_root, "ldfreq_0.1.0.pdf")
+          manual <- file.path(output_root, "ldfreq_0.1.1.pdf")
           manual_status <- system2(
             file.path(R.home("bin"), "R"),
             c(
@@ -130,7 +130,7 @@ jobs:
           )
           archive <- list.files(
             output_root,
-            pattern = "^ldfreq_0[.]1[.]0[.]tar[.]gz$",
+            pattern = "^ldfreq_0[.]1[.]1[.]tar[.]gz$",
             full.names = TRUE
           )
           status <- system2(
@@ -143,7 +143,7 @@ jobs:
               )),
               shQuote(normalizePath(".", mustWork = TRUE)),
               shQuote(archive),
-              shQuote(file.path(output_root, "ldfreq_0.1.0.pdf")),
+              shQuote(file.path(output_root, "ldfreq_0.1.1.pdf")),
               shQuote(file.path(output_root, "evidence"))
             )
           )
@@ -154,8 +154,8 @@ jobs:
         with:
           name: release-candidate-source
           path: |
-            ${{ runner.temp }}/release-candidate-source/ldfreq_0.1.0.tar.gz
-            ${{ runner.temp }}/release-candidate-source/ldfreq_0.1.0.pdf
+            ${{ runner.temp }}/release-candidate-source/ldfreq_0.1.1.tar.gz
+            ${{ runner.temp }}/release-candidate-source/ldfreq_0.1.1.pdf
             ${{ runner.temp }}/release-candidate-source/evidence/*.json
           if-no-files-found: error
           retention-days: 30
@@ -215,7 +215,7 @@ jobs:
           )
           archive <- list.files(
             candidate_root,
-            pattern = "^ldfreq_0[.]1[.]0[.]tar[.]gz$",
+            pattern = "^ldfreq_0[.]1[.]1[.]tar[.]gz$",
             full.names = TRUE
           )
           stopifnot(length(archive) == 1L)
@@ -249,7 +249,7 @@ jobs:
           )
           archive <- list.files(
             candidate_root,
-            pattern = "^ldfreq_0[.]1[.]0[.]tar[.]gz$",
+            pattern = "^ldfreq_0[.]1[.]1[.]tar[.]gz$",
             full.names = TRUE
           )
           status <- system2(

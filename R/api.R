@@ -1,4 +1,4 @@
-# Public orchestration for the frozen lexical-diversity metric set.
+# Public orchestration for the versioned lexical-diversity metric set.
 
 .lex_metric_registry <- list(
   ttr = list(
@@ -65,7 +65,7 @@
   )
 )
 
-#' Frozen lexical-diversity metric identifiers
+#' Versioned lexical-diversity metric identifiers
 #'
 #' Returns the metric identifiers admitted to the current core implementation.
 #' The deterministic `expected_ttr_d` method fits a D curve to exact
@@ -140,7 +140,7 @@ lexdiv_metric_ids <- function() {
   )
 }
 
-#' Compute frozen lexical-diversity metrics from pre-tokenized input
+#' Compute versioned lexical-diversity metrics from pre-tokenized input
 #'
 #' Computes one or more explicitly versioned lexical-diversity variants from an
 #' ordered character vector. The core performs no case conversion, Unicode
@@ -161,7 +161,7 @@ lexdiv_metric_ids <- function() {
 #' @param window_length Requested step-one window length for MATTR. It is never
 #'   reduced to the document length.
 #' @param mtld_threshold MTLD TTR threshold strictly between zero and one. The
-#'   frozen comparator is strict `<`, with a minimum complete-factor length of 10.
+#'   defined comparator is strict `<`, with a minimum complete-factor length of 10.
 #' @param sample_size Requested without-replacement sample size for HD-D. It is
 #'   never reduced to the document length.
 #' @param expected_ttr_sample_sizes Strictly increasing sample sizes used by
@@ -203,7 +203,7 @@ lexdiv_metrics <- function(
     stop(
       sprintf(
         paste0(
-          "Unknown or non-frozen metric ID(s): %s. ",
+          "Unknown metric ID(s): %s. ",
           "Use lexdiv_metric_ids() to list valid metric IDs."
         ),
         paste(unknown, collapse = ", ")

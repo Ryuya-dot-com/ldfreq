@@ -1,4 +1,4 @@
-# Internal implementations of the frozen HD-D and Yule metric variants.
+# Internal implementations of the versioned HD-D and Yule metric variants.
 
 .hdd_sample_size <- function(parameters) {
   if (!is.list(parameters) || is.data.frame(parameters)) {

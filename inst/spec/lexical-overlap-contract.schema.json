@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/inst/spec/lexical-overlap-contract.schema.json",
+  "title": "ldfreq lexical-overlap contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "contract_id",
+    "contract_version",
+    "status",
+    "public_api",
+    "input_contract",
+    "matching_contract",
+    "content_words",
+    "measures",
+    "empty_set_rules",
+    "result_contract",
+    "comparability_contract",
+    "privacy_boundary",
+    "interpretation_boundary"
+  ],
+  "properties": {
+    "$schema": {"const": "lexical-overlap-contract.schema.json"},
+    "contract_id": {"const": "ldfreq-lexical-overlap"},
+    "contract_version": {"const": "0.1.0"},
+    "status": {"const": "normative"},
+    "public_api": {"const": true},
+    "input_contract": {"type": "object"},
+    "matching_contract": {
+      "type": "object",
+      "required": [
+        "unit", "comparison", "normalization", "case_conversion",
+        "stemming_or_fuzzy_matching", "token_repetition_affects_values",
+        "token_order_affects_values"
+      ],
+      "properties": {
+        "unit": {"const": "distinct-types"},
+        "comparison": {"const": "exact-unicode-scalar-sequence"},
+        "normalization": {"const": "none"},
+        "case_conversion": {"const": "none"},
+        "stemming_or_fuzzy_matching": {"const": false},
+        "token_repetition_affects_values": {"const": false},
+        "token_order_affects_values": {"const": false}
+      }
+    },
+    "content_words": {
+      "type": "object",
+      "required": [
+        "content_set_id", "content_set_version", "upos", "lexical_units",
+        "default_lexical_unit", "missing_upos", "non_content_upos",
+        "missing_selected_unit", "implicit_annotation",
+        "upos_backend_identity"
+      ],
+      "properties": {
+        "content_set_id": {"const": "universal-pos-content-words"},
+        "content_set_version": {"const": "0.1.0"},
+        "upos": {
+          "type": "array",
+          "prefixItems": [
+            {"const": "ADJ"}, {"const": "ADV"}, {"const": "NOUN"},
+            {"const": "PROPN"}, {"const": "VERB"}
+          ],
+          "items": false,
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "lexical_units": {
+          "type": "array",
+          "prefixItems": [
+            {"const": "lemma"}, {"const": "surface"}, {"const": "flemma"}
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "default_lexical_unit": {"const": "lemma"},
+        "missing_upos": {"const": "exclude-and-report"},
+        "non_content_upos": {"const": "exclude-and-report"},
+        "missing_selected_unit": {"const": "exclude-and-report"},
+        "implicit_annotation": {"const": false},
+        "upos_backend_identity": {
+          "const": "required-explicit-separate-from-lemma-backend"
+        }
+      }
+    },
+    "measures": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/measure"}
+    },
+    "empty_set_rules": {"type": "object"},
+    "result_contract": {
+      "type": "object",
+      "required": [
+        "schema_id", "schema_version", "summary_shape",
+        "term_detail_disclosure"
+      ],
+      "properties": {
+        "schema_id": {"const": "lexdiv-type-overlap-result"},
+        "schema_version": {"const": "0.1.0"},
+        "summary_shape": {"const": "one-row-per-requested-measure"},
+        "term_detail_disclosure": {"const": "provenance-flag-and-print-notice"}
+      }
+    },
+    "comparability_contract": {
+      "type": "object",
+      "required": [
+        "compared_settings_by_unit", "flemma_lemma_backend_comparison",
+        "comparison_table_columns",
+        "default_mismatch_policy", "mismatch_changes_terms_automatically",
+        "flemma_resource_version_rule", "flemma_override_version_rule",
+        "declared_label_values_disclosed", "declared_label_safety",
+        "content_hash_comparison"
+      ],
+      "properties": {
+        "compared_settings_by_unit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["surface", "lemma", "flemma"],
+          "properties": {
+            "surface": {
+              "type": "array", "minItems": 1,
+              "items": {"type": "string", "minLength": 1}
+            },
+            "lemma": {
+              "type": "array", "minItems": 1,
+              "items": {"type": "string", "minLength": 1}
+            },
+            "flemma": {
+              "type": "array", "minItems": 1,
+              "items": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "flemma_lemma_backend_comparison": {"const": false},
+        "comparison_table_columns": {
+          "type": "array",
+          "prefixItems": [
+            {"const": "component"}, {"const": "value_a"},
+            {"const": "value_b"}, {"const": "matches"}
+          ],
+          "items": false,
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "default_mismatch_policy": {"const": "error"},
+        "mismatch_changes_terms_automatically": {"const": false},
+        "flemma_resource_version_rule": {"const": "both-present-and-equal"},
+        "flemma_override_version_rule": {
+          "const": "both-overrides-absent-or-both-present-with-equal-version"
+        },
+        "declared_label_values_disclosed": {"const": true},
+        "declared_label_safety": {
+          "const": "path-free-caller-labels-with-no-secrets-or-private-hashes"
+        },
+        "content_hash_comparison": {"const": false}
+      }
+    },
+    "privacy_boundary": {
+      "type": "object",
+      "required": [
+        "raw_text_copied_to_result", "text_hash_copied_to_result",
+        "absolute_path_copied_to_result",
+        "flemma_resource_file_name_public_provenance",
+        "flemma_resource_hash_public_provenance",
+        "flemma_override_hash_public_provenance",
+        "flemma_source_hash_internal_cache_only",
+        "internally_computed_flemma_hash_copied_to_result",
+        "term_details_opt_in"
+      ],
+      "properties": {
+        "raw_text_copied_to_result": {"const": false},
+        "text_hash_copied_to_result": {"const": false},
+        "absolute_path_copied_to_result": {"const": false},
+        "flemma_resource_file_name_public_provenance": {"const": false},
+        "flemma_resource_hash_public_provenance": {"const": false},
+        "flemma_override_hash_public_provenance": {"const": false},
+        "flemma_source_hash_internal_cache_only": {"const": true},
+        "internally_computed_flemma_hash_copied_to_result": {"const": false},
+        "term_details_opt_in": {"const": true}
+      }
+    },
+    "interpretation_boundary": {
+      "type": "object",
+      "required": [
+        "direct_semantic_similarity_measure", "plagiarism_detector",
+        "proficiency_or_writing_quality_measure", "coherence_measure"
+      ],
+      "properties": {
+        "direct_semantic_similarity_measure": {"const": false},
+        "plagiarism_detector": {"const": false},
+        "proficiency_or_writing_quality_measure": {"const": false},
+        "coherence_measure": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "measure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["measure_id", "method_id", "formula", "symmetric"],
+      "properties": {
+        "measure_id": {"enum": [
+          "jaccard_types", "dice_types", "a_covered_by_b_types",
+          "b_covered_by_a_types", "overlap_coefficient_types"
+        ]},
+        "method_id": {"type": "string", "minLength": 1},
+        "formula": {"type": "string", "minLength": 1},
+        "symmetric": {"type": "boolean"}
+      }
+    }
+  }
+}

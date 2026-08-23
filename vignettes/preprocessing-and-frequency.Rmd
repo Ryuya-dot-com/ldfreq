@@ -54,7 +54,9 @@ annotated <- lexdiv_lemmatize(
   lemmas = c("cat", "and", "cat", "run", "run"),
   upos = c("NOUN", "CCONJ", "NOUN", "VERB", "VERB"),
   backend_id = "vignette-fixture",
-  backend_version = "1"
+  backend_version = "1",
+  upos_backend_id = "vignette-upos-fixture",
+  upos_backend_version = "1"
 )
 
 surface <- lexdiv_metrics_text(tokenization, metrics = "ttr")
@@ -85,6 +87,64 @@ data.frame(
 The point is not that TTR is preferred. The example demonstrates that the
 lexical unit and denominator change the estimand before any diversity formula
 is selected.
+
+### Exact content-word overlap between two texts
+
+The same annotation boundary supports type-set overlap. A second text must be
+tokenized and annotated explicitly; `ldfreq` does not guess its UPOS tags or
+lemmas.
+
+```{r}
+comparison <- lexdiv_lemmatize(
+  lexdiv_tokenize("Cats and birds ran."),
+  lemmas = c("cat", "and", "bird", "run"),
+  upos = c("NOUN", "CCONJ", "NOUN", "VERB"),
+  backend_id = "vignette-fixture",
+  backend_version = "1",
+  upos_backend_id = "vignette-upos-fixture",
+  upos_backend_version = "1"
+)
+
+content_overlap <- lexdiv_content_overlap(
+  annotated,
+  comparison,
+  unit = "lemma",
+  details = "terms",
+  document_ids = c("essay", "reference")
+)
+content_overlap$summary[, c(
+  "measure_id", "value", "numerator", "denominator", "status"
+)]
+content_overlap$coverage
+content_overlap$shared_terms
+```
+
+Because `details = "terms"` retains exact lexical strings, the result provenance
+and print method disclose their presence. The default comparability policy is
+fail-closed unless an analysis explicitly selects `mismatch = "warn"` or
+`"allow"`. The comparison is unit-relevant: surface uses tokenizer and UPOS
+settings; lemma also uses its annotation method/backend; flemma instead uses
+the fixed flemma adapter/parser and declared resource/override settings while
+ignoring lemma backend identity because the flemma adapter consumes surface
+forms. UPOS labels are always supplied separately from lemma labels. Strict
+flemma comparison requires present, equal caller-declared resource versions.
+Two inputs with no overrides are comparable on the override setting; otherwise
+both need the same declared override version. The four-column comparability
+table discloses label values and match status but does not compare file bytes or
+content hashes.
+
+All five rows use distinct exact types, but not the same denominator. Jaccard
+uses the union, Dice uses the sum of set sizes, the two coverage measures use A
+or B, and the overlap coefficient uses the smaller set. A strict subset can
+therefore have overlap coefficient 1 while Jaccard remains below 1. Missing
+UPOS, non-content UPOS, and missing selected units are counted separately, so
+the coverage table is part of the interpretation rather than an optional
+quality label.
+
+Changing `unit = "lemma"` to `"surface"` changes the estimand and may change
+the value. None of these exact lexical-sharing measures detects plagiarism or
+directly measures semantic similarity, coherence, proficiency, or writing
+quality.
 
 ### Flemma as a caller-supplied resource transformation
 
@@ -120,8 +180,13 @@ lexdiv_metrics_text(flemma_annotations, unit = "flemma", metrics = "ttr")
 ```
 
 For a real analysis, replace the synthetic fixture with a legitimately
-obtained local AntBNC file and record its version. The result retains its
-basename and SHA-256, not its absolute directory.
+obtained local AntBNC file and declare its version. The adapter and parser
+identities are fixed by `ldfreq`; `resource_version` and, when overrides are
+non-empty, `override_version` are caller labels rather than inferred content
+identities. They are disclosed in provenance and overlap comparability output,
+so use path-free, non-sensitive labels and never put secrets or private hashes
+in them. The local file name and content hash are not retained in public
+provenance; a source-byte digest is used only for the internal parse cache.
 
 This is an explicit approximation boundary. NWLC reports using a manually
 modified AntBNC mapping aligned to its selected word lists. Raw AntBNC can map
@@ -160,12 +225,12 @@ as a universal package score.
 
 The version-pinned [TAALED 0.32 documentation](https://pypi.org/project/taaled/0.32/)
 exposes distinctions that a shared label can hide. Its Maas calculation uses
-the base-10, a-squared form, whereas the frozen `ldfreq` core uses natural logs
+the base-10, a-squared form, whereas the versioned `ldfreq` core uses natural logs
 and a-squared. The base-10 value equals the natural-log value multiplied by
 `log(10)`: rankings may be unchanged while coefficients, cutoffs, and raw-scale
 comparisons are not.
 
-For sequential MTLD, the frozen core reports the arithmetic mean of forward
+For sequential MTLD, the versioned core reports the arithmetic mean of forward
 and reverse tokens-per-factor scores. TAALED 0.32 exposes a pooled adjusted
 mean-factor-length value, a mean of the two directional mean-factor-length
 values, and an Original-style directional score mean. The final-token rule and
@@ -259,7 +324,8 @@ synthetic_nj8 <- data.frame(
 )
 level_profile <- new_jacet8000_profile(
   c("The", "develop", "rare", "outside", "the"),
-  synthetic_nj8
+  synthetic_nj8,
+  unit = "surface"
 )
 level_profile$summary
 level_profile$coverage
@@ -319,5 +385,5 @@ For reproducible research, retain at least:
 
 Factor analysis, PCA, dominance analysis, proficiency prediction, and other
 population-dependent models belong in downstream analysis or a research
-vignette. They do not change the meaning of the package's frozen measurement
+vignette. They do not change the meaning of the package's versioned measurement
 records.

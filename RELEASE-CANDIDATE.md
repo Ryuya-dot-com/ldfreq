@@ -1,15 +1,11 @@
-# ldfreq 0.1.0 release-candidate boundary
+# ldfreq 0.1.1 release-candidate boundary
 
-The maintainer authorized a one-time recomposition of the existing GitHub
-`0.1.0` distribution on 2026-08-16. Its previous artifacts and go/no-go
-decision cannot be reused. This replacement candidate adds raw-text
-preprocessing, deterministic expected-TTR D, tidy/`quanteda` input adapters,
-wide reshaping, base-R plots, a TUBELEX public-profile candidate, a
-caller-supplied New JACET 8000 level-profile surface, and a separately
-contracted Maas/MTLD variant surface. The exact replacement commit must pass
-the technical, resource, and maintainer decision gates in
-`RELEASE-CHECKLIST.md` before the existing GitHub tag and assets are replaced
-or the package is submitted to CRAN.
+Version `0.1.1` is an ordinary patch release built on the immutable `0.1.0`
+release. It adds the lexical-overlap API and corrective implementation,
+contract, test, and documentation changes without rewriting the `0.1.0` tag or
+its assets. The exact candidate commit must pass the technical, resource, and
+maintainer decision gates in `RELEASE-CHECKLIST.md` before a new `0.1.1` tag is
+created, release assets are published, or the package is submitted to CRAN.
 
 ## Automated evidence
 
@@ -68,9 +64,8 @@ may enter package artifacts. Review must verify identity fallback, explicit
 override precedence, path-private provenance, and the documented distinction
 between raw AntBNC approximation and NWLC's manually aligned mapping.
 
-Rollback before the authorized replacement means closing or reverting the
-candidate change and leaving the existing distribution unchanged. The
-2026-08-16 replacement is the sole recorded exception to tag immutability;
-after it is published, rollback means documenting the defect, withdrawing the
-affected asset where the hosting service permits, and preparing a reviewed
-patch release without rewriting the tag again.
+Rollback before publication means closing or reverting the candidate change
+and leaving `0.1.0` unchanged. After publication, rollback means documenting
+the defect, withdrawing an affected asset where the hosting service permits,
+and preparing a reviewed follow-up patch release. Published tags remain
+immutable.

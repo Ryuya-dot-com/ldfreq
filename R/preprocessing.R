@@ -1,15 +1,17 @@
 # Versioned raw-text preprocessing and lexical-unit selection.
 #
-# The frozen lexical-diversity core continues to accept only plain ordered
+# The versioned lexical-diversity core continues to accept only plain ordered
 # character vectors.  This file adds a separate envelope so that tokenization,
 # lemmatization, and word-inclusion choices are explicit rather than hidden in
 # metric computation.
 
 .lexprep_contract_id <- "ldfreq-preprocessing"
-.lexprep_contract_version <- "0.1.0"
+.lexprep_contract_version <- "0.1.1"
 .lexprep_tokenizer_id <- "ldfreq-unicode-word-tokenizer"
 .lexprep_tokenizer_version <- "0.1.0"
-.lexprep_antbnc_id <- "antbnc-lemma-list"
+.lexprep_flemma_backend_id <- "ldfreq-antbnc-flemma-adapter"
+.lexprep_flemma_backend_version <- "0.1.1"
+.lexprep_antbnc_resource_id <- "antbnc-lemma-list"
 .lexprep_antbnc_parser_id <- "ldfreq-antbnc-parser"
 .lexprep_antbnc_parser_version <- "0.1.0"
 .lexprep_antbnc_max_bytes <- 25 * 1024^2
@@ -24,13 +26,19 @@
   "(?:['\u2019\\-\u2010\u2011][\\p{L}\\p{M}\\p{N}]+)*"
 )
 .lexprep_content_upos <- c("ADJ", "ADV", "NOUN", "PROPN", "VERB")
+.lexprep_upos_tags <- c(
+  "ADJ", "ADP", "ADV", "AUX", "CCONJ", "DET", "INTJ", "NOUN", "NUM",
+  "PART", "PRON", "PROPN", "PUNCT", "SCONJ", "SYM", "VERB", "X"
+)
+
+.lexprep_is_plain_choice <- function(value, choices) {
+  is.character(value) && !is.object(value) && is.null(dim(value)) &&
+    is.null(attributes(value)) && length(value) == 1L && !is.na(value) &&
+    nzchar(value) && any(vapply(choices, identical, logical(1), value))
+}
 
 .lexprep_scalar_choice <- function(value, choices, argument) {
-  if (
-    !is.character(value) || is.object(value) || !is.null(dim(value)) ||
-      length(value) != 1L || is.na(value) || !nzchar(value) ||
-      !(value %in% choices)
-  ) {
+  if (!.lexprep_is_plain_choice(value, choices)) {
     stop(
       sprintf(
         "%s must be exactly one of: %s.",
@@ -44,7 +52,10 @@
 }
 
 .lexprep_scalar_flag <- function(value, argument) {
-  if (!is.logical(value) || length(value) != 1L || is.na(value)) {
+  if (
+    !is.logical(value) || is.object(value) || !is.null(dim(value)) ||
+      !is.null(attributes(value)) || length(value) != 1L || is.na(value)
+  ) {
     stop(sprintf("%s must be TRUE or FALSE.", argument), call. = FALSE)
   }
   value
@@ -63,6 +74,113 @@
     )
   }
   Encoding(value) <- "UTF-8"
+  value
+}
+
+.lexprep_looks_like_path <- function(value) {
+  grepl("[/\\\\]", value) ||
+    value %in% c(".", "..") ||
+    grepl("^[A-Za-z]:", value) ||
+    grepl("^~($|[/\\\\])", value) ||
+    grepl("^file:(//)?", value, ignore.case = TRUE)
+}
+
+.lexprep_is_path_free_identifier <- function(value) {
+  is.character(value) && !is.object(value) && is.null(dim(value)) &&
+    is.null(attributes(value)) && length(value) == 1L && !is.na(value) &&
+    nzchar(value) && !(Encoding(value) %in% c("bytes", "latin1")) &&
+    validUTF8(value) && !grepl("[[:cntrl:]]", value) &&
+    !.lexprep_looks_like_path(value)
+}
+
+.lexprep_is_count <- function(value, minimum = 0, maximum = Inf) {
+  is.numeric(value) && !is.object(value) && is.null(dim(value)) &&
+    length(value) == 1L && !is.na(value) && is.finite(value) &&
+    value >= minimum && value <= maximum && value == floor(value)
+}
+
+.lexprep_is_optional_path_free_identifier <- function(value) {
+  is.null(value) || .lexprep_is_path_free_identifier(value)
+}
+
+.lexprep_coverage_matches <- function(count, total, coverage) {
+  if (total == 0L) {
+    is.numeric(coverage) && length(coverage) == 1L && is.na(coverage)
+  } else {
+    is.numeric(coverage) && length(coverage) == 1L && !is.na(coverage) &&
+      identical(as.double(coverage), as.double(count / total))
+  }
+}
+
+.lexprep_flemma_override_version_is_valid <- function(annotation) {
+  if (
+    !is.list(annotation) || is.object(annotation) ||
+      !.lexprep_is_count(annotation$override_entries)
+  ) {
+    return(FALSE)
+  }
+  if (annotation$override_entries == 0) {
+    is.null(annotation$override_version)
+  } else {
+    .lexprep_is_optional_path_free_identifier(annotation$override_version)
+  }
+}
+
+.lexprep_upos_identity_is_valid <- function(annotation, expected_upos_tokens) {
+  if (!is.list(annotation) || is.object(annotation)) return(FALSE)
+  if (expected_upos_tokens == 0) {
+    is.null(annotation$upos_backend_id) &&
+      is.null(annotation$upos_backend_version)
+  } else {
+    .lexprep_is_path_free_identifier(annotation$upos_backend_id) &&
+      .lexprep_is_path_free_identifier(annotation$upos_backend_version)
+  }
+}
+
+.lexprep_annotation_backend_is_valid <- function(annotation) {
+  if (!is.list(annotation) || is.object(annotation)) return(FALSE)
+  method <- annotation$method
+  if (
+    !.lexprep_is_plain_choice(method, c("supplied", "textstem")) ||
+      !.lexprep_is_path_free_identifier(annotation$backend_id) ||
+      !.lexprep_is_path_free_identifier(annotation$backend_version)
+  ) {
+    return(FALSE)
+  }
+  !identical(method, "textstem") ||
+    identical(annotation$backend_id, "textstem::lemmatize_words")
+}
+
+.lexprep_flemma_identity_rows_are_valid <- function(token_table, annotation) {
+  if (
+    !is.list(annotation) || is.object(annotation) ||
+      !.lexprep_is_plain_choice(
+        annotation$query_normalization,
+        c("nfkc_lower", "identity")
+      )
+  ) {
+    return(FALSE)
+  }
+  identity <- token_table$flemma_match_rule == "identity"
+  if (!any(identity)) return(TRUE)
+  expected <- .lexprep_flemma_normalize(
+    token_table$surface[identity],
+    annotation$query_normalization
+  )
+  identical(
+    unname(token_table$flemma[identity]),
+    unname(expected)
+  )
+}
+
+.lexprep_scalar_identifier <- function(value, argument) {
+  value <- .lexprep_scalar_string(value, argument)
+  if (grepl("[[:cntrl:]]", value) || .lexprep_looks_like_path(value)) {
+    stop(
+      sprintf("%s must be a path-free identifier without control characters.", argument),
+      call. = FALSE
+    )
+  }
   value
 }
 
@@ -127,13 +245,26 @@
     is.data.frame(value$tokens) && is.list(value$provenance)
 }
 
-.lexprep_validate_tokenization <- function(value) {
+.lexprep_validate_annotation_column <- function(value, size, argument) {
+  is.character(value) &&
+    !is.object(value) &&
+    is.null(dim(value)) &&
+    length(value) == size &&
+    all(is.na(value) | nzchar(value)) &&
+    all(is.na(value) | !(Encoding(value) %in% c("bytes", "latin1"))) &&
+    all(is.na(value) | validUTF8(value))
+}
+
+.lexprep_validate_tokenization <- function(value, argument = "x") {
   if (!.lexprep_is_tokenization(value)) {
-    stop("x must be created by lexdiv_tokenize().", call. = FALSE)
+    stop(
+      sprintf("%s must be created by lexdiv_tokenize().", argument),
+      call. = FALSE
+    )
   }
   required <- c("token_index", "start", "end", "surface", "is_number")
   if (!all(required %in% names(value$tokens))) {
-    stop("x has an invalid tokenization table.", call. = FALSE)
+    stop(sprintf("%s has an invalid tokenization table.", argument), call. = FALSE)
   }
   row_count <- nrow(value$tokens)
   positions_are_valid <-
@@ -153,7 +284,7 @@
       any(!validUTF8(value$tokens$surface)) ||
       !is.logical(value$tokens$is_number) || anyNA(value$tokens$is_number)
   ) {
-    stop("x has an invalid tokenization table.", call. = FALSE)
+    stop(sprintf("%s has an invalid tokenization table.", argument), call. = FALSE)
   }
   if (row_count > 0L) {
     offsets_are_valid <-
@@ -172,7 +303,183 @@
       stringi::stri_detect_regex(value$tokens$surface, "^\\p{N}+$")
     )
     if (!offsets_are_valid || !number_flags_are_valid) {
-      stop("x has an invalid tokenization table.", call. = FALSE)
+      stop(sprintf("%s has an invalid tokenization table.", argument), call. = FALSE)
+    }
+  }
+
+  provenance <- value$provenance
+  provenance_is_valid <-
+    identical(provenance$contract_id, .lexprep_contract_id) &&
+      identical(provenance$contract_version, .lexprep_contract_version) &&
+      identical(provenance$tokenizer_id, .lexprep_tokenizer_id) &&
+      identical(provenance$tokenizer_version, .lexprep_tokenizer_version) &&
+      .lexprep_is_plain_choice(
+        provenance$normalization,
+        c("NFC", "NFKC", "none")
+      ) &&
+      .lexprep_is_plain_choice(provenance$case, c("preserve", "lower")) &&
+      is.logical(provenance$keep_numbers) && !is.object(provenance$keep_numbers) &&
+      is.null(dim(provenance$keep_numbers)) &&
+      is.null(attributes(provenance$keep_numbers)) &&
+      length(provenance$keep_numbers) == 1L && !is.na(provenance$keep_numbers) &&
+      is.numeric(provenance$output_tokens) &&
+      length(provenance$output_tokens) == 1L &&
+      identical(as.double(provenance$output_tokens), as.double(row_count))
+  if (!provenance_is_valid) {
+    stop(sprintf("%s has invalid preprocessing provenance.", argument), call. = FALSE)
+  }
+
+  annotation_columns <- c("lemma", "upos")
+  annotation_present <- annotation_columns %in% names(value$tokens)
+  if (any(annotation_present) && !all(annotation_present)) {
+    stop(sprintf("%s has an incomplete lemma/UPOS annotation layer.", argument), call. = FALSE)
+  }
+  if (all(annotation_present)) {
+    annotation <- provenance$annotation
+    expected_lemma_tokens <- as.double(sum(!is.na(value$tokens$lemma)))
+    expected_upos_tokens <- as.double(sum(!is.na(value$tokens$upos)))
+    expected_lemma_coverage <- if (row_count == 0L) {
+      NA_real_
+    } else {
+      expected_lemma_tokens / row_count
+    }
+    expected_upos_coverage <- if (row_count == 0L) {
+      NA_real_
+    } else {
+      expected_upos_tokens / row_count
+    }
+    upos_identity_is_valid <- .lexprep_upos_identity_is_valid(
+      annotation,
+      expected_upos_tokens
+    )
+    annotation_is_valid <-
+      .lexprep_validate_annotation_column(
+        value$tokens$lemma,
+        row_count,
+        "lemma"
+      ) &&
+      .lexprep_validate_annotation_column(
+        value$tokens$upos,
+        row_count,
+        "upos"
+      ) &&
+      all(is.na(value$tokens$upos) | value$tokens$upos %in% .lexprep_upos_tags) &&
+      .lexprep_annotation_backend_is_valid(annotation) &&
+      upos_identity_is_valid &&
+      identical(annotation$lemma_tokens, expected_lemma_tokens) &&
+      identical(annotation$lemma_coverage, expected_lemma_coverage) &&
+      identical(annotation$upos_tokens, expected_upos_tokens) &&
+      identical(annotation$upos_coverage, expected_upos_coverage)
+    if (!annotation_is_valid) {
+      stop(sprintf("%s has an invalid lemma/UPOS annotation layer.", argument), call. = FALSE)
+    }
+  }
+
+  flemma_columns <- c("flemma", "flemma_matched", "flemma_match_rule")
+  flemma_present <- flemma_columns %in% names(value$tokens)
+  if (any(flemma_present) && !all(flemma_present)) {
+    stop(sprintf("%s has an incomplete flemma annotation layer.", argument), call. = FALSE)
+  }
+  if (all(flemma_present)) {
+    rule <- value$tokens$flemma_match_rule
+    matched <- value$tokens$flemma_matched
+    flemma_table_is_valid <-
+      .lexprep_validate_annotation_column(
+        value$tokens$flemma,
+        row_count,
+        "flemma"
+      ) &&
+      !anyNA(value$tokens$flemma) &&
+      is.logical(matched) && length(matched) == row_count && !anyNA(matched) &&
+      is.character(rule) && !is.object(rule) && is.null(dim(rule)) &&
+      length(rule) == row_count && !anyNA(rule) &&
+      all(rule %in% c("antbnc", "override", "identity")) &&
+      identical(matched, rule != "identity")
+    if (!flemma_table_is_valid) {
+      stop(sprintf("%s has an invalid flemma annotation layer.", argument), call. = FALSE)
+    }
+
+    flemma_annotation <- provenance$flemma_annotation
+    expected_matched_tokens <- as.double(sum(matched))
+    expected_matched_coverage <- if (row_count == 0L) {
+      NA_real_
+    } else {
+      expected_matched_tokens / row_count
+    }
+    expected_identity_tokens <- as.double(sum(rule == "identity"))
+    expected_override_tokens <- as.double(sum(rule == "override"))
+    expected_resource_rule_tokens <- as.double(sum(rule == "antbnc"))
+    flemma_is_valid <-
+      is.list(flemma_annotation) && !is.object(flemma_annotation) &&
+      identical(flemma_annotation$method, "antbnc") &&
+      identical(flemma_annotation$lexical_unit, "flemma") &&
+      identical(flemma_annotation$backend_id, .lexprep_flemma_backend_id) &&
+      identical(
+        flemma_annotation$backend_version,
+        .lexprep_flemma_backend_version
+      ) &&
+      identical(flemma_annotation$parser_id, .lexprep_antbnc_parser_id) &&
+      identical(flemma_annotation$parser_version, .lexprep_antbnc_parser_version) &&
+      identical(flemma_annotation$resource_id, .lexprep_antbnc_resource_id) &&
+      .lexprep_is_optional_path_free_identifier(
+        flemma_annotation$resource_version
+      ) &&
+      identical(flemma_annotation$resource_source_type, "local_text") &&
+      .lexprep_is_count(flemma_annotation$source_records, minimum = 1) &&
+      .lexprep_is_count(
+        flemma_annotation$mapping_records,
+        minimum = flemma_annotation$source_records
+      ) &&
+      .lexprep_is_count(
+        flemma_annotation$resource_matched_tokens,
+        maximum = row_count
+      ) &&
+      flemma_annotation$resource_matched_tokens >= expected_resource_rule_tokens &&
+      flemma_annotation$resource_matched_tokens <=
+        expected_resource_rule_tokens + expected_override_tokens &&
+      .lexprep_coverage_matches(
+        flemma_annotation$resource_matched_tokens,
+        row_count,
+        flemma_annotation$resource_match_coverage
+      ) &&
+      .lexprep_flemma_override_version_is_valid(flemma_annotation) &&
+      (expected_override_tokens == 0 || flemma_annotation$override_entries > 0) &&
+      .lexprep_is_plain_choice(
+        flemma_annotation$query_normalization,
+        c("nfkc_lower", "identity")
+      ) &&
+      .lexprep_flemma_identity_rows_are_valid(
+        value$tokens,
+        flemma_annotation
+      ) &&
+      identical(
+        flemma_annotation$query_normalization_id,
+        unname(.lexprep_flemma_normalization_ids[[
+          flemma_annotation$query_normalization
+        ]])
+      ) &&
+      identical(flemma_annotation$input_tokens, as.double(row_count)) &&
+      identical(flemma_annotation$matched_tokens, expected_matched_tokens) &&
+      identical(
+        flemma_annotation$matched_coverage,
+        expected_matched_coverage
+      ) &&
+      identical(
+        flemma_annotation$identity_fallback_tokens,
+        expected_identity_tokens
+      ) &&
+      identical(
+        flemma_annotation$override_tokens,
+        expected_override_tokens
+      ) &&
+      identical(
+        flemma_annotation$unknown_form_policy,
+        "normalized-surface-identity-fallback"
+      ) &&
+      identical(flemma_annotation$resource_bundled, FALSE) &&
+      identical(flemma_annotation$runtime_download, FALSE)
+    if (!flemma_is_valid) {
+      stop(sprintf("%s has an invalid flemma annotation layer.", argument), call. = FALSE)
     }
   }
   value
@@ -304,12 +611,18 @@ lexdiv_tokenize <- function(
 #' @param lemmas For `method = "supplied"`, a character vector aligned with the
 #'   token rows. Missing lemmas are allowed and later reported as exclusions.
 #' @param upos Optional aligned Universal POS tags. Missing values are allowed.
+#'   Non-missing tags are uppercased and must belong to the Universal POS
+#'   inventory; unsupported labels are errors rather than non-content words.
 #'   The `textstem` backend supplies lemmas only; it does not infer UPOS. Supply
 #'   tags explicitly when a later `word_inclusion = "content"` analysis is
 #'   required.
-#' @param backend_id,backend_version Required provenance strings for supplied
-#'   annotations. For `textstem`, package identity and installed version are
-#'   recorded automatically.
+#' @param backend_id,backend_version Required path-free lemma-backend
+#'   identifiers for supplied annotations. For `textstem`, package identity and
+#'   installed version are recorded automatically and these arguments must be
+#'   `NULL`.
+#' @param upos_backend_id,upos_backend_version Path-free UPOS-backend
+#'   identifiers, required whenever any UPOS tag is present. They are kept
+#'   separate from lemma-backend identity even when one pipeline created both.
 #'
 #' @return The tokenization object with `lemma` and `upos` columns and an
 #'   annotation provenance record.
@@ -320,7 +633,9 @@ lexdiv_lemmatize <- function(
     lemmas = NULL,
     upos = NULL,
     backend_id = NULL,
-    backend_version = NULL) {
+    backend_version = NULL,
+    upos_backend_id = NULL,
+    upos_backend_version = NULL) {
   x <- .lexprep_validate_tokenization(x)
   method <- .lexprep_scalar_choice(
     method,
@@ -334,14 +649,20 @@ lexdiv_lemmatize <- function(
       stop("lemmas must be supplied when method = \"supplied\".", call. = FALSE)
     }
     lemmas <- .lexprep_optional_annotation(lemmas, row_count, "lemmas")
-    backend_id <- .lexprep_scalar_string(backend_id, "backend_id")
-    backend_version <- .lexprep_scalar_string(
+    backend_id <- .lexprep_scalar_identifier(backend_id, "backend_id")
+    backend_version <- .lexprep_scalar_identifier(
       backend_version,
       "backend_version"
     )
   } else {
     if (!is.null(lemmas)) {
       stop("lemmas must be NULL when method = \"textstem\".", call. = FALSE)
+    }
+    if (!is.null(backend_id) || !is.null(backend_version)) {
+      stop(
+        "backend_id and backend_version must be NULL when method = \"textstem\".",
+        call. = FALSE
+      )
     }
     if (!requireNamespace("textstem", quietly = TRUE)) {
       stop(
@@ -356,6 +677,45 @@ lexdiv_lemmatize <- function(
   }
   upos <- .lexprep_optional_annotation(upos, row_count, "upos")
   upos[!is.na(upos)] <- toupper(upos[!is.na(upos)])
+  unsupported_upos <- unique(upos[!is.na(upos) & !(upos %in% .lexprep_upos_tags)])
+  if (length(unsupported_upos) > 0L) {
+    stop(
+      sprintf(
+        "upos contains unsupported Universal POS tag(s): %s.",
+        paste(unsupported_upos, collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+  has_upos <- any(!is.na(upos))
+  supplied_upos_identity <- !is.null(upos_backend_id) ||
+    !is.null(upos_backend_version)
+  if (has_upos && !supplied_upos_identity) {
+    stop(
+      "upos_backend_id and upos_backend_version are required when UPOS tags are present.",
+      call. = FALSE
+    )
+  } else if (has_upos) {
+    if (is.null(upos_backend_id) || is.null(upos_backend_version)) {
+      stop(
+        "upos_backend_id and upos_backend_version must be supplied together.",
+        call. = FALSE
+      )
+    }
+    upos_backend_id <- .lexprep_scalar_identifier(
+      upos_backend_id,
+      "upos_backend_id"
+    )
+    upos_backend_version <- .lexprep_scalar_identifier(
+      upos_backend_version,
+      "upos_backend_version"
+    )
+  } else if (supplied_upos_identity) {
+    stop(
+      "UPOS backend identity must not be supplied when no UPOS tags are present.",
+      call. = FALSE
+    )
+  }
 
   x$tokens$lemma <- lemmas
   x$tokens$upos <- upos
@@ -363,6 +723,8 @@ lexdiv_lemmatize <- function(
     method = method,
     backend_id = backend_id,
     backend_version = backend_version,
+    upos_backend_id = upos_backend_id,
+    upos_backend_version = upos_backend_version,
     lemma_tokens = as.double(sum(!is.na(lemmas))),
     lemma_coverage = if (row_count == 0L) {
       NA_real_
@@ -417,8 +779,6 @@ lexdiv_lemmatize <- function(
     stop("AntBNC resource changed while it was being read.", call. = FALSE)
   }
   list(
-    path = path,
-    source_file = basename(path),
     source_sha256 = digest::digest(bytes, algo = "sha256", serialize = FALSE),
     bytes = bytes
   )
@@ -436,7 +796,6 @@ lexdiv_lemmatize <- function(
     cached <- get(cache_key, envir = .lexprep_antbnc_cache, inherits = FALSE)
     return(list(
       mapping = cached$mapping,
-      source = source[c("source_file", "source_sha256")],
       diagnostics = cached$diagnostics
     ))
   }
@@ -518,7 +877,6 @@ lexdiv_lemmatize <- function(
   assign(cache_key, prepared, envir = .lexprep_antbnc_cache)
   list(
     mapping = prepared$mapping,
-    source = source[c("source_file", "source_sha256")],
     diagnostics = prepared$diagnostics
   )
 }
@@ -531,8 +889,7 @@ lexdiv_lemmatize <- function(
         flemma = character(),
         stringsAsFactors = FALSE,
         check.names = FALSE
-      ),
-      canonical_sha256 = NA_character_
+      )
     ))
   }
   if (
@@ -552,6 +909,16 @@ lexdiv_lemmatize <- function(
   if (length(form) != length(flemma)) {
     stop("override form and flemma columns must have the same length.", call. = FALSE)
   }
+  if (length(form) == 0L) {
+    return(list(
+      mapping = data.frame(
+        form = character(),
+        flemma = character(),
+        stringsAsFactors = FALSE,
+        check.names = FALSE
+      )
+    ))
+  }
   form <- .lexprep_flemma_normalize(form, normalization)
   flemma <- .lexprep_flemma_normalize(flemma, normalization)
   if (any(!nzchar(form)) || any(!nzchar(flemma)) || anyDuplicated(form)) {
@@ -560,24 +927,12 @@ lexdiv_lemmatize <- function(
       call. = FALSE
     )
   }
-  canonical_order <- order(form, method = "radix")
-  canonical_text <- paste0(
-    form[canonical_order],
-    "\t",
-    flemma[canonical_order],
-    collapse = "\n"
-  )
   list(
     mapping = data.frame(
       form = form,
       flemma = flemma,
       stringsAsFactors = FALSE,
       check.names = FALSE
-    ),
-    canonical_sha256 = digest::digest(
-      charToRaw(enc2utf8(canonical_text)),
-      algo = "sha256",
-      serialize = FALSE
     )
   )
 }
@@ -596,8 +951,12 @@ lexdiv_lemmatize <- function(
 #' @param overrides Optional data frame with unique `form` and `flemma` columns.
 #' @param normalization Either case-insensitive `"nfkc_lower"` or exact
 #'   `"identity"` matching.
-#' @param resource_version Optional caller-supplied resource version. By
-#'   default, a label derived from the exact file SHA-256 is used.
+#' @param resource_version Optional caller-declared resource version. It must
+#'   be path-free. Strict flemma overlap treats a missing version as
+#'   unverifiable; the package does not infer content identity from file bytes.
+#' @param override_version Optional caller-declared version for a non-empty
+#'   override table. It must be path-free. Supplying it without overrides is an
+#'   error. Strict flemma overlap treats unversioned overrides as unverifiable.
 #'
 #' @return The tokenization object with `flemma`, `flemma_matched`, and
 #'   `flemma_match_rule` columns plus flemma resource provenance.
@@ -607,7 +966,8 @@ lexdiv_flemmatize <- function(
     resource,
     overrides = NULL,
     normalization = "nfkc_lower",
-    resource_version = NULL) {
+    resource_version = NULL,
+    override_version = NULL) {
   x <- .lexprep_validate_tokenization(x)
   normalization <- .lexprep_scalar_choice(
     normalization,
@@ -615,13 +975,26 @@ lexdiv_flemmatize <- function(
     "normalization"
   )
   if (!is.null(resource_version)) {
-    resource_version <- .lexprep_scalar_string(
+    resource_version <- .lexprep_scalar_identifier(
       resource_version,
       "resource_version"
     )
   }
+  if (!is.null(override_version)) {
+    override_version <- .lexprep_scalar_identifier(
+      override_version,
+      "override_version"
+    )
+  }
   prepared <- .lexprep_antbnc_parse(resource, normalization)
   overrides <- .lexprep_flemma_overrides(overrides, normalization)
+  override_entries <- nrow(overrides$mapping)
+  if (override_entries == 0L && !is.null(override_version)) {
+    stop(
+      "override_version must be NULL when overrides are absent or empty.",
+      call. = FALSE
+    )
+  }
   surface <- .lexprep_flemma_normalize(x$tokens$surface, normalization)
   matched_index <- match(surface, prepared$mapping$form)
   matched <- !is.na(matched_index)
@@ -641,25 +1014,17 @@ lexdiv_flemmatize <- function(
   x$tokens$flemma_matched <- unname(recognized)
   x$tokens$flemma_match_rule <- unname(match_rule)
 
-  version <- if (is.null(resource_version)) {
-    paste0(
-      "sha256-",
-      substr(prepared$source$source_sha256, 1L, 12L)
-    )
-  } else {
-    resource_version
-  }
   row_count <- nrow(x$tokens)
   x$provenance$flemma_annotation <- list(
     method = "antbnc",
     lexical_unit = "flemma",
-    backend_id = .lexprep_antbnc_id,
-    backend_version = version,
+    backend_id = .lexprep_flemma_backend_id,
+    backend_version = .lexprep_flemma_backend_version,
     parser_id = prepared$diagnostics$parser_id,
     parser_version = prepared$diagnostics$parser_version,
+    resource_id = .lexprep_antbnc_resource_id,
+    resource_version = resource_version,
     resource_source_type = "local_text",
-    resource_source_file = prepared$source$source_file,
-    resource_source_sha256 = prepared$source$source_sha256,
     resource_bundled = FALSE,
     runtime_download = FALSE,
     query_normalization = normalization,
@@ -682,8 +1047,8 @@ lexdiv_flemmatize <- function(
       sum(matched) / row_count
     },
     override_tokens = as.double(sum(overridden)),
-    override_entries = as.double(nrow(overrides$mapping)),
-    override_canonical_sha256 = overrides$canonical_sha256,
+    override_entries = as.double(override_entries),
+    override_version = override_version,
     identity_fallback_tokens = as.double(sum(!matched & !overridden)),
     unknown_form_policy = "normalized-surface-identity-fallback"
   )
@@ -721,8 +1086,8 @@ lexdiv_flemmatize <- function(
     }
     missing_upos <- is.na(token_table$upos)
     non_content <- !missing_upos & !(token_table$upos %in% .lexprep_content_upos)
-    exclusion_reason[is.na(exclusion_reason) & missing_upos] <- "missing_upos"
-    exclusion_reason[is.na(exclusion_reason) & non_content] <- "non_content_upos"
+    exclusion_reason[missing_upos] <- "missing_upos"
+    exclusion_reason[non_content] <- "non_content_upos"
   }
 
   eligible <- is.na(exclusion_reason)
@@ -755,7 +1120,7 @@ lexdiv_flemmatize <- function(
 #'
 #' Tokenizes raw text, or consumes an existing tokenization object, selects
 #' surface forms, explicit lemmas, or flemmas, optionally restricts analysis to Universal
-#' POS content words, and then calls the frozen [lexdiv_metrics()] core. The
+#' POS content words, and then calls the versioned [lexdiv_metrics()] core. The
 #' core result schema remains unchanged; preprocessing is returned in a
 #' separate auditable envelope.
 #'
@@ -763,8 +1128,10 @@ lexdiv_flemmatize <- function(
 #'   existing tokenization is supplied, its recorded `normalization`, `case`,
 #'   and `keep_numbers` choices are authoritative; supplying any of those
 #'   tokenizer arguments again is an error.
-#' @param unit One of `"surface"`, `"lemma"`, or `"flemma"`.
-#' @param word_inclusion Either all word tokens or the frozen UPOS content set
+#' @param unit One of `"surface"`, `"lemma"`, or `"flemma"`. Lemma and flemma
+#'   analyses require the corresponding annotations on a `lexdiv_tokenization`
+#'   object; raw character input supports surface analysis only.
+#' @param word_inclusion Either all word tokens or the defined UPOS content set
 #'   `ADJ`, `ADV`, `NOUN`, `PROPN`, and `VERB`. Content-word selection requires
 #'   UPOS annotations; `textstem` does not create them.
 #' @inheritParams lexdiv_tokenize
@@ -784,7 +1151,8 @@ lexdiv_metrics_text <- function(
     segment_length = 50L,
     window_length = 50L,
     mtld_threshold = 0.72,
-    sample_size = 42L) {
+    sample_size = 42L,
+    expected_ttr_sample_sizes = 35:50) {
   supplied_tokenizer_arguments <- c(
     normalization = !missing(normalization),
     case = !missing(case),
@@ -832,7 +1200,8 @@ lexdiv_metrics_text <- function(
     segment_length = segment_length,
     window_length = window_length,
     mtld_threshold = mtld_threshold,
-    sample_size = sample_size
+    sample_size = sample_size,
+    expected_ttr_sample_sizes = expected_ttr_sample_sizes
   )
   token_count <- nrow(selected$audit)
   eligible_count <- sum(selected$audit$eligible)

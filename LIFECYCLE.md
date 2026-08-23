@@ -1,8 +1,9 @@
 # API and measurement lifecycle
 
 The `0.1.x` line freezes the resource-independent, pre-tokenized twelve-method
-core. Raw-text preprocessing and resource-backed profiles are separate public
-surfaces with their own contract versions and review gates. The Maas/MTLD
+core. Raw-text preprocessing, exact lexical overlap, and resource-backed
+profiles are separate public surfaces with their own contract versions and
+review gates. The Maas/MTLD
 sensitivity surface also has a separate variant contract and does not add
 methods to the frozen core registry. Caller-supplied lexical-level profiles
 have a separate contract for resource input, rank bands, denominator, off-list
@@ -54,10 +55,19 @@ normalization, content-word set, lemma backend contract, query transform,
 coverage denominator, or matched-only summary requires a new corresponding
 contract version.
 
-Flemma is a distinct lexical unit. Changing the AntBNC parser, unknown-form
-fallback, override precedence, form-family identity, path-provenance boundary,
-or cache-visible result semantics requires a new preprocessing contract
-version. Performance caching must remain result-invariant and path-free.
+Flemma is a distinct lexical unit. Changing the fixed AntBNC adapter/parser,
+unknown-form fallback, override precedence, declared resource/override version
+semantics, label-disclosure boundary, path-provenance boundary, or public
+result semantics requires a new preprocessing contract version. Declared
+versions are caller labels, not inferred content identities. Performance
+caching must remain result-invariant; its source-byte digest must remain
+internal and must not become public provenance or an overlap-comparability key.
+
+Preprocessing objects are validated against their recorded contract version.
+The stricter `0.1.1` contract does not automatically migrate a
+`lexdiv_tokenization` serialized under `0.1.0` with `saveRDS()` or an equivalent
+mechanism. Recreate the object from the original text and reapply its current
+annotations and explicit backend labels; do not edit old provenance in place.
 
 For lexical-level profiles, changing rank-to-level mapping, entry
 normalization, alias collision policy, default lexical unit, type identity,
@@ -67,6 +77,12 @@ its bytes to the package resource inventory.
 Changing AntBNC-versus-wordlist conflict detection, its default policy, or the
 reported alternative rank/level also requires a new level-profile contract
 version.
+
+For exact lexical overlap, changing set identity, normalization, formulas,
+denominators, empty-set behavior, content-word membership, the default
+comparability policy, or term-detail disclosure requires a new overlap contract
+version. Exact term details remain opt-in and must be visibly disclosed in the
+returned provenance and print output.
 
 Likewise, adding a variant formula, threshold boundary, minimum factor length,
 tail rule, directional aggregation, or compatibility claim requires a new

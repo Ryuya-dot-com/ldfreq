@@ -4,7 +4,7 @@
 \title{Explicit Maas and sequential-MTLD comparison variants}
 \description{
 List or compute a bounded set of formula and aggregation variants without
-changing the frozen twelve-method \code{lexdiv_metrics()} core.
+changing the versioned twelve-method \code{lexdiv_metrics()} core.
 }
 \usage{
 lexdiv_variant_ids()
@@ -33,7 +33,7 @@ ranges from zero to \eqn{1 / \ln(2)} inclusive; changing the log base or taking
 the square root changes that numerical range. The method ID records both scale
 and log base.
 
-The MTLD rows distinguish the frozen \pkg{ldfreq} directional-score mean from
+The MTLD rows distinguish the versioned \pkg{ldfreq} directional-score mean from
 three final-tail factorization and mean-factor-length aggregations. Factor
 lengths and proportions remain available in the diagnostics list-column.
 
