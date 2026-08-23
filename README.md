@@ -486,6 +486,11 @@ keeps unmatched measurements missing rather than coercing them to zero. The
 installed manifest, notice, provenance, and machine-readable inventory allow
 the bundled resource and its package boundary to be audited independently.
 
+The installed CC0 cross-language fixture checks parsed semantic agreement with
+the Python implementation for formulas that share exact method IDs. It also
+records the strict-`<` R MTLD and `<=` Python MTLD as distinct variants; fixture
+file-byte or hash equality is neither required nor asserted.
+
 ## License
 
 The R source code is licensed under the MIT License. The installed TUBELEX

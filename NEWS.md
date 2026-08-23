@@ -43,6 +43,10 @@
   described public methods rather than an immutable method definition.
 - Kept the existing TUBELEX resource-admission state unchanged; any promotion
   still requires evidence tied to the exact release artifact.
+- Added a CC0 cross-language semantic fixture for the ten R/Python formulas
+  that share method IDs. It compares parsed values, status meaning, and missing
+  reasons, while recording the intentionally different R and Python MTLD
+  boundary variants without claiming byte-level fixture identity.
 
 # ldfreq 0.1.0
 
