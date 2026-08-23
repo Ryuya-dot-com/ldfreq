@@ -299,7 +299,7 @@ frequency of zero.
 
 ## Frequency bands are profiles, not mean corpus frequencies
 
-[JACET announced New JACET 8000 as a 2016 publication](https://www.jacet.org/info/%E2%96%A0%E3%80%8E%E5%A4%A7%E5%AD%A6%E8%8B%B1%E8%AA%9E%E6%95%99%E8%82%B2%E5%AD%A6%E4%BC%9A%E5%9F%BA%E6%9C%AC%E8%AA%9E%E3%83%AA%E3%82%B9%E3%83%88-%E6%96%B0jacet8000%E3%80%8F-%E5%88%8A%E8%A1%8C%EF%BC%81/).
+New JACET 8000 was published in 2016.
 The [Ishikawa Laboratory vocabulary page](https://language.sakura.ne.jp/s/voc.html)
 links the official `j8_2016.xlsx` workbook and explains that compilation used
 BNC and COCA evidence plus Japanese educational materials. The workbook labels
