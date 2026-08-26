@@ -49,11 +49,11 @@ lexdiv_screen(
 )
 }
 \arguments{
-  \item{method_id}{One frozen method identifier returned by
+  \item{method_id}{One versioned method identifier returned by
   \code{lexdiv_methods()}. A method fixes its formula, scale, boundary, tail,
   and aggregation rules.}
   \item{parameters}{A plain named list of user-settable method parameters.
-  Omitted values are materialized from the frozen defaults.}
+  Omitted values are materialized from the versioned defaults.}
   \item{request_id}{An optional plain ASCII identifier used to join one request
   to its profile result.}
   \item{parameter}{The one user-settable scalar parameter admitted by the
@@ -108,12 +108,12 @@ row per source result and named floor. It deliberately has no metric-value colum
 }
 \description{
 Builds bounded, reproducible plans for computing multiple parameter settings of
-the frozen lexical-diversity methods without changing the established canonical
-API. The identity hierarchy is metric family, frozen method, and normalized
+the versioned lexical-diversity methods without changing the established canonical
+API. The identity hierarchy is metric family, versioned method, and normalized
 method-plus-parameter specification.
 }
 \details{
-The \code{canonical} preset contains the twelve frozen methods at their default
+The \code{canonical} preset contains the twelve versioned methods at their default
 parameters. The \code{length_50_100} preset contains those twelve requests plus
 MSTTR at segment length 100 and MATTR at window length 100. It has fourteen
 specifications: MTLD is

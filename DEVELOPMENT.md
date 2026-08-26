@@ -1,14 +1,15 @@
 # Release-candidate boundary
 
 The lexical-diversity core remains resource-independent and accepts ordered
-pre-tokenized vectors. The recomposed `0.1.0` release candidate freezes twelve
-methods, including the deterministic expected-TTR D fit, and adds separate
-raw-text preprocessing and TUBELEX profile APIs under their own versioned
-contracts. A third contract exposes selected Maas and sequential-MTLD
-sensitivity variants; a fourth defines caller-supplied lexical-level profiles.
-These extensions leave the twelve-method core contract unchanged. The package does
-not claim compatibility with TAALES, TAALED, CLAN VOCD, or another package's
-same-named variant beyond each row's explicit comparison scope.
+pre-tokenized vectors. The `0.1.1` patch release candidate retains the twelve
+core methods, including the deterministic expected-TTR D fit, and the separate
+versioned contracts for raw-text preprocessing, TUBELEX profiles, selected
+Maas and sequential-MTLD sensitivity variants, and caller-supplied lexical
+levels. It adds a separately contracted lexical-overlap API. These extensions
+leave the twelve-method core contract unchanged. Package version `0.1.1` does
+not imply that unchanged method contracts have been renumbered. The package
+does not claim compatibility with TAALES, TAALED, CLAN VOCD, or another
+package's same-named variant beyond each row's explicit comparison scope.
 
 The lexical-level profile is resource-decoupled: `new_jacet8000_profile()` and
 `new_jacet8000_profile_batch()`
@@ -21,13 +22,17 @@ This public measurement contract does not admit
 the underlying JACET resource into the package inventory.
 
 `lexdiv_flemmatize()` similarly reads only a caller-supplied local AntBNC text
-resource. It keeps that payload outside package artifacts, records only the
-source basename and exact hash, and describes raw AntBNC as an NWLC
-approximation rather than compatibility. New JACET integration must retain
-per-token AntBNC/override/identity rules and selectable headword-conflict
-resolution.
+resource. It keeps that payload outside package artifacts and records the
+fixed package adapter/parser identities plus optional caller-declared resource
+and override versions. Those version labels are public provenance, not content
+hashes or package verification: they must be path-free and must not contain
+secrets or private hashes. The source file name is not retained, and its byte
+hash is cache state only rather than public provenance or an overlap
+comparison key. Raw AntBNC remains an NWLC approximation rather than a
+compatibility claim. New JACET integration must retain per-token
+AntBNC/override/identity rules and selectable headword-conflict resolution.
 
-## Before publishing version 0.1.0
+## Before publishing version 0.1.1
 
 - exercise the package on R-release and R-devel across Linux, macOS, and Windows;
 - preserve the frozen twelve-method public API and lifecycle policy;
@@ -73,9 +78,10 @@ wrapper applies an explicit identity or TUBELEX-oriented query transform,
 retains original and lookup terms, reports token/type coverage and
 normalization collisions, and leaves unmatched measurements missing rather
 than inventing zero counts. Its non-exported exact-match lower layer remains
-governed by the internal lookup contract. The exact state and every explicitly
-deferred or excluded resource are recorded in
-`inst/spec/ldfreq-resource-inventory.json`.
+governed by the non-exported lookup contract. Installed resource facts are
+recorded in `inst/spec/ldfreq-installed-resource-manifest.json`. Release
+admission, deferred resources, and exclusions are recorded separately in
+`experiments/resource-admission/ldfreq-release-resource-inventory.json`.
 A New JACET 8000 adapter does not change that resource state. The list remains
 explicitly excluded from package payloads while durable CRAN and downstream
 redistribution scope remains unresolved; only caller-authorized local input is
@@ -88,15 +94,13 @@ diagnostics, offline behavior, public lifecycle, and source/installed/platform-
 binary membership have all been verified and the maintainer's admission
 decision has been recorded.
 
-The installed release-admission candidate is separately byte-pinned and states
-`maintainer-approved`. It records the pinned upstream BSD-3-Clause license and
-README, CRAN policy basis, maintainer identity and date, approved distribution
-and public-profile scopes, and explicit risk controls. Missing, modified, or
-semantically weakened candidate bytes fail closed without search, download, or
-fallback. A valid decision closes only the resource-admission gate: the
-evaluator always leaves `package_release_ready` false until the final exact
-source, installed, and binary inventory audit passes. Independent review is an
-optional additional check, not a release prerequisite.
+The repository-only release-admission record states `maintainer-approved` and
+records the pinned upstream BSD-3-Clause license and README, CRAN policy basis,
+maintainer identity and date, approved distribution and public-profile scopes,
+explicit risk controls, and remaining package gates. Its CI validator checks
+the record semantically against the installed manifest. Admission records and
+package-readiness evaluation are not installed with the runtime package.
+Independent review is an optional additional check, not a release prerequisite.
 
 The current non-exported loader establishes only the common integrity and
 failure boundary. It consumes exact local paths, hashes the same raw bytes that

@@ -1,4 +1,4 @@
-# Internal implementation of the frozen MTLD variant.
+# Internal implementation of the versioned MTLD variant.
 #
 # This implementation follows the package's metric contract. In particular,
 # the threshold comparison is strict, complete factors require ten tokens, the

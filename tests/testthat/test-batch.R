@@ -240,7 +240,7 @@ test_that("zero documents still validate global metric parameters", {
   )
   expect_error(
     batch_function(empty_list, metrics = "not_frozen"),
-    "non-frozen"
+    "Unknown metric ID"
   )
 
   ignored_local_parameter <- batch_function(

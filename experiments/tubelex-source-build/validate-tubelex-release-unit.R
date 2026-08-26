@@ -52,10 +52,10 @@ expected <- list(
   content_bytes = 8260448,
   content_sha256 = "423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916",
   rows = 515292,
-  notice_bytes = 4193,
-  notice_sha256 = "e65a1f5d0d6e7806e31e92d78bf3b903115e610c36bd9f2406269700441ecdd3",
-  builder_sha256 = "42ce12b2a0a8a29a4c6009092c4453677ad73460c58fe7b56f2bfd7279dd00a6",
-  wrapper_sha256 = "6ba5f8d314130691860e772a633a159477bbc130ad09d401c81cc0786926c20b"
+  notice_bytes = 4175,
+  notice_sha256 = "a3ea8312a5bbf8e7178155259460f089d0377a8c99094f70875910c428cb4cb5",
+  builder_sha256 = "551855007f1d659ad16dc6ae8861eb5408d655a95d3270fc60a6ac68cffe6397",
+  wrapper_sha256 = "44ea7776173f99e72a904a9806c63d3cc88229d32fca99a2d2e8651dd97d3bea"
 )
 
 assertions <- 0L
@@ -146,7 +146,7 @@ inspect_unit <- function(path) {
 
   manifest <- jsonlite::read_json(manifest_path, simplifyVector = FALSE)
   check(
-    identical(manifest$status, "direct-source-r-build-candidate-not-production") &&
+    identical(manifest$status, "direct-source-r-build-record") &&
       identical(manifest$id, "tubelex-en-treebank-7cb5fb36-slim-r-direct-v1") &&
       identical(manifest$source$sha256, expected$source_sha256) &&
       identical(manifest$source$bundled_in_output, FALSE) &&

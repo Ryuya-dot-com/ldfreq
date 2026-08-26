@@ -7,9 +7,10 @@
 The \pkg{ldfreq} package computes explicitly versioned lexical-diversity
 metrics from ordered tokens and provides separate auditable raw-text,
 annotation, lexical-unit, Maas/MTLD sensitivity, and TUBELEX frequency-profile
-surfaces. It also provides a caller-supplied New JACET 8000 level-profile
-surface without bundling that list. Metric rows retain method, parameter,
-schema, and contract provenance.
+surfaces. It also provides exact term and annotated-content-word type overlap,
+plus a caller-supplied New JACET 8000 level-profile surface without bundling
+that list. Result rows retain method, parameter or denominator, schema, and
+contract provenance.
 }
 \details{
 Start with \code{lexdiv_metrics()} for explicit tokens,
@@ -20,6 +21,8 @@ Start with \code{lexdiv_metrics()} for explicit tokens,
 \code{lexdiv_profile()} for explicit parameter variants,
 \code{lexdiv_variant_metrics()} for separately contracted Maas/MTLD
 sensitivity variants, or
+\code{lexdiv_term_overlap()} for two explicit term vectors,
+\code{lexdiv_content_overlap()} for two UPOS-annotated texts, or
 \code{new_jacet8000_profile()} for exact and cumulative pedagogical frequency
 levels from a caller-supplied list, or
 \code{tubelex_frequency_profile()} for coverage-aware corpus-relative
@@ -37,6 +40,8 @@ Choose the entry point from the form of data you already have:
   named list or an explicit ID and token-list-column data frame.}
   \item{One-token-per-row or \pkg{quanteda} input}{Use
   \code{lexdiv_as_documents()} to create the explicit named-list boundary.}
+  \item{Two texts or term sets}{Use \code{lexdiv_term_overlap()} for explicit
+  terms, or \code{lexdiv_content_overlap()} for UPOS-annotated content words.}
   \item{A corpus-relative reference profile}{Use
   \code{tubelex_frequency_profile()} for bundled TUBELEX frequency/prevalence,
   or \code{new_jacet8000_profile()} with a legitimately obtained caller copy
@@ -66,7 +71,7 @@ methods.
 Metric results are long-form data frames. Read \code{status} and
 \code{missing_reason} before \code{value}. Each row records the method, metric
 contract, result schema, requested and effective parameters, token/type counts,
-the frozen \code{below_quality_floor} field, and method diagnostics. Batch,
+the versioned \code{below_quality_floor} field, and method diagnostics. Batch,
 profile, and screen layers add separate envelopes without changing the core
 record.
 }
@@ -77,6 +82,7 @@ and resource boundaries. The main files are:
 \itemize{
   \item \file{lexical-diversity-contract.json}
   \item \file{ldfreq-preprocessing-contract.json}
+  \item \file{lexical-overlap-contract.json}
   \item \file{lexical-diversity-variant-contract.json}
   \item \file{lexical-level-profile-contract.json}
   \item \file{tubelex-frequency-profile-contract.json}
@@ -90,11 +96,34 @@ rely on an R attribute alone.
 \section{Preprocessing and lexical units}{
 The raw-text adapter records Unicode normalization, case handling, number
 retention, offsets, and source/processed text hashes. Lemma analyses record the
-annotation backend and version. Caller-supplied AntBNC flemma analyses also
-record exact resource identity, matching rules, overrides, and identity
-fallback. Surface/lemma/flemma and all/content-word choices are returned with
-token-level exclusion reasons and coverage in an envelope that does not alter
-the normative metric result schema.
+lemma backend and version. Any UPOS tags require their own explicit backend ID
+and version; these values are never defaulted from the lemma backend.
+Caller-supplied AntBNC flemma analyses record fixed package adapter/parser IDs,
+caller-declared resource and override versions, matching rules, and identity
+fallback. They do not expose the local resource file name or a content hash.
+Declared labels are public provenance and must contain no paths, secrets, or
+private hashes. Surface/lemma/flemma and all/content-word choices are returned
+with token-level exclusion reasons and coverage in an envelope that does not
+alter the normative metric result schema.
+}
+\section{Exact lexical overlap}{
+\code{lexdiv_term_overlap()} computes Jaccard, Dice, directional A-in-B and
+B-in-A coverage, and the overlap coefficient from distinct exact terms.
+\code{lexdiv_content_overlap()} first selects \code{ADJ}, \code{ADV},
+\code{NOUN}, \code{PROPN}, and \code{VERB} from two validated annotated
+tokenizations. It never infers UPOS or lemmas. Each row retains its numerator,
+denominator, direction, unit, and contract identity; document-level coverage
+separately counts missing UPOS, non-content UPOS, and missing selected units.
+The comparability table discloses its label values in four columns:
+\code{component}, \code{value_a}, \code{value_b}, and \code{matches}.
+Surface comparison uses tokenizer and UPOS settings; lemma comparison also
+uses lemma annotation identity. Flemma comparison instead adds its fixed
+adapter/parser and declared resource/override settings and ignores lemma
+backend identity because it consumes surface forms. Flemma resource versions
+must be present and equal; override versions are required and compared only
+when overrides are used. No file-content hash is a comparability key. The five
+measures have different denominators and must not be reported as one
+interchangeable generic percentage.
 }
 \section{Corpus-relative frequency}{
 \code{tubelex_frequency_profile()} retains original and normalized lookup
@@ -139,19 +168,23 @@ describe lexical-distribution properties of the supplied tokens.
 They are not direct measures of language proficiency, writing quality, reader
 response, or communicative effectiveness. Inferring those constructs requires a
 separate validated study design and cannot be justified by one score or by the
-frozen \code{below_quality_floor} field.
+versioned \code{below_quality_floor} field.
+
+Exact term/content-word overlap describes lexical sharing under the selected
+unit and annotation. It is not a plagiarism detector or a direct measure of
+semantic similarity, coherence, proficiency, or writing quality.
 }
 \section{Quality screens}{
 \code{below_quality_floor} and \code{lexdiv_screen()} are advisory token-count
-evidence screens. Here, quality is a frozen field name; it does not mean writing
+evidence screens. Here, quality is a field name retained for compatibility; it does not mean writing
 quality, measurement validity, or reliability. The screens never change a value,
 effective parameter, status, or document membership. Passing a screen does not
 establish validity or reliability; failing one does not erase an otherwise
 computable value.
 }
 \section{Versioned surfaces}{
-The core metrics, raw-text preprocessing, variant metrics, lexical-level
-profiles, and TUBELEX profile have separate versioned contracts. This keeps a
+The core metrics, raw-text preprocessing, lexical overlap, variant metrics,
+lexical-level profiles, and TUBELEX profile have separate versioned contracts. This keeps a
 change in tokenization or resource matching from silently redefining a core
 metric. Expected-TTR D is separately named and explicitly distinguished from
 CLAN VOCD.
@@ -159,13 +192,15 @@ CLAN VOCD.
 \section{Offline smoke test}{
 After loading \pkg{ldfreq}, run the installed script returned by
 \code{system.file("examples", "offline-smoke.R", package = "ldfreq")}. It
-exercises single, batch, profile, profile-batch, lexical-level, and screen
-workflows without a network connection or external runtime.
+exercises single, batch, profile, profile-batch, term/content-word overlap,
+lexical-level, and screen workflows without a network connection or external
+runtime.
 }
 \seealso{
 \code{\link{lexdiv_metrics}}, \code{\link{lexdiv_convenience}},
 \code{\link{lexdiv_preprocessing}},
 \code{\link{lexdiv_flemmatize}},
+\code{\link{lexdiv_overlap}},
 \code{\link{lexdiv_profile}}, \code{\link{lexdiv_variant_metrics}},
 \code{\link{new_jacet8000_profile}},
 \code{\link{tubelex_frequency_profile}}
@@ -181,6 +216,7 @@ source(smoke_path, local = TRUE)
 contract_files <- c(
   "lexical-diversity-contract.json",
   "ldfreq-preprocessing-contract.json",
+  "lexical-overlap-contract.json",
   "lexical-diversity-variant-contract.json",
   "lexical-level-profile-contract.json",
   "tubelex-frequency-profile-contract.json"

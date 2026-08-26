@@ -39,7 +39,7 @@ read_bytes <- function(path) {
 }
 manifest_bytes <- read_bytes(manifest_path)
 artifact_bytes <- read_bytes(artifact_path)
-manifest_hash <- "173ca3fe2a65d49769700bc56b090b6059ccb87775d1bba8cb7112821c926e66"
+manifest_hash <- "e7c109ddebf65e5ebb3248b35dba0486f9c6fad6be60978fb1941e71a743b395"
 artifact_hash <- "122af616ac3f0f9500f3ff648d488a5272c3657a50acfd0d3a2096525b64c899"
 expectation <- .lexres_expectation(
   "synthetic-frequency",

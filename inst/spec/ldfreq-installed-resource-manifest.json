@@ -1,0 +1,61 @@
+{
+  "$schema": "ldfreq-installed-resource-manifest.schema.json",
+  "schema_version": "1.0.0",
+  "package_scope": "installed-lexical-resources",
+  "runtime_policy": {
+    "network_access": false,
+    "implicit_download_or_fallback": false
+  },
+  "resources": [
+    {
+      "resource_id": "tubelex-en-treebank-slim",
+      "resource_version": "7cb5fb36-slim-v1",
+      "distribution": "bundled",
+      "runtime_state": "public",
+      "public_api": true,
+      "license_spdx": "BSD-3-Clause",
+      "source_repository": "https://github.com/naist-nlp/tubelex",
+      "source_commit": "7cb5fb36add76b83a266d1967536e1a1d3faa513",
+      "source_sha256": "4096022259d5eaa7261c3bf22c3b0af9fd58ae8eebe17894c0b34a163954f936",
+      "raw_source_bundled": false,
+      "raw_subtitles_or_identifiers_included": false,
+      "manifest_sha256": "a0936c52cbeeccd807161e7236c8d01303819a968ee3be4d84e002966574bb1d",
+      "artifact_sha256": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d",
+      "content_sha256": "423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916",
+      "notice_path": "licenses/tubelex/NOTICE.md",
+      "provenance_path": "extdata/tubelex/7cb5fb36/build-provenance.json",
+      "package_members": [
+        {
+          "path": "extdata/tubelex/7cb5fb36/resource.manifest.dcf",
+          "role": "runtime resource manifest",
+          "bytes": 964,
+          "sha256": "a0936c52cbeeccd807161e7236c8d01303819a968ee3be4d84e002966574bb1d"
+        },
+        {
+          "path": "extdata/tubelex/7cb5fb36/tubelex_en_treebank_7cb5fb36_slim.csv.gz",
+          "role": "runtime aggregate data",
+          "bytes": 2549714,
+          "sha256": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d"
+        },
+        {
+          "path": "extdata/tubelex/7cb5fb36/build-provenance.json",
+          "role": "source and transformation provenance",
+          "bytes": 6232,
+          "sha256": "834e70d09b983f75c6623fb56191706d1ec6f5f836c249a88816a1d93d2336f8"
+        },
+        {
+          "path": "licenses/tubelex/NOTICE.md",
+          "role": "upstream license, attribution, and change notice",
+          "bytes": 4175,
+          "sha256": "a3ea8312a5bbf8e7178155259460f089d0377a8c99094f70875910c428cb4cb5"
+        },
+        {
+          "path": "COPYRIGHTS",
+          "role": "component copyright index",
+          "bytes": 658,
+          "sha256": "08ca83f34d2cec91bbdf84f40f9737de57e9e2f6e3fe641443a5ed8b501429c1"
+        }
+      ]
+    }
+  ]
+}

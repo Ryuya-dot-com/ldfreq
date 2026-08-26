@@ -1,12 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/inst/spec/tubelex-release-admission-candidate.schema.json",
-  "title": "ldfreq TUBELEX release-admission candidate",
+  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/experiments/resource-admission/tubelex-release-admission-candidate.schema.json",
+  "title": "ldfreq repository-only TUBELEX release-admission record",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "$schema",
     "schema_version",
+    "record_scope",
     "candidate_id",
     "candidate_state",
     "resource",
@@ -18,7 +19,8 @@
   ],
   "properties": {
     "$schema": {"const": "tubelex-release-admission-candidate.schema.json"},
-    "schema_version": {"const": "0.3.0"},
+    "schema_version": {"const": "0.4.0"},
+    "record_scope": {"const": "repository-release-evidence"},
     "candidate_id": {"const": "tubelex-en-treebank-slim-7cb5fb36-public-profile-admission-v3"},
     "candidate_state": {"const": "maintainer-approved"},
     "resource": {"$ref": "#/$defs/resource"},
@@ -103,11 +105,11 @@
       ],
       "properties": {
         "loader_contract_id": {"const": "ldfreq-lexical-sophistication-profile"},
-        "loader_contract_version": {"const": "0.1.0-draft.2"},
+        "loader_contract_version": {"const": "0.1.1"},
         "lookup_contract_id": {"const": "ldfreq-lexical-resource-lookup"},
-        "lookup_contract_version": {"const": "0.1.0-draft.1"},
+        "lookup_contract_version": {"const": "0.1.1"},
         "lookup_result_schema_id": {"const": "lexres-frequency-prevalence-result"},
-        "lookup_result_schema_version": {"const": "0.1.0-draft.1"},
+        "lookup_result_schema_version": {"const": "0.1.1"},
         "public_profile_contract_id": {"const": "ldfreq-tubelex-frequency-profile"},
         "public_profile_contract_version": {"const": "0.1.0"}
       }

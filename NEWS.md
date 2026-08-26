@@ -1,3 +1,55 @@
+# ldfreq 0.1.1
+
+## New overlap API
+
+- Added `lexdiv_term_overlap()` for exact distinct-term Jaccard, Dice,
+  directional coverage, and overlap-coefficient results with explicit
+  numerators, denominators, empty-set behavior, and optional term details.
+- Added `lexdiv_content_overlap()` for exact overlap after explicit Universal
+  POS content-word selection. It reports annotation coverage and fails by
+  default when unit-relevant preprocessing or annotation settings differ or
+  are unverifiable.
+- Term-level detail remains opt-in. Results record whether exact lexical terms
+  are retained, and the print method displays a disclosure when they are.
+- Flemma comparisons now use disclosed caller-declared version labels rather
+  than byte or canonical-content hashes. Strict comparison treats missing or
+  different resource versions as unverifiable or mismatched. Two inputs with
+  no overrides remain comparable; otherwise both must declare the same
+  override version.
+
+## Corrections and validation
+
+- `lexdiv_metrics_text()` now forwards custom expected-TTR D sample sizes to
+  the token-vector core.
+- Lemma/UPOS and flemma annotation layers are validated against their recorded
+  provenance before use; unsupported Universal POS tags now fail explicitly.
+- UPOS backend identity is now required explicitly whenever any UPOS tag is
+  present. It is never defaulted from lemma backend identity, including when
+  one caller pipeline produced both layers.
+- Flemma adapter and parser identities are fixed by `ldfreq`;
+  `resource_version` and `override_version` are path-free caller labels that
+  are disclosed in provenance and overlap comparability output. Callers must
+  not put paths, secrets, or private hashes in these labels.
+- Removed AntBNC source-file names and source/override SHA-256 fields from
+  public flemma provenance and overlap comparison. The source-byte digest is
+  used only for caching and is never copied to public provenance or results.
+- Preprocessing contract `0.1.1` validates annotation provenance strictly.
+  `lexdiv_tokenization` objects serialized under `0.1.0` are not migrated
+  automatically; recreate them from the original text with
+  `lexdiv_tokenize()` and reapply annotations with current explicit IDs.
+- Versioned the changed preprocessing behavior as contract `0.1.1`; tokenizer
+  identity remains `0.1.0` because token boundaries did not change.
+- Versioned the installed, non-exported lexical-resource loader, manifest,
+  lookup contract, and result schema as `0.1.1` without changing loading,
+  matching, formulas, or resource behavior.
+- Separated package-release review records from installed resource
+  metadata. The installed manifest now contains only bundled-resource,
+  provenance, license, identity, and runtime-boundary facts.
+- Added a CC0 cross-language semantic fixture for the ten R/Python formulas
+  that share method IDs. It compares parsed values, status meaning, and missing
+  reasons, while recording the intentionally different R and Python MTLD
+  boundary variants without claiming byte-level fixture identity.
+
 # ldfreq 0.1.0
 
 ## Initial release

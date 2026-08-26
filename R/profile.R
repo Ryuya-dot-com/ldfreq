@@ -1,4 +1,4 @@
-# Bounded request-plan and profile layer for the frozen v0.1 method set.
+# Bounded request-plan and profile layer for the versioned v0.1 method set.
 
 .lex_profile_schema_id <- "lexdiv-r-profile-result"
 .lex_profile_schema_version <- "0.1.0"
@@ -170,7 +170,7 @@
   })
   method_ids <- vapply(methods, `[[`, character(1L), "method_id")
   if (anyDuplicated(method_ids)) {
-    stop("Internal error: frozen method IDs must be unique.", call. = FALSE)
+    stop("Internal error: method IDs must be unique.", call. = FALSE)
   }
   methods
 }
@@ -184,7 +184,7 @@
     stop(
       sprintf(
         paste0(
-          "Unknown or non-frozen method_id: %s. ",
+          "Unknown method_id: %s. ",
           "Use lexdiv_methods() to list valid method IDs."
         ),
         method_id
@@ -261,11 +261,11 @@
   )
 }
 
-#' Describe one frozen method and one normalized parameter setting
+#' Describe one versioned method and one normalized parameter setting
 #'
 #' @param method_id One method identifier returned by [lexdiv_methods()].
 #' @param parameters A plain named list of method-local parameters. Omitted
-#'   values are materialized from the frozen defaults.
+#'   values are materialized from the versioned defaults.
 #' @param request_id Optional ASCII identifier used to join profile rows.
 #'
 #' @return A normalized `lexdiv_spec` object.
@@ -298,9 +298,9 @@ lexdiv_spec <- function(method_id, parameters = list(), request_id = NULL) {
   )
 }
 
-#' Expand one scalar parameter of one frozen method
+#' Expand one scalar parameter of one versioned method
 #'
-#' @param method_id One frozen method identifier.
+#' @param method_id One versioned method identifier.
 #' @param parameter The method's single user-settable parameter name.
 #' @param values A non-empty numeric vector. Each element becomes one spec.
 #' @param request_id_prefix Optional ASCII prefix; generated IDs append the
@@ -622,7 +622,7 @@ lexdiv_plan <- function(
   plan
 }
 
-#' List the frozen v0.1 methods
+#' List the versioned v0.1 methods
 #'
 #' @return A data frame with a human-readable name and definition, score
 #'   direction and scale, exact method identity, default parameters, and the
@@ -667,7 +667,7 @@ lexdiv_presets <- function() {
     preset_version = rep.int("0.1.0", 2L),
     specification_count = c(12L, 14L),
     description = c(
-      "The twelve frozen methods at their canonical defaults.",
+      "The twelve versioned methods at their canonical defaults.",
       "Canonical plus MSTTR and MATTR at length 100."
     ),
     stringsAsFactors = FALSE,

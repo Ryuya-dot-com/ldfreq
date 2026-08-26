@@ -16,6 +16,9 @@ reference:
     contents:
       - lexdiv_preprocessing
       - lexdiv_flemmatize
+  - title: Exact lexical overlap
+    contents:
+      - lexdiv_overlap
   - title: Formula variants
     contents:
       - lexdiv_variant_metrics

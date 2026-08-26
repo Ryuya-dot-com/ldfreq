@@ -53,8 +53,8 @@ if (file.access(release_parent, 2L) != 0L) {
   stop("The release parent is not writable.", call. = FALSE)
 }
 
-expected_notice_bytes <- 4193
-expected_notice_sha256 <- "e65a1f5d0d6e7806e31e92d78bf3b903115e610c36bd9f2406269700441ecdd3"
+expected_notice_bytes <- 4175
+expected_notice_sha256 <- "a3ea8312a5bbf8e7178155259460f089d0377a8c99094f70875910c428cb4cb5"
 notice_bytes <- unname(file.info(notice_path)$size)
 notice_sha256 <- digest::digest(file = notice_path, algo = "sha256", serialize = FALSE)
 if (!identical(as.numeric(notice_bytes), as.numeric(expected_notice_bytes)) ||
@@ -144,8 +144,8 @@ numeric_manifest_equal <- function(value, expected) {
     identical(as.numeric(value), as.numeric(expected))
 }
 assert_manifest(
-  identical(manifest$schema_version, "0.2.0-experiment") &&
-    identical(manifest$status, "direct-source-r-build-candidate-not-production") &&
+  identical(manifest$schema_version, "1.0.0") &&
+    identical(manifest$status, "direct-source-r-build-record") &&
     identical(manifest$id, "tubelex-en-treebank-7cb5fb36-slim-r-direct-v1"),
   "The staged manifest identity is not the reviewed direct-build contract."
 )

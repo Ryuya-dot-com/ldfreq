@@ -1,6 +1,6 @@
 {
-  "schema_version": "0.2.0-experiment",
-  "status": "direct-source-r-build-candidate-not-production",
+  "schema_version": "1.0.0",
+  "status": "direct-source-r-build-record",
   "id": "tubelex-en-treebank-7cb5fb36-slim-r-direct-v1",
   "source": {
     "project": "TUBELEX",
@@ -135,11 +135,11 @@
     "build_tools": [
       {
         "file": "experiments/tubelex-source-build/build-tubelex-from-source.R",
-        "sha256": "42ce12b2a0a8a29a4c6009092c4453677ad73460c58fe7b56f2bfd7279dd00a6"
+        "sha256": "551855007f1d659ad16dc6ae8861eb5408d655a95d3270fc60a6ac68cffe6397"
       },
       {
         "file": "experiments/tubelex-source-build/promote-tubelex-release.R",
-        "sha256": "6ba5f8d314130691860e772a633a159477bbc130ad09d401c81cc0786926c20b"
+        "sha256": "44ea7776173f99e72a904a9806c63d3cc88229d32fca99a2d2e8651dd97d3bea"
       }
     ],
     "files": [
@@ -152,8 +152,8 @@
       {
         "file": "NOTICE.md",
         "role": "upstream license, attribution, and change statement",
-        "bytes": 4193,
-        "sha256": "e65a1f5d0d6e7806e31e92d78bf3b903115e610c36bd9f2406269700441ecdd3"
+        "bytes": 4175,
+        "sha256": "a3ea8312a5bbf8e7178155259460f089d0377a8c99094f70875910c428cb4cb5"
       },
       {
         "file": "manifest.json",

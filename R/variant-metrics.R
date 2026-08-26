@@ -1,6 +1,6 @@
 # Explicit comparison variants for Maas and sequential MTLD.
 #
-# These methods live outside the frozen twelve-method core. They provide a
+# These methods live outside the versioned twelve-method core. They provide a
 # bounded sensitivity surface without changing lexdiv_metrics(), its defaults,
 # or its result contract.
 
@@ -394,7 +394,7 @@ lexdiv_variant_ids <- function() {
 #' Compute explicit Maas and sequential-MTLD variants
 #'
 #' Computes a bounded set of formula and aggregation variants without changing
-#' the frozen [lexdiv_metrics()] core. Multiple MTLD thresholds are expanded in
+#' the versioned [lexdiv_metrics()] core. Multiple MTLD thresholds are expanded in
 #' request order. TAALED-relevant rows describe formula/factorization scope only
 #' and do not claim end-to-end compatibility with its preprocessing, missing-
 #' value behavior, or licensed implementation.

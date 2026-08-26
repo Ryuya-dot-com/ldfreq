@@ -1,0 +1,133 @@
+{
+  "$schema": "lexical-overlap-contract.schema.json",
+  "contract_id": "ldfreq-lexical-overlap",
+  "contract_version": "0.1.0",
+  "status": "normative",
+  "public_api": true,
+  "input_contract": {
+    "term_core": "two-plain-valid-utf8-character-vectors-one-complete-term-per-element",
+    "content_adapter": "two-validated-lexdiv-tokenization-objects-with-upos",
+    "invalid_term_policy": "atomic-invalid-input-no-silent-deletion",
+    "raw_text_content_shortcut": false
+  },
+  "matching_contract": {
+    "unit": "distinct-types",
+    "comparison": "exact-unicode-scalar-sequence",
+    "normalization": "none",
+    "case_conversion": "none",
+    "stemming_or_fuzzy_matching": false,
+    "token_repetition_affects_values": false,
+    "token_order_affects_values": false
+  },
+  "content_words": {
+    "content_set_id": "universal-pos-content-words",
+    "content_set_version": "0.1.0",
+    "upos": ["ADJ", "ADV", "NOUN", "PROPN", "VERB"],
+    "lexical_units": ["lemma", "surface", "flemma"],
+    "default_lexical_unit": "lemma",
+    "missing_upos": "exclude-and-report",
+    "non_content_upos": "exclude-and-report",
+    "missing_selected_unit": "exclude-and-report",
+    "implicit_annotation": false,
+    "upos_backend_identity": "required-explicit-separate-from-lemma-backend"
+  },
+  "measures": [
+    {
+      "measure_id": "jaccard_types",
+      "method_id": "jaccard_type_intersection_over_union_v1",
+      "formula": "intersection_type_count / union_type_count",
+      "symmetric": true
+    },
+    {
+      "measure_id": "dice_types",
+      "method_id": "dice_type_twice_intersection_over_sum_v1",
+      "formula": "2 * intersection_type_count / (type_count_a + type_count_b)",
+      "symmetric": true
+    },
+    {
+      "measure_id": "a_covered_by_b_types",
+      "method_id": "a_covered_by_b_type_intersection_over_a_v1",
+      "formula": "intersection_type_count / type_count_a",
+      "symmetric": false
+    },
+    {
+      "measure_id": "b_covered_by_a_types",
+      "method_id": "b_covered_by_a_type_intersection_over_b_v1",
+      "formula": "intersection_type_count / type_count_b",
+      "symmetric": false
+    },
+    {
+      "measure_id": "overlap_coefficient_types",
+      "method_id": "overlap_coefficient_type_intersection_over_min_v1",
+      "formula": "intersection_type_count / min(type_count_a, type_count_b)",
+      "symmetric": true
+    }
+  ],
+  "empty_set_rules": {
+    "both_empty": "all-measures-missing",
+    "one_empty_jaccard_and_dice": "zero",
+    "directional_zero_denominator": "missing",
+    "directional_nonzero_denominator": "zero",
+    "overlap_coefficient_when_either_empty": "missing"
+  },
+  "result_contract": {
+    "schema_id": "lexdiv-type-overlap-result",
+    "schema_version": "0.1.0",
+    "summary_shape": "one-row-per-requested-measure",
+    "numerator_and_denominator_columns": true,
+    "directional_source_and_reference_columns": true,
+    "document_level_coverage": true,
+    "default_term_details": "counts-only",
+    "optional_term_details": "shared-and-side-unique-exact-terms",
+    "term_detail_disclosure": "provenance-flag-and-print-notice"
+  },
+  "comparability_contract": {
+    "compared_settings_by_unit": {
+      "surface": [
+        "tokenizer_id", "tokenizer_version", "normalization", "case",
+        "keep_numbers", "upos_backend_id", "upos_backend_version"
+      ],
+      "lemma": [
+        "tokenizer_id", "tokenizer_version", "normalization", "case",
+        "keep_numbers", "upos_backend_id", "upos_backend_version",
+        "annotation_method", "annotation_backend_id",
+        "annotation_backend_version"
+      ],
+      "flemma": [
+        "tokenizer_id", "tokenizer_version", "normalization", "case",
+        "keep_numbers", "upos_backend_id", "upos_backend_version",
+        "flemma_method", "flemma_backend_id", "flemma_backend_version",
+        "flemma_parser_id", "flemma_parser_version",
+        "flemma_query_normalization", "flemma_resource_id",
+        "flemma_resource_version", "flemma_override_present",
+        "flemma_override_version"
+      ]
+    },
+    "flemma_lemma_backend_comparison": false,
+    "comparison_table_columns": ["component", "value_a", "value_b", "matches"],
+    "default_mismatch_policy": "error",
+    "mismatch_changes_terms_automatically": false,
+    "flemma_resource_version_rule": "both-present-and-equal",
+    "flemma_override_version_rule": "both-overrides-absent-or-both-present-with-equal-version",
+    "declared_label_values_disclosed": true,
+    "declared_label_safety": "path-free-caller-labels-with-no-secrets-or-private-hashes",
+    "content_hash_comparison": false
+  },
+  "privacy_boundary": {
+    "raw_text_copied_to_result": false,
+    "text_hash_copied_to_result": false,
+    "absolute_path_copied_to_result": false,
+    "flemma_resource_file_name_public_provenance": false,
+    "flemma_resource_hash_public_provenance": false,
+    "flemma_override_hash_public_provenance": false,
+    "flemma_source_hash_internal_cache_only": true,
+    "internally_computed_flemma_hash_copied_to_result": false,
+    "term_details_opt_in": true
+  },
+  "interpretation_boundary": {
+    "direct_semantic_similarity_measure": false,
+    "plagiarism_detector": false,
+    "proficiency_or_writing_quality_measure": false,
+    "coherence_measure": false
+  }
+}

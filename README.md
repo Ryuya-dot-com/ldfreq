@@ -4,7 +4,8 @@
 profiles for R. The core computes twelve independently specified metrics from
 ordered tokens. Separate adapters make raw-text tokenization,
 lemma/flemma/POS annotations, lexical-unit selection, New JACET 8000 level profiles,
-and TUBELEX coverage visible rather than hiding those decisions inside a score.
+TUBELEX coverage, and exact term/content-word overlap visible rather than hiding
+those decisions inside a score.
 
 ## What it computes
 
@@ -29,13 +30,15 @@ claim of CLAN VOCD compatibility.
 
 ## Installation
 
-Install the current GitHub release candidate with `pak`:
+Install the current GitHub version with `pak`:
 
 ```r
 pak::pak("Ryuya-dot-com/ldfreq")
 ```
 
 ## Basic use
+
+### Pre-tokenized input
 
 The core accepts only explicit tokens and performs no hidden case
 conversion, Unicode normalization, token deletion, or lemmatization.
@@ -75,6 +78,8 @@ direction, scale, exact method IDs, parameters, and advisory token floors:
 lexdiv_methods()[, c("metric_id", "label", "definition", "direction", "scale")]
 ```
 
+### Raw text and annotations
+
 For raw text, call `lexdiv_metrics_text()` directly. Its output retains
 normalization/case settings and text hashes; the core result schema is
 unchanged.
@@ -111,7 +116,9 @@ annotated <- lexdiv_lemmatize(
   lemmas = c("cat", "and", "cat", "run", "run"),
   upos = c("NOUN", "CCONJ", "NOUN", "VERB", "VERB"),
   backend_id = "documented-analysis-pipeline",
-  backend_version = "1"
+  backend_version = "1",
+  upos_backend_id = "documented-upos-pipeline",
+  upos_backend_version = "1"
 )
 
 lexdiv_metrics_text(
@@ -121,6 +128,16 @@ lexdiv_metrics_text(
   metrics = "ttr"
 )
 ```
+
+Whenever any UPOS tag is present, `upos_backend_id` and
+`upos_backend_version` must be supplied explicitly. They are never inferred
+from the lemma backend, even when one documented pipeline produced both
+layers. The identifiers are returned provenance, so use path-free,
+non-sensitive labels and do not put secrets or private hashes in them.
+
+The stricter preprocessing contract `0.1.1` does not automatically migrate a
+`lexdiv_tokenization` saved under `0.1.0`. Re-tokenize the original text and
+reapply current annotations and explicit backend IDs.
 
 For a quick English lemma baseline, the optional `textstem` package can supply
 lemmas while `ldfreq` records its installed version. It does not supply UPOS
@@ -140,7 +157,7 @@ lexdiv_metrics_text(automatic_lemmas, unit = "lemma", metrics = "ttr")
 
 For NWLC-oriented sensitivity analysis, a legitimately obtained local
 [AntBNC Lemma List](https://www.laurenceanthony.net/software/antconc/) can be
-used as an explicit flemma backend. The list is not bundled or downloaded.
+used through the explicit flemma adapter. The list is not bundled or downloaded.
 Unknown forms remain visible through identity fallback, and every token records
 whether AntBNC, an override, or fallback supplied its flemma.
 
@@ -154,10 +171,21 @@ flemmas <- lexdiv_flemmatize(
 lexdiv_metrics_text(flemmas, unit = "flemma", metrics = "ttr")
 ```
 
+The flemma adapter and parser identities are fixed by `ldfreq`.
+`resource_version` and, when a non-empty override table is used,
+`override_version` are caller-declared labels rather than inferred content
+identities.
+They are disclosed in provenance and overlap comparability output. Use
+path-free, non-sensitive labels; do not place credentials, private hashes, or
+machine-specific information in them. File names and content hashes are not
+included in flemma provenance or overlap results.
+
 The unmodified AntBNC list is an approximation, not an end-to-end NWLC
 compatibility claim. NWLC documents manually aligning AntBNC families to the
 selected word list; `ldfreq` therefore supports explicit overrides and reports
 New JACET headword conflicts rather than concealing them.
+
+### Formula variants
 
 Maas log base/scale and sequential-MTLD aggregation variants are a separate
 long-form sensitivity output. Multiple MTLD thresholds can be requested without
@@ -174,6 +202,61 @@ variants[, c("family", "method_id", "reference_label", "value", "status")]
 Rows marked as TAALED-relevant comparators cover only documented formula,
 factorization, and aggregation choices. They do not claim official equivalence
 of preprocessing, missingness, or the licensed Python implementation.
+
+### Exact term and content-word overlap
+
+`lexdiv_term_overlap()` compares two explicit vectors as sets of distinct,
+exact terms. `lexdiv_content_overlap()` first selects the existing Universal
+POS content set (`ADJ`, `ADV`, `NOUN`, `PROPN`, `VERB`) from two annotated
+tokenizations. It does not infer POS tags or lemmas.
+
+```r
+reference <- lexdiv_lemmatize(
+  lexdiv_tokenize("Cats and birds ran."),
+  lemmas = c("cat", "and", "bird", "run"),
+  upos = c("NOUN", "CCONJ", "NOUN", "VERB"),
+  backend_id = "documented-analysis-pipeline",
+  backend_version = "1",
+  upos_backend_id = "documented-upos-pipeline",
+  upos_backend_version = "1"
+)
+
+overlap <- lexdiv_content_overlap(
+  annotated,
+  reference,
+  unit = "lemma",
+  details = "terms",
+  document_ids = c("essay", "reference")
+)
+overlap$summary[, c(
+  "measure_id", "value", "numerator", "denominator", "status"
+)]
+overlap$coverage
+overlap$shared_terms
+```
+
+The result keeps Jaccard, Dice, A-covered-by-B, B-covered-by-A, and the overlap
+coefficient as different method IDs because their denominators are not
+interchangeable. Empty denominator and annotation-exclusion rules are explicit;
+read `coverage` beside the values. Exact shared terms are retained only when
+`details = "terms"`; the result provenance and print method disclose that
+lexical strings are present. Comparability is conditional on `unit`. Surface
+overlap compares tokenizer settings and the UPOS backend; lemma overlap also
+compares the lemma method/backend. Flemma overlap instead compares the fixed
+flemma adapter/parser and caller-declared resource/override settings, and
+intentionally ignores the lemma backend because flemmatization consumes surface
+forms. Resource-version labels must be present and equal. If neither side used
+overrides, that setting is comparable; otherwise both sides must declare the
+same `override_version`. Missing or different labels are unverifiable or
+mismatched--the package does not infer content identity from file bytes. The
+four-column `comparability` table (`component`, `value_a`, `value_b`, `matches`)
+discloses these labels, so they must contain no paths, secrets, or private
+hashes. Use
+`mismatch = "warn"` or `"allow"` only as an explicit analysis decision. These
+are lexical-sharing measures, not plagiarism, semantic-similarity, coherence,
+proficiency, or writing-quality detectors.
+
+### Reference-frequency and lexical-level profiles
 
 TUBELEX values are returned as corpus-relative frequency/prevalence
 measurements with adjacent coverage, not as a universal sophistication score.
@@ -244,6 +327,8 @@ diagnostics. Provenance retains the source basename but neither stores nor
 prints its absolute directory. The list remains outside the package; users are responsible for
 obtaining and using their copy under the applicable terms.
 
+### Multiple documents and explicit parameter plans
+
 For multiple documents, use an explicitly named list:
 
 ```r
@@ -282,11 +367,12 @@ See `vignette("getting-started", package = "ldfreq")` for the result contract,
 batch inputs, profiles, and token-length screens. See
 `vignette("preprocessing-and-frequency", package = "ldfreq")` for
 surface/lemma/flemma sensitivity, the Maas/MTLD variant crosswalk, word inclusion, and
-coverage-aware TUBELEX and New JACET 8000 level-profile use.
+exact content-word overlap, plus coverage-aware TUBELEX and New JACET 8000
+level-profile use.
 
 See the repository
 [`LIFECYCLE.md`](https://github.com/Ryuya-dot-com/ldfreq/blob/main/LIFECYCLE.md)
-for the method, schema, deprecation, and future-surface rules frozen for the
+for the method, schema, deprecation, and future-surface rules defined for the
 `0.1.x` line.
 
 ## Reproducibility boundary
@@ -308,6 +394,7 @@ repository checkout:
 contract_files <- c(
   "lexical-diversity-contract.json",
   "ldfreq-preprocessing-contract.json",
+  "lexical-overlap-contract.json",
   "lexical-diversity-variant-contract.json",
   "lexical-level-profile-contract.json",
   "tubelex-frequency-profile-contract.json"
@@ -350,10 +437,10 @@ These measurements describe lexical-distribution properties of the supplied
 tokens. They are not direct measures of language proficiency, writing quality,
 reader response, or communicative effectiveness. Such interpretations require a
 separate validated study design and cannot be inferred from one score or the
-frozen `below_quality_floor` field.
+versioned `below_quality_floor` field.
 
 `below_quality_floor` and `lexdiv_screen()` are advisory token-count evidence
-screens. Here, `quality` is a frozen field name; it does not mean writing quality,
+screens. Here, `quality` is a field name retained for compatibility; it does not mean writing quality,
 measurement validity, or reliability.
 They do not change values, parameters, status, or document membership. Passing a
 screen does not establish validity or reliability; failing one does not erase an
@@ -363,8 +450,8 @@ method identity, and requested/effective parameters together.
 ## Offline installed-package smoke test
 
 After installation, the bundled smoke script exercises single-document, batch,
-profile, profile-batch, level-profile, and screen workflows without network
-access or an external runtime:
+profile, profile-batch, term/content-word overlap, level-profile, and screen
+workflows without network access or an external runtime:
 
 ```r
 library(ldfreq)
@@ -375,14 +462,14 @@ source(smoke_path, local = TRUE)
 
 ## Scope
 
-This repository contains no learner corpus, raw subtitle text, source document
+The package contains no learner corpus, raw subtitle text, source document
 identifier, Python or Java runtime, or runtime network-dependent calculation.
 It also contains no New JACET 8000 word-list payload; its exported adapter
 requires an explicit caller-supplied data frame, local CSV, or local XLSX and never
 downloads a fallback.
 It contains the slim TUBELEX-EN Treebank aggregate at commit `7cb5fb36`. Its
 exact manifest, 2.55 MB gzip artifact, canonical-content hash, build provenance,
-BSD 3-Clause notice, and COPYRIGHTS entry are installed together. The new
+BSD 3-Clause notice, and COPYRIGHTS entry are installed together. The
 frequency-profile API does not turn TUBELEX frequency into context-independent
 lexical sophistication. No NGSL or Open English WordNet data are included.
 
@@ -396,13 +483,16 @@ TUBELEX path performs bounded streaming gzip expansion and validates the fixed
 normalization option while retaining both original and lookup terms. It
 preserves order and duplicates, returns token/type coverage diagnostics, and
 keeps unmatched measurements missing rather than coercing them to zero. The
-installed manifest, notice, provenance, and machine-readable inventory allow
-the bundled resource and its package boundary to be audited independently.
+installed resource manifest, notice, and provenance allow the bundled resource
+and its package boundary to be audited independently.
+
+The installed CC0 cross-language fixture checks parsed semantic agreement with
+the Python implementation for formulas that share exact method IDs. It also
+records the strict-`<` R MTLD and `<=` Python MTLD as distinct variants; fixture
+file-byte or hash equality is neither required nor asserted.
 
 ## License
 
 The R source code is licensed under the MIT License. The installed TUBELEX
 aggregate remains BSD-3-Clause material under its component-level NOTICE and
-COPYRIGHTS entry; placement in this repository does not relicense it as MIT.
-Any later lexical resource must retain the same separation of license, notice,
-and provenance.
+COPYRIGHTS entry; its inclusion in the package does not relicense it as MIT.

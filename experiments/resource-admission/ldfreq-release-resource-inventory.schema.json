@@ -1,12 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/inst/spec/ldfreq-resource-inventory.schema.json",
-  "title": "ldfreq installed resource inventory",
+  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/experiments/resource-admission/ldfreq-release-resource-inventory.schema.json",
+  "title": "ldfreq repository-only release resource inventory",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "$schema",
     "schema_version",
+    "record_scope",
     "reviewed_on",
     "package_scope",
     "policy",
@@ -15,8 +16,9 @@
     "not_included"
   ],
   "properties": {
-    "$schema": {"const": "ldfreq-resource-inventory.schema.json"},
+    "$schema": {"const": "ldfreq-release-resource-inventory.schema.json"},
     "schema_version": {"const": "0.1.0"},
+    "record_scope": {"const": "repository-release-evidence"},
     "reviewed_on": {"type": "string", "format": "date"},
     "package_scope": {"type": "string", "minLength": 1},
     "policy": {

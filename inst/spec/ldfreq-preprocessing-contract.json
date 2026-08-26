@@ -1,7 +1,7 @@
 {
   "$schema": "ldfreq-preprocessing-contract.schema.json",
   "contract_id": "ldfreq-preprocessing",
-  "contract_version": "0.1.0",
+  "contract_version": "0.1.1",
   "status": "normative",
   "public_api": true,
   "tokenizer": {
@@ -29,13 +29,44 @@
     "implicit_backend_selection": false,
     "implicit_model_download": false,
     "supplied_backend_identity_required": true,
+    "path_like_backend_identity": "error",
+    "backend_identity_values_disclosed": true,
+    "backend_identity_safety": "path-free-caller-labels-with-no-secrets-or-private-hashes",
+    "upos_backend_identity": "required-explicit-separate-from-lemma-backend-when-upos-present",
+    "textstem_with_caller_upos": "separate-upos-backend-identity-required",
+    "upos_inventory": ["ADJ", "ADP", "ADV", "AUX", "CCONJ", "DET", "INTJ", "NOUN", "NUM", "PART", "PRON", "PROPN", "PUNCT", "SCONJ", "SYM", "VERB", "X"],
+    "unsupported_upos": "error",
+    "annotation_layer_validation": "columns-provenance-and-row-alignment-required",
+    "flemma_backend_identity": {
+      "backend_id": "ldfreq-antbnc-flemma-adapter",
+      "backend_version": "0.1.1",
+      "parser_id": "ldfreq-antbnc-parser",
+      "parser_version": "0.1.0",
+      "resource_id": "antbnc-lemma-list",
+      "caller_configurable": false
+    },
+    "flemma_declared_versions": {
+      "resource_version": "optional-path-free-caller-label",
+      "override_version": "optional-path-free-caller-label-for-non-empty-overrides",
+      "override_version_without_overrides": "error",
+      "strict_overlap_resource_rule": "both-present-and-equal",
+      "strict_overlap_override_rule": "both-overrides-absent-or-both-present-with-equal-version",
+      "labels_disclosed": true,
+      "labels_must_not_contain": ["paths", "secrets", "private-hashes", "machine-specific-details"],
+      "content_identity_inferred": false
+    },
     "missing_lemma": "exclude-and-report",
     "missing_upos_for-content-analysis": "exclude-and-report",
+    "content_exclusion_precedence": ["missing_upos", "non_content_upos", "missing_selected_unit"],
     "unknown_antbnc_form": "normalized-surface-identity-fallback",
     "antbnc_override_precedence": "explicit-override-then-antbnc-then-identity",
     "antbnc_resource_bundled": false,
     "antbnc_runtime_download": false,
-    "antbnc_absolute_path_retained": false
+    "antbnc_absolute_path_retained": false,
+    "antbnc_source_file_name_public_provenance": false,
+    "antbnc_source_hash_public_provenance": false,
+    "antbnc_source_hash_use": "internal-parse-cache-only",
+    "override_content_hash_public_provenance": false
   },
   "lexical_units": {
     "choices": ["surface", "lemma", "flemma"],
@@ -44,9 +75,14 @@
     "word_inclusion_default": "all",
     "content_upos": ["ADJ", "ADV", "NOUN", "PROPN", "VERB"]
   },
+  "compatibility": {
+    "serialized_0_1_0_tokenization": "not-automatically-migrated",
+    "migration": "retokenize-original-text-and-reapply-current-annotations"
+  },
   "result_boundary": {
     "metric_core_schema_changed": false,
     "existing_tokenization_argument_policy": "reject-explicit-normalization-case-or-keep_numbers",
+    "forwarded_metric_parameters": ["expected_ttr_sample_sizes"],
     "preprocessing_envelope_components": ["results", "token_audit", "preprocessing"],
     "excluded_tokens_imputed": false,
     "coverage_reported": true

@@ -1,9 +1,14 @@
-# Pre-commit audit and split plan
+# Pre-commit audit and patch-release plan
 
 Audit date: 2026-08-05
 
 This document records the intended split of the current uncommitted release
-work. It is not final 0.1.0 release evidence.
+work and the later patch-candidate freeze. It is not final `0.1.1` release
+evidence.
+
+The Commit 1 and Commit 2 entries below are a historical preparation record.
+They are not instructions to amend or replay those commits. Version `0.1.1`
+changes must land in new commits through the protected pull-request workflow.
 
 ## Audited starting point
 
@@ -31,7 +36,7 @@ inventory assertions across source, platform archive, and installed library.
 
 Commit 2 is the commit that first contains this execution record, so this file
 does not attempt to contain its own commit hash. Git history is authoritative.
-Neither commit is final 0.1.0 release evidence.
+Neither commit is final `0.1.1` release evidence.
 
 ## Commit 1: add auditable preprocessing and reference-profile APIs
 
@@ -42,25 +47,28 @@ DESCRIPTION
 NAMESPACE
 R/level-profile.R
 R/preprocessing.R
-R/resource-admission.R
 R/tubelex-profile.R
 R/variant-metrics.R
 experiments/package-resource-inventory/validate-package-resource-inventory.R
 experiments/release-candidate/generate-release-evidence.R
 experiments/resource-admission/README.md
 experiments/resource-admission/OPTIONAL-REVIEW.md
+experiments/resource-admission/ldfreq-release-resource-inventory.json
+experiments/resource-admission/ldfreq-release-resource-inventory.schema.json
+experiments/resource-admission/tubelex-release-admission-candidate.json
+experiments/resource-admission/tubelex-release-admission-candidate.schema.json
+experiments/resource-admission/validate-tubelex-admission.R
 experiments/tubelex-source-build/README.md
 inst/spec/ldfreq-preprocessing-contract.json
 inst/spec/ldfreq-preprocessing-contract.schema.json
-inst/spec/ldfreq-resource-inventory.json
+inst/spec/ldfreq-installed-resource-manifest.json
+inst/spec/ldfreq-installed-resource-manifest.schema.json
 inst/spec/lexical-diversity-variant-contract.json
 inst/spec/lexical-diversity-variant-contract.schema.json
 inst/spec/lexical-level-profile-contract.json
 inst/spec/lexical-level-profile-contract.schema.json
 inst/spec/tubelex-frequency-profile-contract.json
 inst/spec/tubelex-frequency-profile-contract.schema.json
-inst/spec/tubelex-release-admission-candidate.json
-inst/spec/tubelex-release-admission-candidate.schema.json
 man/lexdiv_flemmatize.Rd
 man/lexdiv_preprocessing.Rd
 man/lexdiv_variant_metrics.Rd
@@ -69,7 +77,6 @@ man/tubelex_frequency_profile.Rd
 tests/testthat/helper-antbnc.R
 tests/testthat/test-level-profile.R
 tests/testthat/test-preprocessing.R
-tests/testthat/test-resource-admission.R
 tests/testthat/test-tubelex-profile.R
 tests/testthat/test-variant-metrics.R
 tests/tubelex-resource-audit.R
@@ -131,24 +138,24 @@ the README. Also confirm that the rendered vignettes, help index, citation,
 package-resource inventory, and installed example contain neither
 private-resource payloads nor machine-specific absolute paths.
 
-## Later commit: freeze the exact 0.1.0 candidate
+## Later commit: freeze the exact 0.1.1 candidate
 
 Do not create the freeze commit until Commits 1 and 2 pass from a clean tree.
 The freeze is intentionally separate and should contain only candidate-state
 changes such as:
 
-- changing `Version` from the development suffix to `0.1.0`;
-- changing `Config/ldfreq/status` from development to release-candidate;
+- setting `Version` to `0.1.1` after all patch changes have landed;
+- setting the repository-only `state.dcf` status to `release-candidate`;
 - reconciling release wording and evidence identifiers with the exact commit;
 - regenerating evidence from the exact source tarball.
 
 Suggested subject:
 
 ```text
-Freeze ldfreq 0.1.0 release candidate
+Freeze ldfreq 0.1.1 release candidate
 ```
 
-The byte-pinned TUBELEX admission candidate contains the maintainer's explicit
+The repository-only TUBELEX admission record contains the maintainer's explicit
 license and distribution decision, upstream URLs, approved scopes, and risk
 controls. Independent review is optional. The final freeze must retain that
 decision, reproduce the candidate and resource identities, and pass the exact
@@ -167,8 +174,8 @@ From the exact freeze commit and an unmodified checkout:
 4. Build and inspect the PDF manual and vignettes.
 5. Install the exact tarball and run the offline smoke example.
 6. Verify that conditional suggested backends remain conditional when absent.
-7. Validate the bundled maintainer resource-admission decision and its exact
-   candidate bytes.
+7. Validate the repository maintainer resource-admission decision and its
+   semantic agreement with the installed resource manifest.
 8. Merge through the protected-branch review workflow; do not bypass required
    CI gates.
 

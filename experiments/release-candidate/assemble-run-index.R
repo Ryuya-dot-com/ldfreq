@@ -319,7 +319,7 @@ for (index in seq_along(inventories)) {
     paste("Resource inventory artifact drift:", inventory_label)
   )
   check(
-    identical(as.numeric(inventory_record$release_approved_resource_count), 1) &&
+    identical(as.numeric(inventory_record$installed_resource_count), 1) &&
       identical(inventory_record$undeclared_extdata_observed, FALSE),
     paste("Resource boundary changed:", inventory_label)
   )
@@ -332,8 +332,7 @@ inventory_summaries <- lapply(seq_along(inventories), function(index) {
     environment = inventory_record$environment,
     comparison_authority = inventory_record$comparison_authority,
     artifact = inventory_record$source_archive,
-    release_approved_resource_count =
-      inventory_record$release_approved_resource_count,
+    installed_resource_count = inventory_record$installed_resource_count,
     undeclared_extdata_observed =
       inventory_record$undeclared_extdata_observed,
     assertions = inventory_record$assertions

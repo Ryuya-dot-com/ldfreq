@@ -24,7 +24,7 @@ as versioned tool guidance rather than primary empirical evidence.
 
 Method equivalence is not inferred from a shared metric label. In particular,
 the evidence table does not assert that Gramulator, TAALED, or another package's
-MTLD implementation is numerically identical to the frozen target method.
+MTLD implementation is numerically identical to the defined target method.
 }
 \examples{
 evidence <- lexdiv_length_evidence()

@@ -94,8 +94,8 @@ gave one success and one lock refusal. A forced builder failure left no target,
 lock, or staging directory. The measured identities are in `measurement.json`. The
 distribution manifest also pins the reviewed 19-column reference identity and
 states that it was used only for an external set-equivalence audit, not as a
-build input. It rehashes NOTICE after copying, validates provenance/license
-fields fail-closed, records builder/wrapper hashes, and avoids replacing an
+build input. It verifies NOTICE after copying, validates provenance/license
+fields fail-closed, records build-tool identities, and avoids replacing an
 existing staged manifest for Windows portability.
 
 ## Package integration and remaining release gates
@@ -103,9 +103,9 @@ existing staged manifest for Windows portability.
 The numerical/data transformation gate and the full release-unit validator have
 passed locally on macOS. The package workflow repeats the builder, cooperative
 lock, cleanup, and identity checks on Ubuntu and Windows, while ordinary package
-checks exercise the installed resource and its machine-readable inventory.
+checks exercise the installed resource and its machine-readable manifest.
 
-The byte-pinned admission candidate records the maintainer's license,
+The repository-only admission record records the maintainer's license,
 provenance, distribution, and public-profile decision. Independent review is
 optional. Release still requires a final source, installed, and platform-binary
 audit against the named release candidate after all approved resources are

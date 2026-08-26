@@ -1,6 +1,6 @@
 # TUBELEX attribution and change notice
 
-This package's candidate English frequency/prevalence index is derived solely
+This package's bundled English frequency/prevalence index is derived solely
 from an already published aggregate **TUBELEX** frequency table. It does not use
 or distribute source subtitles.
 
@@ -18,7 +18,7 @@ or distribute source subtitles.
   Best Approximation of Spoken Vocabulary?*, COLING 2025,
   https://aclanthology.org/2025.coling-main.641/
 
-## Changes made for the R package candidate
+## Changes made for the bundled R index
 
 The fixed upstream xz file and its decompressed bytes are SHA-256 checked before
 parsing. The no-quote UTF-8 TSV is checked for its exact 19-column schema,
@@ -35,8 +35,8 @@ predicate; it is not an upstream TUBELEX rule. The complete retained-key set
 and the final canonical artifact hash are checked to detect Unicode-library drift.
 
 All 15 `count:<category>` columns are used to validate the source but are removed
-from the distributed candidate. The retained exact keys are sorted in Unicode
-code-point order. The candidate preserves `count`, `videos`, and `channels` as
+from the bundled index. The retained exact keys are sorted in Unicode
+code-point order. The index preserves `count`, `videos`, and `channels` as
 integers and appends the original `[TOTAL]` values. The resulting canonical CSV
 has 515,292 word rows and SHA-256
 `423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916`.
