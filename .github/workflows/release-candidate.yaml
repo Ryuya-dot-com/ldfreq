@@ -30,14 +30,23 @@ jobs:
         id: metadata
         shell: bash
         run: |
+          state_file="experiments/release-candidate/state.dcf"
+          package="$(sed -n 's/^Package:[[:space:]]*//p' DESCRIPTION)"
           version="$(sed -n 's/^Version:[[:space:]]*//p' DESCRIPTION)"
-          status="$(sed -n 's/^Config\/ldfreq\/status:[[:space:]]*//p' DESCRIPTION)"
-          if test "$version" = "0.1.1" && test "$status" = "release-candidate"; then
+          state_scope="$(sed -n 's/^Record-Scope:[[:space:]]*//p' "$state_file")"
+          state_package="$(sed -n 's/^Package:[[:space:]]*//p' "$state_file")"
+          state_version="$(sed -n 's/^Version:[[:space:]]*//p' "$state_file")"
+          state_status="$(sed -n 's/^Status:[[:space:]]*//p' "$state_file")"
+          if test "$state_scope" = "repository-release-evidence" && \
+             test "$package" = "$state_package" && \
+             test "$version" = "$state_version" && \
+             test "$version" = "0.1.1" && \
+             test "$state_status" = "release-candidate"; then
             echo "is_candidate=true" >> "$GITHUB_OUTPUT"
-            echo "Exact 0.1.1 release-candidate metadata detected."
+            echo "Exact repository-only 0.1.1 release-candidate state detected."
           else
             echo "is_candidate=false" >> "$GITHUB_OUTPUT"
-            echo "Development metadata detected (Version: $version; status: $status)."
+            echo "Release-candidate state is not applicable to this checkout."
           fi
 
   build-source:
@@ -73,14 +82,39 @@ jobs:
             any::progress
           needs: check
 
+      - name: Validate repository-only TUBELEX admission evidence
+        shell: Rscript {0}
+        run: |
+          status <- system2(
+            file.path(R.home("bin"), "Rscript"),
+            c(
+              "--vanilla",
+              shQuote(file.path(
+                "experiments", "resource-admission",
+                "validate-tubelex-admission.R"
+              )),
+              shQuote(normalizePath(".", mustWork = TRUE))
+            )
+          )
+          if (!identical(status, 0L)) quit(status = status)
+
       - name: Verify synchronized candidate metadata
         shell: Rscript {0}
         run: |
           description <- read.dcf("DESCRIPTION")
           version <- unname(description[[1L, "Version"]])
           stopifnot(identical(version, "0.1.1"))
+          state <- read.dcf(file.path(
+            "experiments", "release-candidate", "state.dcf"
+          ))
           stopifnot(identical(
-            unname(description[[1L, "Config/ldfreq/status"]]),
+            unname(state[[1L, "Record-Scope"]]),
+            "repository-release-evidence"
+          ))
+          stopifnot(identical(unname(state[[1L, "Package"]]), "ldfreq"))
+          stopifnot(identical(unname(state[[1L, "Version"]]), version))
+          stopifnot(identical(
+            unname(state[[1L, "Status"]]),
             "release-candidate"
           ))
           stopifnot(identical(readLines("NEWS.md", n = 1L), "# ldfreq 0.1.1"))

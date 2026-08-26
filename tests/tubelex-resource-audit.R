@@ -2,15 +2,12 @@ library(ldfreq)
 
 internal_names <- c(
   ".lexres_decode_gzip_bounded",
-  ".lexres_evaluate_tubelex_admission",
-  ".lexres_load_tubelex_admission_candidate",
   ".lexres_load_resource_impl",
   ".lexres_load_tubelex",
   ".lexres_lookup_loaded_tubelex",
   ".lexres_lookup_tubelex",
   ".lexres_sha256_bytes",
   ".lexres_tubelex_expectation",
-  ".lexres_tubelex_admission_candidate_sha256",
   ".lexres_tubelex_manifest_sha256",
   ".lexres_tubelex_paths"
 )
@@ -42,11 +39,11 @@ provenance_path <- file.path(bundle_dir, "build-provenance.json")
 notice_path <- system.file("licenses", "tubelex", "NOTICE.md", package = "ldfreq")
 copyrights_path <- system.file("COPYRIGHTS", package = "ldfreq")
 inventory_path <- system.file(
-  "spec", "ldfreq-resource-inventory.json",
+  "spec", "ldfreq-installed-resource-manifest.json",
   package = "ldfreq"
 )
 inventory_schema_path <- system.file(
-  "spec", "ldfreq-resource-inventory.schema.json",
+  "spec", "ldfreq-installed-resource-manifest.schema.json",
   package = "ldfreq"
 )
 lookup_contract_path <- system.file(
@@ -57,20 +54,10 @@ lookup_contract_schema_path <- system.file(
   "spec", "lexical-resource-lookup-contract.schema.json",
   package = "ldfreq"
 )
-admission_candidate_path <- system.file(
-  "spec", "tubelex-release-admission-candidate.json",
-  package = "ldfreq"
-)
-admission_candidate_schema_path <- system.file(
-  "spec", "tubelex-release-admission-candidate.schema.json",
-  package = "ldfreq"
-)
-
 for (path in c(
   manifest_path, artifact_path, provenance_path, notice_path, copyrights_path,
   inventory_path, inventory_schema_path, lookup_contract_path,
-  lookup_contract_schema_path, admission_candidate_path,
-  admission_candidate_schema_path
+  lookup_contract_schema_path
 )) {
   check(nzchar(path) && file.exists(path), sprintf("Installed file missing: %s", path))
   check(isTRUE(file_test("-f", path)), sprintf("Installed member is not regular: %s", path))
@@ -86,8 +73,8 @@ identities <- list(
     sha256 = "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d"
   ),
   provenance = c(
-    bytes = 6261,
-    sha256 = "00cb5139d4c71f85e63f075d68d50c54db1204b26a99b0f812c41ca661cd1cc0"
+    bytes = 6232,
+    sha256 = "834e70d09b983f75c6623fb56191706d1ec6f5f836c249a88816a1d93d2336f8"
   ),
   notice = c(
     bytes = 4175,
@@ -220,33 +207,6 @@ check(
   "The installed lookup normalized, fabricated, downloaded, or fell back."
 )
 
-admission_candidate <- .lexres_load_tubelex_admission_candidate()
-admission_decision <- .lexres_evaluate_tubelex_admission()
-check(
-  identical(admission_candidate$status, "candidate_ok") &&
-    identical(
-      admission_candidate$diagnostics$candidate_sha256,
-      .lexres_tubelex_admission_candidate_sha256
-    ) &&
-    identical(admission_candidate$diagnostics$candidate_bytes, 3627),
-  "The installed TUBELEX admission candidate changed."
-)
-check(
-  identical(admission_decision$status, "maintainer_decision_valid") &&
-    is.na(admission_decision$failure_reason) &&
-    identical(admission_decision$admission_gate_passed, TRUE) &&
-    identical(admission_decision$package_release_ready, FALSE) &&
-    identical(admission_decision$diagnostics$release_approved_resource_count, 1),
-  "The installed TUBELEX maintainer decision or release boundary changed."
-)
-check(
-  identical(admission_decision$diagnostics$fallback_attempted, FALSE) &&
-    identical(admission_decision$diagnostics$download_attempted, FALSE) &&
-    identical(admission_decision$diagnostics$independent_reviewer_required, FALSE) &&
-    identical(admission_decision$diagnostics$independent_legal_opinion_obtained, FALSE),
-  "The installed admission gate gained fallback or misstated review scope."
-)
-
 known_rows <- list(
   the = c(count = 7448605, videos = 103830, channels = 60433),
   apple = c(count = 7403, videos = 3027, channels = 2563),
@@ -312,7 +272,8 @@ if (!requireNamespace("jsonlite", quietly = TRUE)) {
 }
 provenance <- jsonlite::read_json(provenance_path, simplifyVector = FALSE)
 check(
-  identical(provenance$status, "direct-source-r-build-candidate-not-production") &&
+  identical(provenance$schema_version, "1.0.0") &&
+    identical(provenance$status, "direct-source-r-build-record") &&
     identical(provenance$source$commit, "7cb5fb36add76b83a266d1967536e1a1d3faa513") &&
     identical(provenance$source$sha256, "4096022259d5eaa7261c3bf22c3b0af9fd58ae8eebe17894c0b34a163954f936") &&
     identical(provenance$source$bundled_in_output, FALSE) &&
@@ -351,30 +312,21 @@ check(
   "The installed non-exported lookup-contract boundary changed."
 )
 check(
-  identical(inventory$schema_version, "0.1.0") &&
-    identical(inventory$reviewed_on, "2026-08-06") &&
-    identical(
-      inventory$package_scope,
-      "public-api-resource-release-candidate"
-    ) &&
-    identical(inventory$policy$release_requires_independent_approval, FALSE) &&
-    identical(inventory$policy$release_requires_maintainer_license_decision, TRUE) &&
-    identical(inventory$policy$uncertainty_default, "exclude") &&
-    identical(inventory$policy$runtime_network_access, FALSE) &&
-    identical(inventory$policy$implicit_download_or_fallback, FALSE),
-  "The installed resource-inventory policy changed."
+  identical(inventory$schema_version, "1.0.0") &&
+    identical(inventory$package_scope, "installed-lexical-resources") &&
+    identical(inventory$runtime_policy$network_access, FALSE) &&
+    identical(inventory$runtime_policy$implicit_download_or_fallback, FALSE),
+  "The installed resource-manifest boundary changed."
 )
 check(
-  identical(as.numeric(inventory$release_approved_resource_count), 1) &&
-    length(inventory$included_resources) == 1L,
-  "The installed inventory overstated release approval or resource count."
+  length(inventory$resources) == 1L,
+  "The installed manifest changed its bundled resource count."
 )
-inventory_resource <- inventory$included_resources[[1L]]
+inventory_resource <- inventory$resources[[1L]]
 check(
   identical(inventory_resource$resource_id, "tubelex-en-treebank-slim") &&
-    identical(inventory_resource$distribution_state, "release-candidate") &&
+    identical(inventory_resource$distribution, "bundled") &&
     identical(inventory_resource$runtime_state, "public") &&
-    identical(inventory_resource$release_approved, TRUE) &&
     identical(inventory_resource$public_api, TRUE) &&
     identical(inventory_resource$license_spdx, "BSD-3-Clause") &&
     identical(inventory_resource$raw_source_bundled, FALSE) &&
@@ -393,27 +345,17 @@ for (member in inventory_resource$package_members) {
     sprintf("Inventory member identity changed: %s", member$path)
   )
 }
-excluded_ids <- vapply(
-  inventory$not_included,
-  function(resource_record) resource_record$resource_id,
-  character(1L)
-)
 check(
-  identical(
-    excluded_ids,
-    c(
-      "ngsl-1.2", "oewn-2025", "nj8", "antbnc-lemma-list",
-      "ngsl-31k-workbook",
-      "coca", "ellipse-corpus", "python-resource-derived-golden-outputs"
-    )
-  ),
-  "The explicit not-included resource inventory changed."
+  identical(inventory_resource$notice_path, "licenses/tubelex/NOTICE.md") &&
+    identical(
+      inventory_resource$provenance_path,
+      "extdata/tubelex/7cb5fb36/build-provenance.json"
+    ),
+  "The installed manifest changed its notice or provenance path."
 )
 
 loader_functions <- list(
   .lexres_decode_gzip_bounded,
-  .lexres_evaluate_tubelex_admission,
-  .lexres_load_tubelex_admission_candidate,
   .lexres_load_resource_impl,
   .lexres_load_tubelex,
   .lexres_lookup_loaded_tubelex,

@@ -78,9 +78,10 @@ wrapper applies an explicit identity or TUBELEX-oriented query transform,
 retains original and lookup terms, reports token/type coverage and
 normalization collisions, and leaves unmatched measurements missing rather
 than inventing zero counts. Its non-exported exact-match lower layer remains
-governed by the non-exported lookup contract. The exact state and every explicitly
-deferred or excluded resource are recorded in
-`inst/spec/ldfreq-resource-inventory.json`.
+governed by the non-exported lookup contract. Installed resource facts are
+recorded in `inst/spec/ldfreq-installed-resource-manifest.json`. Release
+admission, deferred resources, and exclusions are recorded separately in
+`experiments/resource-admission/ldfreq-release-resource-inventory.json`.
 A New JACET 8000 adapter does not change that resource state. The list remains
 explicitly excluded from package payloads while durable CRAN and downstream
 redistribution scope remains unresolved; only caller-authorized local input is
@@ -93,15 +94,13 @@ diagnostics, offline behavior, public lifecycle, and source/installed/platform-
 binary membership have all been verified and the maintainer's admission
 decision has been recorded.
 
-The installed release-admission candidate is separately byte-pinned and states
-`maintainer-approved`. It records the pinned upstream BSD-3-Clause license and
-README, CRAN policy basis, maintainer identity and date, approved distribution
-and public-profile scopes, and explicit risk controls. Missing, modified, or
-semantically weakened candidate bytes fail closed without search, download, or
-fallback. A valid decision closes only the resource-admission gate: the
-evaluator always leaves `package_release_ready` false until the final exact
-source, installed, and binary inventory audit passes. Independent review is an
-optional additional check, not a release prerequisite.
+The repository-only release-admission record states `maintainer-approved` and
+records the pinned upstream BSD-3-Clause license and README, CRAN policy basis,
+maintainer identity and date, approved distribution and public-profile scopes,
+explicit risk controls, and remaining package gates. Its CI validator checks
+the record semantically against the installed manifest. Admission records and
+package-readiness evaluation are not installed with the runtime package.
+Independent review is an optional additional check, not a release prerequisite.
 
 The current non-exported loader establishes only the common integrity and
 failure boundary. It consumes exact local paths, hashes the same raw bytes that

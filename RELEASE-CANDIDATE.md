@@ -18,7 +18,7 @@ generates:
 - an SPDX 2.3 dependency SBOM for the release-R build-source environment,
   including the declared R constraint (the five check environments remain in
   their separate logs and result records);
-- a resource BOM derived from the installed resource inventory;
+- a resource BOM derived from the installed resource manifest;
 - release provenance bound to the repository commit, tree, archive, manual,
   environment, and evidence hashes;
 - per-platform `R CMD check --as-cran --no-manual` logs and result records; and
@@ -48,11 +48,12 @@ tree, tarball name and SHA-256, known limitations, and rollback action. It must
 also preserve the workflow definition, logs, and hashes outside expiring CI
 storage.
 
-The TUBELEX unit and exported profile are maintainer-approved in a byte-pinned
-admission candidate. That record documents the pinned BSD-3-Clause and README
-basis, approved scopes, absence of raw subtitle material, installed notice, and
-the fact that no independent legal opinion was obtained. The final exact
-source, installed, and binary inventory must reproduce this boundary.
+The TUBELEX unit and exported profile are maintainer-approved in a
+repository-only admission record. That record documents the pinned
+BSD-3-Clause and README basis, approved scopes, absence of raw subtitle
+material, installed notice, and the fact that no independent legal opinion was
+obtained. The final exact source, installed, and binary inventory must reproduce
+this boundary.
 
 The New JACET 8000 level-profile API is code-only: a final candidate must verify
 that no JACET list bytes appear in the repository, source archive, installed

@@ -1,6 +1,7 @@
 {
-  "$schema": "ldfreq-resource-inventory.schema.json",
+  "$schema": "ldfreq-release-resource-inventory.schema.json",
   "schema_version": "0.1.0",
+  "record_scope": "repository-release-evidence",
   "reviewed_on": "2026-08-06",
   "package_scope": "public-api-resource-release-candidate",
   "policy": {
@@ -40,8 +41,8 @@
         },
         {
           "path": "extdata/tubelex/7cb5fb36/build-provenance.json",
-          "bytes": 6261,
-          "sha256": "00cb5139d4c71f85e63f075d68d50c54db1204b26a99b0f812c41ca661cd1cc0"
+          "bytes": 6232,
+          "sha256": "834e70d09b983f75c6623fb56191706d1ec6f5f836c249a88816a1d93d2336f8"
         },
         {
           "path": "licenses/tubelex/NOTICE.md",

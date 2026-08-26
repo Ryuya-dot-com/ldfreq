@@ -56,9 +56,9 @@ signature/attestation, or publication steps below.
       lookup contract, coverage diagnostics, and offline failure behavior.
 - [ ] For TUBELEX, run
       `experiments/resource-admission/validate-tubelex-admission.R` against the
-      installed package. Confirm the byte-pinned maintainer decision, upstream
-      BSD-3-Clause and README URLs, approved scopes, risk controls, and one
-      release-approved resource. Treat this as resource and public-profile
+      candidate checkout. Confirm the repository-only maintainer decision,
+      upstream BSD-3-Clause and README URLs, approved scopes, risk controls, and
+      one release-approved resource. Treat this as resource and public-profile
       admission evidence only, not final package release readiness.
 - [ ] Include each admitted resource's required license, copyright, notice, and
       manifest files under the appropriate `inst/` path, then verify their

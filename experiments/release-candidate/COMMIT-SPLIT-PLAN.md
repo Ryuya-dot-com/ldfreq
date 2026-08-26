@@ -47,25 +47,28 @@ DESCRIPTION
 NAMESPACE
 R/level-profile.R
 R/preprocessing.R
-R/resource-admission.R
 R/tubelex-profile.R
 R/variant-metrics.R
 experiments/package-resource-inventory/validate-package-resource-inventory.R
 experiments/release-candidate/generate-release-evidence.R
 experiments/resource-admission/README.md
 experiments/resource-admission/OPTIONAL-REVIEW.md
+experiments/resource-admission/ldfreq-release-resource-inventory.json
+experiments/resource-admission/ldfreq-release-resource-inventory.schema.json
+experiments/resource-admission/tubelex-release-admission-candidate.json
+experiments/resource-admission/tubelex-release-admission-candidate.schema.json
+experiments/resource-admission/validate-tubelex-admission.R
 experiments/tubelex-source-build/README.md
 inst/spec/ldfreq-preprocessing-contract.json
 inst/spec/ldfreq-preprocessing-contract.schema.json
-inst/spec/ldfreq-resource-inventory.json
+inst/spec/ldfreq-installed-resource-manifest.json
+inst/spec/ldfreq-installed-resource-manifest.schema.json
 inst/spec/lexical-diversity-variant-contract.json
 inst/spec/lexical-diversity-variant-contract.schema.json
 inst/spec/lexical-level-profile-contract.json
 inst/spec/lexical-level-profile-contract.schema.json
 inst/spec/tubelex-frequency-profile-contract.json
 inst/spec/tubelex-frequency-profile-contract.schema.json
-inst/spec/tubelex-release-admission-candidate.json
-inst/spec/tubelex-release-admission-candidate.schema.json
 man/lexdiv_flemmatize.Rd
 man/lexdiv_preprocessing.Rd
 man/lexdiv_variant_metrics.Rd
@@ -74,7 +77,6 @@ man/tubelex_frequency_profile.Rd
 tests/testthat/helper-antbnc.R
 tests/testthat/test-level-profile.R
 tests/testthat/test-preprocessing.R
-tests/testthat/test-resource-admission.R
 tests/testthat/test-tubelex-profile.R
 tests/testthat/test-variant-metrics.R
 tests/tubelex-resource-audit.R
@@ -143,7 +145,7 @@ The freeze is intentionally separate and should contain only candidate-state
 changes such as:
 
 - setting `Version` to `0.1.1` after all patch changes have landed;
-- changing `Config/ldfreq/status` from development to release-candidate;
+- setting the repository-only `state.dcf` status to `release-candidate`;
 - reconciling release wording and evidence identifiers with the exact commit;
 - regenerating evidence from the exact source tarball.
 
@@ -153,7 +155,7 @@ Suggested subject:
 Freeze ldfreq 0.1.1 release candidate
 ```
 
-The byte-pinned TUBELEX admission candidate contains the maintainer's explicit
+The repository-only TUBELEX admission record contains the maintainer's explicit
 license and distribution decision, upstream URLs, approved scopes, and risk
 controls. Independent review is optional. The final freeze must retain that
 decision, reproduce the candidate and resource identities, and pass the exact
@@ -172,8 +174,8 @@ From the exact freeze commit and an unmodified checkout:
 4. Build and inspect the PDF manual and vignettes.
 5. Install the exact tarball and run the offline smoke example.
 6. Verify that conditional suggested backends remain conditional when absent.
-7. Validate the bundled maintainer resource-admission decision and its exact
-   candidate bytes.
+7. Validate the repository maintainer resource-admission decision and its
+   semantic agreement with the installed resource manifest.
 8. Merge through the protected-branch review workflow; do not bypass required
    CI gates.
 

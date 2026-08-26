@@ -483,8 +483,8 @@ TUBELEX path performs bounded streaming gzip expansion and validates the fixed
 normalization option while retaining both original and lookup terms. It
 preserves order and duplicates, returns token/type coverage diagnostics, and
 keeps unmatched measurements missing rather than coercing them to zero. The
-installed manifest, notice, provenance, and machine-readable inventory allow
-the bundled resource and its package boundary to be audited independently.
+installed resource manifest, notice, and provenance allow the bundled resource
+and its package boundary to be audited independently.
 
 The installed CC0 cross-language fixture checks parsed semantic agreement with
 the Python implementation for formulas that share exact method IDs. It also

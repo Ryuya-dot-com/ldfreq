@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/inst/spec/ldfreq-installed-resource-manifest.schema.json",
+  "title": "ldfreq installed resource manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "package_scope",
+    "runtime_policy",
+    "resources"
+  ],
+  "properties": {
+    "$schema": {"const": "ldfreq-installed-resource-manifest.schema.json"},
+    "schema_version": {"const": "1.0.0"},
+    "package_scope": {"const": "installed-lexical-resources"},
+    "runtime_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network_access", "implicit_download_or_fallback"],
+      "properties": {
+        "network_access": {"const": false},
+        "implicit_download_or_fallback": {"const": false}
+      }
+    },
+    "resources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/resource"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "packageMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "role", "bytes", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "role": {"type": "string", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resource_id",
+        "resource_version",
+        "distribution",
+        "runtime_state",
+        "public_api",
+        "license_spdx",
+        "source_repository",
+        "source_commit",
+        "source_sha256",
+        "raw_source_bundled",
+        "raw_subtitles_or_identifiers_included",
+        "manifest_sha256",
+        "artifact_sha256",
+        "content_sha256",
+        "notice_path",
+        "provenance_path",
+        "package_members"
+      ],
+      "properties": {
+        "resource_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+        "resource_version": {"type": "string", "minLength": 1},
+        "distribution": {"const": "bundled"},
+        "runtime_state": {"enum": ["non-exported", "public"]},
+        "public_api": {"type": "boolean"},
+        "license_spdx": {"type": "string", "minLength": 1},
+        "source_repository": {"type": "string", "format": "uri"},
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "raw_source_bundled": {"type": "boolean"},
+        "raw_subtitles_or_identifiers_included": {"type": "boolean"},
+        "manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "artifact_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "notice_path": {"type": "string", "minLength": 1},
+        "provenance_path": {"type": "string", "minLength": 1},
+        "package_members": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/packageMember"}
+        }
+      }
+    }
+  }
+}

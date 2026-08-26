@@ -42,6 +42,9 @@
 - Versioned the installed, non-exported lexical-resource loader, manifest,
   lookup contract, and result schema as `0.1.1` without changing loading,
   matching, formulas, or resource behavior.
+- Separated package-release review records from installed resource
+  metadata. The installed manifest now contains only bundled-resource,
+  provenance, license, identity, and runtime-boundary facts.
 - Added a CC0 cross-language semantic fixture for the ten R/Python formulas
   that share method IDs. It compares parsed values, status meaning, and missing
   reasons, while recording the intentionally different R and Python MTLD

@@ -144,8 +144,8 @@ numeric_manifest_equal <- function(value, expected) {
     identical(as.numeric(value), as.numeric(expected))
 }
 assert_manifest(
-  identical(manifest$schema_version, "0.2.0-experiment") &&
-    identical(manifest$status, "direct-source-r-build-candidate-not-production") &&
+  identical(manifest$schema_version, "1.0.0") &&
+    identical(manifest$status, "direct-source-r-build-record") &&
     identical(manifest$id, "tubelex-en-treebank-7cb5fb36-slim-r-direct-v1"),
   "The staged manifest identity is not the reviewed direct-build contract."
 )

@@ -396,22 +396,30 @@ check(
   "The SPDX document omitted or changed the DESCRIPTION R constraint."
 )
 
-resource_inventory_path <- file.path(
-  package_extract, "inst", "spec", "ldfreq-resource-inventory.json"
+resource_manifest_path <- file.path(
+  package_extract, "inst", "spec", "ldfreq-installed-resource-manifest.json"
 )
-check(file.exists(resource_inventory_path), "The source package has no resource inventory.")
-resource_inventory <- jsonlite::read_json(resource_inventory_path, simplifyVector = FALSE)
+check(file.exists(resource_manifest_path), "The source package has no installed resource manifest.")
+resource_manifest <- jsonlite::read_json(resource_manifest_path, simplifyVector = FALSE)
 check(
-  identical(as.numeric(resource_inventory$release_approved_resource_count), 1) &&
-    identical(
-      resource_inventory$policy$release_requires_independent_approval,
-      FALSE
-    ) &&
-    identical(
-      resource_inventory$policy$release_requires_maintainer_license_decision,
-      TRUE
-    ),
-  "The release-evidence resource-admission policy changed."
+  identical(resource_manifest$schema_version, "1.0.0") &&
+    identical(resource_manifest$package_scope, "installed-lexical-resources") &&
+    identical(resource_manifest$runtime_policy$network_access, FALSE) &&
+    identical(resource_manifest$runtime_policy$implicit_download_or_fallback, FALSE) &&
+    length(resource_manifest$resources) == 1L,
+  "The release-evidence installed resource boundary changed."
+)
+admission_record_path <- file.path(
+  package_root, "experiments", "resource-admission",
+  "tubelex-release-admission-candidate.json"
+)
+check(file.exists(admission_record_path), "The repository admission record is missing.")
+admission_record <- jsonlite::read_json(admission_record_path, simplifyVector = FALSE)
+check(
+  identical(admission_record$record_scope, "repository-release-evidence") &&
+    identical(admission_record$candidate_state, "maintainer-approved") &&
+    identical(admission_record$maintainer_decision$decision, "approved"),
+  "The repository admission decision changed."
 )
 resource_bom <- list(
   schema_version = "1.0.0",
@@ -420,9 +428,14 @@ resource_bom <- list(
   version = package_version,
   candidate_commit = commit,
   artifact_sha256 = archive_record$sha256,
-  inventory_file = "inst/spec/ldfreq-resource-inventory.json",
-  inventory_sha256 = sha256_file(resource_inventory_path),
-  inventory = resource_inventory
+  installed_manifest_file = "inst/spec/ldfreq-installed-resource-manifest.json",
+  installed_manifest_sha256 = sha256_file(resource_manifest_path),
+  installed_manifest = resource_manifest,
+  admission_record = list(
+    scope = admission_record$record_scope,
+    decision_id = admission_record$maintainer_decision$decision_id,
+    decision = admission_record$maintainer_decision$decision
+  )
 )
 resource_bom_path <- file.path(output_root, "resource-bom.json")
 write_json(resource_bom, resource_bom_path)
@@ -449,15 +462,17 @@ provenance <- list(
   ),
   evidence = evidence_records,
   resource_boundary = list(
-    release_approved_resource_count = resource_inventory$release_approved_resource_count,
+    installed_resource_count = length(resource_manifest$resources),
     public_resource_api_candidate = TRUE,
     candidate_resources_are_release_admitted = TRUE,
-    decision_authority = "package-maintainer"
+    decision_authority = "package-maintainer",
+    admission_record_scope = admission_record$record_scope,
+    admission_decision_id = admission_record$maintainer_decision$decision_id
   ),
   go_no_go = list(
     decision = "PENDING_MAINTAINER_RELEASE_DECISION",
     decision_authority = "package-maintainer",
-    resource_decision_recorded_on = "2026-08-06",
+    resource_decision_recorded_on = admission_record$maintainer_decision$decided_on,
     known_limitations = c(
       "Raw-text preprocessing is governed by a separate versioned public contract.",
       paste(

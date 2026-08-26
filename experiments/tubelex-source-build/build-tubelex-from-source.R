@@ -517,8 +517,8 @@ main <- function() {
   )
   stringi_build <- stringi::stri_info()
   manifest <- list(
-    schema_version = "0.2.0-experiment",
-    status = "direct-source-r-build-candidate-not-production",
+    schema_version = "1.0.0",
+    status = "direct-source-r-build-record",
     id = "tubelex-en-treebank-7cb5fb36-slim-r-direct-v1",
     source = c(
       source_contract,

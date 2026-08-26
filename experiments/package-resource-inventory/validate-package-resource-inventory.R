@@ -119,35 +119,32 @@ check(
 check(nzchar(package_version), "Package version is empty.")
 
 inventory_source_path <- file.path(
-  package_root, "inst", "spec", "ldfreq-resource-inventory.json"
+  package_root, "inst", "spec", "ldfreq-installed-resource-manifest.json"
 )
 schema_source_path <- file.path(
-  package_root, "inst", "spec", "ldfreq-resource-inventory.schema.json"
+  package_root, "inst", "spec", "ldfreq-installed-resource-manifest.schema.json"
 )
 inventory <- jsonlite::read_json(inventory_source_path, simplifyVector = FALSE)
 inventory_schema <- jsonlite::read_json(schema_source_path, simplifyVector = FALSE)
 check(
-  identical(inventory$schema_version, "0.1.0") &&
-    identical(inventory$policy$release_requires_independent_approval, FALSE) &&
-    identical(
-      inventory$policy$release_requires_maintainer_license_decision,
-      TRUE
-    ),
-  "Resource inventory policy changed."
+  identical(inventory$schema_version, "1.0.0") &&
+    identical(inventory$package_scope, "installed-lexical-resources") &&
+    identical(inventory$runtime_policy$network_access, FALSE) &&
+    identical(inventory$runtime_policy$implicit_download_or_fallback, FALSE),
+  "Installed resource-manifest boundary changed."
 )
 check(
-  identical(as.numeric(inventory$release_approved_resource_count), 1) &&
-    length(inventory$included_resources) == 1L,
-  "The inventory must retain one maintainer-approved bundled resource."
+  length(inventory$resources) == 1L,
+  "The installed manifest must declare one bundled resource."
 )
 check(
-  identical(inventory_schema$title, "ldfreq installed resource inventory") &&
+  identical(inventory_schema$title, "ldfreq installed resource manifest") &&
     identical(inventory_schema$additionalProperties, FALSE),
-  "Resource inventory schema changed unexpectedly."
+  "Installed resource-manifest schema changed unexpectedly."
 )
 
 inventory_members <- do.call(c, lapply(
-  inventory$included_resources,
+  inventory$resources,
   function(resource) resource$package_members
 ))
 check(length(inventory_members) > 0L, "No package members are declared.")
@@ -162,7 +159,7 @@ for (index in seq_along(member_paths)) {
   member <- inventory_members[[index]]
   path <- member_paths[[index]]
   check(
-    identical(names(member), c("path", "bytes", "sha256")),
+    identical(names(member), c("path", "role", "bytes", "sha256")),
     sprintf("Inventory member fields changed: %s", path)
   )
   bytes <- read_bytes(file.path(package_root, "inst", path))
@@ -178,12 +175,10 @@ for (index in seq_along(member_paths)) {
 }
 
 metadata_paths <- c(
-  "spec/ldfreq-resource-inventory.json",
-  "spec/ldfreq-resource-inventory.schema.json",
+  "spec/ldfreq-installed-resource-manifest.json",
+  "spec/ldfreq-installed-resource-manifest.schema.json",
   "spec/lexical-resource-lookup-contract.json",
   "spec/lexical-resource-lookup-contract.schema.json",
-  "spec/tubelex-release-admission-candidate.json",
-  "spec/tubelex-release-admission-candidate.schema.json",
   "spec/ldfreq-preprocessing-contract.json",
   "spec/ldfreq-preprocessing-contract.schema.json",
   "spec/tubelex-frequency-profile-contract.json",
@@ -312,7 +307,7 @@ if (!is.null(provided_source_archive)) {
       source_package_root,
       "inst",
       "spec",
-      "ldfreq-resource-inventory.json"
+      "ldfreq-installed-resource-manifest.json"
     ),
     simplifyVector = FALSE
   )
@@ -440,7 +435,7 @@ evidence <- list(
   platform_archive = archive_record(platform_archive),
   audited_members = member_records,
   extdata_members = expected_extdata,
-  release_approved_resource_count = 1,
+  installed_resource_count = length(inventory$resources),
   undeclared_extdata_observed = FALSE,
   assertions = assertions
 )
