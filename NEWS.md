@@ -32,21 +32,16 @@
   not put paths, secrets, or private hashes in these labels.
 - Removed AntBNC source-file names and source/override SHA-256 fields from
   public flemma provenance and overlap comparison. The source-byte digest is
-  used only as an internal, result-invariant parse-cache key.
+  used only for caching and is never copied to public provenance or results.
 - Preprocessing contract `0.1.1` validates annotation provenance strictly.
   `lexdiv_tokenization` objects serialized under `0.1.0` are not migrated
   automatically; recreate them from the original text with
   `lexdiv_tokenize()` and reapply annotations with current explicit IDs.
 - Versioned the changed preprocessing behavior as contract `0.1.1`; tokenizer
   identity remains `0.1.0` because token boundaries did not change.
-- Replaced pre-release wording such as "frozen" with "versioned" where it
-  described public methods rather than an immutable method definition.
 - Versioned the installed, non-exported lexical-resource loader, manifest,
-  lookup contract, and result schema as `0.1.1`, replacing stale draft and
-  release-candidate labels without changing loading, matching, formulas, or
-  resource behavior.
-- Kept the existing TUBELEX resource-admission state unchanged; any promotion
-  still requires evidence tied to the exact release artifact.
+  lookup contract, and result schema as `0.1.1` without changing loading,
+  matching, formulas, or resource behavior.
 - Added a CC0 cross-language semantic fixture for the ten R/Python formulas
   that share method IDs. It compares parsed values, status meaning, and missing
   reasons, while recording the intentionally different R and Python MTLD

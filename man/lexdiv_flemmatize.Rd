@@ -62,9 +62,9 @@ overrides rather than claiming unverified NWLC equivalence.
 The AntBNC payload is read only from the path supplied by the caller. It is
 never bundled, downloaded, or copied into the result. Its local file name,
 absolute directory, and content hash are not retained in public provenance.
-A source-byte digest is used only as an internal, result-invariant parse-cache
-key and is not used to decide overlap comparability. Package-generated
-file-access errors do not echo the supplied path.
+A source-byte digest is used only for caching, is never copied to public
+provenance or results, and is not used to decide overlap comparability.
+Package-generated file-access errors do not echo the supplied path.
 }
 \value{
 The input \code{lexdiv_tokenization} object with three token columns:

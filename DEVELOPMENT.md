@@ -27,7 +27,7 @@ fixed package adapter/parser identities plus optional caller-declared resource
 and override versions. Those version labels are public provenance, not content
 hashes or package verification: they must be path-free and must not contain
 secrets or private hashes. The source file name is not retained, and its byte
-hash is internal cache state only rather than public provenance or an overlap
+hash is cache state only rather than public provenance or an overlap
 comparison key. Raw AntBNC remains an NWLC approximation rather than a
 compatibility claim. New JACET integration must retain per-token
 AntBNC/override/identity rules and selectable headword-conflict resolution.
@@ -78,7 +78,7 @@ wrapper applies an explicit identity or TUBELEX-oriented query transform,
 retains original and lookup terms, reports token/type coverage and
 normalization collisions, and leaves unmatched measurements missing rather
 than inventing zero counts. Its non-exported exact-match lower layer remains
-governed by the internal lookup contract. The exact state and every explicitly
+governed by the non-exported lookup contract. The exact state and every explicitly
 deferred or excluded resource are recorded in
 `inst/spec/ldfreq-resource-inventory.json`.
 A New JACET 8000 adapter does not change that resource state. The list remains

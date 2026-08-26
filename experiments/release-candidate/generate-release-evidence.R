@@ -151,6 +151,8 @@ relative_paths <- relative_paths[ordering]
 text_extensions <- "[.](R|Rd|Rmd|md|dcf|json|ya?ml|txt|csv)$"
 scan_patterns <- c(
   "Codex", "OpenAI", "INTERNAL-ROADMAP", "W[0-9]+-REVIEW",
+  "private mirror", "legacy[- ]private", "stale draft",
+  "pre-release wording", "internal parse[- ]cache", "PENDING_",
   "/Users/", "[A-Za-z]:\\\\Users\\\\"
 )
 scan_findings <- list()

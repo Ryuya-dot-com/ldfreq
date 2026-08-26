@@ -13,7 +13,7 @@
     "content_sha256": "423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916",
     "license_spdx": "BSD-3-Clause",
     "notice_path": "licenses/tubelex/NOTICE.md",
-    "notice_sha256": "e65a1f5d0d6e7806e31e92d78bf3b903115e610c36bd9f2406269700441ecdd3"
+    "notice_sha256": "a3ea8312a5bbf8e7178155259460f089d0377a8c99094f70875910c428cb4cb5"
   },
   "distribution_scope": {
     "package_component_state": "release-candidate",

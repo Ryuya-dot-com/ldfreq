@@ -10,7 +10,7 @@
 .lexres_tubelex_admission_candidate_id <-
   "tubelex-en-treebank-slim-7cb5fb36-public-profile-admission-v3"
 .lexres_tubelex_admission_candidate_sha256 <-
-  "b58a064c4ad0e7f4cead2bf38397d88c6866fd69ef6e8fa2636cabeca365ad5a"
+  "16384233625e1a672cefb85e88c5f7f6d745f8f2c289c3b6487f06c45c8134e4"
 .lexres_admission_remaining_gates <- c(
   "final release-candidate source, installed, and binary inventory audit"
 )

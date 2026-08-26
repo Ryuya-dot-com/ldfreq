@@ -61,7 +61,8 @@ semantics, label-disclosure boundary, path-provenance boundary, or public
 result semantics requires a new preprocessing contract version. Declared
 versions are caller labels, not inferred content identities. Performance
 caching must remain result-invariant; its source-byte digest must remain
-internal and must not become public provenance or an overlap-comparability key.
+limited to caching and must not become public provenance or an
+overlap-comparability key.
 
 Preprocessing objects are validated against their recorded contract version.
 The stricter `0.1.1` contract does not automatically migrate a

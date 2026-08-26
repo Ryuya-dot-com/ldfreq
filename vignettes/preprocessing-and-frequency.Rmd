@@ -186,7 +186,8 @@ non-empty, `override_version` are caller labels rather than inferred content
 identities. They are disclosed in provenance and overlap comparability output,
 so use path-free, non-sensitive labels and never put secrets or private hashes
 in them. The local file name and content hash are not retained in public
-provenance; a source-byte digest is used only for the internal parse cache.
+provenance; a source-byte digest is used only for caching and is never copied
+to public provenance or results.
 
 This is an explicit approximation boundary. NWLC reports using a manually
 modified AntBNC mapping aligned to its selected word lists. Raw AntBNC can map

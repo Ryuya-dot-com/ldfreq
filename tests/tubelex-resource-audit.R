@@ -87,11 +87,11 @@ identities <- list(
   ),
   provenance = c(
     bytes = 6261,
-    sha256 = "dd7d98dac8eb6aaf27f2ea91eda440113d678e149cb2fbfc3f1cf23aaca1e26e"
+    sha256 = "d728e89cd14b4b3bc2df2ce1b99e26a6136b61e081319dc2be191695f3f6d04d"
   ),
   notice = c(
-    bytes = 4193,
-    sha256 = "e65a1f5d0d6e7806e31e92d78bf3b903115e610c36bd9f2406269700441ecdd3"
+    bytes = 4175,
+    sha256 = "a3ea8312a5bbf8e7178155259460f089d0377a8c99094f70875910c428cb4cb5"
   )
 )
 identity_paths <- list(
