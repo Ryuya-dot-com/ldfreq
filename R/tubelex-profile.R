@@ -19,7 +19,7 @@
   .lex_warn_likely_raw_text(
     terms,
     "terms",
-    "tubelex_frequency_profile",
+    "tubelex_profile",
     "pass lexdiv_tokenize(text) instead"
   )
   list(
@@ -99,7 +99,7 @@
   )
 }
 
-.tubelex_frequency_profile <- function(
+.tubelex_profile <- function(
     terms,
     normalization,
     loader = .lexres_load_tubelex) {
@@ -181,7 +181,7 @@
       provenance = provenance,
       diagnostics = lookup$diagnostics
     ),
-    class = "tubelex_frequency_profile"
+    class = "tubelex_profile"
   )
 }
 
@@ -209,11 +209,11 @@
 #'   exact case- and normalization-sensitive lookup. The selected transform is
 #'   recorded in provenance.
 #'
-#' @return A `tubelex_frequency_profile` list containing matched-only token- and
+#' @return A `tubelex_profile` list containing matched-only token- and
 #'   type-weighted summaries, the lossless lookup table, token/type coverage,
 #'   resource and formula provenance, and diagnostics.
 #' @export
-tubelex_frequency_profile <- function(
+tubelex_profile <- function(
     terms,
     normalization = "tubelex") {
   normalization <- .lexprep_scalar_choice(
@@ -221,7 +221,7 @@ tubelex_frequency_profile <- function(
     c("tubelex", "identity"),
     "normalization"
   )
-  .tubelex_frequency_profile(
+  .tubelex_profile(
     terms = terms,
     normalization = normalization,
     loader = .lexres_load_tubelex
@@ -229,7 +229,7 @@ tubelex_frequency_profile <- function(
 }
 
 #' @export
-print.tubelex_frequency_profile <- function(x, ...) {
+print.tubelex_profile <- function(x, ...) {
   token_coverage <- x$coverage$token_coverage
   coverage_label <- if (is.na(token_coverage)) {
     "NA"
@@ -238,7 +238,7 @@ print.tubelex_frequency_profile <- function(x, ...) {
   }
   cat(
     sprintf(
-      "<tubelex_frequency_profile> status=%s | token coverage=%s | normalization=%s\n",
+      "<tubelex_profile> status=%s | token coverage=%s | normalization=%s\n",
       x$status,
       coverage_label,
       x$provenance$query_normalization

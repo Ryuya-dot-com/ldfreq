@@ -1,6 +1,7 @@
 \name{lexdiv_variant_metrics}
 \alias{lexdiv_variant_ids}
 \alias{lexdiv_variant_metrics}
+\alias{print.lexdiv_variant_results}
 \title{Explicit Maas and sequential-MTLD comparison variants}
 \description{
 List or compute a bounded set of formula and aggregation variants without
@@ -14,6 +15,8 @@ lexdiv_variant_metrics(
   variants = lexdiv_variant_ids()$method_id,
   mtld_thresholds = 0.72
 )
+
+\method{print}{lexdiv_variant_results}(x, ...)
 }
 \arguments{
 \item{tokens}{A plain ordered character vector accepted by
@@ -22,6 +25,8 @@ lexdiv_variant_metrics(
 from the \code{method_id} column returned by \code{lexdiv_variant_ids()}.}
 \item{mtld_thresholds}{One to 16 distinct finite numbers strictly between zero
 and one. Each requested MTLD method is expanded over these thresholds.}
+\item{x}{A \code{lexdiv_variant_results} object.}
+\item{...}{Additional arguments passed to \code{print.data.frame()}.}
 }
 \details{
 The Maas rows distinguish \eqn{a} from \eqn{a^2} and natural-log from
@@ -58,6 +63,7 @@ data frame. Maas rows occur once per method; MTLD rows occur once per
 method-threshold combination. Contract identity, status, missing reason,
 parameters, counts, reference label, comparison scope, and diagnostics are
 explicit columns.
+The print method returns \code{x} invisibly.
 }
 \examples{
 tokens <- c(rep("a", 10), "b", "c", "d", "e")

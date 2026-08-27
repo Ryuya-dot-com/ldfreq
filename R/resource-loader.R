@@ -4,11 +4,11 @@
 # mechanism. Manifest approval and distribution rights remain external gates.
 
 .lexres_contract_id <- "ldfreq-lexical-sophistication-profile"
-.lexres_contract_version <- "0.1.1"
+.lexres_contract_version <- "0.1.0"
 .lexres_manifest_schema_id <- "lexsoph-resource-manifest"
-.lexres_manifest_schema_version <- "0.1.1"
+.lexres_manifest_schema_version <- "0.1.0"
 .lexres_tubelex_manifest_sha256 <-
-  "a0936c52cbeeccd807161e7236c8d01303819a968ee3be4d84e002966574bb1d"
+  "a8d5dc3b2a5fee7eadf5a0648762350f9835b4b5e2633d9fe428dcf210120591"
 .lexres_failures <- c(
   "resource_unavailable",
   "hash_mismatch",

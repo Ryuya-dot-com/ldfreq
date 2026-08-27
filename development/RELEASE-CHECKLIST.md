@@ -14,6 +14,10 @@ signature/attestation, or publication steps below.
 - [ ] Start from a fresh clone with no modified, staged, or untracked files.
 - [ ] Record the repository URL, candidate commit SHA, candidate tree SHA, and
       intended version.
+- [ ] Verify every URL in package metadata and public documentation without
+      repository credentials. Keep `state.dcf` at `Status: development` while
+      the repository URL or issue tracker is private or otherwise unreachable;
+      do not classify the resulting incoming-check NOTE as acceptable.
 - [ ] Confirm that the candidate commit already contains the same non-`.9000`
       version in `DESCRIPTION`, NEWS, and CITATION, and that the intended tag
       and archive name match it. Commit and check any version change before
@@ -37,6 +41,16 @@ signature/attestation, or publication steps below.
 
 ## 2. Audit public scope
 
+- [ ] Regenerate the export inventory in `API-SURFACE.md`; confirm that every
+      export has one documented role, return boundary, appropriate S3
+      interactions, and an explicit analysis-ready data path.
+- [ ] Run `Rscript --vanilla development/audit-public-api.R .`; require exact
+      agreement among exports, S3 registrations, help aliases, value/examples,
+      `API-SURFACE.md`, and pkgdown navigation.
+- [ ] Build the complete pkgdown site with examples and vignettes enabled;
+      require clean URL, article, and reference metadata diagnostics, and
+      confirm that repository-only development and release records are not
+      rendered as public pages.
 - [ ] Inspect the candidate tree and all reachable refs for accidental corpus,
       credential, generated-result, cache, or local-environment files.
 - [ ] Confirm that no COCA or ELLIPSE payload, no redistributability-restricted
@@ -44,13 +58,16 @@ signature/attestation, or publication steps below.
       derived from an unapproved resource is in the repository, package,
       release assets, examples, or vignettes.
 - [ ] Confirm that no New JACET 8000 list bytes or reconstructable full-list
-      output is bundled. Exercise `new_jacet8000_profile()` only with
+      output is bundled. Exercise `nj8_profile()` only with
       project-authored synthetic fixtures or a legitimately obtained
       caller-authorized local copy.
 - [ ] Confirm that no AntBNC payload, full mapping, or derived reconstructable
       list is bundled. Exercise `lexdiv_flemmatize()` in installed examples and
       checks only with project-authored synthetic fixtures; local research runs
       may use a legitimately obtained analyst-supplied copy.
+- [ ] Confirm that generic norm examples use only project-authored synthetic
+      tables; caller metadata is not described as proof of redistribution
+      rights, and no private norm table or reconstructable payload is present.
 - [ ] For every admitted lexical resource, record its canonical source,
       version, cryptographic hash, redistribution terms, required notice,
       lookup contract, coverage diagnostics, and offline failure behavior.
@@ -96,6 +113,8 @@ it as internal-only evidence.
       run that must be repeated, not as an exception to a package-check result.
 - [ ] Check the built archive's file list, sizes, license files, vignettes,
       examples, URLs, spelling, and package metadata.
+- [ ] Confirm that locally rendered `docs/` output is absent from the source
+      archive and that `.Rbuildignore` enforces the exclusion.
 - [ ] Install from the built archive in a clean library and run the documented
       smoke examples against the installed package.
 - [ ] Record every exact command and exit code, operating system, R version,
@@ -113,6 +132,15 @@ claim must name and verify a separate controlled build procedure.
       specification and test fixtures.
 - [ ] Confirm that parameter variants remain explicit and that short-input and
       non-computable cases retain structured status and reason fields.
+- [ ] Confirm that reference coverage keeps token and type denominators
+      separate, document repetition affects only token coverage, reference
+      repetition affects neither value, invalid documents remain local, and
+      exact term disclosure remains opt-in.
+- [ ] Confirm that generic norm profiles keep token/type identity explicit,
+      use observed matched-only means, separate resource/value/annotation
+      coverage, distinguish OOV from missing annotations, retain no unused norm
+      columns, and make no implicit normalization, threshold, scale-comparison,
+      composite-score, license, proficiency, or writing-quality claim.
 - [ ] Confirm that each Maas/MTLD sensitivity row matches its separate variant
       contract, that reference labels identify only their declared comparison
       scope, and that no official TAALED compatibility or code-translation

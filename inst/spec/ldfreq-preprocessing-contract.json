@@ -1,7 +1,7 @@
 {
   "$schema": "ldfreq-preprocessing-contract.schema.json",
   "contract_id": "ldfreq-preprocessing",
-  "contract_version": "0.1.1",
+  "contract_version": "0.1.0",
   "status": "normative",
   "public_api": true,
   "tokenizer": {
@@ -39,7 +39,7 @@
     "annotation_layer_validation": "columns-provenance-and-row-alignment-required",
     "flemma_backend_identity": {
       "backend_id": "ldfreq-antbnc-flemma-adapter",
-      "backend_version": "0.1.1",
+      "backend_version": "0.1.0",
       "parser_id": "ldfreq-antbnc-parser",
       "parser_version": "0.1.0",
       "resource_id": "antbnc-lemma-list",

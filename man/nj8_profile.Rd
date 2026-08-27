@@ -1,8 +1,8 @@
-\name{new_jacet8000_profile}
-\alias{new_jacet8000_profile}
-\alias{new_jacet8000_profile_batch}
+\name{nj8_profile}
+\alias{nj8_profile}
+\alias{nj8_profile_batch}
 \alias{print.lexical_level_profile}
-\alias{print.new_jacet8000_profile_batch}
+\alias{print.nj8_profile_batch}
 \alias{plot.lexical_level_profile}
 \title{Profile lexical coverage by New JACET 8000 frequency level}
 \description{
@@ -11,7 +11,7 @@ caller-supplied copy of New JACET 8000. The word list is required at call time
 and is never bundled or downloaded by \pkg{ldfreq}.
 }
 \usage{
-new_jacet8000_profile(
+nj8_profile(
   terms,
   wordlist,
   rank_column = NULL,
@@ -24,7 +24,7 @@ new_jacet8000_profile(
   resource_version = NULL
 )
 
-new_jacet8000_profile_batch(
+nj8_profile_batch(
   documents,
   wordlist,
   rank_column = NULL,
@@ -42,7 +42,7 @@ new_jacet8000_profile_batch(
 
 \method{print}{lexical_level_profile}(x, ...)
 
-\method{print}{new_jacet8000_profile_batch}(x, ...)
+\method{print}{nj8_profile_batch}(x, ...)
 
 \method{plot}{lexical_level_profile}(
   x,
@@ -97,7 +97,7 @@ new_jacet8000_profile_batch(
   list-columns for data-frame batch input.}
   \item{max_rows}{A positive integer bounding the combined number of returned
   batch summary and token-lookup rows. The default is 1,000,000.}
-  \item{x}{A result returned by \code{new_jacet8000_profile()}.}
+  \item{x}{A result returned by \code{nj8_profile()}.}
   \item{weighting}{Either token- or type-weighted output. Types are unique
   normalized lookup terms.}
   \item{scale}{Plot proportions or counts.}
@@ -182,7 +182,7 @@ not treated as permission for \pkg{ldfreq} to redistribute the list. Users
 remain responsible for obtaining and using their copy under applicable terms.
 }
 \section{Batch output}{
-\code{new_jacet8000_profile_batch()} returns document-major \code{summary} and
+\code{nj8_profile_batch()} returns document-major \code{summary} and
 \code{lookup} tables with an explicit \code{document_id}. Its \code{coverage}
 and \code{document_diagnostics} components contain one row per input document;
 \code{exclusion_reasons} retains non-empty preprocessing exclusions;
@@ -202,8 +202,8 @@ redistributed by this package. The adapter's measurement contract is normative
 for version 0.1.0.
 }
 \value{
-\code{new_jacet8000_profile()} returns a list of class
-\code{new_jacet8000_profile} and \code{lexical_level_profile}:
+\code{nj8_profile()} returns a list of class
+\code{nj8_profile} and \code{lexical_level_profile}:
 \describe{
   \item{\code{status}}{\code{"ok"} or \code{"empty"}.}
   \item{\code{summary}}{Exact and cumulative token/type level rows.}
@@ -220,8 +220,8 @@ for version 0.1.0.
 }
 The plot method invisibly returns the summary rows and exact values drawn.
 
-\code{new_jacet8000_profile_batch()} returns a list of class
-\code{new_jacet8000_profile_batch} and
+\code{nj8_profile_batch()} returns a list of class
+\code{nj8_profile_batch} and
 \code{lexical_level_profile_batch}. The profile information is separated into
 document-major tables while the external resource provenance is stored once.
 }
@@ -230,7 +230,7 @@ wordlist <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
   Word = c("the", "develop", "rare", "extreme")
 )
-profile <- new_jacet8000_profile(
+profile <- nj8_profile(
   c("The", "develop", "unknown", "the"),
   wordlist,
   unit = "surface"
@@ -238,7 +238,7 @@ profile <- new_jacet8000_profile(
 profile$summary
 profile$coverage
 
-batch <- new_jacet8000_profile_batch(
+batch <- nj8_profile_batch(
   list(doc_a = c("The", "develop"), doc_b = c("rare", "outside")),
   wordlist,
   unit = "surface"
@@ -253,7 +253,7 @@ basename(contract_path)
 
 \dontrun{
 # A legitimately obtained official workbook can be used directly.
-official <- new_jacet8000_profile(
+official <- nj8_profile(
   c("the", "develop", "unknown"),
   "/path/to/j8_2016.xlsx"
 )
@@ -267,5 +267,5 @@ if (interactive()) {
 \seealso{
 \code{\link{lexdiv_preprocessing}},
 \code{\link{lexdiv_flemmatize}},
-\code{\link{tubelex_frequency_profile}}
+\code{\link{tubelex_profile}}
 }

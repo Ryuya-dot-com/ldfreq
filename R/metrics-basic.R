@@ -258,6 +258,40 @@
   )
 }
 
+.mattr_window_type_counts <- function(tokens, window_length) {
+  token_count <- length(tokens)
+  if (token_count < window_length || token_count == 0L) {
+    return(numeric())
+  }
+
+  token_ids <- match(tokens, unique(tokens))
+  type_count <- max(token_ids)
+  first_window <- seq_len(window_length)
+  window_frequencies <- tabulate(token_ids[first_window], nbins = type_count)
+  distinct <- as.double(sum(window_frequencies > 0))
+  window_count <- token_count - window_length + 1
+  distinct_counts <- numeric(window_count)
+  distinct_counts[[1L]] <- distinct
+
+  if (window_count > 1) {
+    for (start in seq.int(2, window_count)) {
+      outgoing <- token_ids[start - 1]
+      window_frequencies[outgoing] <- window_frequencies[outgoing] - 1
+      if (window_frequencies[outgoing] == 0) {
+        distinct <- distinct - 1
+      }
+
+      incoming <- token_ids[start + window_length - 1]
+      if (window_frequencies[incoming] == 0) {
+        distinct <- distinct + 1
+      }
+      window_frequencies[incoming] <- window_frequencies[incoming] + 1
+      distinct_counts[[start]] <- distinct
+    }
+  }
+  distinct_counts
+}
+
 .metric_mattr <- function(tokens, counts = NULL, parameters = list()) {
   window_length <- .basic_positive_integer_parameter(
     parameters, "window_length", 50
@@ -283,36 +317,16 @@
   }
 
   # Convert exact token identities to integer IDs once, then update the number
-  # of distinct types in O(1) per one-token slide.
-  token_ids <- match(tokens, unique(tokens))
-  type_count <- max(token_ids)
-  first_window <- seq_len(window_length)
-  window_frequencies <- tabulate(token_ids[first_window], nbins = type_count)
-  distinct <- as.double(sum(window_frequencies > 0))
-  distinct_sum <- distinct
-  window_count <- counts$N - window_length + 1
-
-  if (window_count > 1) {
-    for (start in seq.int(2, window_count)) {
-      outgoing <- token_ids[start - 1]
-      window_frequencies[outgoing] <- window_frequencies[outgoing] - 1
-      if (window_frequencies[outgoing] == 0) {
-        distinct <- distinct - 1
-      }
-
-      incoming <- token_ids[start + window_length - 1]
-      if (window_frequencies[incoming] == 0) {
-        distinct <- distinct + 1
-      }
-      window_frequencies[incoming] <- window_frequencies[incoming] + 1
-      distinct_sum <- distinct_sum + distinct
-    }
-  }
+  # of distinct types in O(1) per one-token slide. The same private primitive
+  # supplies the auditable local-window profile.
+  distinct_counts <- .mattr_window_type_counts(tokens, window_length)
+  window_count <- length(distinct_counts)
 
   .lex_ok(
     metric_id = "mattr",
     method_id = "mattr_sliding_step1_v1",
-    value = distinct_sum / (window_count * window_length),
+    value = sum(distinct_counts) /
+      (as.double(window_count) * as.double(window_length)),
     requested_parameters = requested,
     effective_parameters = requested,
     counts = counts,

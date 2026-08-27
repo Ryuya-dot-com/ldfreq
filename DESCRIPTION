@@ -1,7 +1,7 @@
 Package: ldfreq
 Type: Package
 Title: Reproducible Lexical Diversity and Frequency Profiles
-Version: 0.1.1
+Version: 0.1.0
 Authors@R:
     person(
         given = "Ryuya",
@@ -13,9 +13,13 @@ Description: Computes twelve versioned lexical-diversity metrics from ordered to
     vectors and from raw English text. Results record the selected formula,
     parameters, token and type counts, and preprocessing choices such as Unicode
     normalization, case handling, lemmatization, and content-word selection.
-    Separate functions compare Maas and sequential-MTLD definitions and compute
-    exact term-set or annotated content-word overlap with explicit denominators
-    and annotation coverage. Lexical level profiles use a caller-supplied New
+    Separate functions compare Maas and sequential-MTLD definitions, expose
+    local MATTR windows and positional exposure, compute exact term-set or
+    annotated content-word overlap, and measure token- and type-weighted
+    coverage of multiple documents by one explicit reference set. Caller-
+    supplied lexical norm tables can be summarized with exact matching,
+    measure-level provenance, and separate resource and annotation coverage.
+    Lexical level profiles use a caller-supplied New
     JACET 8000 list and report exact and cumulative token- and type-weighted
     coverage without redistributing the list. A bundled, versioned TUBELEX
     aggregate provides frequency, video
@@ -23,7 +27,8 @@ Description: Computes twelve versioned lexical-diversity metrics from ordered to
     Convenience adapters accept tidy token tables and 'quanteda' token objects;
     deterministic wide reshaping and base-R plots support analysis workflows.
 License: MIT + file LICENSE
-URL: https://github.com/Ryuya-dot-com/ldfreq
+URL: https://ryuya-dot-com.github.io/ldfreq/,
+    https://github.com/Ryuya-dot-com/ldfreq
 BugReports: https://github.com/Ryuya-dot-com/ldfreq/issues
 Depends:
     R (>= 4.1.0)

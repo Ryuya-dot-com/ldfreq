@@ -3,6 +3,8 @@
 \alias{lexdiv_tokenize}
 \alias{lexdiv_lemmatize}
 \alias{lexdiv_metrics_text}
+\alias{print.lexdiv_tokenization}
+\alias{print.lexdiv_text_results}
 \title{Versioned raw-text preprocessing for lexical-diversity metrics}
 \description{
 Tokenize one raw text under an explicit Unicode contract, attach lemmas and
@@ -43,6 +45,10 @@ lexdiv_metrics_text(
   sample_size = 42L,
   expected_ttr_sample_sizes = 35:50
 )
+
+\method{print}{lexdiv_tokenization}(x, ...)
+
+\method{print}{lexdiv_text_results}(x, ...)
 }
 \arguments{
 \item{text}{One plain valid-UTF-8 character string. An empty string is valid.}
@@ -57,7 +63,8 @@ retained. Alphanumeric tokens remain eligible under either setting.}
 or one raw character string. When an existing tokenization is supplied, its
 recorded normalization, case, and number-retention choices are authoritative;
 supplying \code{normalization}, \code{case}, or \code{keep_numbers} again is
-an error. Call \code{lexdiv_tokenize()} again to change those choices.}
+an error. Call \code{lexdiv_tokenize()} again to change those choices. For
+the print methods, \code{x} is the corresponding result object.}
 \item{method}{Lemma source: caller-\code{"supplied"} values or the optional
 \code{"textstem"} backend.}
 \item{lemmas}{An aligned character vector of lemmas for the supplied method.
@@ -92,6 +99,8 @@ defined as UPOS \code{ADJ}, \code{ADV}, \code{NOUN}, \code{PROPN}, and
 \item{sample_size}{Requested without-replacement sample size for HD-D.}
 \item{expected_ttr_sample_sizes}{A non-empty, strictly increasing vector of
 sample sizes used to fit deterministic expected-TTR D.}
+\item{...}{Additional arguments passed to the underlying data-frame print
+method.}
 }
 \details{
 The tokenizer extracts Unicode letter, mark, and number sequences, retaining
@@ -129,12 +138,12 @@ The tokenizer arguments \code{normalization}, \code{case}, and
 silently reapplied to, or ignored for, an existing tokenization object.
 }
 \section{Saved-object compatibility}{
-Preprocessing contract \code{0.1.1} validates annotation and provenance more
-strictly than \code{0.1.0}, including explicit UPOS-backend identity. A
-\code{lexdiv_tokenization} object saved under \code{0.1.0}, for example with
-\code{saveRDS()}, is not migrated automatically. Recreate it from the
-original text with \code{lexdiv_tokenize()} and then reapply annotations with
-the current functions and explicit identities.
+Preprocessing contract \code{0.1.0} validates annotation and provenance,
+including explicit UPOS-backend identity, whenever an object is consumed. If
+a saved \code{lexdiv_tokenization} has incomplete, unsupported, or manually
+altered provenance, recreate it from the original text with
+\code{lexdiv_tokenize()} and then reapply annotations with the current
+functions and explicit identities.
 }
 \section{Formal contract}{
 The installed \file{ldfreq-preprocessing-contract.json} file fixes tokenizer,
@@ -150,6 +159,7 @@ be inspected without running a preprocessing backend.
 \code{provenance}. \code{lexdiv_metrics_text()} returns a
 \code{lexdiv_text_results} list containing \code{results},
 \code{token_audit}, and \code{preprocessing}.
+The print methods return \code{x} invisibly.
 }
 \examples{
 tokenization <- lexdiv_tokenize("Cats and cat ran run.")
@@ -189,5 +199,5 @@ if (requireNamespace("textstem", quietly = TRUE)) {
 }
 }
 \seealso{\code{\link{lexdiv_flemmatize}}, \code{\link{lexdiv_metrics}},
-\code{\link{tubelex_frequency_profile}}}
+\code{\link{tubelex_profile}}}
 \keyword{text}

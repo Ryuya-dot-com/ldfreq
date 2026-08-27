@@ -76,13 +76,22 @@ test_that("base plots return their plotted data invisibly", {
   expect_identical(plotted$value, c(2 / 3, 1))
   expect_error(plot(batch), "metric_id must select one")
 
+  text_result <- lexdiv_metrics_text("a a b", metrics = "ttr")
+  plotted_text <- plot(text_result)
+  expect_identical(plotted_text$label, "ttr")
+  expect_identical(plotted_text$value, 2 / 3)
+  expect_error(
+    plot(structure(list(results = data.frame()), class = "lexdiv_text_results")),
+    "lexdiv_text_results object"
+  )
+
   tubelex <- structure(
     list(summary = data.frame(
       weighting = c("token", "type"),
       coverage = c(0.75, 0.5),
       stringsAsFactors = FALSE
     )),
-    class = "tubelex_frequency_profile"
+    class = "tubelex_profile"
   )
   coverage <- plot(tubelex)
   expect_identical(coverage$coverage, c(0.75, 0.5))

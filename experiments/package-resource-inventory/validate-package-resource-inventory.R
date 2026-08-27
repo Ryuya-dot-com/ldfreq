@@ -174,20 +174,11 @@ for (index in seq_along(member_paths)) {
   source_member_bytes[[index]] <- bytes
 }
 
-metadata_paths <- c(
-  "spec/ldfreq-installed-resource-manifest.json",
-  "spec/ldfreq-installed-resource-manifest.schema.json",
-  "spec/lexical-resource-lookup-contract.json",
-  "spec/lexical-resource-lookup-contract.schema.json",
-  "spec/ldfreq-preprocessing-contract.json",
-  "spec/ldfreq-preprocessing-contract.schema.json",
-  "spec/tubelex-frequency-profile-contract.json",
-  "spec/tubelex-frequency-profile-contract.schema.json",
-  "spec/lexical-diversity-variant-contract.json",
-  "spec/lexical-diversity-variant-contract.schema.json",
-  "spec/lexical-level-profile-contract.json",
-  "spec/lexical-level-profile-contract.schema.json"
+metadata_paths <- paste0(
+  "spec/",
+  relative_files(file.path(package_root, "inst", "spec"))
 )
+check(length(metadata_paths) > 0L, "No installed specification files were found.")
 all_audited_paths <- c(member_paths, metadata_paths)
 check(!anyDuplicated(all_audited_paths), "Audited package paths overlap.")
 for (path in metadata_paths) {

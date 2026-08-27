@@ -40,23 +40,23 @@ check_error <- function(code, pattern, message) {
 manifest_identities <- list(
   "valid.manifest.dcf" = c(
     bytes = 790,
-    sha256 = "e7c109ddebf65e5ebb3248b35dba0486f9c6fad6be60978fb1941e71a743b395"
+    sha256 = "934cbc3881edfa87939614cbd9e09e8e05a2fe02009784450dca742a942a70c3"
   ),
   "wrong-manifest-schema.manifest.dcf" = c(
     bytes = 805,
-    sha256 = "bf0b55acb767733a8cf83bfb0963556d647cb1402b5d3ab56ccebc2f033222f2"
+    sha256 = "971cb46b4c7b67522fe7003946c318e9bca52a63d94266ae04ebb0266a9788b2"
   ),
   "unsupported-version.manifest.dcf" = c(
     bytes = 804,
-    sha256 = "dd9b8df6fbee4297c3117a2c5997f204f0cfd11eed5c8bb7cda7a920ae1baca1"
+    sha256 = "0887bd4d3c779661cd894b5f0ff3ff8ca6bb0d5cf46438284b903f0d14710275"
   ),
   "wrong-payload-schema.manifest.dcf" = c(
     bytes = 812,
-    sha256 = "cb949061dc184b6039b843d93c5aeac175e5841df78f26eaa4770115177f549f"
+    sha256 = "f3d4933ecb06ef42af8fca945ff53c23147412bea5be8f6ba5d373db0d144311"
   ),
   "malformed-payload.manifest.dcf" = c(
     bytes = 806,
-    sha256 = "58249fce02c3469e28b16416bbc327dc7b92cbd8df37c0a67065654418e22488"
+    sha256 = "a28866c62005edb379ec2583fd6563c1c61fbe180fc74b44818a18ba9ae32d3b"
   )
 )
 artifact_identities <- list(
@@ -156,7 +156,7 @@ check(
     success$resource_ref,
     list(
       contract_id = "ldfreq-lexical-sophistication-profile",
-      contract_version = "0.1.1",
+      contract_version = "0.1.0",
       resource_id = "synthetic-frequency",
       resource_version = "1",
       resource_manifest_sha256 = valid_hash
@@ -171,7 +171,7 @@ check(
   ) &&
     identical(
       success$manifest$resource_manifest_schema_version,
-      "0.1.1"
+      "0.1.0"
     ) &&
     identical(success$manifest$bundle_variant_id, "fixture-valid") &&
     identical(length(success$manifest$artifacts), 1L) &&

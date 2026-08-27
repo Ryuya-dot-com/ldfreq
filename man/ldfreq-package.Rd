@@ -7,10 +7,13 @@
 The \pkg{ldfreq} package computes explicitly versioned lexical-diversity
 metrics from ordered tokens and provides separate auditable raw-text,
 annotation, lexical-unit, Maas/MTLD sensitivity, and TUBELEX frequency-profile
-surfaces. It also provides exact term and annotated-content-word type overlap,
-plus a caller-supplied New JACET 8000 level-profile surface without bundling
-that list. Result rows retain method, parameter or denominator, schema, and
-contract provenance.
+surfaces. It also provides local MATTR window and positional-exposure
+diagnostics, exact term and annotated-content-word type overlap,
+many-document coverage by one explicit reference term set, caller-supplied
+lexical-norm profiles with separate resource and annotation coverage, plus a
+caller-supplied New JACET 8000 level-profile surface without bundling that list.
+Result rows retain method, parameter or denominator, schema, and contract
+provenance.
 }
 \details{
 Start with \code{lexdiv_metrics()} for explicit tokens,
@@ -19,13 +22,18 @@ Start with \code{lexdiv_metrics()} for explicit tokens,
 \code{lexdiv_as_documents()} for tidy or \pkg{quanteda} token containers,
 \code{lexdiv_widen()} for a pure wide transformation,
 \code{lexdiv_profile()} for explicit parameter variants,
+\code{lexdiv_mattr_profile()} for one or more canonical MATTR trajectories,
 \code{lexdiv_variant_metrics()} for separately contracted Maas/MTLD
 sensitivity variants, or
 \code{lexdiv_term_overlap()} for two explicit term vectors,
 \code{lexdiv_content_overlap()} for two UPOS-annotated texts, or
-\code{new_jacet8000_profile()} for exact and cumulative pedagogical frequency
+\code{lexdiv_reference_coverage()} for several term vectors against one
+reference set, or
+\code{lexdiv_norm_profile()} for exact matching against a caller-supplied
+numeric lexical-norm table, or
+\code{nj8_profile()} for exact and cumulative pedagogical frequency
 levels from a caller-supplied list, or
-\code{tubelex_frequency_profile()} for coverage-aware corpus-relative
+\code{tubelex_profile()} for coverage-aware corpus-relative
 frequency and prevalence.
 }
 \section{Start here}{
@@ -38,13 +46,21 @@ Choose the entry point from the form of data you already have:
   not change case, remove tokens, or lemmatize.}
   \item{Several tokenized documents}{Use \code{lexdiv_metrics_batch()} with a
   named list or an explicit ID and token-list-column data frame.}
+  \item{Several documents and one reference set}{Use
+  \code{lexdiv_reference_coverage()} for separate token- and type-weighted
+  directional coverage with explicit numerators and denominators.}
   \item{One-token-per-row or \pkg{quanteda} input}{Use
   \code{lexdiv_as_documents()} to create the explicit named-list boundary.}
+  \item{A local MATTR trajectory}{Use \code{lexdiv_mattr_profile()} with a
+  MATTR-only plan to retain each window value and position's exposure.}
+  \item{A caller-supplied lexical-norm table}{Use
+  \code{lexdiv_norm_profile()} for conditional observed matched-only means and
+  separate resource, value, and annotation coverage.}
   \item{Two texts or term sets}{Use \code{lexdiv_term_overlap()} for explicit
   terms, or \code{lexdiv_content_overlap()} for UPOS-annotated content words.}
   \item{A corpus-relative reference profile}{Use
-  \code{tubelex_frequency_profile()} for bundled TUBELEX frequency/prevalence,
-  or \code{new_jacet8000_profile()} with a legitimately obtained caller copy
+  \code{tubelex_profile()} for bundled TUBELEX frequency/prevalence,
+  or \code{nj8_profile()} with a legitimately obtained caller copy
   of New JACET 8000.}
 }
 
@@ -52,7 +68,7 @@ In the help pages, a \emph{token} is one occurrence. In core metric results, a
 \emph{type} is one distinct, exactly equal token string supplied to the core;
 Unicode-equivalent spellings remain different unless preprocessing normalized
 them first. In a resource profile, a \emph{type} is instead one distinct
-effective lookup term after that profile's recorded normalization. A
+effective lookup term under that profile's documented lookup identity. A
 \emph{lemma} is an annotation-provided base form. An AntBNC \emph{flemma} is a
 family grouping that does not preserve part-of-speech distinctions.
 \emph{Coverage} is the proportion of eligible tokens or types that received a
@@ -83,6 +99,9 @@ and resource boundaries. The main files are:
   \item \file{lexical-diversity-contract.json}
   \item \file{ldfreq-preprocessing-contract.json}
   \item \file{lexical-overlap-contract.json}
+  \item \file{reference-coverage-contract.json}
+  \item \file{mattr-profile-contract.json}
+  \item \file{norm-profile-contract.json}
   \item \file{lexical-diversity-variant-contract.json}
   \item \file{lexical-level-profile-contract.json}
   \item \file{tubelex-frequency-profile-contract.json}
@@ -125,15 +144,38 @@ when overrides are used. No file-content hash is a comparability key. The five
 measures have different denominators and must not be reported as one
 interchangeable generic percentage.
 }
+\section{Many-document reference coverage}{
+\code{lexdiv_reference_coverage()} asks what proportion of each document's
+tokens and distinct types occurs in one supplied reference term set. It uses
+exact membership with no implicit tokenization, normalization, or annotation.
+Document repetition affects token coverage but not type coverage; reference
+repetition affects neither value. The document-major summary retains
+numerators, denominators, match counts, status, and missing reasons. Exact term
+details are opt-in. The measure does not validate the reference or measure
+semantic similarity, plagiarism, proficiency, writing quality, or reference
+quality.
+}
+\section{Caller-supplied lexical norms}{
+\code{lexdiv_norm_profile()} exact-matches caller-prepared terms against one
+caller-supplied data frame and reports one row per measure and requested
+token/type weighting. Means use observed matched values only. Resource
+coverage, input-relative value coverage, and matched-key annotation coverage
+remain separate, and OOV terms are not merged with matched keys whose values
+are missing. Measure and resource metadata are returned as provenance; they do
+not establish redistribution rights, construct validity, population transfer,
+or comparability across unlike scales. Exact terms are retained in the lookup
+table. The function performs no download, implicit normalization, fuzzy
+matching, thresholding, or composite scoring.
+}
 \section{Corpus-relative frequency}{
-\code{tubelex_frequency_profile()} retains original and normalized lookup
+\code{tubelex_profile()} retains original and normalized lookup
 terms, unmatched rows, token/type coverage, and matched-only token/type-weighted
 summaries. TUBELEX values are relative to a general YouTube subtitle corpus.
 They are not direct measures of proficiency, writing quality, academic
 register, or context-independent lexical sophistication.
 }
 \section{Lexical frequency levels}{
-\code{new_jacet8000_profile()} maps caller-supplied ranks to Levels 1--8 and
+\code{nj8_profile()} maps caller-supplied ranks to Levels 1--8 and
 reports exact and cumulative token/type proportions beside off-list coverage.
 The Level 8 cumulative proportion equals matched coverage because off-list
 items remain in the denominator. The package does not bundle or download the
@@ -183,27 +225,32 @@ establish validity or reliability; failing one does not erase an otherwise
 computable value.
 }
 \section{Versioned surfaces}{
-The core metrics, raw-text preprocessing, lexical overlap, variant metrics,
-lexical-level profiles, and TUBELEX profile have separate versioned contracts. This keeps a
-change in tokenization or resource matching from silently redefining a core
-metric. Expected-TTR D is separately named and explicitly distinguished from
-CLAN VOCD.
+The core metrics, raw-text preprocessing, lexical overlap, reference coverage,
+generic lexical-norm profiles, variant metrics, lexical-level profiles, and
+TUBELEX profile have separate
+versioned contracts. This keeps a change in tokenization or resource matching
+from silently redefining a core metric. Expected-TTR D is separately named and
+explicitly distinguished from CLAN VOCD.
 }
 \section{Offline smoke test}{
 After loading \pkg{ldfreq}, run the installed script returned by
 \code{system.file("examples", "offline-smoke.R", package = "ldfreq")}. It
-exercises single, batch, profile, profile-batch, term/content-word overlap,
-lexical-level, and screen workflows without a network connection or external
-runtime.
+exercises single, batch, profile, local-MATTR, profile-batch,
+term/content-word overlap, many-document reference coverage, lexical-norm,
+lexical-level, and screen workflows without
+a network connection or external runtime.
 }
 \seealso{
 \code{\link{lexdiv_metrics}}, \code{\link{lexdiv_convenience}},
 \code{\link{lexdiv_preprocessing}},
 \code{\link{lexdiv_flemmatize}},
 \code{\link{lexdiv_overlap}},
-\code{\link{lexdiv_profile}}, \code{\link{lexdiv_variant_metrics}},
-\code{\link{new_jacet8000_profile}},
-\code{\link{tubelex_frequency_profile}}
+\code{\link{lexdiv_reference_coverage}},
+\code{\link{lexdiv_norm_profile}},
+\code{\link{lexdiv_profile}}, \code{\link{lexdiv_mattr_profile}},
+\code{\link{lexdiv_variant_metrics}},
+\code{\link{nj8_profile}},
+\code{\link{tubelex_profile}}
 }
 \examples{
 metric_ids <- lexdiv_metric_ids()
@@ -217,6 +264,9 @@ contract_files <- c(
   "lexical-diversity-contract.json",
   "ldfreq-preprocessing-contract.json",
   "lexical-overlap-contract.json",
+  "reference-coverage-contract.json",
+  "mattr-profile-contract.json",
+  "norm-profile-contract.json",
   "lexical-diversity-variant-contract.json",
   "lexical-level-profile-contract.json",
   "tubelex-frequency-profile-contract.json"

@@ -75,6 +75,44 @@ test_that("specs materialize defaults and normalize scalar representations", {
   )
 })
 
+test_that("specification, grid, and plan prints are concise and lossless", {
+  method_id <- method_id_for("mattr")
+  specification <- spec_function(
+    method_id,
+    list(window_length = 50L),
+    "mattr_50"
+  )
+  grid <- grid_function(
+    method_id,
+    "window_length",
+    c(25L, 50L, 100L),
+    "mattr"
+  )
+  plan <- plan_function(presets = character(), grids = grid)
+
+  specification_output <- capture.output(
+    specification_visibility <- withVisible(print(specification))
+  )
+  grid_output <- capture.output(grid_visibility <- withVisible(print(grid)))
+  plan_output <- capture.output(plan_visibility <- withVisible(print(plan)))
+
+  expect_false(specification_visibility$visible)
+  expect_false(grid_visibility$visible)
+  expect_false(plan_visibility$visible)
+  expect_identical(specification_visibility$value, specification)
+  expect_identical(grid_visibility$value, grid)
+  expect_identical(plan_visibility$value, plan)
+  expect_match(specification_output[[1L]], "^<lexdiv_spec:")
+  expect_match(grid_output[[1L]], "^<lexdiv_grid: 3 specifications>")
+  expect_match(plan_output[[1L]], "^<lexdiv_plan: 3 specifications;")
+  expect_true(any(grepl("window_length=50", specification_output, fixed = TRUE)))
+  expect_false(any(grepl("identity_key", c(
+    specification_output,
+    grid_output,
+    plan_output
+  ), fixed = TRUE)))
+})
+
 test_that("one-dimensional grids preserve order and defer deduplication", {
   method_id <- method_id_for("msttr")
   grid <- grid_function(

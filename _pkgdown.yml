@@ -16,9 +16,10 @@ reference:
     contents:
       - lexdiv_preprocessing
       - lexdiv_flemmatize
-  - title: Exact lexical overlap
+  - title: Exact lexical overlap and coverage
     contents:
       - lexdiv_overlap
+      - lexdiv_reference_coverage
   - title: Formula variants
     contents:
       - lexdiv_variant_metrics
@@ -31,11 +32,19 @@ reference:
       - lexdiv_presets
       - lexdiv_profile
       - lexdiv_profile_batch
+      - lexdiv_mattr_profile
+      - plot.lexdiv_mattr_profile
       - lexdiv_screen
+  - title: Caller-supplied lexical norms
+    contents:
+      - lexdiv_norm_profile
   - title: Reference-resource profiles
     contents:
-      - new_jacet8000_profile
-      - tubelex_frequency_profile
+      - nj8_profile
+      - tubelex_profile
+  - title: Output and visualization
+    contents:
+      - lexdiv_convenience
   - title: Evidence
     contents:
       - lexdiv_length_evidence

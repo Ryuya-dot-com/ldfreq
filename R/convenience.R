@@ -350,6 +350,17 @@ plot.lexdiv_profile_results <- plot.lexdiv_results
 plot.lexdiv_profile_batch_results <- plot.lexdiv_results
 
 #' @export
+plot.lexdiv_text_results <- function(x, ...) {
+  if (
+    !inherits(x, "lexdiv_text_results") || !is.list(x) ||
+      !inherits(x$results, "lexdiv_results") || !is.data.frame(x$results)
+  ) {
+    stop("x must be a lexdiv_text_results object.", call. = FALSE)
+  }
+  plot(x$results, ...)
+}
+
+#' @export
 plot.lexdiv_screen_results <- function(
     x,
     screen_id = NULL,
@@ -385,14 +396,14 @@ plot.lexdiv_screen_results <- function(
 }
 
 #' @export
-plot.tubelex_frequency_profile <- function(
+plot.tubelex_profile <- function(
     x,
     col = "#0072B2",
     main = "TUBELEX match coverage",
     ylab = "coverage",
     ...) {
-  if (!inherits(x, "tubelex_frequency_profile") || !is.data.frame(x$summary)) {
-    stop("x must be a tubelex_frequency_profile object.", call. = FALSE)
+  if (!inherits(x, "tubelex_profile") || !is.data.frame(x$summary)) {
+    stop("x must be a tubelex_profile object.", call. = FALSE)
   }
   frame <- x$summary[c("weighting", "coverage")]
   if (any(!is.finite(frame$coverage))) {

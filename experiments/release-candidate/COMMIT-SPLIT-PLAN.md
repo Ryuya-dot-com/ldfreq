@@ -3,12 +3,12 @@
 Audit date: 2026-08-05
 
 This document records the intended split of the current uncommitted release
-work and the later patch-candidate freeze. It is not final `0.1.1` release
+work and the later release-candidate freeze. It is not final `0.1.0` release
 evidence.
 
 The Commit 1 and Commit 2 entries below are a historical preparation record.
-They are not instructions to amend or replay those commits. Version `0.1.1`
-changes must land in new commits through the protected pull-request workflow.
+They are not instructions to amend or replay those commits. All unpublished
+changes are consolidated into `0.1.0` through the protected pull-request workflow.
 
 ## Audited starting point
 
@@ -36,7 +36,7 @@ inventory assertions across source, platform archive, and installed library.
 
 Commit 2 is the commit that first contains this execution record, so this file
 does not attempt to contain its own commit hash. Git history is authoritative.
-Neither commit is final `0.1.1` release evidence.
+Neither commit is final `0.1.0` release evidence.
 
 ## Commit 1: add auditable preprocessing and reference-profile APIs
 
@@ -72,8 +72,8 @@ inst/spec/tubelex-frequency-profile-contract.schema.json
 man/lexdiv_flemmatize.Rd
 man/lexdiv_preprocessing.Rd
 man/lexdiv_variant_metrics.Rd
-man/new_jacet8000_profile.Rd
-man/tubelex_frequency_profile.Rd
+man/nj8_profile.Rd
+man/tubelex_profile.Rd
 tests/testthat/helper-antbnc.R
 tests/testthat/test-level-profile.R
 tests/testthat/test-preprocessing.R
@@ -111,12 +111,12 @@ with all available suggested packages installed.
 Stage these paths together:
 
 ```text
-DEVELOPMENT.md
+development/DEVELOPMENT.md
 LIFECYCLE.md
 NEWS.md
 README.md
-RELEASE-CANDIDATE.md
-RELEASE-CHECKLIST.md
+development/RELEASE-CANDIDATE.md
+development/RELEASE-CHECKLIST.md
 experiments/release-candidate/COMMIT-SPLIT-PLAN.md
 inst/CITATION
 inst/examples/offline-smoke.R
@@ -138,13 +138,13 @@ the README. Also confirm that the rendered vignettes, help index, citation,
 package-resource inventory, and installed example contain neither
 private-resource payloads nor machine-specific absolute paths.
 
-## Later commit: freeze the exact 0.1.1 candidate
+## Later commit: freeze the exact 0.1.0 candidate
 
 Do not create the freeze commit until Commits 1 and 2 pass from a clean tree.
 The freeze is intentionally separate and should contain only candidate-state
 changes such as:
 
-- setting `Version` to `0.1.1` after all patch changes have landed;
+- confirming `Version` is `0.1.0` after all initial-release changes have landed;
 - setting the repository-only `state.dcf` status to `release-candidate`;
 - reconciling release wording and evidence identifiers with the exact commit;
 - regenerating evidence from the exact source tarball.
@@ -152,7 +152,7 @@ changes such as:
 Suggested subject:
 
 ```text
-Freeze ldfreq 0.1.1 release candidate
+Freeze ldfreq 0.1.0 release candidate
 ```
 
 The repository-only TUBELEX admission record contains the maintainer's explicit

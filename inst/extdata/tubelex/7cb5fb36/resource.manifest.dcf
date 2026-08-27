@@ -1,5 +1,5 @@
 Manifest-Schema-ID: lexsoph-resource-manifest
-Manifest-Schema-Version: 0.1.1
+Manifest-Schema-Version: 0.1.0
 Resource-ID: tubelex-en-treebank-slim
 Resource-Version: 7cb5fb36-slim-v1
 Bundle-Variant-ID: treebank-four-column-canonical-v1

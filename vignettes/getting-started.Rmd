@@ -129,14 +129,74 @@ Checker. NWLC documents manual word-list alignment. New JACET profiles
 therefore expose AntBNC-versus-headword conflicts and accept explicit upstream
 overrides.
 
+## Caller-supplied lexical norms
+
+`lexdiv_norm_profile()` exact-matches caller-prepared terms against one
+caller-supplied table. It does not download a norm, transform lookup terms, or
+infer that measures with different units and directions are comparable.
+
+```{r}
+synthetic_norms <- data.frame(
+  term = c("cat", "run", "other"),
+  familiarity = c(6, 5, NA_real_),
+  concreteness = c(5, 3, 4),
+  stringsAsFactors = FALSE
+)
+norm_specs <- data.frame(
+  measure_id = c("familiarity", "concreteness"),
+  value_column = c("familiarity", "concreteness"),
+  construct_id = c("subjective_familiarity", "concreteness"),
+  value_unit = c("seven_point_rating", "seven_point_rating"),
+  direction = c("higher", "descriptive"),
+  language = c("English", "English"),
+  variety = c("unspecified", "unspecified"),
+  population_id = c("example_adults", "example_adults"),
+  collection_year = c("2025", "2025"),
+  valid_min = c(1, 1),
+  valid_max = c(7, 7),
+  stringsAsFactors = FALSE
+)
+norm_resource <- list(
+  resource_id = "synthetic_norms",
+  resource_version = "1",
+  creator = "Project-authored example",
+  source_reference = "Getting-started synthetic fixture",
+  data_license = "synthetic-example-only",
+  transformation_id = "none",
+  lookup_unit = "lowercase_lemma",
+  resource_key_normalization_id = "caller-prepared-v1"
+)
+
+norm_profile <- lexdiv_norm_profile(
+  c("cat", "cat", "other", "outside"),
+  synthetic_norms,
+  key = "term",
+  measure_specs = norm_specs,
+  resource = norm_resource
+)
+norm_profile$summary[, c(
+  "measure_id", "weighting", "estimate", "resource_coverage",
+  "value_coverage", "annotation_coverage", "status"
+)]
+norm_profile$lookup
+```
+
+Summary means are conditional on observed values among matched keys. OOV terms
+and matched keys with missing values have different lookup states and neither
+is imputed. Report the resource-, value-, and annotation-coverage columns with
+the estimate. Caller metadata is recorded as provenance; it is not a license
+decision or evidence that a measure is valid for a new population. The lookup
+table retains the supplied lexical terms, so apply the same data-handling care
+as for the input.
+
 ## Corpus-relative frequency with coverage
 
-`tubelex_frequency_profile()` applies either an explicit source-aligned query
+`tubelex_profile()` applies either an explicit source-aligned query
 normalization or identity matching. It returns original terms, lookup terms,
 unmatched rows, token/type coverage, and matched-only conditional summaries.
 
 ```{r}
-frequency <- tubelex_frequency_profile(tokenization)
+frequency <- tubelex_profile(tokenization)
 frequency$summary
 frequency$coverage
 frequency$lookup
@@ -149,7 +209,7 @@ lexical sophistication.
 
 ## Caller-supplied lexical frequency levels
 
-`new_jacet8000_profile()` maps ranks in a caller-supplied New JACET 8000 table
+`nj8_profile()` maps ranks in a caller-supplied New JACET 8000 table
 to eight 1,000-rank levels. The package contains no copy of the list and never
 downloads one. Exact and cumulative token/type rates keep off-list items in the
 denominator. The official `j8_2016.xlsx` workbook can be passed directly; its
@@ -160,7 +220,7 @@ synthetic_nj8 <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
   Word = c("the", "develop", "rare", "extreme")
 )
-levels <- new_jacet8000_profile(annotated, synthetic_nj8, unit = "lemma")
+levels <- nj8_profile(annotated, synthetic_nj8, unit = "lemma")
 levels$summary
 levels$coverage
 ```
@@ -238,6 +298,27 @@ documents <- list(
 lexdiv_metrics_batch(documents, metrics = c("ttr", "hdd"))
 ```
 
+To compare the same documents with one explicit reference vocabulary, use the
+directional reference-coverage API. It returns token- and type-weighted rows
+separately, with the numerator and denominator retained for downstream models.
+
+```{r}
+reference_coverage <- lexdiv_reference_coverage(
+  documents,
+  reference = c("one", "two", "alpha"),
+  reference_id = "study_list"
+)
+reference_coverage$summary[, c(
+  "document_id", "weighting", "value", "numerator", "denominator", "status"
+)]
+```
+
+This call performs exact matching only. Document repetition changes token
+coverage but not type coverage, and an empty document remains a structured
+missing result. Use `details = "terms"` only when exact lexical strings may be
+retained in the result. This is coverage by the supplied list, not a claim that
+the list or its matches measure proficiency or writing quality.
+
 For a tidy one-token-per-row table, make the document boundary explicit before
 calling the batch API. The same adapter accepts `quanteda` tokens objects
 through their registered `as.list()` method.
@@ -276,6 +357,33 @@ head(profile)
 screen <- lexdiv_screen(profile)
 head(screen)
 ```
+
+MATTR has an additional local diagnostic surface. It accepts a MATTR-only
+canonical plan and returns each complete moving-window value plus the number
+and nominal weight of windows containing each token position.
+
+```{r, fig.width=5, fig.height=3}
+methods <- lexdiv_methods()
+mattr_method <- methods$method_id[methods$metric_id == "mattr"]
+mattr_plan <- lexdiv_plan(
+  presets = character(),
+  grids = lexdiv_grid(
+    mattr_method,
+    "window_length",
+    c(10, 20),
+    request_id_prefix = "mattr"
+  )
+)
+local_mattr <- lexdiv_mattr_profile(rep(tokens, 10), mattr_plan)
+local_mattr$summary
+head(local_mattr$windows)
+head(local_mattr$exposure)
+plot(local_mattr, request_id = "mattr_1")
+```
+
+The plotted trajectory is descriptive. The package does not select an optimal
+window, infer a universal adequate text length, or interpret exposure weights
+as token-level causal contributions.
 
 The versioned `below_quality_floor` field and requested screens are advisory
 token-count evidence checks. Here, `quality` does not mean writing quality,
@@ -318,6 +426,9 @@ rules, result schemas, and resource boundaries are installed as JSON contracts:
 contract_files <- c(
   "lexical-diversity-contract.json",
   "ldfreq-preprocessing-contract.json",
+  "lexical-overlap-contract.json",
+  "reference-coverage-contract.json",
+  "norm-profile-contract.json",
   "lexical-diversity-variant-contract.json",
   "lexical-level-profile-contract.json",
   "tubelex-frequency-profile-contract.json"

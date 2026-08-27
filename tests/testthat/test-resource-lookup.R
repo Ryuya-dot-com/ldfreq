@@ -264,7 +264,7 @@ test_that("the installed contract records the non-exported offline boundary", {
   runtime_ref <- lookup_ref_function()
 
   expect_identical(contract$contract_id, "ldfreq-lexical-resource-lookup")
-  expect_identical(contract$contract_version, "0.1.1")
+  expect_identical(contract$contract_version, "0.1.0")
   expect_identical(
     contract$status,
     "versioned-non-exported-implementation-contract"

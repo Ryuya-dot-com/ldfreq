@@ -3,10 +3,9 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^CONTRIBUTING\.md$
-^DEVELOPMENT\.md$
-^RELEASE-CHECKLIST\.md$
 ^_pkgdown\.yml$
+^docs$
 ^experiments$
+^development$
 ^legal$
 ^LIFECYCLE\.md$
-^RELEASE-CANDIDATE\.md$

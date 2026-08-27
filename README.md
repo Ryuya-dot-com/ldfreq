@@ -4,8 +4,11 @@
 profiles for R. The core computes twelve independently specified metrics from
 ordered tokens. Separate adapters make raw-text tokenization,
 lemma/flemma/POS annotations, lexical-unit selection, New JACET 8000 level profiles,
-TUBELEX coverage, and exact term/content-word overlap visible rather than hiding
-those decisions inside a score.
+TUBELEX coverage, exact term/content-word overlap, and many-document reference
+coverage visible rather than hiding those decisions inside a score. A local
+MATTR profile exposes moving-window values and positional exposure behind its
+whole-profile mean. Caller-supplied lexical norm tables can be profiled with
+measure-level provenance and separate resource and annotation coverage.
 
 ## What it computes
 
@@ -135,9 +138,10 @@ from the lemma backend, even when one documented pipeline produced both
 layers. The identifiers are returned provenance, so use path-free,
 non-sensitive labels and do not put secrets or private hashes in them.
 
-The stricter preprocessing contract `0.1.1` does not automatically migrate a
-`lexdiv_tokenization` saved under `0.1.0`. Re-tokenize the original text and
-reapply current annotations and explicit backend IDs.
+Saved `lexdiv_tokenization` objects are revalidated against preprocessing
+contract `0.1.0` whenever they are consumed. Recreate objects whose provenance
+is incomplete or has been edited, and reapply current annotations with explicit
+backend IDs.
 
 For a quick English lemma baseline, the optional `textstem` package can supply
 lemmas while `ldfreq` records its installed version. It does not supply UPOS
@@ -155,9 +159,10 @@ automatic_lemmas$tokens[, c("surface", "lemma")]
 lexdiv_metrics_text(automatic_lemmas, unit = "lemma", metrics = "ttr")
 ```
 
-For NWLC-oriented sensitivity analysis, a legitimately obtained local
-[AntBNC Lemma List](https://www.laurenceanthony.net/software/antconc/) can be
-used through the explicit flemma adapter. The list is not bundled or downloaded.
+For NWLC-oriented sensitivity analysis, a legitimately obtained local AntBNC
+Lemma List (version 004, distributed from Laurence Anthony's official AntConc
+site) can be used through the explicit flemma adapter. The list is not bundled
+or downloaded.
 Unknown forms remain visible through identity fallback, and every token records
 whether AntBNC, an override, or fallback supplied its flemma.
 
@@ -256,13 +261,109 @@ hashes. Use
 are lexical-sharing measures, not plagiarism, semantic-similarity, coherence,
 proficiency, or writing-quality detectors.
 
+### Coverage of multiple documents by one reference
+
+`lexdiv_reference_coverage()` answers a narrower directional question than the
+pairwise overlap functions: what proportion of each document's tokens and
+distinct types occurs in one explicit reference term set?
+
+```r
+documents <- list(
+  essay_a = c("cat", "cat", "run", "rare"),
+  essay_b = c("bird", "run", "unknown")
+)
+reference_coverage <- lexdiv_reference_coverage(
+  documents,
+  reference = c("cat", "bird", "run"),
+  reference_id = "course_list",
+  details = "terms"
+)
+reference_coverage$summary[, c(
+  "document_id", "weighting", "value", "numerator", "denominator", "status"
+)]
+reference_coverage$terms
+plot(reference_coverage, weighting = "type")
+```
+
+Document repetition affects token coverage but not type coverage; repetition
+inside the reference changes neither value because the reference defines set
+membership. Matching is exact and applies no hidden normalization or
+lemmatization. Exact document terms are retained only with
+`details = "terms"`; otherwise `$terms` is a typed empty table. This coverage
+does not validate the reference or measure semantic similarity, proficiency,
+writing quality, or plagiarism.
+
+### Caller-supplied lexical norms
+
+`lexdiv_norm_profile()` describes one token vector with numeric values from a
+caller-supplied norm table. It exact-matches caller-prepared terms and never
+normalizes, downloads, or licenses a resource on the caller's behalf. Each
+measure keeps its construct, unit, direction, population, and collection year.
+
+```r
+norms <- data.frame(
+  term = c("book", "read", "rare"),
+  familiarity = c(6, 5, NA_real_),
+  concreteness = c(5, 2, 4),
+  stringsAsFactors = FALSE
+)
+norm_specs <- data.frame(
+  measure_id = c("familiarity", "concreteness"),
+  value_column = c("familiarity", "concreteness"),
+  construct_id = c("subjective_familiarity", "concreteness"),
+  value_unit = c("seven_point_rating", "seven_point_rating"),
+  direction = c("higher", "descriptive"),
+  language = c("English", "English"),
+  variety = c("unspecified", "unspecified"),
+  population_id = c("example_adults", "example_adults"),
+  collection_year = c("2025", "2025"),
+  valid_min = c(1, 1),
+  valid_max = c(7, 7),
+  stringsAsFactors = FALSE
+)
+norm_resource <- list(
+  resource_id = "synthetic_norms",
+  resource_version = "1",
+  creator = "Project-authored example",
+  source_reference = "README synthetic fixture",
+  data_license = "synthetic-example-only",
+  transformation_id = "none",
+  lookup_unit = "lowercase_lemma",
+  resource_key_normalization_id = "caller-prepared-v1"
+)
+
+norm_profile <- lexdiv_norm_profile(
+  c("book", "book", "rare", "unknown"),
+  norms,
+  key = "term",
+  measure_specs = norm_specs,
+  resource = norm_resource
+)
+norm_profile$summary[, c(
+  "measure_id", "weighting", "estimate", "resource_coverage",
+  "annotation_coverage", "status"
+)]
+norm_profile$coverage
+norm_profile$lookup
+```
+
+The estimate is an arithmetic mean of observed matched values, not a mean in
+which OOV or missing annotations become zero. `resource_coverage` reports keys
+found in the resource, `value_coverage` reports observed values relative to
+all input units, and `annotation_coverage` reports observed values among
+matched keys. These denominators can differ by token/type weighting and must be
+reported beside an estimate. Measures with different scales or directions
+should not be compared or combined automatically. Resource metadata is
+provenance supplied by the caller, not proof of redistribution rights or
+construct validity. Exact input terms are retained in `$lookup`.
+
 ### Reference-frequency and lexical-level profiles
 
 TUBELEX values are returned as corpus-relative frequency/prevalence
 measurements with adjacent coverage, not as a universal sophistication score.
 
 ```r
-frequency <- tubelex_frequency_profile(tokenization)
+frequency <- tubelex_profile(tokenization)
 frequency$summary
 frequency$coverage
 frequency$lookup
@@ -273,7 +374,7 @@ smoothed base-10 per-billion token score; `video_prevalence` and
 `channel_prevalence` are smoothed base-10 log proportions. Negative prevalence
 values are therefore expected, and values closer to zero indicate wider
 prevalence. Exact formulas and denominators are documented in
-`?tubelex_frequency_profile` and returned in
+`?tubelex_profile` and returned in
 `frequency$provenance$formula_parameters`.
 
 New JACET 8000 level profiles use a caller-supplied list. `ldfreq` does not
@@ -284,7 +385,7 @@ The official workbook is linked from the
 [Ishikawa Laboratory vocabulary page](https://language.sakura.ne.jp/s/voc.html).
 
 ```r
-level_profile <- new_jacet8000_profile(
+level_profile <- nj8_profile(
   annotated,
   "/path/to/j8_2016.xlsx",
   unit = "lemma"
@@ -296,13 +397,13 @@ plot(level_profile)                    # token proportions + cumulative curve
 plot(level_profile, weighting = "type")
 ```
 
-For a corpus, `new_jacet8000_profile_batch()` accepts an explicitly named list
+For a corpus, `nj8_profile_batch()` accepts an explicitly named list
 or an ID/list-column data frame. It validates and hashes the external list once,
 preserves document order, and returns document-major summary, lookup, coverage,
 conflict, exclusion, and preprocessing-provenance tables.
 
 ```r
-level_batch <- new_jacet8000_profile_batch(
+level_batch <- nj8_profile_batch(
   list(
     document_a = annotated,
     document_b = lexdiv_tokenize("A second short document.")
@@ -363,6 +464,33 @@ profile <- lexdiv_profile(tokens, plan)
 lexdiv_screen(profile)
 ```
 
+For local MATTR trajectories, make a MATTR-only plan. The result preserves the
+canonical summary rows and adds analysis-ready window and position tables:
+
+```r
+methods <- lexdiv_methods()
+mattr_method <- methods$method_id[methods$metric_id == "mattr"]
+mattr_plan <- lexdiv_plan(
+  presets = character(),
+  grids = lexdiv_grid(
+    mattr_method,
+    "window_length",
+    c(3, 5),
+    request_id_prefix = "mattr"
+  )
+)
+local_mattr <- lexdiv_mattr_profile(tokens, mattr_plan)
+local_mattr$summary
+local_mattr$windows
+local_mattr$exposure
+plot(local_mattr, request_id = "mattr_1")
+```
+
+Endpoint positions enter fewer complete windows than interior positions.
+`nominal_observation_weight` makes that asymmetry explicit; it is an accounting
+weight, not a token-level causal contribution. The function does not choose a
+window length or turn the trajectory into a universal stability judgment.
+
 See `vignette("getting-started", package = "ldfreq")` for the result contract,
 batch inputs, profiles, and token-length screens. See
 `vignette("preprocessing-and-frequency", package = "ldfreq")` for
@@ -370,10 +498,9 @@ surface/lemma/flemma sensitivity, the Maas/MTLD variant crosswalk, word inclusio
 exact content-word overlap, plus coverage-aware TUBELEX and New JACET 8000
 level-profile use.
 
-See the repository
-[`LIFECYCLE.md`](https://github.com/Ryuya-dot-com/ldfreq/blob/main/LIFECYCLE.md)
+See [`LIFECYCLE.md`](LIFECYCLE.md)
 for the method, schema, deprecation, and future-surface rules defined for the
-`0.1.x` line.
+pre-1.0 package line.
 
 ## Reproducibility boundary
 
@@ -395,6 +522,9 @@ contract_files <- c(
   "lexical-diversity-contract.json",
   "ldfreq-preprocessing-contract.json",
   "lexical-overlap-contract.json",
+  "reference-coverage-contract.json",
+  "mattr-profile-contract.json",
+  "norm-profile-contract.json",
   "lexical-diversity-variant-contract.json",
   "lexical-level-profile-contract.json",
   "tubelex-frequency-profile-contract.json"
@@ -450,7 +580,7 @@ method identity, and requested/effective parameters together.
 ## Offline installed-package smoke test
 
 After installation, the bundled smoke script exercises single-document, batch,
-profile, profile-batch, term/content-word overlap, level-profile, and screen
+profile, local-MATTR, profile-batch, term/content-word overlap, level-profile, and screen
 workflows without network access or an external runtime:
 
 ```r

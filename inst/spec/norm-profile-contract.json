@@ -1,0 +1,122 @@
+{
+  "$schema": "norm-profile-contract.schema.json",
+  "contract_id": "ldfreq-generic-norm-profile",
+  "contract_version": "0.1.0",
+  "status": "normative",
+  "public_api": true,
+  "function": "lexdiv_norm_profile",
+  "input_contract": {
+    "scope": "single-document",
+    "term_unit": "one-caller-prepared-lookup-term-per-vector-element",
+    "norm_table": "caller-supplied-ordinary-data-frame",
+    "raw_text_shortcut": false,
+    "bundled_norm_resource": false,
+    "runtime_network_access": false,
+    "maximum_measures": 128
+  },
+  "measure_spec_contract": {
+    "columns": [
+      "measure_id", "value_column", "construct_id", "value_unit",
+      "direction", "language", "variety", "population_id",
+      "collection_year", "valid_min", "valid_max"
+    ],
+    "unique_fields": ["measure_id", "value_column"],
+    "direction_values": ["higher", "lower", "descriptive"],
+    "finite_numeric_values_or_missing": true
+  },
+  "resource_metadata_contract": {
+    "fields": [
+      "resource_id", "resource_version", "creator", "source_reference",
+      "data_license", "transformation_id", "lookup_unit",
+      "resource_key_normalization_id"
+    ],
+    "caller_asserted": true,
+    "metadata_proves_redistribution_rights": false
+  },
+  "matching_contract": {
+    "comparison": "exact-unicode-scalar-sequence",
+    "query_normalization": "none",
+    "case_conversion": "none",
+    "stemming_lemmatization_or_fuzzy_matching": false,
+    "duplicate_resource_keys": "error",
+    "resource_row_order_affects_result": false,
+    "type_identity": "exact_lookup_term-first-occurrence-membership"
+  },
+  "statistic_contract": {
+    "statistic_id": "arithmetic_mean_observed_matched_only_v1",
+    "weighting_values": ["token", "type"],
+    "default_weightings": ["token", "type"],
+    "missing_value_imputation": false,
+    "oov_imputation": false,
+    "automatic_coverage_threshold": false,
+    "composite_score": false,
+    "stable_accumulation_order": "ascending-observed-double-values"
+  },
+  "missingness_contract": {
+    "top_status_values": ["ok", "empty"],
+    "summary_status_values": ["ok", "missing"],
+    "missing_reasons": [
+      "empty_input", "no_matched_keys", "no_observed_values"
+    ],
+    "lookup_status_values": [
+      "matched_resource", "unknown_to_resource"
+    ],
+    "value_status_values": [
+      "observed", "missing_annotation", "not_applicable_oov"
+    ]
+  },
+  "row_budget_contract": {
+    "formula": "length(terms) * measures + 2 * measures * weightings",
+    "scope": "lookup-plus-summary-plus-coverage",
+    "checked_before_result_allocation": true
+  },
+  "result_contract": {
+    "schema_id": "generic-norm-profile-result",
+    "schema_version": "0.1.0",
+    "class": "lexdiv_norm_profile",
+    "components": [
+      "status", "summary", "lookup", "coverage", "provenance",
+      "diagnostics"
+    ],
+    "lookup_columns": [
+      "input_index", "term", "measure_id", "lookup_status", "value",
+      "value_status"
+    ],
+    "summary_columns": [
+      "result_order", "resource_id", "resource_version", "measure_id",
+      "construct_id", "value_unit", "direction", "language", "variety",
+      "population_id", "collection_year", "statistic_id", "weighting",
+      "type_identity", "estimate", "status", "missing_reason",
+      "input_units", "matched_units", "unmatched_units",
+      "observed_value_units", "matched_missing_value_units",
+      "resource_coverage", "value_coverage", "annotation_coverage"
+    ],
+    "coverage_columns": [
+      "result_order", "resource_id", "resource_version", "measure_id",
+      "weighting", "input_units", "matched_units", "unmatched_units",
+      "observed_value_units", "matched_missing_value_units",
+      "resource_coverage", "value_coverage", "annotation_coverage"
+    ],
+    "lookup_order": "input-major-then-measure-major",
+    "summary_order": "measure-major-then-requested-weighting-order",
+    "bounded_print_rows": 12,
+    "plot_method": false,
+    "summary_method": false,
+    "as_data_frame_method": false
+  },
+  "privacy_boundary": {
+    "lookup_terms_copied_to_result": true,
+    "unused_norm_columns_copied_to_result": false,
+    "full_norm_table_copied_to_result": false,
+    "absolute_path_copied_to_result": false,
+    "private_hash_copied_to_result": false
+  },
+  "interpretation_boundary": {
+    "means_are_conditional_on_observed_matched_values": true,
+    "coverage_must_accompany_estimates": true,
+    "universal_measure_direction_inferred": false,
+    "cross_measure_scale_comparability_assumed": false,
+    "proficiency_or_writing_quality_measure": false,
+    "data_license_approval": false
+  }
+}
