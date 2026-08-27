@@ -32,6 +32,48 @@ annotated_b <- lexdiv_lemmatize(
   upos_backend_version = "1"
 )
 term_overlap <- lexdiv_term_overlap(tokens, documents$document_b)
+reference_coverage <- lexdiv_reference_coverage(
+  documents,
+  reference = c("the", "cat", "one", "two"),
+  reference_id = "smoke_reference",
+  details = "terms"
+)
+synthetic_norms <- data.frame(
+  term = c("the", "cat", "other"),
+  rating = c(7, 5, NA_real_),
+  stringsAsFactors = FALSE
+)
+norm_specs <- data.frame(
+  measure_id = "example_rating",
+  value_column = "rating",
+  construct_id = "example_construct",
+  value_unit = "seven_point_rating",
+  direction = "descriptive",
+  language = "English",
+  variety = "unspecified",
+  population_id = "smoke_fixture",
+  collection_year = "2025",
+  valid_min = 1,
+  valid_max = 7,
+  stringsAsFactors = FALSE
+)
+norm_resource <- list(
+  resource_id = "synthetic_norms",
+  resource_version = "1",
+  creator = "Project-authored smoke fixture",
+  source_reference = "offline-smoke.R",
+  data_license = "synthetic-example-only",
+  transformation_id = "none",
+  lookup_unit = "exact_term",
+  resource_key_normalization_id = "caller-prepared-v1"
+)
+norm_profile <- lexdiv_norm_profile(
+  c("the", "cat", "cat", "other", "outside"),
+  synthetic_norms,
+  "term",
+  norm_specs,
+  norm_resource
+)
 content_overlap <- lexdiv_content_overlap(
   annotated_a,
   annotated_b,
@@ -101,8 +143,32 @@ mattr_4 <- lexdiv_spec(
 )
 plan <- lexdiv_plan(presets = character(), specs = mattr_4)
 profile <- lexdiv_profile(tokens, plan)
+mattr_profile <- lexdiv_mattr_profile(tokens, plan)
 profile_batch <- lexdiv_profile_batch(documents, plan)
 screen <- lexdiv_screen(profile_batch, floors = c(tokens_4 = 4L))
+
+check_print_contract <- function(value) {
+  visibility <- NULL
+  output <- capture.output(visibility <- withVisible(print(value)))
+  stopifnot(
+    length(output) > 0L,
+    !visibility$visible,
+    identical(visibility$value, value)
+  )
+  invisible(TRUE)
+}
+invisible(lapply(
+  list(
+    tokenization,
+    raw_text,
+    variants,
+    frequency,
+    term_overlap,
+    mattr_profile,
+    norm_profile
+  ),
+  check_print_contract
+))
 
 stopifnot(
   identical(single$status, rep("ok", 3L)),
@@ -111,6 +177,29 @@ stopifnot(
   identical(raw_text$results$status, rep("ok", 2L)),
   identical(raw_text$results$N, c(6, 6)),
   all(term_overlap$summary$status == "ok"),
+  identical(nrow(reference_coverage$summary), 4L),
+  identical(reference_coverage$summary$weighting, rep(c("token", "type"), 2L)),
+  all(reference_coverage$summary$status == "ok"),
+  isTRUE(reference_coverage$provenance$contains_lexical_terms),
+  identical(norm_profile$status, "ok"),
+  identical(nrow(norm_profile$lookup), 5L),
+  identical(nrow(norm_profile$summary), 2L),
+  identical(norm_profile$summary$matched_units, c(4, 3)),
+  identical(norm_profile$summary$observed_value_units, c(3, 2)),
+  isTRUE(all.equal(
+    norm_profile$summary$resource_coverage,
+    c(4 / 5, 3 / 4)
+  )),
+  isTRUE(all.equal(
+    norm_profile$summary$annotation_coverage,
+    c(3 / 4, 2 / 3)
+  )),
+  identical(
+    norm_profile$lookup$value_status,
+    c("observed", "observed", "observed", "missing_annotation", "not_applicable_oov")
+  ),
+  identical(norm_profile$provenance$resource$resource_id, "synthetic_norms"),
+  identical(norm_profile$diagnostics$runtime_network_access, FALSE),
   identical(content_overlap$summary$shared_type_count, rep(2, 5L)),
   all(content_overlap$summary$status == "ok"),
   identical(content_overlap$coverage$eligible_tokens, c(4, 3)),
@@ -146,6 +235,10 @@ stopifnot(
   identical(names(wide), c("document_id", "ttr", "maas")),
   identical(wide$document_id, c("a", "b")),
   identical(profile$status, "ok"),
+  identical(mattr_profile$summary, profile),
+  identical(nrow(mattr_profile$windows), 3L),
+  identical(nrow(mattr_profile$exposure), 6L),
+  identical(mattr_profile$provenance$contains_token_strings, FALSE),
   nrow(profile_batch) == 2L,
   all(profile_batch$status == "ok"),
   all(screen$passes_screen)

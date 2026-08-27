@@ -1,0 +1,86 @@
+{
+  "$schema": "mattr-profile-contract.schema.json",
+  "contract_id": "ldfreq-mattr-profile",
+  "contract_version": "0.1.0",
+  "status": "normative",
+  "public_api": true,
+  "function": "lexdiv_mattr_profile",
+  "method_identity": {
+    "metric_id": "mattr",
+    "method_id": "mattr_sliding_step1_v1",
+    "window_step": 1,
+    "window_value": "distinct_types / window_length",
+    "global_value": "sum(distinct_types) / (window_count * window_length)"
+  },
+  "plan_contract": {
+    "class": "lexdiv_plan",
+    "allowed_metric_ids": ["mattr"],
+    "caller_order_preserved": true,
+    "canonical_specification_identity_reused": true,
+    "automatic_window_selection": false
+  },
+  "result_contract": {
+    "class": "lexdiv_mattr_profile",
+    "schema_id": "lexdiv-mattr-profile-result",
+    "schema_version": "0.1.0",
+    "components": ["summary", "windows", "exposure", "diagnostics", "provenance"],
+    "summary_reuses_lexdiv_profile": true,
+    "missing_requests_have_detail_rows": false,
+    "combined_row_bound": "max_rows"
+  },
+  "window_columns": [
+    "plan_md5", "request_index", "request_id", "specification_id",
+    "metric_id", "method_id", "window_index", "window_start",
+    "window_end", "window_midpoint", "window_length", "distinct_types",
+    "value"
+  ],
+  "exposure_columns": [
+    "plan_md5", "request_index", "request_id", "specification_id",
+    "metric_id", "method_id", "position", "exposure_count",
+    "window_inclusion_rate", "nominal_observation_weight"
+  ],
+  "diagnostic_columns": [
+    "plan_md5", "request_index", "request_id", "specification_id", "status",
+    "missing_reason", "N", "V", "window_length", "window_count",
+    "endpoint_exposure_count", "maximum_exposure_count", "exposure_weight_sum",
+    "local_mean", "core_value", "reconciliation_error"
+  ],
+  "exposure_contract": {
+    "unit": "token_position",
+    "exposure_count": "number of complete step-one windows containing the position",
+    "window_inclusion_rate": "exposure_count / window_count",
+    "nominal_observation_weight": "exposure_count / (window_count * window_length)",
+    "nominal_weights_sum_to_one": true,
+    "causal_contribution_claimed": false
+  },
+  "missingness": {
+    "source": "canonical lexdiv_profile status and missing_reason",
+    "empty_invalid_and_short_are_structured": true,
+    "detail_values_imputed": false
+  },
+  "privacy_boundary": {
+    "token_strings_copied_to_result": false,
+    "raw_text_copied_to_result": false,
+    "text_hash_copied_to_result": false,
+    "positions_and_aggregate_counts_returned": true
+  },
+  "interpretation": {
+    "scope": "descriptive local lexical-variety trajectory and positional exposure",
+    "whole_text_sophistication_score": false,
+    "inferential_stability_test": false,
+    "minimum_valid_text_length_inferred": false,
+    "iid_token_resampling": false
+  },
+  "evidence": [
+    {
+      "source_id": "bestgen_2024",
+      "doi": "10.1111/lang.12630",
+      "role": "parameter sensitivity and the twofold length problem"
+    },
+    {
+      "source_id": "bestgen_2025",
+      "doi": "10.1016/j.rmal.2024.100168",
+      "role": "local MATTR interpretation and unequal positional exposure"
+    }
+  ]
+}

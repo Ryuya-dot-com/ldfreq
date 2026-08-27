@@ -168,7 +168,7 @@ test_that("caller-supplied AntBNC resources create auditable flemmas", {
   expect_identical(annotation$method, "antbnc")
   expect_identical(annotation$lexical_unit, "flemma")
   expect_identical(annotation$backend_id, "ldfreq-antbnc-flemma-adapter")
-  expect_identical(annotation$backend_version, "0.1.1")
+  expect_identical(annotation$backend_version, "0.1.0")
   expect_identical(annotation$resource_id, "antbnc-lemma-list")
   expect_null(annotation$resource_version)
   expect_false("resource_source_file" %in% names(annotation))
@@ -349,7 +349,7 @@ test_that("explicit flemma overrides take precedence over AntBNC", {
   expect_true(all(annotated$tokens$flemma_match_rule == "override"))
   expect_identical(
     annotated$provenance$flemma_annotation$backend_version,
-    "0.1.1"
+    "0.1.0"
   )
   expect_identical(
     annotated$provenance$flemma_annotation$resource_version,
@@ -710,7 +710,7 @@ test_that("the installed preprocessing contract matches the public implementatio
   schema <- jsonlite::read_json(schema_path, simplifyVector = FALSE)
 
   expect_identical(contract$contract_id, "ldfreq-preprocessing")
-  expect_identical(contract$contract_version, "0.1.1")
+  expect_identical(contract$contract_version, "0.1.0")
   expect_identical(contract$status, "normative")
   expect_identical(contract$public_api, TRUE)
   expect_identical(

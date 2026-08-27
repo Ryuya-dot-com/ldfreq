@@ -1,4 +1,4 @@
-test_that("the pre-CRAN naming reset exposes one canonical vocabulary", {
+test_that("the initial 0.1.0 API exposes one canonical vocabulary", {
   exports <- getNamespaceExports("ldfreq")
   canonical <- c(
     "nj8_profile",
@@ -14,6 +14,7 @@ test_that("the pre-CRAN naming reset exposes one canonical vocabulary", {
   )
 
   expect_true(all(canonical %in% exports))
+  expect_true("lexdiv_mattr_profile" %in% exports)
   expect_false(any(retired %in% exports))
   expect_false(any(startsWith(exports, "new_")))
 })
@@ -57,4 +58,11 @@ test_that("renamed resource classes and methods use canonical names", {
     optional = TRUE
   )))
   expect_null(getS3method("plot", "tubelex_frequency_profile", optional = TRUE))
+  expect_true(is.function(getS3method(
+    "print", "lexdiv_mattr_profile", optional = TRUE
+  )))
+  expect_true(is.function(getS3method(
+    "plot", "lexdiv_mattr_profile", optional = TRUE
+  )))
+  expect_null(getS3method("summary", "lexdiv_mattr_profile", optional = TRUE))
 })

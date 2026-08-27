@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/inst/spec/reference-coverage-contract.schema.json",
+  "title": "ldfreq reference-coverage contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "contract_id",
+    "contract_version",
+    "status",
+    "public_api",
+    "input_contract",
+    "matching_contract",
+    "measures",
+    "empty_input_rules",
+    "result_contract",
+    "privacy_boundary",
+    "interpretation_boundary"
+  ],
+  "properties": {
+    "$schema": {"const": "reference-coverage-contract.schema.json"},
+    "contract_id": {"const": "ldfreq-reference-coverage"},
+    "contract_version": {"const": "0.1.0"},
+    "status": {"const": "normative"},
+    "public_api": {"const": true},
+    "input_contract": {
+      "type": "object",
+      "required": [
+        "documents", "reference", "term_unit", "invalid_term_policy",
+        "invalid_reference_policy", "raw_text_shortcut"
+      ],
+      "properties": {
+        "raw_text_shortcut": {"const": false}
+      }
+    },
+    "matching_contract": {
+      "type": "object",
+      "required": [
+        "comparison", "reference_membership", "normalization",
+        "case_conversion", "stemming_or_fuzzy_matching",
+        "document_token_repetition_affects_token_coverage",
+        "document_token_repetition_affects_type_coverage",
+        "reference_token_repetition_affects_values",
+        "token_order_affects_values"
+      ],
+      "properties": {
+        "comparison": {"const": "exact-unicode-scalar-sequence"},
+        "reference_membership": {"const": "distinct-reference-type-set"},
+        "normalization": {"const": "none"},
+        "case_conversion": {"const": "none"},
+        "stemming_or_fuzzy_matching": {"const": false},
+        "document_token_repetition_affects_token_coverage": {"const": true},
+        "document_token_repetition_affects_type_coverage": {"const": false},
+        "reference_token_repetition_affects_values": {"const": false},
+        "token_order_affects_values": {"const": false}
+      }
+    },
+    "measures": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "object",
+          "required": ["weighting", "measure_id", "method_id", "formula"],
+          "properties": {
+            "weighting": {"const": "token"},
+            "measure_id": {"const": "reference_coverage_tokens"},
+            "method_id": {"const": "document_tokens_in_reference_type_set_v1"},
+            "formula": {"const": "matched_document_tokens / document_tokens"}
+          }
+        },
+        {
+          "type": "object",
+          "required": ["weighting", "measure_id", "method_id", "formula"],
+          "properties": {
+            "weighting": {"const": "type"},
+            "measure_id": {"const": "reference_coverage_types"},
+            "method_id": {"const": "document_types_in_reference_type_set_v1"},
+            "formula": {"const": "matched_document_types / document_types"}
+          }
+        }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "empty_input_rules": {"type": "object"},
+    "result_contract": {
+      "type": "object",
+      "required": [
+        "schema_id", "schema_version", "components", "summary_columns",
+        "document_columns", "reference_columns", "term_columns", "summary_shape",
+        "numerator_and_denominator_columns", "term_detail_disclosure",
+        "row_limit_scope"
+      ],
+      "properties": {
+        "schema_id": {"const": "lexdiv-reference-coverage-result"},
+        "schema_version": {"const": "0.1.0"},
+        "components": {
+          "const": [
+            "summary", "documents", "reference", "terms", "preprocessing",
+            "provenance"
+          ]
+        },
+        "summary_columns": {
+          "const": [
+            "document_id", "reference_id", "weighting", "measure_id", "method_id",
+            "reference_coverage_contract_id", "reference_coverage_contract_version",
+            "result_schema_id", "result_schema_version", "value", "status",
+            "missing_reason", "numerator", "denominator", "document_tokens",
+            "document_types", "reference_tokens", "reference_types",
+            "matched_tokens", "matched_types", "analysis_scope", "unit"
+          ]
+        },
+        "document_columns": {
+          "const": ["document_id", "state", "input_tokens", "input_types"]
+        },
+        "reference_columns": {
+          "const": ["reference_id", "state", "input_tokens", "input_types"]
+        },
+        "term_columns": {
+          "const": [
+            "document_id", "reference_id", "term", "document_token_count",
+            "reference_token_count", "matched"
+          ]
+        },
+        "summary_shape": {"const": "one-row-per-document-and-weighting"},
+        "numerator_and_denominator_columns": {"const": true},
+        "term_detail_disclosure": {"const": "provenance-flag-and-print-notice"},
+        "row_limit_scope": {"const": "all-returned-data-frame-rows"}
+      }
+    },
+    "privacy_boundary": {
+      "type": "object",
+      "required": [
+        "raw_text_copied_to_result", "text_hash_copied_to_result",
+        "absolute_path_copied_to_result", "term_details_opt_in"
+      ],
+      "properties": {
+        "raw_text_copied_to_result": {"const": false},
+        "text_hash_copied_to_result": {"const": false},
+        "absolute_path_copied_to_result": {"const": false},
+        "term_details_opt_in": {"const": true}
+      }
+    },
+    "interpretation_boundary": {
+      "type": "object",
+      "required": [
+        "direct_semantic_similarity_measure", "plagiarism_detector",
+        "proficiency_or_writing_quality_measure", "reference_quality_measure"
+      ],
+      "properties": {
+        "direct_semantic_similarity_measure": {"const": false},
+        "plagiarism_detector": {"const": false},
+        "proficiency_or_writing_quality_measure": {"const": false},
+        "reference_quality_measure": {"const": false}
+      }
+    }
+  }
+}

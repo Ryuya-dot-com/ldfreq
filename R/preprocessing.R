@@ -6,11 +6,11 @@
 # metric computation.
 
 .lexprep_contract_id <- "ldfreq-preprocessing"
-.lexprep_contract_version <- "0.1.1"
+.lexprep_contract_version <- "0.1.0"
 .lexprep_tokenizer_id <- "ldfreq-unicode-word-tokenizer"
 .lexprep_tokenizer_version <- "0.1.0"
 .lexprep_flemma_backend_id <- "ldfreq-antbnc-flemma-adapter"
-.lexprep_flemma_backend_version <- "0.1.1"
+.lexprep_flemma_backend_version <- "0.1.0"
 .lexprep_antbnc_resource_id <- "antbnc-lemma-list"
 .lexprep_antbnc_parser_id <- "ldfreq-antbnc-parser"
 .lexprep_antbnc_parser_version <- "0.1.0"

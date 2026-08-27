@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/inst/spec/norm-profile-contract.schema.json",
+  "title": "ldfreq generic lexical-norm profile contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema", "contract_id", "contract_version", "status", "public_api",
+    "function", "input_contract", "measure_spec_contract",
+    "resource_metadata_contract", "matching_contract", "statistic_contract",
+    "missingness_contract", "row_budget_contract", "result_contract",
+    "privacy_boundary", "interpretation_boundary"
+  ],
+  "properties": {
+    "$schema": {"const": "norm-profile-contract.schema.json"},
+    "contract_id": {"const": "ldfreq-generic-norm-profile"},
+    "contract_version": {"const": "0.1.0"},
+    "status": {"const": "normative"},
+    "public_api": {"const": true},
+    "function": {"const": "lexdiv_norm_profile"},
+    "input_contract": {
+      "type": "object",
+      "required": [
+        "scope", "term_unit", "norm_table", "raw_text_shortcut",
+        "bundled_norm_resource", "runtime_network_access", "maximum_measures"
+      ],
+      "properties": {
+        "scope": {"const": "single-document"},
+        "raw_text_shortcut": {"const": false},
+        "bundled_norm_resource": {"const": false},
+        "runtime_network_access": {"const": false},
+        "maximum_measures": {"const": 128}
+      }
+    },
+    "measure_spec_contract": {
+      "type": "object",
+      "required": [
+        "columns", "unique_fields", "direction_values",
+        "finite_numeric_values_or_missing"
+      ],
+      "properties": {
+        "columns": {"const": [
+          "measure_id", "value_column", "construct_id", "value_unit",
+          "direction", "language", "variety", "population_id",
+          "collection_year", "valid_min", "valid_max"
+        ]},
+        "unique_fields": {"const": ["measure_id", "value_column"]},
+        "direction_values": {"const": ["higher", "lower", "descriptive"]},
+        "finite_numeric_values_or_missing": {"const": true}
+      }
+    },
+    "resource_metadata_contract": {
+      "type": "object",
+      "required": [
+        "fields", "caller_asserted", "metadata_proves_redistribution_rights"
+      ],
+      "properties": {
+        "fields": {"const": [
+          "resource_id", "resource_version", "creator", "source_reference",
+          "data_license", "transformation_id", "lookup_unit",
+          "resource_key_normalization_id"
+        ]},
+        "caller_asserted": {"const": true},
+        "metadata_proves_redistribution_rights": {"const": false}
+      }
+    },
+    "matching_contract": {
+      "type": "object",
+      "required": [
+        "comparison", "query_normalization", "case_conversion",
+        "stemming_lemmatization_or_fuzzy_matching", "duplicate_resource_keys",
+        "resource_row_order_affects_result", "type_identity"
+      ],
+      "properties": {
+        "comparison": {"const": "exact-unicode-scalar-sequence"},
+        "query_normalization": {"const": "none"},
+        "case_conversion": {"const": "none"},
+        "stemming_lemmatization_or_fuzzy_matching": {"const": false},
+        "duplicate_resource_keys": {"const": "error"},
+        "resource_row_order_affects_result": {"const": false}
+      }
+    },
+    "statistic_contract": {
+      "type": "object",
+      "required": [
+        "statistic_id", "weighting_values", "default_weightings",
+        "missing_value_imputation", "oov_imputation",
+        "automatic_coverage_threshold", "composite_score",
+        "stable_accumulation_order"
+      ],
+      "properties": {
+        "statistic_id": {"const": "arithmetic_mean_observed_matched_only_v1"},
+        "weighting_values": {"const": ["token", "type"]},
+        "default_weightings": {"const": ["token", "type"]},
+        "missing_value_imputation": {"const": false},
+        "oov_imputation": {"const": false},
+        "automatic_coverage_threshold": {"const": false},
+        "composite_score": {"const": false}
+      }
+    },
+    "missingness_contract": {"type": "object"},
+    "row_budget_contract": {
+      "type": "object",
+      "required": ["formula", "scope", "checked_before_result_allocation"],
+      "properties": {
+        "formula": {"const": "length(terms) * measures + 2 * measures * weightings"},
+        "scope": {"const": "lookup-plus-summary-plus-coverage"},
+        "checked_before_result_allocation": {"const": true}
+      }
+    },
+    "result_contract": {
+      "type": "object",
+      "required": [
+        "schema_id", "schema_version", "class", "components",
+        "lookup_columns", "summary_columns", "coverage_columns",
+        "lookup_order", "summary_order", "bounded_print_rows", "plot_method",
+        "summary_method", "as_data_frame_method"
+      ],
+      "properties": {
+        "schema_id": {"const": "generic-norm-profile-result"},
+        "schema_version": {"const": "0.1.0"},
+        "class": {"const": "lexdiv_norm_profile"},
+        "components": {"const": [
+          "status", "summary", "lookup", "coverage", "provenance",
+          "diagnostics"
+        ]},
+        "lookup_columns": {"const": [
+          "input_index", "term", "measure_id", "lookup_status", "value",
+          "value_status"
+        ]},
+        "summary_columns": {"const": [
+          "result_order", "resource_id", "resource_version", "measure_id",
+          "construct_id", "value_unit", "direction", "language", "variety",
+          "population_id", "collection_year", "statistic_id", "weighting",
+          "type_identity", "estimate", "status", "missing_reason",
+          "input_units", "matched_units", "unmatched_units",
+          "observed_value_units", "matched_missing_value_units",
+          "resource_coverage", "value_coverage", "annotation_coverage"
+        ]},
+        "coverage_columns": {"const": [
+          "result_order", "resource_id", "resource_version", "measure_id",
+          "weighting", "input_units", "matched_units", "unmatched_units",
+          "observed_value_units", "matched_missing_value_units",
+          "resource_coverage", "value_coverage", "annotation_coverage"
+        ]},
+        "bounded_print_rows": {"const": 12},
+        "plot_method": {"const": false},
+        "summary_method": {"const": false},
+        "as_data_frame_method": {"const": false}
+      }
+    },
+    "privacy_boundary": {
+      "type": "object",
+      "required": [
+        "lookup_terms_copied_to_result", "unused_norm_columns_copied_to_result",
+        "full_norm_table_copied_to_result", "absolute_path_copied_to_result",
+        "private_hash_copied_to_result"
+      ],
+      "properties": {
+        "lookup_terms_copied_to_result": {"const": true},
+        "unused_norm_columns_copied_to_result": {"const": false},
+        "full_norm_table_copied_to_result": {"const": false},
+        "absolute_path_copied_to_result": {"const": false},
+        "private_hash_copied_to_result": {"const": false}
+      }
+    },
+    "interpretation_boundary": {
+      "type": "object",
+      "required": [
+        "means_are_conditional_on_observed_matched_values",
+        "coverage_must_accompany_estimates",
+        "universal_measure_direction_inferred",
+        "cross_measure_scale_comparability_assumed",
+        "proficiency_or_writing_quality_measure", "data_license_approval"
+      ],
+      "properties": {
+        "means_are_conditional_on_observed_matched_values": {"const": true},
+        "coverage_must_accompany_estimates": {"const": true},
+        "universal_measure_direction_inferred": {"const": false},
+        "cross_measure_scale_comparability_assumed": {"const": false},
+        "proficiency_or_writing_quality_measure": {"const": false},
+        "data_license_approval": {"const": false}
+      }
+    }
+  }
+}

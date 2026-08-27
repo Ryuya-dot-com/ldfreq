@@ -1,13 +1,15 @@
 # Release-candidate boundary
 
 The lexical-diversity core remains resource-independent and accepts ordered
-pre-tokenized vectors. The `0.2.0` minor release candidate retains the twelve
+pre-tokenized vectors. The initial `0.1.0` release candidate retains the twelve
 core methods, including the deterministic expected-TTR D fit, and the separate
 versioned contracts for raw-text preprocessing, TUBELEX profiles, selected
 Maas and sequential-MTLD sensitivity variants, and caller-supplied lexical
-levels. It adds a separately contracted lexical-overlap API and performs the
-pre-CRAN canonical naming reset recorded in `API-NAMING.md`. These changes
-leave the twelve-method core contract unchanged. Package version `0.2.0` does
+levels. It adds separately contracted lexical-overlap and many-document
+reference-coverage APIs, a caller-supplied exact-match generic lexical-norm
+profile, and applies the pre-CRAN canonical naming decision
+recorded in `API-NAMING.md`. These changes
+leave the twelve-method core contract unchanged. Package version `0.1.0` does
 not imply that unchanged method contracts have been renumbered. The package
 does not claim compatibility with TAALES, TAALED, CLAN VOCD, or another
 package's same-named variant beyond each row's explicit comparison scope.
@@ -33,11 +35,18 @@ comparison key. Raw AntBNC remains an NWLC approximation rather than a
 compatibility claim. New JACET integration must retain per-token
 AntBNC/override/identity rules and selectable headword-conflict resolution.
 
-## Before publishing version 0.2.0
+## Before publishing version 0.1.0
 
 - exercise the package on R-release and R-devel across Linux, macOS, and Windows;
 - preserve the frozen twelve-method measurement API and the revised canonical
   function names in `API-NAMING.md`;
+- preserve the directional reference-coverage token/type formulas, explicit
+  denominators, document-local invalidity, opt-in terms, and whole-result row
+  bound;
+- preserve generic norm measure/resource metadata, observed matched-only
+  arithmetic means, exact token/type identity, three coverage denominators,
+  OOV versus missing-annotation states, and the absence of implicit
+  normalization, thresholding, or cross-measure plotting;
 - complete an online `R CMD check --as-cran` with release metadata;
 - review documentation, examples, spelling, URLs, and package contents;
 - preserve the expected-TTR D method identity, deterministic fit, diagnostics,

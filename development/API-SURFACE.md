@@ -1,6 +1,6 @@
 # Public API surface audit
 
-Status: pre-CRAN audit for package version 0.2.0
+Status: pre-CRAN audit for package version 0.1.0
 
 Audited: 2026-08-27
 
@@ -11,7 +11,9 @@ rendered by pkgdown.
 
 ## Decisions
 
-- Keep the 26 exported function names unchanged after the 0.2.0 naming reset.
+- Keep the 26 existing canonical export names selected for the initial 0.1.0
+  release, and add the substantively distinct `lexdiv_reference_coverage()`,
+  `lexdiv_mattr_profile()`, and `lexdiv_norm_profile()` APIs.
 - Add no convenience alias and no new exported extractor solely to shorten
   component access.
 - Use custom `print()` only where an object-specific header or bounded display
@@ -40,6 +42,8 @@ rendered by pkgdown.
 | `lexdiv_grid()` | Bounded ordered list of method specifications | Feeds a plan, not documents | Concise grid method | No | List elements remain complete specs |
 | `lexdiv_as_documents()` | Adapts named/tidy/quanteda tokens to a plain named list | Creates the batch boundary | Base | No | Plain named list |
 | `lexdiv_length_evidence()` | Evidence registry data frame | Not document data | Base data-frame | No | Data frame |
+| `lexdiv_mattr_profile()` | Canonical MATTR summary plus local-window and positional-exposure tables | Document-scoped; accepts a MATTR-only canonical plan | Bounded composite method | One explicit request | `$summary`, `$windows`, `$exposure`, `$diagnostics` |
+| `lexdiv_norm_profile()` | Conditional lexical-norm means plus exact lookup and separate resource/value coverage | Document-scoped; caller supplies one norm table and its provenance | Bounded composite method | No: measures may have unlike scales and directions | `$summary`, `$lookup`, `$coverage`, `$provenance`, `$diagnostics` |
 | `lexdiv_methods()` | Method registry data frame | Shared by single and batch calls | Base data-frame | No | Data frame with list-column parameters |
 | `lexdiv_metrics()` | One-row-per-metric long data frame | Paired with `lexdiv_metrics_batch()` | Result method | Single selected metric | Data frame |
 | `lexdiv_metrics_batch()` | Document-major long metric data frame | Explicit batch form | Batch-result method | Single selected metric | Data frame |
@@ -49,6 +53,7 @@ rendered by pkgdown.
 | `lexdiv_presets()` | Preset registry data frame | Shared by profile calls | Base data-frame | No | Data frame |
 | `lexdiv_profile()` | One-row-per-request long result data frame | Paired with `lexdiv_profile_batch()` | Profile-result method | Single selected request/metric | Data frame |
 | `lexdiv_profile_batch()` | Document-major request-profile data frame | Explicit batch form | Profile-batch method | Single selected request/metric | Data frame |
+| `lexdiv_reference_coverage()` | Token/type coverage of many documents by one exact reference set | Explicit many-to-one batch operation | Bounded composite method | One explicit weighting | `$summary`, `$documents`, `$reference`, optional `$terms` |
 | `lexdiv_screen()` | Independent token-floor screen data frame | Accepts single or batch profile rows | Base data-frame | One selected screen | Data frame |
 | `lexdiv_spec()` | One normalized method/parameter request | Feeds grids/plans | Concise spec method | No | Named list fields |
 | `lexdiv_tokenize()` | Lossless token rows and preprocessing provenance | Document-scoped | Tokenization method | No | `$tokens`, `$provenance` |
@@ -62,7 +67,7 @@ rendered by pkgdown.
 
 ## Documentation and reuse gate
 
-The audit requires all 26 exports to have an installed help alias, an explicit
+The audit requires all 29 exports to have an installed help alias, an explicit
 value section, and an executable example. Shared help topics are acceptable
 when aliases, usage, argument ownership, and return types remain unambiguous.
 Every help topic must appear in the pkgdown reference index.
@@ -86,6 +91,25 @@ analysis column or a public-site page.
    or multi-document NJ8 profiles. A generic chart would conceal denominator,
    scale, family, or document-selection differences; their named tables are
    the intended inputs to caller-controlled graphics and statistical models.
+4. Reference coverage has one safe shared range but two different denominators.
+   Its plot therefore requires one token/type weighting at a time and returns
+   the selected rows, including numerators and denominators, invisibly.
+5. Local MATTR is a composite because its canonical summary, window trajectory,
+   and position exposure answer different questions. `print()` remains bounded,
+   `plot()` requires one request when several window lengths exist, and no
+   `summary()` or `as.data.frame()` method silently discards detail tables.
+6. Six registered print methods were callable but not directly discoverable by
+   installed help. Their aliases, usages, arguments, and invisible return
+   behavior are now documented. MATTR's `add_global_mean` plot choice now uses
+   the same strict scalar-logical validation as other public plot flags.
+7. The MATTR and reference-coverage contracts now enumerate every reusable
+   result table and column. Contract tests compare those arrays with live
+   results, preventing a nominally unchanged 0.1.0 schema from drifting.
+8. Generic norm profiling remains separate from bundled-resource adapters.
+   Exact caller-prepared keys, measure/resource metadata, matched-only means,
+   and three distinct coverage denominators are explicit. No default plot,
+   composite score, automatic threshold, normalization, or license inference
+   is introduced.
 
 ## Release gate
 
@@ -93,3 +117,14 @@ Before the first CRAN submission, regenerate this inventory from `NAMESPACE`
 and fail review if an export is missing, undocumented, absent from pkgdown, or
 lacks an explicit reusable-data path. Re-run examples, vignettes, the offline
 smoke test, the complete pkgdown build, and `R CMD check` after any S3 change.
+The repository-only gate is executable as:
+
+```sh
+Rscript --vanilla development/audit-public-api.R .
+```
+
+It compares `NAMESPACE`, installed-help aliases, value/example sections, this
+inventory, and pkgdown topics; requires every registered S3 method to be
+discoverable by help; rejects retired public names; and enforces the decision
+not to register information-discarding `summary()` or `as.data.frame()` methods
+for composite table objects.

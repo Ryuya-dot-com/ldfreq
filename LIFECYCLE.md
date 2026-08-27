@@ -1,9 +1,11 @@
 # API and measurement lifecycle
 
-The `0.1.x` line freezes the resource-independent, pre-tokenized twelve-method
-core. Raw-text preprocessing, exact lexical overlap, and resource-backed
-profiles are separate public surfaces with their own contract versions and
-review gates. The Maas/MTLD
+The resource-independent, pre-tokenized twelve-method core introduced in
+`0.1.0` remains frozen throughout the pre-1.0 package line. Raw-text
+preprocessing, exact lexical overlap, many-document reference coverage,
+caller-supplied generic lexical-norm profiles, and resource-backed profiles are
+separate public surfaces with their own contract
+versions and review gates. The Maas/MTLD
 sensitivity surface also has a separate variant contract and does not add
 methods to the frozen core registry. Caller-supplied lexical-level profiles
 have a separate contract for resource input, rank bands, denominator, off-list
@@ -45,13 +47,11 @@ removal. A replacement and migration path must be named. During the pre-1.0
 period, an unavoidable breaking change increments the minor package version and
 is called out prominently.
 
-Version 0.2.0 is a one-time naming reset before the package's first CRAN
-submission. It removes four pre-release function-name families and their
-resource-specific result classes without compatibility aliases; the exact
-migration map is recorded in `NEWS.md` and the repository release records.
-This explicit minor version change does not redefine a measurement method,
-formula, denominator, resource contract, or result column, and it does not
-waive the deprecation policy for later releases.
+The canonical function and result-class names are established by the initial
+version 0.1.0 release. Compatibility aliases and a public deprecation cycle are
+unnecessary because no earlier CRAN version exposed alternative names. This
+initial-release exception does not waive the deprecation policy after
+publication.
 
 ## Separate preprocessing and resource surfaces
 
@@ -73,10 +73,10 @@ limited to caching and must not become public provenance or an
 overlap-comparability key.
 
 Preprocessing objects are validated against their recorded contract version.
-The stricter `0.1.1` contract does not automatically migrate a
-`lexdiv_tokenization` serialized under `0.1.0` with `saveRDS()` or an equivalent
-mechanism. Recreate the object from the original text and reapply its current
-annotations and explicit backend labels; do not edit old provenance in place.
+Objects serialized under the current `0.1.0` contract are revalidated whenever
+they are consumed. If provenance is incomplete, unsupported, or manually
+altered, recreate the object from the original text and reapply current
+annotations and explicit backend labels; do not edit provenance in place.
 
 For lexical-level profiles, changing rank-to-level mapping, entry
 normalization, alias collision policy, default lexical unit, type identity,
@@ -92,6 +92,22 @@ denominators, empty-set behavior, content-word membership, the default
 comparability policy, or term-detail disclosure requires a new overlap contract
 version. Exact term details remain opt-in and must be visibly disclosed in the
 returned provenance and print output.
+
+For many-document reference coverage, changing exact reference membership,
+token/type formulas, document or reference empty-input rules, document-local
+invalidity, ID disclosure, summary shape, term-detail disclosure, or the scope
+of the whole-result row bound requires a new reference-coverage contract
+version. Adding normalization, annotation, or multiple-reference inference to
+the existing method IDs is not a compatible extension.
+
+For caller-supplied lexical-norm profiles, changing exact-key matching,
+measure/resource metadata fields, token/type identity, observed matched-only
+arithmetic means, any of the three coverage denominators, OOV versus missing-
+annotation states, fixed table columns or ordering, structural-error boundary,
+or whole-result row budget requires a new norm-profile contract or result
+schema version. Adding implicit normalization, fuzzy matching, imputation,
+automatic thresholds, composite scores, or a default cross-measure plot is not
+a compatible extension.
 
 Likewise, adding a variant formula, threshold boundary, minimum factor length,
 tail rule, directional aggregation, or compatibility claim requires a new

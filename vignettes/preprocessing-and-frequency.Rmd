@@ -146,6 +146,36 @@ the value. None of these exact lexical-sharing measures detects plagiarism or
 directly measures semantic similarity, coherence, proficiency, or writing
 quality.
 
+### Directional reference coverage across documents
+
+When the research question is how much of several documents belongs to one
+reference vocabulary, pairwise Jaccard or Dice values introduce the wrong
+denominator. `lexdiv_reference_coverage()` instead retains both the number of
+matched document items and the full document denominator.
+
+```{r}
+coverage_documents <- list(
+  essay_a = c("cat", "cat", "run", "rare"),
+  essay_b = c("bird", "run", "unknown")
+)
+reference_coverage <- lexdiv_reference_coverage(
+  coverage_documents,
+  reference = c("cat", "bird", "run"),
+  reference_id = "analysis_list",
+  details = "terms"
+)
+reference_coverage$summary[, c(
+  "document_id", "weighting", "value", "numerator", "denominator", "status"
+)]
+reference_coverage$terms
+```
+
+The token row counts every repeated document occurrence; the type row counts
+each distinct document term once. Repeating an entry in the reference changes
+neither value. The function does not normalize or annotate terms, so comparable
+surface, lemma, or flemma vectors must be constructed explicitly upstream.
+Term detail is opt-in because it copies exact lexical strings into the result.
+
 ### Flemma as a caller-supplied resource transformation
 
 For NWLC-oriented sensitivity analysis, `lexdiv_flemmatize()` reads a local
@@ -217,6 +247,35 @@ profile[profile$metric_id %in% c("mattr", "msttr"), c(
   "request_id", "metric_id", "value", "status", "N", "V"
 )]
 ```
+
+The whole-text mean alone hides the local trajectory and the fact that endpoint
+positions occur in fewer complete windows. `lexdiv_mattr_profile()` reuses the
+same MATTR specifications and exposes both quantities without retaining token
+strings:
+
+```{r, fig.width=5, fig.height=3}
+methods <- lexdiv_methods()
+mattr_method <- methods$method_id[methods$metric_id == "mattr"]
+mattr_plan <- lexdiv_plan(
+  presets = character(),
+  grids = lexdiv_grid(
+    mattr_method,
+    "window_length",
+    c(50, 100),
+    request_id_prefix = "mattr"
+  )
+)
+local_mattr <- lexdiv_mattr_profile(long_tokens, mattr_plan)
+local_mattr$diagnostics
+head(local_mattr$windows)
+head(local_mattr$exposure)
+plot(local_mattr, request_id = "mattr_1")
+```
+
+For each request, `nominal_observation_weight` sums to one. It describes the
+moving-window accounting scheme, not the lexical importance of a token. The
+local rows support custom graphics and downstream models, but do not constitute
+an inferential stability test.
 
 A downstream study may combine several indices, fit a PCA, or optimize a
 window for a target population. Such sample-dependent modeling is not embedded

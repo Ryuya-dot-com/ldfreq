@@ -1,7 +1,7 @@
 # Public API naming
 
-This document fixes the naming rules for exported R functions from `ldfreq`
-0.2.0 onward. It controls discoverability and vocabulary only; measurement
+This document fixes the naming rules for exported R functions from the initial
+`ldfreq` 0.1.0 release onward. It controls discoverability and vocabulary only; measurement
 formulas, denominators, result schemas, and resource identities remain governed
 by their feature-specific contracts.
 
@@ -29,13 +29,24 @@ by their feature-specific contracts.
   are not added solely to save keystrokes because they enlarge autocomplete,
   help, testing, and deprecation surfaces.
 
-## Version 0.2.0 migration
+## Pre-publication naming decision
 
-The package had not been submitted to CRAN when this one-time canonical reset
-was made. The previous pre-release names are removed rather than retained as
-aliases.
+The package had not been submitted to CRAN when this one-time canonical naming
+decision was made. Earlier development names are removed rather than retained
+as aliases; version 0.1.0 therefore exposes only the canonical vocabulary.
 
-| Before 0.2.0 | Canonical from 0.2.0 | Reason |
+`lexdiv_mattr_profile()` retains the metric name because it exposes diagnostics
+specific to the canonical MATTR method. A generic `lexdiv_stability_profile()`
+would imply validated support across methods and inferential interpretations
+that the package does not provide.
+
+`lexdiv_norm_profile()` names a resource-neutral operation rather than one
+construct such as familiarity or concreteness. Those identities belong in
+measure rows, and a resource brand belongs in its own adapter. The name does
+not imply that unlike measures are comparable or that the function computes a
+lexical-sophistication score.
+
+| Earlier development name | Canonical in 0.1.0 | Reason |
 |---|---|---|
 | `new_jacet8000_profile()` | `nj8_profile()` | avoids constructor-like `new_`; keeps the recognized NJ8 resource identity |
 | `new_jacet8000_profile_batch()` | `nj8_profile_batch()` | applies the same resource name and retains the explicit batch contract |

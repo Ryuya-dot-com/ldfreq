@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/inst/spec/mattr-profile-contract.schema.json",
+  "title": "ldfreq MATTR profile contract",
+  "type": "object",
+  "required": [
+    "$schema", "contract_id", "contract_version", "status", "public_api",
+    "function", "method_identity", "plan_contract", "result_contract",
+    "window_columns", "exposure_columns", "diagnostic_columns",
+    "exposure_contract", "missingness",
+    "privacy_boundary", "interpretation", "evidence"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {"const": "mattr-profile-contract.schema.json"},
+    "contract_id": {"const": "ldfreq-mattr-profile"},
+    "contract_version": {"const": "0.1.0"},
+    "status": {"const": "normative"},
+    "public_api": {"const": true},
+    "function": {"const": "lexdiv_mattr_profile"},
+    "method_identity": {
+      "type": "object",
+      "required": ["metric_id", "method_id", "window_step", "window_value", "global_value"],
+      "additionalProperties": false,
+      "properties": {
+        "metric_id": {"const": "mattr"},
+        "method_id": {"const": "mattr_sliding_step1_v1"},
+        "window_step": {"const": 1},
+        "window_value": {"type": "string", "minLength": 1},
+        "global_value": {"type": "string", "minLength": 1}
+      }
+    },
+    "plan_contract": {"type": "object"},
+    "result_contract": {
+      "type": "object",
+      "required": ["class", "schema_id", "schema_version", "components"],
+      "properties": {
+        "class": {"const": "lexdiv_mattr_profile"},
+        "schema_id": {"const": "lexdiv-mattr-profile-result"},
+        "schema_version": {"const": "0.1.0"},
+        "components": {
+          "const": ["summary", "windows", "exposure", "diagnostics", "provenance"]
+        }
+      }
+    },
+    "window_columns": {
+      "const": [
+        "plan_md5", "request_index", "request_id", "specification_id",
+        "metric_id", "method_id", "window_index", "window_start",
+        "window_end", "window_midpoint", "window_length", "distinct_types",
+        "value"
+      ]
+    },
+    "exposure_columns": {
+      "const": [
+        "plan_md5", "request_index", "request_id", "specification_id",
+        "metric_id", "method_id", "position", "exposure_count",
+        "window_inclusion_rate", "nominal_observation_weight"
+      ]
+    },
+    "diagnostic_columns": {
+      "const": [
+        "plan_md5", "request_index", "request_id", "specification_id", "status",
+        "missing_reason", "N", "V", "window_length", "window_count",
+        "endpoint_exposure_count", "maximum_exposure_count", "exposure_weight_sum",
+        "local_mean", "core_value", "reconciliation_error"
+      ]
+    },
+    "exposure_contract": {"type": "object"},
+    "missingness": {"type": "object"},
+    "privacy_boundary": {"type": "object"},
+    "interpretation": {"type": "object"},
+    "evidence": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["source_id", "doi", "role"],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {"type": "string", "minLength": 1},
+          "doi": {"type": "string", "pattern": "^10[.]"},
+          "role": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

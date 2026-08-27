@@ -66,7 +66,7 @@ for (path in c(
 identities <- list(
   manifest = c(
     bytes = 964,
-    sha256 = "a0936c52cbeeccd807161e7236c8d01303819a968ee3be4d84e002966574bb1d"
+    sha256 = "a8d5dc3b2a5fee7eadf5a0648762350f9835b4b5e2633d9fe428dcf210120591"
   ),
   artifact = c(
     bytes = 2549714,
@@ -120,7 +120,7 @@ check(
     loaded$resource_ref,
     list(
       contract_id = "ldfreq-lexical-sophistication-profile",
-      contract_version = "0.1.1",
+      contract_version = "0.1.0",
       resource_id = "tubelex-en-treebank-slim",
       resource_version = "7cb5fb36-slim-v1",
       resource_manifest_sha256 = identities$manifest[["sha256"]]
@@ -130,7 +130,7 @@ check(
 )
 check(
   identical(loaded$manifest$resource_manifest_schema_id, "lexsoph-resource-manifest") &&
-    identical(loaded$manifest$resource_manifest_schema_version, "0.1.1") &&
+    identical(loaded$manifest$resource_manifest_schema_version, "0.1.0") &&
     identical(loaded$manifest$bundle_variant_id, "treebank-four-column-canonical-v1") &&
     identical(loaded$manifest$lookup_unit, "surface-form") &&
     identical(loaded$manifest$normalization_id, "nfkc-trim-root-lower-filtered-source-keys-v1"),
@@ -300,7 +300,7 @@ lookup_contract <- jsonlite::read_json(
 )
 check(
   identical(lookup_contract$contract_id, "ldfreq-lexical-resource-lookup") &&
-    identical(lookup_contract$contract_version, "0.1.1") &&
+    identical(lookup_contract$contract_version, "0.1.0") &&
     identical(
       lookup_contract$status,
       "versioned-non-exported-implementation-contract"

@@ -4,6 +4,7 @@
 ^LICENSE\.md$
 ^CONTRIBUTING\.md$
 ^_pkgdown\.yml$
+^docs$
 ^experiments$
 ^development$
 ^legal$

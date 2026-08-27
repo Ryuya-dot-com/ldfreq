@@ -25,14 +25,14 @@
       "source_sha256": "4096022259d5eaa7261c3bf22c3b0af9fd58ae8eebe17894c0b34a163954f936",
       "raw_source_bundled": false,
       "raw_subtitles_or_identifiers_included": false,
-      "manifest_sha256": "a0936c52cbeeccd807161e7236c8d01303819a968ee3be4d84e002966574bb1d",
+      "manifest_sha256": "a8d5dc3b2a5fee7eadf5a0648762350f9835b4b5e2633d9fe428dcf210120591",
       "artifact_sha256": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d",
       "content_sha256": "423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916",
       "package_members": [
         {
           "path": "extdata/tubelex/7cb5fb36/resource.manifest.dcf",
           "bytes": 964,
-          "sha256": "a0936c52cbeeccd807161e7236c8d01303819a968ee3be4d84e002966574bb1d"
+          "sha256": "a8d5dc3b2a5fee7eadf5a0648762350f9835b4b5e2633d9fe428dcf210120591"
         },
         {
           "path": "extdata/tubelex/7cb5fb36/tubelex_en_treebank_7cb5fb36_slim.csv.gz",

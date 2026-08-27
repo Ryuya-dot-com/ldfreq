@@ -1,5 +1,6 @@
 \name{tubelex_profile}
 \alias{tubelex_profile}
+\alias{print.tubelex_profile}
 \title{Coverage-aware TUBELEX frequency and prevalence profile}
 \description{
 Look up surface-form frequency, video prevalence, and channel prevalence in the
@@ -7,6 +8,8 @@ byte-pinned TUBELEX-EN Treebank aggregate bundled with \pkg{ldfreq}.
 }
 \usage{
 tubelex_profile(terms, normalization = "tubelex")
+
+\method{print}{tubelex_profile}(x, ...)
 }
 \arguments{
 \item{terms}{A plain ordered character vector, or an object returned by
@@ -17,6 +20,8 @@ triggers a warning because it may be raw prose. Pass raw prose through
 \item{normalization}{\code{"tubelex"} applies the recorded NFKC, trim, and
 locale-fixed English lowercase query transform. \code{"identity"} performs an
 exact case- and normalization-sensitive lookup.}
+\item{x}{A \code{tubelex_profile} object.}
+\item{...}{Additional arguments passed to the summary-table print method.}
 }
 \details{
 Unmatched terms remain missing. They are not converted to zero counts or to a
@@ -69,8 +74,9 @@ The public profile contract is installed as
 field roles are installed as \file{lexical-resource-lookup-contract.json}.
 Locate either with \code{system.file("spec", filename, package = "ldfreq")}.
 The public profile contract is normative for version 0.1.0. The lookup file
-is the versioned, non-exported implementation contract for ldfreq 0.1.1; its
-installation does not make the lookup helper a supported exported API. The
+is the versioned, non-exported implementation contract at contract version
+\code{0.1.0}; its installation does not make the lookup helper a supported exported
+API. The
 resource's license, provenance, and runtime integrity records are installed
 separately from the measurement contract.
 }
@@ -88,6 +94,7 @@ A \code{tubelex_profile} list containing \code{status},
 \code{failure_reason}, token- and type-weighted \code{summary}, lossless
 \code{lookup} rows, \code{coverage}, versioned \code{provenance}, and
 \code{diagnostics}.
+The print method returns \code{x} invisibly.
 }
 \examples{
 tokens <- lexdiv_tokenize("The apple and the missingword.")
