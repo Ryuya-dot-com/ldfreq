@@ -1,10 +1,11 @@
-# ldfreq 0.1.1 release-candidate boundary
+# ldfreq 0.2.0 release-candidate boundary
 
-Version `0.1.1` is an ordinary patch release built on the immutable `0.1.0`
-release. It adds the lexical-overlap API and corrective implementation,
-contract, test, and documentation changes without rewriting the `0.1.0` tag or
-its assets. The exact candidate commit must pass the technical, resource, and
-maintainer decision gates in `RELEASE-CHECKLIST.md` before a new `0.1.1` tag is
+Version `0.2.0` is a pre-CRAN minor release built on the immutable `0.1.0`
+release. It adds the lexical-overlap API, corrective implementation, contract,
+test, and documentation changes, and the canonical naming reset recorded in
+`API-NAMING.md`, without rewriting the `0.1.0` tag or its assets. The exact
+candidate commit must pass the technical, resource, and
+maintainer decision gates in `RELEASE-CHECKLIST.md` before a new `0.2.0` tag is
 created, release assets are published, or the package is submitted to CRAN.
 
 ## Automated evidence

@@ -23,9 +23,9 @@ Start with \code{lexdiv_metrics()} for explicit tokens,
 sensitivity variants, or
 \code{lexdiv_term_overlap()} for two explicit term vectors,
 \code{lexdiv_content_overlap()} for two UPOS-annotated texts, or
-\code{new_jacet8000_profile()} for exact and cumulative pedagogical frequency
+\code{nj8_profile()} for exact and cumulative pedagogical frequency
 levels from a caller-supplied list, or
-\code{tubelex_frequency_profile()} for coverage-aware corpus-relative
+\code{tubelex_profile()} for coverage-aware corpus-relative
 frequency and prevalence.
 }
 \section{Start here}{
@@ -43,8 +43,8 @@ Choose the entry point from the form of data you already have:
   \item{Two texts or term sets}{Use \code{lexdiv_term_overlap()} for explicit
   terms, or \code{lexdiv_content_overlap()} for UPOS-annotated content words.}
   \item{A corpus-relative reference profile}{Use
-  \code{tubelex_frequency_profile()} for bundled TUBELEX frequency/prevalence,
-  or \code{new_jacet8000_profile()} with a legitimately obtained caller copy
+  \code{tubelex_profile()} for bundled TUBELEX frequency/prevalence,
+  or \code{nj8_profile()} with a legitimately obtained caller copy
   of New JACET 8000.}
 }
 
@@ -126,14 +126,14 @@ measures have different denominators and must not be reported as one
 interchangeable generic percentage.
 }
 \section{Corpus-relative frequency}{
-\code{tubelex_frequency_profile()} retains original and normalized lookup
+\code{tubelex_profile()} retains original and normalized lookup
 terms, unmatched rows, token/type coverage, and matched-only token/type-weighted
 summaries. TUBELEX values are relative to a general YouTube subtitle corpus.
 They are not direct measures of proficiency, writing quality, academic
 register, or context-independent lexical sophistication.
 }
 \section{Lexical frequency levels}{
-\code{new_jacet8000_profile()} maps caller-supplied ranks to Levels 1--8 and
+\code{nj8_profile()} maps caller-supplied ranks to Levels 1--8 and
 reports exact and cumulative token/type proportions beside off-list coverage.
 The Level 8 cumulative proportion equals matched coverage because off-list
 items remain in the denominator. The package does not bundle or download the
@@ -202,8 +202,8 @@ runtime.
 \code{\link{lexdiv_flemmatize}},
 \code{\link{lexdiv_overlap}},
 \code{\link{lexdiv_profile}}, \code{\link{lexdiv_variant_metrics}},
-\code{\link{new_jacet8000_profile}},
-\code{\link{tubelex_frequency_profile}}
+\code{\link{nj8_profile}},
+\code{\link{tubelex_profile}}
 }
 \examples{
 metric_ids <- lexdiv_metric_ids()

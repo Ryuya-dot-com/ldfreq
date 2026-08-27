@@ -7,6 +7,9 @@
 \alias{lexdiv_profile}
 \alias{lexdiv_profile_batch}
 \alias{lexdiv_screen}
+\alias{print.lexdiv_spec}
+\alias{print.lexdiv_grid}
+\alias{print.lexdiv_plan}
 \alias{print.lexdiv_profile_results}
 \alias{print.lexdiv_profile_batch_results}
 \title{Build and Evaluate Explicit Lexical-Diversity Method Plans}
@@ -27,6 +30,12 @@ lexdiv_plan(
   grids = list(),
   max_specs = 128L
 )
+
+\method{print}{lexdiv_spec}(x, ...)
+
+\method{print}{lexdiv_grid}(x, ...)
+
+\method{print}{lexdiv_plan}(x, ...)
 
 lexdiv_methods()
 
@@ -83,17 +92,21 @@ lexdiv_screen(
   allocation. For \code{lexdiv_profile_batch()} it bounds
   document-by-specification rows; for \code{lexdiv_screen()} it bounds
   source-row-by-floor rows.}
-  \item{x}{A result returned by \code{lexdiv_profile()} or
-  \code{lexdiv_profile_batch()}.}
+  \item{x}{For \code{print()}, a specification, grid, or plan returned by the
+  corresponding constructor. For \code{lexdiv_screen()}, a result returned by
+  \code{lexdiv_profile()} or \code{lexdiv_profile_batch()}.}
   \item{floors}{A non-empty named numeric vector of positive integer token-count
   screens. Names become \code{screen_id}; values become
   \code{minimum_tokens}.}
+  \item{...}{Additional arguments passed to \code{print.data.frame()}.}
 }
 \value{
 \code{lexdiv_spec()} returns a normalized \code{lexdiv_spec};
 \code{lexdiv_grid()} returns an ordered list of specifications;
 \code{lexdiv_plan()} returns a deduplicated \code{lexdiv_plan} with an MD5
 fingerprint over normalized request identity and order.
+Their print methods return the input invisibly after displaying a bounded
+tabular view; the full identity fields remain available on the object.
 
 \code{lexdiv_methods()} returns a metadata data frame with human-readable
 labels and definitions, conventional within-method direction, contract scale,
@@ -129,6 +142,11 @@ than 1,024 raw preset, explicit-specification, and expanded-grid candidates
 before normalization; this prevents an arbitrarily large duplicate input from
 bypassing the distinct-specification bound.
 
+The specification, grid, and plan print methods show request, metric, method,
+and parameter identity without dumping the internal canonical identity string.
+Long vector parameters are abbreviated for display only. Printing never
+changes or truncates the stored object.
+
 Profile rows make the method's advisory default floor explicit as
 \code{default_quality_floor_tokens}. Independently requested screens are
 non-censoring: they do not change a metric value, effective parameter, status, or
@@ -160,6 +178,9 @@ grid <- lexdiv_grid(
   request_id_prefix = "mattr"
 )
 plan <- lexdiv_plan(presets = character(), specs = mattr_25, grids = grid)
+print(mattr_25)
+print(grid)
+print(plan)
 
 tokens <- rep(c("a", "b", "a", "c", "d"), 25)
 profile <- lexdiv_profile(tokens, plan)

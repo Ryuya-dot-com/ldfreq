@@ -36,7 +36,7 @@
 #'
 #' @return A character vector in default result order.
 #' @export
-lexdiv_overlap_measure_ids <- function() {
+lexdiv_overlap_ids <- function() {
   .lexoverlap_registry$measure_id
 }
 
@@ -54,7 +54,7 @@ lexdiv_overlap_measure_ids <- function() {
   if (anyDuplicated(measures)) {
     stop("measures must not contain duplicates.", call. = FALSE)
   }
-  unknown <- setdiff(measures, lexdiv_overlap_measure_ids())
+  unknown <- setdiff(measures, lexdiv_overlap_ids())
   if (length(unknown) > 0L) {
     stop(
       sprintf("Unknown overlap measure ID(s): %s.", paste(unknown, collapse = ", ")),
@@ -357,7 +357,7 @@ lexdiv_overlap_measure_ids <- function() {
 #'   per element. Missing, empty, invalid-UTF-8, `bytes`-marked, or
 #'   `latin1`-marked elements invalidate the pair; they are not silently
 #'   removed.
-#' @param measures A duplicate-free vector from [lexdiv_overlap_measure_ids()].
+#' @param measures A duplicate-free vector from [lexdiv_overlap_ids()].
 #' @param document_ids Two distinct non-empty path-free identifiers for A and B.
 #' @param details Either `"counts"` (the default) or `"terms"`. Term details
 #'   retain shared and side-unique lexical items in the result object and should
@@ -374,7 +374,7 @@ lexdiv_overlap_measure_ids <- function() {
 lexdiv_term_overlap <- function(
     terms_a,
     terms_b,
-    measures = lexdiv_overlap_measure_ids(),
+    measures = lexdiv_overlap_ids(),
     document_ids = c("text_a", "text_b"),
     details = "counts") {
   .lexoverlap_term_overlap_impl(
@@ -390,7 +390,7 @@ lexdiv_term_overlap <- function(
 .lexoverlap_term_overlap_impl <- function(
     terms_a,
     terms_b,
-    measures = lexdiv_overlap_measure_ids(),
+    measures = lexdiv_overlap_ids(),
     document_ids = c("text_a", "text_b"),
     details = "counts",
     warn_likely_raw_text) {
@@ -781,7 +781,7 @@ lexdiv_content_overlap <- function(
     x,
     y,
     unit = "lemma",
-    measures = lexdiv_overlap_measure_ids(),
+    measures = lexdiv_overlap_ids(),
     document_ids = c("text_a", "text_b"),
     details = "counts",
     mismatch = "error") {

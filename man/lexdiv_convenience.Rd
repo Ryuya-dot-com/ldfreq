@@ -7,8 +7,9 @@
 \alias{plot.lexdiv_batch_results}
 \alias{plot.lexdiv_profile_results}
 \alias{plot.lexdiv_profile_batch_results}
+\alias{plot.lexdiv_text_results}
 \alias{plot.lexdiv_screen_results}
-\alias{plot.tubelex_frequency_profile}
+\alias{plot.tubelex_profile}
 \title{Adapt, Reshape, and Plot Lexical-Diversity Results}
 \usage{
 lexdiv_as_documents(
@@ -77,6 +78,8 @@ lexdiv_widen(
   ...
 )
 
+\method{plot}{lexdiv_text_results}(x, ...)
+
 \method{plot}{lexdiv_screen_results}(
   x,
   screen_id = NULL,
@@ -88,7 +91,7 @@ lexdiv_widen(
   ...
 )
 
-\method{plot}{tubelex_frequency_profile}(
+\method{plot}{tubelex_profile}(
   x,
   col = "#0072B2",
   main = "TUBELEX match coverage",
@@ -140,6 +143,9 @@ cells are rejected rather than silently aggregated.
 Metric plots include only finite rows with \code{status = "ok"}. TUBELEX plots
 show token- and type-weighted match coverage on a fixed zero-to-one scale. All
 plot methods return the plotted data invisibly for testing and reuse.
+\code{plot.lexdiv_text_results()} delegates to the unchanged
+\code{results} component, so it accepts the same metric-selection arguments
+and does not plot preprocessing coverage on a metric scale.
 }
 \value{
 \code{lexdiv_as_documents()} returns a plain named list of plain character
@@ -158,6 +164,9 @@ lexdiv_widen(long, values_from = "value")
 
 plot(long, metric_id = "ttr")
 
-profile <- tubelex_frequency_profile(c("the", "not-in-resource"))
+text_result <- lexdiv_metrics_text("Words repeat words.", metrics = "ttr")
+plot(text_result)
+
+profile <- tubelex_profile(c("the", "not-in-resource"))
 plot(profile)
 }

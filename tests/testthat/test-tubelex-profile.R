@@ -1,5 +1,5 @@
 profile_lookup_function <- getFromNamespace(
-  ".tubelex_frequency_profile",
+  ".tubelex_profile",
   "ldfreq"
 )
 profile_resource_ref <- getFromNamespace(".lexres_resource_ref", "ldfreq")
@@ -43,7 +43,7 @@ test_that("TUBELEX query normalization is explicit and coverage-aware", {
     loader = synthetic_profile_tubelex_load
   )
 
-  expect_s3_class(normalized, "tubelex_frequency_profile")
+  expect_s3_class(normalized, "tubelex_profile")
   expect_identical(normalized$status, "ok")
   expect_identical(normalized$lookup$term, c("Apple", "apple", "missing"))
   expect_identical(normalized$lookup$lookup_term, c("apple", "apple", "missing"))

@@ -59,19 +59,19 @@ flemma_text <- lexdiv_metrics_text(
   unit = "flemma",
   metrics = "ttr"
 )
-frequency <- tubelex_frequency_profile(tokenization)
+frequency <- tubelex_profile(tokenization)
 synthetic_levels <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
   Word = c("the", "see", "cat", "saw"),
   stringsAsFactors = FALSE
 )
-level_profile <- new_jacet8000_profile(
+level_profile <- nj8_profile(
   flemma_annotation,
   synthetic_levels,
   unit = "flemma",
   flemma_conflict = "antbnc"
 )
-level_profile_batch <- new_jacet8000_profile_batch(
+level_profile_batch <- nj8_profile_batch(
   list(document_a = flemma_annotation, document_b = flemma_annotation),
   synthetic_levels,
   unit = "flemma",

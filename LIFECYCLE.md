@@ -45,6 +45,14 @@ removal. A replacement and migration path must be named. During the pre-1.0
 period, an unavoidable breaking change increments the minor package version and
 is called out prominently.
 
+Version 0.2.0 is a one-time naming reset before the package's first CRAN
+submission. It removes four pre-release function-name families and their
+resource-specific result classes without compatibility aliases; the exact
+migration map is recorded in `NEWS.md` and the repository release records.
+This explicit minor version change does not redefine a measurement method,
+formula, denominator, resource contract, or result column, and it does not
+waive the deprecation policy for later releases.
+
 ## Separate preprocessing and resource surfaces
 
 Raw-text tokenization and resource-backed lookup/results use separate functions

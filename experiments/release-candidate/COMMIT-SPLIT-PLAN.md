@@ -72,8 +72,8 @@ inst/spec/tubelex-frequency-profile-contract.schema.json
 man/lexdiv_flemmatize.Rd
 man/lexdiv_preprocessing.Rd
 man/lexdiv_variant_metrics.Rd
-man/new_jacet8000_profile.Rd
-man/tubelex_frequency_profile.Rd
+man/nj8_profile.Rd
+man/tubelex_profile.Rd
 tests/testthat/helper-antbnc.R
 tests/testthat/test-level-profile.R
 tests/testthat/test-preprocessing.R
@@ -111,12 +111,12 @@ with all available suggested packages installed.
 Stage these paths together:
 
 ```text
-DEVELOPMENT.md
+development/DEVELOPMENT.md
 LIFECYCLE.md
 NEWS.md
 README.md
-RELEASE-CANDIDATE.md
-RELEASE-CHECKLIST.md
+development/RELEASE-CANDIDATE.md
+development/RELEASE-CHECKLIST.md
 experiments/release-candidate/COMMIT-SPLIT-PLAN.md
 inst/CITATION
 inst/examples/offline-smoke.R

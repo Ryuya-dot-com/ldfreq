@@ -37,6 +37,13 @@ signature/attestation, or publication steps below.
 
 ## 2. Audit public scope
 
+- [ ] Regenerate the export inventory in `API-SURFACE.md`; confirm that every
+      export has one documented role, return boundary, appropriate S3
+      interactions, and an explicit analysis-ready data path.
+- [ ] Build the complete pkgdown site with examples and vignettes enabled;
+      require clean URL, article, and reference metadata diagnostics, and
+      confirm that repository-only development and release records are not
+      rendered as public pages.
 - [ ] Inspect the candidate tree and all reachable refs for accidental corpus,
       credential, generated-result, cache, or local-environment files.
 - [ ] Confirm that no COCA or ELLIPSE payload, no redistributability-restricted
@@ -44,7 +51,7 @@ signature/attestation, or publication steps below.
       derived from an unapproved resource is in the repository, package,
       release assets, examples, or vignettes.
 - [ ] Confirm that no New JACET 8000 list bytes or reconstructable full-list
-      output is bundled. Exercise `new_jacet8000_profile()` only with
+      output is bundled. Exercise `nj8_profile()` only with
       project-authored synthetic fixtures or a legitimately obtained
       caller-authorized local copy.
 - [ ] Confirm that no AntBNC payload, full mapping, or derived reconstructable

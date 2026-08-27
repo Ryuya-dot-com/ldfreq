@@ -1,5 +1,8 @@
 # Contributing to ldfreq
 
+Proposed exports must use a consistent, discoverable vocabulary. Maintainers
+apply the repository-local API naming gate before accepting a new export.
+
 `ldfreq` treats a lexical metric as a measurement contract, not just a formula.
 Changes to metric definitions, defaults, missingness, parameter handling, or
 output identity therefore require matching tests and specification updates.

@@ -1,18 +1,19 @@
 # Release-candidate boundary
 
 The lexical-diversity core remains resource-independent and accepts ordered
-pre-tokenized vectors. The `0.1.1` patch release candidate retains the twelve
+pre-tokenized vectors. The `0.2.0` minor release candidate retains the twelve
 core methods, including the deterministic expected-TTR D fit, and the separate
 versioned contracts for raw-text preprocessing, TUBELEX profiles, selected
 Maas and sequential-MTLD sensitivity variants, and caller-supplied lexical
-levels. It adds a separately contracted lexical-overlap API. These extensions
-leave the twelve-method core contract unchanged. Package version `0.1.1` does
+levels. It adds a separately contracted lexical-overlap API and performs the
+pre-CRAN canonical naming reset recorded in `API-NAMING.md`. These changes
+leave the twelve-method core contract unchanged. Package version `0.2.0` does
 not imply that unchanged method contracts have been renumbered. The package
 does not claim compatibility with TAALES, TAALED, CLAN VOCD, or another
 package's same-named variant beyond each row's explicit comparison scope.
 
-The lexical-level profile is resource-decoupled: `new_jacet8000_profile()` and
-`new_jacet8000_profile_batch()`
+The lexical-level profile is resource-decoupled: `nj8_profile()` and
+`nj8_profile_batch()`
 accept only a caller-supplied data frame, local CSV, or official-layout local
 XLSX, compute Level 1--8
 exact/cumulative token and type rates, and never bundles, downloads, or returns
@@ -32,10 +33,11 @@ comparison key. Raw AntBNC remains an NWLC approximation rather than a
 compatibility claim. New JACET integration must retain per-token
 AntBNC/override/identity rules and selectable headword-conflict resolution.
 
-## Before publishing version 0.1.1
+## Before publishing version 0.2.0
 
 - exercise the package on R-release and R-devel across Linux, macOS, and Windows;
-- preserve the frozen twelve-method public API and lifecycle policy;
+- preserve the frozen twelve-method measurement API and the revised canonical
+  function names in `API-NAMING.md`;
 - complete an online `R CMD check --as-cran` with release metadata;
 - review documentation, examples, spelling, URLs, and package contents;
 - preserve the expected-TTR D method identity, deterministic fit, diagnostics,
@@ -72,7 +74,7 @@ as additional assurance but is not required for a single-maintainer release.
 NGSL and Open English WordNet remain separate future work. TUBELEX-EN is
 included as a maintainer-approved bundled resource: its exact
 source, manifest, artifact/content hashes, provenance, BSD notice, and installed
-paths are fixed. The exported `tubelex_frequency_profile()` has a normative
+paths are fixed. The exported `tubelex_profile()` has a normative
 0.1.0 measurement contract and
 wrapper applies an explicit identity or TUBELEX-oriented query transform,
 retains original and lookup terms, reports token/type coverage and

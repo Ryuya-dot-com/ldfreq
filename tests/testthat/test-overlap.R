@@ -19,7 +19,7 @@ overlap_annotate <- function(
 
 test_that("overlap measure identifiers and result columns are explicit", {
   expect_identical(
-    lexdiv_overlap_measure_ids(),
+    lexdiv_overlap_ids(),
     c(
       "jaccard_types", "dice_types", "a_covered_by_b_types",
       "b_covered_by_a_types", "overlap_coefficient_types"
@@ -705,7 +705,7 @@ test_that("installed overlap contract matches measures and privacy behavior", {
   expect_identical(contract$contract_id, "ldfreq-lexical-overlap")
   expect_identical(contract$contract_version, "0.1.0")
   expect_identical(contract$status, "normative")
-  expect_identical(measure_ids, lexdiv_overlap_measure_ids())
+  expect_identical(measure_ids, lexdiv_overlap_ids())
   expect_identical(method_ids, result$summary$method_id)
   expect_identical(
     unlist(contract$content_words$upos, use.names = FALSE),

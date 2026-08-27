@@ -1,3 +1,27 @@
+# ldfreq 0.2.0
+
+## Pre-CRAN API naming reset
+
+- Renamed `new_jacet8000_profile()` and its batch form to `nj8_profile()` and
+  `nj8_profile_batch()`. The shorter resource name avoids the R constructor-like
+  `new_` prefix while help continues to spell out New JACET 8000.
+- Renamed `tubelex_frequency_profile()` to `tubelex_profile()` because the
+  TUBELEX-branded surface has no competing profile operation.
+- Renamed `lexdiv_overlap_measure_ids()` to `lexdiv_overlap_ids()` to match the
+  existing `lexdiv_metric_ids()` and `lexdiv_variant_ids()` catalog pattern.
+- Renamed the corresponding result classes and S3 registrations. The previous
+  pre-release names are not retained as aliases, so autocomplete and installed
+  help expose one canonical vocabulary. Formulas, denominators, resource
+  contracts, result columns, and numerical values are unchanged.
+- Synchronized the canonical names across README examples, installed help,
+  vignettes, the offline smoke example, and pkgdown navigation. The generated
+  site now indexes every public help topic while limiting home pages to public
+  user and contributor documentation.
+- Added concise, lossless print methods for method specifications, grids, and
+  plans, and made `plot()` on a raw-text metric result delegate to its
+  unchanged core result table. Plot methods continue to return the displayed
+  data invisibly for reuse.
+
 # ldfreq 0.1.1
 
 ## New overlap API
@@ -78,11 +102,11 @@
   are formula comparators, not end-to-end compatibility claims.
 - Added bounded method specifications, parameter grids, request plans,
   multi-document profiles, and independent token-length screens.
-- Added `new_jacet8000_profile()` and its batch and plot methods for a
+- Added `nj8_profile()` and its batch and plot methods for a
   caller-supplied New JACET 8000 list. Exact and cumulative Level 1--8 token
   and type rates retain off-list items in the denominator. The package neither
   bundles nor downloads the list.
-- Added `tubelex_frequency_profile()` with explicit query normalization,
+- Added `tubelex_profile()` with explicit query normalization,
   lossless matched and unmatched rows, token and type coverage, and
   matched-only frequency and prevalence summaries.
 - Added the slim TUBELEX-EN aggregate with its BSD-3-Clause notice,

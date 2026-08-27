@@ -192,7 +192,7 @@ to public provenance or results.
 This is an explicit approximation boundary. NWLC reports using a manually
 modified AntBNC mapping aligned to its selected word lists. Raw AntBNC can map
 a surface form that is an independent New JACET headword to a different family
-lemma. `new_jacet8000_profile()` records these conflicts and lets an analysis
+lemma. `nj8_profile()` records these conflicts and lets an analysis
 retain AntBNC, prefer the word-list headword, or stop for explicit review.
 
 ## Length and parameter sensitivity
@@ -270,7 +270,7 @@ and register than by learner proficiency. The TUBELEX output is therefore named
 as frequency and prevalence, not as an unqualified sophistication score.
 
 ```{r}
-frequency <- tubelex_frequency_profile(tokenization)
+frequency <- tubelex_profile(tokenization)
 frequency$summary
 frequency$coverage
 frequency$provenance$formula_parameters
@@ -307,12 +307,12 @@ BNC and COCA evidence plus Japanese educational materials. The workbook labels
 the entries as representative lemmas. This is a ranked pedagogical list, not
 the same estimand as a TUBELEX mean frequency.
 
-`new_jacet8000_profile()` accepts a list supplied by the user; `ldfreq` does
+`nj8_profile()` accepts a list supplied by the user; `ldfreq` does
 not bundle or download it. The example below uses a small synthetic fixture,
 not the JACET list.
 
 The downloaded workbook can be passed directly as
-`new_jacet8000_profile(annotated, "j8_2016.xlsx", unit = "lemma")` when
+`nj8_profile(annotated, "j8_2016.xlsx", unit = "lemma")` when
 `readxl` is installed. Its embedded notice permits personal research use
 with citation and asks commercial users to consult JACET in advance. Public
 download availability does not itself grant a downstream redistribution
@@ -323,7 +323,7 @@ synthetic_nj8 <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
   Word = c("the", "develop", "rare", "extreme")
 )
-level_profile <- new_jacet8000_profile(
+level_profile <- nj8_profile(
   c("The", "develop", "rare", "outside", "the"),
   synthetic_nj8,
   unit = "surface"
@@ -337,7 +337,7 @@ list once. The following synthetic example uses surface units so both documents
 share the same input contract without inventing lemma annotations.
 
 ```{r}
-level_batch <- new_jacet8000_profile_batch(
+level_batch <- nj8_profile_batch(
   list(
     document_a = c("The", "develop", "rare"),
     document_b = c("extreme", "outside")

@@ -1,7 +1,7 @@
 Package: ldfreq
 Type: Package
 Title: Reproducible Lexical Diversity and Frequency Profiles
-Version: 0.1.1
+Version: 0.2.0
 Authors@R:
     person(
         given = "Ryuya",
@@ -23,7 +23,8 @@ Description: Computes twelve versioned lexical-diversity metrics from ordered to
     Convenience adapters accept tidy token tables and 'quanteda' token objects;
     deterministic wide reshaping and base-R plots support analysis workflows.
 License: MIT + file LICENSE
-URL: https://github.com/Ryuya-dot-com/ldfreq
+URL: https://ryuya-dot-com.github.io/ldfreq/,
+    https://github.com/Ryuya-dot-com/ldfreq
 BugReports: https://github.com/Ryuya-dot-com/ldfreq/issues
 Depends:
     R (>= 4.1.0)

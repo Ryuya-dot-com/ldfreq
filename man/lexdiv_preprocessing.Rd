@@ -189,5 +189,5 @@ if (requireNamespace("textstem", quietly = TRUE)) {
 }
 }
 \seealso{\code{\link{lexdiv_flemmatize}}, \code{\link{lexdiv_metrics}},
-\code{\link{tubelex_frequency_profile}}}
+\code{\link{tubelex_profile}}}
 \keyword{text}

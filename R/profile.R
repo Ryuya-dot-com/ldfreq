@@ -570,6 +570,90 @@ lexdiv_plan <- function(
   )
 }
 
+.profile_print_value <- function(value) {
+  if (length(value) == 0L) return("")
+  formatted <- if (is.character(value)) {
+    encodeString(value, quote = "\"")
+  } else {
+    format(value, trim = TRUE, scientific = FALSE)
+  }
+  if (length(formatted) > 5L) {
+    formatted <- c(formatted[seq_len(3L)], "...", formatted[[length(formatted)]])
+  }
+  paste(formatted, collapse = ",")
+}
+
+.profile_parameter_label <- function(parameters) {
+  if (length(parameters) == 0L) return("<none>")
+  paste0(
+    names(parameters),
+    "=",
+    vapply(parameters, .profile_print_value, character(1L)),
+    collapse = "; "
+  )
+}
+
+.profile_print_frame <- function(specifications, include_index = FALSE) {
+  normalized <- lapply(specifications, .profile_normalize_spec_object)
+  output <- data.frame(
+    request_id = vapply(normalized, function(specification) {
+      if (is.null(specification$request_id)) NA_character_ else specification$request_id
+    }, character(1L)),
+    metric_id = vapply(normalized, `[[`, character(1L), "metric_id"),
+    method_id = vapply(normalized, `[[`, character(1L), "method_id"),
+    parameters = vapply(
+      normalized,
+      function(specification) .profile_parameter_label(specification$parameters),
+      character(1L)
+    ),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+  if (include_index) {
+    output <- cbind(request_index = seq_along(normalized), output)
+  }
+  row.names(output) <- NULL
+  output
+}
+
+#' @export
+print.lexdiv_spec <- function(x, ...) {
+  normalized <- .profile_normalize_spec_object(x)
+  cat(sprintf("<lexdiv_spec: %s>\n", normalized$specification_id))
+  print.data.frame(.profile_print_frame(list(normalized)), row.names = FALSE, ...)
+  invisible(x)
+}
+
+#' @export
+print.lexdiv_grid <- function(x, ...) {
+  if (!inherits(x, "lexdiv_grid") || !is.list(x) || length(x) == 0L) {
+    stop("x must be a non-empty lexdiv_grid object.", call. = FALSE)
+  }
+  frame <- .profile_print_frame(x, include_index = TRUE)
+  cat(sprintf(
+    "<lexdiv_grid: %d specification%s>\n",
+    nrow(frame),
+    if (nrow(frame) == 1L) "" else "s"
+  ))
+  print.data.frame(frame, row.names = FALSE, ...)
+  invisible(x)
+}
+
+#' @export
+print.lexdiv_plan <- function(x, ...) {
+  plan <- .profile_validate_plan(x)
+  frame <- .profile_print_frame(plan$specifications, include_index = TRUE)
+  cat(sprintf(
+    "<lexdiv_plan: %d specification%s; schema %s; id %s>\n",
+    nrow(frame),
+    if (nrow(frame) == 1L) "" else "s",
+    plan$plan_schema_version,
+    plan$plan_md5
+  ))
+  print.data.frame(frame, row.names = FALSE, ...)
+  invisible(x)
+}
+
 .profile_validate_plan <- function(plan) {
   if (!inherits(plan, "lexdiv_plan") || !is.list(plan)) {
     stop("plan must be a lexdiv_plan object.", call. = FALSE)

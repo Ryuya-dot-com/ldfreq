@@ -10,8 +10,8 @@ archive and PDF manual must already exist.
 
 ```sh
 Rscript experiments/release-candidate/generate-release-evidence.R \
-  /path/to/ldfreq /path/to/ldfreq_0.1.1.tar.gz \
-  /path/to/ldfreq_0.1.1.pdf /new/evidence-directory
+  /path/to/ldfreq /path/to/ldfreq_0.2.0.tar.gz \
+  /path/to/ldfreq_0.2.0.pdf /new/evidence-directory
 ```
 
 `run-as-cran-check.R` runs `R CMD check --as-cran --no-manual` against one
@@ -26,7 +26,7 @@ checkable without this optional backend.
 
 ```sh
 Rscript experiments/release-candidate/run-as-cran-check.R \
-  /path/to/ldfreq_0.1.1.tar.gz /new/check-directory job-label \
+  /path/to/ldfreq_0.2.0.tar.gz /new/check-directory job-label \
   new-submission-only
 ```
 

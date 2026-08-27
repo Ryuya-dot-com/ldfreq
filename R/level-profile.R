@@ -47,7 +47,7 @@
   .lex_warn_likely_raw_text(
     terms,
     "terms",
-    "new_jacet8000_profile",
+    "nj8_profile",
     "tokenize and, when appropriate, lemmatize the text first"
   )
   Encoding(terms) <- "UTF-8"
@@ -599,7 +599,7 @@
         )
       )
     ),
-    class = c("new_jacet8000_profile", "lexical_level_profile")
+    class = c("nj8_profile", "lexical_level_profile")
   )
 }
 
@@ -697,14 +697,14 @@
 #' @param resource_version Optional caller-supplied version label. If `NULL`, a
 #'   label derived from the canonical rank-entry SHA-256 is used.
 #'
-#' @return A `new_jacet8000_profile` object containing `summary`, lossless query
+#' @return A `nj8_profile` object containing `summary`, lossless query
 #'   `lookup`, token/type `coverage`, resource provenance, and validation
 #'   diagnostics. `summary$proportion` uses all eligible items as its
 #'   denominator; `cumulative_proportion` is the rate at or below each level.
 #'   The installed `lexical-level-profile-contract.json` records the exact
 #'   denominator, normalization, conflict, and resource-boundary rules.
 #' @export
-new_jacet8000_profile <- function(
+nj8_profile <- function(
     terms,
     wordlist,
     rank_column = NULL,
@@ -741,7 +741,7 @@ new_jacet8000_profile <- function(
 #' explicit ID/list-column data frame. The caller-supplied word list is read,
 #' validated, normalized, and hashed once for the whole batch.
 #'
-#' @inheritParams new_jacet8000_profile
+#' @inheritParams nj8_profile
 #' @param documents A plain named list of character vectors or tokenization
 #'   objects, or a data frame with the columns selected by `id_col` and
 #'   `terms_col`.
@@ -750,12 +750,12 @@ new_jacet8000_profile <- function(
 #'   tokenization objects for data-frame input.
 #' @param max_rows Maximum combined number of summary and token-lookup rows.
 #'
-#' @return A `new_jacet8000_profile_batch` object with document-major summary
+#' @return A `nj8_profile_batch` object with document-major summary
 #'   and lookup tables, one coverage and diagnostic row per document, explicit
 #'   exclusions, shared resource provenance, and document preprocessing
 #'   provenance.
 #' @export
-new_jacet8000_profile_batch <- function(
+nj8_profile_batch <- function(
     documents,
     wordlist,
     rank_column = NULL,
@@ -901,20 +901,20 @@ new_jacet8000_profile_batch <- function(
       resource_diagnostics = prepared$diagnostics
     ),
     class = c(
-      "new_jacet8000_profile_batch",
+      "nj8_profile_batch",
       "lexical_level_profile_batch"
     )
   )
 }
 
 #' @export
-print.new_jacet8000_profile_batch <- function(x, ...) {
+print.nj8_profile_batch <- function(x, ...) {
   document_count <- nrow(x$coverage)
   token_count <- sum(x$coverage$eligible_tokens)
   conflict_count <- sum(x$document_diagnostics$flemma_headword_conflicts)
   cat(sprintf(
     paste0(
-      "<new_jacet8000_profile_batch: %d document%s; %s eligible token%s; ",
+      "<nj8_profile_batch: %d document%s; %s eligible token%s; ",
       "unit=%s; conflicts=%s>\n"
     ),
     document_count,
@@ -941,7 +941,7 @@ print.lexical_level_profile <- function(x, ...) {
     sprintf("%.1f%%", 100 * token_coverage)
   }
   cat(sprintf(
-    "<new_jacet8000_profile> status=%s | token coverage=%s | unit=%s\n",
+    "<nj8_profile> status=%s | token coverage=%s | unit=%s\n",
     x$status,
     coverage_label,
     x$provenance$selected_unit
@@ -956,7 +956,7 @@ print.lexical_level_profile <- function(x, ...) {
 #' cumulative profile through Level 8. The off-list bar is shown separately and
 #' is not appended to the cumulative curve.
 #'
-#' @param x A result returned by [new_jacet8000_profile()].
+#' @param x A result returned by [nj8_profile()].
 #' @param weighting Either `"token"` or `"type"`.
 #' @param scale Plot exact and cumulative `"proportion"` values or `"count"`
 #'   values.

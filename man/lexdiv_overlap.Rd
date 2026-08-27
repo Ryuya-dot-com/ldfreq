@@ -1,6 +1,6 @@
 \name{lexdiv_overlap}
 \alias{lexdiv_overlap}
-\alias{lexdiv_overlap_measure_ids}
+\alias{lexdiv_overlap_ids}
 \alias{lexdiv_term_overlap}
 \alias{lexdiv_content_overlap}
 \title{Compute Exact Type Overlap Between Two Texts}
@@ -10,12 +10,12 @@ from two exact term sets. A separate adapter selects explicitly annotated
 Universal POS content words before applying the same term core.
 }
 \usage{
-lexdiv_overlap_measure_ids()
+lexdiv_overlap_ids()
 
 lexdiv_term_overlap(
   terms_a,
   terms_b,
-  measures = lexdiv_overlap_measure_ids(),
+  measures = lexdiv_overlap_ids(),
   document_ids = c("text_a", "text_b"),
   details = "counts"
 )
@@ -24,7 +24,7 @@ lexdiv_content_overlap(
   x,
   y,
   unit = "lemma",
-  measures = lexdiv_overlap_measure_ids(),
+  measures = lexdiv_overlap_ids(),
   document_ids = c("text_a", "text_b"),
   details = "counts",
   mismatch = "error"
@@ -36,7 +36,7 @@ unit per element. Missing or empty terms, invalid UTF-8, and
 \code{bytes}- or \code{latin1}-marked strings invalidate the pair instead of
 being silently removed.}
 \item{measures}{A non-empty, duplicate-free vector from
-\code{lexdiv_overlap_measure_ids()}.}
+\code{lexdiv_overlap_ids()}.}
 \item{document_ids}{Two distinct, path-free, plain, non-empty valid-UTF-8
 identifiers for documents A and B. Control characters are not accepted.}
 \item{details}{Either \code{"counts"}, which does not retain lexical items, or
@@ -155,7 +155,7 @@ the privacy boundary. Locate it with \code{system.file("spec",
 "lexical-overlap-contract.json", package = "ldfreq")}.
 }
 \value{
-\code{lexdiv_overlap_measure_ids()} returns a character vector.
+\code{lexdiv_overlap_ids()} returns a character vector.
 \code{lexdiv_term_overlap()} returns a \code{lexdiv_term_overlap} object;
 \code{lexdiv_content_overlap()} returns a \code{lexdiv_content_overlap}
 object. Both also inherit from \code{lexdiv_overlap}.

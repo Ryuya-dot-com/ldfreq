@@ -34,8 +34,11 @@ reference:
       - lexdiv_screen
   - title: Reference-resource profiles
     contents:
-      - new_jacet8000_profile
-      - tubelex_frequency_profile
+      - nj8_profile
+      - tubelex_profile
+  - title: Output and visualization
+    contents:
+      - lexdiv_convenience
   - title: Evidence
     contents:
       - lexdiv_length_evidence

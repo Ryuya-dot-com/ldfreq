@@ -55,7 +55,7 @@ override version.
 
 The raw AntBNC list is only an approximation to New Word Level Checker (NWLC)
 processing. NWLC uses a manually modified AntBNC mapping aligned to its selected
-word lists. Use \code{new_jacet8000_profile()} conflict diagnostics and explicit
+word lists. Use \code{nj8_profile()} conflict diagnostics and explicit
 overrides rather than claiming unverified NWLC equivalence.
 }
 \section{Resource and path boundary}{
@@ -120,6 +120,6 @@ lexdiv_metrics_text(real_flemmas, unit = "flemma", metrics = "ttr")
 }
 \seealso{
 \code{\link{lexdiv_preprocessing}},
-\code{\link{new_jacet8000_profile}}
+\code{\link{nj8_profile}}
 }
 \keyword{text}

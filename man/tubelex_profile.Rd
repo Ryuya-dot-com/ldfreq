@@ -1,12 +1,12 @@
-\name{tubelex_frequency_profile}
-\alias{tubelex_frequency_profile}
+\name{tubelex_profile}
+\alias{tubelex_profile}
 \title{Coverage-aware TUBELEX frequency and prevalence profile}
 \description{
 Look up surface-form frequency, video prevalence, and channel prevalence in the
 byte-pinned TUBELEX-EN Treebank aggregate bundled with \pkg{ldfreq}.
 }
 \usage{
-tubelex_frequency_profile(terms, normalization = "tubelex")
+tubelex_profile(terms, normalization = "tubelex")
 }
 \arguments{
 \item{terms}{A plain ordered character vector, or an object returned by
@@ -84,14 +84,14 @@ integrity check. \code{failure_reason} is missing for \code{"ok"} and
 missing when its denominator is zero or the lookup could not be completed.
 }
 \value{
-A \code{tubelex_frequency_profile} list containing \code{status},
+A \code{tubelex_profile} list containing \code{status},
 \code{failure_reason}, token- and type-weighted \code{summary}, lossless
 \code{lookup} rows, \code{coverage}, versioned \code{provenance}, and
 \code{diagnostics}.
 }
 \examples{
 tokens <- lexdiv_tokenize("The apple and the missingword.")
-profile <- tubelex_frequency_profile(tokens)
+profile <- tubelex_profile(tokens)
 profile$summary
 profile$coverage
 profile$lookup

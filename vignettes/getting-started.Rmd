@@ -131,12 +131,12 @@ overrides.
 
 ## Corpus-relative frequency with coverage
 
-`tubelex_frequency_profile()` applies either an explicit source-aligned query
+`tubelex_profile()` applies either an explicit source-aligned query
 normalization or identity matching. It returns original terms, lookup terms,
 unmatched rows, token/type coverage, and matched-only conditional summaries.
 
 ```{r}
-frequency <- tubelex_frequency_profile(tokenization)
+frequency <- tubelex_profile(tokenization)
 frequency$summary
 frequency$coverage
 frequency$lookup
@@ -149,7 +149,7 @@ lexical sophistication.
 
 ## Caller-supplied lexical frequency levels
 
-`new_jacet8000_profile()` maps ranks in a caller-supplied New JACET 8000 table
+`nj8_profile()` maps ranks in a caller-supplied New JACET 8000 table
 to eight 1,000-rank levels. The package contains no copy of the list and never
 downloads one. Exact and cumulative token/type rates keep off-list items in the
 denominator. The official `j8_2016.xlsx` workbook can be passed directly; its
@@ -160,7 +160,7 @@ synthetic_nj8 <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
   Word = c("the", "develop", "rare", "extreme")
 )
-levels <- new_jacet8000_profile(annotated, synthetic_nj8, unit = "lemma")
+levels <- nj8_profile(annotated, synthetic_nj8, unit = "lemma")
 levels$summary
 levels$coverage
 ```

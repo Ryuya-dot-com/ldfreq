@@ -262,7 +262,7 @@ TUBELEX values are returned as corpus-relative frequency/prevalence
 measurements with adjacent coverage, not as a universal sophistication score.
 
 ```r
-frequency <- tubelex_frequency_profile(tokenization)
+frequency <- tubelex_profile(tokenization)
 frequency$summary
 frequency$coverage
 frequency$lookup
@@ -273,7 +273,7 @@ smoothed base-10 per-billion token score; `video_prevalence` and
 `channel_prevalence` are smoothed base-10 log proportions. Negative prevalence
 values are therefore expected, and values closer to zero indicate wider
 prevalence. Exact formulas and denominators are documented in
-`?tubelex_frequency_profile` and returned in
+`?tubelex_profile` and returned in
 `frequency$provenance$formula_parameters`.
 
 New JACET 8000 level profiles use a caller-supplied list. `ldfreq` does not
@@ -284,7 +284,7 @@ The official workbook is linked from the
 [Ishikawa Laboratory vocabulary page](https://language.sakura.ne.jp/s/voc.html).
 
 ```r
-level_profile <- new_jacet8000_profile(
+level_profile <- nj8_profile(
   annotated,
   "/path/to/j8_2016.xlsx",
   unit = "lemma"
@@ -296,13 +296,13 @@ plot(level_profile)                    # token proportions + cumulative curve
 plot(level_profile, weighting = "type")
 ```
 
-For a corpus, `new_jacet8000_profile_batch()` accepts an explicitly named list
+For a corpus, `nj8_profile_batch()` accepts an explicitly named list
 or an ID/list-column data frame. It validates and hashes the external list once,
 preserves document order, and returns document-major summary, lookup, coverage,
 conflict, exclusion, and preprocessing-provenance tables.
 
 ```r
-level_batch <- new_jacet8000_profile_batch(
+level_batch <- nj8_profile_batch(
   list(
     document_a = annotated,
     document_b = lexdiv_tokenize("A second short document.")
@@ -370,8 +370,7 @@ surface/lemma/flemma sensitivity, the Maas/MTLD variant crosswalk, word inclusio
 exact content-word overlap, plus coverage-aware TUBELEX and New JACET 8000
 level-profile use.
 
-See the repository
-[`LIFECYCLE.md`](https://github.com/Ryuya-dot-com/ldfreq/blob/main/LIFECYCLE.md)
+See [`LIFECYCLE.md`](LIFECYCLE.md)
 for the method, schema, deprecation, and future-surface rules defined for the
 `0.1.x` line.
 
