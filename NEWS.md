@@ -80,6 +80,10 @@
 
 ## Corrections and validation
 
+- Made the documented-public-API audit part of ordinary pull-request CI, not
+  only the exact-candidate path. Release-state classification now fails on an
+  inconsistent package/scope/version or an unknown status instead of silently
+  treating malformed candidate metadata as development.
 - Excluded locally rendered pkgdown output from source-package builds and
   removed a documentation hyperlink whose upstream server rejects automated
   availability checks. The authoritative resource name and source remain

@@ -37,16 +37,23 @@ jobs:
           state_package="$(sed -n 's/^Package:[[:space:]]*//p' "$state_file")"
           state_version="$(sed -n 's/^Version:[[:space:]]*//p' "$state_file")"
           state_status="$(sed -n 's/^Status:[[:space:]]*//p' "$state_file")"
-          if test "$state_scope" = "repository-release-evidence" && \
-             test "$package" = "$state_package" && \
-             test "$version" = "$state_version" && \
-             test "$version" = "0.1.0" && \
-             test "$state_status" = "release-candidate"; then
+          if test "$state_scope" != "repository-release-evidence" || \
+             test "$package" != "ldfreq" || \
+             test "$package" != "$state_package" || \
+             test "$version" != "$state_version" || \
+             test "$version" != "0.1.0"; then
+            echo "::error::Release-state metadata is inconsistent with DESCRIPTION."
+            exit 1
+          fi
+          if test "$state_status" = "release-candidate"; then
             echo "is_candidate=true" >> "$GITHUB_OUTPUT"
             echo "Exact repository-only 0.1.0 release-candidate state detected."
-          else
+          elif test "$state_status" = "development"; then
             echo "is_candidate=false" >> "$GITHUB_OUTPUT"
-            echo "Release-candidate state is not applicable to this checkout."
+            echo "Validated repository-only development state."
+          else
+            echo "::error::Status must be development or release-candidate."
+            exit 1
           fi
 
   build-source:

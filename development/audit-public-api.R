@@ -167,7 +167,7 @@ retired_names <- c(
 )
 public_paths <- c(
   "DESCRIPTION", "NAMESPACE", "NEWS.md", "README.md", "R", "man",
-  file.path("inst", "examples"), "vignettes"
+  file.path("inst", "examples"), file.path("inst", "spec"), "vignettes"
 )
 public_files <- unlist(lapply(public_paths, function(path) {
   full_path <- file.path(package_root, path)

@@ -38,6 +38,12 @@ These outputs are technical evidence. A workflow result is not the maintainer's
 final release decision, and expiring Actions artifacts are not the durable
 archive required for publication.
 
+The state classifier is fail-closed: only `development` and
+`release-candidate` are recognized, and the record scope, package, and version
+must agree with `DESCRIPTION`. Ordinary development CI runs the public-API
+integration audit even when exact-candidate artifact jobs are correctly
+skipped.
+
 Additional automated or third-party analyses are useful quality-control layers,
 but they do not replace upstream rights or the maintainer's accountability for
 the release decision.

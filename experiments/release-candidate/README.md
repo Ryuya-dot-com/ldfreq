@@ -11,6 +11,9 @@ matrix. Change the status to `release-candidate` only after every metadata URL
 can be checked without repository credentials and the exact candidate commit is
 otherwise ready to freeze. A private-repository 404 is not an allowed CRAN NOTE
 and must not be hidden by weakening the strict result policy.
+The classifier accepts only `development` and `release-candidate`; a mismatched
+record scope, package, version, or any other status fails the workflow rather
+than falling back to a non-candidate result.
 
 `generate-release-evidence.R` requires a clean checkout and writes a package
 BOM, SPDX dependency SBOM, resource BOM, and release-provenance record. The

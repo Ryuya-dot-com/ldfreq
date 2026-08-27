@@ -69,7 +69,12 @@ These are target settings stored by GitHub, not claims about the current
 configuration of the repository. Record the verified ruleset with each release
 candidate. The matrix jobs retain platform-specific diagnostics; the stable
 `R-CMD-check required` job is the single branch-rule interface and passes only
-when every matrix job passes.
+when every matrix job passes. The ordinary Ubuntu release job also runs the
+repository API audit, so export, S3-help, API-inventory, example, and pkgdown
+navigation drift is blocking during development rather than deferred to an
+exact candidate. The separate release-state classifier accepts only the exact
+development or release-candidate vocabulary and fails on package, version, or
+scope inconsistency.
 
 A status job defined in the same pull request is not by itself a trust anchor:
 the pull request could weaken the workflow and emit the same successful job
