@@ -8,7 +8,9 @@ Look up surface-form frequency, video prevalence, and channel prevalence in the
 byte-pinned TUBELEX-EN Treebank aggregate bundled with \pkg{ldfreq}.
 }
 \usage{
-tubelex_profile(terms, normalization = "tubelex", tokenization_mismatch = "error")
+tubelex_profile(
+  terms, normalization = "tubelex", tokenization_mismatch = "error"
+)
 
 tubelex_profile_batch(
   documents, normalization = "tubelex", tokenization_mismatch = "error",
@@ -48,8 +50,8 @@ rows, checked before resource loading.}
 }
 \details{
 The general-purpose \code{lexdiv_tokenize()} tokenizer retains contractions
-such as \code{don't}, whereas the bundled resource uses Treebank units such
-as \code{do} and \code{n't}. A spelling can match a resource entry even when
+such as \samp{don't}, whereas the bundled resource uses Treebank units such
+as \samp{do} and \samp{n't}. A spelling can match a resource entry even when
 segmentation is inappropriate: 100 percent coverage does not verify alignment.
 Do not extract the surface column merely to bypass the object mismatch check.
 An explicitly allowed mismatch measures sensitivity to a different segmentation;
@@ -89,8 +91,8 @@ The lossless \code{lookup} table contains:
   \code{channel_total + 2}.}
 }
 
-The four normalization constants used to form these three denominators are
-stored in the \code{formula_parameters} component of \code{provenance}. Video
+The \code{formula_parameters} component of \code{provenance} stores the four
+normalization constants used to form these three denominators. Video
 and channel prevalence values are normally non-positive because they are
 base-10 logarithms of smoothed proportions no greater than one; a value closer
 to zero denotes wider prevalence. The \code{summary} means and Zipf standard
