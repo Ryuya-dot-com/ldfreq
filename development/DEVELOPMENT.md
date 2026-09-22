@@ -1,7 +1,7 @@
 # Release-candidate boundary
 
 The lexical-diversity core remains resource-independent and accepts ordered
-pre-tokenized vectors. The initial `0.1.0` release candidate retains the twelve
+pre-tokenized vectors. The current `0.2.0` development version retains the twelve
 core methods, including the deterministic expected-TTR D fit, and the separate
 versioned contracts for raw-text preprocessing, TUBELEX profiles, selected
 Maas and sequential-MTLD sensitivity variants, and caller-supplied lexical
@@ -9,7 +9,9 @@ levels. It adds separately contracted lexical-overlap and many-document
 reference-coverage APIs, a caller-supplied exact-match generic lexical-norm
 profile, and applies the pre-CRAN canonical naming decision
 recorded in `API-NAMING.md`. These changes
-leave the twelve-method core contract unchanged. Package version `0.1.0` does
+retain the twelve-method estimators. The 0.2.0 numerical correction to D is
+recorded in `REVIEW-20260922.md`; preprocessing and TUBELEX contracts advance
+to 0.2.0. Package version `0.2.0` does
 not imply that unchanged method contracts have been renumbered. The package
 does not claim compatibility with TAALES, TAALED, CLAN VOCD, or another
 package's same-named variant beyond each row's explicit comparison scope.
@@ -35,7 +37,7 @@ comparison key. Raw AntBNC remains an NWLC approximation rather than a
 compatibility claim. New JACET integration must retain per-token
 AntBNC/override/identity rules and selectable headword-conflict resolution.
 
-## Before publishing version 0.1.0
+## Before publishing version 0.2.0
 
 - exercise the package on R-release and R-devel across Linux, macOS, and Windows;
 - preserve the frozen twelve-method measurement API and the revised canonical
@@ -89,8 +91,8 @@ NGSL and Open English WordNet remain separate future work. TUBELEX-EN is
 included as a maintainer-approved bundled resource: its exact
 source, manifest, artifact/content hashes, provenance, BSD notice, and installed
 paths are fixed. The exported `tubelex_profile()` has a normative
-0.1.0 measurement contract and
-wrapper applies an explicit identity or TUBELEX-oriented query transform,
+0.2.0 measurement contract and its
+wrapper applies an explicit identity, TUBELEX-oriented, or apostrophe query transform,
 retains original and lookup terms, reports token/type coverage and
 normalization collisions, and leaves unmatched measurements missing rather
 than inventing zero counts. Its non-exported exact-match lower layer remains

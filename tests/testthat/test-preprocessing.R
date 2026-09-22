@@ -710,7 +710,7 @@ test_that("the installed preprocessing contract matches the public implementatio
   schema <- jsonlite::read_json(schema_path, simplifyVector = FALSE)
 
   expect_identical(contract$contract_id, "ldfreq-preprocessing")
-  expect_identical(contract$contract_version, "0.1.0")
+  expect_identical(contract$contract_version, "0.2.0")
   expect_identical(contract$status, "normative")
   expect_identical(contract$public_api, TRUE)
   expect_identical(

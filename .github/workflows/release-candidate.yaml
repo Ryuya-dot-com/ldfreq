@@ -41,13 +41,13 @@ jobs:
              test "$package" != "ldfreq" || \
              test "$package" != "$state_package" || \
              test "$version" != "$state_version" || \
-             test "$version" != "0.1.0"; then
+             test "$version" != "0.2.0"; then
             echo "::error::Release-state metadata is inconsistent with DESCRIPTION."
             exit 1
           fi
           if test "$state_status" = "release-candidate"; then
             echo "is_candidate=true" >> "$GITHUB_OUTPUT"
-            echo "Exact repository-only 0.1.0 release-candidate state detected."
+            echo "Exact repository-only 0.2.0 release-candidate state detected."
           elif test "$state_status" = "development"; then
             echo "is_candidate=false" >> "$GITHUB_OUTPUT"
             echo "Validated repository-only development state."
@@ -110,7 +110,7 @@ jobs:
         run: |
           description <- read.dcf("DESCRIPTION")
           version <- unname(description[[1L, "Version"]])
-          stopifnot(identical(version, "0.1.0"))
+          stopifnot(identical(version, "0.2.0"))
           state <- read.dcf(file.path(
             "experiments", "release-candidate", "state.dcf"
           ))
@@ -124,10 +124,10 @@ jobs:
             unname(state[[1L, "Status"]]),
             "release-candidate"
           ))
-          stopifnot(identical(readLines("NEWS.md", n = 1L), "# ldfreq 0.1.0"))
+          stopifnot(identical(readLines("NEWS.md", n = 1L), "# ldfreq 0.2.0"))
           citation <- paste(readLines(file.path("inst", "CITATION")), collapse = "\n")
           stopifnot(grepl('family = "Komuro"', citation, fixed = TRUE))
-          stopifnot(grepl('R package version 0.1.0', citation, fixed = TRUE))
+          stopifnot(grepl('R package version 0.2.0', citation, fixed = TRUE))
 
       - name: Audit the documented public API surface
         shell: bash
@@ -151,11 +151,11 @@ jobs:
           if (!identical(build_status, 0L)) quit(status = build_status)
           archive <- list.files(
             output_root,
-            pattern = "^ldfreq_0[.]1[.]0[.]tar[.]gz$",
+            pattern = "^ldfreq_0[.]2[.]0[.]tar[.]gz$",
             full.names = TRUE
           )
           stopifnot(length(archive) == 1L)
-          manual <- file.path(output_root, "ldfreq_0.1.0.pdf")
+          manual <- file.path(output_root, "ldfreq_0.2.0.pdf")
           manual_status <- system2(
             file.path(R.home("bin"), "R"),
             c(
@@ -175,7 +175,7 @@ jobs:
           )
           archive <- list.files(
             output_root,
-            pattern = "^ldfreq_0[.]1[.]0[.]tar[.]gz$",
+            pattern = "^ldfreq_0[.]2[.]0[.]tar[.]gz$",
             full.names = TRUE
           )
           status <- system2(
@@ -188,7 +188,7 @@ jobs:
               )),
               shQuote(normalizePath(".", mustWork = TRUE)),
               shQuote(archive),
-              shQuote(file.path(output_root, "ldfreq_0.1.0.pdf")),
+              shQuote(file.path(output_root, "ldfreq_0.2.0.pdf")),
               shQuote(file.path(output_root, "evidence"))
             )
           )
@@ -199,8 +199,8 @@ jobs:
         with:
           name: release-candidate-source
           path: |
-            ${{ runner.temp }}/release-candidate-source/ldfreq_0.1.0.tar.gz
-            ${{ runner.temp }}/release-candidate-source/ldfreq_0.1.0.pdf
+            ${{ runner.temp }}/release-candidate-source/ldfreq_0.2.0.tar.gz
+            ${{ runner.temp }}/release-candidate-source/ldfreq_0.2.0.pdf
             ${{ runner.temp }}/release-candidate-source/evidence/*.json
           if-no-files-found: error
           retention-days: 30
@@ -260,7 +260,7 @@ jobs:
           )
           archive <- list.files(
             candidate_root,
-            pattern = "^ldfreq_0[.]1[.]0[.]tar[.]gz$",
+            pattern = "^ldfreq_0[.]2[.]0[.]tar[.]gz$",
             full.names = TRUE
           )
           stopifnot(length(archive) == 1L)
@@ -294,7 +294,7 @@ jobs:
           )
           archive <- list.files(
             candidate_root,
-            pattern = "^ldfreq_0[.]1[.]0[.]tar[.]gz$",
+            pattern = "^ldfreq_0[.]2[.]0[.]tar[.]gz$",
             full.names = TRUE
           )
           status <- system2(

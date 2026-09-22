@@ -1,8 +1,8 @@
 # Public API surface audit
 
-Status: pre-CRAN audit for package version 0.1.0
+Status: pre-CRAN audit for package version 0.2.0
 
-Audited: 2026-08-27
+Audited: 2026-09-22
 
 This repository-only record checks whether each exported function has a clear
 role, result boundary, batch relationship, standard R interaction, and
@@ -14,6 +14,8 @@ rendered by pkgdown.
 - Keep the 26 existing canonical export names selected for the initial 0.1.0
   release, and add the substantively distinct `lexdiv_reference_coverage()`,
   `lexdiv_mattr_profile()`, and `lexdiv_norm_profile()` APIs.
+- Package 0.2.0 adds `tubelex_profile_batch()` to reuse a verified resource
+  snapshot without a persistent cache or reduced result object.
 - Add no convenience alias and no new exported extractor solely to shorten
   component access.
 - Use custom `print()` only where an object-specific header or bounded display
@@ -63,11 +65,12 @@ rendered by pkgdown.
 | `lexdiv_widen()` | Pure long-to-wide transformation | Preserves document IDs when present | Wide-result method | No | Data frame |
 | `nj8_profile()` | Level summary, lookup, coverage, provenance, diagnostics | Paired with `nj8_profile_batch()` | Level-profile method | One weighting and scale | Named component tables |
 | `nj8_profile_batch()` | Document-major level-profile composite | Explicit batch form | Batch-level method | No: document selection must be explicit | Named component tables with `document_id` |
-| `tubelex_profile()` | Frequency/prevalence summary, lookup, coverage, provenance | Document-scoped | TUBELEX method | Token/type coverage | Named component tables |
+| `tubelex_profile()` | Frequency/prevalence summary, lookup, coverage, provenance | Paired with `tubelex_profile_batch()` | TUBELEX method | Token/type coverage | Named component tables |
+| `tubelex_profile_batch()` | Input-ordered named list of complete frequency profiles | One verified resource snapshot per batch call | Base list | No: choose a document explicitly | Each document retains summary, lookup, coverage, provenance |
 
 ## Documentation and reuse gate
 
-The audit requires all 29 exports to have an installed help alias, an explicit
+The audit requires all 30 exports to have an installed help alias, an explicit
 value section, and an executable example. Shared help topics are acceptable
 when aliases, usage, argument ownership, and return types remain unambiguous.
 Every help topic must appear in the pkgdown reference index.

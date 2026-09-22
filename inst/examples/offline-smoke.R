@@ -101,7 +101,11 @@ flemma_text <- lexdiv_metrics_text(
   unit = "flemma",
   metrics = "ttr"
 )
-frequency <- tubelex_profile(tokenization)
+frequency_terms <- c("the", "cat", "saw", "the", "other", "cat")
+frequency <- tubelex_profile(frequency_terms)
+frequency_batch <- tubelex_profile_batch(list(a = frequency_terms, b = frequency_terms))
+stopifnot(identical(frequency, frequency_batch$a),
+          identical(names(frequency_batch), c("a", "b")))
 synthetic_levels <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
   Word = c("the", "see", "cat", "saw"),

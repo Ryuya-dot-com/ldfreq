@@ -191,12 +191,15 @@ as for the input.
 
 ## Corpus-relative frequency with coverage
 
-`tubelex_profile()` applies either an explicit source-aligned query
-normalization or identity matching. It returns original terms, lookup terms,
+`tubelex_profile()` applies explicit query normalization or identity matching.
+The resource uses Treebank segmentation, which differs from
+`lexdiv_tokenize()`; character-vector alignment is the caller's responsibility.
+It returns original terms, lookup terms,
 unmatched rows, token/type coverage, and matched-only conditional summaries.
 
 ```{r}
-frequency <- tubelex_profile(tokenization)
+# Manually prepared terms illustrate this sentence, not a general tokenizer.
+frequency <- tubelex_profile(c("I", "do", "n't", "think", "it", "'s", "a", "book"))
 frequency$summary
 frequency$coverage
 frequency$lookup
@@ -206,6 +209,13 @@ TUBELEX is a general YouTube subtitle frequency space. Its values describe
 frequency and prevalence relative to that corpus; they are not direct measures
 of proficiency, writing quality, academic register, or context-independent
 lexical sophistication.
+
+Passing a `lexdiv_tokenization` object requires
+`tokenization_mismatch = "allow"` for an explicit sensitivity analysis.
+High coverage alone cannot validate segmentation. For multiple documents,
+`tubelex_profile_batch()` returns a named list of complete profiles while
+loading one verified resource snapshot per call. See
+`vignette("designing-comparisons", package = "ldfreq")` for a worked design.
 
 ## Caller-supplied lexical frequency levels
 

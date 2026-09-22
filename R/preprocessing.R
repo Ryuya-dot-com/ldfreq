@@ -6,7 +6,7 @@
 # metric computation.
 
 .lexprep_contract_id <- "ldfreq-preprocessing"
-.lexprep_contract_version <- "0.1.0"
+.lexprep_contract_version <- "0.2.0"
 .lexprep_tokenizer_id <- "ldfreq-unicode-word-tokenizer"
 .lexprep_tokenizer_version <- "0.1.0"
 .lexprep_flemma_backend_id <- "ldfreq-antbnc-flemma-adapter"
@@ -255,6 +255,21 @@
     all(is.na(value) | validUTF8(value))
 }
 
+.lexprep_token_fingerprint <- function(tokens) {
+  records <- if (nrow(tokens)) {
+    paste(tokens$token_index, tokens$start, tokens$end, tokens$surface,
+      tokens$is_number, sep = "\t", collapse = "\n")
+  } else {
+    ""
+  }
+  digest::digest(charToRaw(enc2utf8(records)), algo = "sha256", serialize = FALSE)
+}
+
+.lexprep_is_sha256 <- function(value) {
+  is.character(value) && !is.object(value) && is.null(attributes(value)) &&
+    length(value) == 1L && !is.na(value) && grepl("^[0-9a-f]{64}$", value)
+}
+
 .lexprep_validate_tokenization <- function(value, argument = "x") {
   if (!.lexprep_is_tokenization(value)) {
     stop(
@@ -309,10 +324,17 @@
 
   provenance <- value$provenance
   provenance_is_valid <-
-    identical(provenance$contract_id, .lexprep_contract_id) &&
+    is.list(provenance) && !is.object(provenance) &&
+      identical(provenance$contract_id, .lexprep_contract_id) &&
       identical(provenance$contract_version, .lexprep_contract_version) &&
       identical(provenance$tokenizer_id, .lexprep_tokenizer_id) &&
       identical(provenance$tokenizer_version, .lexprep_tokenizer_version) &&
+      identical(provenance$token_pattern, .lexprep_token_pattern) &&
+      .lexprep_is_sha256(provenance$source_text_sha256) &&
+      .lexprep_is_sha256(provenance$processed_text_sha256) &&
+      .lexprep_is_sha256(provenance$token_table_sha256) &&
+      .lexprep_is_count(provenance$input_characters) &&
+      .lexprep_is_count(provenance$processed_characters) &&
       .lexprep_is_plain_choice(
         provenance$normalization,
         c("NFC", "NFKC", "none")
@@ -326,7 +348,25 @@
       length(provenance$output_tokens) == 1L &&
       identical(as.double(provenance$output_tokens), as.double(row_count))
   if (!provenance_is_valid) {
-    stop(sprintf("%s has invalid preprocessing provenance.", argument), call. = FALSE)
+    stop(sprintf(
+      "%s has invalid preprocessing provenance; recreate it with lexdiv_tokenize() and reapply annotations.",
+      argument
+    ), call. = FALSE)
+  }
+  surfaces <- value$tokens$surface
+  content_is_valid <-
+    all(value$tokens$end <= provenance$processed_characters) &&
+      all(stringi::stri_detect_regex(surfaces, paste0("^", .lexprep_token_pattern, "$"))) &&
+      identical(surfaces, .lexprep_normalize_text(
+        surfaces, provenance$normalization, provenance$case
+      )) &&
+      (provenance$keep_numbers || !any(value$tokens$is_number)) &&
+      identical(provenance$token_table_sha256, .lexprep_token_fingerprint(value$tokens))
+  if (!content_is_valid) {
+    stop(sprintf(
+      "%s has token content inconsistent with its preprocessing provenance; recreate it with lexdiv_tokenize().",
+      argument
+    ), call. = FALSE)
   }
 
   annotation_columns <- c("lemma", "upos")
@@ -588,6 +628,7 @@ lexdiv_tokenize <- function(
       algo = "sha256",
       serialize = FALSE
     ),
+    token_table_sha256 = .lexprep_token_fingerprint(token_table),
     input_characters = as.double(stringi::stri_length(text)),
     processed_characters = as.double(stringi::stri_length(processed)),
     output_tokens = as.double(nrow(token_table)),

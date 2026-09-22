@@ -24,7 +24,8 @@ lexdiv_widen(
   names_from = NULL,
   values_from = c(
     "value", "status", "missing_reason", "method_id",
-    "below_quality_floor"
+    "below_quality_floor", "metric_contract_id", "metric_contract_version",
+    "requested_parameters", "effective_parameters", "N", "V"
   )
 )
 
@@ -124,7 +125,7 @@ lexdiv_widen(
 \description{
 Provides explicit convenience operations around the versioned computation
 core. Adapters expose document and token order; wide reshaping does not
-recompute values; plot methods select one metric so incompatible metric scales
+recompute values; plot methods select one measurement specification so incompatible metric scales or parameters
 are not silently compared.
 }
 \details{
@@ -135,11 +136,21 @@ tokens object is converted through its registered \code{as.list()} method, so
 not tokenized by this adapter.
 
 \code{lexdiv_widen()} uses profile \code{request_id} values when available,
-which prevents parameter variants of the same metric from colliding. With one
+and checks that every output column has one contract, method, and requested
+parameter identity. A request ID is only a plan-local label; combining plans
+with reused labels and different parameters is rejected. Use
+\code{names_from = "specification_id"} to give those conditions separate
+columns. Default output retains parameters, contract identity, and N/V.
+With one
 \code{values_from} field, the output columns are named directly by metric or
 request. With multiple fields they use \code{ID__field}. Duplicate output
 cells are rejected rather than silently aggregated.
 
+Metric plots require a single specification, including when all rows share
+the same metric ID. Select a request or subset the input by specification.
+Their invisible return contains \code{label} followed by the complete selected
+result rows, including parameter and contract columns. Missing results are
+excluded from displayed points, but still participate in the specification check.
 Metric plots include only finite rows with \code{status = "ok"}. TUBELEX plots
 show token- and type-weighted match coverage on a fixed zero-to-one scale. All
 plot methods return the plotted data invisibly for testing and reuse.
