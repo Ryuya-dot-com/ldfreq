@@ -3,7 +3,7 @@
   "contract_id": "ldfreq-lexical-diversity-core",
   "contract_version": "0.1.0",
   "status": "normative",
-  "reviewed_on": "2026-08-16",
+  "reviewed_on": "2026-09-22",
   "normative": true,
   "normative_authority": "This contract and its hand fixtures are authoritative for the twelve-method core; no Python, R, Java, Web, koRpus, or quanteda implementation is the sole oracle.",
   "input_contract": {
@@ -421,12 +421,14 @@
       "construct": "D parameter fitted to an exact finite-population sample-size/TTR curve",
       "definition": {
         "expected_curve": "y_n = sum_t(1 - choose(N-f_t,n)/choose(N,n)) / n",
-        "probability_evaluation": "group types by increasing integer frequency; for each frequency compute the absent probability by multiplying ((N-f-i)/(N-i)) for i=0,...,n-1 in increasing order; accumulate spectrum_count*(1-absent) in increasing frequency order",
+        "probability_evaluation": "compute delta_n=1-y_n directly as sum_f(V_f*f/N)*sum_{j=1}^{n-1}[1-choose(N-f,j)/choose(N-1,j)]/n; skip f=1, accumulate increasing f; evaluate absence by cumulative log1p(-(f-1)/(N-1-i)) and repeat probability by -expm1",
+        "numerical_correction": "package 0.2.0 replaces cancellation-prone absent-product/subtraction and near-one residuals; the exact expectation, objective and method identity are unchanged; record package version",
+        "stable_residual": "g-y = delta_n - (2*n/D)/(sqrt(1+2*n/D)+1)^2; use this residual for SSE and analytic log-D derivative",
         "model_stable_form": "g(n,D) = 2 / (sqrt(1 + 2*n/D) + 1)",
         "objective": "unweighted sum over requested sample sizes of (g(n,D)-y_n)^2",
         "domain_for_D": "0 < D < infinity; no arbitrary upper or lower censoring",
         "optimizer": [
-          "for each 0<y_n<1 compute D_n = n*y_n*y_n/(2*(1-y_n)) in the written operation order",
+          "for each 0<delta_n<1 compute y_n=1-delta_n and D_n = n*y_n*y_n/(2*delta_n) in the written operation order",
           "bracket log(D) by log(min(D_n)) and log(max(D_n))",
           "bisect the analytic derivative with respect to log(D) exactly 100 times",
           "iterate sample sizes in increasing order and accumulate terms left to right",
@@ -447,7 +449,7 @@
         "optimizer_iterations": {"value": 100, "user_settable": false}
       },
       "computational_domain": {
-        "condition": "N >= max(requested sample_sizes) and all expected TTR values are in (0,1)",
+        "condition": "N >= max(requested sample_sizes) and all expected TTR deficits delta_n=1-y_n are in (0,1)",
         "short_document": "too_short_for_requested_parameter",
         "all_hapax": "unbounded_high",
         "invalid_numeric_fit": "non_convergence"

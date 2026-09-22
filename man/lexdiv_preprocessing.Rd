@@ -138,12 +138,19 @@ The tokenizer arguments \code{normalization}, \code{case}, and
 silently reapplied to, or ignored for, an existing tokenization object.
 }
 \section{Saved-object compatibility}{
-Preprocessing contract \code{0.1.0} validates annotation and provenance,
-including explicit UPOS-backend identity, whenever an object is consumed. If
+Preprocessing contract \code{0.2.0} validates annotation and provenance,
+including explicit UPOS-backend identity, text hashes, character bounds,
+normalization consistency, and a fingerprint of the surface token table,
+whenever an object is consumed. The tokenizer rules remain version 0.1.0.
+Objects saved with preprocessing contract 0.1.0 must be recreated from the
+original text; their token-table fingerprint cannot be recovered as verified
+provenance by simply relabeling the saved object. If
 a saved \code{lexdiv_tokenization} has incomplete, unsupported, or manually
 altered provenance, recreate it from the original text with
 \code{lexdiv_tokenize()} and then reapply annotations with the current
 functions and explicit identities.
+The fingerprint detects ordinary token-table edits; it is not authentication
+and cannot reconstruct or verify the original text from its hash.
 }
 \section{Formal contract}{
 The installed \file{ldfreq-preprocessing-contract.json} file fixes tokenizer,

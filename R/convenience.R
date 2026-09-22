@@ -128,10 +128,33 @@ lexdiv_as_documents <- function(
     return(rep.int("", nrow(frame)))
   }
   pieces <- lapply(frame, function(column) {
-    value <- ifelse(is.na(column), "<NA>", enc2utf8(as.character(column)))
-    paste0(nchar(value, type = "bytes"), ":", value)
+    missing <- is.na(column)
+    value <- ifelse(missing, "", enc2utf8(as.character(column)))
+    paste0(ifelse(missing, "N", "V"), nchar(value, type = "bytes"), ":", value)
   })
   do.call(paste, c(pieces, sep = "|"))
+}
+
+# Method names and plan-local request IDs alone do not identify a measurement.
+# Use the recorded request for missing rows too: their effective parameters are
+# empty, whereas computable rows materialize the same requested parameters.
+.lex_comparison_keys <- function(x) {
+  identity <- c("metric_contract_id", "metric_contract_version", "method_id")
+  required <- c(identity, "requested_parameters", "effective_parameters", "status")
+  if (!all(required %in% names(x))) {
+    stop("Results must retain contract, method, and parameter columns for comparison.", call. = FALSE)
+  }
+  if (!all(vapply(x[identity], function(column) {
+    is.character(column) && !anyNA(column) && all(nzchar(column))
+  }, logical(1L)))) {
+    stop("Results have missing or invalid measurement identity.", call. = FALSE)
+  }
+  requested <- vapply(x$requested_parameters, .profile_parameter_text, character(1L))
+  effective <- vapply(x$effective_parameters, .profile_parameter_text, character(1L))
+  if (any(x$status %in% "ok" & requested != effective)) {
+    stop("Computable results have inconsistent requested and effective parameters.", call. = FALSE)
+  }
+  .lex_wide_group_key(data.frame(x[identity], parameters = requested))
 }
 
 #' Convert long lexical-diversity results to a deterministic wide table
@@ -139,6 +162,9 @@ lexdiv_as_documents <- function(
 #' This is a pure reshaping operation: it never recomputes or changes metric
 #' values. Profile results use `request_id` by default so multiple parameter
 #' settings of one metric remain distinct; other results use `metric_id`.
+#' Within a wide column group, contract, method, and requested parameters must
+#' agree. Request IDs are local to a plan; use `specification_id` or separate
+#' tables for different specifications from independently created plans.
 #'
 #' @param x A lexical-diversity result data frame.
 #' @param id_cols Columns identifying output rows. By default this is
@@ -147,7 +173,8 @@ lexdiv_as_documents <- function(
 #'   for profile results and `metric_id` otherwise.
 #' @param values_from Result columns to widen. With one column, output columns
 #'   use the metric/request IDs directly. With several, names have the form
-#'   `ID__field`.
+#'   `ID__field`. Defaults retain values, status, method, contract, requested and
+#'   effective parameters, quality-floor flags, and token/type counts.
 #'
 #' @return A `lexdiv_wide_results` data frame.
 #' @export
@@ -157,7 +184,8 @@ lexdiv_widen <- function(
     names_from = NULL,
     values_from = c(
       "value", "status", "missing_reason", "method_id",
-      "below_quality_floor"
+      "below_quality_floor", "metric_contract_id", "metric_contract_version",
+      "requested_parameters", "effective_parameters", "N", "V"
     )) {
   if (!is.data.frame(x)) {
     stop("x must be a lexical-diversity result data frame.", call. = FALSE)
@@ -190,6 +218,18 @@ lexdiv_widen <- function(
     row.names(output) <- NULL
     class(output) <- c("lexdiv_wide_results", "data.frame")
     return(output)
+  }
+  measurement_keys <- .lex_comparison_keys(x)
+  for (wide_id in unique(wide_ids)) {
+    if (length(unique(measurement_keys[wide_ids == wide_id])) > 1L) {
+      stop(
+        paste0(
+          "A wide column would mix different measurement specifications. ",
+          "Use distinct specification IDs in names_from or reshape each condition separately."
+        ),
+        call. = FALSE
+      )
+    }
   }
   id_frame <- x[id_cols]
   id_keys <- .lex_wide_group_key(id_frame)
@@ -285,6 +325,15 @@ print.lexdiv_wide_results <- function(x, ...) {
   if (nrow(frame) == 0L) {
     stop("The requested metric/profile selection is absent from x.", call. = FALSE)
   }
+  if (length(unique(.lex_comparison_keys(frame))) != 1L) {
+    stop(
+      paste0(
+        "Select one measurement specification before plotting; ",
+        "use request_id or subset by specification_id/parameters."
+      ),
+      call. = FALSE
+    )
+  }
   ok <- frame$status == "ok" & is.finite(frame$value)
   if (!any(ok)) {
     stop("The requested selection contains no finite ok values to plot.", call. = FALSE)
@@ -309,14 +358,7 @@ print.lexdiv_wide_results <- function(x, ...) {
     col = col, pch = pch, ...
   )
   graphics::axis(1, at = positions, labels = labels)
-  invisible(data.frame(
-    label = labels,
-    metric_id = frame$metric_id,
-    value = frame$value,
-    below_quality_floor = frame$below_quality_floor,
-    stringsAsFactors = FALSE,
-    check.names = FALSE
-  ))
+  invisible(data.frame(label = labels, as.data.frame(frame), check.names = FALSE))
 }
 
 #' Plot lexical-diversity results

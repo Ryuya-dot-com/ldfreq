@@ -1,31 +1,44 @@
 # Public, coverage-aware TUBELEX frequency and prevalence profile.
 
 .tubelex_profile_contract_id <- "ldfreq-tubelex-frequency-profile"
-.tubelex_profile_contract_version <- "0.1.0"
+.tubelex_profile_contract_version <- "0.2.0"
 .tubelex_normalization_ids <- c(
   tubelex = "nfkc-trim-en-lower-v1",
+  tubelex_apostrophe = "nfkc-trim-en-lower-internal-apostrophe-v1",
   identity = "identity-valid-utf8-v1"
 )
 
-.tubelex_profile_terms <- function(terms) {
+.tubelex_profile_terms <- function(terms, tokenization_mismatch) {
   if (.lexprep_is_tokenization(terms)) {
     tokenization <- .lexprep_validate_tokenization(terms)
+    if (identical(tokenization_mismatch, "error")) {
+      stop(
+        paste0(
+          "lexdiv_tokenize() does not use the bundled TUBELEX Treebank segmentation. ",
+          "Supply source-aligned tokens, or explicitly set tokenization_mismatch = ",
+          "\"allow\" for a segmentation-sensitivity analysis. Coverage does not verify alignment."
+        ),
+        call. = FALSE
+      )
+    }
     return(list(
       terms = unname(tokenization$tokens$surface),
       input_source = "lexdiv_tokenization",
-      preprocessing_ref = tokenization$provenance
+      preprocessing_ref = tokenization$provenance,
+      tokenization_alignment = "known_different_tokenizer_explicitly_allowed"
     ))
   }
   .lex_warn_likely_raw_text(
     terms,
     "terms",
     "tubelex_profile",
-    "pass lexdiv_tokenize(text) instead"
+    "supply tokens prepared with the resource's Treebank segmentation instead"
   )
   list(
     terms = terms,
     input_source = "character_terms",
-    preprocessing_ref = NULL
+    preprocessing_ref = NULL,
+    tokenization_alignment = "caller_supplied_terms_unverified"
   )
 }
 
@@ -34,6 +47,15 @@
   output <- stringi::stri_trans_nfkc(terms)
   output <- stringi::stri_trim_both(output)
   output <- stringi::stri_trans_tolower(output, locale = "en")
+  if (identical(normalization, "tubelex_apostrophe")) {
+    # A term-level typography transform, not a raw-text tokenizer. Preserve
+    # trailing quotation marks; convert internal apostrophes and clitic starts.
+    output <- stringi::stri_replace_all_regex(
+      output,
+      "(?:(?<=[\\p{L}\\p{M}\\p{N}])|^)[\u2019\u2032](?=[\\p{L}\\p{M}\\p{N}])",
+      "'"
+    )
+  }
   Encoding(output[!is.na(output)]) <- "UTF-8"
   output
 }
@@ -102,8 +124,9 @@
 .tubelex_profile <- function(
     terms,
     normalization,
-    loader = .lexres_load_tubelex) {
-  input <- .tubelex_profile_terms(terms)
+    loader = .lexres_load_tubelex,
+    tokenization_mismatch = "error") {
+  input <- .tubelex_profile_terms(terms, tokenization_mismatch)
   original_terms <- input$terms
   validated <- .lexres_lookup_input(original_terms)
   if (isTRUE(validated$ok)) {
@@ -153,9 +176,11 @@
     lookup = lookup$lookup_ref,
     input_source = input$input_source,
     preprocessing_ref = input$preprocessing_ref,
+    tokenization_alignment = input$tokenization_alignment,
+    tokenization_mismatch = tokenization_mismatch,
     query_normalization = normalization,
     query_normalization_id = unname(.tubelex_normalization_ids[[normalization]]),
-    normalization_applied = identical(normalization, "tubelex"),
+    normalization_applied = !identical(normalization, "identity"),
     original_input_types = original_type_count,
     normalized_lookup_types = if (is.character(normalized_terms) &&
       !anyNA(normalized_terms)) {
@@ -199,15 +224,19 @@
 #' therefore be negative. Exact formulas and denominators are returned in
 #' provenance and in the installed lexical-resource lookup contract.
 #'
-#' @param terms A plain character vector of ordered terms, or an object returned
-#'   by [lexdiv_tokenize()]. Order and duplicates are retained in the lookup
+#' @param terms A plain character vector of source-prepared ordered terms, or an object returned
+#'   by [lexdiv_tokenize()] with explicit mismatch opt-in. Order and duplicates are retained in the lookup
 #'   table. Each character-vector element is one complete lookup term; a single
 #'   string containing whitespace triggers a warning because it may be raw
-#'   prose. Pass raw prose through [lexdiv_tokenize()].
+#'   prose. General word segmentation is not the resource's Treebank segmentation.
 #' @param normalization `"tubelex"` applies the documented NFKC, trim, and
 #'   locale-fixed English lowercase query transform. `"identity"` performs an
 #'   exact case- and normalization-sensitive lookup. The selected transform is
-#'   recorded in provenance.
+#'   recorded in provenance. `"tubelex_apostrophe"` additionally converts internal
+#'   typographic apostrophes and clitic starts, without splitting contractions.
+#' @param tokenization_mismatch `"error"` rejects general tokenization objects;
+#'   `"allow"` records their explicit use for segmentation sensitivity. Character
+#'   vectors remain caller-prepared terms whose segmentation is not verified.
 #'
 #' @return A `tubelex_profile` list containing matched-only token- and
 #'   type-weighted summaries, the lossless lookup table, token/type coverage,
@@ -215,17 +244,70 @@
 #' @export
 tubelex_profile <- function(
     terms,
-    normalization = "tubelex") {
+    normalization = "tubelex",
+    tokenization_mismatch = "error") {
   normalization <- .lexprep_scalar_choice(
     normalization,
-    c("tubelex", "identity"),
+    names(.tubelex_normalization_ids),
     "normalization"
+  )
+  tokenization_mismatch <- .lexprep_scalar_choice(
+    tokenization_mismatch, c("error", "allow"), "tokenization_mismatch"
   )
   .tubelex_profile(
     terms = terms,
     normalization = normalization,
-    loader = .lexres_load_tubelex
+    loader = .lexres_load_tubelex,
+    tokenization_mismatch = tokenization_mismatch
   )
+}
+
+#' Profile several documents with one validated TUBELEX resource load
+#'
+#' @param documents An explicitly named list, or an ID/list-column data frame.
+#' @inheritParams tubelex_profile
+#' @param id_col,terms_col Column names for data-frame input.
+#' @param max_rows Maximum combined lookup and summary rows across documents.
+#' @return An input-ordered named list of complete `tubelex_profile` objects.
+#' @export
+tubelex_profile_batch <- function(
+    documents,
+    normalization = "tubelex",
+    tokenization_mismatch = "error",
+    id_col = "document_id",
+    terms_col = "terms",
+    max_rows = 1e6) {
+  normalization <- .lexprep_scalar_choice(
+    normalization, names(.tubelex_normalization_ids), "normalization"
+  )
+  tokenization_mismatch <- .lexprep_scalar_choice(
+    tokenization_mismatch, c("error", "allow"), "tokenization_mismatch"
+  )
+  id_col <- .lex_batch_scalar_name(id_col, "id_col")
+  terms_col <- .lex_batch_scalar_name(terms_col, "terms_col")
+  if (identical(id_col, terms_col)) {
+    stop("id_col and terms_col must select different columns.", call. = FALSE)
+  }
+  max_rows <- .profile_positive_integer(max_rows, "max_rows")
+  batch <- .lex_batch_documents(documents, id_col, terms_col)
+  # Fail on known tokenizer mismatches and row limits before touching resources.
+  inputs <- lapply(batch$tokens, .tubelex_profile_terms,
+    tokenization_mismatch = tokenization_mismatch)
+  planned_rows <- sum(vapply(inputs, function(input) {
+    as.double(length(input$terms)) + 2
+  }, numeric(1L)))
+  if (planned_rows > max_rows) {
+    stop("The requested TUBELEX batch exceeds max_rows.", call. = FALSE)
+  }
+  loaded <- NULL
+  loader <- function() {
+    if (is.null(loaded)) loaded <<- .lexres_load_tubelex()
+    loaded
+  }
+  output <- lapply(batch$tokens, .tubelex_profile,
+    normalization = normalization, loader = loader,
+    tokenization_mismatch = tokenization_mismatch)
+  stats::setNames(output, batch$ids)
 }
 
 #' @export

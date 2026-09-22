@@ -65,32 +65,29 @@
   2 / (sqrt(1 + 2 * as.double(sample_sizes) / D) + 1)
 }
 
-.expected_ttr_d_curve <- function(frequencies, sample_sizes) {
+.expected_ttr_d_deficit <- function(frequencies, sample_sizes) {
   frequencies <- sort(as.double(frequencies))
   N <- sum(frequencies)
   spectrum <- table(frequencies)
   spectrum_frequencies <- as.double(names(spectrum))
   spectrum_types <- as.double(spectrum)
 
-  vapply(sample_sizes, function(sample_size) {
-    expected_types <- 0
-    for (index in seq_along(spectrum_frequencies)) {
-      frequency <- spectrum_frequencies[[index]]
-      probability_absent <- if (N - frequency < sample_size) {
-        0
-      } else {
-        probability <- 1
-        for (offset in seq_len(sample_size) - 1L) {
-          probability <- probability *
-            ((N - frequency - offset) / (N - offset))
-        }
-        probability
-      }
-      expected_types <- expected_types +
-        spectrum_types[[index]] * (1 - probability_absent)
-    }
-    expected_types / sample_size
-  }, numeric(1L))
+  # Given that draw j has type t, its preceding j-1 draws sample a population
+  # of N-1 with f_t-1 occurrences of t. Sum the probability that the current
+  # draw repeats a preceding type. This computes 1 - E[TTR] directly, without
+  # subtracting nearly equal numbers; singleton types contribute exactly zero.
+  offsets <- seq_len(max(sample_sizes) - 1L) - 1
+  deficit <- numeric(length(sample_sizes))
+  for (index in which(spectrum_frequencies > 1)) {
+    frequency <- spectrum_frequencies[[index]]
+    log_absence <- cumsum(log1p(-pmin(
+      1, (frequency - 1) / (N - 1 - offsets)
+    )))
+    repeated <- cumsum(-expm1(log_absence))
+    deficit <- deficit + (spectrum_types[[index]] * frequency / N) *
+      repeated[sample_sizes - 1L] / sample_sizes
+  }
+  deficit
 }
 
 .metric_expected_ttr_d <- function(tokens, counts = NULL, parameters = list()) {
@@ -125,7 +122,8 @@
     ))
   }
 
-  observed <- .expected_ttr_d_curve(counts$freq, sample_sizes)
+  deficit <- .expected_ttr_d_deficit(counts$freq, sample_sizes)
+  observed <- 1 - deficit
   diagnostics$expected_ttr <- observed
   diagnostics$near_saturation <- max(observed) >= 0.99
   if (all(counts$freq == 1)) {
@@ -140,7 +138,7 @@
       diagnostics = diagnostics
     ))
   }
-  if (any(!is.finite(observed)) || any(observed <= 0) || any(observed >= 1)) {
+  if (any(!is.finite(deficit)) || any(deficit <= 0) || any(deficit >= 1)) {
     return(.lex_missing(
       metric_id = "expected_ttr_d",
       method_id = "expected_ttr_d_hypergeom_fit_v1",
@@ -154,7 +152,7 @@
 
   numeric_sizes <- as.double(sample_sizes)
   point_solutions <- numeric_sizes * observed * observed /
-    (2 * (1 - observed))
+    (2 * deficit)
   if (any(!is.finite(point_solutions)) || any(point_solutions <= 0)) {
     return(.lex_missing(
       metric_id = "expected_ttr_d",
@@ -174,13 +172,13 @@
     accumulator <- 0
     for (index in seq_along(numeric_sizes)) {
       n <- numeric_sizes[[index]]
-      y <- observed[[index]]
       root <- sqrt(1 + 2 * n / D)
       root_plus_one <- root + 1
-      fitted <- 2 / root_plus_one
+      fitted_deficit <- (2 * n / D) / (root_plus_one * root_plus_one)
       derivative <- (2 * n) /
         (D * root * root_plus_one * root_plus_one)
-      accumulator <- accumulator + 2 * (fitted - y) * derivative
+      accumulator <- accumulator +
+        2 * (deficit[[index]] - fitted_deficit) * derivative
     }
     accumulator
   }
@@ -223,7 +221,9 @@
   }
 
   fitted <- .expected_ttr_d_model(sample_sizes, D)
-  residuals <- fitted - observed
+  fitted_deficit <- (2 * numeric_sizes / D) /
+    (sqrt(1 + 2 * numeric_sizes / D) + 1)^2
+  residuals <- deficit - fitted_deficit
   diagnostics$fit_sse <- sum(residuals * residuals)
   diagnostics$fit_rmse <- sqrt(mean(residuals * residuals))
   diagnostics$fitted_ttr <- fitted

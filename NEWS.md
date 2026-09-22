@@ -1,3 +1,40 @@
+# ldfreq 0.2.0 (development)
+
+## Compatibility and migration
+
+- TUBELEX profiles now reject `lexdiv_tokenization` objects by default because
+  their segmentation differs from the bundled Treebank resource. Prepare
+  source-compatible term vectors externally; vector alignment remains
+  unverified. The explicit `tokenization_mismatch = "allow"` override records
+  a different-tokenizer sensitivity analysis. Coverage is not alignment evidence.
+- Preprocessing contract 0.2.0 requires text hashes, token pattern, character
+  counts, and a token-table fingerprint, and checks normalization consistency.
+  Recreate objects saved under 0.1.0 from their original text and reapply
+  annotations. Tokenizer rules and tokenizer version 0.1.0 are unchanged.
+- `lexdiv_widen()` retains contract, requested/effective parameters, and N/V
+  by default. It rejects column groups containing unlike specifications;
+  plan-local request labels are not globally unique. Metric plots similarly
+  require one specification and invisibly return all selected result fields.
+
+## Corrections and additions
+
+- Corrected cancellation near saturation in `expected_ttr_d_hypergeom_fit_v1`
+  by computing expected duplicate-draw fractions and model residuals directly.
+  The exact expected-TTR curve, objective, and method ID remain unchanged;
+  record package version for numerical reproducibility. A one-doubleton,
+  million-token regression agrees with an independent 80-digit reference.
+  The earlier result was about 8.8% too small. No arbitrary D cap is introduced.
+- Added `tubelex_profile_batch()` with one verified resource snapshot per call,
+  document-local invalid results, a row budget, and complete per-document outputs.
+- TUBELEX profile contract 0.2.0 records the input alignment boundary and adds
+  explicit `normalization = "tubelex_apostrophe"` for internal apostrophe/prime
+  typography. This does not provide Treebank segmentation. Default term-vector
+  normalization, resource bytes, and lookup formulas are unchanged.
+- Documented the frozen MTLD minimum-factor/tail discontinuity and added a
+  regression example. Its definition has not been silently clamped or replaced.
+- Added a worked research-design vignette distinguishing parameter sensitivity,
+  computability, reference coverage, and evidence of construct validity.
+
 # ldfreq 0.1.0
 
 ## Caller-supplied lexical norm profiles

@@ -329,7 +329,9 @@ and register than by learner proficiency. The TUBELEX output is therefore named
 as frequency and prevalence, not as an unqualified sophistication score.
 
 ```{r}
-frequency <- tubelex_profile(tokenization)
+# Resource-compatible segmentation must be prepared separately.
+# This manually prepared sequence illustrates only the sentence shown.
+frequency <- tubelex_profile(c("I", "do", "n't", "think", "it", "'s", "a", "book"))
 frequency$summary
 frequency$coverage
 frequency$provenance$formula_parameters
@@ -339,6 +341,16 @@ The conditional means answer: "Among terms found in this TUBELEX resource,
 what is their average frequency or prevalence?" Coverage answers the separate
 question: "How much of this text did the resource measure?" Neither should be
 reported without the other.
+
+The Unicode tokenizer preserves contractions; the bundled TUBELEX resource
+uses Treebank segmentation. A `lexdiv_tokenization` object therefore requires
+an explicit `tokenization_mismatch = "allow"` override and is marked as using
+a different tokenizer. Plain term vectors carry unverified alignment rather
+than a claim of compatibility. Inspect contraction and punctuation handling
+in the caller's preparation pipeline even when lookup coverage is 100%.
+The optional `normalization = "tubelex_apostrophe"` only harmonizes term-level
+apostrophe typography; it is not a segmentation adapter. For several documents,
+`tubelex_profile_batch()` shares the verified resource snapshot within the call.
 
 The lookup values are deliberately inspectable. `count`, `videos`, and
 `channels` are raw resource counts. Derived scores use the following base-10

@@ -1,7 +1,7 @@
 {
   "$schema": "ldfreq-preprocessing-contract.schema.json",
   "contract_id": "ldfreq-preprocessing",
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "status": "normative",
   "public_api": true,
   "tokenizer": {
@@ -12,7 +12,12 @@
     "preserved_internal_connectors": ["apostrophe", "right-single-quotation-mark", "hyphen-minus", "hyphen", "non-breaking-hyphen"],
     "punctuation_tokens": false,
     "empty_text": "valid-zero-token-result",
-    "offset_coordinate_space": "processed-text-unicode-code-points"
+    "offset_coordinate_space": "processed-text-unicode-code-points",
+    "required_provenance": ["source_text_sha256", "processed_text_sha256", "token_table_sha256", "token_pattern", "input_characters", "processed_characters"],
+    "token_table_fingerprint": "sha256-of-utf8-tab-separated-token_index-start-end-surface-is_number-rows-joined-with-newlines-no-final-newline",
+    "annotation_columns_in_fingerprint": false,
+    "validation": "require-supported-contract-pattern-and-hashes; check-offset-bounds-normalization-case-number-policy-and-token-fingerprint",
+    "validation_limit": "detects-accidental-inconsistency-not-authenticity-or-reconstruction-of-unretained-text"
   },
   "normalization": {
     "choices": ["NFC", "NFKC", "none"],

@@ -84,12 +84,15 @@ test_that("token- and type-weighted summaries remain conditional on matches", {
   expect_identical(result$provenance$matched_only_summary, TRUE)
 })
 
-test_that("a tokenization object can feed the TUBELEX profile without ambiguity", {
+test_that("a known tokenizer mismatch requires an explicit opt-in", {
   tokenization <- lexdiv_tokenize("Apple apple missing")
+  expect_error(profile_lookup_function(tokenization, "tubelex",
+    loader = synthetic_profile_tubelex_load), "Treebank segmentation")
   result <- profile_lookup_function(
     tokenization,
     normalization = "tubelex",
-    loader = synthetic_profile_tubelex_load
+    loader = synthetic_profile_tubelex_load,
+    tokenization_mismatch = "allow"
   )
 
   expect_identical(result$provenance$input_source, "lexdiv_tokenization")
@@ -98,6 +101,54 @@ test_that("a tokenization object can feed the TUBELEX profile without ambiguity"
     "ldfreq-unicode-word-tokenizer"
   )
   expect_identical(result$lookup$term, c("Apple", "apple", "missing"))
+  expect_identical(result$provenance$tokenization_alignment,
+    "known_different_tokenizer_explicitly_allowed")
+})
+
+test_that("apostrophe typography is opt-in and does not perform segmentation", {
+  terms <- c("don't", "don\u2019t", "it\u2032s", "\u2019s", "book\u2019")
+  unchanged <- profile_lookup_function(terms, "tubelex",
+    loader = synthetic_profile_tubelex_load)
+  transformed <- profile_lookup_function(terms, "tubelex_apostrophe",
+    loader = synthetic_profile_tubelex_load)
+  expect_identical(unchanged$lookup$lookup_term, enc2utf8(terms))
+  expect_identical(transformed$lookup$term, enc2utf8(terms))
+  expect_identical(transformed$lookup$lookup_term,
+    enc2utf8(c("don't", "don't", "it's", "'s", "book\u2019")))
+  expect_equal(nrow(transformed$lookup), length(terms))
+  expect_identical(transformed$provenance$tokenization_alignment,
+    "caller_supplied_terms_unverified")
+  expect_identical(transformed$provenance$query_normalization,
+    "tubelex_apostrophe")
+})
+
+test_that("TUBELEX batch retains full profiles and document-local failures", {
+  documents <- list(b = c("Apple", "apple", "missing-word"),
+    a = c("the", "book"), empty = character(), bad = c("the", NA_character_))
+  batch <- tubelex_profile_batch(documents)
+  expect_identical(names(batch), names(documents))
+  individual <- lapply(documents, tubelex_profile)
+  expect_identical(batch, individual)
+  expect_identical(vapply(batch, `[[`, character(1), "status"),
+    c(b = "ok", a = "ok", empty = "empty", bad = "invalid_input"))
+  tidy <- data.frame(id = names(documents), stringsAsFactors = FALSE)
+  tidy$words <- unname(documents)
+  expect_identical(tubelex_profile_batch(tidy, id_col = "id", terms_col = "words"), batch)
+  empty_documents <- stats::setNames(list(), character())
+  expect_identical(tubelex_profile_batch(empty_documents), empty_documents)
+  expect_error(tubelex_profile_batch(list()), "plain named list")
+  expect_error(tubelex_profile_batch(documents, max_rows = 3), "max_rows")
+  expect_error(tubelex_profile_batch(list(x = "a", x = "b")), "unique")
+  expect_error(tubelex_profile_batch(list(x = "a"), id_col = "id", terms_col = "id"),
+    "different columns")
+  expect_error(tubelex_profile_batch(list(x = lexdiv_tokenize("don't"))),
+    "Treebank segmentation")
+  expect_error(tubelex_profile_batch(documents, normalization = "unknown"),
+    "normalization")
+  allowed <- tubelex_profile_batch(list(x = lexdiv_tokenize("apple")),
+    tokenization_mismatch = "allow")
+  expect_identical(allowed$x$provenance$tokenization_alignment,
+    "known_different_tokenizer_explicitly_allowed")
 })
 
 test_that("invalid profile inputs fail atomically before resource loading", {
@@ -174,7 +225,7 @@ test_that("the installed TUBELEX profile contract matches the stable public resu
     contract$contract_id,
     "ldfreq-tubelex-frequency-profile"
   )
-  expect_identical(contract$contract_version, "0.1.0")
+  expect_identical(contract$contract_version, "0.2.0")
   expect_identical(
     contract$status,
     "normative"

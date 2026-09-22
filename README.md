@@ -139,9 +139,11 @@ layers. The identifiers are returned provenance, so use path-free,
 non-sensitive labels and do not put secrets or private hashes in them.
 
 Saved `lexdiv_tokenization` objects are revalidated against preprocessing
-contract `0.1.0` whenever they are consumed. Recreate objects whose provenance
-is incomplete or has been edited, and reapply current annotations with explicit
-backend IDs.
+contract `0.2.0` whenever they are consumed. A token-table fingerprint and
+normalization checks detect accidental edits. Recreate older objects and objects
+whose provenance is incomplete or edited from the original text, then reapply
+annotations with explicit backend IDs. These checks do not authenticate an
+object or reconstruct text that was not retained.
 
 For a quick English lemma baseline, the optional `textstem` package can supply
 lemmas while `ldfreq` records its installed version. It does not supply UPOS
@@ -363,11 +365,27 @@ TUBELEX values are returned as corpus-relative frequency/prevalence
 measurements with adjacent coverage, not as a universal sophistication score.
 
 ```r
-frequency <- tubelex_profile(tokenization)
+# Illustrative, manually prepared Treebank-style terms for this sentence only.
+terms <- c("I", "do", "n't", "think", "it", "'s", "John", "'s", "book")
+frequency <- tubelex_profile(terms)
 frequency$summary
 frequency$coverage
 frequency$lookup
+
+# Share one verified resource snapshot across documents.
+frequencies <- tubelex_profile_batch(list(essay_a = terms, essay_b = terms))
 ```
+
+The bundled resource uses Treebank segmentation. `lexdiv_tokenize()` preserves
+contractions and is a different tokenizer; passing its object now errors by
+default. Prepare and document source-compatible tokens outside this package.
+Character-vector inputs are accepted but their alignment is not verified;
+100% lookup coverage does not establish alignment. For a deliberate sensitivity
+analysis only, `tokenization_mismatch = "allow"` accepts a tokenization object
+and records the mismatch. `normalization = "tubelex_apostrophe"` additionally
+converts internal curly apostrophes and primes, including clitic starts, to
+ASCII apostrophes. This explicit typography option does not split contractions
+or reproduce the complete TUBELEX preprocessing pipeline.
 
 `count`, `videos`, and `channels` are raw resource counts. `zipf` is a
 smoothed base-10 per-billion token score; `video_prevalence` and
@@ -609,12 +627,17 @@ before decoding, rejects unavailable, mismatched, unsupported-version, and
 schema-invalid inputs in a fixed order, and never downloads or searches for a
 fallback. In addition to project-authored synthetic fixtures, the non-exported
 TUBELEX path performs bounded streaming gzip expansion and validates the fixed
-515,292-row four-column schema. A public wrapper adds an explicit source-aligned
-normalization option while retaining both original and lookup terms. It
+515,292-row four-column schema. A public wrapper adds explicit query
+normalization options while retaining both original and lookup terms. It
 preserves order and duplicates, returns token/type coverage diagnostics, and
 keeps unmatched measurements missing rather than coercing them to zero. The
 installed resource manifest, notice, and provenance allow the bundled resource
 and its package boundary to be audited independently.
+
+For a complete question-to-result example, see
+[Designing comparable lexical-diversity analyses](vignettes/designing-comparisons.Rmd).
+It explains common parameter choices, unequal text lengths, conditional
+frequency summaries, and the limits of synthetic validation.
 
 The installed CC0 cross-language fixture checks parsed semantic agreement with
 the Python implementation for formulas that share exact method IDs. It also

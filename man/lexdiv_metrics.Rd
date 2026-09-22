@@ -94,6 +94,22 @@ MTLD, sample-size-normalized hypergeometric HD-D on the TTR scale, Yule's K,
 deterministic expected-TTR curve-fit D, and type-based Yule's I. Expected-TTR D
 fits the model \eqn{2/(\sqrt{1+2n/D}+1)} to exact finite-population expected TTR
 values. It uses no random sampling or arbitrary D cap and is not CLAN VOCD.
+From package version 0.2.0, the same expected curve and objective are evaluated
+through the expected duplicate-draw fraction to avoid cancellation near TTR=1.
+The method ID is unchanged because this is a numerical correction, not a new
+estimator. Record the package version as well as method and parameters.
+\code{near_saturation} diagnoses a nearly flat curve; it does not establish
+statistical precision or validity.
+
+The canonical MTLD method requires at least ten tokens per complete factor
+and applies an unclamped linear tail credit. The credit can exceed one for
+a shorter repetitive tail. Consequently, \code{rep("a", 59)} gives about
+7.2175 and \code{rep("a", 60)} gives 10, although no new type was added.
+This is a frozen variant rule, not a guarantee of length independence for
+every input. Inspect directional/tail diagnostics and sensitivity to the
+sampling design for highly repetitive texts. Passing a length screen does
+not remove this boundary effect; do not silently clamp the tail or compare
+different MTLD variants as the same method.
 
 An invalid token anywhere has precedence over empty-input and metric-specific
 domain conditions. Invalid documents return \code{status = "invalid_input"},
