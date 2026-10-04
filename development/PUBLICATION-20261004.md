@@ -92,6 +92,13 @@ in this session, so complete visual inspection of the rendered site is not
 claimed.
 
 Cross-platform full-check evidence belongs to the PR's existing CI runs.
+The first Windows build exposed Git's automatic LF-to-CRLF conversion of the
+new byte-pinned files. A `core.autocrlf=true` checkout reproduced five resource
+member hash mismatches. Explicit `-text` attributes for the NJ8 directory,
+notice, and optional Python example preserve their exact bytes. The same
+checkout verification then matched all ten declared resource members. This
+change affects checkout behavior, not R calculations or the resource content.
+
 Repository visibility and `experiments/release-candidate/state.dcf` remain
 unchanged: this is development work, not a publication or CRAN submission.
 The ordinary private-repository checks do not replace final anonymously
