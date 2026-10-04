@@ -103,3 +103,46 @@ Repository visibility and `experiments/release-candidate/state.dcf` remain
 unchanged: this is development work, not a publication or CRAN submission.
 The ordinary private-repository checks do not replace final anonymously
 accessible URL checks for publication.
+
+## English tokenizer and raw-text batch follow-up
+
+The owner selected usability for English analysis entirely within R as the
+priority. The opt-in `tokenizer = "english"` therefore adds fixed lexical rules
+to the existing tokenizer API without new dependencies, Python calls, or model
+downloads. Contractions and hyphenated words stay whole; dotted initialisms,
+number-like spans, URLs and email addresses have documented rules. Apostrophe
+and hyphen typography is canonicalized. Excluded recognized spans have reasons,
+processed-text offsets, and an integrity fingerprint. This is neither Treebank
+segmentation nor automatic lemmatization or validated multilingual segmentation.
+
+`lexdiv_tokenize_batch()` validates named texts or character ID/text columns and
+returns complete document tokenizations. `lexdiv_metrics_text_batch()` accepts
+raw or prepared documents and returns full metric rows, token audits with IDs,
+and document-local preprocessing. Empty documents survive, missing texts name
+the failing document, and explicit tokenizer settings are rejected for prepared
+objects. Existing annotation, NJ8, overlap-comparability, wide-table, and plot
+interfaces are exercised. The Unicode default and metric formulas are unchanged;
+preprocessing contract 0.3.0 also accepts saved 0.2.0 Unicode objects without
+rewriting their recorded provenance.
+
+Current local evidence is in
+`reviews/ldfreq-english-tokenizer-20261004/evidence/`:
+
+- `R CMD check --no-manual`: Status OK; all five test scripts and six vignettes
+  passed, including 4,410 testthat assertions (zero failures, warnings or skips).
+- The public API audit covers 32 exports, 30 registered S3 methods, and 15
+  shared help topics. Eleven installed JSON documents passed schema validation.
+- All six articles and the pkgdown reference built successfully. All 84 HTML
+  pages have existing local href/src targets. Whole-site visual browser review
+  is not claimed.
+- The source archive SHA-256 is
+  `d4241994463d61d75bdc6cc227907cfa35268f2debd8e8e5b36f509a287104ed`.
+
+The initial vignette build caught a syntax error in the newly extended smoke
+example; it was fixed and the installed example and complete final build/check
+passed. This was an example-edit error, not a numerical-method failure.
+Resource bytes, source builders, the optional external Python tokenizer, and
+license notices are unchanged, so their prior source-reproduction evidence is
+still applicable. The new preprocessing and batch paths require fresh full
+cross-platform package checks; the PR records those results separately from this
+local check. No release-state or repository-visibility change is included.

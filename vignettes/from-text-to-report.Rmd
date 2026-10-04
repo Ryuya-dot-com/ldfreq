@@ -20,7 +20,7 @@ questions: repeating familiar words can change diversity without changing
 list membership. The observations here are two project-authored sentences;
 they do not represent learner groups or establish proficiency differences.
 
-We use the same NFC normalization, lowercase conversion, word selection, and
+We use the same English tokenizer, NFC normalization, lowercase conversion, word selection, and
 10-token MATTR window for both texts. The small window makes the example
 executable; it is not a recommended universal window. In a study, justify the
 common window from the task and document-length distribution before comparing
@@ -31,11 +31,13 @@ texts <- c(
   first = "The student reads a book and discusses the book with a friend.",
   second = "The student explores a story and shares several ideas with a friend."
 )
-prepared <- lapply(texts, lexdiv_tokenize, normalization = "NFC", case = "lower")
-documents <- lapply(prepared, function(x) x$tokens$surface)
-metrics <- lexdiv_metrics_batch(
-  documents, metrics = c("ttr", "mattr"), window_length = 10
+prepared <- lexdiv_tokenize_batch(
+  texts, tokenizer = "english", normalization = "NFC", case = "lower"
 )
+diversity <- lexdiv_metrics_text_batch(
+  prepared, metrics = c("ttr", "mattr"), window_length = 10
+)
+metrics <- diversity$results
 knitr::kable(metrics[, c("document_id", "metric_id", "N", "V", "value", "status")])
 ```
 
@@ -125,7 +127,7 @@ access rules. It is not intended for automatic public sharing.
 
 ```{r}
 record <- list(
-  prepared = prepared, metrics = metrics, levels = levels,
+  prepared = prepared, diversity = diversity, metrics = metrics, levels = levels,
   analysis = analysis, session = sessionInfo()
 )
 path <- tempfile(fileext = ".rds")
@@ -137,7 +139,8 @@ levels$provenance[c("resource_version", "resource_bundled", "resource_citation")
 
 A methods statement for this example could read:
 
-> We tokenized both texts with ldfreq, using NFC normalization and lowercase
+> We tokenized both texts with the ldfreq English word tokenizer (0.1.0),
+> using NFC normalization and lowercase
 > surface forms. We calculated TTR over each full text and MATTR with a
 > common 10-token window.
 > New JACET 8000 coverage used the bundled jacet2016-8000-v1 table with the

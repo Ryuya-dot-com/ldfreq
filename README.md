@@ -59,21 +59,30 @@ texts <- c(
   first = "The student reads a book and discusses the book with a friend.",
   second = "The student explores a story and shares several ideas with a friend."
 )
-prepared <- lapply(texts, lexdiv_tokenize, normalization = "NFC", case = "lower")
-documents <- lapply(prepared, function(x) x$tokens$surface)
+prepared <- lexdiv_tokenize_batch(
+  texts, tokenizer = "english", normalization = "NFC", case = "lower"
+)
 
 # Window 10 illustrates the interface; choose a window for your research design.
-metrics <- lexdiv_metrics_batch(
-  documents, metrics = c("ttr", "mattr"), window_length = 10
+analysis <- lexdiv_metrics_text_batch(
+  prepared, metrics = c("ttr", "mattr"), window_length = 10
 )
-metrics[, c("document_id", "metric_id", "N", "V", "value", "status")]
+analysis$results[, c("document_id", "metric_id", "N", "V", "value", "status")]
 
 # The bundled NJ8 table is available offline, with JACET's permission.
 # This is surface-form coverage; it does not silently lemmatize the text.
 levels <- nj8_profile_batch(prepared, unit = "surface")
 levels$coverage
-plot(metrics, metric_id = "mattr")
+plot(analysis, metric_id = "mattr")
 ```
+
+The English tokenizer runs entirely in R. It retains contractions and
+hyphenated words, recognizes dotted initialisms, and records excluded URLs,
+email addresses and number-like spans. Named text vectors and ID/text data
+frames share the same batch interface. Existing calls keep the original
+`tokenizer = "unicode"` default; select the English rules explicitly.
+See [English tokenization and document input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html)
+for segmentation examples, CSV/text-file input, and limitations.
 
 These two authored sentences illustrate the workflow, not a population effect.
 TTR uses the full document denominator; MATTR uses the selected local window.
@@ -110,6 +119,7 @@ a high match rate does not prove that arbitrary tokens use the right segmentatio
 | Task | Entry points |
 |---|---|
 | Twelve diversity measures | `lexdiv_metrics()`, `lexdiv_metrics_text()`, `lexdiv_metrics_batch()` |
+| Named raw texts or document ID/text tables | `lexdiv_tokenize_batch()`, `lexdiv_metrics_text_batch()` |
 | Raw text, lemmas, or externally supplied AntBNC flemmas | `lexdiv_tokenize()`, `lexdiv_lemmatize()`, `lexdiv_flemmatize()` |
 | Parameter and definition sensitivity | `lexdiv_spec()`, `lexdiv_grid()`, `lexdiv_plan()`, `lexdiv_profile()`, `lexdiv_profile_batch()`, `lexdiv_variant_metrics()` |
 | Local MATTR windows and exposure | `lexdiv_mattr_profile()` |

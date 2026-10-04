@@ -1,0 +1,175 @@
+---
+title: "English tokenization and document input"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{English tokenization and document input}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ldfreq)
+```
+
+## Choose what counts as a word
+
+An essay can include contractions, web addresses and dates. Counting pieces of
+a URL as vocabulary changes both lexical diversity and vocabulary-list coverage.
+Before comparing texts, choose the same segmentation and inspect representative
+examples from your corpus. ldfreq offers an English lexical tokenizer that runs
+in R with its existing `stringi` dependency, without Python, model downloads,
+or an external service.
+
+Select it explicitly with `tokenizer = "english"`. The default `"unicode"`
+retains the original segmentation for compatibility with existing analyses.
+
+```{r}
+text <- "John’s well-known book costs 3.14. See https://example.org on 2026-10-04."
+english <- lexdiv_tokenize(text, tokenizer = "english", case = "lower")
+english$tokens
+english$provenance$excluded_spans
+```
+
+`John's` and `well-known` each count as one surface word. The price, URL, and
+date do not enter the lexical denominator. Apostrophe and hyphen typography are
+canonicalized after the requested Unicode normalization and case conversion:
+left/right curly apostrophes become `'`, and Unicode hyphen/non-breaking hyphen
+become `-`. This does not expand contractions or provide lemmas.
+
+| Input | English lexical rule |
+|---|---|
+| `can't`, `won't`, `John's` | Keep whole; no grammatical interpretation |
+| `well-known`, `COVID-19`, `2nd` | Keep as one word |
+| `U.S.A.`, `e.g.` | Keep dotted initialisms with periods |
+| `Dr.` | Retain `Dr`; discard the final punctuation |
+| `3.14`, `-12`, `1,000`, `2e-3`, `75%` | One number-like span; exclude by default |
+| `2026-10-04`, `3/4`, `10:30` | One number-like span; exclude by default |
+| HTTP(S)/www URL, dotted-domain email address | Exclude recognized full span |
+| Standalone punctuation, emoji, combining mark | Ignore |
+
+With `keep_numbers = TRUE`, number-like expressions are retained and flagged
+with `is_number = TRUE`. Numeric recognition is not date or number validation;
+for example, an invalid calendar date can still be a number-like expression.
+URL recognition can include trailing punctuation. Bare domains without www or
+HTTP(S), malformed addresses, abbreviations requiring a dictionary, and
+language-specific segmentation are outside these rules. Check token rows when
+those cases are important to your corpus.
+
+Offsets count Unicode code points in the **processed text**, after normalization,
+case conversion and typography changes. They are not byte positions or offsets
+into the original text. The full source is not retained, but tokens and
+`excluded_spans` contain observed text; this is an analysis record, not redaction.
+The exclusion table lists recognized URLs, emails and removed numbers, not every
+punctuation character. SHA-256 fingerprints detect accidental edits when the
+object is reused. They do not establish authenticity or reconstruct source text.
+
+## Check the effect on your results
+
+The two rules answer different operational questions. This small sensitivity
+example illustrates the consequences; it does not establish that either rule
+is universally superior.
+
+```{r}
+comparison_text <- "Read read at https://example.org on 2026-10-04."
+prepared <- lapply(c("unicode", "english"), function(rule) {
+  lexdiv_tokenize(comparison_text, tokenizer = rule, case = "lower")
+})
+names(prepared) <- c("unicode", "english")
+comparison <- lexdiv_metrics_text_batch(prepared, metrics = "ttr")
+knitr::kable(comparison$results[, c("document_id", "N", "V", "value")])
+lapply(prepared, function(x) x$tokens$surface)
+```
+
+Here, removing non-lexical spans changes the number of tokens and types, and
+therefore TTR. A higher TTR under one rule is not evidence of better writing or
+better tokenization. Report the tokenizer ID/version and settings along with
+the metric definition and parameters. For NJ8, a retained surface form such as
+`John's`, `can't` or `U.S.A.` can still be off-list. Lemma analyses require an
+explicit annotation step, and the coverage report must remain with the scores.
+Both R tokenizers differ from the bundled TUBELEX Treebank segmentation; see
+the separate [TUBELEX input guide](tubelex-input.html) when source-aligned
+segmentation is required.
+
+## Analyze an ID/text table
+
+Use one row per document, with explicit unique IDs and character text. Other
+columns, such as writer or task, stay in the study table for a later join by ID.
+Empty text is a valid zero-token document. `NA` text is an error naming the
+document; decide whether it denotes missing data before analysis rather than
+silently replacing it with an empty string.
+
+```{r}
+essays <- data.frame(
+  essay_id = c("essay_02", "essay_01", "empty"),
+  response = c("The student reads a book and discusses the book.",
+               "A reader explores a story with a friend.", "")
+)
+tokens <- lexdiv_tokenize_batch(
+  essays, id_col = "essay_id", text_col = "response",
+  tokenizer = "english", case = "lower"
+)
+analysis <- lexdiv_metrics_text_batch(
+  tokens, metrics = c("ttr", "mattr"), window_length = 5
+)
+analysis$results
+levels <- nj8_profile_batch(tokens, unit = "surface")
+levels$coverage
+```
+
+The output keeps the input document order. Empty documents retain metric rows
+with missing values and reasons, plus a preprocessing record. They have no token
+audit rows. Short documents never reduce another document's requested window.
+For raw text alone, `lexdiv_metrics_text_batch(essays, id_col = "essay_id",
+text_col = "response", tokenizer = "english", case = "lower", ...)` combines
+the two steps. For existing tokenizations, omit tokenizer arguments: their
+recorded settings are authoritative. Annotated tokenizations can be analyzed
+with `unit = "lemma"` or `"flemma"` and the same explicit word-inclusion policy
+used by `lexdiv_metrics_text()`.
+
+## Import CSV or UTF-8 text files
+
+Base R is sufficient. Read ID/text columns as character to retain identifiers
+such as `001` and literal responses such as `TRUE`. Choose missing-value markers
+deliberately for your data.
+
+```{r, eval=FALSE}
+essays <- read.csv(
+  "essays.csv", fileEncoding = "UTF-8", colClasses = "character",
+  na.strings = "<MISSING>", check.names = FALSE
+)
+tokens <- lexdiv_tokenize_batch(essays, tokenizer = "english", case = "lower")
+
+# Explicit file-to-ID mapping, with each file representing one document.
+files <- c(essay_01 = "texts/essay_01.txt", essay_02 = "texts/essay_02.txt")
+texts <- vapply(files, function(path) {
+  paste(readLines(path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
+}, character(1))
+tokens <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
+```
+
+This file recipe joins lines with newline separators and does not record source
+file bytes. The tokenization hash identifies the string passed to the tokenizer.
+Retain the original corpus and its import procedure separately when byte-level
+source reconstruction is needed.
+
+## Save the complete analysis
+
+```{r}
+record <- list(tokens = tokens, diversity = analysis, nj8 = levels,
+               session = sessionInfo())
+path <- tempfile(fileext = ".rds")
+saveRDS(record, path)
+stopifnot(identical(readRDS(path), record))
+unlink(path)
+wide <- lexdiv_widen(analysis$results)
+```
+
+Use `wide` for a join or a CSV export, while keeping the RDS record for the
+tokenization and exclusion decisions. In methods, state that the English
+tokenizer preserves contractions and hyphenated words, identify the number
+policy and case/normalization choices, and distinguish surface coverage from
+lemma coverage. Cite ldfreq and the New JACET 8000 source recorded in
+`levels$provenance` when reporting NJ8 results. The
+[text-to-report example](from-text-to-report.html) develops the interpretation
+and reporting of the resulting metrics.

@@ -17,7 +17,8 @@ lexdiv_tokenize(
   text,
   normalization = "NFC",
   case = "preserve",
-  keep_numbers = FALSE
+  keep_numbers = FALSE,
+  tokenizer = "unicode"
 )
 
 lexdiv_lemmatize(
@@ -43,7 +44,8 @@ lexdiv_metrics_text(
   window_length = 50L,
   mtld_threshold = 0.72,
   sample_size = 42L,
-  expected_ttr_sample_sizes = 35:50
+  expected_ttr_sample_sizes = 35:50,
+  tokenizer = "unicode"
 )
 
 \method{print}{lexdiv_tokenization}(x, ...)
@@ -57,12 +59,16 @@ or \code{"none"}.}
 \item{case}{Either \code{"preserve"} or locale-fixed English
 \code{"lower"}.}
 \item{keep_numbers}{Whether tokens consisting only of Unicode numbers are
-retained. Alphanumeric tokens remain eligible under either setting.}
+retained. Under \code{tokenizer = "english"}, this includes number-like
+expressions such as decimals, percentages, dates and numeric ranges.
+Alphanumeric words remain eligible under either setting.}
+\item{tokenizer}{\code{"unicode"} preserves the original word rules;
+\code{"english"} selects the English lexical rules described below.}
 \item{x}{For \code{lexdiv_lemmatize()}, an object created by
 \code{lexdiv_tokenize()}. For \code{lexdiv_metrics_text()}, either that object
 or one raw character string. When an existing tokenization is supplied, its
 recorded normalization, case, and number-retention choices are authoritative;
-supplying \code{normalization}, \code{case}, or \code{keep_numbers} again is
+supplying \code{normalization}, \code{case}, \code{keep_numbers}, or \code{tokenizer} again is
 an error. Call \code{lexdiv_tokenize()} again to change those choices. For
 the print methods, \code{x} is the corresponding result object.}
 \item{method}{Lemma source: caller-\code{"supplied"} values or the optional
@@ -103,10 +109,37 @@ sample sizes used to fit deterministic expected-TTR D.}
 method.}
 }
 \details{
-The tokenizer extracts Unicode letter, mark, and number sequences, retaining
+The default \code{"unicode"} tokenizer extracts Unicode letter, mark, and number sequences, retaining
 internal apostrophes and hyphens while excluding punctuation tokens. Start and
 end offsets refer to the processed text after the requested normalization and
-case transformation.
+case transformation (Unicode code points, not bytes or original-text offsets).
+
+The opt-in \code{"english"} tokenizer keeps contractions and hyphenated words
+whole, preserves dotted initialisms such as \code{U.S.A.}, and excludes recognized
+HTTP(S)/www URLs and dotted-domain email addresses before looking for words.
+It recognizes number-like spans including decimals, grouped numbers, numeric
+dates, fractions, exponents and percentages. These are lexical rules, not
+numeric or date validation. By default they are excluded; \code{keep_numbers = TRUE}
+retains them. Standalone combining marks are ignored.
+After the requested normalization and case conversion, left/right curly
+apostrophes become ASCII apostrophes and Unicode hyphen/non-breaking hyphen
+become ASCII hyphens. This mapping applies even with \code{normalization = "none"}.
+For example, \code{"can't"} stays one word, \code{well-known} stays one word,
+\code{3.14} is one number, and \code{Dr.} contributes \code{Dr}.
+URL recognition can include trailing punctuation. Bare domains without www or
+HTTP(S), malformed addresses, and linguistic exceptions are not inferred.
+Neither tokenizer expands contractions, supplies lemmas, performs multilingual
+word segmentation, or reproduces Treebank/TUBELEX segmentation.
+
+English provenance includes \code{excluded_spans}, a data frame with processed
+\code{start}/\code{end} offsets, \code{surface}, and \code{reason}
+(\code{url}, \code{email}, or \code{number}), plus its SHA-256 fingerprint.
+These records retain excluded text; they are an analysis audit, not redacted
+output. Ordinary punctuation and ignored symbols are not listed. Only retained
+word/number tokens enter the later lexical-unit selection denominator.
+Saved Unicode tokenizations under preprocessing contract 0.2.0 remain accepted
+with their recorded provenance. New objects use contract 0.3.0; the Unicode
+segmentation rules and the core metric schema are unchanged.
 
 The package does not silently choose or download a lemmatization model.
 \code{lexdiv_lemmatize(method = "supplied")} accepts annotations created by
@@ -133,15 +166,16 @@ surface/lemma/flemma
 and all/content-word analyses to be compared without treating one choice as a
 universal default.
 
-The tokenizer arguments \code{normalization}, \code{case}, and
-\code{keep_numbers} apply only when \code{x} is raw text. They are never
+The tokenizer arguments \code{normalization}, \code{case},
+\code{keep_numbers}, and \code{tokenizer} apply only when \code{x} is raw text. They are never
 silently reapplied to, or ignored for, an existing tokenization object.
 }
 \section{Saved-object compatibility}{
-Preprocessing contract \code{0.2.0} validates annotation and provenance,
+Preprocessing contract \code{0.3.0} validates annotation and provenance,
 including explicit UPOS-backend identity, text hashes, character bounds,
 normalization consistency, and a fingerprint of the surface token table,
-whenever an object is consumed. The tokenizer rules remain version 0.1.0.
+whenever an object is consumed. Both tokenizer rule sets use their own identity and version 0.1.0.
+Unicode objects saved under preprocessing contract 0.2.0 remain accepted.
 Objects saved with preprocessing contract 0.1.0 must be recreated from the
 original text; their token-table fingerprint cannot be recovered as verified
 provenance by simply relabeling the saved object. If
@@ -169,6 +203,13 @@ be inspected without running a preprocessing backend.
 The print methods return \code{x} invisibly.
 }
 \examples{
+english <- lexdiv_tokenize(
+  "John's well-known book costs 3.14. See https://example.org.",
+  tokenizer = "english", case = "lower"
+)
+english$tokens
+english$provenance$excluded_spans
+
 tokenization <- lexdiv_tokenize("Cats and cat ran run.")
 surface <- lexdiv_metrics_text(tokenization, metrics = "ttr")
 surface$results

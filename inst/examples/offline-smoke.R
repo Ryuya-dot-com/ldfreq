@@ -256,4 +256,18 @@ stopifnot(
   bundled_levels$diagnostics$missing_rank_count == 0
 )
 
+# English text input requires no Python, network or model download.
+english_texts <- data.frame(document_id = c("essay", "empty"),
+  text = c("The cat can't read. 3.14 https://example.org", ""))
+english_tokens <- lexdiv_tokenize_batch(english_texts, tokenizer = "english", case = "lower")
+english_batch <- lexdiv_metrics_text_batch(english_tokens, metrics = "ttr")
+stopifnot(
+  identical(english_tokens$essay$tokens$surface, c("the", "cat", "can't", "read")),
+  identical(english_tokens$essay$provenance$excluded_spans$reason, c("number", "url")),
+  identical(english_batch$results$document_id, c("essay", "empty")),
+  identical(english_batch$results$status, c("ok", "missing")),
+  identical(names(english_batch$preprocessing), c("essay", "empty"))
+)
+check_print_contract(english_batch)
+
 invisible(TRUE)

@@ -6,7 +6,7 @@
 # metric computation.
 
 .lexprep_contract_id <- "ldfreq-preprocessing"
-.lexprep_contract_version <- "0.2.0"
+.lexprep_contract_version <- "0.3.0"
 .lexprep_tokenizer_id <- "ldfreq-unicode-word-tokenizer"
 .lexprep_tokenizer_version <- "0.1.0"
 .lexprep_flemma_backend_id <- "ldfreq-antbnc-flemma-adapter"
@@ -282,6 +282,11 @@
     stop(sprintf("%s has an invalid tokenization table.", argument), call. = FALSE)
   }
   row_count <- nrow(value$tokens)
+  provenance <- value$provenance
+  tokenizer <- if (identical(provenance$tokenizer_id, "ldfreq-english-word-tokenizer")) {
+    "english"
+  } else "unicode"
+  specification <- .lexprep_tokenizer_spec(tokenizer)
   positions_are_valid <-
     is.integer(value$tokens$start) &&
       length(value$tokens$start) == row_count &&
@@ -315,21 +320,23 @@
         )
     number_flags_are_valid <- identical(
       value$tokens$is_number,
-      stringi::stri_detect_regex(value$tokens$surface, "^\\p{N}+$")
+      stringi::stri_detect_regex(value$tokens$surface,
+        paste0("^(?:", specification$number_pattern, ")$"))
     )
     if (!offsets_are_valid || !number_flags_are_valid) {
       stop(sprintf("%s has an invalid tokenization table.", argument), call. = FALSE)
     }
   }
 
-  provenance <- value$provenance
   provenance_is_valid <-
     is.list(provenance) && !is.object(provenance) &&
       identical(provenance$contract_id, .lexprep_contract_id) &&
-      identical(provenance$contract_version, .lexprep_contract_version) &&
-      identical(provenance$tokenizer_id, .lexprep_tokenizer_id) &&
-      identical(provenance$tokenizer_version, .lexprep_tokenizer_version) &&
-      identical(provenance$token_pattern, .lexprep_token_pattern) &&
+      (identical(provenance$contract_version, .lexprep_contract_version) ||
+        (identical(tokenizer, "unicode") &&
+          identical(provenance$contract_version, "0.2.0"))) &&
+      identical(provenance$tokenizer_id, specification$id) &&
+      identical(provenance$tokenizer_version, specification$version) &&
+      identical(provenance$token_pattern, specification$pattern) &&
       .lexprep_is_sha256(provenance$source_text_sha256) &&
       .lexprep_is_sha256(provenance$processed_text_sha256) &&
       .lexprep_is_sha256(provenance$token_table_sha256) &&
@@ -356,9 +363,9 @@
   surfaces <- value$tokens$surface
   content_is_valid <-
     all(value$tokens$end <= provenance$processed_characters) &&
-      all(stringi::stri_detect_regex(surfaces, paste0("^", .lexprep_token_pattern, "$"))) &&
-      identical(surfaces, .lexprep_normalize_text(
-        surfaces, provenance$normalization, provenance$case
+      all(stringi::stri_detect_regex(surfaces, paste0("^(?:", specification$pattern, ")$"))) &&
+      identical(surfaces, .lexprep_prepare_text(
+        surfaces, provenance$normalization, provenance$case, tokenizer
       )) &&
       (provenance$keep_numbers || !any(value$tokens$is_number)) &&
       identical(provenance$token_table_sha256, .lexprep_token_fingerprint(value$tokens))
@@ -367,6 +374,10 @@
       "%s has token content inconsistent with its preprocessing provenance; recreate it with lexdiv_tokenize().",
       argument
     ), call. = FALSE)
+  }
+  if (identical(tokenizer, "english") &&
+      !.lexprep_validate_english_exclusions(value)) {
+    stop(sprintf("%s has invalid tokenizer exclusion records.", argument), call. = FALSE)
   }
 
   annotation_columns <- c("lemma", "upos")
@@ -554,6 +565,11 @@
 #' @param keep_numbers Whether tokens consisting only of Unicode numbers are
 #'   retained. Alphanumeric tokens such as `"COVID-19"` are retained under
 #'   either setting.
+#' @param tokenizer `"unicode"` preserves the original word rules.
+#'   `"english"` uses the English lexical rules, excludes URLs and email
+#'   addresses, recognizes number-like expressions and dotted initialisms,
+#'   and canonicalizes curly apostrophes and hyphen typography. It keeps
+#'   contractions and hyphenated words intact. Neither method is Treebank.
 #'
 #' @return A `lexdiv_tokenization` object containing a token table and a
 #'   versioned preprocessing provenance record. The `surface` column can be
@@ -563,7 +579,8 @@ lexdiv_tokenize <- function(
     text,
     normalization = "NFC",
     case = "preserve",
-    keep_numbers = FALSE) {
+    keep_numbers = FALSE,
+    tokenizer = "unicode") {
   text <- .lexprep_text(text)
   normalization <- .lexprep_scalar_choice(
     normalization,
@@ -572,30 +589,39 @@ lexdiv_tokenize <- function(
   )
   case <- .lexprep_scalar_choice(case, c("preserve", "lower"), "case")
   keep_numbers <- .lexprep_scalar_flag(keep_numbers, "keep_numbers")
-  processed <- .lexprep_normalize_text(text, normalization, case)
+  tokenizer <- .lexprep_scalar_choice(tokenizer, c("unicode", "english"), "tokenizer")
+  specification <- .lexprep_tokenizer_spec(tokenizer)
+  processed <- .lexprep_prepare_text(text, normalization, case, tokenizer)
 
-  locations <- stringi::stri_locate_all_regex(
-    processed,
-    .lexprep_token_pattern,
-    omit_no_match = TRUE
-  )[[1L]]
-  if (is.null(dim(locations)) || nrow(locations) == 0L) {
-    locations <- matrix(integer(), nrow = 0L, ncol = 2L)
-    colnames(locations) <- c("start", "end")
-    surfaces <- character()
-    is_number <- logical()
+  if (identical(tokenizer, "english")) {
+    extracted <- .lexprep_english_extract(processed, keep_numbers)
+    locations <- extracted$locations
+    surfaces <- extracted$surfaces
+    is_number <- extracted$is_number
   } else {
-    surfaces <- stringi::stri_sub(
+    locations <- stringi::stri_locate_all_regex(
       processed,
-      from = locations[, "start"],
-      to = locations[, "end"]
-    )
-    is_number <- stringi::stri_detect_regex(surfaces, "^\\p{N}+$")
-    if (!keep_numbers && any(is_number)) {
-      retained <- !is_number
-      locations <- locations[retained, , drop = FALSE]
-      surfaces <- surfaces[retained]
-      is_number <- is_number[retained]
+      .lexprep_token_pattern,
+      omit_no_match = TRUE
+    )[[1L]]
+    if (is.null(dim(locations)) || nrow(locations) == 0L) {
+      locations <- matrix(integer(), nrow = 0L, ncol = 2L)
+      colnames(locations) <- c("start", "end")
+      surfaces <- character()
+      is_number <- logical()
+    } else {
+      surfaces <- stringi::stri_sub(
+        processed,
+        from = locations[, "start"],
+        to = locations[, "end"]
+      )
+      is_number <- stringi::stri_detect_regex(surfaces, "^\\p{N}+$")
+      if (!keep_numbers && any(is_number)) {
+        retained <- !is_number
+        locations <- locations[retained, , drop = FALSE]
+        surfaces <- surfaces[retained]
+        is_number <- is_number[retained]
+      }
     }
   }
   Encoding(surfaces) <- "UTF-8"
@@ -612,12 +638,12 @@ lexdiv_tokenize <- function(
   provenance <- list(
     contract_id = .lexprep_contract_id,
     contract_version = .lexprep_contract_version,
-    tokenizer_id = .lexprep_tokenizer_id,
-    tokenizer_version = .lexprep_tokenizer_version,
+    tokenizer_id = specification$id,
+    tokenizer_version = specification$version,
     normalization = normalization,
     case = case,
     keep_numbers = keep_numbers,
-    token_pattern = .lexprep_token_pattern,
+    token_pattern = specification$pattern,
     source_text_sha256 = digest::digest(
       charToRaw(enc2utf8(text)),
       algo = "sha256",
@@ -634,6 +660,10 @@ lexdiv_tokenize <- function(
     output_tokens = as.double(nrow(token_table)),
     annotation = NULL
   )
+  if (identical(tokenizer, "english")) {
+    provenance$excluded_spans <- extracted$excluded_spans
+    provenance$excluded_spans_sha256 <- .lexprep_exclusion_fingerprint(extracted$excluded_spans)
+  }
   structure(
     list(tokens = token_table, provenance = provenance),
     class = "lexdiv_tokenization"
@@ -1167,7 +1197,7 @@ lexdiv_flemmatize <- function(
 #'
 #' @param x One raw character string or a `lexdiv_tokenization` object. When an
 #'   existing tokenization is supplied, its recorded `normalization`, `case`,
-#'   and `keep_numbers` choices are authoritative; supplying any of those
+#'   `keep_numbers`, and `tokenizer` choices are authoritative; supplying any of those
 #'   tokenizer arguments again is an error.
 #' @param unit One of `"surface"`, `"lemma"`, or `"flemma"`. Lemma and flemma
 #'   analyses require the corresponding annotations on a `lexdiv_tokenization`
@@ -1193,11 +1223,13 @@ lexdiv_metrics_text <- function(
     window_length = 50L,
     mtld_threshold = 0.72,
     sample_size = 42L,
-    expected_ttr_sample_sizes = 35:50) {
+    expected_ttr_sample_sizes = 35:50,
+    tokenizer = "unicode") {
   supplied_tokenizer_arguments <- c(
     normalization = !missing(normalization),
     case = !missing(case),
-    keep_numbers = !missing(keep_numbers)
+    keep_numbers = !missing(keep_numbers),
+    tokenizer = !missing(tokenizer)
   )
   if (
     .lexprep_is_tokenization(x) &&
@@ -1231,7 +1263,8 @@ lexdiv_metrics_text <- function(
       text = x,
       normalization = normalization,
       case = case,
-      keep_numbers = keep_numbers
+      keep_numbers = keep_numbers,
+      tokenizer = tokenizer
     )
   }
   selected <- .lexprep_selected_units(tokenization, unit, word_inclusion)
@@ -1276,12 +1309,14 @@ lexdiv_metrics_text <- function(
 print.lexdiv_tokenization <- function(x, ...) {
   cat(
     sprintf(
-      "<lexdiv_tokenization> %d token%s | %s | %s | numbers=%s\n",
+      "<lexdiv_tokenization> %d token%s | %s | %s | numbers=%s | %s %s\n",
       nrow(x$tokens),
       if (nrow(x$tokens) == 1L) "" else "s",
       x$provenance$normalization,
       x$provenance$case,
-      if (isTRUE(x$provenance$keep_numbers)) "kept" else "removed"
+      if (isTRUE(x$provenance$keep_numbers)) "kept" else "removed",
+      x$provenance$tokenizer_id,
+      x$provenance$tokenizer_version
     )
   )
   print(x$tokens, row.names = FALSE, ...)

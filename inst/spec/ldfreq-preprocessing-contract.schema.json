@@ -5,33 +5,68 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "$schema", "contract_id", "contract_version", "status", "public_api",
-    "tokenizer", "normalization", "annotation", "lexical_units",
-    "compatibility", "result_boundary"
+    "$schema",
+    "contract_id",
+    "contract_version",
+    "status",
+    "public_api",
+    "tokenizer",
+    "normalization",
+    "annotation",
+    "lexical_units",
+    "compatibility",
+    "result_boundary"
   ],
   "properties": {
-    "$schema": {"const": "ldfreq-preprocessing-contract.schema.json"},
-    "contract_id": {"const": "ldfreq-preprocessing"},
-    "contract_version": {"const": "0.2.0"},
-    "status": {"const": "normative"},
-    "public_api": {"const": true},
-    "tokenizer": {"type": "object"},
-    "normalization": {"type": "object"},
-    "annotation": {"type": "object"},
-    "lexical_units": {"type": "object"},
+    "$schema": {
+      "const": "ldfreq-preprocessing-contract.schema.json"
+    },
+    "contract_id": {
+      "const": "ldfreq-preprocessing"
+    },
+    "contract_version": {
+      "const": "0.3.0"
+    },
+    "status": {
+      "const": "normative"
+    },
+    "public_api": {
+      "const": true
+    },
+    "tokenizer": {
+      "type": "object"
+    },
+    "normalization": {
+      "type": "object"
+    },
+    "annotation": {
+      "type": "object"
+    },
+    "lexical_units": {
+      "type": "object"
+    },
     "compatibility": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["serialized_0_1_0_tokenization", "migration"],
+      "required": [
+        "serialized_0_1_0_tokenization",
+        "migration",
+        "serialized_0_2_0_unicode_tokenization"
+      ],
       "properties": {
         "serialized_0_1_0_tokenization": {
           "const": "not-automatically-migrated"
         },
         "migration": {
           "const": "retokenize-original-text-and-reapply-current-annotations"
+        },
+        "serialized_0_2_0_unicode_tokenization": {
+          "const": "accepted-with-existing-validation-without-rewriting-saved-provenance"
         }
       }
     },
-    "result_boundary": {"type": "object"}
+    "result_boundary": {
+      "type": "object"
+    }
   }
 }

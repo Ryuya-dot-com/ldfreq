@@ -15,6 +15,7 @@ reference:
   - title: Raw text and lexical units
     contents:
       - lexdiv_preprocessing
+      - lexdiv_text_batch
       - lexdiv_flemmatize
   - title: Exact lexical overlap and coverage
     contents:
@@ -55,6 +56,7 @@ articles:
     contents:
       - from-text-to-report
       - getting-started
+      - english-tokenization
   - title: Research design and reference resources
     contents:
       - designing-comparisons

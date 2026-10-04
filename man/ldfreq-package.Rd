@@ -10,7 +10,7 @@ annotation, lexical-unit, Maas/MTLD sensitivity, and TUBELEX frequency-profile
 surfaces. It also provides local MATTR window and positional-exposure
 diagnostics, exact term and annotated-content-word type overlap,
 many-document coverage by one explicit reference term set, caller-supplied
-lexical-norm profiles with separate resource and annotation coverage, plus a
+lexical-norm profiles with separate resource and annotation coverage, plus
 New JACET 8000 level profiles using the bundled table or an external copy.
 Result rows retain method, parameter or denominator, schema, and contract
 provenance.
@@ -19,6 +19,8 @@ provenance.
 Start with \code{lexdiv_metrics()} for explicit tokens,
 \code{lexdiv_metrics_text()} for one raw or annotated text,
 \code{lexdiv_metrics_batch()} for multiple tokenized documents,
+\code{lexdiv_tokenize_batch()} and \code{lexdiv_metrics_text_batch()} for
+named raw texts or explicit ID/text tables,
 \code{lexdiv_as_documents()} for tidy or \pkg{quanteda} token containers,
 \code{lexdiv_widen()} for a pure wide transformation,
 \code{lexdiv_profile()} for explicit parameter variants,

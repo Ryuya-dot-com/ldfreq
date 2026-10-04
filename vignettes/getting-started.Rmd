@@ -24,6 +24,13 @@ result <- lexdiv_metrics(tokens, metrics = c("ttr", "rttr", "yule_k"))
 result
 ```
 
+For a named character vector or an ID/text table, use
+`lexdiv_tokenize_batch()` and `lexdiv_metrics_text_batch()`; see
+[English tokenization and document input](english-tokenization.html).
+Use `tokenizer = "english"` to select the English lexical rules. The examples
+below retain the original Unicode default so their measurement choices stay
+explicit.
+
 ## Raw text without hidden preprocessing
 
 The shortest raw-text workflow is a direct call to `lexdiv_metrics_text()`.

@@ -2,7 +2,7 @@
 
 Status: pre-CRAN audit for package version 0.2.0
 
-Audited: 2026-09-22
+Audited: 2026-10-04
 
 This repository-only record checks whether each exported function has a clear
 role, result boundary, batch relationship, standard R interaction, and
@@ -33,6 +33,11 @@ rendered by pkgdown.
   select `$results`, `$tokens`, `$summary`, `$lookup`, `$coverage`, or another
   named component deliberately.
 
+The English tokenizer is an explicit option of `lexdiv_tokenize()`, rather
+than a second competing single-document facade. `lexdiv_tokenize_batch()` adds
+validated raw-text tables and IDs; `lexdiv_metrics_text_batch()` additionally
+retains joined result/audit tables and complete document-local preprocessing.
+
 ## Export inventory
 
 | Export | Role and return boundary | Batch relation | Print | Plot | Analysis-ready access |
@@ -49,7 +54,8 @@ rendered by pkgdown.
 | `lexdiv_methods()` | Method registry data frame | Shared by single and batch calls | Base data-frame | No | Data frame with list-column parameters |
 | `lexdiv_metrics()` | One-row-per-metric long data frame | Paired with `lexdiv_metrics_batch()` | Result method | Single selected metric | Data frame |
 | `lexdiv_metrics_batch()` | Document-major long metric data frame | Explicit batch form | Batch-result method | Single selected metric | Data frame |
-| `lexdiv_metrics_text()` | Core results plus token audit and preprocessing | Document-scoped; callers batch explicitly | Text-result method | Delegates to unchanged `$results` | `$results`, `$token_audit`, `$preprocessing` |
+| `lexdiv_metrics_text()` | Core results plus token audit and preprocessing | Paired with `lexdiv_metrics_text_batch()` | Text-result method | Delegates to unchanged `$results` | `$results`, `$token_audit`, `$preprocessing` |
+| `lexdiv_metrics_text_batch()` | Raw/prepared document metrics with audits and provenance | Explicit text batch | Text-batch method | Delegates to complete `$results` | `$results`, `$token_audit`, `$preprocessing` |
 | `lexdiv_overlap_ids()` | Overlap measure ID character vector | Shared by both pair operations | Base | No | Vector |
 | `lexdiv_plan()` | Deduplicated bounded request plan | Shared by profile calls | Concise plan method | No | `$specifications` and plan identity fields |
 | `lexdiv_presets()` | Preset registry data frame | Shared by profile calls | Base data-frame | No | Data frame |
@@ -59,6 +65,7 @@ rendered by pkgdown.
 | `lexdiv_screen()` | Independent token-floor screen data frame | Accepts single or batch profile rows | Base data-frame | One selected screen | Data frame |
 | `lexdiv_spec()` | One normalized method/parameter request | Feeds grids/plans | Concise spec method | No | Named list fields |
 | `lexdiv_tokenize()` | Lossless token rows and preprocessing provenance | Document-scoped | Tokenization method | No | `$tokens`, `$provenance` |
+| `lexdiv_tokenize_batch()` | Named raw-text vector or ID/text table to complete tokenizations | Explicit text batch | Base list | No | Named list of `$tokens` / `$provenance` objects |
 | `lexdiv_term_overlap()` | Exact term-set overlap composite | Pair operation; no batch inference | Overlap method | No: denominators differ by measure | `$summary`, `$counts`, optional term tables |
 | `lexdiv_variant_ids()` | Variant registry data frame | Not document data | Base data-frame | No | Data frame |
 | `lexdiv_variant_metrics()` | Cross-definition result data frame | Document-scoped | Variant-result method | No: families and scales differ | Data frame |
@@ -70,7 +77,7 @@ rendered by pkgdown.
 
 ## Documentation and reuse gate
 
-The audit requires all 30 exports to have an installed help alias, an explicit
+The audit requires all 32 exports to have an installed help alias, an explicit
 value section, and an executable example. Shared help topics are acceptable
 when aliases, usage, argument ownership, and return types remain unambiguous.
 Every help topic must appear in the pkgdown reference index.

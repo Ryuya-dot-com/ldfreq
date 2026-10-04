@@ -1,5 +1,21 @@
 # ldfreq 0.2.0 (development)
 
+## English text and document tables
+
+- Added an opt-in `tokenizer = "english"` using R and the existing stringi
+  dependency. It retains contractions, hyphenated words and dotted initialisms,
+  canonicalizes apostrophe/hyphen typography, and records excluded URLs,
+  emails and number-like spans with processed-text offsets and fingerprints.
+  Existing Unicode-tokenizer defaults and numerical definitions are unchanged.
+- Added `lexdiv_tokenize_batch()` for named text vectors or explicit ID/text
+  tables, and `lexdiv_metrics_text_batch()` for raw or prepared documents.
+  Document IDs, empty documents, full metric rows, token audits, and preprocessing
+  records survive the batch workflow; missing texts produce identified errors.
+- Preprocessing contract 0.3.0 supports both tokenizer identities. Saved 0.2.0
+  Unicode objects remain valid. Neither tokenizer claims Treebank equivalence.
+- Added a tokenizer guide with worked segmentation differences, CSV/UTF-8 text
+  input, NJ8 coverage, and reporting guidance.
+
 ## Bundled vocabulary and research workflows
 
 - New JACET 8000 is bundled with JACET's permission and source attribution.
