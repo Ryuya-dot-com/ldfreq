@@ -1,7 +1,7 @@
 # Contributing to ldfreq
 
-Proposed exports must use a consistent, discoverable vocabulary. Maintainers
-apply the repository-local API naming gate before accepting a new export.
+Proposed public functions should use a consistent, discoverable vocabulary
+and include help, examples, and tests for the behavior they introduce.
 
 `ldfreq` treats a lexical metric as a measurement contract, not just a formula.
 Changes to metric definitions, defaults, missingness, parameter handling, or

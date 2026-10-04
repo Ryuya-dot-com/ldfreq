@@ -9,6 +9,44 @@ nj8_fixture <- function() {
   )
 }
 
+test_that("the bundled NJ8 table contains every verified rank and remains optional", {
+  path <- system.file("extdata", "nj8", "2016", "NJ8.csv", package = "ldfreq")
+  table <- utils::read.csv(path, colClasses = c("integer", "character"),
+                           na.strings = character())
+  expect_identical(table$NJ8, 1:8000)
+  expect_identical(table$Word[c(326L, 2382L, 6926L)], c("true", "false", "nan"))
+  # Identity lookup exposes case corruption that default lowercasing would hide.
+  terms <- c("true", "false", "nan", "ldfreq_not_a_word")
+  result <- nj8_profile(terms, normalization = "identity")
+  external <- nj8_profile(terms, table, normalization = "identity")
+  expect_identical(result$lookup$rank, c(326L, 2382L, 6926L, NA_integer_))
+  expect_identical(result$coverage$token_coverage, 3 / 4)
+  expect_identical(result$summary, external$summary)
+  expect_identical(result$lookup, external$lookup)
+  expect_identical(result$diagnostics$missing_rank_count, 0)
+  expect_true(result$provenance$resource_bundled)
+  expect_false(external$provenance$resource_bundled)
+  expect_identical(result$provenance$resource_version, "jacet2016-8000-v1")
+  expect_match(result$provenance$resource_citation, "JACET.*2016")
+  expect_error(nj8_profile("nan", resource_version = "another-list"), "cannot relabel")
+  restored <- unserialize(serialize(result, NULL))
+  expect_identical(restored, result)
+  batch <- nj8_profile_batch(list(a = terms, b = character()), normalization = "identity")
+  expect_true(batch$provenance$resource_bundled)
+  expect_identical(batch$lookup$rank, result$lookup$rank)
+  expect_identical(batch$coverage$token_coverage, c(3 / 4, NA_real_))
+  expect_identical(nj8_profile_batch(setNames(list(), character()))$status, "empty")
+})
+
+test_that("a damaged bundled NJ8 table fails without an external fallback", {
+  path <- system.file("extdata", "nj8", "2016", "NJ8.csv", package = "ldfreq")
+  bytes <- ldfreq:::.nj8_read_file_bytes(path)
+  bytes[length(bytes) - 2L] <- as.raw(88L)
+  local_mocked_bindings(.nj8_read_file_bytes = function(path) bytes, .package = "ldfreq")
+  expect_error(nj8_profile("the"), "checksum does not match")
+  expect_error(nj8_profile_batch(list(a = "the")), "checksum does not match")
+})
+
 test_that("New JACET profiles expose exact and cumulative token/type rates", {
   result <- nj8_profile(
     c("The", "mum", "develop", "rare", "unknown", "the"),
@@ -535,10 +573,10 @@ test_that("the installed level-profile contract matches the public result", {
   result <- nj8_profile(character(), nj8_fixture())
 
   expect_identical(contract$contract_id, "ldfreq-lexical-level-profile")
-  expect_identical(contract$contract_version, "0.1.0")
+  expect_identical(contract$contract_version, "0.2.0")
   expect_identical(contract$status, "normative")
   expect_identical(contract$resource_boundary$caller_supplied, TRUE)
-  expect_identical(contract$resource_boundary$bundled, FALSE)
+  expect_identical(contract$resource_boundary$bundled, TRUE)
   expect_identical(contract$resource_boundary$downloaded, FALSE)
   expect_identical(contract$provenance$source_filename_only, TRUE)
   expect_identical(contract$provenance$absolute_path_retained, FALSE)
@@ -548,7 +586,7 @@ test_that("the installed level-profile contract matches the public result", {
     contract$batch$contract_id,
     "ldfreq-lexical-level-profile-batch"
   )
-  expect_identical(contract$batch$contract_version, "0.1.0")
+  expect_identical(contract$batch$contract_version, "0.2.0")
   expect_identical(contract$batch$resource_read_validate_normalize_hash_count, 1L)
   expect_identical(contract$batch$absolute_path_retained, FALSE)
   expect_identical(

@@ -48,3 +48,15 @@ reference:
   - title: Evidence
     contents:
       - lexdiv_length_evidence
+
+articles:
+  - title: Start here
+    navbar: ~
+    contents:
+      - from-text-to-report
+      - getting-started
+  - title: Research design and reference resources
+    contents:
+      - designing-comparisons
+      - preprocessing-and-frequency
+      - tubelex-input

@@ -16,15 +16,12 @@ not imply that unchanged method contracts have been renumbered. The package
 does not claim compatibility with TAALES, TAALED, CLAN VOCD, or another
 package's same-named variant beyond each row's explicit comparison scope.
 
-The lexical-level profile is resource-decoupled: `nj8_profile()` and
-`nj8_profile_batch()`
-accept only a caller-supplied data frame, local CSV, or official-layout local
-XLSX, compute Level 1--8
-exact/cumulative token and type rates, and never bundles, downloads, or returns
-the full New JACET 8000 list. The batch adapter requires explicit document IDs,
-processes the external list once, and bounds its combined summary/lookup rows.
-This public measurement contract does not admit
-the underlying JACET resource into the package inventory.
+The lexical-level profile uses the bundled `jacet2016-8000-v1` table by default,
+with optional caller-supplied data-frame, CSV, and XLSX inputs. The level-profile
+and batch contracts are 0.2.0. Permission, citation, the verified three-entry
+correction, and source identities are recorded in the NJ8 notice and provenance.
+Batch processing validates the selected resource once and preserves explicit IDs.
+There is no network download and no full-list copy in the returned result.
 
 `lexdiv_flemmatize()` similarly reads only a caller-supplied local AntBNC text
 resource. It keeps that payload outside package artifacts and records the
@@ -100,10 +97,10 @@ governed by the non-exported lookup contract. Installed resource facts are
 recorded in `inst/spec/ldfreq-installed-resource-manifest.json`. Release
 admission, deferred resources, and exclusions are recorded separately in
 `experiments/resource-admission/ldfreq-release-resource-inventory.json`.
-A New JACET 8000 adapter does not change that resource state. The list remains
-explicitly excluded from package payloads while durable CRAN and downstream
-redistribution scope remains unresolved; only caller-authorized local input is
-read at runtime, with no network or fallback path.
+New JACET 8000 is admitted on the project owner's confirmed JACET permission
+with attribution, reaffirmed for this work on 2026-10-04. The original reply is
+not required. All 8,000 bundled rank/entry pairs were checked against the official
+workbook; this is data permission, not a final package publication decision.
 The AntBNC adapter also does not admit its payload: official download
 availability is not treated as downstream redistribution permission, and only
 caller-authorized local input is read without a network path.

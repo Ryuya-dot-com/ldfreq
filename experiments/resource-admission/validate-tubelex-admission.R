@@ -135,8 +135,8 @@ check(
     identical(release_inventory$policy$uncertainty_default, "exclude") &&
     identical(release_inventory$policy$runtime_network_access, FALSE) &&
     identical(release_inventory$policy$implicit_download_or_fallback, FALSE) &&
-    identical(as.numeric(release_inventory$release_approved_resource_count), 1) &&
-    length(release_inventory$included_resources) == 1L,
+    identical(as.numeric(release_inventory$release_approved_resource_count), 2) &&
+    length(release_inventory$included_resources) == 2L,
   "The repository release inventory changed its policy or resource count."
 )
 excluded_ids <- vapply(
@@ -148,7 +148,7 @@ check(
   identical(
     excluded_ids,
     c(
-      "ngsl-1.2", "oewn-2025", "nj8", "antbnc-lemma-list",
+      "ngsl-1.2", "oewn-2025", "antbnc-lemma-list",
       "ngsl-31k-workbook", "coca", "ellipse-corpus",
       "python-resource-derived-golden-outputs"
     )
@@ -157,11 +157,11 @@ check(
 )
 
 check(
-  identical(installed_manifest$schema_version, "1.0.0") &&
+  identical(installed_manifest$schema_version, "1.1.0") &&
     identical(installed_manifest$package_scope, "installed-lexical-resources") &&
     identical(installed_manifest$runtime_policy$network_access, FALSE) &&
     identical(installed_manifest$runtime_policy$implicit_download_or_fallback, FALSE) &&
-    length(installed_manifest$resources) == 1L &&
+    length(installed_manifest$resources) == 2L &&
     identical(installed_manifest_schema$title, "ldfreq installed resource manifest") &&
     identical(installed_manifest_schema$additionalProperties, FALSE),
   "The installed resource-manifest contract changed."

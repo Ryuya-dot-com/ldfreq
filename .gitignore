@@ -5,3 +5,4 @@
 *.Rcheck/
 *.tar.gz
 docs/
+__pycache__/

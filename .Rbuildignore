@@ -9,3 +9,4 @@
 ^development$
 ^legal$
 ^LIFECYCLE\.md$
+^inst/examples/__pycache__$

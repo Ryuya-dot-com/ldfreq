@@ -4,7 +4,6 @@
   "contract_version": "0.1.0",
   "status": "versioned-non-exported-implementation-contract",
   "public_api": false,
-  "release_approved": true,
   "resource": {
     "resource_id": "tubelex-en-treebank-slim",
     "resource_version": "7cb5fb36-slim-v1",

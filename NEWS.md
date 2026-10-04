@@ -1,5 +1,21 @@
 # ldfreq 0.2.0 (development)
 
+## Bundled vocabulary and research workflows
+
+- New JACET 8000 is bundled with JACET's permission and source attribution.
+  `nj8_profile()` and `nj8_profile_batch()` now default to this versioned table;
+  explicit external tables remain supported. The level-profile contract advances
+  to 0.2.0, recording bundled/external identity and the bundled source citation.
+- Checked all 8,000 rank/entry pairs against the official workbook. Corrected
+  three entries in the supplied snapshot: restore `nan` at rank 6926, and
+  lowercase `true`/`false` at ranks 326/2382. Source and correction records are
+  installed with the data. Lookup checks the bundled file before use.
+- Added a complete text-to-report example, resource/method citation guidance,
+  and an optional external NLTK recipe for TUBELEX input. Python remains optional
+  and is not called by any R calculation.
+- Reorganized the introduction around comparison conditions and reference
+  coverage, with an explicit comparison to existing R packages.
+
 ## Compatibility and migration
 
 - TUBELEX profiles now reject `lexdiv_tokenization` objects by default because
@@ -115,55 +131,15 @@
   no overrides remain comparable; otherwise both must declare the same
   override version.
 
-## Corrections and validation
+## Other corrections
 
-- Made the documented-public-API audit part of ordinary pull-request CI, not
-  only the exact-candidate path. Release-state classification now fails on an
-  inconsistent package/scope/version or an unknown status instead of silently
-  treating malformed candidate metadata as development.
-- Excluded locally rendered pkgdown output from source-package builds and
-  removed a documentation hyperlink whose upstream server rejects automated
-  availability checks. The authoritative resource name and source remain
-  stated without creating a false release-readiness signal.
-- Documented every registered S3 method under an installed help alias and
-  added a repository API audit that cross-checks exports, S3 registrations,
-  value/examples, the public-surface inventory, and pkgdown navigation.
-- MATTR plotting now rejects non-scalar or missing `add_global_mean` values
-  instead of treating them as an implicit false choice. MATTR and reference
-  coverage contracts now fix every reusable table's component and column
-  topology.
-- The package-resource inventory now discovers every installed `inst/spec`
-  file automatically, so a new contract cannot bypass source/archive/install
-  identity checks through omission from a hand-maintained list.
-- `lexdiv_metrics_text()` now forwards custom expected-TTR D sample sizes to
+- `lexdiv_metrics_text()` forwards custom expected-TTR D sample sizes to
   the token-vector core.
-- Lemma/UPOS and flemma annotation layers are validated against their recorded
-  provenance before use; unsupported Universal POS tags now fail explicitly.
-- UPOS backend identity is now required explicitly whenever any UPOS tag is
-  present. It is never defaulted from lemma backend identity, including when
-  one caller pipeline produced both layers.
-- Flemma adapter and parser identities are fixed by `ldfreq`;
-  `resource_version` and `override_version` are path-free caller labels that
-  are disclosed in provenance and overlap comparability output. Callers must
-  not put paths, secrets, or private hashes in these labels.
-- Removed AntBNC source-file names and source/override SHA-256 fields from
-  public flemma provenance and overlap comparison. The source-byte digest is
-  used only for caching and is never copied to public provenance or results.
-- Preprocessing contract `0.1.0` validates annotation provenance strictly,
-  including explicit UPOS-backend identity. Serialized objects are revalidated
-  before use; unsupported or manually altered provenance fails explicitly.
-- Kept tokenizer and preprocessing contract identity at `0.1.0` because all
-  corrected behavior is part of the first unpublished release.
-- Versioned the installed, non-exported lexical-resource loader, manifest,
-  lookup contract, and result schema as `0.1.0` without changing loading,
-  matching, formulas, or resource behavior.
-- Separated package-release review records from installed resource
-  metadata. The installed manifest now contains only bundled-resource,
-  provenance, license, identity, and runtime-boundary facts.
-- Added a CC0 cross-language semantic fixture for the ten R/Python formulas
-  that share method IDs. It compares parsed values, status meaning, and missing
-  reasons, while recording the intentionally different R and Python MTLD
-  boundary variants without claiming byte-level fixture identity.
+- Lemma, UPOS, and flemma annotations are checked against their recorded
+  settings before use. UPOS identity is explicit even when the same pipeline
+  generates lemmas and tags.
+- MATTR plotting validates `add_global_mean`; plots return their selected
+  data invisibly. S3 methods are documented in installed help.
 
 ## Initial release
 
@@ -192,10 +168,10 @@
   are formula comparators, not end-to-end compatibility claims.
 - Added bounded method specifications, parameter grids, request plans,
   multi-document profiles, and independent token-length screens.
-- Added `nj8_profile()` and its batch and plot methods for a
+- Added `nj8_profile()` and its batch and plot methods, initially for a
   caller-supplied New JACET 8000 list. Exact and cumulative Level 1--8 token
-  and type rates retain off-list items in the denominator. The package neither
-  bundles nor downloads the list.
+  and type rates retain off-list items in the denominator. Version 0.1.0 did
+  not bundle the list; version 0.2.0 adds the permitted reference table.
 - Added `tubelex_profile()` with explicit query normalization,
   lossless matched and unmatched rows, token and type coverage, and
   matched-only frequency and prevalence summaries.

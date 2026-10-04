@@ -11,7 +11,7 @@ surfaces. It also provides local MATTR window and positional-exposure
 diagnostics, exact term and annotated-content-word type overlap,
 many-document coverage by one explicit reference term set, caller-supplied
 lexical-norm profiles with separate resource and annotation coverage, plus a
-caller-supplied New JACET 8000 level-profile surface without bundling that list.
+New JACET 8000 level profiles using the bundled table or an external copy.
 Result rows retain method, parameter or denominator, schema, and contract
 provenance.
 }
@@ -32,7 +32,7 @@ reference set, or
 \code{lexdiv_norm_profile()} for exact matching against a caller-supplied
 numeric lexical-norm table, or
 \code{nj8_profile()} for exact and cumulative pedagogical frequency
-levels from a caller-supplied list, or
+levels from the bundled or an external list, or
 \code{tubelex_profile()} for coverage-aware corpus-relative
 frequency and prevalence.
 }
@@ -60,8 +60,7 @@ Choose the entry point from the form of data you already have:
   terms, or \code{lexdiv_content_overlap()} for UPOS-annotated content words.}
   \item{A corpus-relative reference profile}{Use
   \code{tubelex_profile()} for bundled TUBELEX frequency/prevalence,
-  or \code{nj8_profile()} with a legitimately obtained caller copy
-  of New JACET 8000.}
+  or \code{nj8_profile()} for New JACET 8000 levels.}
 }
 
 In the help pages, a \emph{token} is one occurrence. In core metric results, a
@@ -175,11 +174,11 @@ They are not direct measures of proficiency, writing quality, academic
 register, or context-independent lexical sophistication.
 }
 \section{Lexical frequency levels}{
-\code{nj8_profile()} maps caller-supplied ranks to Levels 1--8 and
+\code{nj8_profile()} maps bundled or caller-supplied ranks to Levels 1--8 and
 reports exact and cumulative token/type proportions beside off-list coverage.
 The Level 8 cumulative proportion equals matched coverage because off-list
-items remain in the denominator. The package does not bundle or download the
-New JACET 8000 list. Flemma input exposes conflicts between AntBNC families and
+items remain in the denominator. The package bundles the versioned New JACET 8000 table with JACET
+permission and source attribution; an external list can be supplied explicitly. Flemma input exposes conflicts between AntBNC families and
 New JACET headwords instead of silently choosing one mapping.
 }
 \section{Direction and contract scale}{

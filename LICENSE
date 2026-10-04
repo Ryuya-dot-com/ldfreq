@@ -1,2 +1,8 @@
 YEAR: 2026
 COPYRIGHT HOLDER: Komuro Ryuya and the ldfreq authors
+NOTE: The MIT license applies to original code and documentation. Bundled
+    third-party materials retain their own terms. TUBELEX data and adapted
+    example code use BSD-3-Clause; see licenses/tubelex/NOTICE.md. The New
+    JACET 8000 table is copyright JACET and is redistributed with permission
+    and source attribution; see licenses/nj8/NOTICE.md. These paths refer to
+    the installed package and are prefixed with inst/ in the source package.

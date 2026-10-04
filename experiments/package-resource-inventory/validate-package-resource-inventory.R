@@ -127,15 +127,15 @@ schema_source_path <- file.path(
 inventory <- jsonlite::read_json(inventory_source_path, simplifyVector = FALSE)
 inventory_schema <- jsonlite::read_json(schema_source_path, simplifyVector = FALSE)
 check(
-  identical(inventory$schema_version, "1.0.0") &&
+  identical(inventory$schema_version, "1.1.0") &&
     identical(inventory$package_scope, "installed-lexical-resources") &&
     identical(inventory$runtime_policy$network_access, FALSE) &&
     identical(inventory$runtime_policy$implicit_download_or_fallback, FALSE),
   "Installed resource-manifest boundary changed."
 )
 check(
-  length(inventory$resources) == 1L,
-  "The installed manifest must declare one bundled resource."
+  length(inventory$resources) == 2L,
+  "The installed manifest must declare the two bundled resources."
 )
 check(
   identical(inventory_schema$title, "ldfreq installed resource manifest") &&

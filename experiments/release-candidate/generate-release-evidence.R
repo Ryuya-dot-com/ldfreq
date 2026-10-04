@@ -402,11 +402,11 @@ resource_manifest_path <- file.path(
 check(file.exists(resource_manifest_path), "The source package has no installed resource manifest.")
 resource_manifest <- jsonlite::read_json(resource_manifest_path, simplifyVector = FALSE)
 check(
-  identical(resource_manifest$schema_version, "1.0.0") &&
+  identical(resource_manifest$schema_version, "1.1.0") &&
     identical(resource_manifest$package_scope, "installed-lexical-resources") &&
     identical(resource_manifest$runtime_policy$network_access, FALSE) &&
     identical(resource_manifest$runtime_policy$implicit_download_or_fallback, FALSE) &&
-    length(resource_manifest$resources) == 1L,
+    length(resource_manifest$resources) == 2L,
   "The release-evidence installed resource boundary changed."
 )
 admission_record_path <- file.path(

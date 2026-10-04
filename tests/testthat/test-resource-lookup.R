@@ -270,7 +270,7 @@ test_that("the installed contract records the non-exported offline boundary", {
     "versioned-non-exported-implementation-contract"
   )
   expect_identical(contract$public_api, FALSE)
-  expect_identical(contract$release_approved, TRUE)
+  expect_false("release_approved" %in% names(contract))
   expect_identical(runtime_ref$contract_id, contract$contract_id)
   expect_identical(runtime_ref$contract_version, contract$contract_version)
   expect_identical(

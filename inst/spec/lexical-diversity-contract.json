@@ -3,7 +3,7 @@
   "contract_id": "ldfreq-lexical-diversity-core",
   "contract_version": "0.1.0",
   "status": "normative",
-  "reviewed_on": "2026-09-22",
+  "reviewed_on": "2026-10-04",
   "normative": true,
   "normative_authority": "This contract and its hand fixtures are authoritative for the twelve-method core; no Python, R, Java, Web, koRpus, or quanteda implementation is the sole oracle.",
   "input_contract": {
@@ -94,7 +94,7 @@
   },
   "r_profile_contract": {
     "scope": "optional R orchestration over the twelve normative core methods; it does not change a core metric result",
-    "admitted_stability": ["freeze-ready"],
+    "admitted_stability": ["stable"],
     "identity_model": {
       "metric_id": "construct or metric family",
       "method_id": "formula, scale, boundary, tail, and aggregation identity fixed by a metric contract entry",
@@ -160,7 +160,7 @@
         "preset_id": "canonical",
         "preset_version": "0.1.0",
         "specification_count": 12,
-        "resolution": "one default specification for every freeze-ready metric in contract order",
+        "resolution": "one default specification for every stable metric in contract order",
         "additions": []
       },
       {
@@ -241,7 +241,7 @@
       "metric_id": "ttr",
       "method_id": "ttr_v_over_n_v1",
       "label": "Type-token ratio",
-      "stability": "freeze-ready",
+      "stability": "stable",
       "construct": "observed lexical variety relative to tokens",
       "definition": {"formula": "V / N"},
       "parameters": {},
@@ -254,7 +254,7 @@
       "metric_id": "rttr",
       "method_id": "rttr_guiraud_v_over_sqrt_n_v1",
       "label": "Root TTR (Guiraud)",
-      "stability": "freeze-ready",
+      "stability": "stable",
       "construct": "length-adjusted observed lexical variety",
       "definition": {"formula": "V / sqrt(N)"},
       "parameters": {},
@@ -267,7 +267,7 @@
       "metric_id": "cttr",
       "method_id": "cttr_v_over_sqrt_2n_v1",
       "label": "Corrected TTR",
-      "stability": "freeze-ready",
+      "stability": "stable",
       "construct": "length-adjusted observed lexical variety",
       "definition": {"formula": "V / sqrt(2 * N)"},
       "parameters": {},
@@ -280,7 +280,7 @@
       "metric_id": "herdan",
       "method_id": "herdan_c_logv_over_logn_v1",
       "label": "Herdan's C",
-      "stability": "freeze-ready",
+      "stability": "stable",
       "construct": "log-scaled lexical variety",
       "definition": {"formula": "ln(V) / ln(N)", "log_base": "any common base; the ratio is invariant"},
       "parameters": {},
@@ -293,7 +293,7 @@
       "metric_id": "maas",
       "method_id": "maas_a2_ln_v1",
       "label": "Maas a-squared",
-      "stability": "freeze-ready",
+      "stability": "stable",
       "construct": "log-scaled lexical repetition",
       "definition": {
         "formula": "(ln(N) - ln(V)) / (ln(N)^2)",
@@ -316,7 +316,7 @@
       "metric_id": "msttr",
       "method_id": "msttr_nonoverlap_complete_drop_v1",
       "label": "Mean segmental TTR",
-      "stability": "freeze-ready",
+      "stability": "stable",
       "construct": "mean local variety in fixed non-overlapping segments",
       "definition": {
         "algorithm": [
@@ -339,7 +339,7 @@
       "metric_id": "mattr",
       "method_id": "mattr_sliding_step1_v1",
       "label": "Moving-average TTR",
-      "stability": "freeze-ready",
+      "stability": "stable",
       "construct": "mean local variety in all fixed overlapping windows",
       "definition": {
         "algorithm": [
@@ -361,7 +361,7 @@
       "metric_id": "mtld",
       "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
       "label": "Measure of textual lexical diversity",
-      "stability": "freeze-ready",
+      "stability": "stable",
       "construct": "mean tokens per sequential factor at a TTR threshold",
       "definition": {
         "directional_algorithm": [
@@ -398,7 +398,7 @@
       "metric_id": "hdd",
       "method_id": "hdd_expected_ttr_scaled_v1",
       "label": "HD-D on expected-TTR scale",
-      "stability": "freeze-ready",
+      "stability": "stable",
       "construct": "expected TTR of a uniform sample without replacement",
       "definition": {
         "formula": "sum_t(1 - choose(N - f_t, sample_size) / choose(N, sample_size)) / sample_size",
@@ -417,7 +417,7 @@
       "metric_id": "expected_ttr_d",
       "method_id": "expected_ttr_d_hypergeom_fit_v1",
       "label": "Deterministic expected-TTR D fit",
-      "stability": "freeze-ready",
+      "stability": "stable",
       "construct": "D parameter fitted to an exact finite-population sample-size/TTR curve",
       "definition": {
         "expected_curve": "y_n = sum_t(1 - choose(N-f_t,n)/choose(N,n)) / n",
@@ -467,7 +467,7 @@
       "metric_id": "yule_k",
       "method_id": "yule_k_m2_tokens_v1",
       "label": "Yule's K",
-      "stability": "freeze-ready",
+      "stability": "stable",
       "construct": "concentration of repeated lexical types",
       "definition": {"formula": "10000 * (M2 - N) / (N^2)"},
       "parameters": {},
@@ -480,7 +480,7 @@
       "metric_id": "yule_i",
       "method_id": "yule_i_types_v2_over_m2_minus_v_v1",
       "label": "Yule's I",
-      "stability": "freeze-ready",
+      "stability": "stable",
       "construct": "inverse type-based lexical concentration",
       "definition": {
         "formula": "V^2 / (M2 - V)",
@@ -492,6 +492,5 @@
       "scale": {"lower_bound": 0, "upper_bound": null, "bounded": false},
       "direction": "higher"
     }
-  ],
-  "open_design_gates": []
+  ]
 }

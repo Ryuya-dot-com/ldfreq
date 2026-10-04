@@ -122,6 +122,11 @@ integrity check. \code{failure_reason} is missing for \code{"ok"} and
 \code{"empty"}, and otherwise gives the specific failure reason. Coverage is
 missing when its denominator is zero or the lookup could not be completed.
 }
+\references{
+Nohejl et al. (2025). Beyond Film Subtitles: Is YouTube the Best Approximation
+of Spoken Vocabulary? \emph{Proceedings of COLING 2025}.
+\url{https://aclanthology.org/2025.coling-main.641/}.
+}
 \value{
 A \code{tubelex_profile} list containing \code{status},
 \code{failure_reason}, token- and type-weighted \code{summary}, lossless
@@ -159,5 +164,9 @@ contract_paths <- system.file("spec", contract_files, package = "ldfreq")
 stopifnot(all(nzchar(contract_paths)))
 basename(contract_paths)
 }
-\seealso{\code{\link{lexdiv_tokenize}}, \code{\link{lexdiv_metrics_text}}}
+\seealso{
+\code{\link{lexdiv_tokenize}}, \code{\link{lexdiv_metrics_text}};
+\code{vignette("tubelex-input", package = "ldfreq")} for the optional
+external tokenization recipe and its reproducibility boundaries.
+}
 \keyword{text}

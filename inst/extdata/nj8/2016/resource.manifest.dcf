@@ -1,0 +1,7 @@
+Resource-ID: new-jacet8000
+Resource-Version: jacet2016-8000-v1
+Artifact: NJ8.csv
+Artifact-SHA256: 6797238778c4b67bdce9657f16bfbdcc65982c72e4fd29eca93f7fef2d010f59
+Entries: 8000
+Citation: JACET Basic Word Revision Committee (Ed.). (2016). The New JACET List of 8000 Basic Words. Tokyo: Kirihara Shoten.
+Notice: licenses/nj8/NOTICE.md

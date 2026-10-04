@@ -1,6 +1,6 @@
 {
   "$schema": "ldfreq-installed-resource-manifest.schema.json",
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "package_scope": "installed-lexical-resources",
   "runtime_policy": {
     "network_access": false,
@@ -52,8 +52,60 @@
         {
           "path": "COPYRIGHTS",
           "role": "component copyright index",
-          "bytes": 658,
-          "sha256": "08ca83f34d2cec91bbdf84f40f9737de57e9e2f6e3fe641443a5ed8b501429c1"
+          "bytes": 1401,
+          "sha256": "467853be2cc1944f88b434a9ce802b0b5d9b358d483e24f849b6d97c7f647beb"
+        },
+        {
+          "path": "examples/tubelex-tokenize.py",
+          "role": "optional external token preparation example",
+          "bytes": 8184,
+          "sha256": "abe30786ceedc28495f9742ffdd28b308c0934262f76675ca3808897c5c506f0"
+        }
+      ]
+    },
+    {
+      "resource_id": "new-jacet8000",
+      "resource_version": "jacet2016-8000-v1",
+      "distribution": "bundled",
+      "runtime_state": "public",
+      "public_api": true,
+      "license_spdx": null,
+      "license_name": "JACET permission with source attribution",
+      "source_repository": null,
+      "source_commit": null,
+      "source_url": "https://language.sakura.ne.jp/s/doc/voc/j8_2016.xlsx",
+      "source_sha256": "1433dcd94135f86cfdbcbf5bafc209661678f1104f5062041b737834e99d3cf8",
+      "raw_source_bundled": false,
+      "raw_subtitles_or_identifiers_included": false,
+      "manifest_sha256": "6a802a0de9a4fd534d224508586fbefff764890839a4fb4c896b9e1b0e4035b0",
+      "artifact_sha256": "6797238778c4b67bdce9657f16bfbdcc65982c72e4fd29eca93f7fef2d010f59",
+      "content_sha256": "6797238778c4b67bdce9657f16bfbdcc65982c72e4fd29eca93f7fef2d010f59",
+      "notice_path": "licenses/nj8/NOTICE.md",
+      "provenance_path": "extdata/nj8/2016/provenance.json",
+      "package_members": [
+        {
+          "path": "extdata/nj8/2016/NJ8.csv",
+          "role": "rank and representative-lemma table",
+          "bytes": 120181,
+          "sha256": "6797238778c4b67bdce9657f16bfbdcc65982c72e4fd29eca93f7fef2d010f59"
+        },
+        {
+          "path": "extdata/nj8/2016/resource.manifest.dcf",
+          "role": "runtime resource manifest",
+          "bytes": 333,
+          "sha256": "6a802a0de9a4fd534d224508586fbefff764890839a4fb4c896b9e1b0e4035b0"
+        },
+        {
+          "path": "extdata/nj8/2016/provenance.json",
+          "role": "source verification and corrections",
+          "bytes": 1163,
+          "sha256": "27754e491fab1b64f0c96efb9843fce7be27952f8e89760d8861f8712cc62826"
+        },
+        {
+          "path": "licenses/nj8/NOTICE.md",
+          "role": "permission, attribution, and changes",
+          "bytes": 1786,
+          "sha256": "c676ae232916910290454f5e27d643f69958d72caad53a3cd6fe259535596232"
         }
       ]
     }

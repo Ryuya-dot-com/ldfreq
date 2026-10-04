@@ -13,7 +13,7 @@
   ],
   "properties": {
     "$schema": {"const": "ldfreq-installed-resource-manifest.schema.json"},
-    "schema_version": {"const": "1.0.0"},
+    "schema_version": {"const": "1.1.0"},
     "package_scope": {"const": "installed-lexical-resources"},
     "runtime_policy": {
       "type": "object",
@@ -71,9 +71,11 @@
         "distribution": {"const": "bundled"},
         "runtime_state": {"enum": ["non-exported", "public"]},
         "public_api": {"type": "boolean"},
-        "license_spdx": {"type": "string", "minLength": 1},
-        "source_repository": {"type": "string", "format": "uri"},
-        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "license_name": {"type": "string", "minLength": 1},
+        "source_url": {"type": "string", "format": "uri"},
+        "license_spdx": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+        "source_repository": {"anyOf": [{"type": "string", "format": "uri"}, {"type": "null"}]},
+        "source_commit": {"anyOf": [{"type": "string", "pattern": "^[0-9a-f]{40}$"}, {"type": "null"}]},
         "source_sha256": {"$ref": "#/$defs/sha256"},
         "raw_source_bundled": {"type": "boolean"},
         "raw_subtitles_or_identifiers_included": {"type": "boolean"},

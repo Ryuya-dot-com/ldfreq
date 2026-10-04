@@ -1,6 +1,6 @@
-# ldfreq 0.1.0 release-candidate boundary
+# ldfreq 0.2.0 publication boundary
 
-Version `0.1.0` is the initial CRAN release candidate. It consolidates the core,
+Version `0.2.0` is under development toward an initial CRAN submission. It consolidates the core,
 preprocessing, lexical-overlap, many-document reference-coverage, lexical-level,
 TUBELEX, formula-variant, correction, test, documentation, and canonical naming
 work completed before the first CRAN submission. No earlier package version is
@@ -70,12 +70,12 @@ material, installed notice, and the fact that no independent legal opinion was
 obtained. The final exact source, installed, and binary inventory must reproduce
 this boundary.
 
-The New JACET 8000 level-profile API is code-only: a final candidate must verify
-that no JACET list bytes appear in the repository, source archive, installed
-library, platform archive, examples, vignettes, or generated evidence. Its
-scientific review must separately confirm the all-eligible denominator,
-off-list row, rank-to-level rule, and surface/lemma/flemma provenance.
-The caller-supplied AntBNC flemma adapter is also code-only: no AntBNC payload
+The New JACET 8000 level-profile API uses an attributed, permitted bundled
+rank/entry table by default and still accepts explicit external copies. The
+candidate must preserve the installed NJ8 notice, source/correction provenance,
+all 8,000 verified ranks, and default/external resource identity.
+
+The caller-supplied AntBNC flemma adapter remains code-only: no AntBNC payload
 may enter package artifacts. Review must verify identity fallback, explicit
 override precedence, path-private provenance, and the documented distinction
 between raw AntBNC approximation and NWLC's manually aligned mapping.

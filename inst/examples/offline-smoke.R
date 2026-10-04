@@ -248,4 +248,12 @@ stopifnot(
   all(screen$passes_screen)
 )
 
+# The real bundled NJ8 resource is available without a file path or network.
+bundled_levels <- nj8_profile(c("true", "false", "nan", "ldfreq_not_a_word"))
+stopifnot(
+  isTRUE(bundled_levels$provenance$resource_bundled),
+  identical(bundled_levels$lookup$rank, c(326L, 2382L, 6926L, NA_integer_)),
+  bundled_levels$diagnostics$missing_rank_count == 0
+)
+
 invisible(TRUE)

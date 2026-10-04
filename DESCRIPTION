@@ -9,23 +9,18 @@ Authors@R:
         email = "komuro.4121@gmail.com",
         role = c("aut", "cre")
     )
-Description: Computes twelve versioned lexical-diversity metrics from ordered token
-    vectors and from raw English text. Results record the selected formula,
-    parameters, token and type counts, and preprocessing choices such as Unicode
-    normalization, case handling, lemmatization, and content-word selection.
-    Separate functions compare Maas and sequential-MTLD definitions, expose
-    local MATTR windows and positional exposure, compute exact term-set or
-    annotated content-word overlap, and measure token- and type-weighted
-    coverage of multiple documents by one explicit reference set. Caller-
-    supplied lexical norm tables can be summarized with exact matching,
-    measure-level provenance, and separate resource and annotation coverage.
-    Lexical level profiles use a caller-supplied New
-    JACET 8000 list and report exact and cumulative token- and type-weighted
-    coverage without redistributing the list. A bundled, versioned TUBELEX
-    aggregate provides frequency, video
-    prevalence, and channel prevalence profiles with explicit match coverage.
-    Convenience adapters accept tidy token tables and 'quanteda' token objects;
-    deterministic wide reshaping and base-R plots support analysis workflows.
+Description: Compares lexical diversity and reference-vocabulary profiles while
+    retaining the formula, parameters, preprocessing choices, and match coverage
+    used in each analysis. Computes twelve lexical-diversity measures from
+    ordered tokens or raw English text; compares selected Maas and MTLD
+    definitions; and exposes local MATTR windows. Bundled New JACET 8000 and
+    TUBELEX tables support lexical-level coverage and corpus-relative frequency
+    profiles, with off-list terms and non-computable requests kept explicit.
+    Additional functions provide exact lexical overlap, reference-set coverage,
+    caller-supplied lexical norm profiles, multi-document workflows, and plots.
+    The methods include Covington and McFall (2010)
+    <doi:10.1080/09296171003643098> and McCarthy and Jarvis (2010)
+    <doi:10.3758/BRM.42.2.381>.
 License: MIT + file LICENSE
 URL: https://ryuya-dot-com.github.io/ldfreq/,
     https://github.com/Ryuya-dot-com/ldfreq

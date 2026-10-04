@@ -378,16 +378,17 @@ BNC and COCA evidence plus Japanese educational materials. The workbook labels
 the entries as representative lemmas. This is a ranked pedagogical list, not
 the same estimand as a TUBELEX mean frequency.
 
-`nj8_profile()` accepts a list supplied by the user; `ldfreq` does
-not bundle or download it. The example below uses a small synthetic fixture,
-not the JACET list.
+`nj8_profile()` uses the bundled `jacet2016-8000-v1` table by default.
+JACET has permitted redistribution with source attribution. Cite:
+JACET Basic Word Revision Committee (Ed.). (2016).
+*The New JACET List of 8000 Basic Words*. Tokyo: Kirihara Shoten.
+The installed `licenses/nj8/NOTICE.md` contains the full attribution and the
+three verified corrections to the supplied snapshot. All 8,000 pairs match
+the official workbook. The permission does not relicense the table as MIT.
 
-The downloaded workbook can be passed directly as
-`nj8_profile(annotated, "j8_2016.xlsx", unit = "lemma")` when
-`readxl` is installed. Its embedded notice permits personal research use
-with citation and asks commercial users to consult JACET in advance. Public
-download availability does not itself grant a downstream redistribution
-license, so the file stays outside the package.
+An external copy can still be passed explicitly, for example
+`nj8_profile(annotated, "j8_2016.xlsx", unit = "lemma")` with `readxl` installed.
+The example below uses a small synthetic table for hand-checkable results.
 
 ```{r}
 synthetic_nj8 <- data.frame(

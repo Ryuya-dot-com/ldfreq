@@ -9,6 +9,19 @@ License: BSD-3-Clause
 Files: extdata/tubelex/7cb5fb36/tubelex_en_treebank_7cb5fb36_slim.csv.gz
 Notice: licenses/tubelex/NOTICE.md
 Source: https://github.com/naist-nlp/tubelex/tree/7cb5fb36add76b83a266d1967536e1a1d3faa513
+Additional file: examples/tubelex-tokenize.py adapts the upstream English
+ apostrophe, number-replacement, and word-filter functions under BSD-3-Clause.
 Changes: The bundled index filters the published aggregate table to the
  canonical four-column lookup index described in the installed notice. No raw
  subtitle text or source identifiers are included.
+
+New JACET 8000 rank/representative-lemma table
+Copyright: Japan Association of College English Teachers (JACET)
+License: Redistributed with permission from JACET; source attribution required
+Files: extdata/nj8/2016/NJ8.csv
+Notice: licenses/nj8/NOTICE.md
+Source: JACET Basic Word Revision Committee (Ed.). (2016).
+ The New JACET List of 8000 Basic Words. Tokyo: Kirihara Shoten.
+Changes: Restore nan at rank 6926 and lowercase true/false at ranks 326/2382
+ in the supplied snapshot, verified against the official workbook.
+ Normalize CSV serialization. This data is not licensed under MIT.

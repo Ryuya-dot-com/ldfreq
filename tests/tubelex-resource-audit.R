@@ -306,20 +306,20 @@ check(
       "versioned-non-exported-implementation-contract"
     ) &&
     identical(lookup_contract$public_api, FALSE) &&
-    identical(lookup_contract$release_approved, TRUE) &&
+    !("release_approved" %in% names(lookup_contract)) &&
     identical(lookup_contract$runtime_policy$network_access, FALSE) &&
     identical(lookup_contract$runtime_policy$fallback, FALSE),
   "The installed non-exported lookup-contract boundary changed."
 )
 check(
-  identical(inventory$schema_version, "1.0.0") &&
+  identical(inventory$schema_version, "1.1.0") &&
     identical(inventory$package_scope, "installed-lexical-resources") &&
     identical(inventory$runtime_policy$network_access, FALSE) &&
     identical(inventory$runtime_policy$implicit_download_or_fallback, FALSE),
   "The installed resource-manifest boundary changed."
 )
 check(
-  length(inventory$resources) == 1L,
+  length(inventory$resources) == 2L,
   "The installed manifest changed its bundled resource count."
 )
 inventory_resource <- inventory$resources[[1L]]

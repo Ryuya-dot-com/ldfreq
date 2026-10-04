@@ -5,9 +5,9 @@ The resource-independent, pre-tokenized twelve-method core introduced in
 preprocessing, exact lexical overlap, many-document reference coverage,
 caller-supplied generic lexical-norm profiles, and resource-backed profiles are
 separate public surfaces with their own contract
-versions and review gates. The Maas/MTLD
+versions. The Maas/MTLD
 sensitivity surface also has a separate variant contract and does not add
-methods to the frozen core registry. Caller-supplied lexical-level profiles
+methods to the frozen core registry. Bundled and external lexical-level profiles
 have a separate contract for resource input, rank bands, denominator, off-list
 handling, and plot data. Package version,
 metric-contract version, result-schema version, preprocessing-contract version,
@@ -32,7 +32,7 @@ This is an explicit numerical-correction exception to frozen evaluation order,
 not a new estimator: the method and core contract IDs remain unchanged, and
 the specification records the corrected evaluation. An independently generated
 80-digit fixture covers the failure. Record the package version as well as the
-method ID when reproducing results. See `development/REVIEW-20260922.md`.
+method ID when reproducing results.
 
 ## Result and orchestration schemas
 
@@ -140,3 +140,12 @@ A normative measurement contract does not by itself establish redistribution
 rights for its reference data. Resource rights, artifact identity,
 coverage/failure behavior, installed notices, and package inventory are reviewed
 and recorded separately from the public API contract.
+
+## Bundled NJ8 in 0.2.0
+
+The level-profile and batch contracts advance to 0.2.0. An omitted or NULL
+`wordlist` selects the bundled `jacet2016-8000-v1` table. Explicit external
+inputs retain their previous matching, denominator, and conflict rules.
+Results now distinguish bundled and external resource identity and record the
+bundled source citation. The bundled version cannot be relabelled by a caller.
+No core metric formula or numerical value changes as part of this addition.

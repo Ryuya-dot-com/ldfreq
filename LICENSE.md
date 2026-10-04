@@ -1,3 +1,9 @@
+The MIT license below applies to the original ldfreq code and documentation.
+Bundled third-party materials retain their own terms: TUBELEX data and adapted
+example code use BSD-3-Clause; the New JACET 8000 table is redistributed with
+JACET's permission and source attribution. See [COPYRIGHTS](https://github.com/Ryuya-dot-com/ldfreq/blob/main/inst/COPYRIGHTS)
+and the notices under `inst/licenses/` for their sources and terms.
+
 MIT License
 
 Copyright (c) 2026 Komuro Ryuya and the ldfreq authors
