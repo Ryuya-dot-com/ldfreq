@@ -1,5 +1,16 @@
 # ldfreq 0.2.0 (development)
 
+## Source-aligned phrase-list example
+
+- Added an explicitly sourced helper and an offline English/Japanese example
+  linking caller-supplied phrase components to quanteda search, original-text
+  KWIC, per-ID counts and union token coverage. Long, nested and overlapping
+  expressions retain source positions; exclusions remain gaps.
+- The annotated-corpora guide explains segmentation, exact surface matching,
+  case/Unicode policy, punctuation, empty documents, denominators, RDS replay
+  and separate human interpretation. No new export, dependency or external
+  phrase inventory is added.
+
 ## Reusable contextual study example
 
 - Added three installed R scripts connecting authored source/annotation inputs,

@@ -1363,3 +1363,50 @@ The template's initial source-object accessor was corrected to the existing
 review `source` field. The no-vector test was corrected to retain a zero-row
 matrix with the declared dimensions; this did not require changing the scorer.
 Commit-specific OS checks are recorded in PR #21. Publication remains development.
+
+
+## Source-aligned phrase-list example (2026-10-05)
+
+Added an explicitly sourced helper and an authored English/Japanese demo. The
+helper validates a complete external annotation import, searches supplied token
+sequences with quanteda, verifies original unnormalized surfaces, and returns
+source-text KWIC with segment-local codepoint spans. Excluded token slots and
+segment/document boundaries remain barriers. All nested/overlapping and
+per-ID matches remain available, while token coverage uses their union.
+Document-by-ID counts retain zeros; coverage is NA for zero retained tokens.
+No phrase list, corpus, parser, new dependency or exported function was added.
+The guide describes preparation, denominators, RDS replay, scope and separate
+human interpretation. Exact surface matches are not sense/function judgments.
+
+Evidence: `reviews/ldfreq-phrase-list-20261005/evidence/`.
+
+- Final installed checks: 64 expectations pass, without failures or warnings:
+  47 phrase-example checks, 15 API naming checks and two smoke checks. Cases
+  include 4+ token expressions, nesting, repeated overlaps, duplicate sequences
+  with different IDs, punctuation and exclusion gaps, segment/document edges,
+  empty documents, absent lists, original Unicode including decomposed forms
+  and an emoji prefix, underscores, source tampering and malformed inputs.
+- Separate fresh R sessions prepare/save and replay the result identically.
+  UTF-8 occurrence CSV roundtrip also preserves the table. The authored English
+  example has four per-ID occurrences and nine union-covered tokens out of
+  12 retained tokens; the Japanese example preserves its original unspaced text.
+- Archive: 3,450,717 bytes, SHA-256
+  `601029b820af7d6959ef3a2a893687943d835fd19d792037f9f1dbb3b6ca1652`.
+  Exact-archive `R CMD check --no-tests --no-manual --no-vignettes` is Status OK,
+  including examples. All 206 staged source members match the checkout;
+  archive source identity and normalized DESCRIPTION fields also agree.
+  All 137 prior R/test/help/extdata members and all 12 extdata files match the
+  preceding archive. Prior successful numerical/model checks remain applicable
+  to unchanged files; those computations were not repeated locally.
+- The changed annotated-corpora guide executes and renders; 17 unchanged
+  compiled guides are reused. Home, NEWS and that article were rebuilt locally.
+  There are 18 installed guides and 118 local HTML files with zero missing
+  relative file targets. Help is unchanged; the prior 81-page manual is retained.
+  API audit remains 50 exports, 34 S3 registrations and 30 public help topics.
+
+The first test run exposed that the demo sourced its helper into the global
+rather than the supplied environment; local sourcing fixes execution in tests
+and user environments. This helper is deliberately for modest lists and retains
+all source data and zero-count cells; no large-corpus performance or empirical
+validity claim is made. The exact commit's OS checks are recorded in PR #21.
+Publication state remains development.

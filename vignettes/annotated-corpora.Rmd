@@ -12,6 +12,8 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(ldfreq)
 has_xml <- requireNamespace("xml2", quietly = TRUE)
 has_quanteda <- has_xml && requireNamespace("quanteda", quietly = TRUE)
+has_phrase_example <- requireNamespace("quanteda", quietly = TRUE) &&
+  isTRUE(l10n_info()[["UTF-8"]])
 ```
 
 Suppose a corpus already provides token boundaries, lemmas and part-of-speech
@@ -146,6 +148,142 @@ shows a source-verified KWIC workflow with complete external imports, original
 context, occurrence IDs and explicit unresolved decisions. That interface
 accepts `lexdiv_import_annotations()` results; do not pass the MASC reader's
 document-relative coordinates as segment-relative positions without conversion.
+
+## Match your phrase list and inspect its coverage
+
+Suppose you want to find a supplied list of expressions in essays, articles,
+or conversations, then check whether each occurrence is relevant in context.
+The installed `phrase-list-kwic.R` helper connects existing quanteda phrase
+search to original source spans and document summaries. It is a **copyable
+example**, sourced explicitly, rather than a new exported ldfreq function.
+It does not download phrase lists, run a parser, or infer idiomatic meanings.
+
+Run the complete English/Japanese illustration:
+
+```{r phrase-demo, eval=has_phrase_example}
+example_env <- new.env()
+sys.source(system.file("examples", "phrase-list-demo.R", package = "ldfreq"),
+           envir = example_env)
+phrase_result <- example_env$result
+```
+
+All text, annotations and list entries in this example were authored for
+ldfreq and carry its MIT licence. They are not extracts from published phrase
+inventories or empirical frequency norms. The example requires only optional
+quanteda and a UTF-8 R session; the XML reader is not needed for this step.
+
+For your own analysis, first import **complete** token annotations using
+`lexdiv_import_annotations()`, as in the [Japanese annotation guide](japanese-annotations.html).
+The helper rechecks this unchanged object before any exclusions. It accepts
+segment-local positions from that importer; it does not accept the MASC
+reader's document-relative positions directly. Token and segment boundaries
+must already be specified. The helper never guesses where sentences end.
+
+Provide a named list of explicit component vectors:
+
+```{r phrase-input, eval=has_phrase_example}
+phrases <- list(
+  long = c("In", "the", "end", "of", "the", "day"),
+  nested = c("the", "end"),
+  short = c("in", "the", "end"),
+  japanese = c("国際", "協力", "を", "学ぶ"),
+  absent = c("not", "present")
+)
+```
+
+IDs must be unique and each entry needs at least two tokens. There is no
+bigram/trigram restriction. Japanese components follow the supplied analyzer's
+segmentation: `c("国際", "協力")` will not match a single token `"国際協力"`.
+Underscores within components are literal. Searches are case sensitive and
+surface based; no lemmatization, Unicode normalization, variant expansion or
+discontinuous matching occurs. `In` and `in` are different. Canonically
+equivalent Unicode strings are checked against their original components
+after quanteda search, so they are not silently merged.
+
+To prepare the list in a spreadsheet, use long columns `phrase_id`,
+`component_index`, `term`, with one component per row. Read IDs and terms as
+character strings; validate unique consecutive component indices starting at
+1 within each ID, sort by those indices, and convert each group to a vector.
+Keep citation, version and permission information with the list. Merely
+putting spaces into a Japanese expression does not establish token boundaries.
+
+```{r phrase-run, eval=has_phrase_example}
+source(system.file("examples", "phrase-list-kwic.R", package = "ldfreq"), local = TRUE)
+a <- example_env$annotations
+keep <- !a$tokens$surface %in% c(",", ".", "。", "very")
+result <- phrase_list_kwic(a, phrases, example_env$resource, keep, window = 2L)
+result$occurrences[c("phrase_id", "document_id", "segment_id", "from", "to",
+                     "start", "end", "keyword")]
+result$counts
+result$documents
+```
+
+Exclusions are an explicit logical mask over the original token table, not
+deletions followed by renumbering. Kept surfaces must be non-whitespace tokens.
+If your annotations include whitespace tokens, exclude their slots explicitly;
+those slots remain barriers to matching. Punctuation is retained unless you
+exclude it and can be part of a listed sequence. In the illustration,
+removing `very` from `in the very end` does **not** create `in the end`.
+No match crosses a removed slot, segment boundary, or document boundary.
+
+`from` and `to` count original token slots within a segment. `start` and `end`
+are **1-based inclusive Unicode-codepoint positions in `segment_text`**, not
+byte offsets or whole-document offsets. `keyword` is the exact substring
+between those endpoints, including original spacing. `pre` and `post` retain
+original text up to `window` token slots either side, within that segment;
+excluded punctuation/words can therefore remain visible as context. A window
+of zero produces empty `pre`/`post`. This source display differs from quanteda's
+space-joined display, particularly for Japanese. Save the full segment for
+interpretation when a short window is insufficient.
+
+Three outputs answer distinct questions:
+
+| Output | Interpretation |
+|---|---|
+| `occurrences` | Every matched phrase ID and span, including nested and overlapping matches |
+| `counts` / `summary` | Per-document/per-ID occurrences, and occurrence/document totals for each ID; absent phrases and empty documents stay visible |
+| `documents` | All original token slots, retained tokens, occurrence counts, and the union of covered tokens divided by retained tokens |
+
+For the English example, four occurrences cover nine distinct tokens out of
+12 retained tokens: coverage is `9/12`, not the sum of phrase lengths divided
+by 12. The longer expression contains a shorter listed expression, and both
+are recorded. Repeated identical sequences under different IDs also remain
+separate list entries; they increase per-ID occurrence totals, but not union
+coverage. For an empty or fully excluded document, coverage is `NA`, with
+zero counts. A nonempty retained document with no match has coverage zero.
+The denominator includes every retained token, including punctuation if kept;
+it is not automatically a word-only or eligible-window denominator.
+
+Keep a full result for replay and a separate review table for judgments:
+
+```{r phrase-save, eval=has_phrase_example}
+path <- tempfile(fileext = ".rds")
+saveRDS(result, path)
+restored <- readRDS(path)
+replayed <- phrase_list_kwic(restored$source, restored$phrases, restored$resource,
+  restored$settings$keep, restored$settings$window)
+stopifnot(identical(replayed, restored))
+unlink(path)
+```
+
+The saved object includes source annotations, phrase components, resource
+declarations, exclusions, settings, input hash and package versions. A review
+table can use `phrase_id`, `document_id`, `segment_id`, `from` and `to` together
+with that input hash. Record literal/idiomatic or other functional judgments
+separately, with reviewer, criteria and unresolved cases. Phrase matches do not
+establish collocational strength, formulaicity, proficiency, or a learner's
+knowledge. The current single-token ambiguity API does not accept these phrase
+rows; this example does not create a phrase-sense classifier.
+
+This helper is intended for inspectable, modest lists: it calls quanteda once
+per ID and retains source text plus every document-by-ID count, including zeros.
+It is not a large dictionary index or a streaming corpus search. The resource
+record documents caller declarations, not verified redistribution rights;
+saving or sharing the result also copies your source text and phrase list.
+Existing [quanteda phrase patterns](https://quanteda.io/reference/phrase.html)
+and [KWIC](https://quanteda.io/reference/kwic.html) perform the search. The
+addition here is the reproducible connection to source spans, exclusions,
+overlap-aware denominators and subsequent human inspection.
 
 ## Connect to the existing ldfreq reference workflow
 

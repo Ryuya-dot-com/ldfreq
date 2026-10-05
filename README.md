@@ -155,8 +155,12 @@ Tillman's fluencysimilarity, compares unigram/trigram use across performances
 or against a source. Phrase matching, overlap and cosine similarity are not
 new contributions of ldfreq. Its focus is connecting analysis units and source
 locations to reference-resource definitions, human decisions and missingness
-in an R workflow. General phrase-list matching and discourse-function
-classification are outside the current ldfreq APIs.
+in an R workflow. An [installed phrase-list example](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.html#match-your-phrase-list-and-inspect-its-coverage)
+uses quanteda for exact sequences of two or more supplied tokens, including
+long expressions, and returns original-text KWIC and overlap-aware document
+coverage. It is an explicitly sourced helper, not an exported API or a
+phrase-sense/discourse-function classifier. Phrase lists are supplied by the
+caller and are not bundled.
 
 ## Installation
 
