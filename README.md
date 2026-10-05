@@ -59,6 +59,17 @@ language and register. The raw-text English rules and bundled English reference
 resources have narrower scope. Automatic POS tagging, sense disambiguation,
 corpus-XML import and proficiency scoring are not part of the default pipeline.
 
+To inspect lexical ambiguity in context, `lexdiv_ambiguity_review()` connects
+complete imported annotations to optional quanteda KWIC displays. It keeps
+original segment text, source positions, caller-supplied candidates and explicit
+reviewer decisions together, including unresolved occurrences. See the
+[English/Japanese review guide](https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.html).
+It does not infer senses or split aggregate reference frequencies by meaning.
+`lexdiv_compare_ambiguity()` pairs two reviews, reports descriptive agreement
+alongside joint-selection coverage, and returns open cases with both contexts
+and reasons. The guide also connects a separately obtained WLSP inventory to
+the same review interface.
+
 For Japanese, use an existing morphological analyzer and import its complete
 annotations with `lexdiv_import_annotations()`. It verifies surfaces against
 original text, derives source positions, retains lexical-form/POS columns and

@@ -203,6 +203,11 @@ knowing, writing, reading, speaking and listening. Numeric estimates are not
 converted into probabilities, raw rating points or individual knowledge scores.
 The data remain subject to CC BY-NC-SA 3.0; no WLSP ratings are bundled.
 
+For occurrences in running text, the [KWIC review guide](ambiguity-review.html)
+uses the same local-file reader through `wlsp_ambiguity_candidates()` to retain
+record IDs, readings and classifications as contextual review candidates.
+It also shows how to compare two reviewers while keeping unresolved cases.
+
 The following are authored study items. The reading and context specify the
 intended stimulus; the helper keeps them as metadata and does not use them to
 automatically discard candidates or resolve word senses.

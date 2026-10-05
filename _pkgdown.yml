@@ -17,6 +17,8 @@ reference:
       - lexdiv_preprocessing
       - lexdiv_compare_annotations
       - lexdiv_import_annotations
+      - lexdiv_ambiguity_review
+      - lexdiv_compare_ambiguity
       - lexdiv_text_batch
       - lexdiv_flemmatize
   - title: Exact lexical overlap and coverage
@@ -80,6 +82,7 @@ articles:
       - japanese-stimuli
       - ngram-profiles
       - annotated-corpora
+      - ambiguity-review
       - open-access-papers
       - auditing-vocabulary-profiles
       - preprocessing-and-frequency

@@ -87,3 +87,28 @@ review_wlsp_items <- function(items, path, decisions = NULL) {
       value_unit = "published Bayesian estimates, no rescaling",
       selection_validation = "ID and spelling consistency only; contextual validity requires review"))
 }
+
+# Convert the verified local inventory to KWIC candidates, retaining its terms.
+# WLSP record identity is not asserted to be a validated discrete word sense.
+wlsp_ambiguity_candidates <- function(terms, path) {
+  if (!is.character(terms) || !is.null(attributes(terms)) || !length(terms) ||
+      anyNA(terms) || any(!nzchar(terms)) || any(!validUTF8(terms)) ||
+      any(Encoding(terms) %in% c("bytes", "latin1")))
+    stop("terms must be a non-empty plain UTF-8 character vector without missing or empty values.")
+  terms <- unique(terms)
+  review <- review_wlsp_items(data.frame(item_id = paste0("term_", seq_along(terms)),
+    term = terms), path)
+  entries <- review$candidates
+  candidates <- data.frame(term = entries$term, candidate_id = entries$record_id,
+    label = sprintf("%s [%s]", entries$heading, entries$classification_label),
+    heading = entries$heading, reading = entries$reading,
+    classification = entries$classification, classification_label = entries$classification_label,
+    record_type = entries$record_type)
+  source <- review$source
+  list(candidates = candidates, coverage = review$items[c("term", "wlsp_candidate_count")],
+    resource = list(resource_id = source$resource_id, resource_version = source$version,
+      source_reference = source$source_reference, data_license = source$data_license,
+      creator = source$creator, publication = source$publication, sha256 = source$sha256,
+      candidate_unit = "WLSP record; not a validated discrete word sense",
+      matching = "exact UTF-8 spelling; no reading or POS filtering"))
+}

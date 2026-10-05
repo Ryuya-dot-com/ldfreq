@@ -1,5 +1,28 @@
 # ldfreq 0.2.0 (development)
 
+## Contextual ambiguity review
+
+- Added `lexdiv_compare_ambiguity()` to pair two intact reviews by occurrence
+  ID, retain both decisions and KWIC contexts, and return disagreements and
+  other open cases for review. Conditional agreement, its numerator/denominator,
+  joint-selection coverage and status pairs are explicit. Missing/unresolved
+  choices never count as semantic agreements; no kappa or automatic adjudication
+  is computed. Review results now include a whole-result fingerprint.
+- Extended the separately sourced WLSP example with `wlsp_ambiguity_candidates()`
+  to connect the verified local v4.0 file to KWIC candidates. Record IDs,
+  readings, classifications, coverage and source terms survive. Record counts
+  are not treated as validated counts of distinct senses; no data are bundled.
+- Added experimental `lexdiv_ambiguity_review()` for complete imported
+  annotations. It reuses optional quanteda KWIC search and retains original
+  segment text, token positions, candidate counts, and occurrence identities.
+- Caller-supplied candidates and explicit decisions stay separate. Single
+  candidates are not selected automatically; unreviewed, selected, unresolved
+  and no-candidate occurrences remain distinguishable. Decisions include a
+  reviewer and reason and are checked against the source/candidate snapshot.
+- Added an offline English/Japanese guide with reordered decisions and an
+  RDS round trip. No semantic model, dictionary, corpus, automatic sense
+  disambiguation, sense-specific reference frequencies or new dependency is added.
+
 ## Japanese frequency and stimulus review
 
 - UTF-8 frequency fields are read without conversion to the native locale.

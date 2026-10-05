@@ -141,6 +141,12 @@ position to obtain the final token's character endpoint. The mapping applies
 to the returned tokens and transformations that preserve positions. Collapsing
 padding, compounding tokens, or rebuilding tokenization requires a new mapping.
 
+For single-token candidate decisions, the [ambiguity review guide](ambiguity-review.html)
+shows a source-verified KWIC workflow with complete external imports, original
+context, occurrence IDs and explicit unresolved decisions. That interface
+accepts `lexdiv_import_annotations()` results; do not pass the MASC reader's
+document-relative coordinates as segment-relative positions without conversion.
+
 ## Connect to the existing ldfreq reference workflow
 
 ```{r adjacent, eval=has_quanteda}

@@ -22,6 +22,8 @@ Description: Compares lexical diversity and reference-vocabulary profiles while
     vocabulary response pairs, multi-document workflows, and plots.
     External annotations, local MASC Penn annotations and optional 'quanteda' integration retain
     supplied token boundaries and source positions for corpus analysis.
+    Contextual review connects caller-supplied lexical candidates and explicit
+    decisions to keyword-in-context displays and original text.
     The methods include Covington and McFall (2010)
     <doi:10.1080/09296171003643098> and McCarthy and Jarvis (2010)
     <doi:10.3758/BRM.42.2.381>.

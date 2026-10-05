@@ -99,5 +99,6 @@ x$tokens
 lexdiv_metrics(x$tokens$surface[1:4], metrics = "ttr")
 lexdiv_ngrams(x$tokens[1:4, ], "authored-surface-v1", term_col = "surface")
 }
-\seealso{\code{\link{lexdiv_ngrams}}, \code{\link{lexdiv_as_quanteda}},
+\seealso{\code{\link{lexdiv_ambiguity_review}},
+\code{\link{lexdiv_ngrams}}, \code{\link{lexdiv_as_quanteda}},
 \code{\link{lexdiv_metrics}}, \code{vignette("japanese-annotations", package = "ldfreq")}}

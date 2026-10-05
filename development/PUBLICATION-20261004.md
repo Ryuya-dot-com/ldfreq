@@ -1009,3 +1009,104 @@ The full Suggests-inclusive dependency preflight under exactly those dependency
 types passes for R 4.1.3; the earlier hard-dependency-only result is not claimed
 to cover this setup. Current-R setup remains unchanged. No package source,
 archive, numerical tests or rendered documents were changed for this correction.
+
+## Contextual ambiguity review (2026-10-05)
+
+Added experimental `lexdiv_ambiguity_review()` with optional quanteda KWIC,
+complete verified imports, original segment text and positions, caller-supplied
+candidate inventories, stable occurrence IDs and snapshot-bound reviewer
+decisions. Selection, unresolved review, unreviewed occurrences and absent
+candidates remain distinct. No automatic sense choice, external semantic data,
+new dependency or change to existing numerical estimators is included.
+
+An added counterexample showed that quanteda 4.5.0 fixed search matches both
+composed and decomposed Unicode spellings. The review now checks original
+surface/query equality before accepting a hit, preserving the declared exact
+matching contract. The initial archive and initial check did not include this
+correction; the final archive and final test result below supersede them.
+
+Evidence: `reviews/ldfreq-ambiguity-review-20261005/evidence/`.
+
+- New tests: **73 PASS, 0 FAIL/WARN/SKIP** in `targeted-results.csv`, covering
+  English/Japanese contexts, original spans, candidate and source changes,
+  duplicate/foreign decisions, missing candidates, padding, exact case/Unicode
+  matching, reordered decisions, and RDS/CSV round trips. Existing annotation
+  input and MASC/quanteda tests also passed; unchanged numerical code retains
+  its earlier evidence. No full numerical suite was repeated.
+- The final source archive is **3,342,098 bytes**, SHA-256
+  `7d8a0ca6990c374f4a255b4c55fb338d3d1f346e63700b981e628a47fc36169c`.
+  All 179 R/man/tests/vignettes/inst source files agree with the current
+  checkout; generated documentation is recorded separately. All 12 extdata
+  files are byte-identical to the preceding Japanese-stimuli archive.
+- Exact final archive: `R CMD check --no-tests --no-manual --no-vignettes`,
+  **Status: OK**. Installation, code/Rd checks and examples completed.
+  The new/changed guides were executed and rendered separately; unchanged
+  compiled guides were reused. There are **16 discoverable installed guides**.
+- The final installed function accepted the previously saved real gibasa /
+  unidic-lite annotations and preserved all source data and the three selected
+  occurrence locations. This is integration evidence, not semantic validation.
+- Public API audit: **46 exports, 34 S3 methods, 26 function help topics**.
+  A 72-page PDF manual was built. Local pkgdown produced **112 HTML files**
+  with no missing relative file links. Its first attempt failed only on a
+  sandboxed CRAN hostname lookup; document construction resumed with permitted
+  network access, without repeating the package check or PDF build.
+
+This is local macOS/R 4.6.1/quanteda 4.5.0 evidence. The previously successful
+cross-platform CI at `2717dcba` predates this feature. This change has not been
+pushed, tested in the remote OS matrix, merged, deployed or submitted to CRAN.
+Resource-backed automatic candidates, multi-token decisions, inter-rater
+adjudication, sense-frequency estimates and semantic-model validity remain
+outside the implemented scope.
+
+## Paired contextual reviews and WLSP candidates (2026-10-05)
+
+`lexdiv_compare_ambiguity()` pairs two complete reviews by occurrence ID and
+retains both original reviews, their contexts, reviewer IDs and reasons. It
+reports conditional selection agreement together with the fraction of all
+target occurrences selected in both reviews, and keeps non-agreements in a
+review queue. Unresolved, unreviewed and absent-candidate cases remain distinct;
+two unresolved decisions are not treated as a semantic agreement. Source,
+inventory and resource identities must agree; context windows may differ.
+Review results now include a full-content fingerprint. Older saved reviews can
+be regenerated from their retained inputs and decisions before comparison.
+
+The separately sourced `wlsp_ambiguity_candidates()` recipe reuses the pinned
+WLSP-familiarity v4 reader. It returns exact record IDs, readings and
+classification metadata, plus coverage and source/license declarations. It
+does not download or bundle the external CSV or return its rating columns as
+sense estimates. Resource records are not a validated inventory of discrete
+psychological meanings. Agreement is descriptive: no automatic adjudication,
+chance-corrected coefficient, accuracy or independent-rater claim is made.
+
+Evidence: `reviews/ldfreq-ambiguity-comparison-20261005/evidence/`.
+
+- **126 PASS, 0 FAIL/WARN/SKIP**: 53 new comparison expectations plus the 73
+  review expectations. Hand-counted outcomes, denominators, no selections,
+  absent targets, review/order/window differences, stale or altered results,
+  term-local candidate IDs, status pairs and save/read are covered.
+- The separately acquired real CSV produced 2 / 7 / 1 / 0 records for the
+  authored Japanese query set. The installed recipe's IDs, readings and
+  classifications matched independently read source columns. Input rejection,
+  KWIC integration, disagreement counts and RDS replay passed. This is software
+  integration evidence, not a contextual semantic validation study. A missing
+  closing brace in the repository-only validation script initially prevented
+  that script from parsing; only the corrected script was rerun.
+- Archive: **3,354,100 bytes**, SHA-256
+  `3c072a7e822fc9a95667450f82498a2a9fe01651f99ae08c35231eb33dcca880`.
+  Package-source equality is recorded in `source-equality.tsv`; all 12 extdata
+  files are identical to the previous archive. Excluded development and
+  experiment files, including the real-resource validation script, are absent.
+- Exact archive: `R CMD check --no-tests --no-manual --no-vignettes`, **Status:
+  OK**, including installation, code/Rd checks and runnable examples. The two
+  changed guides were executed and rendered separately; other compiled guides
+  were reused. All **16 installed guides** are retained. No unrelated local
+  numerical suite was rerun.
+- API: **47 exports, 34 S3 registrations, 27 function help topics**. A **74-page
+  PDF manual** and **113 HTML files** built; relative file-link target failures:
+  **0**. Compilation and link checks are not a complete visual/usability review.
+
+These are local macOS/R 4.6.1/quanteda 4.5.0 results. The previous successful
+remote CI at `2717dcba` does not verify these two ambiguity APIs. The changes
+are consolidated for PR #21 and its existing OS-matrix workflow; remote results
+must be identified by the actual new commit/run. No repository visibility,
+main-branch merge, deployment, release-state or CRAN-submission change is made.
