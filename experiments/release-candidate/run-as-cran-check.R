@@ -26,17 +26,17 @@ note_policy <- if (length(arguments) == 4L) {
 if (!nzchar(job_label)) stop("job-label must not be empty.", call. = FALSE)
 allowed_note_policies <- c(
   "new-submission-only",
-  "minimum-r-optional-textstem"
+  "minimum-r-optional-backends"
 )
 if (!note_policy %in% allowed_note_policies) {
   stop("Unrecognized check NOTE policy: ", note_policy, call. = FALSE)
 }
-if (identical(note_policy, "minimum-r-optional-textstem") &&
+if (identical(note_policy, "minimum-r-optional-backends") &&
     (!identical(job_label, "ubuntu-latest-r-4.1") ||
       !grepl("^R version 4[.]1[.]", R.version.string))) {
   stop(
     paste(
-      "The minimum-r-optional-textstem NOTE policy is restricted to the",
+      "The minimum-r-optional-backends NOTE policy is restricted to the",
       "ubuntu-latest-r-4.1 job running R 4.1.x."
     ),
     call. = FALSE

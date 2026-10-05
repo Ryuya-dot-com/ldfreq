@@ -34,24 +34,21 @@ release_new_submission_note <- function(note_block) {
     identical(note_block$detail[[2L]], "New submission")
 }
 
-release_unavailable_textstem_note <- function(note_block) {
+release_unavailable_backends_note <- function(note_block) {
   dependency_stage_pattern <- paste0(
     "^\\* checking package dependencies \\.\\.\\. ",
     "(\\[[^]]+\\] )?NOTE$"
   )
-  textstem_pattern <- paste0(
-    "^Package suggested but not available for checking: ",
-    "[‘']textstem[’']$"
-  )
+  detail <- gsub("[‘’]", "'", paste(unlist(note_block$detail), collapse = " "))
+  expected <- "Packages suggested but not available for checking: 'gibasa', 'textstem'"
   grepl(dependency_stage_pattern, note_block$stage) &&
-    length(note_block$detail) == 1L &&
-    grepl(textstem_pattern, note_block$detail[[1L]])
+    identical(detail, expected)
 }
 
 release_classify_notes <- function(check_status, note_blocks, note_policy) {
   allowed_policies <- c(
     "new-submission-only",
-    "minimum-r-optional-textstem"
+    "minimum-r-optional-backends"
   )
   if (!note_policy %in% allowed_policies) {
     stop("Unrecognized check NOTE policy: ", note_policy, call. = FALSE)
@@ -65,11 +62,11 @@ release_classify_notes <- function(check_status, note_blocks, note_policy) {
     length(note_blocks) == 1L &&
     release_new_submission_note(note_blocks[[1L]])
   minimum_r_notes <-
-    identical(note_policy, "minimum-r-optional-textstem") &&
+    identical(note_policy, "minimum-r-optional-backends") &&
     identical(check_status, "Status: 2 NOTEs") &&
     length(note_blocks) == 2L &&
     release_new_submission_note(note_blocks[[1L]]) &&
-    release_unavailable_textstem_note(note_blocks[[2L]])
+    release_unavailable_backends_note(note_blocks[[2L]])
 
   if (new_submission_only) {
     return(list(
@@ -95,11 +92,11 @@ release_classify_notes <- function(check_status, note_blocks, note_policy) {
           )
         ),
         list(
-          note = "Package suggested but not available for checking: textstem",
+          note = "Packages suggested but not available for checking: gibasa, textstem",
           disposition = paste(
             "Expected only in the declared R 4.1 minimum-version diagnostic:",
-            "textstem is an optional backend, the workflow deliberately does",
-            "not install it before R 4.4, and _R_CHECK_FORCE_SUGGESTS_ is false."
+            "the optional backends need newer R (gibasa 4.2; textstem 4.4).",
+            "The workflow deliberately omits them and _R_CHECK_FORCE_SUGGESTS_ is false."
           )
         )
       )

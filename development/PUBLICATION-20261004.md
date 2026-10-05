@@ -939,3 +939,33 @@ This local hash does not identify independently rebuilt CI archives.
 Repository visibility is still private and Pages serves main at the repository
 root (read-only confirmation on 2026-10-05). No visibility change, main merge,
 remote site deployment or CRAN submission is included in this preparation step.
+
+### Cross-platform preparation corrections
+
+The first consolidated PR run (`37260822842`, commit `f95f89e`) completed without
+cancellation. It exposed three distinct issues: R 4.1 dependency resolution tried
+to install gibasa >= 1.1.3 although that optional backend needs R >= 4.2; the old
+convenience test fabricated a `tokens` class instead of a real quanteda object;
+and Windows checkout converted the offset-based MASC example's LF to CRLF.
+These are corrected by declaring the optional-backend CI exclusion, constructing
+real quanteda tokens in the test, and retaining exact MASC example bytes in
+`.gitattributes`. The core computations were not changed. The future candidate
+NOTE policy now permits exactly the two declared unavailable optional backends
+on R 4.1; its narrow acceptance/rejection check is runnable and included in CI.
+
+A separate C-locale probe exposed native-encoding conversion in the new frequency
+reader. It now marks UTF-8 fields without conversion to the native locale.
+The installed helper's complete check passes in both C.UTF-8 and C locales;
+the test script uses Unicode escapes to keep source parsing independent of the
+process locale. The Japanese guide states gibasa's R >= 4.2 requirement.
+The corrected convenience test passes locally (25 expectations), and a checkout
+with `core.autocrlf=true` preserves the MASC source bytes.
+
+The revised archive again passes the same bounded install/document check with
+Status: OK. The installed real-resource workflow and token connection also pass.
+The 110-page site has no broken relative file links; 179 common source/archive
+files agree, excluding generated DESCRIPTION metadata. No external Japanese tables
+are present. The superseding local archive is **3,318,227 bytes**, SHA-256
+`5651682fcaf825de01e44479033f5129fff217005d0352bcb587501b709a0d03`.
+The final remote revision will verify the supported matrix; record its outcome
+against its commit rather than treating this local archive as the CI artifact.

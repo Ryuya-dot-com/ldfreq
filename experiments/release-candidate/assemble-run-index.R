@@ -177,7 +177,7 @@ for (result in results) {
     result$job_label,
     "ubuntu-latest-r-4.1"
   )) {
-    "minimum-r-optional-textstem"
+    "minimum-r-optional-backends"
   } else {
     "new-submission-only"
   }

@@ -2,6 +2,8 @@
 
 ## Japanese frequency and stimulus review
 
+- UTF-8 frequency fields are read without conversion to the native locale.
+  The optional gibasa recipe requires R >= 4.2; the core remains R >= 4.1.
 - Added an explicitly sourced local-file helper for the pinned Japanese
   TUBELEX orthographic-base table. It records original/reviewed/normalized
   forms, unresolved and unmatched items, source hash and published denominators;

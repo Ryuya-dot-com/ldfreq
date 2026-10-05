@@ -48,13 +48,16 @@ jobs:
       - name: Audit the documented public API surface
         if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release' }}
         shell: bash
-        run: Rscript --vanilla development/audit-public-api.R .
+        run: |
+          Rscript --vanilla development/audit-public-api.R .
+          Rscript --vanilla experiments/release-candidate/validate-note-policy.R
 
       - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
           extra-packages: |
             any::rcmdcheck
             textstem=?ignore-before-r=4.4.0
+            gibasa=?ignore-before-r=4.2.0
           needs: check
 
       - uses: r-lib/actions/check-r-package@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2

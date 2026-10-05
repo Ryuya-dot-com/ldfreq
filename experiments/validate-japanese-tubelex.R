@@ -7,15 +7,15 @@ if (length(args) == 2L) .libPaths(c(args[2L], .libPaths()))
 source(system.file("examples", "japanese-tubelex.R", package = "ldfreq"))
 path <- args[1L]
 items <- data.frame(item_id = as.character(1:7), condition = c("A", "B", "A", "B", "A", "B", "A"),
-  term = c("学校", "食べた", "学校", "ＣＡＴ", "未登録の例語", "青い空", " 学校 "),
-  orth_base = c("学校", "食べる", "学校", "ＣＡＴ", "未登録の例語", NA_character_, " 学校 "),
+  term = c("\u5b66\u6821", "\u98df\u3079\u305f", "\u5b66\u6821", "\uff23\uff21\uff34", "\u672a\u767b\u9332\u306e\u4f8b\u8a9e", "\u9752\u3044\u7a7a", " \u5b66\u6821 "),
+  orth_base = c("\u5b66\u6821", "\u98df\u3079\u308b", "\u5b66\u6821", "\uff23\uff21\uff34", "\u672a\u767b\u9332\u306e\u4f8b\u8a9e", NA_character_, " \u5b66\u6821 "),
   base_reason = "Explicit test of supplied keys; not a tokenizer benchmark")
 r <- profile_japanese_tubelex_items(items, path)
 x <- r$items
 stopifnot(identical(x[names(items)], items),
   identical(x$tubelex_status, c(rep("matched", 4), "unmatched", "unresolved_base", "unmatched")),
   identical(x$tubelex_count, c(29923, 83103, 29923, 184, NA, NA, NA)),
-  identical(x$tubelex_lookup_term, c("学校", "食べる", "学校", "cat", "未登録の例語", NA, " 学校 ")),
+  identical(x$tubelex_lookup_term, c("\u5b66\u6821", "\u98df\u3079\u308b", "\u5b66\u6821", "cat", "\u672a\u767b\u9332\u306e\u4f8b\u8a9e", NA, " \u5b66\u6821 ")),
   isTRUE(all.equal(x$tubelex_per_million[1], 29923 / 165932178 * 1e6)),
   isTRUE(all.equal(x$tubelex_video_proportion[1], 9033 / 100660)),
   isTRUE(all.equal(x$tubelex_channel_proportion[1], 4381 / 30550)),

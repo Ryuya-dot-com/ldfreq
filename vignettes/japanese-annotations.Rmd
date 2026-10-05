@@ -33,6 +33,11 @@ Japanese proficiency scale.
 
 ## An offline example
 
+The package's token-table importer supports R >= 4.1. The optional
+gibasa 1.1.3 recipe requires **R >= 4.2**, as well as the separately supplied
+dictionary. On R 4.1, import annotations prepared elsewhere or use the offline
+example below; gibasa is not required to install or use the core package.
+
 These annotations are authored for illustration, not analyzer output or a
 Japanese gold standard. The original examples in this guide are covered by the
 package's MIT license; no corpus or dictionary is redistributed.

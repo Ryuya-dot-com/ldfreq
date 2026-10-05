@@ -14,17 +14,21 @@ test_that("tidy token rows become ordered named documents", {
   expect_identical(batch$value, c(1, 1))
 })
 
-test_that("named lists and quanteda-style tokens use the same boundary", {
+test_that("named lists retain document boundaries and reject invalid inputs", {
   documents <- list(a = c("a", "a"), b = c("b", "c"))
   expect_identical(lexdiv_as_documents(documents), documents)
 
-  quanteda_style <- structure(documents, class = "tokens")
-  expect_identical(lexdiv_as_documents(quanteda_style), documents)
   expect_error(lexdiv_as_documents(unname(documents)), "unique, non-empty names")
   expect_error(
     lexdiv_as_documents(data.frame(document_id = "a", token = 1)),
     "plain character token column"
   )
+})
+
+test_that("real quanteda tokens retain document boundaries", {
+  skip_if_not_installed("quanteda")
+  documents <- list(a = c("a", "a"), b = c("b", "c"), empty = character())
+  expect_identical(lexdiv_as_documents(quanteda::as.tokens(documents)), documents)
 })
 
 test_that("long results widen without recomputation", {

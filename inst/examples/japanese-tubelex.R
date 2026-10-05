@@ -30,10 +30,11 @@ profile_japanese_tubelex_items <- function(items, path) {
   if (!identical(hash, "be1a66ac600d5e7efe6a301f63fba5321352742ae5dbaaa231529cdf2ab11710")) {
     stop("File differs from the inspected Japanese base table; review its version first.")
   }
-  con <- xzfile(path, open = "rt", encoding = "UTF-8")
+  # Mark decoded fields as UTF-8 without converting them to the native locale.
+  con <- xzfile(path, open = "rt")
   on.exit(close(con), add = TRUE)
   raw <- utils::read.delim(con, quote = "", comment.char = "", check.names = FALSE,
-    stringsAsFactors = FALSE, colClasses = c("character", rep("numeric", 3L),
+    stringsAsFactors = FALSE, encoding = "UTF-8", colClasses = c("character", rep("numeric", 3L),
       "character", rep("NULL", 15L)))
   stopifnot(identical(names(raw), c("word", "count", "videos", "channels", "pos")),
     !anyNA(raw$word), !anyDuplicated(raw$word), tail(raw$word, 1L) == "[TOTAL]")

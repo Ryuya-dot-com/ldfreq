@@ -1,6 +1,9 @@
 # These fixtures are byte-pinned inputs. Never rewrite their line endings.
 tests/fixtures/resource-loader/* -text
 
+# MASC example annotations refer to exact source character offsets.
+inst/extdata/masc-example/* -text
+
 # Resource identities and build-tool hashes are also exact byte contracts.
 experiments/tubelex-source-build/* -text
 inst/COPYRIGHTS -text
