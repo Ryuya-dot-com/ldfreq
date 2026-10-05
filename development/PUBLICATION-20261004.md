@@ -1570,8 +1570,8 @@ dependency MI requires a separately suitable reference and denominator.
 
 Evidence: `reviews/ldfreq-annotation-alignment-20261006/evidence/`.
 
-- Installed-package focused checks pass **294 expectations**: 105 alignment
-  checks, 117 existing evaluator checks, 55 import checks, 15 API checks and
+- Installed-package focused evidence covers **296 expectations**: 107 alignment
+  checks after the Unicode fixture correction, 117 existing evaluator checks, 55 import checks, 15 API checks and
   two smoke checks; no failures, errors, warnings or skips. Cases cover manual
   boundary/count calculations, split/merge/many-to-many correspondence, shifted
   token indices, Unicode/decomposed text, whitespace ownership, missing labels,
@@ -1585,14 +1585,18 @@ Evidence: `reviews/ldfreq-annotation-alignment-20261006/evidence/`.
 - The first source archive passes `R CMD check --no-tests --no-manual
   --no-vignettes` with **Status OK**, including help examples. Subsequent PDF
   layout corrections change only help prose/formatting; all R, test, example
-  and guide bytes are identical. The final archive's documentation check with
+  and guide bytes are identical. The pre-fixture-correction archive's documentation check with
   `--no-tests --no-examples --no-manual --no-vignettes` is **Status OK**. Those
   checks plus the retained focused tests are combined evidence, not one full
   local check invocation.
-- Final archive: **3,508,823 bytes**, SHA-256
-  `81e11437235d2f29eadc06e23a97367ab0a33cb274009cd1cc90918778099c3b`.
+- Final archive after fixture correction: **3,508,998 bytes**, SHA-256
+  `9c86797543888180ddb41885fd77c34c287bba39ecb9f6678c46e1fbd42796c7`.
   All 218 audited non-DESCRIPTION source members match the checkout; only the
-  new help file and build metadata differ from the tested archive. The 128
+  new help file, corrected alignment test fixture and build metadata differ
+  from the first tested archive. All runtime, installed example, guide and
+  resource bytes are unchanged. The corrected 107-expectation alignment test
+  uses the already checked installation; 189 unaffected focused expectations
+  retain their earlier evidence rather than being repeated locally. The 128
   unchanged prior R/test/help files and all 12 resource files retain their
   existing evidence. The existing evaluator implementation and its help are
   the only changed prior R/test/help members; their affected checks are included.
@@ -1605,7 +1609,20 @@ Evidence: `reviews/ldfreq-annotation-alignment-20261006/evidence/`.
   inspected after repairing long-code wrapping. This is focused changed-topic
   inspection, not a new visual audit of every pre-existing manual page.
 
-These local results precede the branch push. Existing user approval covers the
-branch and draft PR #21 update; CI results for the resulting head are recorded
-there to avoid another heavy CI run solely for updating this evidence note.
+The first pushed head, `49dacb7`, passed the four non-Windows R jobs, both
+resource builders and PDF manual. R 4.1 passed 6,709 expectations with eight
+optional-textstem skips and two NOTEs (optional dependencies and installed
+size). Windows reported one error while importing the new Unicode test fixture,
+before calling the alignment function; its guide rebuild succeeded. The test
+mixed a literal supplementary-plane character with Unicode escapes. The exact
+parser-level cause is not independently established on this Mac. The fixture
+now constructs its six intended codepoints with `intToUtf8()` and verifies the
+source before testing the same decomposed-character and emoji positions. No
+runtime or tolerance was changed, and the Unicode case was not skipped.
+
+This test correction requires a new head and Windows CI confirmation. The
+repository's normal PR workflow starts its full matrix on that push; no extra
+manual workflow or cancellation is introduced. Existing user approval covers
+this branch and draft PR #21 update. Final CI results are recorded in the PR
+rather than causing another push solely to record their URLs here.
 No main merge, visibility change, site deployment or CRAN submission occurs.
