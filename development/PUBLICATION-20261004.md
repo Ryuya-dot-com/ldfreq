@@ -998,3 +998,14 @@ check dependencies, omitting only the already declared optional gibasa/textstem
 backends; it is a solver check, not execution under R 4.1. The actual R 4.1 CI
 remains the runtime check. CI-only changes are consolidated for one final push;
 existing workflow gates rerun on that revision. Neither prior run was cancelled.
+
+R 4.1's actual setup still differed from the first dependency preflight: the
+setup action defaults to `dependencies = "all"`, which pulled Matrix's optional
+Bioconductor `graph` enhancement. The R 4.1 setup now explicitly keeps Depends,
+Imports, LinkingTo and Suggests, excluding only Enhances; ldfreq declares no
+Enhances. It pins MASS 7.3-60 as well (official DESCRIPTION: R >= 4.0), satisfying
+Matrix's optional dependency without selecting a current R-incompatible MASS.
+The full Suggests-inclusive dependency preflight under exactly those dependency
+types passes for R 4.1.3; the earlier hard-dependency-only result is not claimed
+to cover this setup. Current-R setup remains unchanged. No package source,
+archive, numerical tests or rendered documents were changed for this correction.
