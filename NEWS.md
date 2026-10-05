@@ -1,5 +1,17 @@
 # ldfreq 0.2.0 (development)
 
+## Annotation sensitivity example
+
+- Added explicitly sourced offline scripts linking changes in supplied lemmas
+  and UPOS to source-text context, TTR/MATTR and NJ8 coverage. Paired differences
+  retain non-computable results; selection and reference denominators remain
+  separate, including missing annotations and empty documents.
+- The vocabulary-audit guide explains original-text checks, position mapping,
+  fixed analysis conditions and saved-input replay. Authored examples show why
+  changed labels need not change scores and unchanged counts can hide different
+  exclusions. No new export, dependency, corpus or annotation-accuracy claim is
+  introduced.
+
 ## Source-aligned phrase-list example
 
 - Added an explicitly sourced helper and an offline English/Japanese example

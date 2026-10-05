@@ -1410,3 +1410,56 @@ and user environments. This helper is deliberately for modest lists and retains
 all source data and zero-count cells; no large-corpus performance or empirical
 validity claim is made. The exact commit's OS checks are recorded in PR #21.
 Publication state remains development.
+
+
+## Annotation sensitivity example (2026-10-05)
+
+The two installed scripts connect before/after supplied lemma and UPOS labels
+with original-text context, all-word surface/lemma and content-lemma TTR/MATTR,
+and bundled NJ8 coverage. They preserve every selection position, missing
+labels, reference denominators, non-computable paired differences and complete
+inputs for replay. Source and processed hashes must both match the supplied
+original text; changed segmentation or transformed-text offsets are rejected.
+No export, numerical method, dependency, model or external corpus was added.
+The six documents and their annotation changes are authored illustrations, not
+independent human judgments or evidence of annotation accuracy.
+
+The priority follows the page-by-page reading of Kyle & Eguchi (2024), recorded
+in `KYLE-EGUCHI-2024-READING.md`. The next research/implementation step is the
+separate input and scoring contract for predictions and independent references.
+The current difference helper does not assign TP/FP/FN or infer which label is
+correct, and it does not accept external-import objects or score flemma units.
+
+Evidence: `reviews/ldfreq-annotation-sensitivity-20261005/evidence/`.
+
+- Installed archive checks pass 69 expectations (52 new example, 15 API naming,
+  two smoke), with no failures/warnings/skips. Hand checks cover lemma effects,
+  content-word exclusions, lost MATTR computability, different coverage
+  denominators, missing-to-present transitions, empty/all-excluded documents,
+  ID reordering, source tampering, original Unicode/emoji/decomposed characters,
+  unchanged surface phrase matches, and save/replay.
+- Preparation and replay in separate R sessions produce identical full RDS
+  results. A subsequent CSV check exposed automatic conversion of all-missing
+  character columns to logical; specifying the saved column classes restores
+  exact equality. The guide uses RDS for complete reproducibility and CSV for
+  inspection. This was a CSV type-inference issue, not a failed RDS replay or
+  numerical change; only the failed CSV step needed an additional check.
+- Archive: 3,467,664 bytes, SHA-256
+  `5d90cec7b24d9ae6033a9d10e5be45b12d81e92e480dc2f62d10f7b8db134ee0`.
+  Exact-archive `R CMD check --no-tests --no-manual --no-vignettes` is Status OK,
+  including examples. Repository-index lookups were unavailable in the sandbox;
+  installed dependencies were used. This does not verify current repository
+  availability. All 209 staged source members match the checkout, and archive
+  identity matches with DESCRIPTION formatting normalized.
+- All 138 prior R/test/help/extdata files and all 12 resource files match the
+  preceding phrase-list archive. Existing successful numerical/model checks
+  remain applicable; those computations were not repeated locally. API audit
+  remains 50 exports, 34 S3 registrations and 30 public help topics.
+- The changed vocabulary-audit guide executes and renders. Seventeen unchanged
+  compiled guides are reused, for 18 installed guides in total. Home, NEWS and
+  that article build locally; 118 HTML files have no missing relative file
+  targets. Help is unchanged and the prior 81-page manual remains applicable.
+
+Local focused evidence is distinct from OS CI. Publication state remains
+`development`; no main merge, public-site deployment or CRAN submission is part
+of this change.

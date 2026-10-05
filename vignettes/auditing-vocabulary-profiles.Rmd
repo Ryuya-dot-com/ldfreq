@@ -171,8 +171,126 @@ are changes; two missing values are unchanged. Backend-only differences remain
 visible in `$provenance` even when `$changes` is empty. Save both prepared inputs
 and the audit: `saveRDS(list(before = base_scheme, after = refined_scheme,
 audit = annotation_audit, conditions = scheme_conditions, runs = scheme_runs), path)`.
-Backend labels alone are not proof of dictionary content identity. The next
-example records the dictionary content fingerprint and saves the actual table.
+Backend labels alone are not proof of dictionary content identity. The
+dictionary example below records the content fingerprint and saves the table.
+
+## Connect annotation changes to document results
+
+A changed label does not necessarily change a document score. Conversely, a
+single POS change can remove a token from a content-word analysis and make a
+fixed-window score unavailable. The feature-level and document-level evaluation
+in [Kyle and Eguchi (2024)](https://doi.org/10.1016/j.rmal.2024.100120) motivates
+checking both levels. Their dependency-based adjective-noun analysis is not
+replicated here: this example compares supplied lemmas and UPOS, TTR/MATTR and
+NJ8 coverage. It does not estimate annotation accuracy or vocabulary ability.
+
+Two installed scripts provide an offline, editable workflow. The demo uses six
+authored documents, including missing annotations, an invented off-list form,
+all-excluded content words, and an empty text. It performs no inference,
+downloads or automatic file writes. Source it into its own environment:
+
+```{r}
+sensitivity <- new.env()
+invisible(capture.output(sys.source(system.file("examples",
+  "annotation-sensitivity-demo.R", package = "ldfreq", mustWork = TRUE),
+  envir = sensitivity)))
+effects <- sensitivity$result
+effects$changes[, c("document_id", "token_index", "keyword",
+  "before_lemma", "after_lemma", "before_upos", "after_upos")]
+```
+
+`pre`, `keyword` and `post` retain up to 24 Unicode characters of source context
+on either side. These are character windows, not quanteda token windows. The
+helper checks the original text against both stored text hashes and every token
+span. This initial workflow requires **identical original and processed text**;
+use explicit `normalization = "none", case = "preserve"` and check the tokenizer's
+other transformations. It rejects changed text, normalization-induced changes
+and lowercased offsets instead of presenting processed positions as original
+positions. Different token boundaries are also outside its scope.
+
+For `cats saw cat.`, replacing `cats/saw/cat` with `cat/see/cat` leaves three
+selected tokens but changes the type count from three to two. TTR and the
+illustrative three-token MATTR change from 1 to 2/3. Surface-based scores and
+exact surface-phrase matches remain unchanged. A label's change alone is not
+evidence that the new label is correct.
+
+```{r}
+subset(effects$differences, document_id %in% c("lemma", "pos") &
+  condition_id == "lemma_content", select = c(document_id, metric_id,
+    N_before, N_after, value_before, value_after, delta, difference_status))
+```
+
+For `we can run and jump.`, changing `can` from VERB to AUX reduces the selected
+content sequence from three tokens to two. TTR stays 1, but MATTR with window 3
+becomes unavailable. The report retains both statuses and missing reasons;
+the difference is `NA`, not zero. `delta` is after minus before, and
+`absolute_delta` describes its magnitude. A three-token window is chosen for
+hand verification, not recommended for a substantive corpus study.
+
+### Keep selection coverage separate from reference coverage
+
+```{r}
+subset(effects$coverage, document_id %in% c("missing", "unknown", "empty") &
+  condition_id == "lemma_content", select = c(document_id, version,
+    source_tokens, selected_tokens, reference_eligible_tokens,
+    selection_coverage, nj8_coverage_of_eligible, matched_fraction_of_source))
+```
+
+The missing-annotation document has one selected word out of two, and that word
+matches NJ8. Thus selection coverage is 1/2, conditional NJ8 coverage is 1, and
+the matched fraction of all source word tokens is 1/2. These are different
+denominators. `source_tokens` means tokenizer output, not all characters or
+punctuation. NJ8 can apply additional lookup exclusions; its eligible count is
+reported separately. Full resource provenance and diagnostics remain in `runs`.
+
+`effects$tokens` retains every source word position for each condition and
+version, including excluded tokens, selected forms, UPOS, missing-label flags,
+the selection reason and NJ8 lookup. A reference query's position indexes the
+selected vector; the helper maps it back to the source token before joining.
+Never join that query position directly to an unfiltered source table.
+
+The invented word `glorp` has a defined zero match rate. An empty selection has
+undefined conditional coverage. In `birds fly.`, the second token changes from
+missing lemma to missing UPOS in the content condition; both exclude it, but
+the reason changes. Even unchanged scores can therefore warrant inspection.
+
+### Reuse and replay with your own annotations
+
+Copy the two example scripts to a study folder for editing. In the demo, replace
+the texts and position-aligned lemma/UPOS lists with your recorded annotations;
+both columns are required, with unavailable labels represented by `NA`.
+Alternatively, source only `annotation-sensitivity.R` and call
+`annotation_sensitivity(before, after, texts, window_length = ...)` with named
+batches of `lexdiv_tokenization` objects and a named text vector. IDs must agree;
+order need not. `lexdiv_import_annotations()` output is a different format and
+cannot be supplied to this helper. Flemma-based scores and changed segmentation
+require a separate extension.
+
+The fixed conditions are surface/all, lemma/all and lemma/content, with TTR and
+MATTR and the bundled NJ8 table. Inspect `settings` before adapting these choices.
+No general-purpose public function is added. Keep participant/task metadata
+separately and join by unique document ID. `before` and `after` are versions,
+not independent raters or gold/prediction labels.
+
+```{r, eval=FALSE}
+# Save explicitly to a new local file, respecting access rules for original text.
+saveRDS(list(result = effects, session = sessionInfo()), "annotation-sensitivity.rds")
+
+# A fresh R session: load the helper, then replay from saved inputs.
+source(system.file("examples", "annotation-sensitivity.R", package = "ldfreq"))
+saved <- readRDS("annotation-sensitivity.rds")$result
+replayed <- do.call(annotation_sensitivity,
+  c(saved$inputs, list(window_length = saved$settings$window_length)))
+stopifnot(identical(replayed, saved))
+```
+
+Preserve the actual example scripts, R/package environment and input resources
+with the RDS file. A different package or resource version is a new analysis,
+not an exact replay. CSV exports of `changes`, `coverage` or `differences` are
+useful for inspection but do not retain the complete inputs and provenance.
+Independent reference annotations, including non-candidates, are needed before
+claiming precision, recall or improved validity. Group inference additionally
+requires a sampling design that respects writers, speakers and repeated tasks.
 
 ## Choose and save the actual lemma dictionary
 
