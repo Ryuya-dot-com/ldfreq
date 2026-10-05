@@ -88,6 +88,22 @@ jobs:
           )
           cat(readLines(evidence_path, warn = FALSE), sep = "\n")
 
+      - name: Verify installed Japanese frequency example
+        if: ${{ matrix.config.r == 'release' }}
+        shell: Rscript {0}
+        run: |
+          source_path <- file.path(Sys.getenv("RUNNER_TEMP"), "tubelex-ja-base-pos.tsv.xz")
+          download.file(paste0(
+            "https://raw.githubusercontent.com/naist-nlp/tubelex/",
+            "7cb5fb36add76b83a266d1967536e1a1d3faa513/",
+            "frequencies/tubelex-ja-base-pos.tsv.xz"), source_path, mode = "wb")
+          library_path <- file.path(Sys.getenv("RUNNER_TEMP"),
+            "ldfreq-package-resource-inventory", "library")
+          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
+            shQuote("experiments/validate-japanese-tubelex.R"),
+            shQuote(source_path), shQuote(library_path)))
+          if (!identical(status, 0L)) quit(status = status)
+
   tubelex-build-audit:
     name: ${{ matrix.os }} / TUBELEX builder
     runs-on: ${{ matrix.os }}

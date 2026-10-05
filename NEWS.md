@@ -1,5 +1,189 @@
 # ldfreq 0.2.0 (development)
 
+## Japanese frequency and stimulus review
+
+- Added an explicitly sourced local-file helper for the pinned Japanese
+  TUBELEX orthographic-base table. It records original/reviewed/normalized
+  forms, unresolved and unmatched items, source hash and published denominators;
+  frequencies and video/channel proportions reuse `lexdiv_norm_profile()`.
+- Added a stimulus-selection guide joining TUBELEX, WLSP-familiarity, AoA and
+  BOI by study item ID, with per-condition missingness, distributions, explicit
+  WLSP choices and an RDS round trip. The optional gibasa annotation workflow
+  connects reviewed base forms while retaining original token positions.
+- No Japanese data tables or new mandatory dependencies are bundled. The
+  helper performs reviewed key lookup, not full TUBELEX tokenizer replication.
+
+## Japanese norms for stimulus items
+
+- Added an explicitly sourced WLSP-familiarity example for reviewing all
+  exact-spelling candidates and recording item-to-record choices with reasons.
+  It preserves unmatched and unreviewed items separately, checks record IDs
+  against the intended spelling, and retains five published estimates without
+  choosing a candidate automatically. Norm data are obtained separately.
+- Added a guide and an explicitly sourced example for separately obtained
+  Japanese AoA or BOI aggregate files. It reuses `lexdiv_norm_profile()` and
+  retains study IDs, experimental conditions, source IDs, rating counts, SDs,
+  unmatched items, source hashes and data terms. Each resource works independently.
+- Documented age-category interpretation, condition-specific missingness and
+  ambiguous spelling/reading keys. No external norm values, new dependencies,
+  automatic downloads or new exported functions are included.
+
+## External annotations and a Japanese input workflow
+
+- Added experimental `lexdiv_import_annotations()` to align complete external
+  token tables with original segment text. It retains lexical forms, POS,
+  missing annotations, original token indices, empty documents, dictionary
+  declarations and source hashes. Positions use segment-local Unicode
+  codepoints; omitted non-whitespace text and normalization mismatches fail.
+- Added an offline Japanese illustration and an optional R-only gibasa/UniDic
+  recipe. The importer needs no new mandatory dependency; gibasa is suggested
+  for the recipe and dictionaries are obtained separately. Filtering preserves
+  gaps for the existing n-gram and quanteda interfaces. English tokenizer,
+  bundled resources and all existing metric definitions are unchanged.
+- This does not bundle Japanese frequency norms or add a new morphological analyzer,
+  split/merge comparison, or evidence of cross-language measurement equivalence.
+
+## Building references from larger local inputs
+
+- Added `lexdiv_ngram_reference_build()` to read whole-document extraction
+  chunks sequentially and retain exact type counts, document counts,
+  denominators and source fingerprints. Occurrence tables are released after
+  each chunk. Distinct types and document IDs still occupy memory; there is
+  no disk-backed index, pruning or automatic resume. No dependency was added.
+- MASC reader interface 0.2.0 accepts `documentHeader`/`.hdr` references as
+  well as Mini-MASC's `cesHeader`/`.anc` layout. Boundary checks are unchanged.
+  An audit of all 392 official MASC 3.0.0 documents accepted 122 and rejected
+  270 under these checks; this is not validated whole-corpus support.
+
+## Comparing reference choices
+
+- Added `lexdiv_ngram_compare()` to apply named references to the same target,
+  retain each reference's available-value mean and coverage, and compare rates
+  on target items with defined values in every reference. Common-set means,
+  differences from an explicit baseline, source positions, denominators and
+  metadata stay together; undefined comparisons remain missing.
+- Added an offline example showing that pruning can raise a conditional mean
+  while frequencies on the common items remain unchanged. Existing frequency
+  arithmetic is reused; there are no new dependencies or automatic rankings.
+- Clarified that the quanteda adapter's UTF-8 requirement concerns the running
+  R session, including on macOS. `C.UTF-8` is UTF-8-capable and differs from
+  the plain `C` locale used in a stress test.
+
+## Annotated corpus input and quanteda integration
+
+- Added experimental `lexdiv_read_masc()` for local GrAF 1.0 Penn annotations,
+  verified with Mini-MASC 1.0. It retains supplied token boundaries, lemma/POS
+  features, sentence/utterance IDs, source coordinates, original text and file
+  fingerprints. Overlapping, discontinuous or unresolved spans are rejected.
+  Source anchors may explicitly use Unicode codepoints or UTF-16 code units.
+- Added `lexdiv_as_quanteda()` for explicit token and segment tables, preserving
+  excluded positions, empty segments and mappings back to source rows. It uses
+  quanteda's public APIs without retokenization; quanteda is an optional
+  dependency. Existing core calculations and tokenizer defaults are unchanged.
+  Non-ASCII imports require a UTF-8 locale; the adapter verifies imported
+  terms and positions and never changes the user's locale.
+- Added an offline guide and original, MIT-licensed annotation example.
+  MASC/OANC corpus data are not bundled or automatically downloaded. Other
+  annotation layers and OANC are not validated reader inputs. See the
+  MASC 3.0.0 scope above before using that release.
+
+## Adjacent n-grams with local references
+
+- Added `lexdiv_ngrams()` for adjacent bigrams and trigrams from explicit
+  document/segment IDs and original positions. It retains occurrences, corpus
+  and document counts, eligible-window totals, empty documents and provenance.
+  Position gaps break adjacency; no sentence splitting or normalization is
+  inferred. An occurrence-row ceiling is checked before output allocation.
+- Added `lexdiv_ngram_reference()` for local extractions or external aggregate
+  tables with explicit totals and source metadata, and `lexdiv_ngram_profile()`
+  for per-document token/type means and coverage. Complete-reference sample
+  zeros and unlisted incomplete-reference keys have different states. Rates
+  divide by eligible n-gram opportunities. RDS preserves full provenance.
+- Added an offline guide with authored examples, boundary counterexamples,
+  CSV import and RDS reuse. No n-gram corpus, new dependency, association score
+  or automatic download is added. Contract version starts at 0.1.0.
+
+## Open-access academic texts
+
+- Added an explicitly run example and guide using three CC BY 4.0 JOSS papers.
+  The recipe checks pinned source hashes and licenses, records paragraph
+  extraction, and saves attribution, metadata, diagnostics and full results.
+  Paper text is obtained only when requested and is not bundled. `xml2` is an
+  optional dependency for this recipe. Author L1 remains unknown; the example
+  describes academic English without assigning a native-speaker label.
+
+## Caller-supplied references across corpora
+
+- Added `lexdiv_norm_profile_batch()` with one shared resource validation,
+  a global output-row bound, and document-specific summary, lookup and coverage
+  tables. Single-document arithmetic and missingness are unchanged. Empty
+  documents and unmatched/missing annotations remain explicit.
+- Added a guide for custom reference data, exact word units, document metadata,
+  three coverage denominators and reproducible saving. No new dependencies or
+  external datasets are required. Third-party copyright notices are now also
+  referenced from DESCRIPTION.
+
+## Corpus scope and study design
+
+- Clarified native-speaker and learner corpus applications, including
+  within-population register comparisons. The comparison guide distinguishes
+  analysis samples, reference resources and matched comparison samples, with
+  spoken-data boundaries and language-background metadata kept explicit.
+  The vocabulary-use guide remains one application, not an input requirement.
+
+## Paired vocabulary responses
+
+- Added `lexdiv_compare_responses()` for already scored binary response pairs.
+  It checks composite pair IDs, separates directional disagreement and three
+  missingness patterns, and reports numerators and denominators by explicit
+  groups. Original metadata remain attached. It does not score free text,
+  dichotomize partial credit, or estimate lexical employability.
+- The vocabulary-use guide now includes CSV input, item/sense matching,
+  rubric metadata and repeated-occasion examples using this function.
+
+## TUBELEX diagnostics and vocabulary-use evidence
+
+- Added `tubelex_diagnostics()` to turn existing profiles into reusable summary
+  and document tables, count confirmed unmatched terms, and inspect query
+  normalization. It retains empty/failed documents and unresolved matches,
+  separates recorded input conditions, and performs no new resource lookup.
+- Added a worked guide connecting TUBELEX word-form features to explicitly
+  scored learner-by-item responses. It distinguishes recognition, meaning recall
+  and contextual use, preserves missing pairs and directional disagreement, and
+  does not interpret corpus frequency as an employability score.
+
+## Reproducible lemma dictionaries
+
+- `lexdiv_lemmatize(method = "textstem")` now accepts `dictionary`,
+  `dictionary_id` and `dictionary_version`. It records the actual dictionary's
+  SHA-256 fingerprint and lookup locale, including for the default lexicon
+  dictionary. Save the dictionary separately for reruns. It remains an optional,
+  context-free backend; aligned supplied annotations support contextual review.
+- Preprocessing contract 0.4.0 retains reading of 0.3.0 objects and 0.2.0
+  Unicode objects. Lexical-overlap contract 0.2.0 checks dictionary records for
+  lemma comparisons involving textstem; absent legacy records cannot establish
+  strict comparability. Metric formulas and result schemas are unchanged.
+
+## Annotation comparisons
+
+- Added `lexdiv_compare_annotations()` to compare lemma, UPOS and flemma
+  annotations on the same tokenized text or named document batches. It checks
+  original text and token alignment, pairs by document ID, retains empty
+  documents and missing annotations, and preserves both provenance records.
+  Differences identify changed labels, not errors or proficiency gains.
+
+## NJ8 diagnostics
+
+- Added `nj8_diagnostics()` for existing single or batch profiles. It counts
+  unmatched terms and surface-to-unit mappings by occurrences and documents,
+  flags introduced numeric/whitespace labels, and preserves coverage,
+  exclusions and provenance. It does not rerun lookup, correct annotations or
+  label unmatched terms as difficult words.
+- Added a worked guide to surface/lemma coverage and parameter sensitivity,
+  using authored examples that run without an external model or corpus.
+  It includes paired document/condition tables that retain uncomputable rows,
+  and a fixed-frequency example separating MATTR position effects from HD-D.
+
 ## English text and document tables
 
 - Added an opt-in `tokenizer = "english"` using R and the existing stringi

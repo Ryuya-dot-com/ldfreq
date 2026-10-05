@@ -1,0 +1,337 @@
+---
+title: "Understanding unmatched words and lexical-unit choices"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Understanding unmatched words and lexical-unit choices}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ldfreq)
+```
+
+## Begin with the question
+
+A teacher wants to describe how much vocabulary in student essays matches
+New JACET 8000. Several frequent words fail to match. Before interpreting this
+as advanced vocabulary, check which lexical units were compared with the list.
+NJ8 contains representative headwords; surface forms and dictionary lemmas can
+produce different coverage. These authored sentences make that choice visible.
+
+```{r}
+texts <- c(a = "Students have jobs.", b = "Students enjoy jobs.", blank = "")
+prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
+surface <- nj8_profile_batch(prepared, unit = "surface")
+audit <- nj8_diagnostics(surface)
+audit$unmatched_terms
+audit$coverage[, c("document_id", "eligible_tokens", "off_list_tokens", "token_coverage")]
+```
+
+`token_count` counts occurrences; `document_count` counts distinct documents
+containing the term. Repeating a word in one essay raises only the former.
+The empty document remains in coverage with an undefined rate. Do not silently
+drop it when describing the sample, or replace its undefined coverage with zero.
+
+## Compare explicit annotations on the same input
+
+Here we supply lemmas ourselves so that the example runs without an optional
+dictionary or model. In real work use reviewed annotations, or explicitly call
+`lexdiv_lemmatize(x, method = "textstem")` after installing `textstem`.
+That dictionary backend does not provide context-sensitive POS disambiguation.
+
+```{r}
+lemmas <- list(a = c("student", "have", "job"),
+               b = c("student", "enjoy", "job"), blank = character())
+annotated <- Map(function(x, lemma) lexdiv_lemmatize(x, lemmas = lemma,
+  backend_id = "authored-example", backend_version = "1"), prepared, lemmas)
+lemma <- nj8_profile_batch(annotated, unit = "lemma")
+comparison <- data.frame(document_id = surface$coverage$document_id,
+  surface_coverage = surface$coverage$token_coverage,
+  lemma_coverage = lemma$coverage$token_coverage)
+comparison
+audit_lemma <- nj8_diagnostics(lemma)
+subset(audit_lemma$unit_mappings, unit_changed)
+```
+
+The change is an answer about matching different units to the same resource.
+It is not evidence that a writer learned more words or that lemmatization is
+universally preferable. Choose a lexical unit for the research question and
+keep it consistent across documents. For a supplied character vector, NJ8
+cannot reconstruct surface forms that the caller already replaced upstream.
+
+## Compare the same documents under explicit conditions
+
+Lemmatization and word inclusion can change lexical findings
+([Caltabellotta et al., 2026](https://doi.org/10.1016/j.asw.2026.101039)).
+Separate the choice of lexical unit from the choice of MATTR window. This
+example crosses two units with two windows using the same annotated documents.
+These very small windows illustrate the workflow; they are not recommended
+settings for learner essays or a replication of the cited study.
+
+```{r}
+conditions <- expand.grid(unit = c("surface", "lemma"),
+  window_length = c(2L, 4L), stringsAsFactors = FALSE)
+conditions$condition_id <- paste0(conditions$unit, "_w", conditions$window_length)
+
+condition_runs <- lapply(seq_len(nrow(conditions)), function(i) {
+  lexdiv_metrics_text_batch(annotated, unit = conditions$unit[i],
+    word_inclusion = "all", metrics = "mattr",
+    window_length = conditions$window_length[i])
+})
+names(condition_runs) <- conditions$condition_id
+
+condition_results <- do.call(rbind, lapply(seq_along(condition_runs), function(i) {
+  rows <- condition_runs[[i]]$results
+  stopifnot(identical(rows$document_id, names(annotated)))
+  data.frame(condition_id = conditions$condition_id[i],
+    unit = conditions$unit[i], window_length = conditions$window_length[i],
+    rows[, c("document_id", "N", "V", "value", "status", "missing_reason")])
+}))
+row.names(condition_results) <- NULL
+condition_results
+```
+
+All three documents remain in each condition. The four-token window is too
+large for these sentences; the output retains the missing result and its reason.
+The empty document also remains. For computable rows, these toy sentences have
+no within-sentence repetition in either unit, so MATTR is unchanged even though
+NJ8 coverage changes. Coverage and diversity answer different questions.
+
+Keep `condition_runs` as well as this display table: the full objects retain
+method identities, requested/effective parameters, token audits and preprocessing.
+For a paired comparison, match document IDs within a fixed specification and
+report the number of usable pairs; do not silently omit failed conditions.
+
+An all-word/content-word comparison additionally needs aligned UPOS annotations
+and their backend identity on every document. Once these exist, repeat the same
+explicit workflow with `word_inclusion = "content"`. The retained token count
+then changes, and a window spans selected words rather than the original token
+positions. A surface/lemma contrast is also different from a default/custom
+lemmatizer contrast: the latter requires two separately recorded annotation
+sets on the same original texts. Do not treat them as interchangeable replications.
+
+## Audit alternative annotation schemes
+
+The custom scheme in Caltabellotta et al. (2026, Section 4.3 and Table 1)
+distinguished verbal mood and tense. It was not a dictionary-correction exercise.
+Here we supply a small authored example with explicit POS-sensitive labels and
+a refined verbal scheme. The package counts supplied strings as given;
+`unit = "lemma"` does not automatically append POS, mood or tense.
+
+```{r}
+scheme_tokens <- lexdiv_tokenize(
+  "Students see students and saw teachers.", case = "lower")
+scheme_pos <- c("NOUN", "VERB", "NOUN", "CCONJ", "VERB", "NOUN")
+base_labels <- c("student_NOUN", "see_VERB", "student_NOUN",
+  "and_CCONJ", "see_VERB", "teacher_NOUN")
+refined_labels <- base_labels
+refined_labels[c(2, 5)] <- c("see_VERB_Ind_Pres", "see_VERB_Ind_Past")
+make_scheme <- function(labels, version) {
+  lexdiv_lemmatize(scheme_tokens, lemmas = labels, upos = scheme_pos,
+    backend_id = "authored-counting-scheme", backend_version = version,
+    upos_backend_id = "authored-upos", upos_backend_version = "1")
+}
+base_scheme <- make_scheme(base_labels, "base-v1")
+refined_scheme <- make_scheme(refined_labels, "tense-v1")
+annotation_audit <- lexdiv_compare_annotations(base_scheme, refined_scheme)
+annotation_audit$documents
+annotation_audit$changes[, c("token_index", "surface", "before_lemma", "after_lemma")]
+
+schemes <- list(base = base_scheme, refined = refined_scheme)
+scheme_conditions <- expand.grid(scheme = names(schemes),
+  inclusion = c("all", "content"), stringsAsFactors = FALSE)
+scheme_runs <- lapply(seq_len(nrow(scheme_conditions)), function(i) {
+  lexdiv_metrics_text_batch(list(essay = schemes[[scheme_conditions$scheme[i]]]),
+    unit = "lemma", word_inclusion = scheme_conditions$inclusion[i],
+    metrics = "mattr", window_length = 3)
+})
+names(scheme_runs) <- with(scheme_conditions, paste(scheme, inclusion, sep = "_"))
+lapply(scheme_runs, function(x) x$results[, c("document_id", "N", "V", "value")])
+```
+
+Two lemma labels changed; no UPOS labels changed. The conjunction remains in the
+all-word condition and is excluded in the content-word condition. The window
+length is measured in the selected tokens. These authored annotations and the
+three-token window illustrate the workflow, not a replication or a recommended
+setting. The published study used spaCy, a 50-token window, and the same
+processing for learner texts and its reference corpora.
+
+Do not submit these POS/morphology keys directly to NJ8 or an ordinary lemma
+frequency table: their lexical units differ. Keep separate prepared objects
+for headword lookup and scheme-sensitive diversity, with explicit identities.
+For frequency comparisons, the reference counts need a corresponding scheme.
+An improved match rate alone cannot establish that correspondence.
+
+`lexdiv_compare_annotations()` also accepts named batches. It matches IDs even
+if their order differs, retains empty documents, and rejects differences in
+original text or tokenization. Missing-to-value and value-to-missing transitions
+are changes; two missing values are unchanged. Backend-only differences remain
+visible in `$provenance` even when `$changes` is empty. Save both prepared inputs
+and the audit: `saveRDS(list(before = base_scheme, after = refined_scheme,
+audit = annotation_audit, conditions = scheme_conditions, runs = scheme_runs), path)`.
+Backend labels alone are not proof of dictionary content identity. The next
+example records the dictionary content fingerprint and saves the actual table.
+
+## Choose and save the actual lemma dictionary
+
+A backend version alone does not identify its dictionary. With optional
+`textstem` installed, pass a two-column character data frame and give it an
+explicit identity and version. Lookup terms must be unique and lowercase under
+the current R locale. Unmatched tokens retain their surface forms. This tiny
+authored dictionary illustrates lookup; it is not a general English dictionary.
+
+```{r}
+if (requireNamespace("textstem", quietly = TRUE)) {
+  dictionary <- data.frame(term = c("cats", "ran", "third"),
+    lemma = c("cat", "run", "3"))
+  input <- lexdiv_tokenize("Cats ran. The third group ate one third.",
+    tokenizer = "english", case = "lower")
+  baseline <- lexdiv_lemmatize(input, method = "textstem",
+    dictionary = dictionary, dictionary_id = "authored-demo",
+    dictionary_version = "1")
+  baseline$tokens[, c("token_index", "surface", "lemma")]
+  baseline$provenance$annotation$dictionary
+}
+```
+
+The record includes a content fingerprint, entry count and lookup locale.
+Reordering rows leaves the fingerprint unchanged; changing a mapping changes
+it even if the version label stays the same. With `dictionary = NULL`, the
+package uses `lexicon::hash_lemmas` and records the installed lexicon version
+and the actual table's fingerprint. This records context-free lookup, not
+POS disambiguation or evidence that the labels are linguistically correct.
+
+The example has two occurrences of `third`. Suppose an analysis specifies
+word-form labels for ordinal expressions, while leaving the fractional
+expression for separate review. Editing the dictionary would affect both.
+Instead, record the reviewed token position and supply an aligned lemma vector.
+This is an illustration of an explicit counting scheme, not a recommendation
+to retain numeric fraction labels in every study.
+
+```{r}
+if (requireNamespace("textstem", quietly = TRUE)) {
+  revisions <- data.frame(token_index = 4L, before_lemma = "3",
+    after_lemma = "third", reason = "ordinal word-form counting scheme")
+  stopifnot(baseline$tokens$surface[revisions$token_index] == "third",
+    baseline$tokens$lemma[revisions$token_index] == revisions$before_lemma)
+  reviewed_lemmas <- baseline$tokens$lemma
+  reviewed_lemmas[revisions$token_index] <- revisions$after_lemma
+  reviewed <- lexdiv_lemmatize(input, lemmas = reviewed_lemmas,
+    backend_id = "authored-context-review", backend_version = "1")
+  changes <- lexdiv_compare_annotations(baseline, reviewed)
+  changes$changes[, c("token_index", "surface", "before_lemma", "after_lemma")]
+  saved <- tempfile(fileext = ".rds")
+  saveRDS(list(dictionary = dictionary, before = baseline, after = reviewed,
+    revisions = revisions, audit = changes), saved)
+  restored <- readRDS(saved)
+  replay <- lexdiv_lemmatize(input, method = "textstem",
+    dictionary = restored$dictionary, dictionary_id = "authored-demo",
+    dictionary_version = "1")
+  stopifnot(identical(replay, restored$before))
+  unlink(saved)
+}
+```
+
+Use a persistent path for real analyses. The prepared object retains dictionary
+metadata, not the dictionary table; saving only its hash cannot reproduce
+lookup. Retain the actual dictionary, backend versions, locale, both annotation
+sets and revision reasons. For a POS-tagged analysis also pass the aligned UPOS
+vector and its backend identity when reannotating. Missing tags are not inferred.
+Older saved annotations remain readable; missing dictionary records cannot
+establish strict lemma comparability in `lexdiv_content_overlap()`.
+
+## Inspect surprising transformations
+
+```{r}
+example <- lexdiv_tokenize("second compound missing", case = "lower")
+example <- lexdiv_lemmatize(example, lemmas = c("2", "two words", NA),
+  backend_id = "authored-transformations", backend_version = "1")
+example_profile <- nj8_profile(example, unit = "lemma")
+diagnostic <- nj8_diagnostics(example_profile)
+diagnostic$unit_mappings
+diagnostic$exclusion_reasons
+```
+
+The numeric and whitespace flags describe changes; they do not establish an
+error. The phrase `two words` remains one supplied lexical unit. Missing lemmas
+are excluded, not counted as unmatched. `lookup_changed` can reflect query
+normalization or a flemma headword-conflict decision. Keep the original
+`profile$lookup` for occurrence positions and the prepared objects for annotation
+details. No automatic spelling correction, compound splitting or numeric-label
+removal is performed by the diagnostics.
+
+## Keep window sensitivity separate from vocabulary coverage
+
+The existing plan API compares common windows on ordered tokens. These repeated
+tokens are an illustration of parameter effects, not learner observations.
+
+```{r}
+documents <- list(clustered = rep(c("river", "stone", "cloud"), each = 20),
+                  interleaved = rep(c("river", "stone", "cloud"), 20))
+method <- lexdiv_methods()$method_id[lexdiv_methods()$metric_id == "mattr"]
+plan <- lexdiv_plan(presets = character(), grids = lexdiv_grid(
+  method, "window_length", c(10, 20), request_id_prefix = "window"))
+results <- lexdiv_profile_batch(documents, plan)
+results[, c("document_id", "request_id", "value", "status")]
+```
+
+Use the same requested windows for every text; retain missing results when a
+text is too short. Do not choose a different window for each writer to improve
+its score or average unlike conditions together. Lexical diversity and NJ8
+coverage answer different questions, so neither provides a combined proficiency
+score. Generalizing to proficiency or writing quality needs an appropriate
+external criterion and a design that respects writers, tasks and raters.
+
+## Distinguish window size from position effects
+
+Text length and the reduction parameter are separate sensitivity questions
+([Bestgen, 2024](https://doi.org/10.1111/lang.12630)). MATTR also weights
+positions unequally through its overlapping windows
+([Bestgen, 2025](https://doi.org/10.1016/j.rmal.2024.100168)). This authored
+counterexample holds the number and frequency of tokens fixed and moves one
+unique token from an endpoint to the middle.
+
+```{r}
+positions <- list(endpoint = c("x", rep("a", 6)),
+  middle = c(rep("a", 3), "x", rep("a", 3)))
+position_scores <- lexdiv_metrics_batch(positions,
+  metrics = c("ttr", "mattr", "hdd"), window_length = 3, sample_size = 3)
+position_scores[, c("document_id", "metric_id", "N", "V", "value")]
+
+position_plan <- lexdiv_plan(presets = character(), specs = lexdiv_spec(
+  method, list(window_length = 3), request_id = "mattr_3"))
+position_profile <- lexdiv_mattr_profile(positions$endpoint, position_plan)
+position_profile$exposure[, c("position", "exposure_count")]
+```
+
+There are five complete windows. At the endpoint, `x` appears in one window;
+in the middle it appears in three. MATTR is therefore 0.4 and 8/15 (about 0.533),
+respectively. TTR and HD-D are identical across the two orders because their
+calculations here depend on the same frequency distribution. This checks a
+mathematical property, not which index best captures learners' proficiency.
+Exposure counts describe window membership, not each token's causal contribution.
+Keep the canonical MATTR calculation; dividing its score by exposure counts
+would define a different, unvalidated index.
+
+The local windows overlap and are not independent observations. A future
+length/position study should retain the parent document ID, distinguish
+contiguous excerpts from randomly sampled tokens, and use uncertainty estimates
+that respect repeated observations within writers. A single MATTR window
+comparison does not establish text-length invariance.
+
+## Save a reproducible analysis
+
+Save the complete profiles and prepared objects, not just a top-word list:
+`saveRDS(list(prepared = annotated, profile = lemma, audit = audit_lemma), path)`.
+Use `write.csv(audit_lemma$unmatched_terms, path, row.names = FALSE)` for inspection
+in a spreadsheet. These objects can contain text-derived data; choose a
+destination appropriate to the corpus. Record the package version, selected
+unit, annotation backend, normalization, exclusions and NJ8 citation alongside
+any reported coverage.
+
+For the condition comparison, also save
+`saveRDS(list(prepared = annotated, conditions = conditions, runs = condition_runs,
+results = condition_results), path)`. Save the complete objects before exporting
+display tables to CSV; a CSV alone does not preserve their annotation records.

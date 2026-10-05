@@ -25,7 +25,7 @@
       "const": "ldfreq-preprocessing"
     },
     "contract_version": {
-      "const": "0.3.0"
+      "const": "0.4.0"
     },
     "status": {
       "const": "normative"
@@ -51,7 +51,9 @@
       "required": [
         "serialized_0_1_0_tokenization",
         "migration",
-        "serialized_0_2_0_unicode_tokenization"
+        "serialized_0_2_0_unicode_tokenization",
+        "serialized_0_3_0_tokenization",
+        "reannotation"
       ],
       "properties": {
         "serialized_0_1_0_tokenization": {
@@ -62,6 +64,12 @@
         },
         "serialized_0_2_0_unicode_tokenization": {
           "const": "accepted-with-existing-validation-without-rewriting-saved-provenance"
+        },
+        "serialized_0_3_0_tokenization": {
+          "const": "accepted-with-existing-validation; absent-dictionary-record-does-not-establish-strict-lemma-comparability"
+        },
+        "reannotation": {
+          "const": "lexdiv_lemmatize-upgrades-contract-and-records-new-annotation-provenance"
         }
       }
     },

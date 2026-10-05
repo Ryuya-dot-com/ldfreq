@@ -23,7 +23,62 @@ a result about vocabulary knowledge, proficiency, or writing quality.
 
 The examples below are synthetic. They isolate effects of length, order, and
 window size so that we can explain what the calculations answer. They cannot
-establish an effect in learners or the validity of a chosen window for a task.
+establish a population effect or the validity of a chosen window for a task.
+
+## Native-speaker corpora are also analysis targets
+
+The package does not restrict input to English learners. Native-speaker
+conversation, student essays, professional writing and other registers can be
+studied in their own right. L1/L2 comparison is another application, not a
+requirement for a corpus study. A corpus can play three different roles:
+
+| Role | Example question | What the observations support |
+|---|---|---|
+| Analysis sample | How do local lexical variety and repetition vary across spoken and written registers? | Description of the sampled texts under the selected unit and parameters |
+| Reference resource | Does a text's frequency profile change with the reference register? | Dependence on the reference vocabulary, corpus composition and coverage |
+| Comparison sample | How do comparable L1 and L2 responses to a task differ? | A conditional group comparison, with task and sampling differences still considered |
+
+For student writing, [LOCNESS](https://corpora.uclouvain.be/catalog/en/corpus/locness)
+contains essays by British and American native English students. For natural
+conversation, [Spoken BNC2014](https://www.lancaster.ac.uk/news/articles/2017/researchers-release-largest-ever-public-collection-of-british-conversations/)
+contains spontaneous British English conversations recorded among friends and
+family. [COCA](https://www.english-corpora.org/coca/help/tour.asp) supplies a
+broader register contrast, including spoken, fiction, news and academic texts.
+These are candidate sources, not bundled datasets or automatically matched
+control groups. General-English coverage alone does not verify every
+contributor's L1 background; use documented participant metadata if that is an
+inclusion criterion.
+
+An initial corpus study can test whether conclusions about lexical variety
+survive changes in window length, word unit and reference resource within each
+register. Then compare populations where age, education, task, topic, mode,
+time constraints and editing conditions are sufficiently aligned. Do not
+interpret a difference between edited professional articles and timed learner
+essays as a pure effect of language background. Native speakers also vary;
+neither higher diversity nor lower reference frequency is a universal target.
+
+Retain a document metadata table with `document_id`, `corpus_id`, corpus version,
+author/speaker ID, documented language background, register, task/topic and
+collection period. Join it to result rows by unique document ID; the metric
+functions do not discover or automatically carry arbitrary metadata columns.
+Keep unknown background as unknown. Do not concatenate a whole corpus into one
+document: local windows must not cross unrelated text boundaries, and pooled
+tokens answer a different question from typical-document scores.
+
+For conversations, specify whether a unit is a conversation, a speaker's turn,
+or a defined sequence of turns. Record treatment of transcription tags,
+fillers, false starts and repairs before tokenization. Removing other speakers'
+turns can create artificial adjacency in a speaker-only stream; do not treat
+that stream as uninterrupted speech. Repeated turns from one speaker are not
+independent participants. The English tokenizer is not a corpus-XML parser.
+
+The existing batch and profile APIs can perform these calculations. Compare
+document distributions and missing-result/coverage patterns by the chosen
+strata, preserving author/speaker dependencies in any later inference. Corpus
+frequencies and attested uses describe a sample; individual vocabulary ability
+requires additional evidence. The
+[vocabulary-use guide](vocabulary-knowledge-and-use.html) addresses that separate
+question using paired response data.
 
 ## Why use a common MATTR window?
 

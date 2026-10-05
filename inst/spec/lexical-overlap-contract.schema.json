@@ -23,7 +23,7 @@
   "properties": {
     "$schema": {"const": "lexical-overlap-contract.schema.json"},
     "contract_id": {"const": "ldfreq-lexical-overlap"},
-    "contract_version": {"const": "0.1.0"},
+    "contract_version": {"const": "0.2.0"},
     "status": {"const": "normative"},
     "public_api": {"const": true},
     "input_contract": {"type": "object"},
@@ -155,7 +155,7 @@
         "declared_label_safety": {
           "const": "path-free-caller-labels-with-no-secrets-or-private-hashes"
         },
-        "content_hash_comparison": {"const": false}
+        "content_hash_comparison": {"const": "textstem-dictionary-only"}
       }
     },
     "privacy_boundary": {

@@ -1,0 +1,264 @@
+---
+title: "Japanese annotations: from original text to lexical measures"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Japanese annotations: from original text to lexical measures}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ldfreq)
+dic_dir <- Sys.getenv("LDFREQ_UNIDIC_LITE_1_0_8", unset = "")
+run_gibasa <- nzchar(dic_dir) && requireNamespace("gibasa", quietly = TRUE)
+```
+
+For stimulus-item ratings and separately obtained AoA/BOI tables, see
+[Japanese lexical norms](japanese-norms.html). That workflow retains item IDs
+and norm-matching decisions independently of morphological segmentation.
+
+Japanese text needs an explicit word-unit decision. For example, counting
+`国際連合` as one item or `国際 / 連合` as two changes both vocabulary diversity
+and the available bigrams. The default Unicode tokenizer in ldfreq does not
+perform Japanese morphological analysis. Instead, use a Japanese analyzer and
+bring its complete annotations into `lexdiv_import_annotations()`.
+
+The importer checks the supplied surfaces against original text, derives source
+positions, retains dictionary metadata and leaves missing annotations missing.
+Use existing R packages for morphology and concordances, and ldfreq to keep
+those input decisions visible in lexical analyses. This is an integration and
+audit contribution, not a new Japanese segmentation algorithm or a validated
+Japanese proficiency scale.
+
+## An offline example
+
+These annotations are authored for illustration, not analyzer output or a
+Japanese gold standard. The original examples in this guide are covered by the
+package's MIT license; no corpus or dictionary is redistributed.
+
+```{r authored}
+segments <- data.frame(
+  document_id = c("essay", "empty"), segment_id = c("s1", "s1"),
+  text = c("国際連合で国際協力を学ぶ。", "")
+)
+annotations <- data.frame(
+  document_id = "essay", segment_id = "s1", token_index = 1:8,
+  surface = c("国際", "連合", "で", "国際", "協力", "を", "学ぶ", "。"),
+  lemma = c("国際", "連合", "で", "国際", "協力", "を", "学ぶ", NA_character_)
+)
+imported <- lexdiv_import_annotations(annotations, segments, list(
+  language = "ja", analyzer = "authored", analyzer_version = "1",
+  dictionary = "none", dictionary_version = "not-applicable",
+  unit = "authored-fine", normalization = "none"
+))
+imported$tokens
+```
+
+`start` and `end` are **1-based inclusive Unicode codepoint positions within
+the segment's original text**. They are not whole-document positions, byte
+offsets, UTF-16 offsets or positions after normalization. The empty document
+remains in `imported$documents`, with a zero-token segment. A sentence or turn
+is a caller-supplied segment; the importer does not infer these boundaries.
+
+Import **before filtering**. Apart from whitespace, every original character
+must be covered, including punctuation. A skipped repeated word, dropped
+punctuation, or normalized replacement causes an error. A supplied `start` or
+`end` column must match the derived coordinates. This verifies the alignment,
+not the correctness of POS, lexical units, or the source's sentence boundaries.
+
+```{r measures}
+words <- imported$tokens[imported$tokens$surface != "。", ]
+lexdiv_metrics(words$surface, metrics = "ttr")
+phrases <- lexdiv_ngrams(words, "authored-ja-surface-no-punctuation-v1",
+  term_col = "surface", documents = imported$documents$document_id)
+phrases$documents
+```
+
+The seven retained tokens contain six distinct surface strings: TTR is 6/7.
+There are six adjacent bigram and five trigram opportunities. These counts
+verify the example's arithmetic; a seven-token text cannot establish the
+reliability of a diversity measure. Choose length-appropriate measures and
+report non-computable requests rather than changing their parameters silently.
+
+## Use gibasa and a local UniDic dictionary in R
+
+[gibasa](https://paithiov909.github.io/gibasa/) supplies the MeCab interface;
+ldfreq does not reimplement it. Install gibasa separately with
+`install.packages("gibasa")`. Its optional installation requirements are
+separate from those of ldfreq. A UTF-8 compiled dictionary is also required.
+
+This recipe is for **unidic-lite 1.0.8, based on UniDic 2.1.2**, with the
+26-field binary schema. It is a concrete integration example, not a claim that
+this older dictionary is best for every contemporary Japanese dataset.
+[unidic-lite](https://github.com/polm/unidic-lite) modifies the original UniDic
+release; record both identities. Obtain its versioned archive from the
+[release files](https://pypi.org/project/unidic-lite/1.0.8/#files), verify the
+published SHA-256, and extract it. R's `download.file()` and `untar()` can do
+this; no Python runtime is needed to use the extracted dictionary in gibasa.
+Keep the included dictionary license and source information with it. Set
+`LDFREQ_UNIDIC_LITE_1_0_8` to the extracted `unidic_lite/dicdir` directory before
+rendering this guide, or assign that path to `dic_dir` and run the following
+chunks interactively. The package build runs the authored examples offline;
+it does not download a dictionary.
+
+Supply one sentence or turn per segment, with a separate roster for original
+document IDs. The following strings are new examples, not sampled corpus text.
+The full-width letters and an invented string expose normalization and
+missing-feature decisions.
+
+```{r japanese-source}
+ja_segments <- data.frame(document_id = c("essay", "essay", "empty"),
+  segment_id = c("s1", "s2", "s1"),
+  text = c("国際連合で国際協力を学ぶ。", "ＡＩで学びました。 qzxv😀", ""))
+```
+
+gibasa needs a readable MeCab configuration file even when `sys_dic` is
+explicit. This helper retains an existing `~/.mecabrc` (which gibasa's bundled
+MeCab checks before `MECABRC`), or uses a temporary empty configuration when
+that file is absent. It records the configuration hash, verifies that only the
+requested system dictionary is active, and restores the prior environment on
+exit. It does not edit the home configuration or request normalization or
+automatic sentence splitting. Use a path without spaces for this gibasa recipe.
+
+```{r gibasa-analysis, eval=run_gibasa}
+analyze_unidic <- function(segments, dic_dir) {
+  rc <- path.expand("~/.mecabrc")
+  temporary_rc <- !file.exists(rc)
+  if (temporary_rc) {
+    rc <- tempfile("mecabrc-")
+    writeLines("", rc)
+  }
+  previous <- Sys.getenv("MECABRC", unset = NA_character_)
+  on.exit({
+    if (is.na(previous)) Sys.unsetenv("MECABRC") else Sys.setenv(MECABRC = previous)
+    if (temporary_rc) unlink(rc)
+  })
+  Sys.setenv(MECABRC = rc)
+  info <- gibasa::dictionary_info(sys_dic = dic_dir, user_dic = "")
+  stopifnot(nrow(info) == 1L, info$type == 0L,
+    tolower(gsub("-", "", info$charset)) == "utf8",
+    normalizePath(info$file_path) == normalizePath(file.path(dic_dir, "sys.dic")))
+  texts <- setNames(segments$text, paste0("input_", seq_len(nrow(segments))))
+  raw <- gibasa::tokenize(texts, sys_dic = dic_dir, user_dic = "",
+    split = FALSE, partial = FALSE)
+  expanded <- as.data.frame(gibasa::prettify(raw,
+    into = gibasa::get_dict_features("unidic26")))
+  source_row <- match(as.character(raw$doc_id), names(texts))
+  tokens <- data.frame(document_id = segments$document_id[source_row],
+    segment_id = segments$segment_id[source_row], token_index = raw$token_id,
+    surface = raw$token, raw_feature = raw$feature)
+  features <- setdiff(names(expanded), c("doc_id", "sentence_id", "token_id", "token"))
+  list(tokens = cbind(tokens, expanded[features]),
+    configuration_sha256 = digest::digest(file = rc, algo = "sha256"))
+}
+analysis <- analyze_unidic(ja_segments, dic_dir)
+ja_annotations <- analysis$tokens
+ja_annotations[c("surface", "orthBase", "lemma", "lForm", "POS1")]
+```
+
+Use the feature schema for the **actual dictionary**, not the default IPA
+schema of `prettify()`. The raw feature string is retained to make the expansion
+auditable, including quoted commas and missing fields. gibasa does not expose
+MeCab's unknown-node flag in these rows: a missing lemma is observable, but
+is not an independently verified unknown-word classification. Do not fabricate
+a definitive unknown flag from it.
+
+```{r gibasa-import, eval=run_gibasa}
+dictionary_files <- c("sys.dic", "unk.dic", "char.bin", "matrix.bin", "dicrc")
+dictionary_hashes <- setNames(lapply(file.path(dic_dir, dictionary_files),
+  function(path) digest::digest(file = path, algo = "sha256")),
+  paste0(dictionary_files, "_sha256"))
+ja <- lexdiv_import_annotations(ja_annotations, ja_segments, c(list(
+  language = "ja", analyzer = "gibasa/MeCab",
+  analyzer_version = as.character(utils::packageVersion("gibasa")),
+  dictionary = "unidic-lite", dictionary_version = "1.0.8 (UniDic 2.1.2)",
+  unit = "UniDic-short-unit-analysis", normalization = "none",
+  settings = "unidic26; split=FALSE; partial=FALSE; no user dictionary",
+  configuration_sha256 = analysis$configuration_sha256,
+  dictionary_source = "https://pypi.org/project/unidic-lite/1.0.8/"
+), dictionary_hashes))
+ja$tokens[c("document_id", "segment_id", "token_index", "surface",
+  "orthBase", "lemma", "start", "end")]
+```
+
+Metadata and hashes record the declared dictionary snapshot. They do not
+independently identify or license an arbitrary dictionary path. If you change
+dictionary release, schema, user dictionary or settings, update the metadata
+and verify the feature mapping again. Retain user-dictionary hashes as well
+when used. RDS saves the imported tables without requiring gibasa or the
+dictionary when reloading them for analysis.
+
+## Choose lexical forms and preserve exclusions
+
+[UniDic's terminology](https://clrd.ninjal.ac.jp/unidic/glossary.html)
+distinguishes the observed surface, `orthBase` (orthographic base) and `lemma`
+(lexeme label). In this example, surface `学び` has base and lemma `学ぶ`;
+`まし` maps to `ます`. A lemma label alone need not identify a unique lexeme:
+homographs may require reading, POS or dictionary IDs. Do not use a first-match
+join to resolve collisions with a reference table.
+
+This explicit example excludes auxiliary symbols and whitespace tokens,
+retains particles and auxiliary verbs, and requires an observed `orthBase`.
+Inspect and save the exclusions rather than substituting surface forms for
+missing bases. Change this selection if the research question calls for a
+different lexical population, and change the preprocessing label accordingly.
+
+```{r gibasa-selection, eval=run_gibasa}
+t <- ja$tokens
+punctuation <- !is.na(t$POS1) & t$POS1 %in% c("補助記号", "空白")
+has_whitespace <- stringi::stri_detect_regex(t$surface, "\\p{White_Space}")
+missing_base <- is.na(t$orthBase) | !nzchar(t$orthBase)
+keep <- !punctuation & !has_whitespace & !missing_base
+selection <- data.frame(document_id = t$document_id, segment_id = t$segment_id,
+  token_index = t$token_index, punctuation, has_whitespace, missing_base, retained = keep)
+selected <- t[keep, ]
+selected$term <- selected$orthBase
+by_document <- setNames(lapply(ja$documents$document_id,
+  function(id) selected$term[selected$document_id == id]), ja$documents$document_id)
+results <- lexdiv_metrics_batch(by_document, metrics = "ttr")
+grams <- lexdiv_ngrams(selected, "ja-unidic-lite-1.0.8-orthBase-selection-v1",
+  documents = ja$documents$document_id)
+results
+grams$documents
+```
+
+The diversity calculation describes the retained sequence. N-grams also
+respect segment boundaries and the **original** `token_index`: excluding a
+particle, punctuation or an unavailable base leaves a gap, not a new adjacent
+pair. Do not renumber `selected`. With quanteda installed,
+`lexdiv_as_quanteda(selected, ja$segments, term_col = "term")` preserves those
+gaps for concordances and other quanteda operations in a UTF-8 R session.
+
+```{r save-analysis, eval=FALSE}
+saveRDS(list(imported = ja, selection = selection, metrics = results, ngrams = grams),
+  "japanese-analysis.rds")
+```
+
+## Frequency resources and interpretation
+
+The bundled `tubelex_profile()` and `nj8_profile()` resources are **English**;
+do not treat unmatched Japanese tokens as rare English words. Japanese
+[TUBELEX](https://github.com/naist-nlp/tubelex) has different surface/base/lemma
+and dictionary-version variants. Sharing MeCab does not by itself establish
+compatible keys: normalization, dictionary version, POS definition and
+selection also matter. The [Japanese stimulus guide](japanese-stimuli.html)
+connects reviewed `orthBase` keys to one separately acquired, pinned Japanese
+TUBELEX table. It records denominators and key transformations without claiming
+to reproduce upstream tokenization. Its unigram tables cannot supply n-gram
+co-occurrences.
+
+For an external Japanese norm table, prepare and check unique keys and use
+`lexdiv_norm_profile()` with the table's actual metadata and missingness. For
+n-gram frequencies, supply permitted local reference counts through the
+[n-gram workflow](ngram-profiles.html). Neither approach requires redistributing
+the underlying corpus. Access to a source does not itself establish a right
+to redistribute it; check the terms of the actual artifact used.
+
+Analyzing Japanese learner texts, native-speaker texts, or instructional
+materials is possible with this input path. Software alignment tests do not
+validate learner-error tokenization, lexical sophistication, or equivalence
+between English and Japanese scores. Evaluate those questions against suitable
+annotated data and external outcomes. Comparing segmentations with splits and
+merges remains a separate development task: `lexdiv_compare_annotations()`
+still requires identical token rows and cannot perform that comparison.

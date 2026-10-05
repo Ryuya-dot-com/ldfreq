@@ -2,9 +2,12 @@
 
 **Compare lexical diversity and vocabulary profiles while keeping the analysis
 conditions attached to the results.** `ldfreq` is an R package for researchers
-working with English writing, teaching materials, and other texts. It combines
+working with first- and additional-language writing, transcribed speech,
+teaching materials, and other texts. It combines
 lexical-diversity measures, New JACET 8000 level coverage, and TUBELEX reference
 frequency with explicit preprocessing, parameter settings, and match coverage.
+The bundled resources and built-in linguistic rules target English; prepared
+tokens can represent other languages, with an experimental Japanese workflow.
 
 A difference between two scores can reflect different word units, window sizes,
 or reference-list matches. `ldfreq` helps you inspect those choices and report
@@ -21,9 +24,63 @@ and checks that reshaped tables and plots do not mix incompatible specifications
   terms remain visible; missing frequency values are not replaced by zero.
 - **Examine sensitivity.** Compare lexical units, parameter settings, and selected
   Maas/MTLD definitions; inspect local MATTR windows and positional exposure.
+- **Describe word combinations with your own reference.** Extract adjacent
+  bigrams/trigrams from prepared segments and original positions, then look up
+  local reference counts with explicit opportunity totals. Sample zeros and
+  unlisted keys in pruned tables remain distinct. No corpus needs to be bundled.
+  See the [n-gram guide](https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html)
+  for CSV/RDS inputs, boundary requirements and phrase-level research examples.
+- **Trace the effect of reference choice.** Compare the same target phrases
+  across references, keeping coverage and sample sizes beside common-item
+  differences. A higher mean caused by missing phrases should not be mistaken
+  for greater familiarity.
 
 These are features for describing and comparing texts. A score alone does not
 establish proficiency, writing quality, measurement validity, or reliability.
+
+## Corpus scope
+
+The same analysis functions accept native-speaker and learner texts. Research
+can examine variation within native-speaker corpora, compare matched L1/L2
+samples, or evaluate reference-frequency choices across registers. Learner
+assessment is one application; no participant knowledge scores are required
+for descriptive corpus analysis.
+
+Keep author/speaker, task, register, corpus version and documented language
+background in a metadata table linked by document ID. Match relevant sampling
+conditions before interpreting L1/L2 differences. Native-speaker status is not
+a universal quality target, and a general English corpus need not contain only
+verified L1 speakers. See [corpus roles and comparison design](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html)
+for reference-corpus candidates and limits.
+
+The token-based calculations accept caller-prepared strings without inferring a
+language. Segmentation and lexical units still need validation for the target
+language and register. The raw-text English rules and bundled English reference
+resources have narrower scope. Automatic POS tagging, sense disambiguation,
+corpus-XML import and proficiency scoring are not part of the default pipeline.
+
+For Japanese, use an existing morphological analyzer and import its complete
+annotations with `lexdiv_import_annotations()`. It verifies surfaces against
+original text, derives source positions, retains lexical-form/POS columns and
+dictionary metadata, and connects to the existing metrics and n-gram functions.
+The [Japanese guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html)
+provides an R-only gibasa/UniDic recipe, explicit missing-feature handling, and
+gap-preserving exclusions. A Japanese dictionary is optional and separately
+obtained; the package does not bundle one or establish cross-language score
+equivalence. The Unicode tokenizer alone is not a Japanese word segmenter.
+
+For experimental stimuli, the [Japanese norms guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.html)
+shows how to attach separately obtained AoA or BOI ratings while retaining item
+IDs, experimental conditions, rating counts, missing matches and resource terms.
+It includes an offline illustration and a local-file R example; external norm
+data are not bundled. A WLSP-familiarity example lists spelling candidates and
+retains explicit record choices and reasons, including unresolved items.
+The [stimulus-selection guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-stimuli.html)
+adds a pinned Japanese TUBELEX base-form lookup and joins all four resources by
+study item ID. It retains source denominators and mapping decisions, inspects
+per-condition missingness and distributions, and saves a complete RDS record.
+Adult native-speaker norms do not measure individual L2
+knowledge or acquisition history.
 
 ## Relationship to other R packages
 
@@ -32,6 +89,7 @@ establish proficiency, writing quality, measurement validity, or reliability.
 | [quanteda.textstats](https://quanteda.io/reference/textstat_lexdiv.html) | Text statistics and lexical diversity for quanteda tokens and document-feature matrices | Use prepared tokens with explicit method/parameter records, non-computability reasons, and reference-resource profiles |
 | [koRpus](https://reaktanz.de/?c=hacking&s=koRpus) | Text analysis including lemma workflows, MTLD, HD-D, MTLD-MA, and detailed diagnostics | Compare the exact definitions and add a common workflow for condition tracking and reference coverage |
 | [tidytext](https://juliasilge.github.io/tidytext/) | Text processing with tidy tables | Pass one-token-per-row tables through `lexdiv_as_documents()` |
+| [gibasa](https://paithiov909.github.io/gibasa/) | MeCab morphological analysis from R using separately supplied dictionaries | Import complete Japanese annotations with original-text alignment and retain lexical-form choices and dictionary metadata alongside analysis results |
 | [zipfR](https://r-forge.r-project.org/projects/zipfr/) | Statistical models for word-frequency distributions and vocabulary growth | Use ldfreq for document-level descriptive measures and reference-list profiles |
 
 Existing R packages already implement many of these metrics and document their
@@ -40,6 +98,15 @@ conditions and resource coverage, not a claim to have invented the measures.
 Same-named metrics can differ in formula, log base, aggregation, or short-text
 handling. See [definition and preprocessing comparisons](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html).
 No speed or empirical-validity advantage over these packages is claimed.
+
+N-gram extraction is also established functionality in
+[quanteda](https://quanteda.io/reference/tokens_ngrams.html), and
+[TAALES](https://www.linguisticanalysistools.org/taales.html) provides word and
+phrase measures with coverage diagnostics. In ldfreq, the emphasis is a shared
+R workflow retaining document/segment locations, reference definitions,
+eligible-window denominators and missingness alongside other lexical measures.
+The current n-gram functions provide frequencies, not MI/t-score or a validated
+phraseological-sophistication score.
 
 ## Installation
 
@@ -73,6 +140,7 @@ analysis$results[, c("document_id", "metric_id", "N", "V", "value", "status")]
 # This is surface-form coverage; it does not silently lemmatize the text.
 levels <- nj8_profile_batch(prepared, unit = "surface")
 levels$coverage
+nj8_diagnostics(levels)$unmatched_terms
 plot(analysis, metric_id = "mattr")
 ```
 
@@ -89,6 +157,8 @@ TTR uses the full document denominator; MATTR uses the selected local window.
 NJ8 coverage asks how much of the selected vocabulary matches the list, not how
 much vocabulary a writer knows. For lemma coverage, supply or explicitly generate
 lemmas first. Report the selected unit, exclusions, and off-list proportion.
+Use [the vocabulary-audit guide](https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.html)
+to inspect unmatched terms and surface-to-unit mappings before interpreting coverage.
 
 [From text to a report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html) extends this example
 to a reusable analysis table, an interpretation, saved results, and citations.
@@ -121,14 +191,24 @@ a high match rate does not prove that arbitrary tokens use the right segmentatio
 | Twelve diversity measures | `lexdiv_metrics()`, `lexdiv_metrics_text()`, `lexdiv_metrics_batch()` |
 | Named raw texts or document ID/text tables | `lexdiv_tokenize_batch()`, `lexdiv_metrics_text_batch()` |
 | Raw text, lemmas, or externally supplied AntBNC flemmas | `lexdiv_tokenize()`, `lexdiv_lemmatize()`, `lexdiv_flemmatize()` |
+| Record or choose the lemma dictionary | `lexdiv_lemmatize(method = "textstem", dictionary = ...)` records content identity and lookup locale |
+| Audit annotation changes on the same documents | `lexdiv_compare_annotations()` retains changed labels and both provenance records |
 | Parameter and definition sensitivity | `lexdiv_spec()`, `lexdiv_grid()`, `lexdiv_plan()`, `lexdiv_profile()`, `lexdiv_profile_batch()`, `lexdiv_variant_metrics()` |
 | Local MATTR windows and exposure | `lexdiv_mattr_profile()` |
 | Exact term/content-word overlap | `lexdiv_term_overlap()`, `lexdiv_content_overlap()` |
 | Coverage of a supplied reference set | `lexdiv_reference_coverage()` |
 | Numeric lexical norms with observed-value and annotation coverage | `lexdiv_norm_profile()` |
+| Apply your reference table across a corpus with document-level coverage | `lexdiv_norm_profile_batch()` |
 | Bundled or external NJ8 levels | `nj8_profile()`, `nj8_profile_batch()` |
 | Bundled TUBELEX frequency/prevalence | `tubelex_profile()`, `tubelex_profile_batch()` |
+| Tabulate TUBELEX results with coverage and input conditions | `tubelex_diagnostics()` |
+| Compare scored recognition/recall pairs with explicit denominators | `lexdiv_compare_responses()` |
 | Token-table adapters, wide tables, and plots | `lexdiv_as_documents()`, `lexdiv_widen()`, `plot()` |
+| Import local MASC Penn annotations with original positions | `lexdiv_read_masc()` (experimental; Mini-MASC 1.0 and a validated subset of MASC 3.0.0) |
+| Import complete external annotations, including Japanese morphology | `lexdiv_import_annotations()` (experimental; exact source alignment before exclusions) |
+| Use quanteda n-grams and KWIC while retaining gaps and source IDs | `lexdiv_as_quanteda()` (optional quanteda dependency) |
+| Compare reference choices with coverage and a common set of target phrases | `lexdiv_ngram_compare()` |
+| Build local reference counts from whole-document chunks | `lexdiv_ngram_reference_build()` (retains types and document IDs in memory) |
 
 The twelve core measures are TTR, RTTR/Guiraud, CTTR, Herdan C, Maas a-squared,
 MSTTR, MATTR, MTLD, HD-D, deterministic expected-TTR D, and Yule K/I.
@@ -141,10 +221,14 @@ results do not change the requested parameters or silently remove documents.
 
 ## Learning and reporting
 
+- [Annotated corpora and quanteda](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.html): import supplied annotations, preserve exclusions and return from KWIC to source positions; includes an offline authored example.
 - [Getting started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html): inputs, result tables, annotation, and parameter plans.
 - [From text to a report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html): one complete workflow and what to cite.
 - [Designing comparisons](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html): questions, common settings, sensitivity, answers, and limits.
+- [Your own reference data across a corpus](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html): custom norms, document metadata, missingness, and reproducible saving.
+- [Analyze open-access papers](https://ryuya-dot-com.github.io/ldfreq/articles/open-access-papers.html): a reproducible example using three CC BY papers, with explicit text extraction, attribution and unknown author language backgrounds.
 - [Preprocessing and frequency](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html): lexical units, formula variants, and resource coverage.
+- [Vocabulary knowledge and use](https://ryuya-dot-com.github.io/ldfreq/articles/vocabulary-knowledge-and-use.html): relate corpus features to learner evidence without inferring ability from frequency.
 - [TUBELEX input recipe](https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.html): optional external token preparation.
 
 After installation, the same articles are available with `vignette(package = "ldfreq")`.

@@ -69,6 +69,10 @@ only. Resource coverage and annotation coverage are therefore returned
 separately and should accompany every interpretation of an estimate.
 }
 \details{
+For several documents sharing a reference table, use
+\code{\link{lexdiv_norm_profile_batch}} to validate the shared inputs once and
+retain separate document estimates and coverage under a global row bound.
+
 The three coverage rates have different denominators:
 \code{resource_coverage = matched_units / input_units},
 \code{value_coverage = observed_value_units / input_units}, and
@@ -76,6 +80,10 @@ The three coverage rates have different denominators:
 key with an \code{NA} norm is \code{missing_annotation}; an unmatched key is
 \code{not_applicable_oov}. The function does not infer a universal direction,
 compare unlike scales, form composite scores, or approve a data license.
+}
+\seealso{
+\code{vignette("japanese-norms", package = "ldfreq")} for stimulus-item
+tables, local Japanese norm files, scale interpretation and data terms.
 }
 \examples{
 norms <- data.frame(

@@ -1,0 +1,334 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ldfreq generic norm batch contract",
+  "type": "object",
+  "required": [
+    "$schema",
+    "contract_id",
+    "contract_version",
+    "status",
+    "public_api",
+    "function",
+    "single_document_contract",
+    "input_contract",
+    "row_budget_contract",
+    "result_contract",
+    "interpretation_boundary"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "const": "norm-profile-batch-contract.schema.json"
+    },
+    "contract_id": {
+      "const": "ldfreq-generic-norm-profile-batch"
+    },
+    "contract_version": {
+      "const": "0.1.0"
+    },
+    "status": {
+      "const": "normative"
+    },
+    "public_api": {
+      "const": true
+    },
+    "function": {
+      "const": "lexdiv_norm_profile_batch"
+    },
+    "single_document_contract": {
+      "type": "object",
+      "required": [
+        "file",
+        "contract_version",
+        "arithmetic_and_matching_unchanged"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "const": "norm-profile-contract.json"
+        },
+        "contract_version": {
+          "const": "0.1.0"
+        },
+        "arithmetic_and_matching_unchanged": {
+          "const": true
+        }
+      }
+    },
+    "input_contract": {
+      "type": "object",
+      "required": [
+        "containers",
+        "default_id_column",
+        "default_terms_column",
+        "unique_explicit_document_ids",
+        "empty_documents_allowed",
+        "zero_documents_allowed",
+        "invalid_terms",
+        "shared_resource_validation_count",
+        "extra_document_columns_copied",
+        "normalization",
+        "runtime_network_access"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "containers": {
+          "const": [
+            "plain-named-list",
+            "data-frame-with-id-and-terms-list-column"
+          ]
+        },
+        "default_id_column": {
+          "const": "document_id"
+        },
+        "default_terms_column": {
+          "const": "terms"
+        },
+        "unique_explicit_document_ids": {
+          "const": true
+        },
+        "empty_documents_allowed": {
+          "const": true
+        },
+        "zero_documents_allowed": {
+          "const": true
+        },
+        "invalid_terms": {
+          "const": "whole-call-error"
+        },
+        "shared_resource_validation_count": {
+          "const": 1
+        },
+        "extra_document_columns_copied": {
+          "const": false
+        },
+        "normalization": {
+          "const": "none"
+        },
+        "runtime_network_access": {
+          "const": false
+        }
+      }
+    },
+    "row_budget_contract": {
+      "type": "object",
+      "required": [
+        "formula",
+        "scope",
+        "default_max_rows",
+        "checked_before_lookup_and_result_allocation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "formula": {
+          "const": "measures * sum(document_term_counts) + 2 * documents * measures * weightings"
+        },
+        "scope": {
+          "const": "lookup-plus-summary-plus-coverage"
+        },
+        "default_max_rows": {
+          "const": 1000000
+        },
+        "checked_before_lookup_and_result_allocation": {
+          "const": true
+        }
+      }
+    },
+    "result_contract": {
+      "type": "object",
+      "required": [
+        "schema_id",
+        "schema_version",
+        "class",
+        "components",
+        "lookup_columns",
+        "summary_columns",
+        "coverage_columns",
+        "lookup_order",
+        "summary_order",
+        "result_order",
+        "status_values",
+        "empty_status",
+        "single_provenance_preserved",
+        "batch_provenance_fields",
+        "document_diagnostic_columns",
+        "bounded_print_rows",
+        "plot_method",
+        "summary_method",
+        "as_data_frame_method"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema_id": {
+          "const": "generic-norm-profile-batch-result"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "class": {
+          "const": "lexdiv_norm_profile_batch"
+        },
+        "components": {
+          "const": [
+            "status",
+            "summary",
+            "lookup",
+            "coverage",
+            "provenance",
+            "diagnostics"
+          ]
+        },
+        "lookup_columns": {
+          "const": [
+            "document_id",
+            "input_index",
+            "term",
+            "measure_id",
+            "lookup_status",
+            "value",
+            "value_status"
+          ]
+        },
+        "summary_columns": {
+          "const": [
+            "document_id",
+            "result_order",
+            "resource_id",
+            "resource_version",
+            "measure_id",
+            "construct_id",
+            "value_unit",
+            "direction",
+            "language",
+            "variety",
+            "population_id",
+            "collection_year",
+            "statistic_id",
+            "weighting",
+            "type_identity",
+            "estimate",
+            "status",
+            "missing_reason",
+            "input_units",
+            "matched_units",
+            "unmatched_units",
+            "observed_value_units",
+            "matched_missing_value_units",
+            "resource_coverage",
+            "value_coverage",
+            "annotation_coverage"
+          ]
+        },
+        "coverage_columns": {
+          "const": [
+            "document_id",
+            "result_order",
+            "resource_id",
+            "resource_version",
+            "measure_id",
+            "weighting",
+            "input_units",
+            "matched_units",
+            "unmatched_units",
+            "observed_value_units",
+            "matched_missing_value_units",
+            "resource_coverage",
+            "value_coverage",
+            "annotation_coverage"
+          ]
+        },
+        "lookup_order": {
+          "const": "document-major-input-major-measure-minor"
+        },
+        "summary_order": {
+          "const": "document-major-measure-major-requested-weighting-order"
+        },
+        "result_order": {
+          "const": "restarts-per-document"
+        },
+        "status_values": {
+          "const": [
+            "ok",
+            "empty"
+          ]
+        },
+        "empty_status": {
+          "const": "zero-documents-only"
+        },
+        "single_provenance_preserved": {
+          "const": true
+        },
+        "batch_provenance_fields": {
+          "const": [
+            "batch_contract_id",
+            "batch_contract_version",
+            "batch_result_schema_id",
+            "batch_result_schema_version",
+            "document_count",
+            "document_ids"
+          ]
+        },
+        "document_diagnostic_columns": {
+          "const": [
+            "document_id",
+            "status",
+            "input_terms",
+            "input_types",
+            "planned_lookup_rows",
+            "planned_summary_rows",
+            "planned_coverage_rows",
+            "planned_result_rows"
+          ]
+        },
+        "bounded_print_rows": {
+          "const": 12
+        },
+        "plot_method": {
+          "const": false
+        },
+        "summary_method": {
+          "const": false
+        },
+        "as_data_frame_method": {
+          "const": false
+        }
+      }
+    },
+    "interpretation_boundary": {
+      "type": "object",
+      "required": [
+        "document_pooling",
+        "composite_score",
+        "automatic_coverage_threshold",
+        "oov_imputation",
+        "missing_value_imputation",
+        "data_license_approval",
+        "save_actual_resource_and_metadata_separately"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "document_pooling": {
+          "const": false
+        },
+        "composite_score": {
+          "const": false
+        },
+        "automatic_coverage_threshold": {
+          "const": false
+        },
+        "oov_imputation": {
+          "const": false
+        },
+        "missing_value_imputation": {
+          "const": false
+        },
+        "data_license_approval": {
+          "const": false
+        },
+        "save_actual_resource_and_metadata_separately": {
+          "const": true
+        }
+      }
+    }
+  }
+}

@@ -68,7 +68,10 @@ remain visible.
 
 TUBELEX is a general YouTube subtitle frequency space. Its values are relative
 to that corpus and are not direct measures of proficiency, writing quality,
-academic register, or context-independent lexical sophistication.
+academic register, or context-independent lexical sophistication. In particular,
+lexical employability (using words in communication) requires learner-level
+criteria; neither frequency nor video/channel prevalence demonstrates an
+individual's meaning recall, processing speed or appropriate contextual use.
 }
 \section{Reading lookup and summary values}{
 The lossless \code{lookup} table contains:
@@ -165,7 +168,8 @@ stopifnot(all(nzchar(contract_paths)))
 basename(contract_paths)
 }
 \seealso{
-\code{\link{lexdiv_tokenize}}, \code{\link{lexdiv_metrics_text}};
+\code{\link{lexdiv_tokenize}}, \code{\link{lexdiv_metrics_text}},
+\code{\link{tubelex_diagnostics}};
 \code{vignette("tubelex-input", package = "ldfreq")} for the optional
 external tokenization recipe and its reproducibility boundaries.
 }

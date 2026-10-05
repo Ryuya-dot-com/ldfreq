@@ -13,7 +13,8 @@
       "language-proficiency",
       "writing-quality",
       "academic-register",
-      "context-independent-lexical-sophistication"
+      "context-independent-lexical-sophistication",
+      "learner-lexical-employability"
     ]
   },
   "query_normalization": {
@@ -30,7 +31,10 @@
   },
   "input_boundary": {
     "resource_segmentation": "penn-treebank",
-    "tokenization_mismatch_choices": ["error", "allow"],
+    "tokenization_mismatch_choices": [
+      "error",
+      "allow"
+    ],
     "tokenization_mismatch_default": "error",
     "lexdiv_tokenization_alignment": "known_different_tokenizer_explicitly_allowed",
     "character_terms_alignment": "caller_supplied_terms_unverified",
@@ -45,12 +49,25 @@
     "structural_errors_and_known_tokenizer_mismatches": "stop-before-loading"
   },
   "lookup_columns": [
-    "query_index", "term", "lookup_term", "matched", "resource_word",
-    "count", "videos", "channels", "zipf", "video_prevalence",
+    "query_index",
+    "term",
+    "lookup_term",
+    "matched",
+    "resource_word",
+    "count",
+    "videos",
+    "channels",
+    "zipf",
+    "video_prevalence",
     "channel_prevalence"
   ],
   "result_status": {
-    "statuses": ["ok", "empty", "invalid_input", "resource_error"],
+    "statuses": [
+      "ok",
+      "empty",
+      "invalid_input",
+      "resource_error"
+    ],
     "status_semantics": {
       "ok": "a non-empty valid input was looked up successfully",
       "empty": "a valid zero-term input produced typed zero-row output",
@@ -59,11 +76,16 @@
     }
   },
   "summary": {
-    "weightings": ["token", "type"],
+    "weightings": [
+      "token",
+      "type"
+    ],
     "matched_only": true,
     "unmatched_measurements": "missing-not-zero",
     "statistics": [
-      "mean_zipf", "sd_zipf", "mean_video_prevalence",
+      "mean_zipf",
+      "sd_zipf",
+      "mean_video_prevalence",
       "mean_channel_prevalence"
     ],
     "coverage_adjacent": true
@@ -73,5 +95,55 @@
     "download": false,
     "fallback": false,
     "byte_pinned_local_resource": true
+  },
+  "diagnostic_tables": {
+    "export": "tubelex_diagnostics",
+    "version": "0.1.0",
+    "input": "unmodified-current-resource-profile-contract-0.2.0-single-or-plain-named-list",
+    "components": [
+      "summary",
+      "documents",
+      "unmatched_terms",
+      "normalization_mappings",
+      "provenance",
+      "diagnostics"
+    ],
+    "status_policy": "retain-empty-invalid-and-resource-error-documents; unresolved-matches-not-counted-as-unmatched",
+    "counts": "occurrences-and-distinct-document-IDs-within-recorded-input-condition",
+    "condition_id": "call-local-first-seen-resource-query-input-and-tokenizer-setting-group; not-verified-alignment",
+    "max_rows": "input-lookup-rows-plus-two-summary-rows-per-document-before-aggregation",
+    "resource_lookup_repeated": false,
+    "learner_ability_inferred": false,
+    "metadata": "complete-provenance-and-diagnostics-per-document",
+    "summary_columns": [
+      "document_id",
+      "condition_id",
+      "status",
+      "failure_reason",
+      "weighting",
+      "eligible_items",
+      "matched_items",
+      "coverage",
+      "mean_zipf",
+      "sd_zipf",
+      "mean_video_prevalence",
+      "mean_channel_prevalence"
+    ],
+    "unmatched_columns": [
+      "condition_id",
+      "lookup_term",
+      "token_count",
+      "document_count"
+    ],
+    "mapping_columns": [
+      "condition_id",
+      "term",
+      "lookup_term",
+      "matched",
+      "token_count",
+      "document_count",
+      "lookup_changed",
+      "number_marker"
+    ]
   }
 }

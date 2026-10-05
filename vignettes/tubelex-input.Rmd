@@ -73,7 +73,9 @@ prepared$documents
 prepared$preprocessing
 
 profiles <- tubelex_profile_batch(prepared$documents, normalization = "identity")
-profiles$first$summary
+audit <- tubelex_diagnostics(profiles)
+audit$summary
+audit$unmatched_terms
 # Keep tokenization metadata beside the R profiles.
 saveRDS(list(profiles = profiles, preprocessing = prepared$preprocessing),
         "tubelex-analysis.rds")
@@ -114,6 +116,12 @@ These estimates describe frequency in the reference corpus, not proficiency
 or context-independent lexical sophistication. Character-vector inputs retain
 `caller_supplied_terms_unverified` in the R profile; the companion preprocessing
 record explains how these particular tokens were produced.
+
+For learner-level vocabulary use, keep the corpus features separate from
+recognition, recall and contextual-use responses. The worked guide
+[Connecting corpus frequency with evidence of vocabulary use](vocabulary-knowledge-and-use.html)
+shows item-ID joins, missing pairs and directional disagreement. TUBELEX itself
+does not determine which words a learner can employ.
 
 Cite Nohejl et al. (2025), *Beyond Film Subtitles: Is YouTube the Best
 Approximation of Spoken Vocabulary?*, COLING 2025,

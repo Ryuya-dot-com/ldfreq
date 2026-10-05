@@ -15,6 +15,8 @@ reference:
   - title: Raw text and lexical units
     contents:
       - lexdiv_preprocessing
+      - lexdiv_compare_annotations
+      - lexdiv_import_annotations
       - lexdiv_text_batch
       - lexdiv_flemmatize
   - title: Exact lexical overlap and coverage
@@ -39,10 +41,22 @@ reference:
   - title: Caller-supplied lexical norms
     contents:
       - lexdiv_norm_profile
+      - lexdiv_norm_profile_batch
+  - title: Scored vocabulary responses
+    contents:
+      - lexdiv_compare_responses
+  - title: Adjacent n-gram frequencies
+    contents:
+      - lexdiv_ngrams
+      - lexdiv_ngram_reference_build
+      - lexdiv_ngram_compare
+      - lexdiv_read_masc
   - title: Reference-resource profiles
     contents:
       - nj8_profile
+      - nj8_diagnostics
       - tubelex_profile
+      - tubelex_diagnostics
   - title: Output and visualization
     contents:
       - lexdiv_convenience
@@ -57,8 +71,17 @@ articles:
       - from-text-to-report
       - getting-started
       - english-tokenization
+      - japanese-annotations
   - title: Research design and reference resources
     contents:
       - designing-comparisons
+      - corpus-reference-profiles
+      - japanese-norms
+      - japanese-stimuli
+      - ngram-profiles
+      - annotated-corpora
+      - open-access-papers
+      - auditing-vocabulary-profiles
       - preprocessing-and-frequency
       - tubelex-input
+      - vocabulary-knowledge-and-use

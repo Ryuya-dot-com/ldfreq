@@ -29,7 +29,10 @@ lexdiv_lemmatize(
   backend_id = NULL,
   backend_version = NULL,
   upos_backend_id = NULL,
-  upos_backend_version = NULL
+  upos_backend_version = NULL,
+  dictionary = NULL,
+  dictionary_id = NULL,
+  dictionary_version = NULL
 )
 
 lexdiv_metrics_text(
@@ -91,6 +94,16 @@ defaulted from the lemma backend, even when one pipeline created both layers.
 They must be \code{NULL} when no UPOS tags are present. These values are
 public provenance; callers must not put paths, secrets, or private hashes in
 them.}
+\item{dictionary}{For \code{method = "textstem"}, an optional two-column data
+frame: unique lowercase lookup terms in column one and lemmas in column two.
+Both columns must be character vectors without empty or missing values. Column
+names and row order do not affect lookup. An empty dictionary is allowed.
+The default is \code{lexicon::hash_lemmas}. Unmatched tokens retain their
+surface forms; lookup lowercases queries with base R in the current locale.}
+\item{dictionary_id, dictionary_version}{Required non-empty path-free labels
+when supplying a dictionary; \code{NULL} for the default dictionary, whose
+identity and installed lexicon version are recorded automatically. All three
+dictionary arguments must be \code{NULL} for \code{method = "supplied"}.}
 \item{unit}{One of \code{"surface"}, \code{"lemma"}, or \code{"flemma"}.
 Lemma and flemma analyses require the corresponding annotations on a
 \code{lexdiv_tokenization} object; raw character input supports surface
@@ -138,14 +151,28 @@ These records retain excluded text; they are an analysis audit, not redacted
 output. Ordinary punctuation and ignored symbols are not listed. Only retained
 word/number tokens enter the later lexical-unit selection denominator.
 Saved Unicode tokenizations under preprocessing contract 0.2.0 remain accepted
-with their recorded provenance. New objects use contract 0.3.0; the Unicode
-segmentation rules and the core metric schema are unchanged.
+with their recorded provenance, as do contract 0.3.0 tokenizations of either
+kind. New objects use contract 0.4.0, and reapplying \code{lexdiv_lemmatize()}
+upgrades the annotation record. Older textstem records lacking dictionary
+provenance remain readable but cannot establish strict lemma comparability in
+\code{lexdiv_content_overlap()}. Tokenization rules and metric schemas are unchanged.
 
 The package does not silently choose or download a lemmatization model.
 \code{lexdiv_lemmatize(method = "supplied")} accepts annotations created by
 any documented external workflow and requires its identity and version.
 \code{method = "textstem"} is an optional English lemma convenience backend.
 It records the installed \pkg{textstem} version but does not create UPOS tags.
+The annotation's \code{dictionary} record contains the dictionary ID, version,
+entry count, SHA-256 content fingerprint, hash method, and query casefold/locale.
+The fingerprint ignores row order and column names but changes if a mapping
+changes, even with the same version label. It hashes length-prefixed UTF-8
+term/lemma pairs in sorted term order, as specified in the installed contract.
+It is a content comparison aid, not proof of authenticity or linguistic accuracy.
+The dictionary itself is not retained: save it separately alongside the prepared
+objects to rerun lookup, and retain the backend version and locale. A loaded
+object can validate record structure but cannot recompute the dictionary hash
+without the original dictionary. The backend performs context-free lookup;
+use aligned supplied annotations for occurrence-specific decisions.
 Consequently, it can be used directly for \code{unit = "lemma"} with
 \code{word_inclusion = "all"}; content-word selection additionally requires
 caller-supplied UPOS annotations. Missing lemmas or UPOS tags are excluded and
@@ -171,7 +198,7 @@ The tokenizer arguments \code{normalization}, \code{case},
 silently reapplied to, or ignored for, an existing tokenization object.
 }
 \section{Saved-object compatibility}{
-Preprocessing contract \code{0.3.0} validates annotation and provenance,
+Preprocessing contract \code{0.4.0} validates annotation and provenance,
 including explicit UPOS-backend identity, text hashes, character bounds,
 normalization consistency, and a fingerprint of the surface token table,
 whenever an object is consumed. Both tokenizer rule sets use their own identity and version 0.1.0.

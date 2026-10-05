@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graph xmlns="http://www.xces.org/ns/GrAF/1.0/">
+  <region xml:id="r0" anchors="0 2"/>
+  <region xml:id="r1" anchors="3 5"/>
+  <region xml:id="r2" anchors="5 6"/>
+  <region xml:id="r3" anchors="6 9"/>
+  <region xml:id="r4" anchors="10 15"/>
+  <region xml:id="r5" anchors="15 16"/>
+  <region xml:id="r6" anchors="17 19"/>
+  <region xml:id="r7" anchors="20 22"/>
+  <region xml:id="r8" anchors="22 23"/>
+</graph>

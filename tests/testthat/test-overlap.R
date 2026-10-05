@@ -703,7 +703,7 @@ test_that("installed overlap contract matches measures and privacy behavior", {
   result <- lexdiv_term_overlap("a", "a")
 
   expect_identical(contract$contract_id, "ldfreq-lexical-overlap")
-  expect_identical(contract$contract_version, "0.1.0")
+  expect_identical(contract$contract_version, "0.2.0")
   expect_identical(contract$status, "normative")
   expect_identical(measure_ids, lexdiv_overlap_ids())
   expect_identical(method_ids, result$summary$method_id)

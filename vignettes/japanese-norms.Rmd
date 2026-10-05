@@ -1,0 +1,309 @@
+---
+title: "Japanese lexical norms: from stimulus items to documented matches"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Japanese lexical norms: from stimulus items to documented matches}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ldfreq)
+```
+
+Suppose you are selecting Japanese words for a lexical-decision or reading
+experiment. You need to inspect each item's normative ratings, how many people
+rated it, and which items have no match. Keep those rows and experimental
+conditions together before comparing groups. A document average alone cannot
+show that a particular stimulus was unmatched.
+
+This guide uses existing `lexdiv_norm_profile()` calculations and an optional
+local-file example. No external norm values, participant data or dictionaries
+are bundled. The executable illustration uses **invented values**; sections
+using real data run only when you explicitly supply the separately obtained
+files. The example script can be loaded in R without a shell or Python.
+
+## Choose a construct and check the data terms
+
+| Resource | Information | Data terms and scope |
+|---|---|---|
+| [WLSP-familiarity v4.0](https://github.com/masayu-a/WLSP-familiarity) | Familiarity/use estimates for knowing, reading, writing, speaking and listening | CC BY-NC-SA 3.0. Local-file candidate review below; record choices remain explicit |
+| [AWD-J core](https://sociocom.naist.jp/awd-j/) | Human abstractness ratings for 15,220 words | CC BY 4.0. Scale-direction descriptions conflict; no automatic transformation here. EX contains model predictions |
+| [Japanese AoA](https://osf.io/fawmq/) | Retrospective acquisition ratings for 5,736 words | Data: CC BY-NC 4.0, independently of the article's CC BY license. Local-file example below |
+| [JALEX](https://osf.io/qr2sg/) | Lexical-decision response times and accuracy | The data's `license.txt` specifies CC BY-NC 4.0. Current data version/exclusion rules need separate review |
+| [Japanese BOI](https://osf.io/gkjmc/) | Body-object interaction ratings | OSF project: CC BY 4.0. Local-file example below; publication/file scope caveat applies |
+
+These conditions were checked on 2026-10-05. Free access does not by itself
+permit redistribution. Follow attribution and other applicable conditions for
+the actual data, including joined tables or extracts; this package's MIT code
+license does not relicense imported data. An OSF project's license does not
+automatically clear third-party columns in a merged table.
+
+Familiarity, frequency, acquisition age, abstractness, BOI and reaction time
+measure different things. Do not average them into an undocumented difficulty
+score. Adult native-speaker ratings are not an individual Japanese learner's
+acquisition history, known vocabulary, or ability to use a word appropriately.
+
+## Keep a row for every stimulus
+
+Use `item_id` as the study's unique identifier. A word can occur in several
+items or conditions: the lookup form need not be unique. `term` is the exact
+spelling to look up. Keep the displayed stimulus, reading, sense and any mapping
+decisions in additional columns if they differ from the lookup form.
+
+```{r items}
+items <- data.frame(
+  item_id = c("a1", "a2", "b1", "b2", "b3"),
+  condition = c("A", "A", "B", "B", "B"),
+  term = c("学校", "研究", "学校", "辞書", "未登録の例語")
+)
+```
+
+For a CSV, use `read.csv("stimuli.csv", fileEncoding = "UTF-8",
+colClasses = "character")` when IDs must retain leading zeros. Convert numeric
+design variables separately. The real-data helper below rejects duplicate or
+missing IDs, missing lookup forms, and output-column collisions. It preserves
+input order and extra columns; it does not tokenize, normalize or resolve senses.
+
+## Inspect matches before interpreting averages
+
+The following table is **authored demonstration data, not Japanese norms**.
+It includes a matched word with a missing annotation, as well as a query word
+absent from the table. Both produce `NA`, with different reasons.
+
+```{r offline-profile}
+toy <- data.frame(term = c("学校", "研究", "辞書"),
+                  rating = c(2, 5, NA_real_))
+specs <- data.frame(measure_id = "illustration", value_column = "rating",
+  construct_id = "authored_illustration", value_unit = "invented_rating_points",
+  direction = "descriptive", language = "Japanese", variety = "unspecified",
+  population_id = "authored_not_participant_data", collection_year = "not_observed",
+  valid_min = 1, valid_max = 7)
+resource <- list(resource_id = "authored_ja_norms", resource_version = "1",
+  creator = "Example author", source_reference = "Invented values in this guide",
+  data_license = "MIT: authored illustration", transformation_id = "none",
+  lookup_unit = "authored_spelling", resource_key_normalization_id = "identity-v1")
+example <- lexdiv_norm_profile(items$term, toy, "term", specs, resource)
+item_table <- cbind(items, example$lookup[, c("value", "lookup_status", "value_status")])
+item_table
+example$summary[, c("weighting", "estimate", "resource_coverage",
+                     "value_coverage", "annotation_coverage")]
+stopifnot(identical(item_table$item_id, items$item_id),
+          isTRUE(all.equal(example$summary$estimate, c(3, 3.5))))
+```
+
+For item-row (`token`) weighting, 4/5 rows match the resource, 3/5 have a value,
+and 3/4 matched rows have an annotation. The mean is `(2 + 5 + 2) / 3 = 3`.
+For distinct-spelling (`type`) weighting, the mean is `(2 + 5) / 2 = 3.5`.
+Here “token” means each supplied item row, not an independently observed corpus
+token. Neither mean should replace item-level information in the experiment.
+
+Inspect missingness by condition rather than silently dropping unmatched rows:
+
+```{r condition-coverage}
+condition_coverage <- do.call(rbind, lapply(split(item_table, item_table$condition),
+  function(x) data.frame(condition = x$condition[1], items = nrow(x),
+    with_value = sum(x$value_status == "observed"),
+    without_value = sum(x$value_status != "observed"),
+    value_coverage = mean(x$value_status == "observed"))))
+rownames(condition_coverage) <- NULL
+condition_coverage
+```
+
+In this illustration, condition A has values for both items, whereas B has
+values for only one of three. A comparison of available-value means would use
+different subsets. Review the unmatched forms and selection rules before
+interpreting such a comparison. Do not equate missing values with zero, rarity,
+low familiarity, or lack of participant knowledge.
+
+## Use a separately obtained AoA or BOI file
+
+Download `data_AoA.csv` from the [AoA project](https://osf.io/fawmq/) or
+`data_boi.csv` from the [BOI project](https://osf.io/gkjmc/) after checking the
+terms for your intended use. Each can be used independently. Use the aggregate
+file, not raw participant responses or a merged collection of third-party norms.
+
+The helper checks the inspected file's SHA-256; a changed file fails rather
+than silently acquiring the old metadata. Both inspected files contain 5,736
+unique `Word` keys. A future version requires reviewing the source and updating
+the example, not disabling the hash check without examining the change.
+
+```{r real-data, eval=FALSE}
+source(system.file("examples", "japanese-norms.R", package = "ldfreq"))
+aoa <- profile_japanese_norm_items(items, "data_AoA.csv", resource = "aoa")
+aoa$items                  # Original IDs/conditions plus source IDs, n, SD and values
+aoa$profile$coverage        # Resource, value and annotation coverage
+aoa$source                 # Citation, data license, input hash and limitation
+
+# Independent alternative: obtaining AoA is not required to use BOI.
+boi <- profile_japanese_norm_items(items, "data_boi.csv", resource = "boi")
+```
+
+AoA `norm_mean` is the mean of **seven age-category ratings**, not years.
+Categories run from 1 (0–1 years) to 7 (12+ years); the instructions also assign
+unknown acquisition age to 7. The aggregate cannot separate those responses.
+See [Mochizuki & Ota (2025)](https://doi.org/10.3389/flang.2025.1605224).
+
+BOI `norm_mean` is the original mean rating. The
+[2026 publication](https://doi.org/10.3758/s13428-025-02939-1) and OSF project
+title say 5,637 words, whereas the inspected CSV and analysis script contain
+5,736. The content of the [correction](https://doi.org/10.3758/s13428-026-03000-5)
+has not been verified here. Treat this as a reproducible lookup into the pinned
+file, not replication of the corrected publication's analysis sample.
+
+`norm_n` and `norm_sd` describe the source ratings, not the sample size or
+uncertainty of your own experiment. A normative SD is not a standard error for
+a condition difference. Preserve source sampling, repeated participants/items,
+and your experiment's task when choosing a statistical model.
+
+## Join resources and save the record
+
+Join by the **study item ID**, after separately matching each resource's
+spelling. Do not assume that two data providers' numerical source IDs are equal.
+Do not use an inner join that discards unmatched stimuli.
+
+```{r save-real-data, eval=FALSE}
+index <- match(aoa$items$item_id, boi$items$item_id)
+stopifnot(!anyNA(index), !anyDuplicated(boi$items$item_id))
+combined <- aoa$items
+combined$boi_mean <- boi$items$norm_mean[index]
+combined$boi_value_status <- boi$items$norm_value_status[index]
+# Source details for both resources stay in the RDS, alongside the flat table.
+saveRDS(list(aoa = aoa, boi = boi, combined = combined,
+             session = sessionInfo()), "japanese-norm-analysis.rds")
+write.csv(combined, "japanese-norm-items.csv", row.names = FALSE,
+          fileEncoding = "UTF-8")
+restored <- readRDS("japanese-norm-analysis.rds")
+stopifnot(identical(restored$combined, combined))
+```
+
+## Why spelling alone sometimes fails
+
+WLSP includes multiple readings for spellings such as `人気` (`にんき` and
+`ひとけ`). Even spelling plus reading is not necessarily unique in the inspected
+file: `上手` includes repeated `じょうず` records with different estimates.
+Inspect the original record IDs, headings, reading and classification before
+defining a correspondence. The generic profile deliberately rejects duplicate
+keys; it does not pick the first row or average distinct entries automatically.
+
+Keep a separate, explicit correspondence table when a study item needs a
+particular source record. Review each mapping in context. A morphological
+analyzer's lemma is not evidence of a uniquely correct psycholinguistic norm
+match. For running text, start with the [Japanese annotation workflow](japanese-annotations.html)
+and retain source positions, forms, dictionary and segmentation decisions.
+
+## Review WLSP candidates and record your choices
+
+The bundled `wlsp-items.R` example reads a separately obtained
+`bunruidb-fam.csv` from **WLSP-familiarity v4.0**, with its verified file hash.
+It returns every exact-spelling candidate, retaining record ID, heading,
+reading, classification, record type and the five published estimates for
+knowing, writing, reading, speaking and listening. Numeric estimates are not
+converted into probabilities, raw rating points or individual knowledge scores.
+The data remain subject to CC BY-NC-SA 3.0; no WLSP ratings are bundled.
+
+The following are authored study items. The reading and context specify the
+intended stimulus; the helper keeps them as metadata and does not use them to
+automatically discard candidates or resolve word senses.
+
+```{r wlsp-candidates, eval=FALSE}
+source(system.file("examples", "wlsp-items.R", package = "ldfreq"))
+stimuli <- data.frame(
+  item_id = c("p1", "p2", "p3", "p4", "p5"),
+  condition = c("A", "B", "A", "B", "B"),
+  term = c("人気", "人気", "学校", "上手", "未登録の例語"),
+  intended_reading = c("にんき", "ひとけ", "がっこう", "じょうず", NA),
+  context = c("この商品は人気がある。", "夜の公園には人気がない。",
+              "学校に通う。", "彼は料理が上手だ。", "作成した未照合例。")
+)
+path <- "bunruidb-fam.csv"
+review <- review_wlsp_items(stimuli, path)
+review$items[, c("item_id", "term", "wlsp_candidate_count", "wlsp_status")]
+review$candidates[, c("item_id", "record_id", "heading", "reading",
+                     "classification", "classification_label", "know")]
+```
+
+For this pinned file the candidate counts are 2, 2, 1, 7 and 0. None is selected
+automatically, including the single candidate for `学校`. The five study rows
+remain separate from the twelve candidate rows. Candidate multiplicity must not
+increase an item's weight in subsequent analyses.
+
+After inspecting the candidates, record one source record per chosen item and
+a reason. This example selects the two intended readings of `人気` and the
+reviewed `学校` entry. It leaves `上手` unresolved: reading alone does not make
+its correspondence unique.
+
+```{r wlsp-decisions, eval=FALSE}
+chosen <- subset(review$candidates,
+  (item_id == "p1" & reading == "にんき") |
+  (item_id == "p2" & reading == "ひとけ") | item_id == "p3")
+stopifnot(nrow(chosen) == 3L,
+          identical(chosen$item_id, c("p1", "p2", "p3")))
+decisions <- data.frame(
+  item_id = chosen$item_id, record_id = chosen$record_id,
+  reason = c("Reviewed heading/reading for the intended popularity stimulus",
+             "Reviewed heading/reading for the intended human-presence stimulus",
+             "Reviewed the single school entry against the stimulus")
+)
+resolved <- review_wlsp_items(stimuli, path, decisions)
+resolved$items[, c("item_id", "wlsp_status", "wlsp_record_id",
+                   "wlsp_reason", "wlsp_know")]
+```
+
+`selected` records an explicit correspondence, `unreviewed` means candidates
+exist but none was chosen, and `unmatched` means no exact-spelling candidate
+exists. Unselected values stay `NA`; so do missing values in a selected source
+record. Inspect selection status **and** the value you intend to analyze.
+The helper rejects unknown item/record IDs, multiple choices for one item,
+blank reasons, choices whose source spelling differs from the item, and files
+that differ from the inspected snapshot. It does not validate a reviewer's
+linguistic judgment. Repeated spellings across different item IDs are allowed.
+
+Do not read these decisions as validated sense-specific familiarity norms.
+The upstream description says that estimation changed to surface forms from
+version 3, yet the inspected table still contains different estimates for some
+repeated heading/reading combinations. A recorded mapping makes the choice
+auditable; it does not settle that methodological issue. Uncertain mappings can
+remain unresolved or be compared in explicitly labeled sensitivity analyses.
+
+Keep the denominator and reasons visible, including items without values:
+
+```{r wlsp-save, eval=FALSE}
+selection_coverage <- do.call(rbind, lapply(
+  split(resolved$items, resolved$items$condition), function(x) data.frame(
+    condition = x$condition[1], items = nrow(x),
+    with_candidates = sum(x$wlsp_candidate_count > 0),
+    selected = sum(x$wlsp_status == "selected"),
+    with_know_value = sum(!is.na(x$wlsp_know)))))
+selection_coverage
+write.csv(decisions, "wlsp-decisions.csv", row.names = FALSE, fileEncoding = "UTF-8")
+# Source record IDs such as 002375 have leading zeros: preserve them as text.
+saved_decisions <- read.csv("wlsp-decisions.csv", fileEncoding = "UTF-8",
+                           colClasses = "character")
+restored <- review_wlsp_items(stimuli, path, saved_decisions)
+stopifnot(identical(restored$items, resolved$items))
+saveRDS(list(review = resolved, coverage = selection_coverage,
+             session = sessionInfo()), "wlsp-item-review.rds")
+```
+
+Report which of the five estimates you used and why. The helper returns
+item-level values without pooling across candidate records or experimental
+conditions. In this example, condition A has two chosen items with values and
+B has one of three: report the remaining unreviewed and unmatched items before
+interpreting condition means. The example caps expansion at one million
+candidate pairs; review smaller item sets if needed.
+
+## Report what the analysis can answer
+
+Record the resource/file version, population, scale, lookup form and any mapping
+or exclusion rule. Report coverage for each condition and the subset used for
+each comparison. Examine distributions as well as averages when selecting
+stimuli; similar means alone do not establish balanced conditions.
+
+This workflow documents normative features of the chosen items. It does not
+validate a proficiency score, diagnose knowledge from an unmatched word, or
+establish causal effects of familiarity or acquisition age on response time.
+For corpus-level profiles, see [multiple-document norms](corpus-reference-profiles.html).
+To combine these sources with Japanese TUBELEX, review item-level missingness
+and inspect condition distributions, follow the [stimulus-selection workflow](japanese-stimuli.html).

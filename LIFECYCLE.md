@@ -49,6 +49,34 @@ Plan and specification hashes are reproducibility labels rather than security
 signatures. Any change to their identity inputs or serialization receives a new
 schema version and new pinned fixtures.
 
+## Annotated corpus interfaces
+
+The experimental external-annotation importer starts at interface 0.1.0.
+It requires complete, ordered surface annotations before exclusions, permits
+only whitespace gaps, and reports segment-local inclusive Unicode codepoint
+positions without normalization. Feature columns and declared dictionary
+metadata remain explicit. It returns plain tables, not a sealed
+`lexdiv_tokenization`; the existing one-to-one annotation comparator is
+unchanged. The Japanese gibasa recipe does not define Japanese frequency
+resource compatibility or change any core metric contract.
+
+The experimental MASC Penn reader is at interface 0.2.0 and the quanteda
+adapter at 0.1.0 in package 0.2.0. Their source-coordinate rules, supported GrAF
+layout, gap preservation, segment mappings and output fields are public
+semantics. Unsupported annotations fail explicitly. They do not redefine the
+existing tokenizer, core metrics or adjacent n-gram contract. Reader coverage
+is verified for Mini-MASC 1.0's Penn layer. Reader 0.2.0 adds the modern
+MASC 3.0.0 documentHeader layout without changing output fields or boundary
+rules. Only 122 of that archive's 392 documents passed those rules in the
+local audit. Whole-corpus MASC and OANC support is not claimed.
+
+The experimental n-gram reference builder starts at version 0.1.0. It retains
+exact counts, denominators, source extraction fingerprints and a whole-document
+roster while dropping chunk occurrence tables. Its reference output uses the
+unchanged adjacent n-gram contract. Chunk boundaries can change row order and
+fingerprints without changing count or profile values. No pruning or silent
+document exclusions are permitted by the builder.
+
 ## Deprecation
 
 An exported function, argument, method, or schema must be documented as
@@ -130,6 +158,30 @@ or whole-result row budget requires a new norm-profile contract or result
 schema version. Adding implicit normalization, fuzzy matching, imputation,
 automatic thresholds, composite scores, or a default cross-measure plot is not
 a compatible extension.
+
+The adjacent n-gram contract starts at 0.1.0, separately from core metrics.
+Document/segment boundaries, original-position adjacency, overlapping windows,
+component-wise exact identity, n-specific opportunity totals, completeness,
+sample-zero versus unlisted-key handling, token/type means and coverage,
+typed empty tables, field order and content fingerprints are public semantics.
+Changing these requires a new corresponding contract version. The occurrence
+ceiling is not a whole-result memory bound. Preparation and source metadata are
+caller assertions; fingerprints detect accidental changes, not authenticity.
+Association scores or new segmentation rules must not silently change these
+frequency definitions.
+
+The n-gram reference-comparison interface starts at contract 0.1.0. It reuses
+the existing per-reference profiles and fixes an all-reference intersection
+of defined rates, including defined sample zeros, for common-item means and
+baseline differences. Common coverage, per-document token/type weighting,
+empty/no-common-value states, reference order and pre-allocation row bound
+are public semantics. It does not change the adjacent n-gram 0.1.0 contract.
+
+The generic norm batch contract starts at 0.1.0. It preserves the unchanged
+single-document 0.1.0 tables behind a document-ID column and shared provenance.
+Its global row bound, document order, typed empty outputs and document-local
+missingness are public semantics. Pooling documents or changing its error
+boundary requires a separate contract decision.
 
 Likewise, adding a variant formula, threshold boundary, minimum factor length,
 tail rule, directional aggregation, or compatibility claim requires a new

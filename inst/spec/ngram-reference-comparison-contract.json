@@ -1,0 +1,20 @@
+{
+  "contract_id": "ldfreq-ngram-reference-comparison",
+  "contract_version": "0.1.0",
+  "status": "experimental",
+  "inputs": "One unmodified lexdiv_ngrams target and at least two uniquely named lexdiv_ngram_reference results",
+  "compatibility": "Matching preprocessing_id, lookup_unit and resource_key_normalization_id declarations; all requested n supported; declarations do not prove equivalence",
+  "baseline": "An explicit reference name or first reference by default",
+  "arithmetic": "Reuse lexdiv_ngram_profile without changing its available-value statistics or source statuses",
+  "common_set": "Target occurrences whose per-million rate is defined in every supplied reference; includes defined sample zeros; excludes unlisted incomplete-reference keys and zero-opportunity rates",
+  "weighting": "Token occurrences or distinct exact component sequences within document and n",
+  "difference": "Reference minus baseline on the common set; missing when no common values, including for baseline itself",
+  "common_coverage": "Common occurrences or types divided by eligible target occurrences or types; missing for empty target",
+  "comparison_status": ["ok", "empty", "no_common_values"],
+  "order": "Reference-major; summary follows target document, requested n and token/type order; lookup follows target occurrence order",
+  "outputs": ["summary", "lookup", "documents", "references", "provenance"],
+  "source_retention": "Original target positions, source status and counts, denominators, complete flags, resource metadata and input content hashes; full reference count tables must be saved separately",
+  "max_rows": "Positive bound on number of references times target occurrence rows plus twice target document/n rows; before profiling; not a total-memory bound",
+  "network": false,
+  "interpretation": "Descriptive reference sensitivity only; no imputation, rankings, significance, proficiency or employability inference"
+}

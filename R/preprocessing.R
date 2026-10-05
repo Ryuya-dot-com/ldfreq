@@ -6,7 +6,7 @@
 # metric computation.
 
 .lexprep_contract_id <- "ldfreq-preprocessing"
-.lexprep_contract_version <- "0.3.0"
+.lexprep_contract_version <- "0.4.0"
 .lexprep_tokenizer_id <- "ldfreq-unicode-word-tokenizer"
 .lexprep_tokenizer_version <- "0.1.0"
 .lexprep_flemma_backend_id <- "ldfreq-antbnc-flemma-adapter"
@@ -149,6 +149,61 @@
   }
   !identical(method, "textstem") ||
     identical(annotation$backend_id, "textstem::lemmatize_words")
+}
+
+.lexprep_dictionary_hash_method <- "sha256-utf8-byte-length-pairs-v1"
+
+.lexprep_dictionary <- function(dictionary) {
+  if (!is.data.frame(dictionary) || ncol(dictionary) != 2L ||
+      !all(vapply(dictionary, function(column) {
+        is.character(column) && !is.object(column) &&
+          is.null(attributes(column)) && !anyNA(column) &&
+          all(nzchar(column)) && all(validUTF8(column)) &&
+          !any(Encoding(column) %in% c("bytes", "latin1"))
+      }, logical(1)))) {
+    stop("dictionary must be a two-column data frame of non-empty valid-UTF-8 character values without missing values.",
+      call. = FALSE)
+  }
+  dictionary <- data.frame(term = enc2utf8(dictionary[[1L]]),
+    lemma = enc2utf8(dictionary[[2L]]), stringsAsFactors = FALSE)
+  if (anyDuplicated(dictionary$term) ||
+      !identical(dictionary$term, tolower(dictionary$term))) {
+    stop("dictionary lookup terms must be unique and lowercase under the current LC_CTYPE locale.",
+      call. = FALSE)
+  }
+  dictionary
+}
+
+.lexprep_dictionary_fingerprint <- function(dictionary) {
+  rows <- order(dictionary$term, method = "radix")
+  term <- dictionary$term[rows]
+  lemma <- dictionary$lemma[rows]
+  pairs <- if (length(rows)) paste0(nchar(term, type = "bytes"), ":", term,
+    nchar(lemma, type = "bytes"), ":", lemma) else character()
+  payload <- paste0(.lexprep_dictionary_hash_method, ":", nrow(dictionary), ":",
+    paste0(pairs, collapse = ""))
+  digest::digest(charToRaw(enc2utf8(payload)), algo = "sha256", serialize = FALSE)
+}
+
+.lexprep_dictionary_record_is_valid <- function(annotation, contract_version) {
+  record <- annotation$dictionary
+  if (is.null(record)) {
+    return(!identical(annotation$method, "textstem") ||
+      contract_version %in% c("0.2.0", "0.3.0"))
+  }
+  identical(annotation$method, "textstem") &&
+    is.list(record) && !is.object(record) &&
+    .lexprep_is_plain_choice(record$source, c("lexicon", "supplied")) &&
+    .lexprep_is_path_free_identifier(record$id) &&
+    .lexprep_is_path_free_identifier(record$version) &&
+    (identical(record$source, "supplied") ||
+      identical(record$id, "lexicon::hash_lemmas")) &&
+    .lexprep_is_sha256(record$sha256) &&
+    identical(record$hash_method, .lexprep_dictionary_hash_method) &&
+    .lexprep_is_count(record$entries) &&
+    identical(record$query_casefold, "base-tolower") &&
+    .lexprep_is_path_free_identifier(record$query_locale) &&
+    identical(record$unknown_form_policy, "surface")
 }
 
 .lexprep_flemma_identity_rows_are_valid <- function(token_table, annotation) {
@@ -332,6 +387,7 @@
     is.list(provenance) && !is.object(provenance) &&
       identical(provenance$contract_id, .lexprep_contract_id) &&
       (identical(provenance$contract_version, .lexprep_contract_version) ||
+        identical(provenance$contract_version, "0.3.0") ||
         (identical(tokenizer, "unicode") &&
           identical(provenance$contract_version, "0.2.0"))) &&
       identical(provenance$tokenizer_id, specification$id) &&
@@ -416,6 +472,7 @@
       ) &&
       all(is.na(value$tokens$upos) | value$tokens$upos %in% .lexprep_upos_tags) &&
       .lexprep_annotation_backend_is_valid(annotation) &&
+      .lexprep_dictionary_record_is_valid(annotation, provenance$contract_version) &&
       upos_identity_is_valid &&
       identical(annotation$lemma_tokens, expected_lemma_tokens) &&
       identical(annotation$lemma_coverage, expected_lemma_coverage) &&
@@ -694,6 +751,12 @@ lexdiv_tokenize <- function(
 #' @param upos_backend_id,upos_backend_version Path-free UPOS-backend
 #'   identifiers, required whenever any UPOS tag is present. They are kept
 #'   separate from lemma-backend identity even when one pipeline created both.
+#' @param dictionary For `method = "textstem"`, an optional two-column data
+#'   frame of unique lowercase terms and their lemmas. The default is
+#'   `lexicon::hash_lemmas`. Unmatched tokens retain their surface forms.
+#' @param dictionary_id,dictionary_version Required path-free identifiers for
+#'   a supplied dictionary; `NULL` for the default dictionary or supplied lemmas.
+#'   Content fingerprints and the lookup locale are recorded automatically.
 #'
 #' @return The tokenization object with `lemma` and `upos` columns and an
 #'   annotation provenance record.
@@ -706,7 +769,10 @@ lexdiv_lemmatize <- function(
     backend_id = NULL,
     backend_version = NULL,
     upos_backend_id = NULL,
-    upos_backend_version = NULL) {
+    upos_backend_version = NULL,
+    dictionary = NULL,
+    dictionary_id = NULL,
+    dictionary_version = NULL) {
   x <- .lexprep_validate_tokenization(x)
   method <- .lexprep_scalar_choice(
     method,
@@ -714,8 +780,14 @@ lexdiv_lemmatize <- function(
     "method"
   )
   row_count <- nrow(x$tokens)
+  dictionary_record <- NULL
 
   if (identical(method, "supplied")) {
+    if (!is.null(dictionary) || !is.null(dictionary_id) ||
+        !is.null(dictionary_version)) {
+      stop("dictionary, dictionary_id and dictionary_version require method = \"textstem\".",
+        call. = FALSE)
+    }
     if (is.null(lemmas)) {
       stop("lemmas must be supplied when method = \"supplied\".", call. = FALSE)
     }
@@ -741,7 +813,31 @@ lexdiv_lemmatize <- function(
         call. = FALSE
       )
     }
-    lemmas <- unname(textstem::lemmatize_words(x$tokens$surface))
+    dictionary_source <- if (is.null(dictionary)) "lexicon" else "supplied"
+    if (is.null(dictionary)) {
+      if (!is.null(dictionary_id) || !is.null(dictionary_version)) {
+        stop("dictionary_id and dictionary_version must be NULL for the default dictionary.",
+          call. = FALSE)
+      }
+      if (!requireNamespace("lexicon", quietly = TRUE)) {
+        stop("The default dictionary requires the suggested lexicon package.", call. = FALSE)
+      }
+      dictionary <- lexicon::hash_lemmas
+      dictionary_id <- "lexicon::hash_lemmas"
+      dictionary_version <- as.character(utils::packageVersion("lexicon"))
+    } else {
+      dictionary_id <- .lexprep_scalar_identifier(dictionary_id, "dictionary_id")
+      dictionary_version <- .lexprep_scalar_identifier(dictionary_version, "dictionary_version")
+    }
+    dictionary <- .lexprep_dictionary(dictionary)
+    dictionary_record <- list(source = dictionary_source,
+      id = dictionary_id, version = dictionary_version,
+      sha256 = .lexprep_dictionary_fingerprint(dictionary),
+      hash_method = .lexprep_dictionary_hash_method,
+      entries = as.double(nrow(dictionary)), query_casefold = "base-tolower",
+      query_locale = Sys.getlocale("LC_CTYPE"), unknown_form_policy = "surface")
+    lemmas <- if (row_count == 0L) character() else
+      unname(textstem::lemmatize_words(x$tokens$surface, dictionary = dictionary))
     lemmas <- .lexprep_optional_annotation(lemmas, row_count, "textstem lemmas")
     backend_id <- "textstem::lemmatize_words"
     backend_version <- as.character(utils::packageVersion("textstem"))
@@ -790,10 +886,12 @@ lexdiv_lemmatize <- function(
 
   x$tokens$lemma <- lemmas
   x$tokens$upos <- upos
+  x$provenance$contract_version <- .lexprep_contract_version
   x$provenance$annotation <- list(
     method = method,
     backend_id = backend_id,
     backend_version = backend_version,
+    dictionary = dictionary_record,
     upos_backend_id = upos_backend_id,
     upos_backend_version = upos_backend_version,
     lemma_tokens = as.double(sum(!is.na(lemmas))),
