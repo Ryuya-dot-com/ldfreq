@@ -1,11 +1,7 @@
 # Descriptive comparison to an explicit reference, without changing judgments.
 lexdiv_evaluate_contextual <- function(x, reference, direction, reference_info,
                                       tie_tolerance = 0) {
-  if (!is.list(x) || !is.list(x$provenance) ||
-      !identical(x$provenance$importer, "ldfreq-contextual-output") ||
-      !identical(x$provenance$importer_version, "0.1.0") ||
-      !identical(x$provenance$content_sha256, .lexng_hash(x)))
-    stop("x must be an unmodified lexdiv_import_contextual() result.", call. = FALSE)
+  .lexctx_validate_output(x)
   .lexamb_validate_review(reference)
   if (!identical(x$provenance$review_id, reference$provenance$review_id))
     stop("Model output and reference must use the same source, targets, candidates and resource snapshot.",

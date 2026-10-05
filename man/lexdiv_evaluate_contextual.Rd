@@ -113,4 +113,5 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
 }
 }
 \seealso{\code{\link{lexdiv_import_contextual}},
+\code{\link{lexdiv_score_contextual}},
 \code{\link{lexdiv_compare_ambiguity}}}

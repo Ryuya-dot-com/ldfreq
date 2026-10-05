@@ -172,6 +172,107 @@ overlapping evaluable occurrence IDs as well. A higher conditional agreement
 based on fewer, easier cases is not evidence of improvement. Do not derive
 baseline frequencies from held-out labels or equate different candidate inventories.
 
+## Score separate training and query examples in R
+
+`lexdiv_score_contextual()` bridges imported vectors and the evaluator. Its
+centroid baseline averages the raw target vectors for each selected training
+candidate, then computes cosine similarity to a query vector. Averaging labeled
+contextual embeddings is a starting point in
+[Loureiro & Jorge (2019), section 4.1](https://aclanthology.org/P19-1569/).
+This small baseline does not implement their full LMMS method, WordNet
+propagation, gloss representations or reported benchmark results.
+
+The comparison baseline uses selected training-label counts for the same surface.
+Unlike centroid fitting, it can use selected examples without embeddings.
+Always inspect both `n_selected` and `n_vectors`. Neither score is a probability.
+The two methods remain separate: there is no automatic frequency fallback.
+
+Create training and query sources separately **before** model computation.
+Stable document IDs must not overlap; renamed copies of identical target-bearing
+segments are also rejected. Candidate tables/resources and embedding declarations
+(including model/tokenizer revisions, layer/aggregation and software) must match.
+Matching declarations are not proof that external software followed them.
+
+The following sentences, labels and vectors are authored for illustration.
+They are not an independent annotation study or a trained BERT benchmark.
+
+```{r score-baselines, eval=has_quanteda}
+train_words <- list(c("Her", "bank", "approved", "a", "loan", "."),
+                    c("A", "bank", "holds", "deposits", "."),
+                    c("We", "rested", "by", "the", "bank", "."),
+                    c("人気", "の", "店", "だ", "。"),
+                    c("周囲", "に", "人気", "が", "ない", "。"))
+train_tokens <- data.frame(document_id = "training-example",
+  segment_id = rep(paste0("t", 1:5), lengths(train_words)),
+  token_index = sequence(lengths(train_words)), surface = unlist(train_words, use.names = FALSE))
+train_segments <- data.frame(document_id = "training-example", segment_id = paste0("t", 1:5),
+  text = c("Her bank approved a loan.", "A bank holds deposits.", "We rested by the bank.",
+           "人気の店だ。", "周囲に人気がない。"))
+train_annotations <- lexdiv_import_annotations(train_tokens, train_segments,
+  annotations$provenance$annotation)
+train_review <- lexdiv_ambiguity_review(train_annotations, c("bank", "人気"), candidates,
+  review$provenance$resource)
+train_input <- train_review$occurrences[c("review_id", "occurrence_id", "segment_text", "surface", "start", "end")]
+train_data <- train_input
+train_data$status <- "processed"; train_data$reason <- "Authored training vectors"
+train_vectors <- rbind(c(2,0), c(2,1), c(0,2), c(2,0), c(0,2))
+rownames(train_vectors) <- train_input$occurrence_id
+train_imported <- lexdiv_import_contextual(train_review, train_data, model, train_vectors)
+train_decisions <- train_input[c("review_id", "occurrence_id")]
+train_decisions$status <- "selected"
+train_decisions$candidate_id <- c("financial", "financial", "river", "popularity", "human-presence")
+train_decisions$reviewer <- "authored-example"
+train_decisions$reason <- "Intended labels of authored sentences; not independent human judgments"
+train_reference <- lexdiv_ambiguity_review(train_annotations, c("bank", "人気"), candidates,
+  review$provenance$resource, train_decisions)
+scored <- lexdiv_score_contextual(imported, train_imported, train_reference,
+  training_info = list(training_id = "authored-training",
+    annotation_protocol = "Author-specified intended labels",
+    partition_protocol = "Separate authored documents and target contexts",
+    model_exposure = "unknown"))
+scored$candidates[c("term", "candidate_id", "n_selected", "n_vectors", "prototype_status")]
+scored$query_occurrences[c("surface", "model_status", "centroid_status", "frequency_status")]
+baseline_evaluations <- lapply(scored[c("centroid", "frequency")], function(output)
+  lexdiv_evaluate_contextual(output, reference_review, "higher",
+    evaluation$provenance$reference_info))
+comparison <- do.call(rbind, lapply(baseline_evaluations, function(result)
+  result$summary[c("agreement", "paired", "prediction_coverage", "agreement_among_paired")]))
+comparison
+baseline_evaluations$centroid$review_queue[c("keyword", "pre", "post", "prediction_status", "model_reason")]
+stopifnot(comparison$agreement_among_paired == c(1, 0.5),
+          all(comparison$prediction_coverage == 0.5),
+          identical(scored$query, imported), identical(scored$reference, train_reference))
+saved_scores <- tempfile(fileext = ".rds")
+saveRDS(scored, saved_scores)
+stopifnot(identical(readRDS(saved_scores), scored))
+unlink(saved_scores)
+```
+
+The centroid method matches both English reference choices in this constructed
+example; the frequency baseline picks the financial candidate for both. This
+is a demonstration of different rules, not empirical evidence of improvement.
+The Japanese queries have no imported vectors, so no centroid scores are made.
+Frequency scores exist for those queries, but tied training counts mean that
+the evaluator abstains. Scoring-stage `processed` therefore does not mean a
+unique prediction, an available embedding or a correct interpretation.
+
+A missing candidate prototype stays missing and causes evaluator abstention
+when the score list is incomplete. Frequency zero means no selected training
+example of that candidate; an entirely unobserved surface receives no scores.
+Zero vectors and canceling means are recorded separately. Training counts can
+be small or uneven; inspect them before interpreting a candidate comparison.
+
+For a real run, use the optional embedding script below separately on the two
+source rosters with identical settings, import both outputs, and supply the
+training review and independent query reference. Do not relabel query outputs
+as training data or manufacture new IDs to bypass the split check. Participant
+overlap, near duplicates, pretraining contamination and earlier model-selection
+leakage are not detected automatically. This baseline cannot generalize to a
+new surface with no training labels; a word-held-out study needs another method.
+Save the entire `scored` object: each score output contains training fingerprints
+and required declarations, while the full object retains all training examples,
+prototype vectors and exclusion reasons.
+
 ## Compute actual target embeddings with a cached model
 
 The installed `examples/contextual-embeddings.py` is an optional, explicitly

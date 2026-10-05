@@ -1,5 +1,21 @@
 # ldfreq 0.2.0 (development)
 
+## Supervised contextual baselines
+
+- Added experimental `lexdiv_score_contextual()` with centroid-cosine and
+  training-frequency scores, using selected training references without reading
+  query labels or prior suggestions. Both outputs feed contextual evaluation.
+- Checks disjoint document IDs, identical target-context copies, candidate/
+  resource snapshots and embedding declarations/dimensions. These checks do not
+  establish a leak-free study or independent human labels.
+- Retains per-candidate training counts, normalized prototypes, zero/missing
+  vectors, canceling centroids, original model reasons and complete inputs.
+  Unseen candidates remain missing for cosine and zero-count for an observed
+  surface's frequency baseline. Unseen surfaces receive no scores. No fallback,
+  smoothing, tie breaking, inference or new dependency is implicit.
+- The English/Japanese guide connects authored training examples, separate query
+  references, coverage-aware baseline comparison, KWIC inspection and RDS replay.
+
 ## Comparing model suggestions with reference judgments
 
 - Added experimental `lexdiv_evaluate_contextual()` with explicit score direction

@@ -109,3 +109,12 @@ lexdiv_import_contextual <- function(review, data, model, embeddings = NULL,
   out$provenance$content_sha256 <- .lexng_hash(out)
   out
 }
+
+.lexctx_validate_output <- function(x) {
+  if (!is.list(x) || !is.list(x$provenance) ||
+      !identical(x$provenance$importer, "ldfreq-contextual-output") ||
+      !identical(x$provenance$importer_version, "0.1.0") ||
+      !identical(x$provenance$content_sha256, .lexng_hash(x)))
+    stop("Use unmodified lexdiv_import_contextual() results with content fingerprints.", call. = FALSE)
+  invisible(x)
+}

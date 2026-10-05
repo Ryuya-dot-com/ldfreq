@@ -85,6 +85,12 @@ keeps all-occurrence coverage beside conditional agreement, and returns a KWIC
 queue of disagreements and unavailable comparisons. A human reference is not
 automatically a validated gold standard; model exposure and evaluation role
 remain part of the research design.
+`lexdiv_score_contextual()` supplies two explicit baselines from separately
+labeled training examples: cosine to a candidate's mean target vector and its
+training-label count. It checks document/context separation, candidate inventories
+and embedding compatibility, and retains missing prototypes and excluded examples.
+Both score outputs connect to evaluation and KWIC; no model weights or new R
+dependency are needed. These baselines do not establish semantic validity.
 
 For Japanese, use an existing morphological analyzer and import its complete
 annotations with `lexdiv_import_annotations()`. It verifies surfaces against

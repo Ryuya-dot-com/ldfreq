@@ -1264,3 +1264,58 @@ archive. Full commit-specific remote checks are recorded in PR #21; existing
 local numerical evidence is reused for unchanged code. These software checks do
 not establish gold-label validity, semantic accuracy or human-review time savings.
 Publication state remains development.
+
+## Supervised contextual scoring baselines (2026-10-05)
+
+Added experimental `lexdiv_score_contextual()` to connect imported target
+embeddings, separate training labels, contextual evaluation and KWIC review.
+It returns raw-mean centroid cosine and unsmoothed training-label counts as
+separate contextual outputs. Query labels and prior scores are never used to
+fit or score either baseline. Candidate inventories/resources, model declarations
+and dimensions must match; shared document IDs and exact target-context copies
+are rejected. These checks do not establish independent annotations or detect
+all forms of leakage. Missing/zero vectors, canceling centroids, unobserved
+candidates and all original model statuses/reasons remain auditable.
+
+Evidence: `reviews/ldfreq-contextual-scoring-20261005/evidence/`.
+
+- Installed tests pass 227 expectations: 67 new scoring checks, 66 importer,
+  77 evaluation, 15 API naming and two smoke checks. Hand-computed centroids,
+  negative cosines, training counts, extreme scaling, input separation,
+  query-label invariance, empty/missing inputs, Japanese candidate scopes and
+  complete-result RDS replay pass. The input validator was shared unchanged
+  between scoring and evaluation.
+- Five installed guide chunks execute, including the complete authored
+  English/Japanese scoring and baseline-comparison example. The guide explains
+  training-population differences, coverage, retained reasons and why these
+  constructed outcomes are not empirical accuracy results.
+- The cached, pinned multilingual model processed four of five new training
+  occurrences. The `popularity` candidate's example, `人気の店だ。`, was skipped
+  by the unchanged exact-span rule.
+  No replacement example was selected to hide this exclusion. Four previously
+  saved query vectors were reused; cosine has six scores and frequency eight.
+  Both Japanese queries retain incomplete cosine inventories and abstain.
+  Independent direct vector sums/cosine calculations agree within 1e-12;
+  the complete result passes RDS replay. No query gold labels were supplied,
+  so reference agreement remains NA. This checks integration, not WSD accuracy.
+- Final archive: 3,417,814 bytes, SHA-256
+  `07b501dea1a2428140b47934183c6521fc5e86801379deb49e68bae55104252a`.
+  Exact-archive `R CMD check --no-tests --no-manual --no-vignettes` is Status OK,
+  including examples. All 199 compared source members agree (DESCRIPTION uses
+  normalized DCF values); 129 core/test/help/resource members and all 12 resource
+  files match the preceding archive. No external models or restricted corpora
+  are added. Unchanged numerical calculations were not rerun locally.
+- API audit: 50 exports, 34 S3 registrations, 30 function help topics. The
+  changed guide was rendered, with other compiled guides reused: 18 installed
+  guides, an 81-page PDF manual and 118 local site HTML files, with no missing
+  relative file targets. This is not a complete visual/usability evaluation.
+
+Initial test expectations were corrected for retained no-candidate status and
+changed reference fingerprints; an empty-input fixture was changed to the
+annotation importer's required segment roster. The actual-model validator's
+initial all-five-vectors assumption was corrected after inspecting the recorded
+skip; inference was not repeated. An HTML assertion used a source chunk name
+instead of the rendered section ID and was corrected without rebuilding docs.
+The commit-specific remote matrix is recorded in PR #21. Publication state
+remains development; semantic validity and human annotation evidence remain
+separate research requirements.
