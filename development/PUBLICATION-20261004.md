@@ -1110,3 +1110,54 @@ remote CI at `2717dcba` does not verify these two ambiguity APIs. The changes
 are consolidated for PR #21 and its existing OS-matrix workflow; remote results
 must be identified by the actual new commit/run. No repository visibility,
 main-branch merge, deployment, release-state or CRAN-submission change is made.
+
+
+## Reviewed WLSP polysemy resource connection (2026-10-05)
+
+Added two explicitly sourced helpers in `inst/examples/wlsp-polysemy.R` and the
+`japanese-polysemy` guide. They read only the pinned v1.0 polysemous.txt file,
+retain exact WID/WORD/LABEL keys, and require explicit item-to-display-key and
+candidate decisions. They reuse existing norm-profile and contextual review
+APIs. Full-item selection/value coverage is distinct from the selected-WID
+profile; unresolved keys, unmatched keys and unreviewed candidates are retained.
+No new export, dependency, formula or external rating table is introduced.
+
+The actual source has 100,827 WIDs and 84,152 distinct display words. The
+released signed estimates are preserved without rescaling or interpreting them
+as sense counts. Exact normalization details are not established by the inspected
+README/preprint. Resource IDs are not equated with familiarity IDs, readings or
+lexemes; a KWIC choice does not validate a context-specific rating.
+
+Evidence: `reviews/ldfreq-wlsp-polysemy-20261005/evidence/`.
+
+- The installed helper passed independent all-character source-column and
+  numeric-cell comparisons, hand-checked selection denominators and weighted
+  means, unmatched/unresolved/empty inputs, reordered decisions, wrong resource
+  IDs and types, altered-file rejection, KWIC integration and RDS replay.
+- All four published guide chunks were executed against the already acquired
+  file, with full-item coverage 3/6 and original contextual IDs retained. The
+  original purl attempt left eval=FALSE chunks commented; execution was then
+  checked explicitly by enabling evaluation in a local copy of the guide text.
+- The reader and selected-item lookup also passed under the C character locale;
+  this does not remove the separate UTF-8 requirement for Japanese KWIC.
+- Archive: 3,370,304 bytes, SHA-256
+  `9fac0b2af971d84f3d93eda9c6e4d2ad8cec0d81aa44acf8b5dfbafcc515a20d`.
+  Exact-archive `R CMD check --no-tests --no-manual --no-vignettes`: Status OK,
+  including examples. Its installed helper passed the real-resource validator.
+- All 186 compared source/help/test/example/vignette files match the archive;
+  127 core/test/help/resource members are byte-identical to the previous archive.
+  The earlier successful numerical suite and 74-page manual remain applicable
+  to those unchanged files. Neither was rerun locally. A missing closing brace
+  in the local build runner was corrected before the build could start.
+- All 17 guides are installed. The three new/changed guides were rendered and
+  the local site built with 114 HTML files and zero missing relative file
+  targets. No source norm table or excluded experiment/development directories
+  are in the archive. The API audit remains 47 exports, 34 S3 methods, 27 topics.
+
+The new installed-helper validator is an explicit release-R CI step on Linux,
+macOS and Windows. It obtains the pinned file in runner temporary storage;
+ordinary package loading, tests and document builds do not download it. It
+retains the source credit/license in the helper and does not upload a data
+fixture. The previous successful CI at 1d7497db does not cover the new helper;
+PR #21 must record the actual new run. This is a software integration check,
+not a new semantic or behavioral validation study. Publication state is unchanged.

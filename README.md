@@ -69,6 +69,9 @@ It does not infer senses or split aggregate reference frequencies by meaning.
 alongside joint-selection coverage, and returns open cases with both contexts
 and reasons. The guide also connects a separately obtained WLSP inventory to
 the same review interface.
+The [Japanese polysemy guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-polysemy.html)
+connects separately obtained WLSP-norms estimates to reviewed stimulus items
+and KWIC occurrences, preserving source IDs, signed values and selection coverage.
 
 For Japanese, use an existing morphological analyzer and import its complete
 annotations with `lexdiv_import_annotations()`. It verifies surfaces against

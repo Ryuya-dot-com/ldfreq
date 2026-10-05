@@ -260,6 +260,11 @@ decision cannot recover sense-specific frequencies from an aggregate table,
 and a spelling-based familiarity rating is not automatically a rating for each
 of its senses. Missing decisions are not zero frequency or zero knowledge.
 
+For a separately obtained subjective polysemy estimate, follow the
+[WLSP-norms workflow](japanese-polysemy.html). Its WIDs, displayed keys and
+classification labels need their own reviewed mapping. They are not the
+WLSP-familiarity IDs, and its signed estimates are not counts of meanings.
+
 Candidate counts reflect inventory coverage and sense granularity, not a
 learner's knowledge. Related senses and unrelated meanings need not have the
 same processing consequences ([Rodd et al., 2002](https://doi.org/10.1006/jmla.2001.2810)).

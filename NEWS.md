@@ -1,5 +1,17 @@
 # ldfreq 0.2.0 (development)
 
+## Reviewed Japanese polysemy estimates
+
+- Added explicitly sourced `read_wlsp_polysemy()` and
+  `review_wlsp_polysemy_items()` examples for the separately obtained, pinned
+  WLSP-norms v1.0 file. Exact WIDs, decorated words, classifications, signed
+  estimates, mapping reasons and unselected items remain visible.
+- Added a guide joining reviewed items and KWIC occurrences to these values,
+  reusing the existing norm-profile and ambiguity APIs. Full-item coverage is
+  separate from the selected-record profile. Values are not rescaled into raw
+  ratings, sense counts or sense-specific frequencies. No new exported API,
+  dependency or external rating data is added.
+
 ## Contextual ambiguity review
 
 - Added `lexdiv_compare_ambiguity()` to pair two intact reviews by occurrence

@@ -110,6 +110,22 @@ jobs:
             shQuote(source_path), shQuote(library_path)))
           if (!identical(status, 0L)) quit(status = status)
 
+      - name: Verify installed Japanese polysemy example
+        if: ${{ matrix.config.r == 'release' }}
+        shell: Rscript {0}
+        run: |
+          source_path <- file.path(Sys.getenv("RUNNER_TEMP"), "polysemous.txt")
+          download.file(paste0(
+            "https://raw.githubusercontent.com/masayu-a/WLSP-norms/",
+            "72125c8dc538aeb70b07cb1c76c183e338f0cde9/polysemous.txt"),
+            source_path, mode = "wb")
+          library_path <- file.path(Sys.getenv("RUNNER_TEMP"),
+            "ldfreq-package-resource-inventory", "library")
+          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
+            shQuote("experiments/validate-wlsp-polysemy.R"),
+            shQuote(source_path), shQuote(library_path)))
+          if (!identical(status, 0L)) quit(status = status)
+
   tubelex-build-audit:
     name: ${{ matrix.os }} / TUBELEX builder
     runs-on: ${{ matrix.os }}

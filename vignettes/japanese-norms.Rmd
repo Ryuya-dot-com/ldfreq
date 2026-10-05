@@ -29,6 +29,7 @@ files. The example script can be loaded in R without a shell or Python.
 | Resource | Information | Data terms and scope |
 |---|---|---|
 | [WLSP-familiarity v4.0](https://github.com/masayu-a/WLSP-familiarity) | Familiarity/use estimates for knowing, reading, writing, speaking and listening | CC BY-NC-SA 3.0. Local-file candidate review below; record choices remain explicit |
+| [WLSP-norms v1.0](https://github.com/masayu-a/WLSP-norms) | Subjective polysemousness estimates | CC BY-NC-SA 3.0. [Reviewed record lookup and KWIC connection](japanese-polysemy.html); values are not sense counts |
 | [AWD-J core](https://sociocom.naist.jp/awd-j/) | Human abstractness ratings for 15,220 words | CC BY 4.0. Scale-direction descriptions conflict; no automatic transformation here. EX contains model predictions |
 | [Japanese AoA](https://osf.io/fawmq/) | Retrospective acquisition ratings for 5,736 words | Data: CC BY-NC 4.0, independently of the article's CC BY license. Local-file example below |
 | [JALEX](https://osf.io/qr2sg/) | Lexical-decision response times and accuracy | The data's `license.txt` specifies CC BY-NC 4.0. Current data version/exclusion rules need separate review |
