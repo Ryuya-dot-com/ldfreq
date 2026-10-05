@@ -253,6 +253,7 @@ a high match rate does not prove that arbitrary tokens use the right segmentatio
 | Record or choose the lemma dictionary | `lexdiv_lemmatize(method = "textstem", dictionary = ...)` records content identity and lookup locale |
 | Audit annotation changes on the same documents | `lexdiv_compare_annotations()` retains changed labels and both provenance records |
 | Evaluate external labels against a supplied reference | `lexdiv_evaluate_annotations()` returns per-label errors, document coverage and source context on the same segmentation |
+| Compare different English/Japanese token segmentations | `lexdiv_align_annotations()` separates source-span/boundary correspondence from conditional label agreement and retains split/merge KWIC |
 | Parameter and definition sensitivity | `lexdiv_spec()`, `lexdiv_grid()`, `lexdiv_plan()`, `lexdiv_profile()`, `lexdiv_profile_batch()`, `lexdiv_variant_metrics()` |
 | Local MATTR windows and exposure | `lexdiv_mattr_profile()` |
 | Exact term/content-word overlap | `lexdiv_term_overlap()`, `lexdiv_content_overlap()` |
@@ -287,6 +288,7 @@ results do not change the requested parameters or silently remove documents.
 - [Designing comparisons](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html): questions, common settings, sensitivity, answers, and limits.
 - [Audit annotations and vocabulary profiles](https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.html): connect changed labels to original context, document-score differences, selection/reference coverage and saved-input replay.
 - [Evaluate annotations and their effect on document scores](https://ryuya-dot-com.github.io/ldfreq/articles/annotation-evaluation.html): explicit references, label-specific errors, missing predictions and English/Japanese examples.
+- [Compare token boundaries and document scores](https://ryuya-dot-com.github.io/ldfreq/articles/annotation-alignment.html): source-based split/merge correspondence, conditional label coverage, and full-document TTR/MATTR sensitivity.
 - [Your own reference data across a corpus](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html): custom norms, document metadata, missingness, and reproducible saving.
 - [Analyze open-access papers](https://ryuya-dot-com.github.io/ldfreq/articles/open-access-papers.html): a reproducible example using three CC BY papers, with explicit text extraction, attribution and unknown author language backgrounds.
 - [Preprocessing and frequency](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html): lexical units, formula variants, and resource coverage.

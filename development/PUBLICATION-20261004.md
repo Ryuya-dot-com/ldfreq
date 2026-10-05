@@ -1538,3 +1538,74 @@ resolves the earlier remote-write blocker. Current remote head and CI results
 are recorded in PR #21 rather than triggering another heavy CI run solely to
 add their URLs here. Main merge, repository visibility changes, site deployment
 and CRAN submission remain separate actions; package status stays development.
+
+## Source alignment across token segmentations (2026-10-06)
+
+Added experimental `lexdiv_align_annotations()` for roadmap stage 3. Both inputs
+are complete, revalidated external imports with identical source segments.
+An interval sweep groups overlapping source spans without a Cartesian product
+or matching token row numbers. Split, merge, complex, changed-span and one-sided
+relations retain original context and both sides' token IDs. Exact-span coverage
+and internal-junction agreement use separate, explicit denominators. A junction
+is the pair of left-token end and right-token start; compulsory segment edges
+are excluded, and explicit whitespace/punctuation tokens remain in the counts.
+
+Optional label evaluation shares the existing evaluator's scoring code but uses
+only exact span pairs. Non-exact spans retain exclusion reasons and are not
+silently treated as missing predicted labels or counted in conditional label
+FN. The four exact pairs in the authored example all agree, while only 4/9
+reference tokens and 4/15 predicted tokens are covered. This is descriptive
+correspondence to a supplied baseline, not independent analyzer validation.
+The same-segmentation evaluator retains its strict contract and saved results.
+
+The installed English/Japanese example uses both complete sequences for N/V,
+TTR and MATTR, with a declared all-surface-token policy including punctuation
+and the same four-token window. Japanese TTR changes from 0.75 to 2/3; English
+TTR stays 0.75 while MATTR changes from 0.75 to 0.85. Empty and short documents
+retain undefined metrics and their reasons. No new required dependency,
+corpus or model is included. Independent reference validation, word-sense
+analysis and dependency-head evaluation are not claimed. The next implementation
+stage remains the narrowly scoped basic-UD amod–noun occurrence extraction;
+dependency MI requires a separately suitable reference and denominator.
+
+Evidence: `reviews/ldfreq-annotation-alignment-20261006/evidence/`.
+
+- Installed-package focused checks pass **294 expectations**: 105 alignment
+  checks, 117 existing evaluator checks, 55 import checks, 15 API checks and
+  two smoke checks; no failures, errors, warnings or skips. Cases cover manual
+  boundary/count calculations, split/merge/many-to-many correspondence, shifted
+  token indices, Unicode/decomposed text, whitespace ownership, missing labels,
+  empty rosters, source tampering and reordered collision-safe compound IDs.
+  An independent all-pairs overlap graph agrees with the interval sweep on
+  every pair of partitions of a four-codepoint string (64 combinations).
+- The old evaluator reproduces its preceding saved full result identically
+  after extraction of shared validation/scoring helpers. New inputs, alignment,
+  whole-document scores and settings replay identically in separate R sessions,
+  including from the final archive's installation.
+- The first source archive passes `R CMD check --no-tests --no-manual
+  --no-vignettes` with **Status OK**, including help examples. Subsequent PDF
+  layout corrections change only help prose/formatting; all R, test, example
+  and guide bytes are identical. The final archive's documentation check with
+  `--no-tests --no-examples --no-manual --no-vignettes` is **Status OK**. Those
+  checks plus the retained focused tests are combined evidence, not one full
+  local check invocation.
+- Final archive: **3,508,823 bytes**, SHA-256
+  `81e11437235d2f29eadc06e23a97367ab0a33cb274009cd1cc90918778099c3b`.
+  All 218 audited non-DESCRIPTION source members match the checkout; only the
+  new help file and build metadata differ from the tested archive. The 128
+  unchanged prior R/test/help files and all 12 resource files retain their
+  existing evidence. The existing evaluator implementation and its help are
+  the only changed prior R/test/help members; their affected checks are included.
+- Public API inventory, help, exports, examples and pkgdown agree: **52 exports,
+  34 S3 registrations, 32 help topics**. The new guide executes and renders;
+  19 unchanged compiled guides are reused for **20 installed guides**. Home,
+  NEWS, affected help and article/index pages build; all **122 local HTML files**
+  have valid relative file targets. Package/site contain no workspace AGENTS.md.
+- The rebuilt manual has **87 pages**; the new topic on pages 8–10 was visually
+  inspected after repairing long-code wrapping. This is focused changed-topic
+  inspection, not a new visual audit of every pre-existing manual page.
+
+These local results precede the branch push. Existing user approval covers the
+branch and draft PR #21 update; CI results for the resulting head are recorded
+there to avoid another heavy CI run solely for updating this evidence note.
+No main merge, visibility change, site deployment or CRAN submission occurs.

@@ -3,52 +3,13 @@ lexdiv_evaluate_annotations <- function(predicted, reference, column, labels,
                                         reference_info, context_chars = 30L,
                                         max_tokens = 1e6) {
   max_tokens <- .lexnorm_positive_whole(max_tokens, "max_tokens")
-  column <- .lexnorm_scalar_string(column, "column")
-  labels <- .lexnorm_plain_character(labels, "labels")
-  if (anyDuplicated(labels) || any(!nzchar(stringi::stri_trim_both(labels))))
-    stop("labels must be unique, non-blank labels in the complete label inventory.", call. = FALSE)
-  if (!is.null(attributes(context_chars)) || length(context_chars) != 1L)
-    stop("context_chars must be one non-negative whole number.", call. = FALSE)
-  context_chars <- .lexng_count(context_chars, "context_chars")
-  reference_info <- .lexnorm_plain_list(reference_info, "reference_info")
-  required <- c("reference_id", "annotation_protocol", "label_scheme",
-    "model_exposure", "evaluation_role")
-  if (!all(required %in% names(reference_info)))
-    stop("reference_info requires: ", paste(required, collapse = ", "), ".", call. = FALSE)
-  for (field in names(reference_info)) {
-    reference_info[[field]] <- .lexnorm_scalar_string(reference_info[[field]], field)
-    if (!nzchar(stringi::stri_trim_both(reference_info[[field]])))
-      stop("Reference declarations must not be blank.", call. = FALSE)
-  }
-  if (!reference_info$model_exposure %in% c("not_shown", "shown", "unknown") ||
-      !reference_info$evaluation_role %in% c("held_out", "development", "unknown"))
-    stop("Use model_exposure not_shown/shown/unknown and evaluation_role held_out/development/unknown.",
-      call. = FALSE)
-
-  validate <- function(x, argument) {
-    x <- .lexnorm_plain_list(x, argument)
-    if (!all(c("tokens", "segments", "provenance") %in% names(x)) ||
-        !identical(x$provenance$importer, "ldfreq-external-annotations"))
-      stop(argument, " must be an unmodified lexdiv_import_annotations() result.", call. = FALSE)
-    segments <- .lexnorm_plain_data_frame(x$segments, paste0(argument, "$segments"))
-    checked <- lexdiv_import_annotations(x$tokens,
-      segments[setdiff(names(segments), c("token_count", "text_sha256"))],
-      x$provenance$annotation, max_tokens = max_tokens)
-    if (!identical(x, checked))
-      stop(argument, " has changed; import the complete annotations again.", call. = FALSE)
-    value <- x$tokens[[column]]
-    if (!column %in% names(x$tokens) || !is.character(value) ||
-        !is.null(attributes(value)))
-      stop(argument, "$tokens must contain column as a plain character vector.", call. = FALSE)
-    .lexnorm_plain_character(value[!is.na(value)], paste0(argument, "$tokens$", column),
-      allow_zero = TRUE)
-    if (any(!is.na(value) & !value %in% labels))
-      stop(argument, " contains values outside labels; supply the complete label inventory.",
-        call. = FALSE)
-    x
-  }
-  predicted <- validate(predicted, "predicted")
-  reference <- validate(reference, "reference")
+  policy <- .lexann_policy(column, labels, reference_info)
+  column <- policy$column
+  labels <- policy$labels
+  reference_info <- policy$reference_info
+  context_chars <- .lexann_context(context_chars)
+  predicted <- .lexann_validate(predicted, "predicted", max_tokens, column, labels)
+  reference <- .lexann_validate(reference, "reference", max_tokens, column, labels)
   keys <- c("document_id", "segment_id")
   segment_keys <- .lexng_key(reference$segments[keys])
   segment_row <- match(segment_keys, .lexng_key(predicted$segments[keys]))
@@ -75,6 +36,74 @@ lexdiv_evaluate_annotations <- function(predicted, reference, column, labels,
     pmin(width, pairs$end + context_chars))
   pairs$reference_label <- reference$tokens[[column]]
   pairs$predicted_label <- predicted$tokens[[column]][row]
+  out <- c(.lexann_score(pairs, reference$documents$document_id, labels), list(
+    predicted = predicted, reference = reference,
+    provenance = list(evaluator = "ldfreq-annotation-evaluation", evaluator_version = "0.1.0",
+      column = column, labels = labels, context_chars = context_chars,
+      reference_info = reference_info,
+      alignment = "exact same segment IDs/text and token IDs/surfaces/codepoint positions; reference order",
+      scoring = "single-label exact match on available references; absent prediction counts as false negative",
+      weighting = "token occurrences; no sampling weights or macro average",
+      interpretation = "descriptive reference agreement; independence, validity and holdout are caller declarations")))
+  out$provenance$content_sha256 <- .lexng_hash(out)
+  out
+}
+
+.lexann_context <- function(context_chars) {
+  if (!is.null(attributes(context_chars)) || length(context_chars) != 1L)
+    stop("context_chars must be one non-negative whole number.", call. = FALSE)
+  context_chars <- .lexng_count(context_chars, "context_chars")
+  context_chars
+}
+
+.lexann_policy <- function(column, labels, reference_info) {
+  column <- .lexnorm_scalar_string(column, "column")
+  labels <- .lexnorm_plain_character(labels, "labels")
+  if (anyDuplicated(labels) || any(!nzchar(stringi::stri_trim_both(labels))))
+    stop("labels must be unique, non-blank labels in the complete label inventory.", call. = FALSE)
+  reference_info <- .lexnorm_plain_list(reference_info, "reference_info")
+  required <- c("reference_id", "annotation_protocol", "label_scheme",
+    "model_exposure", "evaluation_role")
+  if (!all(required %in% names(reference_info)))
+    stop("reference_info requires: ", paste(required, collapse = ", "), ".", call. = FALSE)
+  for (field in names(reference_info)) {
+    reference_info[[field]] <- .lexnorm_scalar_string(reference_info[[field]], field)
+    if (!nzchar(stringi::stri_trim_both(reference_info[[field]])))
+      stop("Reference declarations must not be blank.", call. = FALSE)
+  }
+  if (!reference_info$model_exposure %in% c("not_shown", "shown", "unknown") ||
+      !reference_info$evaluation_role %in% c("held_out", "development", "unknown"))
+    stop("Use model_exposure not_shown/shown/unknown and evaluation_role held_out/development/unknown.",
+      call. = FALSE)
+
+  list(column = column, labels = labels, reference_info = reference_info)
+}
+
+.lexann_validate <- function(x, argument, max_tokens, column = NULL, labels = NULL) {
+  x <- .lexnorm_plain_list(x, argument)
+  if (!all(c("tokens", "segments", "provenance") %in% names(x)) ||
+      !identical(x$provenance$importer, "ldfreq-external-annotations"))
+    stop(argument, " must be an unmodified lexdiv_import_annotations() result.", call. = FALSE)
+  segments <- .lexnorm_plain_data_frame(x$segments, paste0(argument, "$segments"))
+  checked <- lexdiv_import_annotations(x$tokens,
+    segments[setdiff(names(segments), c("token_count", "text_sha256"))],
+    x$provenance$annotation, max_tokens = max_tokens)
+  if (!identical(x, checked))
+    stop(argument, " has changed; import the complete annotations again.", call. = FALSE)
+  if (is.null(column)) return(x)
+  value <- x$tokens[[column]]
+  if (!column %in% names(x$tokens) || !is.character(value) ||
+      !is.null(attributes(value)))
+    stop(argument, "$tokens must contain column as a plain character vector.", call. = FALSE)
+  .lexnorm_plain_character(value[!is.na(value)], paste0(argument, "$tokens$", column),
+    allow_zero = TRUE)
+  if (any(!is.na(value) & !value %in% labels))
+    stop(argument, " contains values outside labels; supply the complete label inventory.",
+      call. = FALSE)
+  x
+}
+
+.lexann_score <- function(pairs, document_ids, labels) {
   known <- !is.na(pairs$reference_label)
   available <- !is.na(pairs$predicted_label)
   paired <- known & available
@@ -103,7 +132,7 @@ lexdiv_evaluate_annotations <- function(predicted, reference, column, labels,
     out$prediction_complete <- out$prediction_available == n
     out
   }
-  documents <- reference$documents
+  documents <- data.frame(document_id = document_ids)
   groups <- split(seq_len(nrow(pairs)), factor(match(pairs$document_id, documents$document_id),
     levels = seq_len(nrow(documents))))
   documents <- cbind(documents, do.call(rbind, lapply(groups, summarize)))
@@ -130,17 +159,7 @@ lexdiv_evaluate_annotations <- function(predicted, reference, column, labels,
   confusion <- confusion[first, , drop = FALSE]
   confusion$n <- counts
   rownames(confusion) <- NULL
-  out <- list(summary = summarize(seq_len(nrow(pairs))), labels = by_label,
+  list(summary = summarize(seq_len(nrow(pairs))), labels = by_label,
     documents = documents, pairs = pairs, confusion = confusion,
-    review_queue = pairs[pairs$outcome != "agreement", , drop = FALSE],
-    predicted = predicted, reference = reference,
-    provenance = list(evaluator = "ldfreq-annotation-evaluation", evaluator_version = "0.1.0",
-      column = column, labels = labels, context_chars = context_chars,
-      reference_info = reference_info,
-      alignment = "exact same segment IDs/text and token IDs/surfaces/codepoint positions; reference order",
-      scoring = "single-label exact match on available references; absent prediction counts as false negative",
-      weighting = "token occurrences; no sampling weights or macro average",
-      interpretation = "descriptive reference agreement; independence, validity and holdout are caller declarations"))
-  out$provenance$content_sha256 <- .lexng_hash(out)
-  out
+    review_queue = pairs[pairs$outcome != "agreement", , drop = FALSE])
 }

@@ -1,5 +1,20 @@
 # ldfreq 0.2.0 (development)
 
+## Source alignment across token segmentations
+
+- Added experimental `lexdiv_align_annotations()` for complete imports of the
+  same original segments with different token boundaries. Source-interval
+  groups retain split/merge/complex relations, both token IDs and original KWIC.
+- Exact token-span coverage and internal-junction agreement have separate
+  denominators. Optional label evaluation is conditional on exact span pairs;
+  unmatched tokens and missing labels remain visible. Existing same-segmentation
+  evaluation retains its strict contract and results.
+- Added an offline English/Japanese example and guide connecting whole-input
+  token/type counts, TTR and fixed-window MATTR to saved-input replay. No corpus,
+  model or required dependency was added. These examples do not establish
+  analyzer accuracy or psychological validity.
+
+
 ## Reference-based annotation evaluation
 
 - Added experimental `lexdiv_evaluate_annotations()` for complete external

@@ -74,7 +74,10 @@ The label scheme must be substantively comparable in both inputs. The function
 checks literal labels and positions, not equivalence of different tagsets.
 UPOS or XPOS agreement is not word-sense disambiguation. Dependency accuracy
 requires matched heads as well as labels; evaluating a dependency-label column
-alone does not compute LAS. Different token or segment boundaries are rejected.
+alone does not compute LAS. Different token or segment boundaries are rejected. For different token
+boundaries on the same original segments, use
+\code{\link{lexdiv_align_annotations}} and report geometry coverage alongside
+its conditional label evaluation.
 
 Use document completeness and occurrence selections when connecting annotation
 errors to lexical metrics. A partial reference cannot define a full-document

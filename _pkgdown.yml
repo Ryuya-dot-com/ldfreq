@@ -18,6 +18,7 @@ reference:
       - lexdiv_compare_annotations
       - lexdiv_import_annotations
       - lexdiv_evaluate_annotations
+      - lexdiv_align_annotations
       - lexdiv_ambiguity_review
       - lexdiv_compare_ambiguity
       - lexdiv_import_contextual
@@ -92,6 +93,7 @@ articles:
       - open-access-papers
       - auditing-vocabulary-profiles
       - annotation-evaluation
+      - annotation-alignment
       - preprocessing-and-frequency
       - tubelex-input
       - vocabulary-knowledge-and-use

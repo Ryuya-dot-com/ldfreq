@@ -283,4 +283,13 @@ stopifnot(
   annotation_result$evaluation$summary$prediction_only == 1
 )
 
+# Different token boundaries retain global correspondence beside label agreement.
+alignment_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "annotation-alignment.R", package = "ldfreq",
+  mustWork = TRUE), alignment_env)
+alignment <- alignment_env$annotation_alignment_example$alignment
+stopifnot(is.function(lexdiv_align_annotations),
+  alignment$summary$matched[1] == 4,
+  alignment$annotation_evaluation$summary$agreement_among_paired == 1)
+
 invisible(TRUE)
