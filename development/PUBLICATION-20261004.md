@@ -969,3 +969,32 @@ are present. The superseding local archive is **3,318,227 bytes**, SHA-256
 `5651682fcaf825de01e44479033f5129fff217005d0352bcb587501b709a0d03`.
 The final remote revision will verify the supported matrix; record its outcome
 against its commit rather than treating this local archive as the CI artifact.
+
+### Complete the existing publication gates without changing package calculations
+
+Run `37261636301` at `edc3540` passed the current-R package checks (the macOS
+log reports 6,094 passing expectations), R-devel, the PDF manual and both
+English TUBELEX builders. Release-R jobs subsequently stopped at the separate
+resource-inventory gate because the authored MASC example files were not in its
+explicit extdata set; this was not a failed numerical test. R 4.1 stopped before
+checking: quanteda needs Matrix >= 1.5-0, while available current Matrix releases
+need newer R than 4.1.
+
+The inventory gate now explicitly enumerates all six authored example files and
+compares them across source/platform/installed artifacts. Unlisted extdata still
+fails. The installed lexical-resource manifest still correctly declares two
+reference tables; the examples are not a third reference corpus. The existing
+local source archive was reused for the corrected audit: **1,757 assertions,
+45 members**, source/platform/installed byte equality. The package archive and
+all numerical code, tests, documentation and example source bytes are unchanged
+by this CI-only correction, so no local numerical suite or document build was
+repeated.
+
+The R 4.1 jobs now pin `Matrix@1.6-5`. The official CRAN archive DESCRIPTION was
+checked (R >= 3.5.0; SHA-256
+`726c8d46626e73d1d6e76a74679813c6df96ffdee1aee45d94e7014cb4ceb97d`).
+A source-dependency resolution preflight for R 4.1.3 passed for the package's
+check dependencies, omitting only the already declared optional gibasa/textstem
+backends; it is a solver check, not execution under R 4.1. The actual R 4.1 CI
+remains the runtime check. CI-only changes are consolidated for one final push;
+existing workflow gates rerun on that revision. Neither prior run was cancelled.

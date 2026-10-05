@@ -250,6 +250,7 @@ jobs:
             any::jsonlite
             textstem=?ignore-before-r=4.4.0
             gibasa=?ignore-before-r=4.2.0
+            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5' || '' }}
           needs: check
 
       - name: Check the exact source archive as CRAN

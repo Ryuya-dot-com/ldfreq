@@ -49,3 +49,8 @@ labels to their recorded OS/R environments and rechecks every source, manual,
 BOM, SBOM, and resource-BOM identity named by provenance. It deliberately leaves
 the final maintainer go/no-go decision pending after recording resource
 admission.
+
+For the R 4.1 diagnostic, CI pins the compatible `Matrix@1.6-5` needed by
+quanteda (>= 1.5-0 Matrix). Current Matrix releases require newer R; the archived
+1.6-5 DESCRIPTION declares R >= 3.5.0. Current-R jobs use their normal dependency
+resolution. This is a CI compatibility pin, not a package runtime dependency.

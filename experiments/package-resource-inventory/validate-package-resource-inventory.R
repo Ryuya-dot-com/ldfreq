@@ -179,14 +179,18 @@ metadata_paths <- paste0(
   relative_files(file.path(package_root, "inst", "spec"))
 )
 check(length(metadata_paths) > 0L, "No installed specification files were found.")
-all_audited_paths <- c(member_paths, metadata_paths)
+# Authored examples are not reference lexical resources. Enumerate them
+# explicitly so extra extdata still fails, and compare their exact bytes too.
+example_paths <- paste0("extdata/masc-example/", c("README.txt", "example-penn.xml",
+  "example-s.xml", "example-seg.xml", "example.anc", "example.txt"))
+all_audited_paths <- c(member_paths, metadata_paths, example_paths)
 check(!anyDuplicated(all_audited_paths), "Audited package paths overlap.")
-for (path in metadata_paths) {
+for (path in c(metadata_paths, example_paths)) {
   source_member_bytes[[path]] <- read_bytes(file.path(package_root, "inst", path))
 }
 
 expected_extdata <- sort(
-  sub("^extdata/", "", member_paths[startsWith(member_paths, "extdata/")]),
+  sub("^extdata/", "", c(member_paths[startsWith(member_paths, "extdata/")], example_paths)),
   method = "radix"
 )
 check(length(expected_extdata) > 0L, "No extdata payload is declared.")
@@ -427,6 +431,7 @@ evidence <- list(
   audited_members = member_records,
   extdata_members = expected_extdata,
   installed_resource_count = length(inventory$resources),
+  authored_example_members = example_paths,
   undeclared_extdata_observed = FALSE,
   assertions = assertions
 )

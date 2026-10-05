@@ -20,6 +20,11 @@ The validator uses only base R plus the package's existing `digest` and
 archive member paths before extraction. Repository-only `experiments/` and
 `legal/` directories must not enter either package archive.
 
+The two bundled lexical resources are distinct from the six authored MASC-format
+example files. The latter are explicitly enumerated in the validator and undergo
+the same source/platform/installed byte comparison. They are MIT examples, not
+redistributed corpus data. Unexpected files under `extdata` still fail the audit.
+
 Run it with a destination that does not exist:
 
 ```sh
