@@ -94,6 +94,84 @@ and keep the earlier review as well. Model-assisted judgments are not independen
 human judgments; conduct a blinded human pass before showing suggestions when
 independent accuracy or agreement is the research question.
 
+## Compare scores with a declared reference
+
+`lexdiv_evaluate_contextual()` predicts a candidate only when **every candidate
+in the supplied inventory is scored** and one is best. Partial lists and tied
+best scores abstain. This conservative policy is not a WSD benchmark convention
+or proof that the inventory contains every meaning. Specify whether larger or
+smaller scores are preferred. The optional absolute `tie_tolerance` treats nearby
+scores as ties; choose it before final evaluation, not by tuning on test labels.
+
+These reference labels are also authored illustrations, not independent human
+gold labels. Agreement here is not evidence about BERT accuracy. Keep the
+reference separate from the imported model output and its original human review.
+
+```{r evaluate-scores, eval=has_quanteda}
+decisions <- input[c("review_id", "occurrence_id")]
+decisions$status <- c("selected", "selected", "selected", "unresolved")
+decisions$candidate_id <- c("financial", "river", "popularity", NA_character_)
+decisions$reviewer <- "authored-example"
+decisions$reason <- c(rep("Authored criterion for this example", 3),
+                      "Illustration of an unresolved reference")
+reference_review <- lexdiv_ambiguity_review(annotations, c("bank", "人気"),
+  candidates, review$provenance$resource, decisions)
+evaluation <- lexdiv_evaluate_contextual(imported, reference_review,
+  direction = "higher", reference_info = list(
+    reference_id = "authored-demonstration", annotation_protocol = "Authored examples, not human ratings",
+    model_exposure = "unknown", evaluation_role = "development"))
+evaluation$summary[c("agreement", "paired", "agreement_among_paired",
+  "predictions", "occurrences", "prediction_coverage",
+  "reference_selected", "matches_among_reference_selected")]
+evaluation$review_queue[c("surface", "prediction_status", "model_status",
+  "reference_status", "reference_reason", "outcome")]
+stopifnot(evaluation$summary$agreement_among_paired == 1,
+          evaluation$summary$prediction_coverage == 1/4,
+          evaluation$summary$matches_among_reference_selected == 1/3,
+          identical(evaluation$reference, reference_review),
+          identical(evaluation$model_output, imported))
+saved_evaluation <- tempfile(fileext = ".rds")
+saveRDS(evaluation, saved_evaluation)
+stopifnot(identical(readRDS(saved_evaluation), evaluation))
+unlink(saved_evaluation)
+```
+
+The one comparable case agrees (1/1), but only one of four occurrences receives
+a prediction. Among the three occurrences with selected reference labels, one
+receives a matching prediction (1/3). "100% agreement" alone would hide most
+cases. The KWIC `review_queue` retains the tied English example, the skipped
+Japanese example and the unresolved reference. `terms` repeats counts by surface,
+including absent targets; `confusion` keeps candidate IDs scoped to each surface.
+Overall proportions weight occurrences rather than word types. A singleton
+inventory produces a trivial prediction, counted in `single_candidate_predictions`;
+inspect these separately when evaluating ambiguity.
+
+All inputs remain unchanged. An unresolved or unreviewed reference is not a wrong
+label and is not counted as agreement. Embedding-only output yields no predictions:
+a separately specified classifier or scoring procedure is still needed.
+`reference_scored` identifies whether a selected reference candidate appeared in
+the scores, distinguishing a missing reference candidate from missing rivals.
+
+Use `model_exposure = "not_shown"` only when annotators did not see model output,
+and `evaluation_role = "held_out"` only when examples were not used to fit or
+choose the scoring procedure or evaluation settings. These declarations are not
+verified by the package. Model-assisted judgments (`shown`) and development
+examples are valid descriptive inputs, but are not independent held-out accuracy.
+
+WSD evaluation depends on consistent annotation guidelines and sense inventories
+([Raganato et al., 2017](https://aclanthology.org/E17-1010/)). Performance on answered
+cases and coverage are also distinguished in selective classification
+([Geifman & El-Yaniv, 2017](https://papers.neurips.cc/paper_files/paper/2017/hash/4a8423d5e91fda00bb7e46540e2b0cf1-Abstract.html)).
+This evaluator implements neither their training algorithms nor their statistical
+guarantees; it reports counts and descriptive proportions.
+
+For a candidate-frequency baseline, estimate its scores on separate training
+data, import them against the same unchanged review, and evaluate with the same
+reference and predeclared policy. Keep each method's coverage and compare their
+overlapping evaluable occurrence IDs as well. A higher conditional agreement
+based on fewer, easier cases is not evidence of improvement. Do not derive
+baseline frequencies from held-out labels or equate different candidate inventories.
+
 ## Compute actual target embeddings with a cached model
 
 The installed `examples/contextual-embeddings.py` is an optional, explicitly

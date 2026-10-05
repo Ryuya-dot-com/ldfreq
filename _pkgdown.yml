@@ -20,6 +20,7 @@ reference:
       - lexdiv_ambiguity_review
       - lexdiv_compare_ambiguity
       - lexdiv_import_contextual
+      - lexdiv_evaluate_contextual
       - lexdiv_text_batch
       - lexdiv_flemmatize
   - title: Exact lexical overlap and coverage

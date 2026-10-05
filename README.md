@@ -79,6 +79,12 @@ Model suggestions stay separate from human choices; failed or absent outputs
 remain in the denominator. The [contextual model guide](https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.html)
 includes an offline example and an optional, explicit Python call using a cached
 Hugging Face model. No model or Python installation is required for the R importer.
+`lexdiv_evaluate_contextual()` compares scored candidates to an explicitly
+declared reference review. It abstains on incomplete inventories and ties,
+keeps all-occurrence coverage beside conditional agreement, and returns a KWIC
+queue of disagreements and unavailable comparisons. A human reference is not
+automatically a validated gold standard; model exposure and evaluation role
+remain part of the research design.
 
 For Japanese, use an existing morphological analyzer and import its complete
 annotations with `lexdiv_import_annotations()`. It verifies surfaces against

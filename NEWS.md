@@ -1,5 +1,19 @@
 # ldfreq 0.2.0 (development)
 
+## Comparing model suggestions with reference judgments
+
+- Added experimental `lexdiv_evaluate_contextual()` with explicit score direction
+  and absolute tie tolerance. Predictions require scores for the complete
+  supplied inventory and one best candidate; missing rivals and ties abstain.
+- Overall/per-term summaries report matching predictions, conditional agreement,
+  reference/prediction/pair coverage, singleton predictions and unscored reference
+  candidates. Term-specific confusion counts and a KWIC review queue retain
+  unavailable comparisons. Human judgments are not overwritten.
+- Reference protocol, model exposure and evaluation role are recorded as caller
+  declarations. The guide distinguishes reference agreement from validated WSD
+  accuracy and illustrates high conditional agreement with low coverage. No
+  model inference, new dependency, external data or tuning procedure is added.
+
 ## External contextual model outputs
 
 - Added experimental `lexdiv_import_contextual()` to check occurrence IDs,

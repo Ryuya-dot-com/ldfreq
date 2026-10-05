@@ -108,4 +108,5 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
 }
 }
 \seealso{\code{\link{lexdiv_ambiguity_review}},
+\code{\link{lexdiv_evaluate_contextual}},
 \code{\link{lexdiv_compare_ambiguity}}}

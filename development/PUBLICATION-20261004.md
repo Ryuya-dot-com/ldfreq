@@ -1216,3 +1216,51 @@ commit-specific remote CI is recorded in PR #21, separately from these local
 macOS/R 4.6.1 results. Release metadata, visibility, main merge, deployment and
 CRAN submission remain unchanged. Independent sense labels, behavioral data,
 model-assistance time savings and research validity remain to be evaluated.
+
+## Comparing contextual scores with a reference review (2026-10-05)
+
+Added experimental `lexdiv_evaluate_contextual()`. It ranks supplied candidate
+scores with an explicit direction and absolute tie tolerance, requiring the
+complete supplied inventory and a unique best score. Ties and incomplete scores
+abstain. Overall/per-term counts retain reference/prediction/pair coverage,
+singleton predictions and unscored reference candidates. Term-specific confusion
+counts and the non-agreement KWIC queue preserve original occurrences and both
+inputs. Reference protocol, model exposure and evaluation role are declarations,
+not evidence that a reference is valid, blinded or held out. No classifier,
+inference, model weights, external data or new dependency was added.
+
+Evidence: `reviews/ldfreq-contextual-evaluation-20261005/evidence/`.
+
+- The final archive's installed tests pass 94 expectations: 77 new evaluation,
+  15 API-naming and two smoke checks. Cases cover absent/tied/partial scores,
+  lower/higher direction, tolerance, stale/modified inputs, row order, Japanese
+  candidate scopes, absent targets, empty inputs and RDS replay. Final review
+  stabilized the empty prediction-status column as character and added a check.
+- Four actual installed guide chunks run. The authored example distinguishes
+  conditional agreement 1/1 from prediction coverage 1/4 and matching predictions
+  among selected references 1/3. These are not empirical accuracy results.
+- The previously saved real-model output (four 384-dimensional vectors) passes
+  the new evaluator without inventing predictions or judgments; all occurrences
+  and the complete input survive an RDS round trip. Model inference and the
+  unchanged Python alignment tests were not rerun locally.
+- Final archive: 3,403,076 bytes, SHA-256
+  `0860fe05f0c4744af36544985379581dfebaa45a02ce16b75d264ed7a07f1672`.
+  Exact-archive `R CMD check --no-tests --no-manual --no-vignettes` is Status OK,
+  including examples. All 196 compared source members agree (DESCRIPTION uses
+  normalized DCF values); 129 core/test/help/resource members and all 12 resource
+  files match the preceding archive. No external models or excluded development/
+  experiment directories are bundled.
+- API audit: 49 exports, 34 S3 registrations, 29 function help topics. The
+  changed guide was rendered and unchanged compiled guides reused. There are
+  18 installed guides, a 78-page PDF manual and 117 local site HTML files with
+  zero missing relative file targets. The empty-result code correction does not
+  change help or rendered examples, so those document checks were retained.
+
+An initial evidence CSV write failed on a test-result list column after all 93
+then-current expectations passed. The unexecuted guide checks resumed separately;
+final test results are saved as RDS. This was a result-recording failure, not a
+package test failure. The final code correction was checked in the rebuilt
+archive. Full commit-specific remote checks are recorded in PR #21; existing
+local numerical evidence is reused for unchanged code. These software checks do
+not establish gold-label validity, semantic accuracy or human-review time savings.
+Publication state remains development.
