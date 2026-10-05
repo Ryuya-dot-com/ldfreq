@@ -23,6 +23,12 @@ rendered by pkgdown.
 - Use package `plot()` methods only when one explicit scale or selection rule
   prevents unlike measurements from being compared silently. Every package
   plot method returns the plotted data invisibly.
+- All eleven plot methods use color by default and accept the named argument
+  `monochrome = TRUE`, without a new export or dependency. No automatic title
+  is added; plots retain their existing selection and return contracts.
+  Color and shape jointly encode advisory status in both modes. Cosmetic
+  defaults restore device settings and do not change plot coordinates/layout.
+  An undefined NJ8 proportion now raises an error instead of displaying zeros.
 - Do not add package `summary()` methods. Long result objects are already
   analysis-ready data frames; composite objects already expose a component
   explicitly named `summary` beside coverage, exclusions, diagnostics, and
@@ -42,6 +48,7 @@ retains joined result/audit tables and complete document-local preprocessing.
 
 | Export | Role and return boundary | Batch relation | Print | Plot | Analysis-ready access |
 |---|---|---|---|---|---|
+| `lexdiv_amod_pairs()` | Experimental basic-UD ADJ–amod–NOUN extraction from complete source-checked annotations; validates trees and distinguishes missing sentences from zero pairs | Explicit document/sentence IDs; observed counts beside complete totals and coverage | Base list | No: select counts, types or coverage explicitly; guide illustrates paired changes | `$occurrences`, `$counts`, `$segments`, `$documents`, `$summary`, complete `$annotations` and `$provenance` |
 | `lexdiv_score_contextual()` | Experimental supervised centroid-cosine and training-frequency baselines over separate imported reviews | Same supplied inventory, disjoint documents, explicit training/reference audit | Base list | No | `$centroid`, `$frequency`, `$candidates`, `$prototypes`, both occurrence audits and complete inputs |
 | `lexdiv_evaluate_contextual()` | Experimental complete-inventory ranking and descriptive comparison to an explicit reference review | Overall and per-target counts, coverage, and term-specific confusion; source IDs preserved | Base list | No | `$summary`, `$terms`, `$pairs`, `$confusion`, `$review_queue`, complete inputs and policy |
 | `lexdiv_import_contextual()` | Experimental source-checked external embeddings/scores, distinct from human decisions; no inference | One complete review with all-occurrence coverage and ID-paired output | Base list | No | `$occurrences`, `$embeddings`, `$suggestions`, `$summary`, complete `$review` and model `$provenance` |

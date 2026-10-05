@@ -118,6 +118,83 @@ If the research question also concerns frequency in YouTube subtitles, follow
 `vignette("tubelex-input", package = "ldfreq")`. Keep that segmentation and its
 frequency results distinct from the surface units selected above.
 
+## Prepare the figure at its publication size
+
+Plots default to color and have no automatic title or subtitle. In both color
+modes, advisory token floors are encoded by shape as well as color: triangles
+are below the floor and circles are not. This follows the redundant-coding
+principle described by [Wilke (2019, Chapter 20)](https://clauswilke.com/dataviz/redundant-coding.html).
+The common blue/orange defaults are from the Okabe--Ito palette; the dedicated
+`monochrome = TRUE` mode remains available. A palette alone does not guarantee
+legibility: inspect line widths, point shapes, labels and the actual output size.
+
+Use a sans serif font and choose its size at the final figure dimensions.
+[APA's figure guidance](https://www.apa.org/ed/precollege/psn/2020/09/apa-style-student-papers)
+specifies 8--14 point text inside the image; this example uses 11 points.
+Place the figure number, title and explanatory note in the manuscript, outside
+the image. Do not add these as `main`, `sub`, or an embedded caption.
+
+The same plotted data can be exported as vector PDF or a 300-dpi PNG. Replace
+the temporary paths below with your intended output paths; follow the target
+journal's file-format and resolution requirements. The `par()` adjustment
+below reduces unused margins for this particular short-label example, and
+restores the previous settings afterwards. Longer document labels need more
+room, a larger figure, or a custom horizontal dot plot rather than smaller text.
+
+```{r, results='hide'}
+draw_mattr <- function(monochrome = FALSE) {
+  old <- par(mar = c(4.2, 4.5, 1, 1))
+  on.exit(par(old))
+  plot(metrics, metric_id = "mattr", monochrome = monochrome)
+}
+pdf_path <- tempfile(fileext = ".pdf")
+pdf(pdf_path, width = 6.5, height = 4, pointsize = 11, useDingbats = FALSE)
+pdf_rows <- draw_mattr()
+dev.off()
+
+png_path <- tempfile(fileext = ".png")
+png(png_path, width = 6.5, height = 4, units = "in", res = 300, pointsize = 11)
+png_rows <- draw_mattr(monochrome = TRUE)
+dev.off()
+stopifnot(identical(pdf_rows, png_rows))
+unlink(c(pdf_path, png_path))
+```
+
+[Wilke (2019, Chapter 24)](https://clauswilke.com/dataviz/small-axis-labels.html)
+emphasizes checking figures at the size at which they will be read. Increasing
+DPI alone does not enlarge printed text, and shrinking a finished image also
+shrinks its labels. These plot defaults are a starting point, not a guarantee
+of every journal's requirements or accessibility at every device size.
+
+These export examples use Latin-script labels. For Japanese labels, select an
+installed font containing the required glyphs. Where `capabilities("cairo")`
+is true, [`cairo_pdf()`](https://stat.ethz.ch/R-manual/R-devel/library/grDevices/html/cairo.html)
+can cover a wider range of UTF-8 glyphs and embed fonts; check the resulting
+file on the target system. Pass the chosen `family` to `plot()` as well as the
+device, because package plots otherwise use their `"sans"` default.
+
+### Show the observations and respect the design
+
+The metric plot shows one point per computable document, not a bar of group
+means. [Weissgerber et al. (2015)](https://doi.org/10.1371/journal.pbio.1002128)
+show why summary-only bars can conceal distributions and paired changes in
+small-sample continuous data. This does not rule out bars for NJ8 category
+counts or coverage proportions. For annotation changes in the same documents,
+use a paired comparison or document-level difference plot; the vocabulary-audit
+guide includes such an example. Retain the full roster and report the numbers
+and reasons for unavailable values outside the image. Missing scores are not
+zero changes.
+
+[Cumming (2014)](https://doi.org/10.1177/0956797613504966) emphasizes effect sizes
+and uncertainty in estimation, while [Gabry et al. (2019)](https://doi.org/10.1111/rssa.12378)
+place visualization within model building and checking. For this workflow,
+we keep descriptive output separate from inference: these figures do not fit
+a model or generate confidence intervals. Choose the estimand, sampling units
+and dependence structure before using an existing modelling package for
+intervals or predictions. Overlapping MATTR windows are not independent
+replicates, and a pooled lexical network does not identify a person's mental
+lexicon. A well-formatted figure does not supply those missing assumptions.
+
 ## Save enough to reproduce and report the analysis
 
 Save the full results and preprocessing record, not just a CSV of scores.

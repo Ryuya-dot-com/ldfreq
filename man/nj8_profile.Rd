@@ -51,13 +51,14 @@ nj8_profile_batch(
   scale = "proportion",
   show_cumulative = TRUE,
   include_off_list = TRUE,
-  bar_col = "#4C78A8",
-  cumulative_col = "#E45756",
+  bar_col = "#0072B2",
+  cumulative_col = "#D55E00",
   main = NULL,
   xlab = "New JACET 8000 frequency level",
   ylab = NULL,
   show_legend = TRUE,
-  ...
+  ...,
+  monochrome = FALSE
 )
 }
 \arguments{
@@ -110,11 +111,20 @@ nj8_profile_batch(
   \item{bar_col, cumulative_col}{Colors for the bars and cumulative curve.}
   \item{main, xlab, ylab}{Optional base-graphics labels.}
   \item{show_legend}{Whether to draw the exact/cumulative legend.}
-  \item{...}{For \code{plot()}, additional arguments passed to
+  \item{monochrome}{One \code{TRUE} or \code{FALSE} value; specify by name. Defaults to color; \code{TRUE} overrides bar and curve colors with gray and black. The off-list bar has a separate shade, and bars have black outlines. No title is added automatically; place figure titles and notes outside the image.}
+\item{...}{For \code{plot()}, additional arguments passed to
   \code{graphics::barplot()}; for \code{print()}, additional arguments passed
   to the summary-table print method.}
 }
 \details{
+Plots label every level as 1--8 and keep Off-list separate. The default
+proportion axis is fixed at 0--1 across documents, with unlabelled space above
+for the legend. Count plots scale to the displayed series. An undefined
+proportion (for example, no eligible terms) is not drawn as zero; inspect
+\code{coverage} instead. Use \code{yaxt} or \code{axes} to control the axis.
+Defaults use a sans serif font, horizontal tick labels, and an open frame;
+\code{family}, \code{las} and \code{bty} can be overridden in \code{...}.
+
 Ranks 1--8000 are assigned to eight 1,000-rank levels using
 \code{ceiling(rank / 1000)}. The official XLSX labels its entries as
 representative lemmas, so lemma input is the default. Surface-form matching is

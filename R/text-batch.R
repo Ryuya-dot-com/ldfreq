@@ -139,6 +139,6 @@ print.lexdiv_text_batch_results <- function(x, ...) {
 }
 
 #' @export
-plot.lexdiv_text_batch_results <- function(x, ...) {
-  plot(x$results, ...)
+plot.lexdiv_text_batch_results <- function(x, ..., monochrome = FALSE) {
+  plot(x$results, ..., monochrome = monochrome)
 }

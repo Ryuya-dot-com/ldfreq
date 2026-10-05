@@ -455,6 +455,9 @@ print.lexdiv_reference_coverage <- function(x, ...) {
 #' @param x A `lexdiv_reference_coverage` object.
 #' @param weighting Exactly one of `"token"` or `"type"`.
 #' @param col,pch,main,xlab,ylab,ylim Base-graphics settings.
+#' @param monochrome One `TRUE` or `FALSE` value. Defaults to color; `TRUE`
+#'   overrides `col` with black. No title is added automatically; place
+#'   figure titles and notes outside the image.
 #' @param ... Additional arguments passed to [graphics::plot()].
 #'
 #' @return Invisibly, the exact rows plotted plus their positions.
@@ -468,7 +471,10 @@ plot.lexdiv_reference_coverage <- function(
     xlab = "document",
     ylab = "coverage",
     ylim = c(0, 1),
-    ...) {
+    ...,
+    monochrome = FALSE) {
+  monochrome <- .lexprep_scalar_flag(monochrome, "monochrome")
+  if (monochrome) col <- "black"
   if (
     !inherits(x, "lexdiv_reference_coverage") || !is.list(x) ||
       !is.data.frame(x$summary)
@@ -489,8 +495,9 @@ plot.lexdiv_reference_coverage <- function(
     stop(sprintf("The %s-weighted coverage has no finite ok values to plot.", weighting),
       call. = FALSE)
   }
-  if (is.null(main)) main <- sprintf("Reference coverage (%s weighted)", weighting)
   positions <- seq_len(nrow(frame))
+  old_par <- .lex_plot_style(list(...))
+  on.exit(graphics::par(old_par), add = TRUE)
   graphics::plot(
     positions,
     frame$value,

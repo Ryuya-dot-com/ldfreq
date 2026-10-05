@@ -1626,3 +1626,146 @@ manual workflow or cancellation is introduced. Existing user approval covers
 this branch and draft PR #21 update. Final CI results are recorded in the PR
 rather than causing another push solely to record their URLs here.
 No main merge, visibility change, site deployment or CRAN submission occurs.
+
+## Color defaults and monochrome plots (2026-10-06)
+
+All eleven existing plot methods now accept the named argument
+`monochrome = FALSE`; `TRUE` selects black/gray series. Metric and screening
+defaults retain advisory distinctions with triangles/circles. MATTR retains
+its dashed mean line, and NJ8 retains its separate off-list bar. Automatic
+titles were removed; metric IDs label the y-axis. Explicit base-graphics
+labels/symbols remain available. No export, dependency, metric, denominator,
+selection rule or return schema was added or changed.
+
+Local working-tree evidence is in workspace
+`reviews/ldfreq-plot-style-20261006/evidence/`:
+
+- Installation and 1,519 focused assertions passed without failures, warnings
+  or skips, including 165 plot-style assertions. Tests exercise all eleven
+  methods, both modes, unchanged invisible returns, invalid flags, actual
+  graphics colors and overlays, default symbols and explicit overrides.
+- Visual inspection found the existing NJ8 legend overlapping the off-list
+  bar. It now uses reserved space at the top right. The affected 324 NJ8/style
+  assertions passed again after that correction; 1,195 unaffected assertions
+  are retained. These are combined focused results, not a new full check.
+- Code/help signatures agree, all five affected help topics validate/render,
+  and the three guides containing package plots execute/render with the final
+  code. Six plot families were rendered in both modes; focused visual review
+  checked labels, grayscale distinctions and the corrected NJ8 legend.
+- The public API audit remains 52 exports, 34 registered S3 methods and 32
+  documented topics. README, help, NEWS and the introductory guide describe
+  the same switch and external figure-title/note convention.
+
+The earlier alignment/network illustrations also have color defaults and
+explicit monochrome variants in their local example script. Their saved
+numerical data are unchanged; they remain prototypes outside the package API.
+This entry records local source installation/tests and documentation, not a
+new release archive, remote CI run or published site.
+
+## Literature-informed figure refinement (2026-10-06)
+
+The user requested Web and Zotero evidence for further refinement. Zotero
+searches for visualization, visualisation, graphics and Cumming identified
+Cumming (2014), item `NP46KF6G`, DOI 10.1177/0956797613504966, and Gabry et al.
+(2019), item `LAA54HWF`, DOI 10.1111/rssa.12378. Their metadata and abstracts
+were read; this was not a full-text/page-by-page review. No library entries
+were written. The helper's localhost probe was sandbox-blocked; the connected
+Zotero tools successfully supplied the records.
+
+Primary Web sources consulted were Wilke's *Fundamentals of Data Visualization*
+(chapters 4, 20 and 24, at https://clauswilke.com/dataviz/), Weissgerber et al.
+(2015), DOI 10.1371/journal.pbio.1002128, official APA figure/font guidance, and
+R's Cairo-device documentation. The report guide links the sources beside the
+corresponding design choices. Estimation/model-checking principles inform the
+interpretation boundary; the package does not infer intervals or fit a model
+merely because a descriptive graph is requested.
+
+Changes: redundant point shapes in both color modes; a common Okabe--Ito
+blue/orange palette; sans serif text, horizontal tick labels and open frames;
+restoration of cosmetic device settings even after errors. NJ8 uses common
+0--1 proportion ticks, explicit category labels with a wrapped Off-list label
+at narrow widths, and count ranges determined by the visible series. Undefined
+proportions raise an error rather than becoming zero-height bars. The audit
+guide now plots signed TTR changes for the same documents: four of six authored
+documents are paired, two remain unavailable in the full status table. This is
+an illustration of annotation sensitivity, not an independent accuracy study.
+
+Workspace evidence: `reviews/ldfreq-visual-refinement-20261006/evidence/`.
+The first installed run passed 1,555 focused assertions. Final narrow-label
+corrections and four additional checks passed 364 NJ8/style assertions;
+1,195 unaffected assertions are retained, for 1,559 combined passes without
+failures/warnings/skips. All eleven computable plot-data returns match the
+previous installed version exactly. Five help topics validate/render and agree
+with code signatures; four affected guides execute/render, including PDF/PNG
+round trips with identical plotted rows. No new export/dependency was added.
+
+Six plot families were rendered in both modes, with additional 3.25-inch NJ8
+figures and paired-change figures. Visual checks exposed the automatic loss
+of the narrow Off-list label; explicit category-axis placement fixed it without
+reducing the 11-point text. The local network prototype also offsets count
+labels from edges; its saved numeric tables are unchanged. These are local
+source/document/figure checks, not a new archive-wide or cross-platform CI run.
+
+## Basic UD adjective–noun pairs (2026-10-06)
+
+Added experimental `lexdiv_amod_pairs()` over an unmodified external-annotation
+import. One sentence per segment supplies basic UD head/deprel/UPOS. Selection
+is ADJ–amod–NOUN, including relation subtypes but excluding PROPN/PRON; this is
+not the exact Penn-tag feature used by Kyle & Eguchi (2024). The official UD
+amod, CoNLL-U and Japanese amod pages were checked for this implementation.
+No parser, required dependency, model, corpus or MI resource was added.
+
+The function validates head ranges, self-links, root consistency and cycles,
+including known contradictions within incomplete annotations. Whole sentences
+with missing heads/relations/UPOS are excluded; observed counts survive but
+complete document totals are unavailable. Missing lemmas affect type coverage,
+not syntactic occurrence detection. Both source endpoints, direction, distance,
+original KWIC, surface/lemma units and complete annotation provenance survive.
+The offline seven-document example includes English/Japanese, a true zero,
+missing and partially analyzed documents, and empty input. Equal counts can
+still have one FP and one FN by endpoint comparison. These are authored
+implementation examples, not independently collected accuracy data.
+
+Evidence is in workspace `reviews/ldfreq-amod-pairs-20261006/evidence/`:
+
+- The new feature passed **116 installed expectations**, including an independent
+  adjacency-matrix reachability oracle over all 27 possible three-node head
+  assignments without self-links. Cases include non-adjacency, postposed
+  dependents, subtypes, missing annotations/lemmas, enhanced-edge rejection,
+  malformed heads, Unicode codepoints, compound IDs and RDS replay.
+  The test run succeeded; its first CSV summary write failed because a testthat
+  result column was a list. The log retains the passing test evidence. This was
+  an evidence-output error, not a feature-test failure. Subsequent integration
+  results save RDS first and serialize only scalar columns to CSV.
+- **17 installed API/smoke expectations** passed with no failures/warnings/skips.
+  The existing plot evidence (1,559 combined focused passes) and unchanged core
+  numerical evidence are reused; no new full local numerical run is claimed.
+- Exact source archive passes `R CMD check --no-tests --no-manual --no-vignettes`
+  with **Status: OK**, including installation and all help examples. The runtime
+  and plot tests above are separate evidence, not tests run by that command.
+  All **225 audited source members** match the checkout; build metadata and
+  compiled guides are checked separately. Private development files and
+  workspace instructions are absent. Resource bytes and builders are unchanged.
+- Archive SHA-256: `f67ab008aab5852ced7b170dcaf153dfaf12fd4266218e20df159d35cf79053a`.
+  Twenty existing guides retain their earlier source/render evidence (the four
+  plot-related outputs use the final figure-refinement artifacts); the new
+  dependency guide executes/renders for **21 installed guides**. A fresh R
+  process using the archive installation reproduces both saved pair results.
+- API audit agrees at **53 exports, 34 S3 registrations and 33 public topics**.
+  New help and guide describe the same arguments, return tables and limitations.
+  Color and monochrome paired-change figures render; the color plot was visually
+  checked. Figure titles remain outside the image. No plot S3 method was added.
+- The PDF manual builds to **89 pages**. The new help on pages 13–15 was visually
+  checked for wrapping and legibility; this is not an audit of all older topics.
+  Home, NEWS, affected help/articles and indexes build locally. The initial
+  pkgdown home build could not resolve CRAN within the sandbox; only the failed
+  document build was retried with network access and succeeded. No deployment
+  occurred.
+
+This completes the initial source-linked extraction API. Real-parser/corpus
+adapters, independent reference evaluation and compatible dependency MI remain
+separate work. Existing approval covers updating the development branch and
+PR #21 once these changes are combined. Commit-specific CI is recorded in the
+PR to avoid another source push solely to copy workflow URLs. Main merge,
+visibility changes, site deployment and CRAN submission are not part of this
+update.

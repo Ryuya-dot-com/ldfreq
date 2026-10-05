@@ -1,5 +1,38 @@
 # ldfreq 0.2.0 (development)
 
+## Source-linked adjective–noun dependencies
+
+- Added experimental `lexdiv_amod_pairs()` for supplied basic UD trees, selecting
+  ADJ dependents with amod relations to NOUN heads. Non-adjacent pairs retain
+  both source endpoints, direction, original KWIC and document identity.
+- Tree checks reject invalid heads, self-links, cycles and root contradictions.
+  Sentences with missing head/relation/UPOS remain explicit; their document
+  totals are unavailable instead of zero. Surface/lemma type counts separately
+  report missing lexical values and retain complete input provenance.
+- Added an offline English/Japanese example, endpoint comparison and a guide
+  showing why equal counts can conceal different pairs. No parser, corpus,
+  model, required dependency, MI score or general accuracy claim was added.
+
+## Color and monochrome plots
+
+- All eleven `plot()` methods default to color and accept the named argument
+  `monochrome = TRUE`. Both color modes use triangles in metric/screen plots below
+  advisory thresholds and circles otherwise unless `pch` is supplied;
+  MATTR retains its dashed mean line, and NJ8 retains its separate off-list bar.
+- Removed automatic plot titles. Metric IDs now label the metric y-axis;
+  figure titles and notes belong outside the image. Existing explicit color
+  settings remain available in color mode; monochrome overrides series colors.
+  Computable plots retain their rows, denominators, selection rules and invisible returns.
+- Refined publication defaults with a sans serif font, horizontal tick labels,
+  open frames and a consistent Okabe--Ito blue/orange palette. Cosmetic graphics
+  settings are restored, including on errors; explicit overrides remain available.
+- NJ8 proportion plots share 0--1 ticks across documents; legends use reserved
+  space. All eight levels and Off-list are labelled, with Off-list wrapped at
+  narrow widths. Undefined proportions now stop instead of appearing as zero.
+- Added publication-size PDF/PNG export instructions and a document-level
+  annotation-change plot. Sources and limits of descriptive versus inferential
+  graphics are explained in the report guide. No inferential model was added.
+
 ## Source alignment across token segmentations
 
 - Added experimental `lexdiv_align_annotations()` for complete imports of the

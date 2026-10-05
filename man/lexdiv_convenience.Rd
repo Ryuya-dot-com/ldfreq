@@ -40,7 +40,8 @@ lexdiv_widen(
   main = NULL,
   xlab = "",
   ylab = NULL,
-  ...
+  ...,
+  monochrome = FALSE
 )
 
 \method{plot}{lexdiv_batch_results}(
@@ -52,7 +53,8 @@ lexdiv_widen(
   main = NULL,
   xlab = "",
   ylab = NULL,
-  ...
+  ...,
+  monochrome = FALSE
 )
 
 \method{plot}{lexdiv_profile_results}(
@@ -64,7 +66,8 @@ lexdiv_widen(
   main = NULL,
   xlab = "",
   ylab = NULL,
-  ...
+  ...,
+  monochrome = FALSE
 )
 
 \method{plot}{lexdiv_profile_batch_results}(
@@ -76,28 +79,31 @@ lexdiv_widen(
   main = NULL,
   xlab = "",
   ylab = NULL,
-  ...
+  ...,
+  monochrome = FALSE
 )
 
-\method{plot}{lexdiv_text_results}(x, ...)
+\method{plot}{lexdiv_text_results}(x, ..., monochrome = FALSE)
 
 \method{plot}{lexdiv_screen_results}(
   x,
   screen_id = NULL,
   col = NULL,
   pch = 19,
-  main = "Token-count screen",
+  main = NULL,
   xlab = "document / request",
   ylab = "tokens",
-  ...
+  ...,
+  monochrome = FALSE
 )
 
 \method{plot}{tubelex_profile}(
   x,
   col = "#0072B2",
-  main = "TUBELEX match coverage",
+  main = NULL,
   ylab = "coverage",
-  ...
+  ...,
+  monochrome = FALSE
 )
 }
 \arguments{
@@ -119,7 +125,8 @@ lexdiv_widen(
   \item{col, pch, main, xlab, ylab}{Base-graphics settings. By default metric
   results below their advisory token floor are orange and other finite results
   are blue.}
-  \item{...}{Additional arguments passed to the underlying base print or plot
+  \item{monochrome}{One \code{TRUE} or \code{FALSE} value; specify this argument by name. The default \code{FALSE} uses color. \code{TRUE} overrides \code{col} with black (gray for TUBELEX bars). In both color modes, unless \code{pch} is supplied, metric points below their advisory floor and screen points below their threshold use triangles; other points use circles.}
+\item{...}{Additional arguments passed to the underlying base print or plot
   function.}
 }
 \description{
@@ -154,6 +161,12 @@ excluded from displayed points, but still participate in the specification check
 Metric plots include only finite rows with \code{status = "ok"}. TUBELEX plots
 show token- and type-weighted match coverage on a fixed zero-to-one scale. All
 plot methods return the plotted data invisibly for testing and reuse.
+Plots have no automatic title. A sans serif font, horizontal tick labels and
+an open frame are used by default. Override these with \code{family},
+\code{las} or \code{bty} in \code{...}; cosmetic graphics parameters are
+restored after drawing, including after an error. The default metric y-axis label is the uppercase metric ID.
+Place figure numbers, titles and notes outside the image in the manuscript.
+Explicit \code{main} remains available for custom base graphics.
 \code{plot.lexdiv_text_results()} delegates to the unchanged
 \code{results} component, so it accepts the same metric-selection arguments
 and does not plot preprocessing coverage on a metric scale.
@@ -174,6 +187,7 @@ long <- lexdiv_metrics_batch(documents, metrics = c("ttr", "maas"))
 lexdiv_widen(long, values_from = "value")
 
 plot(long, metric_id = "ttr")
+plot(long, metric_id = "ttr", monochrome = TRUE)
 
 text_result <- lexdiv_metrics_text("Words repeat words.", metrics = "ttr")
 plot(text_result)

@@ -25,7 +25,7 @@ lexdiv_metrics_text_batch(
 )
 
 \method{print}{lexdiv_text_batch_results}(x, ...)
-\method{plot}{lexdiv_text_batch_results}(x, ...)
+\method{plot}{lexdiv_text_batch_results}(x, ..., monochrome = FALSE)
 }
 \arguments{
 \item{documents}{A named character vector, or a data frame with plain character
@@ -47,6 +47,7 @@ these arguments for a prepared-tokenization list is an error.}
 the corresponding annotations on every input tokenization; raw texts do not
 acquire annotations automatically.}
 \item{x}{A \code{lexdiv_text_batch_results} object.}
+\item{monochrome}{One \code{TRUE} or \code{FALSE} value passed to the metric plot method; specify by name. Defaults to color; \code{TRUE} uses black and distinguishes points below the advisory floor by shape unless \code{pch} is supplied. No title is added automatically. See \code{\link{lexdiv_convenience}}.}
 \item{...}{For the metric function, named metric requests passed to
 \code{lexdiv_metrics_text}, such as \code{metrics} and \code{window_length}.
 For print and plot methods, arguments passed to the corresponding method for
@@ -54,6 +55,10 @@ For print and plot methods, arguments passed to the corresponding method for
 table contains several.}
 }
 \details{
+Plot defaults use a sans serif font, horizontal tick labels and an open frame.
+Override these with \code{family}, \code{las} or \code{bty} in the plot
+method's \code{...}. Cosmetic graphics parameters are restored after drawing.
+
 Input order is retained. Short and zero-token documents remain in the metric
 table with their computability status, requested parameters, and counts.
 A document does not change another document's requested window or sample size.

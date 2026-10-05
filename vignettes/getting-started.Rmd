@@ -360,6 +360,17 @@ metric scales are present.
 plot(tidy_long, metric_id = "ttr")
 ```
 
+Plots use color by default. Set `monochrome = TRUE` for black and gray output,
+for example `plot(tidy_long, metric_id = "ttr", monochrome = TRUE)`.
+In both color modes, metric and screening plots use triangles for points below
+the advisory threshold and circles for other points. Explicit `pch` values are retained.
+No title or subtitle is added automatically: put figure numbers, titles and
+notes outside the image in the manuscript. This option changes presentation
+only; the selected rows and invisible return are the same in both modes.
+The default font is sans serif, tick labels are horizontal and the frame is
+open. Explicit `family`, `las` and `bty` arguments override these defaults.
+See the report guide for exporting at the final publication size.
+
 ## Explicit method profiles
 
 A profile plan records parameter variants before computation. The

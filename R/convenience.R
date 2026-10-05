@@ -292,6 +292,21 @@ print.lexdiv_wide_results <- function(x, ...) {
   invisible(x)
 }
 
+# Change only cosmetic parameters, not the device layout or plot coordinates.
+# Explicit graphics arguments also apply to axes and legends drawn afterwards.
+.lex_plot_style <- function(dots) {
+  settings <- list(bty = "l", las = 1, family = "sans", tcl = -.25,
+    mgp = c(2.6, .7, 0))
+  supplied <- intersect(names(settings), names(dots))
+  settings[supplied] <- dots[supplied]
+  previous <- graphics::par(names(settings))
+  tryCatch(graphics::par(settings), error = function(e) {
+    graphics::par(previous)
+    stop(e)
+  })
+  previous
+}
+
 .lex_plot_metric_frame <- function(
     x,
     metric_id = NULL,
@@ -301,7 +316,9 @@ print.lexdiv_wide_results <- function(x, ...) {
     main = NULL,
     xlab = "",
     ylab = NULL,
-    ...) {
+    ...,
+    monochrome = FALSE) {
+  monochrome <- .lexprep_scalar_flag(monochrome, "monochrome")
   if (!is.data.frame(x) || !all(c("metric_id", "value", "status") %in% names(x))) {
     stop("x is not a supported lexical-diversity result frame.", call. = FALSE)
   }
@@ -349,9 +366,12 @@ print.lexdiv_wide_results <- function(x, ...) {
   if (is.null(col)) {
     col <- ifelse(frame$below_quality_floor %in% TRUE, "#D55E00", "#0072B2")
   }
-  if (is.null(main)) main <- metric_id
-  if (is.null(ylab)) ylab <- "value"
+  if (monochrome) col <- "black"
+  if (is.null(pch)) pch <- ifelse(frame$below_quality_floor %in% TRUE, 17, 19)
+  if (is.null(ylab)) ylab <- toupper(metric_id)
   positions <- seq_len(nrow(frame))
+  old_par <- .lex_plot_style(list(...))
+  on.exit(graphics::par(old_par), add = TRUE)
   graphics::plot(
     positions, frame$value,
     xaxt = "n", xlab = xlab, ylab = ylab, main = main,
@@ -365,20 +385,27 @@ print.lexdiv_wide_results <- function(x, ...) {
 #'
 #' Plots exactly one metric at a time so values on incompatible scales are not
 #' visually compared. Points below the advisory token floor are orange; other
-#' finite `ok` results are blue. The returned plot-data table is invisible.
+#' finite `ok` results are blue. In both modes, default symbols are triangles
+#' below the floor and circles otherwise. No title is added automatically.
+#' The returned plot-data table is invisible.
 #'
 #' @param x A supported lexical-diversity result object.
 #' @param metric_id One metric to plot. It may be omitted only when the object
 #'   contains one metric.
 #' @param request_id Optional profile request to select.
 #' @param col,pch,main,xlab,ylab Base-graphics settings.
+#' @param monochrome One `TRUE` or `FALSE` value. The default `FALSE` uses
+#'   color. `TRUE` overrides color arguments with black/gray; explicit point
+#'   symbols are retained. Figure titles and notes belong outside the image.
 #' @param ... Additional arguments passed to [graphics::plot()].
 #' @export
 plot.lexdiv_results <- function(
     x, metric_id = NULL, request_id = NULL, col = NULL, pch = 19,
-    main = NULL, xlab = "", ylab = NULL, ...) {
+    main = NULL, xlab = "", ylab = NULL, ..., monochrome = FALSE) {
+  if (missing(pch)) pch <- NULL
   .lex_plot_metric_frame(
-    x, metric_id, request_id, col, pch, main, xlab, ylab, ...
+    x, metric_id, request_id, col, pch, main, xlab, ylab, ...,
+    monochrome = monochrome
   )
 }
 
@@ -392,14 +419,14 @@ plot.lexdiv_profile_results <- plot.lexdiv_results
 plot.lexdiv_profile_batch_results <- plot.lexdiv_results
 
 #' @export
-plot.lexdiv_text_results <- function(x, ...) {
+plot.lexdiv_text_results <- function(x, ..., monochrome = FALSE) {
   if (
     !inherits(x, "lexdiv_text_results") || !is.list(x) ||
       !inherits(x$results, "lexdiv_results") || !is.data.frame(x$results)
   ) {
     stop("x must be a lexdiv_text_results object.", call. = FALSE)
   }
-  plot(x$results, ...)
+  plot(x$results, ..., monochrome = monochrome)
 }
 
 #' @export
@@ -408,10 +435,12 @@ plot.lexdiv_screen_results <- function(
     screen_id = NULL,
     col = NULL,
     pch = 19,
-    main = "Token-count screen",
+    main = NULL,
     xlab = "document / request",
     ylab = "tokens",
-    ...) {
+    ...,
+    monochrome = FALSE) {
+  monochrome <- .lexprep_scalar_flag(monochrome, "monochrome")
   if (!is.data.frame(x) || !all(c("screen_id", "N", "minimum_tokens") %in% names(x))) {
     stop("x must be a lexdiv_screen_results table.", call. = FALSE)
   }
@@ -426,8 +455,12 @@ plot.lexdiv_screen_results <- function(
   frame <- x[x$screen_id == screen_id & is.finite(x$N), , drop = FALSE]
   if (nrow(frame) == 0L) stop("The requested screen has no finite token counts.", call. = FALSE)
   labels <- if ("document_id" %in% names(frame)) frame$document_id else frame$request_id
-  if (is.null(col)) col <- ifelse(frame$N >= frame$minimum_tokens, "#009E73", "#D55E00")
+  if (is.null(col)) col <- ifelse(frame$N >= frame$minimum_tokens, "#0072B2", "#D55E00")
+  if (monochrome) col <- "black"
+  if (missing(pch)) pch <- ifelse(frame$N >= frame$minimum_tokens, 19, 17)
   positions <- seq_len(nrow(frame))
+  old_par <- .lex_plot_style(list(...))
+  on.exit(graphics::par(old_par), add = TRUE)
   graphics::plot(
     positions, frame$N, xaxt = "n", xlab = xlab, ylab = ylab,
     main = main, col = col, pch = pch, ...
@@ -441,9 +474,12 @@ plot.lexdiv_screen_results <- function(
 plot.tubelex_profile <- function(
     x,
     col = "#0072B2",
-    main = "TUBELEX match coverage",
+    main = NULL,
     ylab = "coverage",
-    ...) {
+    ...,
+    monochrome = FALSE) {
+  monochrome <- .lexprep_scalar_flag(monochrome, "monochrome")
+  if (monochrome) col <- "grey70"
   if (!inherits(x, "tubelex_profile") || !is.data.frame(x$summary)) {
     stop("x must be a tubelex_profile object.", call. = FALSE)
   }
@@ -451,6 +487,8 @@ plot.tubelex_profile <- function(
   if (any(!is.finite(frame$coverage))) {
     stop("The TUBELEX profile has no finite coverage to plot.", call. = FALSE)
   }
+  old_par <- .lex_plot_style(list(...))
+  on.exit(graphics::par(old_par), add = TRUE)
   positions <- graphics::barplot(
     frame$coverage,
     names.arg = frame$weighting,

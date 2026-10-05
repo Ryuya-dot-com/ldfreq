@@ -1003,6 +1003,10 @@ print.lexical_level_profile <- function(x, ...) {
 #' @param bar_col,cumulative_col Colors for the bars and cumulative curve.
 #' @param main,xlab,ylab Optional plot labels.
 #' @param show_legend Whether to draw a compact legend.
+#' @param monochrome One `TRUE` or `FALSE` value. Defaults to color; `TRUE`
+#'   overrides bar and curve colors with gray and black. The off-list bar
+#'   remains a separate shade. No title is added automatically; place figure
+#'   titles and notes outside the image.
 #' @param ... Additional arguments passed to [graphics::barplot()].
 #'
 #' @return Invisibly, the rows and plotting values used to draw the figure.
@@ -1013,13 +1017,19 @@ plot.lexical_level_profile <- function(
     scale = "proportion",
     show_cumulative = TRUE,
     include_off_list = TRUE,
-    bar_col = "#4C78A8",
-    cumulative_col = "#E45756",
+    bar_col = "#0072B2",
+    cumulative_col = "#D55E00",
     main = NULL,
     xlab = "New JACET 8000 frequency level",
     ylab = NULL,
     show_legend = TRUE,
-    ...) {
+    ...,
+    monochrome = FALSE) {
+  monochrome <- .lexprep_scalar_flag(monochrome, "monochrome")
+  if (monochrome) {
+    bar_col <- "grey70"
+    cumulative_col <- "black"
+  }
   if (!inherits(x, "lexical_level_profile") || !is.data.frame(x$summary)) {
     stop("x must be a lexical level profile.", call. = FALSE)
   }
@@ -1040,8 +1050,9 @@ plot.lexical_level_profile <- function(
   } else {
     rows$cumulative_items
   }
-  if (is.null(main)) {
-    main <- sprintf("New JACET 8000 lexical profile (%s)", weighting)
+  if (!any(is.finite(exact))) {
+    stop("The selected level profile has no finite values to plot; inspect its coverage.",
+      call. = FALSE)
   }
   if (is.null(ylab)) {
     ylab <- if (identical(scale, "proportion")) {
@@ -1050,24 +1061,49 @@ plot.lexical_level_profile <- function(
       sprintf("Number of %ss", weighting)
     }
   }
-  finite_values <- c(exact[is.finite(exact)], cumulative[is.finite(cumulative)])
-  upper <- if (!length(finite_values) || max(finite_values) <= 0) {
-    1
-  } else {
-    max(finite_values) * 1.08
+  finite_values <- c(exact[is.finite(exact)],
+    if (show_cumulative) cumulative[is.finite(cumulative)])
+  maximum <- if (identical(scale, "proportion")) 1 else max(1, finite_values)
+  upper <- maximum * if (show_legend) 1.35 else 1.08
+  bar_colors <- ifelse(is.na(rows$level), if (monochrome) "grey90" else "#B8B8B8", bar_col)
+  dots <- list(...)
+  old_par <- .lex_plot_style(dots)
+  on.exit(graphics::par(old_par), add = TRUE)
+  proportion_axis <- identical(scale, "proportion") &&
+    !("yaxt" %in% names(dots)) && !identical(dots$axes, FALSE)
+  if (proportion_axis) dots$yaxt <- "n"
+  level_labels <- ifelse(is.na(rows$level), "Off-list", as.character(rows$level))
+  label_cex <- if (is.null(dots$cex.names)) graphics::par("cex.axis") else dots$cex.names
+  # Wrap the longer endpoint label at narrow publication widths, rather than
+  # shrinking every label or allowing axis() to silently omit it.
+  if (anyNA(rows$level) && mean(graphics::strwidth(c("8", "Off-list"),
+      units = "inches", cex = label_cex)) > graphics::par("pin")[[1L]] / (nrow(rows) + 1)) {
+    level_labels[is.na(rows$level)] <- "Off-\nlist"
   }
-  bar_colors <- ifelse(is.na(rows$level), "#B8B8B8", bar_col)
-  positions <- graphics::barplot(
+  draw_names <- !identical(dots$axisnames, FALSE) && !identical(dots$xaxt, "n")
+  axis_labels <- if ("names.arg" %in% names(dots)) dots$names.arg else level_labels
+  dots$axisnames <- FALSE
+  bar_args <- list(
     height = ifelse(is.na(exact), 0, exact),
-    names.arg = rows$level_label,
+    names.arg = level_labels,
     col = bar_colors,
-    border = NA,
+    border = if (monochrome) "black" else NA,
     ylim = c(0, upper),
     main = main,
     xlab = xlab,
-    ylab = ylab,
-    ...
+    ylab = ylab
   )
+  positions <- do.call(graphics::barplot,
+    c(bar_args[!names(bar_args) %in% names(dots)], dots))
+  if (draw_names && !is.null(axis_labels)) {
+    graphics::axis(1, at = positions, labels = axis_labels, lty = 0,
+      cex.axis = label_cex, gap.axis = 0,
+      padj = ifelse(grepl("\n", axis_labels, fixed = TRUE), 1, NA_real_))
+  }
+  if (proportion_axis) {
+    graphics::axis(2, at = c(0, .25, .5, .75, 1),
+      labels = c("0", ".25", ".50", ".75", "1.00"))
+  }
   cumulative_rows <- which(!is.na(rows$level) & is.finite(cumulative))
   if (show_cumulative && length(cumulative_rows)) {
     graphics::lines(
@@ -1080,14 +1116,14 @@ plot.lexical_level_profile <- function(
     )
   }
   if (show_legend) {
-    labels <- "Exact level"
+    labels <- "Exact Level"
     line_types <- NA_integer_
     points <- 15L
     colors <- bar_col
     line_widths <- NA_real_
     point_sizes <- 1.4
     if (show_cumulative && length(cumulative_rows)) {
-      labels <- c(labels, "Cumulative through level")
+      labels <- c(labels, "Cumulative")
       line_types <- c(line_types, 1L)
       points <- c(points, 16L)
       colors <- c(colors, cumulative_col)
@@ -1095,7 +1131,7 @@ plot.lexical_level_profile <- function(
       point_sizes <- c(point_sizes, 1)
     }
     graphics::legend(
-      "right",
+      "topright",
       legend = labels,
       lty = line_types,
       pch = points,

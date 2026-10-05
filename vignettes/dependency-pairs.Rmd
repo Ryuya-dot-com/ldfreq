@@ -1,0 +1,180 @@
+---
+title: "Trace adjective–noun dependencies from source context to document counts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Trace adjective–noun dependencies from source context to document counts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ldfreq)
+```
+
+## Which noun does an adjective modify?
+
+In *Big red balloons float*, both *big* and *red* modify *balloons*.
+Adjacent bigrams cannot represent the first relation as a two-word sequence.
+`lexdiv_amod_pairs()` instead reads supplied basic Universal Dependencies (UD)
+and connects each selected pair to its two source positions, context and
+document counts. It does not run a parser or decide whether a phrase is idiomatic.
+
+The initial feature is deliberately specific: a dependent tagged `ADJ`, a head
+tagged `NOUN`, and an `amod` relation (including subtypes). `PROPN` and `PRON`
+heads are excluded. [UD's amod relation](https://universaldependencies.org/u/dep/amod.html)
+is broader than this selected feature. The function also does not reproduce
+the Penn-tag selection in Kyle and Eguchi (2024) exactly.
+
+The research question is whether annotation differences change the pairs and
+counts used in an analysis. A correct total does not establish that the same
+occurrences were found. A structurally valid tree can still have the wrong head.
+
+## Supply complete sentences and basic trees
+
+Use `lexdiv_import_annotations()` to import the complete, unnormalized output
+of an existing parser or human annotation process. Keep punctuation and original
+sentence text. The input contract is:
+
+| Table | Required information |
+|---|---|
+| `segments` | `document_id`, `segment_id`, `text`; one sentence per segment, including empty inputs |
+| token table | Same IDs; `token_index` starting at 1 in each sentence; exact `surface`; `upos`, `head`, `deprel` |
+| optional lexical units | `lemma`, if lemma type counts are requested |
+| provenance | Language, analyzer and version, dictionary and version, token unit and normalization; add model identity and any explicit projection choices |
+
+`head` is numeric and refers to `token_index` in the **same sentence**; root has
+head 0. `deprel` and `upos` use UD labels. Convert missing annotation fields to
+typed `NA`, not the literal underscore used by CoNLL-U. Do not convert legitimate
+surface strings such as `NA` into missing values. When adapting a parser table,
+map its columns explicitly and preserve the relation between IDs and heads.
+
+This is not a general CoNLL-U reader. Multiword-token range records, empty nodes,
+and syntactic words without individually matching original surfaces are outside
+the current input contract. Enhanced edges in `deps`/`DEPS` are rejected;
+explicitly select the basic tree and record the projection when that is the
+research target. See the [CoNLL-U specification](https://universaldependencies.org/format.html).
+The importer never reconstructs original text from normalized token strings.
+
+Known head errors, self-links, cycles, inconsistent root labels and multiple
+roots raise errors. A valid complete tree has one root. These checks cannot
+verify that a declared segment is linguistically one sentence or that its
+syntactic analysis is correct.
+
+## Run an offline English/Japanese example
+
+The installed example supplies authored annotations. It requires no model,
+corpus download or additional package. The Japanese sentence includes *赤い鳥*
+to exercise original Japanese source positions and the same declared feature;
+this does not establish comparable feature coverage across languages.
+
+```{r}
+env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "amod-pairs.R", package = "ldfreq",
+  mustWork = TRUE), env)
+example <- env$amod_pairs_example
+reference <- lexdiv_amod_pairs(example$inputs$reference, unit = "lemma")
+reference$occurrences[c("document_id", "dependent_term", "head_term",
+  "token_distance", "pre", "keyword", "post")]
+```
+
+`keyword` spans both endpoints and all intervening text. The separate
+`dependent_start`/`dependent_end` and `head_start`/`head_end` columns identify
+the selected words. Positions are one-based, inclusive Unicode codepoints
+within the original sentence. Keep document and segment IDs with these columns
+when returning to KWIC or comparing occurrences. A row number is not an
+occurrence identity.
+
+## Report counts beside coverage
+
+```{r}
+predicted <- example$predicted
+predicted$documents[c("document_id", "tokens", "analyzed_tokens", "token_coverage",
+  "observed_pairs", "pairs", "pairs_with_unit", "types", "status")]
+predicted$segments[c("document_id", "segment_id", "missing_heads",
+  "missing_relations", "missing_upos", "status")]
+```
+
+Any missing head, relation or UPOS excludes that whole sentence. This conservative
+rule prevents an unknown label from being silently classified as a negative.
+The `partial` document retains one observed pair from a complete sentence, but
+its total pair count is unknown because its other sentence is incomplete.
+`zero` has a complete analysis with no selected relation; `unavailable` has no
+analyzed sentence. Their totals are respectively 0 and `NA`. Empty inputs have
+zero counts, an `empty` status and undefined token coverage.
+
+Token coverage uses all supplied syntactic tokens, **including punctuation**,
+as its denominator. `counts` and `observed_types` summarize the observed subset,
+not an estimate for excluded sentences. Surface matching is case-sensitive;
+selecting `unit = "lemma"` uses exactly the supplied lemmas. If a detected pair
+is missing either lemma, it remains in the occurrence table but contributes no
+known type key. `pairs_with_unit` reports this second source of incompleteness,
+and a complete type total is `NA`.
+
+## Compare occurrences as well as totals
+
+```{r}
+example$differences
+subset(example$comparison, document_id == "wrong_head")
+```
+
+The `wrong_head` document has two pairs under both annotations, yet one intended
+pair was lost and another introduced. The example joins **both endpoints** by
+source IDs and positions, yielding one true positive, one false positive and
+one false negative relative to the authored reference. Comparing word strings
+alone would also lose the identity of repeated occurrences.
+
+Incomplete documents remain in the differences table but are not scored as
+complete-reference comparisons. Their unavailable predictions are not reported
+as perfect zero-error results. The example is a transparent comparison recipe,
+not a new general dependency-evaluation API. It assumes common original text and
+segmentation; use `lexdiv_align_annotations()` to examine segmentation changes
+before defining a cross-segmentation dependency evaluation.
+
+```{r document-differences, fig.width=6.5, fig.height=3.2, dev.args=list(pointsize=11)}
+draw_pair_changes <- function(example, monochrome = FALSE) {
+  d <- example$differences
+  keep <- d$evaluated & example$reference$documents$tokens > 0
+  d <- d[keep, ]
+  changed <- d$delta_pairs != 0
+  old <- par(family = "sans", bty = "l", las = 1, mar = c(4, 7, 1, 1))
+  on.exit(par(old))
+  plot(d$delta_pairs, seq_len(nrow(d)), type = "n", yaxt = "n",
+    xlim = c(-1.2, .2), xlab = "Pair Count Difference (Prediction - Reference)", ylab = "")
+  abline(v = 0, lty = 2, col = "grey60")
+  axis(2, at = seq_len(nrow(d)), labels = d$document_id, tick = FALSE)
+  points(d$delta_pairs, seq_len(nrow(d)), pch = ifelse(changed, 17, 16),
+    col = if (monochrome) "black" else ifelse(changed, "#D55E00", "#0072B2"))
+  invisible(d)
+}
+draw_pair_changes(example)
+```
+
+This is an illustration of four nonempty documents, not an estimate of population
+effects or parser accuracy. The zero difference for `wrong_head` is why the
+occurrence comparison must accompany the plot. Use `monochrome = TRUE` for black
+symbols. Place manuscript figure numbers, titles and explanatory notes outside
+the image; see [the report guide](from-text-to-report.html) for final-size export.
+
+## Save inputs and reproduce the result
+
+```{r}
+path <- tempfile(fileext = ".rds")
+saveRDS(example$inputs, path)
+saved <- readRDS(path)
+replayed <- lexdiv_amod_pairs(saved$predicted, unit = saved$unit)
+stopifnot(identical(replayed, example$predicted))
+unlink(path)
+```
+
+For an empirical study, preserve annotation guidelines, sampling and reviewer
+decisions separately. Candidate KWIC review alone cannot discover all missed
+positive cases; independent complete-sentence annotation is needed to assess
+recall. Authored fixtures verify implementation behavior, not the accuracy of
+an English or Japanese parser, and a common API does not establish measurement
+equivalence between languages.
+
+No reference corpus is bundled for this feature. MI requires dependency-specific
+joint counts, compatible marginals and opportunity totals; unigram frequencies
+or adjacent-bigram frequencies do not supply those quantities automatically.
+The present output ends at source-linked occurrences, counts and coverage.

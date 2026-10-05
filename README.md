@@ -201,7 +201,18 @@ levels <- nj8_profile_batch(prepared, unit = "surface")
 levels$coverage
 nj8_diagnostics(levels)$unmatched_terms
 plot(analysis, metric_id = "mattr")
+plot(analysis, metric_id = "mattr", monochrome = TRUE)
 ```
+
+All package plots default to color; `monochrome = TRUE` selects black and gray.
+No title or subtitle is added automatically. Place figure numbers, titles and
+notes outside the image in the manuscript. Both color modes distinguish
+points below the advisory token floor by shape; custom `pch` settings are retained.
+The plotted values and returned data are identical in both modes. Plot defaults
+use a sans serif font, horizontal tick labels and an open frame.
+See the [report guide](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html)
+for final-size PDF/PNG export and the distinction between descriptive and
+inferential figures.
 
 The English tokenizer runs entirely in R. It retains contractions and
 hyphenated words, recognizes dotted initialisms, and records excluded URLs,
@@ -254,6 +265,7 @@ a high match rate does not prove that arbitrary tokens use the right segmentatio
 | Audit annotation changes on the same documents | `lexdiv_compare_annotations()` retains changed labels and both provenance records |
 | Evaluate external labels against a supplied reference | `lexdiv_evaluate_annotations()` returns per-label errors, document coverage and source context on the same segmentation |
 | Compare different English/Japanese token segmentations | `lexdiv_align_annotations()` separates source-span/boundary correspondence from conditional label agreement and retains split/merge KWIC |
+| Trace adjective–common-noun dependencies | `lexdiv_amod_pairs()` validates supplied basic UD trees and retains both endpoints, KWIC, document counts and incomplete-sentence coverage |
 | Parameter and definition sensitivity | `lexdiv_spec()`, `lexdiv_grid()`, `lexdiv_plan()`, `lexdiv_profile()`, `lexdiv_profile_batch()`, `lexdiv_variant_metrics()` |
 | Local MATTR windows and exposure | `lexdiv_mattr_profile()` |
 | Exact term/content-word overlap | `lexdiv_term_overlap()`, `lexdiv_content_overlap()` |
@@ -289,6 +301,7 @@ results do not change the requested parameters or silently remove documents.
 - [Audit annotations and vocabulary profiles](https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.html): connect changed labels to original context, document-score differences, selection/reference coverage and saved-input replay.
 - [Evaluate annotations and their effect on document scores](https://ryuya-dot-com.github.io/ldfreq/articles/annotation-evaluation.html): explicit references, label-specific errors, missing predictions and English/Japanese examples.
 - [Compare token boundaries and document scores](https://ryuya-dot-com.github.io/ldfreq/articles/annotation-alignment.html): source-based split/merge correspondence, conditional label coverage, and full-document TTR/MATTR sensitivity.
+- [Trace adjective–noun dependencies](https://ryuya-dot-com.github.io/ldfreq/articles/dependency-pairs.html): source-linked basic UD pairs, missing annotations, and occurrence differences hidden by equal document counts; offline English/Japanese examples.
 - [Your own reference data across a corpus](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html): custom norms, document metadata, missingness, and reproducible saving.
 - [Analyze open-access papers](https://ryuya-dot-com.github.io/ldfreq/articles/open-access-papers.html): a reproducible example using three CC BY papers, with explicit text extraction, attribution and unknown author language backgrounds.
 - [Preprocessing and frequency](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html): lexical units, formula variants, and resource coverage.

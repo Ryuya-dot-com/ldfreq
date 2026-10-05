@@ -292,4 +292,13 @@ stopifnot(is.function(lexdiv_align_annotations),
   alignment$summary$matched[1] == 4,
   alignment$annotation_evaluation$summary$agreement_among_paired == 1)
 
+# Basic UD pairs retain endpoint errors even when document counts agree.
+amod_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "amod-pairs.R", package = "ldfreq",
+  mustWork = TRUE), amod_env)
+amod <- amod_env$amod_pairs_example
+stopifnot(is.function(lexdiv_amod_pairs), amod$differences$delta_pairs[2] == 0,
+  amod$differences$fp[2] == 1, amod$differences$fn[2] == 1,
+  all(is.na(amod$differences$delta_pairs[5:6])))
+
 invisible(TRUE)

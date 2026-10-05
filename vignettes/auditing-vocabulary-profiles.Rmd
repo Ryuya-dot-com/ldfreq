@@ -227,6 +227,50 @@ the difference is `NA`, not zero. `delta` is after minus before, and
 `absolute_delta` describes its magnitude. A three-token window is chosen for
 hand verification, not recommended for a substantive corpus study.
 
+### Show changes for the same documents
+
+This horizontal dot plot shows the signed TTR change for each paired document,
+retaining the document IDs. Unlike a group mean, it exposes changes that could
+cancel out across documents. It uses the existing difference table; no new
+metric or uncertainty model is introduced. Shape and color both distinguish a
+decrease from no change in this authored example. The dashed line is zero change.
+
+```{r annotation-changes, fig.width=6.5, fig.height=3.5}
+document_changes <- subset(effects$differences,
+  condition_id == "lemma_content" & metric_id == "ttr")
+document_changes[, c("document_id", "difference_status", "missing_reason_before",
+  "missing_reason_after")]
+paired <- subset(document_changes, difference_status == "paired")
+stopifnot(nrow(document_changes) == 6L, nrow(paired) == 4L)
+
+draw_changes <- function(paired, monochrome = FALSE) {
+  old <- par(mar = c(4.2, 5.2, 1, 1), family = "sans", las = 1,
+    bty = "l", mgp = c(2.6, .7, 0), tcl = -.25)
+  on.exit(par(old))
+  y <- rev(seq_len(nrow(paired)))
+  decreased <- paired$delta < 0
+  plot(paired$delta, y, type = "n", yaxt = "n", ylab = "",
+    xlab = "TTR Difference (After - Before)",
+    xlim = range(c(0, paired$delta)))
+  axis(2, at = y, labels = paired$document_id)
+  abline(v = 0, col = "grey50", lty = 2)
+  points(paired$delta, y,
+    col = if (monochrome) "black" else ifelse(decreased, "#D55E00", "#0072B2"),
+    pch = ifelse(decreased, 17, 19))
+  invisible(paired)
+}
+draw_changes(paired)
+```
+
+Four of six documents have paired TTR values; `excluded` and `empty` remain in
+the displayed status table and are not plotted as zero. The `lemma` document's
+TTR decreases by one third; the other three paired documents have zero change.
+This is a sensitivity illustration, not evidence that the new annotations
+are more accurate or that a population effect has been estimated. The four
+rows can be drawn in monochrome with `draw_changes(paired, monochrome = TRUE)`.
+For actual research, preserve the participant/task structure and annotation
+conditions in the full table before calculating any uncertainty interval.
+
 ### Keep selection coverage separate from reference coverage
 
 ```{r}
