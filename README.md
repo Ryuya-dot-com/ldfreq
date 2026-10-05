@@ -91,6 +91,11 @@ training-label count. It checks document/context separation, candidate inventori
 and embedding compatibility, and retains missing prototypes and excluded examples.
 Both score outputs connect to evaluation and KWIC; no model weights or new R
 dependency are needed. These baselines do not establish semantic validity.
+The guide includes a copyable three-script study folder for preparation,
+development/frozen evaluation and replay in a new R session. It checks declared
+document/group splits, keeps individual judgments alongside the reference, and
+compares methods on all available cases and their common evaluable occurrences.
+Its authored English/Japanese values demonstrate the workflow, not model accuracy.
 
 For Japanese, use an existing morphological analyzer and import its complete
 annotations with `lexdiv_import_annotations()`. It verifies surfaces against
@@ -141,6 +146,17 @@ R workflow retaining document/segment locations, reference definitions,
 eligible-window denominators and missingness alongside other lexical measures.
 The current n-gram functions provide frequencies, not MI/t-score or a validated
 phraseological-sophistication score.
+
+Phrase-list profiling and source-text overlap also have existing tools.
+Masaki Eguchi's [Multi-Word Units Profiler](https://github.com/egumasa/Multi-Word-Units-Profiler)
+highlights expressions from published phrase lists, while
+[cx-overlaps](https://github.com/egumasa/cx-overlaps), his extension of Philip
+Tillman's fluencysimilarity, compares unigram/trigram use across performances
+or against a source. Phrase matching, overlap and cosine similarity are not
+new contributions of ldfreq. Its focus is connecting analysis units and source
+locations to reference-resource definitions, human decisions and missingness
+in an R workflow. General phrase-list matching and discourse-function
+classification are outside the current ldfreq APIs.
 
 ## Installation
 

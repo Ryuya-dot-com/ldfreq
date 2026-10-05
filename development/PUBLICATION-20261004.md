@@ -1319,3 +1319,47 @@ instead of the rendered section ID and was corrected without rebuilding docs.
 The commit-specific remote matrix is recorded in PR #21. Publication state
 remains development; semantic validity and human annotation evidence remain
 separate research requirements.
+
+## Reusable contextual study folder (2026-10-05)
+
+Added three installed R scripts for authored English/Japanese study preparation,
+development/frozen evaluation, and read-only replay. Document/group separation,
+exact target-context copies across all three partitions, individual judgments,
+unresolved references, coverage and common-evaluable cases remain explicit.
+Settings and complete training inputs are saved before test scoring; test scores
+are saved before the reference labels are opened. This workflow neither enforces
+blinding nor turns authored labels into independent judgments. A real study must
+replace the source, sampling, annotation protocol and model outputs.
+
+Evidence: `reviews/ldfreq-contextual-study-20261005/evidence/`.
+
+- The final archive's installed tests pass 50 expectations: 33 template checks,
+  15 API-naming and two smoke checks. Cases include shared groups, mismatched
+  document metadata, blank/duplicate IDs, development contexts renamed into
+  test documents, overwrite rejection, no common evaluable occurrences and
+  unchanged saved files after repeated reporting.
+- Each script passes in a separate fresh R session. Reporting succeeds after
+  the live input directory is moved away. The authored comparison has centroid
+  prediction coverage 3/4 and conditional agreement 2/2, versus frequency 4/4
+  and 2/3. Both match 2/3 of all selected references; on their common two cases,
+  agreement is 2/2 versus 1/2. No empirical accuracy claim follows.
+- Exact archive: 3,432,925 bytes, SHA-256
+  `7c3425c40d7e8076317ccac01e8d0913b8c3398be621a60a4bf2ed518866b569`.
+  `R CMD check --no-tests --no-manual --no-vignettes` is Status OK, including
+  examples. All 203 staged source members match the checkout before build;
+  archive source identity is also checked, with DESCRIPTION normalized by R.
+  All 166 compared prior core/test/help/resource members and 12 resource files
+  match the preceding archive. No exported function or numerical implementation
+  changed; the 227 earlier focused expectations and actual-model evidence at
+  `980372ff` remain applicable to those unchanged files.
+- The changed contextual guide was executed and rendered; the 17 unchanged
+  compiled guides were reused. The archive retains 18 installed guides. Local
+  home, NEWS and contextual-article pages were rebuilt. Help is unchanged, so
+  the existing 81-page PDF manual was retained rather than regenerated.
+
+The site build initially stopped while fetching CRAN metadata under restricted
+network access; only that document build was retried with network access.
+The template's initial source-object accessor was corrected to the existing
+review `source` field. The no-vector test was corrected to retain a zero-row
+matrix with the declared dimensions; this did not require changing the scorer.
+Commit-specific OS checks are recorded in PR #21. Publication remains development.

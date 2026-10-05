@@ -1,5 +1,16 @@
 # ldfreq 0.2.0 (development)
 
+## Reusable contextual study example
+
+- Added three installed R scripts connecting authored source/annotation inputs,
+  document/group split checks, development evaluation, frozen settings and
+  training inputs, test scoring before reference access, and read-only replay.
+- The contextual-model guide explains replacing the illustration with real
+  annotations and model outputs. Reports retain each method's coverage,
+  common-occurrence comparisons, unresolved references and individual judgments.
+  The example does not establish independent labels or empirical accuracy;
+  no new exported API, inference, corpus, model or dependency is added.
+
 ## Supervised contextual baselines
 
 - Added experimental `lexdiv_score_contextual()` with centroid-cosine and

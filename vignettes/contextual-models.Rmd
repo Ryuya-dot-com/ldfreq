@@ -273,6 +273,129 @@ Save the entire `scored` object: each score output contains training fingerprint
 and required declarations, while the full object retains all training examples,
 prototype vectors and exclusion reasons.
 
+## A study folder that survives a new R session
+
+The installed `examples/contextual-study/` template connects preparation,
+development, a frozen analysis, final scoring and replay. It follows the useful
+file handoffs in [Masaki Eguchi's LDA II project template](https://github.com/egumasa/lda2-proj-template),
+using existing ldfreq functions and local R files. No code or data from that
+project is included. No cloud account, Python, model or new dependency is needed
+to run this illustration; optional quanteda and a UTF-8 R session are required.
+
+**Every sentence, label, group and vector is authored.** The 14 documents are
+six training, four development and four test illustrations. Group IDs demonstrate
+split checks; they do not identify independent participants. The word *bank*
+and the readings of Japanese `人気` illustrate different candidate inventories,
+not validated equivalent ambiguity manipulations. The example's test evaluation
+uses `evaluation_role = "unknown"`, not a claim of independent held-out accuracy.
+
+| Script | What it does | Saved handoff |
+|---|---|---|
+| `01-prepare.R` | Creates source-checked occurrences, a document/group partition table, two authored judgments and a separate reference, plus vectors and a missing-vector case | `inputs/`: design, metadata, request CSVs, model and reference RDS files, readable decision CSV snapshots |
+| `02-evaluate.R` | Checks document/group separation and exact target-context copies across partitions, evaluates development examples, freezes the settings and training inputs, then writes test scores before opening test reference labels | `analysis/`: development results, frozen inputs/settings/session, test scores and evaluations |
+| `03-report.R` | Recomputes evaluation from saved scores and references, checks agreement with the saved result, and creates coverage and common-occurrence comparison tables | An R object `report`; this stage reads files without changing them |
+
+Copy the scripts to a **new study directory**. Preparation and evaluation refuse
+existing output directories, so a later run cannot silently replace an earlier
+one. The report can be replayed repeatedly. If a stage fails after writing a
+partial result, retain it for diagnosis; fix the input and use a new run directory.
+Directories and RDS files are not access controls, tamper-proof registration or
+proof that a researcher did not inspect test examples.
+
+```{r study-template, eval=has_quanteda}
+template <- system.file("examples", "contextual-study", package = "ldfreq", mustWork = TRUE)
+study_dir <- tempfile("ldfreq-study-") # Choose a permanent new folder for your study.
+dir.create(study_dir)
+stopifnot(all(file.copy(list.files(template, pattern = "[.]R$", full.names = TRUE), study_dir)))
+run_stage <- function(script) {
+  previous <- setwd(study_dir)
+  on.exit(setwd(previous))
+  env <- new.env(parent = globalenv())
+  sys.source(script, envir = env)
+  env
+}
+invisible(run_stage("01-prepare.R"))
+invisible(run_stage("02-evaluate.R"))
+study_report <- run_stage("03-report.R")$report
+study_report$comparison[c("method", "occurrences", "predictions", "paired",
+  "agreement_among_paired", "matches_among_reference_selected")]
+study_report$common_comparison
+study_report$judgments$summary
+```
+
+The centroid method predicts 3/4 examples and matches 2/2 selected references
+among those predictions. The frequency baseline predicts 4/4 and matches 2/3
+selected references. Both match **2/3 of all selected references**. On the two
+examples where both methods and the reference are available, the match counts
+are 2/2 and 1/2. These are different denominators and populations, not competing
+estimates of the same quantity. Common-case coverage is only 2/4. The unresolved
+fourth reference is not counted as correct or incorrect for either method.
+
+The two authored judges jointly select a candidate in 3/4 cases and agree in
+2/3 of those cases. Their individual judgments survive adjudication. An unresolved
+case remains unresolved in the reference. `report$pairs` retains group/language
+metadata, predictions, reference status and KWIC; `report$terms` and
+`report$review_queue` keep word-level results and cases needing inspection.
+The counts are too small, and the values too constructed, to support a claim
+about English/Japanese accuracy, proficiency or psychological validity.
+
+After changing to the copied study directory, these commands also run in three
+separate R sessions. Replaying the report does not need the live `inputs/` files
+or another model inference:
+
+```sh
+Rscript --vanilla 01-prepare.R
+Rscript --vanilla 02-evaluate.R
+Rscript --vanilla 03-report.R
+```
+
+### Replace the authored inputs for a real study
+
+Keep the three file handoffs, and adapt the preparation script to your source
+annotations, candidate inventory and independently collected decisions. In
+particular:
+
+1. Define the target population, sense/reading criteria, sampling and grouping
+   before final evaluation. Use real author/speaker IDs for a study of new
+   participants. For a study of new documents from known participants, define
+   the grouping accordingly and describe that narrower claim. A supplied group
+   ID is checked for overlap, not for its truth. Near-duplicate contexts and
+   pretraining contamination still require separate assessment.
+2. Create unreviewed occurrence rosters and collect each annotator's decisions
+   without model suggestions. Retain their initial tables, disagreement review
+   and reasons for adjudication separately. Rebuild each reference with
+   `lexdiv_ambiguity_review(..., decisions = decisions)`, using its unchanged
+   source and candidate resource. The CSV files here are readable snapshots;
+   **editing them does not update the saved RDS inputs**. Read your finalized
+   table explicitly (for these CSVs, use `na.strings = ""` and UTF-8), pass it to
+   the review API, then save that rebuilt object in the reference bundle.
+3. Replace the authored vectors with actual source-aligned outputs imported by
+   `lexdiv_import_contextual()`. Keep the same declared model/layer/aggregation
+   across partitions. Use development data to choose those settings, leaving
+   final evaluation untouched. The scorer uses training labels only; this
+   example keeps the original training data after development rather than
+   refitting on development labels. Candidate inventories must agree, but a
+   candidate need not occur in every partition. Report rare/missing candidates.
+   If a partition yields no vectors, preserve a zero-row matrix with the known
+   model dimension and column names; `NULL` does not declare those dimensions.
+4. Replace the authored protocol and `unknown` declarations only with accurate
+   descriptions of your study. Freeze the selected settings and save test
+   scores before examining test labels. Do not choose a model or tolerance by
+   repeatedly trying the final evaluation set. Keep skipped examples, abstentions
+   and unresolved references in their respective denominators.
+
+For statistical comparisons, define the estimand and account for repeated
+documents/participants, word inventories and unequal missingness. The template
+supplies descriptive tables, not confidence intervals or a test of superiority.
+Candidate-frequency counts describe the labeled training sample, which may be
+balanced or purposefully sampled; they are not population sense frequencies or
+TUBELEX sense-specific frequencies. Source text in saved reviews retains the
+original corpus's sharing restrictions. No test-set secrecy is enforced by RDS.
+
+```{r study-cleanup, eval=has_quanteda, include=FALSE}
+unlink(study_dir, recursive = TRUE)
+```
+
 ## Compute actual target embeddings with a cached model
 
 The installed `examples/contextual-embeddings.py` is an optional, explicitly
