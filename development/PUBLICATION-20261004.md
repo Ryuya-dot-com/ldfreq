@@ -1530,6 +1530,11 @@ Evidence: `reviews/ldfreq-annotation-evaluation-20261005/evidence/`.
   generated internal page was removed. Neither archive nor site contains it.
 
 These are local source/archive checks, not new Windows/Linux/macOS CI runs.
-The previous remote-write approval rejection remains unresolved: no push,
-PR update, main merge, site deployment or CRAN submission was performed for
-this change. Development status and the earlier publication boundary remain.
+At completion of those checks, push and PR updates were pending after a
+remote-write approval rejection. On 2026-10-06 the user explicitly approved
+pushing the verified changes to `Ryuya-dot-com/ldfreq`, branch
+`prepare/publication-nj8-20261004`, and updating existing PR #21. That approval
+resolves the earlier remote-write blocker. Current remote head and CI results
+are recorded in PR #21 rather than triggering another heavy CI run solely to
+add their URLs here. Main merge, repository visibility changes, site deployment
+and CRAN submission remain separate actions; package status stays development.
