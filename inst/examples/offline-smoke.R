@@ -270,4 +270,17 @@ stopifnot(
 )
 check_print_contract(english_batch)
 
+# Source-linked label evaluation and downstream noun TTR, without a model.
+annotation_demo <- new.env(parent = baseenv())
+sys.source(system.file("examples", "annotation-evaluation.R", package = "ldfreq",
+  mustWork = TRUE), envir = annotation_demo)
+annotation_result <- annotation_demo$annotation_evaluation_example
+stopifnot(
+  is.function(lexdiv_evaluate_annotations),
+  identical(annotation_result$differences$delta_ttr[1:2], c(.5, .5)),
+  all(is.na(annotation_result$differences$delta_ttr[3:5])),
+  annotation_result$evaluation$summary$reference_only == 1,
+  annotation_result$evaluation$summary$prediction_only == 1
+)
+
 invisible(TRUE)

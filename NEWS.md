@@ -1,5 +1,20 @@
 # ldfreq 0.2.0 (development)
 
+## Reference-based annotation evaluation
+
+- Added experimental `lexdiv_evaluate_annotations()` for complete external
+  annotations with identical source segmentation and an explicit reference.
+  It returns per-label TP/FP/FN, precision/recall/F1, document coverage, sparse
+  confusion counts and every occurrence with original-text character context.
+- Unavailable references are not scored as negatives; missing predictions on
+  available references count as false negatives. Empty documents and original
+  review/failure metadata survive. Reference independence remains a declaration.
+- A new guide and offline English/Japanese example connect changed noun
+  selections to document TTR, retaining incomplete and empty documents. Equal
+  noun counts can hide different selected words. No analyzer, model, corpus or
+  new dependency is added; different segmentations and dependency-head accuracy
+  are outside this evaluator's contract.
+
 ## Annotation sensitivity example
 
 - Added explicitly sourced offline scripts linking changes in supplied lemmas

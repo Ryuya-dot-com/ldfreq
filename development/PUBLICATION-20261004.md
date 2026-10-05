@@ -1463,3 +1463,73 @@ Evidence: `reviews/ldfreq-annotation-sensitivity-20261005/evidence/`.
 Local focused evidence is distinct from OS CI. Publication state remains
 `development`; no main merge, public-site deployment or CRAN submission is part
 of this change.
+
+## Reference-based annotation evaluation (2026-10-05–06)
+
+Added experimental `lexdiv_evaluate_annotations()` for complete external
+annotation imports on the same original segments and token boundaries. It
+evaluates one explicitly named categorical column with a complete allowed
+label inventory. Source context covers all tokens, including non-candidates.
+Per-label TP/FP/FN, precision/recall/F1, document coverage and sparse confusion
+counts distinguish unavailable references from unavailable predictions.
+Missing predictions on available references count as FN; unavailable references
+do not enter the error denominators. Complete inputs retain separate review and
+prediction-failure metadata. Reference independence and evaluation role remain
+caller declarations. No dependency, analyzer, corpus or model was added.
+
+The new installed example and guide connect noun selection to document TTR.
+English and Japanese authored examples have two selected nouns in each
+condition, but different occurrences: reference TTR is 0.5 and predicted TTR
+is 1.0. Partial reference/prediction annotations leave the corresponding full
+document count and score unavailable. Empty documents remain explicit. This
+illustrates a mechanism; it is not independent human validation, a language
+comparison, dependency-head accuracy, or word-sense disambiguation.
+
+This implements the software part of roadmap stage 2, following the separate
+input contract proposed after the sensitivity example. The existing
+`lexdiv_compare_annotations()` contract remains unchanged. Real reference
+sampling, independent judgments and adjudication remain research work; they
+are not silently counted as complete or made prerequisites for distributing
+this limited descriptive evaluator.
+
+Evidence: `reviews/ldfreq-annotation-evaluation-20261005/evidence/`.
+
+- On macOS with R 4.6.1, the installed archive passes **189 expectations**:
+  117 evaluator/example checks, 55 external-import checks, 15 API naming checks,
+  and two installed smoke checks. Failures, errors, warnings and skips are zero.
+  Independent hand counts cover class errors, empty/unobserved classes, missing
+  references/predictions, equal counts with different TTR, exact source matching,
+  reordered compound IDs, Unicode/decomposed characters and saved-input replay.
+- A separate R session reconstructs both the evaluation and complete example
+  object identically, including document-score outputs and settings.
+- The first archive's `R CMD check --no-tests --no-manual --no-vignettes` is
+  **Status OK**, including execution of help examples. PDF inspection exposed
+  clipped long field lists in the new help topic; those lists and example line
+  breaks were reformatted. The final archive's R/test/example implementations
+  are byte-identical to the tested archive; only help prose/formatting and the
+  DESCRIPTION build timestamp differ. Parsed help-example R expressions are
+  unchanged. Numerical tests were not repeated for those documentation edits.
+- Final archive: **3,492,724 bytes**, SHA-256
+  `77cc8c84dbf8e5ff45ffc96b15d68590087f36700ddfe6190c0dd9f2748f3b41`.
+  Its focused `R CMD check --no-tests --no-examples --no-manual --no-vignettes`
+  is **Status OK**. All 213 checked non-DESCRIPTION source members match the
+  checkout; DESCRIPTION fields match after build metadata/format normalization.
+  All 127 prior R/test/help members and 12 resource files are unchanged from
+  the sensitivity archive. Prior numerical/model evidence is reused for them.
+- API audit: **51 exports, 34 S3 registrations, 31 public help topics**.
+  The new vignette executes and renders, giving 19 installed guides; 18
+  unchanged compiled guides are reused. A newly compiled **84-page manual**
+  includes the new topic on pages 19–22, inspected visually. Existing manual
+  layout warnings outside the changed topic are not a new whole-manual audit.
+- Home, NEWS, the new article/help and their indexes build locally. The
+  original attempt stopped on sandbox DNS access to public package metadata;
+  rerunning only document construction with network access succeeds. All
+  120 local HTML pages have valid relative file targets. A newly created root
+  AGENTS.md was found to be picked up automatically by pkgdown, so its roadmap
+  pointers were moved to the workspace AGENTS.md outside the package and the
+  generated internal page was removed. Neither archive nor site contains it.
+
+These are local source/archive checks, not new Windows/Linux/macOS CI runs.
+The previous remote-write approval rejection remains unresolved: no push,
+PR update, main merge, site deployment or CRAN submission was performed for
+this change. Development status and the earlier publication boundary remain.

@@ -24,6 +24,11 @@ and checks that reshaped tables and plots do not mix incompatible specifications
   terms remain visible; missing frequency values are not replaced by zero.
 - **Examine sensitivity.** Compare lexical units, parameter settings, and selected
   Maas/MTLD definitions; inspect local MATTR windows and positional exposure.
+- **Trace annotation errors to the analysis.** Evaluate supplied labels against
+  an explicit reference on the same tokenization. Keep missing labels and
+  class-specific precision/recall beside source-text context, then examine how
+  different word selections change document scores. See the
+  [annotation evaluation guide](https://ryuya-dot-com.github.io/ldfreq/articles/annotation-evaluation.html).
 - **Describe word combinations with your own reference.** Extract adjacent
   bigrams/trigrams from prepared segments and original positions, then look up
   local reference counts with explicit opportunity totals. Sample zeros and
@@ -247,6 +252,7 @@ a high match rate does not prove that arbitrary tokens use the right segmentatio
 | Raw text, lemmas, or externally supplied AntBNC flemmas | `lexdiv_tokenize()`, `lexdiv_lemmatize()`, `lexdiv_flemmatize()` |
 | Record or choose the lemma dictionary | `lexdiv_lemmatize(method = "textstem", dictionary = ...)` records content identity and lookup locale |
 | Audit annotation changes on the same documents | `lexdiv_compare_annotations()` retains changed labels and both provenance records |
+| Evaluate external labels against a supplied reference | `lexdiv_evaluate_annotations()` returns per-label errors, document coverage and source context on the same segmentation |
 | Parameter and definition sensitivity | `lexdiv_spec()`, `lexdiv_grid()`, `lexdiv_plan()`, `lexdiv_profile()`, `lexdiv_profile_batch()`, `lexdiv_variant_metrics()` |
 | Local MATTR windows and exposure | `lexdiv_mattr_profile()` |
 | Exact term/content-word overlap | `lexdiv_term_overlap()`, `lexdiv_content_overlap()` |
@@ -280,6 +286,7 @@ results do not change the requested parameters or silently remove documents.
 - [From text to a report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html): one complete workflow and what to cite.
 - [Designing comparisons](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html): questions, common settings, sensitivity, answers, and limits.
 - [Audit annotations and vocabulary profiles](https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.html): connect changed labels to original context, document-score differences, selection/reference coverage and saved-input replay.
+- [Evaluate annotations and their effect on document scores](https://ryuya-dot-com.github.io/ldfreq/articles/annotation-evaluation.html): explicit references, label-specific errors, missing predictions and English/Japanese examples.
 - [Your own reference data across a corpus](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html): custom norms, document metadata, missingness, and reproducible saving.
 - [Analyze open-access papers](https://ryuya-dot-com.github.io/ldfreq/articles/open-access-papers.html): a reproducible example using three CC BY papers, with explicit text extraction, attribution and unknown author language backgrounds.
 - [Preprocessing and frequency](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html): lexical units, formula variants, and resource coverage.

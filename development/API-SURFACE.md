@@ -2,7 +2,7 @@
 
 Status: pre-CRAN audit for package version 0.2.0
 
-Audited: 2026-10-05
+Audited: 2026-10-06
 
 This repository-only record checks whether each exported function has a clear
 role, result boundary, batch relationship, standard R interaction, and
@@ -55,6 +55,7 @@ retains joined result/audit tables and complete document-local preprocessing.
 | `lexdiv_as_documents()` | Adapts named/tidy/quanteda tokens to a plain named list | Creates the batch boundary | Base | No | Plain named list |
 | `lexdiv_read_masc()` | Experimental GrAF 1.0 Penn reader preserving supplied tokens, regions, text and hashes | Explicit vector of headers and unique IDs | Base list | No | `$tokens`, `$segments`, `$documents`, `$provenance` |
 | `lexdiv_import_annotations()` | Experimental exact alignment of complete external surfaces to original text, preserving feature columns and declared analyzer/dictionary metadata | Ordered segment roster includes empty documents | Base list | No | `$tokens`, `$segments`, `$documents`, `$provenance` |
+| `lexdiv_evaluate_annotations()` | Experimental single-label evaluation against an explicit reference on the same imported source segmentation | Per-document coverage and all-occurrence pairing in reference order | Base list | No: select a label and denominator | `$summary`, `$labels`, `$documents`, `$pairs`, `$confusion`, `$review_queue`, complete inputs and declared policy |
 | `lexdiv_as_quanteda()` | Explicit token/segment tables to quanteda without closing gaps or retokenizing | Each segment has a mapping to its original document | Base list | Through quanteda | `$tokens`, `$positions`, `$segments`, `$provenance` |
 | `lexdiv_length_evidence()` | Evidence registry data frame | Not document data | Base data-frame | No | Data frame |
 | `lexdiv_mattr_profile()` | Canonical MATTR summary plus local-window and positional-exposure tables | Document-scoped; accepts a MATTR-only canonical plan | Bounded composite method | One explicit request | `$summary`, `$windows`, `$exposure`, `$diagnostics` |
@@ -95,7 +96,7 @@ retains joined result/audit tables and complete document-local preprocessing.
 
 ## Documentation and reuse gate
 
-The audit requires all 45 exports to have an installed help alias, an explicit
+The audit requires every export to have an installed help alias, an explicit
 value section, and an executable example. Shared help topics are acceptable
 when aliases, usage, argument ownership, and return types remain unambiguous.
 Every help topic must appear in the pkgdown reference index.
