@@ -14,6 +14,12 @@ has_quanteda <- requireNamespace("quanteda", quietly = TRUE)
 has_utf8 <- isTRUE(l10n_info()[["UTF-8"]])
 ```
 
+External embeddings or model-scored candidates can be attached to these same
+occurrences with `lexdiv_import_contextual()`. See
+[the contextual model guide](contextual-models.html) for checked source joins,
+missing-output coverage and an optional Hugging Face example. Model suggestions
+remain separate from human decisions.
+
 A frequency table can give the same value to *bank* in a financial context
 and *bank* beside a river. For an experiment or a corpus study, the intended
 meaning may matter. This guide shows how to inspect each occurrence with its

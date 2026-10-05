@@ -1,5 +1,18 @@
 # ldfreq 0.2.0 (development)
 
+## External contextual model outputs
+
+- Added experimental `lexdiv_import_contextual()` to check occurrence IDs,
+  source text/spans and review identity before attaching external embeddings
+  or candidate scores. Human decisions remain separate; skipped, failed and
+  absent output stays in the coverage denominator. Scores are not converted
+  to probabilities or automatic selections.
+- Added an offline English/Japanese guide and an explicitly invoked Python
+  example using separately cached, commit-pinned Hugging Face models. It checks
+  exact target subword coverage and skips overlong contexts without truncation.
+  R does not invoke inference, install software or download models. No model
+  weights, corpus data or new R dependency is included.
+
 ## Reviewed Japanese polysemy estimates
 
 - Added explicitly sourced `read_wlsp_polysemy()` and

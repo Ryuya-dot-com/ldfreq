@@ -42,6 +42,7 @@ retains joined result/audit tables and complete document-local preprocessing.
 
 | Export | Role and return boundary | Batch relation | Print | Plot | Analysis-ready access |
 |---|---|---|---|---|---|
+| `lexdiv_import_contextual()` | Experimental source-checked external embeddings/scores, distinct from human decisions; no inference | One complete review with all-occurrence coverage and ID-paired output | Base list | No | `$occurrences`, `$embeddings`, `$suggestions`, `$summary`, complete `$review` and model `$provenance` |
 | `lexdiv_metric_ids()` | Core metric ID character vector | Catalog used by both core calls | Base | No | Vector |
 | `lexdiv_content_overlap()` | Annotated content-word overlap composite | Pair operation; no batch inference | Overlap method | No: denominators differ by measure | `$summary`, `$coverage`, term and exclusion tables |
 | `lexdiv_lemmatize()` | Adds explicit lemma/UPOS layers and textstem dictionary fingerprints to `lexdiv_tokenization` | Tokenization object remains document-scoped | Tokenization method | No | `$tokens`, `$provenance` |

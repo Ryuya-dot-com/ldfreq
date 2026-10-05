@@ -1161,3 +1161,58 @@ retains the source credit/license in the helper and does not upload a data
 fixture. The previous successful CI at 1d7497db does not cover the new helper;
 PR #21 must record the actual new run. This is a software integration check,
 not a new semantic or behavioral validation study. Publication state is unchanged.
+
+## External contextual model outputs (2026-10-05)
+
+Added experimental `lexdiv_import_contextual()` and a separately invoked,
+offline Hugging Face example. Embeddings and candidate scores are paired to
+intact reviews using occurrence/review IDs, original text and codepoint spans.
+Human selections remain separate; skipped/error/absent model output remains in
+all-occurrence coverage. Full-segment input is the initial supported context
+policy. No model, external corpus or new R dependency is bundled.
+
+Evidence: `reviews/ldfreq-contextual-models-20261005/evidence/`.
+
+- New importer: 66 expectations passed. The 126 ambiguity review/comparison
+  expectations also passed after sharing the existing review validator. The
+  installed API naming/smoke checks add 17 passes: 209 focused expectations in
+  total. The first new-test attempt failed because a fixture was file-local;
+  moving it unchanged into a test helper resolved the test setup.
+- The Python span validator passes three tests with crossing/gapped/overlapping
+  offsets, unknown/special tokens, repeated words and Unicode codepoints. Actual
+  cached English BERT processes two English examples and skips two Japanese
+  targets; a multilingual MiniLM base model processes all four. Independent
+  char-to-token mapping and explicit vector addition agree with both outputs.
+  A six-case actual-model stress input processes repeated words, a target after
+  an emoji and a four-subword target; it skips boundary-crossing and overlong
+  cases. These are transport/alignment tests, not semantic accuracy estimates.
+- The installed guide's four chunks, including its optional R-to-Python call,
+  complete with four 384-dimensional vectors and an RDS round trip. The first
+  installed call exposed a Transformers 5.3 tokenizer compatibility check that
+  attempted network access despite `local_files_only`; the script now sets
+  offline/telemetry environment variables before importing model libraries.
+  This is confined to its explicitly invoked child process. The final script
+  matches the installed copy and executes without caller-set offline variables.
+- Final archive: 3,393,013 bytes, SHA-256
+  `deae74348ce09ce107a7a8124a6437f8a74cd90053953fff53455be3baea07ba`.
+  `R CMD check --no-tests --no-manual --no-vignettes` is Status OK, including
+  examples. All 193 source members agree (DESCRIPTION is compared as DCF values
+  because R build reformats it and adds packaging fields); 123 core/test/help/
+  resource members and all 12 resource files match the preceding archive.
+  The unchanged numerical suite is reused locally; the PR OS matrix runs the
+  current complete package checks. No external model files are in the archive.
+- API audit: 48 exports, 34 S3 registrations, 28 function help topics. The two
+  new/changed guides were rendered, other compiled guides reused, and the final
+  package installs 18 guides. A 76-page PDF manual and a 116-HTML pkgdown site
+  build successfully, with no missing relative file targets. This is not a
+  complete visual or human usability evaluation.
+
+The final check initially lacked the existing gibasa library path when invoked
+outside the build runner; the dependency-stage failure was resumed with the
+established library paths, without rebuilding unchanged guides or rerunning
+successful numerical tests. pkgdown's CRAN metadata lookup required network
+access; its build resumed after the checked library was available. The actual
+commit-specific remote CI is recorded in PR #21, separately from these local
+macOS/R 4.6.1 results. Release metadata, visibility, main merge, deployment and
+CRAN submission remain unchanged. Independent sense labels, behavioral data,
+model-assistance time savings and research validity remain to be evaluated.

@@ -73,6 +73,13 @@ The [Japanese polysemy guide](https://ryuya-dot-com.github.io/ldfreq/articles/ja
 connects separately obtained WLSP-norms estimates to reviewed stimulus items
 and KWIC occurrences, preserving source IDs, signed values and selection coverage.
 
+`lexdiv_import_contextual()` attaches externally computed target embeddings or
+candidate scores after checking original text, positions and review identity.
+Model suggestions stay separate from human choices; failed or absent outputs
+remain in the denominator. The [contextual model guide](https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.html)
+includes an offline example and an optional, explicit Python call using a cached
+Hugging Face model. No model or Python installation is required for the R importer.
+
 For Japanese, use an existing morphological analyzer and import its complete
 annotations with `lexdiv_import_annotations()`. It verifies surfaces against
 original text, derives source positions, retains lexical-form/POS columns and
@@ -104,6 +111,7 @@ knowledge or acquisition history.
 | [koRpus](https://reaktanz.de/?c=hacking&s=koRpus) | Text analysis including lemma workflows, MTLD, HD-D, MTLD-MA, and detailed diagnostics | Compare the exact definitions and add a common workflow for condition tracking and reference coverage |
 | [tidytext](https://juliasilge.github.io/tidytext/) | Text processing with tidy tables | Pass one-token-per-row tables through `lexdiv_as_documents()` |
 | [gibasa](https://paithiov909.github.io/gibasa/) | MeCab morphological analysis from R using separately supplied dictionaries | Import complete Japanese annotations with original-text alignment and retain lexical-form choices and dictionary metadata alongside analysis results |
+| [text](https://www.r-text.org/) | Transformer embeddings and language analysis from R using Python | Attach source-aligned external outputs to KWIC reviews, human decisions and explicit missing-output coverage; model inference is not reimplemented |
 | [zipfR](https://r-forge.r-project.org/projects/zipfr/) | Statistical models for word-frequency distributions and vocabulary growth | Use ldfreq for document-level descriptive measures and reference-list profiles |
 
 Existing R packages already implement many of these metrics and document their

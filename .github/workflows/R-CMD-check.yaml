@@ -51,6 +51,7 @@ jobs:
         run: |
           Rscript --vanilla development/audit-public-api.R .
           Rscript --vanilla experiments/release-candidate/validate-note-policy.R
+          python3 experiments/validate-contextual-spans.py
 
       - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:

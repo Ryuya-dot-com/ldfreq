@@ -1,0 +1,203 @@
+---
+title: "Connect contextual model outputs to research occurrences"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Connect contextual model outputs to research occurrences}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ldfreq)
+has_quanteda <- requireNamespace("quanteda", quietly = TRUE) &&
+  packageVersion("quanteda") >= "4.5.0" && isTRUE(l10n_info()[["UTF-8"]])
+```
+
+## The research problem
+
+For a word such as *bank*, a model can provide a representation of each
+occurrence in context. The research question might be whether those
+representations distinguish financial from river-edge uses. Computing vectors
+does not establish that distinction: the target, context, candidate inventory
+and an independent evaluation must also be specified.
+
+`lexdiv_import_contextual()` connects external model output to source occurrences
+used for KWIC review. It checks joins, preserves missing output and keeps model
+suggestions separate from human decisions. It does not run BERT, install Python,
+download weights, select a meaning, or validate a semantic measure. The importer
+needs no model software. Creating the review uses optional quanteda; the
+English/Japanese example below requires a UTF-8 R session.
+
+## An offline example with authored values
+
+These sentences, candidates, vectors and scores are **authored illustrations**,
+not model predictions, corpus observations or psycholinguistic norms. Japanese
+`人気` illustrates different readings of the same spelling, not a demonstrated
+related-sense manipulation. Use real annotations for a real study.
+
+```{r prepare, eval=has_quanteda}
+words <- list(c("The", "bank", "lent", "money", "."),
+              c("The", "river", "bank", "flooded", "."),
+              c("その", "店", "は", "人気", "が", "ある", "。"),
+              c("ここ", "は", "人気", "が", "ない", "。"))
+tokens <- data.frame(document_id = "example",
+  segment_id = rep(paste0("s", 1:4), lengths(words)),
+  token_index = sequence(lengths(words)), surface = unlist(words, use.names = FALSE))
+segments <- data.frame(document_id = "example", segment_id = paste0("s", 1:4),
+  text = c("The bank lent money.", "The river bank flooded.",
+           "その店は人気がある。", "ここは人気がない。"))
+annotations <- lexdiv_import_annotations(tokens, segments, list(
+  language = "en/ja", analyzer = "authored", analyzer_version = "1",
+  dictionary = "none", dictionary_version = "none", unit = "authored",
+  normalization = "none"))
+candidates <- data.frame(term = c("bank", "bank", "人気", "人気"),
+  candidate_id = c("financial", "river", "popularity", "human-presence"),
+  label = c("financial institution", "river edge", "にんき", "ひとけ"))
+review <- lexdiv_ambiguity_review(annotations, c("bank", "人気"), candidates,
+  list(resource_id = "authored", resource_version = "1",
+    source_reference = "Authored candidates, not a dictionary", data_license = "MIT"))
+
+# Export anchors BEFORE computation. Never reconstruct them after a model run.
+input <- review$occurrences[c("review_id", "occurrence_id", "segment_text",
+                              "surface", "start", "end")]
+data <- input[1:3, ]
+data$status <- c("processed", "processed", "skipped")
+data$reason <- c("Authored transport example", "Authored transport example",
+                 "Illustrated failure, not an actual model limitation")
+vectors <- matrix(c(1, 0, 0, 1), nrow = 2,
+                  dimnames = list(data$occurrence_id[1:2], NULL))
+scores <- data.frame(occurrence_id = rep(data$occurrence_id[1:2], each = 2),
+  candidate_id = rep(c("financial", "river"), 2), score = c(2, -1, 0.5, 0.5))
+model <- list(model_id = "authored-example", model_revision = "1",
+  tokenizer_id = "authored", tokenizer_revision = "1",
+  software = "illustration", software_version = "1",
+  context_policy = "full segment; no truncation",
+  representation = "authored two-dimensional vectors, not model output",
+  score_definition = "authored scores; larger is preferred; not probabilities")
+imported <- lexdiv_import_contextual(review, data, model, vectors, scores)
+imported$summary
+imported$occurrences[c("surface", "status", "model_status", "has_embedding")]
+imported$suggestions[c("pre", "keyword", "post", "label", "score", "human_status")]
+stopifnot(identical(imported$review, review),
+          imported$summary$processed_proportion == 0.5,
+          all(imported$occurrences$status == "unreviewed"))
+```
+
+Two of four occurrences have output. Skipped and omitted (`not_returned`)
+occurrences remain in the denominator. Tied and negative scores are retained;
+importing them does not create probabilities or human decisions. The suggestions
+table contains KWIC and candidate labels; `segment_text` retains the full original
+segment. Scores may cover only part of an inventory: an absent score is missing,
+not zero. Use the ordinary review decision table to record later human selections
+and keep the earlier review as well. Model-assisted judgments are not independent
+human judgments; conduct a blinded human pass before showing suggestions when
+independent accuracy or agreement is the research question.
+
+## Compute actual target embeddings with a cached model
+
+The installed `examples/contextual-embeddings.py` is an optional, explicitly
+invoked Python example using Hugging Face Transformers and PyTorch. Obtain those
+dependencies and the chosen model separately under their applicable terms.
+The script uses only the local Hugging Face cache, a specified full commit,
+CPU inference and safetensors; it never downloads files or loads custom remote
+code. A missing model or incompatible tokenizer stops with an error.
+
+It extracts the last hidden layer and averages only subwords that exactly cover
+the target span. This is **not** the complete sentence-transformers embedding
+pipeline, even when its base model is used. It is not a trained WSD model and
+does not produce candidate scores.
+
+```{r model-call, eval=FALSE}
+# Explicit optional step: jsonlite is a suggested package.
+# 'review' and 'input' are the unchanged objects created above.
+request_path <- tempfile(fileext = ".json")
+output_path <- tempfile(fileext = ".json")
+jsonlite::write_json(list(schema_version = "0.1.0", occurrences = input),
+  request_path, dataframe = "rows", auto_unbox = TRUE, pretty = TRUE)
+script <- system.file("examples", "contextual-embeddings.py", package = "ldfreq")
+python <- Sys.which("python3") # Must contain torch and transformers.
+stopifnot(nzchar(python))
+# Illustration, not a validated Japanese WSD model. Cache this revision first.
+model_id <- "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+revision <- "e8f8c211226b894fcb81acc59f3b34ba3efd5f42"
+status <- system2(python, c(shQuote(script), "--input", shQuote(request_path),
+  "--output", shQuote(output_path), "--model", shQuote(model_id),
+  "--revision", shQuote(revision)))
+stopifnot(status == 0L)
+payload <- jsonlite::fromJSON(output_path)
+stopifnot(identical(payload$schema_version, "0.1.0"))
+embeddings <- NULL
+if (length(payload$embeddings$occurrence_ids)) {
+  embeddings <- as.matrix(payload$embeddings$values)
+  rownames(embeddings) <- payload$embeddings$occurrence_ids
+}
+# A zero-row JSON array needs the typed, empty input roster in R.
+returned <- payload$data
+if (!length(returned)) {
+  returned <- input[FALSE, ]
+  returned$status <- returned$reason <- character()
+}
+actual <- lexdiv_import_contextual(review, returned, payload$model, embeddings)
+actual$summary
+actual$occurrences[c("surface", "model_status", "model_reason")]
+saveRDS(actual, "contextual-model-result.rds")
+```
+
+The script processes one occurrence at a time; it is not a high-throughput corpus
+engine. A fast tokenizer must expose original character offsets. Python uses
+zero-based/end-exclusive offsets; R's request uses one-based/inclusive Unicode
+codepoints, so the script subtracts one from `start` only. It rejects subwords
+crossing the target boundary, gaps, overlaps and unknown target tokens. Overlong
+segments are skipped without truncation. These strict checks can exclude valid
+linguistic items that cannot be represented with exact spans: report that coverage.
+See the [Hugging Face tokenizer documentation](https://huggingface.co/docs/transformers/main_classes/tokenizer).
+
+The full original segment is used regardless of the visible KWIC window.
+Sentence/turn boundaries are supplied by the researcher. This initial importer
+does not accept cropped, truncated or multi-segment contexts. Record tokenizer
+normalization, model revision, layer and aggregation. Do not mix models or
+dimensions in a matrix. The importer checks declared anchors, not whether external
+software actually followed them. Source text in JSON/RDS retains its original
+sharing restrictions; no input corpus or model weights are bundled in ldfreq.
+
+## Use existing R tools where they fit
+
+[text](https://www.r-text.org/) already calls Transformer models from R through
+Python. `text::textEmbed()` supports token/layer aggregation. An adapter must
+additionally demonstrate exact per-occurrence target alignment: do not label
+sentence or word-type vectors as target-token vectors. For Japanese, review
+preprocessing explicitly: the documented `remove_non_ascii` default is `TRUE`.
+See [textEmbed](https://www.r-text.org/reference/textEmbed.html).
+
+ldfreq adds checked source joins, missing-output coverage and connections to
+human KWIC reviews and lexical resources. It does not claim a new embedding
+algorithm or better accuracy. Either R or Python can supply values satisfying
+the contract. The core R analyses require neither model environment.
+
+## Evaluate a research claim separately
+
+A useful study asks whether contextual representations distinguish meanings of
+the **target word** beyond a simple candidate-frequency baseline. Define the
+inventory and obtain independent human judgments first; WLSP row counts are
+not a gold-standard sense inventory. GlossBERT illustrates an additional
+context/definition model for WSD, not a capability obtained by averaging vectors
+([Huang et al., 2019](https://aclanthology.org/D19-1355/)).
+
+Separate examples used to choose a model, layer, threshold or sense prototype
+from final evaluation examples. For generalization to unseen words or documents,
+split by those units rather than mixing their occurrences across sets. Report
+candidate coverage, processed/all-occurrence coverage, conditional accuracy on
+independently resolved cases and unresolved cases separately. Inspect errors by
+language, reading, frequency, genre and segmentation. Abstentions must remain
+visible. For usability, compare existing tools and this joined workflow on the
+same task: erroneous joins, missed cases, correction time and reproducibility.
+Human review time, semantic accuracy, norm validity and learner knowledge require
+evidence beyond a software round trip; the authored examples supply none of it.
+
+```{r save, eval=has_quanteda}
+saved <- tempfile(fileext = ".rds")
+saveRDS(imported, saved)
+stopifnot(identical(readRDS(saved), imported))
+unlink(saved)
+```

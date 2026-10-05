@@ -123,5 +123,6 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
 }
 }
 \seealso{\code{\link{lexdiv_compare_ambiguity}},
+\code{\link{lexdiv_import_contextual}},
 \code{\link{lexdiv_import_annotations}}, \code{\link{lexdiv_as_quanteda}},
 \code{vignette("ambiguity-review", package = "ldfreq")}}

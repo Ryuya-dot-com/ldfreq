@@ -133,16 +133,20 @@ lexdiv_ambiguity_review <- function(x, targets, candidates, resource,
   out
 }
 
-# Compare complete saved reviews without searching or changing decisions again.
-lexdiv_compare_ambiguity <- function(a, b) {
-  for (x in list(a, b)) {
+.lexamb_validate_review <- function(x) {
     if (!is.list(x) || !is.list(x$provenance) ||
         !identical(x$provenance$review, "ldfreq-ambiguity-review") ||
         !identical(x$provenance$review_version, "0.1.0") ||
         !identical(x$provenance$content_sha256, .lexng_hash(x)))
       stop("Use unmodified lexdiv_ambiguity_review() results with content fingerprints; regenerate older reviews.",
         call. = FALSE)
-  }
+  invisible(x)
+}
+
+# Compare complete saved reviews without searching or changing decisions again.
+lexdiv_compare_ambiguity <- function(a, b) {
+  .lexamb_validate_review(a)
+  .lexamb_validate_review(b)
   if (!identical(a$provenance$review_id, b$provenance$review_id))
     stop("Reviews must use the same source annotations, targets, candidates and resource snapshot.", call. = FALSE)
   ids <- a$occurrences$occurrence_id

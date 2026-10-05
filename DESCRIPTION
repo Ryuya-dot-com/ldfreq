@@ -24,6 +24,8 @@ Description: Compares lexical diversity and reference-vocabulary profiles while
     supplied token boundaries and source positions for corpus analysis.
     Contextual review connects caller-supplied lexical candidates and explicit
     decisions to keyword-in-context displays and original text.
+    External model outputs can be attached with checked source identities
+    while keeping model suggestions separate from reviewer decisions.
     The methods include Covington and McFall (2010)
     <doi:10.1080/09296171003643098> and McCarthy and Jarvis (2010)
     <doi:10.3758/BRM.42.2.381>.
