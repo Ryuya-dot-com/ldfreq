@@ -3483,7 +3483,7 @@ that independent API proposal.
 Mac installed-package evidence: all 55 targeted assertions pass, covering exact
 UTF-8 and CP932 strings, CRLF/LF/final-newline/empty/BOM handling, a Japanese
 filename, lossy/invalid input rejection, special CSV strings and quoted multiline
-fields, metadata IDs, empty-document results and saving. All eight new tutorial
+fields, metadata IDs, empty-document results and saving. All seven new tutorial
 chunks execute independently in a fresh R process. Full extracted execution of
 english-tokenization, from-text-to-report and getting-started also succeeds.
 Fresh-session reaggregation exactly matches the saved result; color/monochrome
@@ -3507,3 +3507,32 @@ article and source bytes. No CRAN submission is authorized or performed.
 These local completion-record updates do not trigger another documentation-only
 CI cycle; the public PR description contains the result and evidence links.
 No runtime/API/dependency/resource change, new release tag or CRAN submission.
+
+## 2026-10-07 Thirty-document plot follow-up
+
+The user's requested expansion replaces the two computable examples with 30
+constructed English documents (107–149 tokens) and retains one empty document.
+All plotted values use the same 50-token MATTR window. Six authored topic
+passages and five endings, with varied repetition, are explicitly teaching
+material rather than independent learner observations. The 8-by-4-inch point
+plot uses vertical document labels, color by default, optional monochrome, and
+no embedded title. Metadata, CSV input, saved output and empty-document examples
+use the same 31 IDs.
+
+All 58 focused assertions pass. The seven standalone tutorial chunks and full
+English guide execute with the updated installed samples; unchanged report and
+getting-started execution evidence is retained from the preceding check. In a
+fresh R session, reaggregation exactly matches the saved result. Independently
+computed Python token counts and all 30 MATTR values agree (maximum absolute
+error 1.11e-16); color and monochrome return the same 30 rows. The empty document
+retains two missing/empty_input rows, not zero scores. There are still 57 exports.
+
+Initial PR CI at f88c0a5 reports a Windows vignette failure in the TXT/CSV equality
+assertion, before package tests. Git checkout newline conversion and read.csv's
+CRLF-to-LF parsing inside quoted fields make cross-format source strings differ.
+The exact-byte teaching files are now marked -text in .gitattributes, preserving
+their committed LF bytes on Windows. The tutorial explains CSV parsing separately
+from decoding; a focused check confirms its CRLF behavior. The text reader keeps
+original TXT line endings. This is an input-fixture/document-build correction,
+not a change to metric arithmetic. Final-head CI and live publication remain
+pending at this record point.

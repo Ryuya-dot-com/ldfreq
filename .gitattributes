@@ -4,6 +4,9 @@ tests/fixtures/resource-loader/* -text
 # MASC example annotations refer to exact source character offsets.
 inst/extdata/masc-example/* -text
 
+# TXT/CSV teaching files compare exact decoded strings, including newlines.
+inst/examples/text-input/** -text
+
 # Resource identities and build-tool hashes are also exact byte contracts.
 experiments/tubelex-source-build/* -text
 inst/COPYRIGHTS -text

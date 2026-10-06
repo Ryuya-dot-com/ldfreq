@@ -6,8 +6,10 @@
 
 2026-10-07：下記Aのファイル入力教材を実装した。単一TXT／フォルダ／CSVからID付き表へ進み、
 metadata結合・点図・完全RDS保存までを実行できる。UTF-8／CP932を明示する小さな読込exampleと
-再配布可能な作成ファイルを追加し、公開API・依存・指標計算は不変。Macで55 assertions、
-教材部分の単独実行、変更3ガイド全体、別セッション再集計が成功。保護付きmain統合と公開確認は未完了。
+再配布可能な作成英文30件と空文書1件を追加し、公開API・依存・指標計算は不変。
+共通50語窓で30点を表示する。Macで58 assertions、教材部分の単独実行、変更Englishガイド全体、
+別セッション再集計・独立したMATTR算術照合が成功。変更のない他2ガイドの初回成功は再利用する。
+Windows初回CIで見つかった教材の改行変換を.gitattributesで修正した。保護付きmain統合と公開確認は未完了。
 英語tokenizationと外部注釈importを区別したB、実作文の文脈レビューとその分布比較は引き続き後続作業。
 
 公開後の利用例は追加・公開済み：report guideへ431語の作成英文・25/50/100語窓の
@@ -788,7 +790,7 @@ Cの小例の点図はAへ接続済みだが、注釈レビュー後の図表・
 
 **実装した範囲**：`english-tokenization.Rmd#import-text-files`の旧`eval=FALSE`読込例を、
 1個のTXT→フォルダ→CSV→metadata結合→既存batch→点図→CSV／完全RDS保存の実行例へ置き換えた。
-`inst/examples/text-input/`の作成英文2件・空文書1件・和文・CSVを使い、
+`inst/examples/text-input/`の作成英文30件・空文書1件・和文・CSVを使い、
 from-text-to-report／getting-startedから案内する。原文ファイルの行と作文を同一視しない。
 `inst/examples/text-file-input.R`は明示sourceする小さなhelperであり、exportではない。
 UTF-8／既知CP932、BOM記録、元改行・最終改行・SHA-256、10 MiBの明示上限を扱う。
@@ -799,8 +801,13 @@ UTF-8／既知CP932、BOM記録、元改行・最終改行・SHA-256、10 MiBの
 今回の範囲へそのまま統合しない。byte読込・境界確認の考え方は既存ninjal readerとも整合させた。
 旧PRは変更・closeしておらず、独立したAPI採否が必要な提案として保持する。
 
-Mac導入後の`test-text-file-input-example.R`は55 assertions成功。単独教材と変更3ガイドの
-抽出実行、別Rセッションでの保存復元・再集計・カラー／白黒の描画対象一致を確認した。
+Mac導入後の`test-text-file-input-example.R`は58 assertions成功。初回の変更3ガイド実行に加え、
+30文書への拡張後は単独教材とEnglishガイドだけを再実行した。107–149語の作成英文へ
+共通50語窓を用い、30件すべてのN・MATTRを独立Python計算と照合（最大誤差1.12e-16未満）。
+別Rセッションでの保存復元・再集計・カラー／白黒の描画対象一致を確認した。
+6題材の共通本文と反復を含む作成例であり、独立した学習者標本や熟達度差とは解釈しない。
+初回Windows CIはvignetteのTXT/CSV一致で失敗した。教材のLFをGit属性で固定し、
+一般のCSVではread.csvが引用内CRLFをLFへ変えることを説明・検証した。
 専用コーパスreaderと汎用テキスト入力の区別、および以下の設計・受入条件を維持する。
 
 **成果物**：まず同ガイドの既存節を拡張し、from-text-to-report／getting-startedから直接案内する。

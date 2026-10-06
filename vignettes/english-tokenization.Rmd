@@ -295,9 +295,11 @@ used by `lexdiv_metrics_text()`.
 ## Import CSV or UTF-8 text files {#import-text-files}
 
 Start here if your essays are saved as files rather than typed into R. This
-walkthrough runs offline with three project-authored, MIT-licensed documents:
-two short English texts and one intentionally empty file. They are teaching
-examples, not learner observations. Reading Japanese text uses the same input
+walkthrough runs offline with 30 constructed English texts and one intentionally
+empty file, all project-authored and MIT-licensed. Shared topic passages and
+different amounts of repetition illustrate variation in vocabulary diversity;
+they are not independent learner observations or proficiency data.
+Reading Japanese text uses the same input
 steps; its subsequent annotation is a [separate workflow](japanese-annotations.html).
 
 The small `read_text_file()` helper below is an **explicitly sourced example**,
@@ -316,8 +318,10 @@ Run this setup once. The installed sample directory has the following layout:
 text-input/
   texts/001.txt
   texts/002.txt
-  texts/003.txt     # intentionally empty
-  essays.csv       # the same three documents, one row per document
+  ...
+  texts/030.txt
+  texts/031.txt     # intentionally empty
+  essays.csv       # the same 31 documents, one row per document
   metadata.csv     # writer/task information, in a different row order
   japanese.txt     # UTF-8 reading example only
 ```
@@ -333,7 +337,8 @@ input_dir <- system.file("examples", "text-input",
 one_path <- file.path(input_dir, "texts", "001.txt")
 stopifnot(file.exists(one_path))
 one_file <- input_helpers$read_text_file(one_path, encoding = "UTF-8")
-cat(one_file$text)
+# Wrap the preview only; one_file$text retains its original line breaks.
+cat(strwrap(one_file$text, width = 68), sep = "\n")
 one_file$source[c("source_encoding", "source_bytes", "characters", "utf8_bom_removed")]
 ```
 
@@ -346,7 +351,7 @@ missing, update ldfreq using the [installation instructions](https://ryuya-dot-c
 
 Check that the displayed text and paragraph breaks match your file. Bytes,
 characters and analyzed words are different counts. This example treats the
-whole file as **one document**, including both lines; a newline does not create
+whole file as **one document**, including both paragraphs; a newline does not create
 a new essay.
 
 ### Read several files with explicit document IDs
@@ -363,14 +368,13 @@ selected_files <- file.path("texts", list.files(
 if (!length(selected_files)) stop("No TXT files selected; check input_dir and the folder.")
 selected_files
 
-file_map <- data.frame(
-  document_id = c("001", "002", "003"),
-  file = file.path("texts", c("001.txt", "002.txt", "003.txt"))
-)
+# Explicit naming rule for these sample files; replace this mapping for your data.
+file_map <- data.frame(document_id = sprintf("%03d", 1:31),
+  file = file.path("texts", sprintf("%03d.txt", 1:31)))
 stopifnot(!anyNA(file_map$document_id), all(nzchar(trimws(file_map$document_id))),
   !anyDuplicated(file_map$document_id), !anyDuplicated(file_map$file),
   setequal(selected_files, file_map$file))
-file_map
+head(file_map)
 
 decoded_files <- lapply(file_map$file, function(name) {
   input_helpers$read_text_file(file.path(input_dir, name), encoding = "UTF-8")
@@ -380,14 +384,15 @@ file_documents <- data.frame(document_id = file_map$document_id,
 file_sources <- do.call(rbind, lapply(decoded_files, `[[`, "source"))
 file_sources$document_id <- file_map$document_id
 file_sources$source_file <- file_map$file  # retain project-relative paths
-file_sources[c("document_id", "source_file", "source_bytes", "characters")]
+file_sources[c(1:3, nrow(file_sources)),
+  c("document_id", "source_file", "source_bytes", "characters")]
 stopifnot(identical(file_documents$text[1], one_file$text),
-  identical(file_documents$text[3], ""))
+  identical(file_documents$text[31], ""))
 ```
 
 The mapping table determines document order; directory order does not assign
-writer or task IDs. All three documents remain present, including the empty
-file. Keep the original files as well as these hashes: a hash identifies bytes
+writer or task IDs. The preview shows the first three documents and the empty
+file; all 31 remain in the saved tables. Keep the original files as well as these hashes: a hash identifies bytes
 but cannot reconstruct them.
 
 ### Alternatively, read a CSV containing the texts
@@ -404,7 +409,13 @@ csv_documents <- read.csv(text = csv_input$text,
 stopifnot(identical(csv_documents, file_documents))
 ```
 
-The two routes now contain exactly the same IDs and text strings. For your CSV,
+These sample files use LF line endings, so the two routes contain exactly the
+same IDs and text strings. CSV parsing is a separate step: `read.csv()` converts
+CRLF inside quoted fields to LF. For your own TXT/CSV comparison, check the
+parsed strings and record that transformation; do not assume identical source
+character positions merely because the displayed prose looks the same.
+The original CSV hash is retained separately from its parsed text.
+For your CSV,
 select the real ID/text columns with `id_col` and `text_col` in the batch call
 below. Reading columns as character preserves IDs such as `001`, and literal
 responses such as `TRUE` or `NA`. Here only `<MISSING>` denotes missing data;
@@ -416,17 +427,22 @@ resolve its meaning in your study record instead of replacing it with `""`.
 
 Use `file_documents` below, or substitute `csv_documents`. Normalization and
 case conversion happen here as declared analysis choices, after file reading.
-The 10-token window is for this short demonstration, not a recommended window
-for a research corpus. Keep your chosen window common across comparable texts.
+The 50-token window is common to all documents. The 30 nonempty teaching texts
+are 107–149 tokens long and can all use that window. For a research corpus,
+justify the window for your task and length distribution; keep it common across
+comparable texts rather than shrinking it for short documents.
 
 ```{r file-input-analysis}
 file_tokens <- lexdiv_tokenize_batch(file_documents,
   id_col = "document_id", text_col = "text", tokenizer = "english",
   normalization = "NFC", case = "lower")
 file_analysis <- lexdiv_metrics_text_batch(file_tokens,
-  metrics = c("ttr", "mattr"), window_length = 10)
-file_analysis$results[c("document_id", "metric_id", "N", "V", "value",
+  metrics = c("ttr", "mattr"), window_length = 50)
+file_results <- file_analysis$results[c("document_id", "metric_id", "N", "V", "value",
   "status", "missing_reason")]
+# Preview three nonempty documents and the empty document; retain all result rows.
+rbind(head(file_results, 6), subset(file_results, document_id == "031"))
+with(file_results, table(metric_id, status))
 
 metadata_input <- input_helpers$read_text_file(file.path(input_dir, "metadata.csv"))
 file_metadata <- read.csv(text = metadata_input$text,
@@ -437,23 +453,28 @@ file_report <- lexdiv_widen(file_analysis$results)
 metadata_row <- match(file_report$document_id, file_metadata$document_id)
 stopifnot(identical(file_report$document_id, file_metadata$document_id[metadata_row]))
 file_report[c("writer_id", "task")] <- file_metadata[metadata_row, c("writer_id", "task")]
-file_report[c("document_id", "writer_id", "task", "ttr__value", "mattr__value")]
+file_report[c(1:3, nrow(file_report)),
+  c("document_id", "writer_id", "task", "ttr__value", "mattr__value")]
 ```
 
 Metadata are deliberately in a different order: join by ID, never by row
 number. This example requires metadata for exactly the selected documents;
 subset a larger study table explicitly and inspect unmatched IDs. Several
-documents may share a writer ID, so three documents do not mean three
-independent participants. Document `003` stays in the report with unavailable
+documents may share a writer ID. Here all writer/task IDs are fictional and the
+texts share authored passages; they cannot support population inference.
+Document `031` stays in the report with unavailable
 metrics and their reasons. It is not a zero-diversity essay.
 
-```{r file-input-plot, fig.width=6.5, fig.height=3.5}
-plot(file_analysis, metric_id = "mattr")
+```{r file-input-plot, fig.width=8, fig.height=4}
+plot(file_analysis, metric_id = "mattr", xlab = "Document", las = 2)
 ```
 
-Only the two computable values are drawn; the full roster remains in the table.
-Triangles indicate the package's advisory short-text status, not missing values.
-Two observations call for points, not a density curve. Add `monochrome = TRUE`
+All 30 computable values are drawn in document-ID order; the empty document
+remains in the table and is not drawn as zero. Rotated labels and an 8-by-4-inch
+figure keep all 30 IDs readable. The points show each document's actual value;
+ID order does not represent time, proficiency or a treatment gradient.
+Shared passages and repetition explain this constructed spread, not differences
+between learner groups. Add `monochrome = TRUE`
 for black-and-white output. The [report guide](from-text-to-report.html#prepare-the-figure-at-its-publication-size)
 shows publication-size PDF/PNG export and figure notes outside the image.
 

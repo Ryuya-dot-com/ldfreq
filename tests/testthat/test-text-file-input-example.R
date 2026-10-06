@@ -61,26 +61,34 @@ test_that("authored TXT and CSV inputs retain IDs, metadata and missingness", {
   read_csv <- function(path) utils::read.csv(text = e$read_text_file(path)$text,
     colClasses = "character", na.strings = "<MISSING>", check.names = FALSE)
   documents <- read_csv(file.path(root, "essays.csv"))
-  expect_identical(documents$document_id, c("001", "002", "003"))
+  expect_identical(documents$document_id, sprintf("%03d", 1:31))
   texts <- vapply(documents$document_id, function(id)
     e$read_text_file(file.path(root, "texts", paste0(id, ".txt")))$text, character(1))
   expect_identical(documents$text, unname(texts))
-  expect_identical(documents$text[3], "")
+  expect_identical(documents$text[31], "")
   metadata <- read_csv(file.path(root, "metadata.csv"))
-  expect_identical(metadata$writer_id[match(documents$document_id, metadata$document_id)],
-    c("writer_a", "writer_b", "writer_a"))
+  expect_identical(metadata$writer_id[match(c("001", "002", "031"), metadata$document_id)],
+    c("example_writer_01", "example_writer_02", "example_writer_01"))
   prepared <- lexdiv_tokenize_batch(documents, tokenizer = "english", case = "lower")
   result <- lexdiv_metrics_text_batch(prepared, metrics = "ttr")
   expect_identical(result$results$document_id, documents$document_id)
-  expect_equal(result$results$N, c(30, 31, 0))
-  expect_true(is.na(result$results$value[3]))
-  expect_true(nzchar(result$results$missing_reason[3]))
+  expect_equal(result$results$N, c(107, 129, 147, 117, 138, 108, 127, 149, 117, 137,
+    108, 128, 147, 119, 137, 107, 128, 148, 118, 140, 108, 128, 149, 119, 138,
+    110, 128, 148, 119, 139, 0))
+  expect_true(is.na(result$results$value[31]))
+  expect_true(nzchar(result$results$missing_reason[31]))
+  mattr <- lexdiv_metrics_text_batch(prepared, metrics = "mattr", window_length = 50)
+  expect_identical(which(is.finite(mattr$results$value)), 1:30)
+  expect_true(is.na(mattr$results$value[31]))
   path <- tempfile(fileext = ".csv")
   on.exit(unlink(path))
   special <- data.frame(document_id = c("001", "TRUE", "NA", "empty", "missing"),
     text = c("A, \"quoted\" line.\nNext line.\n", "TRUE", "NA", "", NA_character_))
   utils::write.csv(special, path, row.names = FALSE, na = "<MISSING>", fileEncoding = "UTF-8")
   expect_identical(read_csv(path), special)
+  csv_crlf <- utils::read.csv(text = '"document_id","text"\r\n"001","A\r\nB\r\n"\r\n',
+    colClasses = "character")
+  expect_identical(csv_crlf$text, "A\nB\n")  # CSV parsing has its own newline policy.
   expect_error(lexdiv_tokenize_batch(read_csv(path)), "missing")
   expect_error(lexdiv_tokenize_batch(documents[c(1, 1), ]), "unique")
 })
