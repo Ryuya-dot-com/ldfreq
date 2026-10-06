@@ -204,7 +204,7 @@ One text can contain passages with very different amounts of repetition. This
 example overlays local type-token ratios for 25-, 50- and 100-token windows,
 so you can inspect both variation through the text and sensitivity to the
 window choice. The following chunks form a complete, runnable example after
-[installing ldfreq](../index.html#installation); no additional plotting package
+[installing ldfreq](https://ryuya-dot-com.github.io/ldfreq/#installation); no additional plotting package
 or downloaded corpus is required.
 
 The 431-token English passage below was written for this demonstration. It
