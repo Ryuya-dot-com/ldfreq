@@ -237,7 +237,7 @@ documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@c788d909dcd113492261b4fd99b9787f6d61eb1e")
+pak::pak("Ryuya-dot-com/ldfreq@3f2d802f472b54860edc38e2005522aafc975094")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
@@ -256,6 +256,10 @@ The built archive includes rendered guides. A GitHub source installation may
 omit them; the online guides remain available.
 
 ## A first analysis
+
+For TXT files, folders or ID/text CSV files, start with the
+[executable file-input tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
+It includes sample files, metadata joins and complete analysis saving.
 
 ```r
 library(ldfreq)
