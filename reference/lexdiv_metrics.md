@@ -1,0 +1,330 @@
+# Compute Versioned Lexical-Diversity Metric Variants
+
+Computes explicitly versioned lexical-diversity variants from
+pre-tokenized input. The core performs no normalization, token deletion,
+or lemmatization. Requested segment, window, and sample sizes are never
+silently reduced for a short document. Missingness, method identity,
+sufficient counts, quality flags, parameters, and diagnostics are
+returned beside each value.
+
+## Usage
+
+``` r
+lexdiv_metric_ids()
+
+lexdiv_metrics(
+  tokens,
+  metrics = lexdiv_metric_ids(),
+  segment_length = 50L,
+  window_length = 50L,
+  mtld_threshold = 0.72,
+  sample_size = 42L,
+  expected_ttr_sample_sizes = 35:50
+)
+
+lexdiv_metrics_batch(
+  documents,
+  id_col = "document_id",
+  tokens_col = "tokens",
+  ...
+)
+
+# S3 method for class 'lexdiv_batch_results'
+print(x, ...)
+
+# S3 method for class 'lexdiv_results'
+print(x, ...)
+```
+
+## Arguments
+
+- tokens:
+
+  A plain, unclassed, one-dimensional character vector of ordered,
+  already-tokenized strings. Missing and empty tokens, invalid UTF-8,
+  and `bytes`- or `latin1`-marked strings invalidate the document. A
+  zero-length character vector denotes an empty document. Valid
+  non-ASCII strings with an unknown encoding marker are interpreted as
+  UTF-8 on a local copy before equality and counting. Each vector
+  element is exactly one token; a single string containing whitespace
+  triggers a warning because it may be raw prose. Use
+  [`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md)
+  for raw text.
+
+- metrics:
+
+  A plain, non-empty, duplicate-free character vector selected from
+  `lexdiv_metric_ids()`.
+
+- segment_length:
+
+  One plain finite numeric scalar with an integer value at least one;
+  requested complete non-overlapping MSTTR segment length.
+
+- window_length:
+
+  One plain finite numeric scalar with an integer value at least one;
+  requested step-one MATTR window length.
+
+- mtld_threshold:
+
+  One plain finite numeric scalar strictly between zero and one.
+
+- sample_size:
+
+  One plain finite numeric scalar with an integer value at least one;
+  requested without-replacement HD-D sample size.
+
+- expected_ttr_sample_sizes:
+
+  A non-empty, strictly increasing plain integer vector with values at
+  least two. It fixes the sample-size curve used by deterministic
+  expected-TTR D and is never resized to the document.
+
+- documents:
+
+  Either a plain list with unique, non-empty document IDs as names, or a
+  data frame with an explicit plain character ID column and a
+  token-vector list-column. Zero-document inputs are accepted only when
+  they retain the required structure.
+
+- id_col:
+
+  One plain, non-empty character string selecting the document-ID column
+  of data-frame input. IDs must be unique, non-missing, valid UTF-8 and
+  may not be marked `bytes` or `latin1`.
+
+- tokens_col:
+
+  One plain, non-empty character string selecting the token list-column
+  of data-frame input.
+
+- x:
+
+  A `lexdiv_results` or `lexdiv_batch_results` object.
+
+- ...:
+
+  For `lexdiv_metrics_batch()`, arguments forwarded to
+  `lexdiv_metrics()`; for print methods, arguments passed to
+  [`print.data.frame()`](https://rdrr.io/r/base/print.dataframe.html).
+
+## Value
+
+`lexdiv_metric_ids()` returns the versioned metric IDs in default order.
+`lexdiv_metrics()` returns a `lexdiv_results` data frame with one row
+per metric. Its columns are `metric_id`, `method_id`,
+`metric_contract_id`, `metric_contract_version`, `result_schema_id`,
+`result_schema_version`, `value`, `status`, `missing_reason`, requested
+and effective parameter list-columns, `N`, `V`, `below_quality_floor`,
+and a diagnostics list-column. The print method returns its input
+invisibly.
+
+`lexdiv_metrics_batch()` returns a `lexdiv_batch_results` object in
+document-major, requested-metric-minor long form. Its first three
+columns are `document_id`, `batch_schema_id`, and
+`batch_schema_version`; all single-document record columns follow.
+
+## Details
+
+The current versioned set contains TTR, RTTR/Guiraud, CTTR, Herdan's C,
+natural-log Maas a-squared, complete non-overlapping MSTTR, step-one
+MATTR, bidirectional MTLD, sample-size-normalized hypergeometric HD-D on
+the TTR scale, Yule's K, deterministic expected-TTR curve-fit D, and
+type-based Yule's I. Expected-TTR D fits the model
+\\2/(\sqrt{1+2n/D}+1)\\ to exact finite-population expected TTR values.
+It uses no random sampling or arbitrary D cap and is not CLAN VOCD. From
+package version 0.2.0, the same expected curve and objective are
+evaluated through the expected duplicate-draw fraction to avoid
+cancellation near TTR=1. The method ID is unchanged because this is a
+numerical correction, not a new estimator. Record the package version as
+well as method and parameters. `near_saturation` diagnoses a nearly flat
+curve; it does not establish statistical precision or validity.
+
+The canonical MTLD method requires at least ten tokens per complete
+factor and applies an unclamped linear tail credit. The credit can
+exceed one for a shorter repetitive tail. Consequently, `rep("a", 59)`
+gives about 7.2175 and `rep("a", 60)` gives 10, although no new type was
+added. This is a frozen variant rule, not a guarantee of length
+independence for every input. Inspect directional/tail diagnostics and
+sensitivity to the sampling design for highly repetitive texts. Passing
+a length screen does not remove this boundary effect; do not silently
+clamp the tail or compare different MTLD variants as the same method.
+
+An invalid token anywhere has precedence over empty-input and
+metric-specific domain conditions. Invalid documents return
+`status = "invalid_input"`, `missing_reason = "invalid_token"`, and
+unknown `N`/`V`. A zero-length document returns `status = "missing"` and
+`missing_reason = "empty_input"`. Formula and requested-parameter domain
+failures use more specific missing reasons. Parameter values are
+validated only when their metric is requested; those selected-metric
+request errors are structural and are checked before document-token
+state.
+
+`below_quality_floor` is an advisory screening flag. It is deliberately
+separate from mathematical computability and never changes a requested
+parameter or suppresses an otherwise computable value. Passing the floor
+does not establish validity or reliability, and falling below it does
+not erase an otherwise computable value. Unicode encoding-marker
+canonicalization is not Unicode normalization: canonically equivalent
+but scalar-distinct strings remain distinct types.
+
+Within the same exact method and design, Maas a-squared and Yule's K
+conventionally decrease as repetition decreases; the other ten v0.1
+methods conventionally increase with observed lexical variety or lower
+repetition. These methods primarily operationalize lexical variety and
+repetition rather than the full multidimensional lexical-diversity
+construct. Direction applies only within the same method, parameters,
+preprocessing, and sampling design. The metrics are not direct measures
+of language proficiency, writing quality, reader response, or
+communicative effectiveness, and raw values from different metric IDs
+are not interchangeable.
+
+The batch adapter does not infer IDs, tokenize raw strings, recycle
+parameters by document, or accept one-token-per-row long tables. Invalid
+token vectors are contained as structured rows for their document, while
+malformed containers, duplicate IDs, and invalid selected-metric
+arguments stop the whole call. Named-list and data-frame inputs preserve
+document order, followed within each document by requested metric order.
+Batch-envelope and core-record schemas have separate explicit IDs and
+versions.
+
+## Reading status and missing reason
+
+Interpret `value` only after checking both fields:
+
+- `status = "ok"`:
+
+  The requested method was computed. Its `missing_reason` is missing.
+
+- `status = "missing"`:
+
+  The document was structurally valid, but the requested method had no
+  value under its defined domain or parameter rules.
+
+- `status = "invalid_input"`:
+
+  At least one token made the document invalid. The package returns an
+  audited row rather than silently deleting that token.
+
+The versioned reason vocabulary is `empty_input`, `invalid_token`,
+`insufficient_tokens_for_formula`, `too_short_for_requested_parameter`,
+`zero_denominator`, `no_factor`, `non_convergence`, `boundary_censored`,
+and `unbounded_high`. The reasons that can occur depend on the selected
+method. Structural request errors, such as an unknown metric ID or
+invalid selected parameter, stop the call instead of returning a result
+row.
+
+## Formal contract
+
+Exact formulas, domains, floating-point policy, method IDs, result
+fields, and the complete status vocabulary are installed in
+`lexical-diversity-contract.json`. Locate it with
+`system.file("spec", "lexical-diversity-contract.json", package = "ldfreq")`.
+The adjacent schema and hand-case fixture are installed under the same
+`spec` directory.
+
+## References
+
+Covington, M. A. and McFall, J. D. (2010). Cutting the Gordian Knot: The
+Moving-Average Type-Token Ratio (MATTR). *Journal of Quantitative
+Linguistics*, 17(2), 94–100.
+[doi:10.1080/09296171003643098](https://doi.org/10.1080/09296171003643098)
+.
+
+McCarthy, P. M. and Jarvis, S. (2010). MTLD, vocd-D, and HD-D: A
+validation study of sophisticated approaches to lexical diversity
+assessment. *Behavior Research Methods*, 42, 381–392.
+[doi:10.3758/BRM.42.2.381](https://doi.org/10.3758/BRM.42.2.381) .
+
+Tweedie, F. J. and Baayen, R. H. (1998). How Variable May a Constant Be?
+Measures of Lexical Richness in Perspective. *Computers and the
+Humanities*, 32, 323–352.
+[doi:10.1023/A:1001749303137](https://doi.org/10.1023/A%3A1001749303137)
+.
+
+These references describe the method families. Use the exact formulas,
+variants and parameter values documented here when reporting ldfreq
+results. Expected-TTR D is a separately named exact-expectation curve
+fit, not CLAN VOCD.
+
+## Examples
+
+``` r
+lexdiv_metric_ids()
+#>  [1] "ttr"            "rttr"           "cttr"           "herdan"        
+#>  [5] "maas"           "msttr"          "mattr"          "mtld"          
+#>  [9] "hdd"            "expected_ttr_d" "yule_k"         "yule_i"        
+
+tokens <- c("a", "a", "b", "c")
+lexdiv_metrics(tokens, metrics = c("ttr", "hdd"), sample_size = 2)
+#> <lexdiv_results: 2 metrics; contract 0.1.0>
+#>   metric_id     value status missing_reason N V below_quality_floor
+#> 1       ttr 0.7500000     ok           <NA> 4 3               FALSE
+#> 2       hdd 0.9166667     ok           <NA> 4 3                TRUE
+
+lexdiv_metrics(
+  rep(c("a", "b", "a", "c"), 20),
+  metrics = "expected_ttr_d"
+)
+#> <lexdiv_results: 1 metric; contract 0.1.0>
+#>        metric_id     value status missing_reason  N V below_quality_floor
+#> 1 expected_ttr_d 0.1164681     ok           <NA> 80 3               FALSE
+
+lexdiv_metrics(character(), metrics = "ttr")
+#> <lexdiv_results: 1 metric; contract 0.1.0>
+#>   metric_id value  status missing_reason N V below_quality_floor
+#> 1       ttr    NA missing    empty_input 0 0                TRUE
+lexdiv_metrics(c("a", NA_character_), metrics = "ttr")
+#> <lexdiv_results: 1 metric; contract 0.1.0>
+#>   metric_id value        status missing_reason  N  V below_quality_floor
+#> 1       ttr    NA invalid_input  invalid_token NA NA                  NA
+lexdiv_metrics(c("a", "b"), metrics = "mattr", window_length = 3)
+#> <lexdiv_results: 1 metric; contract 0.1.0>
+#>   metric_id value  status                    missing_reason N V
+#> 1     mattr    NA missing too_short_for_requested_parameter 2 2
+#>   below_quality_floor
+#> 1                TRUE
+
+mtld <- lexdiv_metrics(rep(c("a", "b"), 10), metrics = "mtld")
+mtld$diagnostics[[1]]
+#> $forward_score
+#> [1] 10
+#> 
+#> $reverse_score
+#> [1] 10
+#> 
+#> $forward_complete_factors
+#> [1] 2
+#> 
+#> $reverse_complete_factors
+#> [1] 2
+#> 
+#> $forward_tail_credit
+#> [1] 0
+#> 
+#> $reverse_tail_credit
+#> [1] 0
+#> 
+
+documents <- list(doc_a = c("a", "a", "b"), doc_b = character())
+lexdiv_metrics_batch(documents, metrics = c("ttr", "mtld"))
+#> <lexdiv_batch_results: 2 documents; 4 metric records; schema 0.1.0>
+#>   document_id metric_id     value  status                  missing_reason N V
+#> 1       doc_a       ttr 0.6666667      ok                            <NA> 3 2
+#> 2       doc_a      mtld        NA missing insufficient_tokens_for_formula 3 2
+#> 3       doc_b       ttr        NA missing                     empty_input 0 0
+#> 4       doc_b      mtld        NA missing                     empty_input 0 0
+#>   below_quality_floor
+#> 1               FALSE
+#> 2                TRUE
+#> 3                TRUE
+#> 4                TRUE
+
+contract_path <- system.file(
+  "spec", "lexical-diversity-contract.json", package = "ldfreq"
+)
+stopifnot(nzchar(contract_path))
+basename(contract_path)
+#> [1] "lexical-diversity-contract.json"
+```

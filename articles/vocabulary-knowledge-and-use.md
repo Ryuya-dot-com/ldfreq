@@ -1,0 +1,405 @@
+# Connecting corpus frequency with evidence of vocabulary use
+
+This guide develops one learner-focused application. The package also
+supports native-speaker corpora, register comparisons and other
+descriptive corpus research; see [comparison
+design](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.md).
+Those analyses do not require recognition or recall responses. The same
+response-comparison function can also describe scored L1 participant
+data: supply the appropriate ID columns through `keys`, such as
+`c("participant_id", "item_id")`.
+
+## Begin with what a learner can do
+
+A learner selects the right definition in a vocabulary test. Can that
+learner recall the meaning when reading, recognize a related derivative,
+or use the word appropriately in a sentence? These are separate
+questions. [Kremmel and Schmitt
+(2016)](https://doi.org/10.1080/15434303.2016.1237516) use *lexical
+employability* for the ability to employ words in communication. Their
+reading-focused study operationalized a prerequisite through meaning
+recall, rather than observing fluent reading directly. Recognition,
+meaning recall, form recall, derivatives, collocations, and contextual
+use must not be collapsed into a single undifferentiated “known word”
+label.
+
+TUBELEX supplies another kind of evidence: properties of word forms in a
+reference corpus. Its original evaluation concerned lexical decision
+time, familiarity and lexical complexity, not this learner’s ability to
+use words ([Nohejl et al.,
+2025](https://aclanthology.org/2025.coling-main.641/)). The frequency
+and video/channel counts can help describe or select target words and
+serve as candidate predictors. They are not learner response scores.
+
+Native-speaker corpora can supply attested contexts, register-specific
+use patterns and candidate items for this research. With suitable
+contextual annotation, an observed use can provide evidence of
+performance on that occasion. Aggregate frequency cannot show which
+senses an individual can retrieve, and an absent form may simply reflect
+the topic or opportunity to use it. TUBELEX’s English subtitle
+frequencies do not certify each speaker’s L1 background. Treat its
+documented source domain separately from participant language
+background.
+
+| Observation | What it can describe | What it does not establish alone |
+|----|----|----|
+| TUBELEX count / Zipf | Frequency of a form in the reference corpus | This learner’s exposure or knowledge |
+| Video / channel prevalence | How widely a form occurs across source parts | Diversity of word senses or automatic recall |
+| Meaning recognition | A scored response with supplied options | Unaided meaning recall |
+| Meaning recall | Recall under an explicit prompt and scoring rubric | Speed, comprehension of a passage, or productive use |
+| Contextual use / comprehension | Performance in a specified task | Transfer to every task, sense or skill |
+| An occurrence in an essay | A form used in that essay | Appropriateness, independent retrieval, or knowledge of absent words |
+
+## Attach corpus features to items, not to inferred ability labels
+
+These four items and all responses below are authored demonstrations,
+not observations from learners or a reproduction of the published study.
+Two items use the same form, `bank`, for different intended senses.
+`ldfreq` illustrates a term outside this fixed reference corpus. Keep
+item and sense identities even when the lookup form is identical.
+
+``` r
+items <- data.frame(
+  item_id = c("i1", "i2", "i3", "i4"),
+  target_form = c("bank", "bank", "accurate", "ldfreq"),
+  sense_id = c("financial-institution", "river-edge", "precise", "R-package"),
+  context_id = c("authored-context-1", "authored-context-2",
+                 "authored-context-3", "authored-context-4")
+)
+stopifnot(all(vapply(items, function(x)
+  is.character(x) && !anyNA(x) && all(nzchar(trimws(x))), logical(1))),
+  !anyDuplicated(items$item_id))
+item_profile <- tubelex_profile(items$target_form, normalization = "identity")
+stopifnot(item_profile$status == "ok",
+  identical(item_profile$lookup$query_index, seq_len(nrow(items))),
+  identical(item_profile$lookup$term, items$target_form))
+item_features <- cbind(items, item_profile$lookup[, c(
+  "lookup_term", "matched", "count", "videos", "channels",
+  "zipf", "video_prevalence", "channel_prevalence")])
+item_features[, c("item_id", "target_form", "sense_id", "matched", "zipf")]
+#>   item_id target_form              sense_id matched     zipf
+#> 1      i1        bank financial-institution    TRUE 4.848312
+#> 2      i2        bank            river-edge    TRUE 4.848312
+#> 3      i3    accurate               precise    TRUE 4.454142
+#> 4      i4      ldfreq             R-package   FALSE       NA
+```
+
+The two `bank` items receive the same corpus values. This resource does
+not separate their senses. `ldfreq` has missing frequency, which means
+no match, not zero knowledge or maximal difficulty. Matching a target
+form directly is useful for item features; it does not certify a
+tokenizer for connected text. A lemma or word-family score must not be
+substituted for all of its forms’ frequencies. Summing derivative
+video/channel counts would double-count source parts shared by the
+forms; the aggregate table cannot recover their union.
+
+## Keep the learner-by-item evidence intact
+
+This example uses already scored binary meaning-recognition and
+meaning-recall responses. It does not score free text. Real data also
+need the prompt, scoring rubric/version, rater or adjudication record,
+administration order and missingness reason. Use separate rows/IDs for
+repeated occasions or senses.
+
+``` r
+responses <- expand.grid(item_id = items$item_id,
+  learner_id = c("learner_a", "learner_b", "learner_c"),
+  stringsAsFactors = FALSE, KEEP.OUT.ATTRS = FALSE)
+responses$recognition <- c(1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, NA)
+responses$meaning_recall <- c(1, 0, 1, 0, 1, 0, 0, 1, 1, 0, NA, 0)
+responses$occasion_id <- "demo"
+responses$test_format <- "meaning-recognition"
+responses$test_rubric <- "authored-recognition-v1"
+responses$criterion_rubric <- "authored-recall-v1"
+responses$rater_id <- "authored-scores"
+responses$test_missing_reason <- ifelse(is.na(responses$recognition),
+  "not-administered", NA_character_)
+responses$criterion_missing_reason <- ifelse(is.na(responses$meaning_recall),
+  "not-administered", NA_character_)
+index <- match(responses$item_id, item_features$item_id)
+stopifnot(!anyNA(index),
+  !any(setdiff(names(item_features), "item_id") %in% names(responses)))
+analysis <- cbind(responses,
+  item_features[index, setdiff(names(item_features), "item_id"), drop = FALSE])
+rownames(analysis) <- NULL
+stopifnot(nrow(analysis) == nrow(responses))
+```
+
+Matching by the unique item ID prevents a many-to-many join on `bank`
+from silently multiplying observations. Repeated item features do not
+create more independent words. Learners are also repeated across items.
+
+## Inspect agreement and its direction before fitting a model
+
+The same overall agreement can conceal different discrepancies. A
+recognized word whose meaning was not recalled differs from a recalled
+word missed in the recognition test. Following the comparison logic of
+Kremmel and Schmitt, count both directions against the stated criterion,
+without treating the criterion as an infallible observation of
+real-world ability.
+
+``` r
+comparison <- lexdiv_compare_responses(analysis,
+  test = "recognition", criterion = "meaning_recall")
+comparison$counts
+#>             outcome n
+#> 1      both_correct 4
+#> 2         test_only 2
+#> 3    criterion_only 1
+#> 4    both_incorrect 3
+#> 5      missing_test 1
+#> 6 missing_criterion 1
+#> 7      missing_both 0
+comparison$summary
+#>                                              quantity denominator numerator
+#> 1                      agreement_among_complete_pairs          10         7
+#> 2                      test_only_among_complete_pairs          10         2
+#> 3                 criterion_only_among_complete_pairs          10         1
+#> 4 criterion_failure_among_test_correct_complete_pairs           6         2
+#> 5                              complete_pair_fraction          12        10
+#>   proportion
+#> 1  0.7000000
+#> 2  0.2000000
+#> 3  0.1000000
+#> 4  0.3333333
+#> 5  0.8333333
+stopifnot(identical(comparison$counts$n, c(4L, 2L, 1L, 3L, 1L, 1L, 0L)))
+```
+
+There are 10 complete pairs and two missing pairs. Recognition-only
+responses are 2/10 of complete pairs, but 2/6 of recognition-correct
+complete pairs. Those denominators answer different questions.
+`test_only` means recognition correct and recall incorrect in this call;
+reversing `test` and `criterion` reverses that interpretation. Each
+supplied row contributes once, so these are pair-weighted proportions,
+not averages of learner-level proportions. Missing responses stay
+missing; a failure to observe a word in an essay likewise must not be
+coded as a failed elicited response. The observed-case proportions may
+be biased if missingness is related to knowledge or task difficulty.
+
+Do not select a Zipf cutoff that labels words “employable”, equate an
+NJ8 match with learner knowledge, or multiply mean frequency and
+diversity into a new ability score. Such rules would need independent
+outcome data and validation.
+
+## Read scored CSV data without losing IDs or missingness
+
+Use two tables: an item dictionary with unique `item_id`, `target_form`,
+`sense_id` and `context_id`; and a response table with `learner_id`,
+`item_id` and the two scores. Include occasion/task/format IDs, scoring
+versions, rater records, presentation order and separate missingness
+reasons as appropriate to your design. These columns remain in
+`$responses`; the function does not verify that their labels accurately
+describe the administration or scoring.
+
+The runnable round trip below writes the authored data to a temporary
+folder. For your own data, set `input_dir` to the directory containing
+your two CSVs and begin at
+[`read.csv()`](https://rdrr.io/r/utils/read.table.html); do not write
+the demonstration over real files. Read IDs as text so, for example,
+`001` stays distinct from `1`. This convention uses an empty CSV field
+for a missing value, and preserves the literal text `NA` as a possible
+ID. Scores must be exactly `0`, `1`, or missing.
+
+``` r
+input_dir <- tempfile("vocabulary-example-")
+dir.create(input_dir)
+write.csv(items, file.path(input_dir, "items.csv"), row.names = FALSE,
+  na = "", fileEncoding = "UTF-8")
+write.csv(responses, file.path(input_dir, "responses.csv"),
+  row.names = FALSE, na = "", fileEncoding = "UTF-8")
+
+items_csv <- read.csv(file.path(input_dir, "items.csv"),
+  colClasses = "character", na.strings = "", check.names = FALSE,
+  fileEncoding = "UTF-8")
+responses_csv <- read.csv(file.path(input_dir, "responses.csv"),
+  colClasses = "character", na.strings = "", check.names = FALSE,
+  fileEncoding = "UTF-8")
+stopifnot(!anyDuplicated(names(items_csv)),
+  all(c("item_id", "target_form", "sense_id", "context_id") %in% names(items_csv)),
+  !anyDuplicated(names(responses_csv)),
+  all(c("learner_id", "item_id", "recognition", "meaning_recall") %in%
+        names(responses_csv)))
+for (column in c("recognition", "meaning_recall")) {
+  score <- responses_csv[[column]]
+  stopifnot(all(is.na(score) | score %in% c("0", "1")))
+  responses_csv[[column]] <- as.numeric(score)
+}
+stopifnot(!anyNA(items_csv$item_id), all(nzchar(trimws(items_csv$item_id))),
+  !anyDuplicated(items_csv$item_id),
+  all(responses_csv$item_id %in% items_csv$item_id))
+from_csv <- lexdiv_compare_responses(responses_csv,
+  test = "recognition", criterion = "meaning_recall")
+stopifnot(identical(from_csv$counts, comparison$counts),
+  identical(from_csv$summary, comparison$summary),
+  identical(from_csv$responses[names(responses)], responses))
+unlink(input_dir, recursive = TRUE)
+```
+
+For a real analysis, run the earlier item-profile and ID-matching code
+with `items <- items_csv` and `responses <- responses_csv` before
+comparing the joined rows. The item checks and
+[`match()`](https://rdrr.io/r/base/match.html) prevent unknown IDs and
+many-to-many joins. Do not drop unmatched TUBELEX items or replace their
+missing frequencies with zero. Missing item/sense/context identifiers
+need resolution before making a sense-specific claim; they are not
+inferable from a frequency lookup.
+
+Blank scores here mean missing, not incorrect. Whether an administered
+but unanswered item receives zero depends on your prespecified rubric;
+retain its raw response and reason. Fractional scores are rejected
+instead of silently rounded. Scheduled but wholly absent response rows
+cannot be detected by this function: reconcile with the administration
+roster and add explicit missing rows before reporting a completion
+denominator.
+
+## Separate formats and repeated occasions
+
+For repeated measurements, extend the composite key and choose the
+strata explicitly. Merely adding `by` does not permit duplicate
+learner/item keys. This duplicated demonstration is a software example,
+not evidence of change.
+
+``` r
+repeated <- rbind(transform(analysis, occasion_id = "pre"),
+                  transform(analysis, occasion_id = "post"))
+by_occasion <- lexdiv_compare_responses(repeated,
+  test = "recognition", criterion = "meaning_recall",
+  keys = c("learner_id", "item_id", "occasion_id"),
+  by = c("occasion_id", "test_format", "test_rubric", "criterion_rubric"))
+by_occasion$summary[, c("occasion_id", "quantity", "numerator", "denominator")]
+#>    occasion_id                                            quantity numerator
+#> 1          pre                      agreement_among_complete_pairs         7
+#> 2          pre                      test_only_among_complete_pairs         2
+#> 3          pre                 criterion_only_among_complete_pairs         1
+#> 4          pre criterion_failure_among_test_correct_complete_pairs         2
+#> 5          pre                              complete_pair_fraction        10
+#> 6         post                      agreement_among_complete_pairs         7
+#> 7         post                      test_only_among_complete_pairs         2
+#> 8         post                 criterion_only_among_complete_pairs         1
+#> 9         post criterion_failure_among_test_correct_complete_pairs         2
+#> 10        post                              complete_pair_fraction        10
+#>    denominator
+#> 1           10
+#> 2           10
+#> 3           10
+#> 4            6
+#> 5           12
+#> 6           10
+#> 7           10
+#> 8           10
+#> 9            6
+#> 10          12
+```
+
+If a learner encounters several formats for the same item on one
+occasion, include the format ID in `keys` as well. Keep different rubric
+versions or criteria separate unless their comparability is justified.
+An `NA` group label is retained as a missing-label stratum; it does not
+identify a common known condition. Zero cells are retained, zero
+denominators give `NA`, and there are no automatic significance tests or
+confidence intervals that would ignore repeated learners and items. See
+[`?lexdiv_compare_responses`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_responses.md)
+for the full return structure.
+
+## Keep frequency, prevalence and coverage together
+
+For document profiles, the diagnostic function produces reusable tables
+while retaining failed and empty documents. The following tokens are
+authored inputs; their preparation is explicit, and the package still
+records vector alignment as unverified. See the [TUBELEX input
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.md)
+for connected text.
+
+``` r
+profiles <- tubelex_profile_batch(list(
+  a = c("the", "bank", "bank", "ldfreq"),
+  b = c("an", "accurate", "description"), blank = character(),
+  invalid = c("bank", NA_character_)))
+audit <- tubelex_diagnostics(profiles)
+audit$summary[, c("document_id", "status", "weighting", "eligible_items",
+                  "matched_items", "coverage", "mean_zipf")]
+#>   document_id        status weighting eligible_items matched_items  coverage
+#> 1           a            ok     token              4             3 0.7500000
+#> 2           a            ok      type              3             2 0.6666667
+#> 3           b            ok     token              3             3 1.0000000
+#> 4           b            ok      type              3             3 1.0000000
+#> 5       blank         empty     token              0             0        NA
+#> 6       blank         empty      type              0             0        NA
+#> 7     invalid invalid_input     token             NA            NA        NA
+#> 8     invalid invalid_input      type             NA            NA        NA
+#>   mean_zipf
+#> 1  5.777371
+#> 2  6.241901
+#> 3  5.261596
+#> 4  5.261596
+#> 5        NA
+#> 6        NA
+#> 7        NA
+#> 8        NA
+audit$unmatched_terms
+#>   condition_id lookup_term token_count document_count
+#> 1  condition_1      ldfreq           1              1
+audit$documents[, c("document_id", "tokenization_alignment", "query_normalization")]
+#>   document_id           tokenization_alignment query_normalization
+#> 1           a caller_supplied_terms_unverified             tubelex
+#> 2           b caller_supplied_terms_unverified             tubelex
+#> 3       blank caller_supplied_terms_unverified             tubelex
+#> 4     invalid caller_supplied_terms_unverified             tubelex
+```
+
+The means remain conditional on matches. `unmatched_terms` contains
+confirmed non-matches only; a resource failure is unresolved, not
+evidence of absence. Token and type weighting remain separate. When
+input/query settings differ, `condition_id` keeps aggregate counts
+apart; matching settings do not establish validity or tokenizer
+equivalence. Do not pool unlike conditions as one corpus.
+
+## Design the empirical validation around the claim
+
+An initial study can ask whether frequency and channel prevalence help
+explain meaning-recall performance beyond a recognition response on the
+same target sense. This tests an association with the chosen recall
+criterion. A further study needs performance in an appropriate reading,
+listening, speaking or writing task, with accuracy and, where relevant,
+processing time. Derivative and collocation knowledge require their own
+evidence.
+
+Retain learner, item, target sense, task, occasion and rater IDs.
+Balance item format and administration order to limit cueing between
+recognition and recall; do not reuse this toy example as a test design.
+Predefine acceptable answers, partial credit, missingness and any time
+criterion, then check independent rating and adjudication. Start with a
+limited model such as a binomial model with learner and item effects,
+provided the sample supports it. Compare a frequency-only model with an
+explicitly justified addition of channel range; frequency, video range
+and channel range can be strongly related. Evaluate calibration and
+held-out prediction, with splits that match the intended claim about new
+learners, new words, or both. Randomly splitting response rows leaks
+both learner and item information across sets.
+
+The ICNALE essay data used in package development do not include the
+paired learner-by-word recognition/recall and contextual-use criteria
+needed for this claim. Its general writing ratings can support a
+different question, but they cannot establish employability of
+particular words. The package currently supports the descriptive inputs
+and audit trail, not a validated employability measure or an automatic
+response scorer.
+
+``` r
+saved <- tempfile(fileext = ".rds")
+saveRDS(list(items = items, responses = responses, item_profile = item_profile,
+  analysis = analysis, comparison = comparison, profiles = profiles, audit = audit,
+  scoring = list(example = "authored-not-empirical", version = "1"),
+  session = sessionInfo()), saved)
+restored <- readRDS(saved)
+stopifnot(identical(restored$analysis, analysis),
+  identical(lexdiv_compare_responses(restored$analysis,
+    "recognition", "meaning_recall"), restored$comparison),
+  identical(tubelex_diagnostics(restored$profiles), restored$audit))
+unlink(saved)
+```
+
+Use a persistent destination for actual research. Save full records
+before exporting display tables to CSV; the CSV alone cannot retain the
+corpus and scoring provenance.

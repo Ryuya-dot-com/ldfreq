@@ -1,0 +1,29 @@
+pandoc: 3.7.0.2
+pkgdown: 2.2.1
+pkgdown_sha: ~
+articles:
+  ambiguity-review: ambiguity-review.html
+  annotated-corpora: annotated-corpora.html
+  annotation-alignment: annotation-alignment.html
+  annotation-evaluation: annotation-evaluation.html
+  auditing-vocabulary-profiles: auditing-vocabulary-profiles.html
+  contextual-models: contextual-models.html
+  corpus-reference-profiles: corpus-reference-profiles.html
+  dependency-pairs: dependency-pairs.html
+  designing-comparisons: designing-comparisons.html
+  english-tokenization: english-tokenization.html
+  from-text-to-report: from-text-to-report.html
+  getting-started: getting-started.html
+  japanese-annotations: japanese-annotations.html
+  japanese-norms: japanese-norms.html
+  japanese-polysemy: japanese-polysemy.html
+  japanese-stimuli: japanese-stimuli.html
+  ngram-profiles: ngram-profiles.html
+  open-access-papers: open-access-papers.html
+  preprocessing-and-frequency: preprocessing-and-frequency.html
+  tubelex-input: tubelex-input.html
+  vocabulary-knowledge-and-use: vocabulary-knowledge-and-use.html
+last_built: 2026-10-06T10:21Z
+urls:
+  reference: https://ryuya-dot-com.github.io/ldfreq/reference
+  article: https://ryuya-dot-com.github.io/ldfreq/articles
