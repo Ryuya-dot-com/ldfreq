@@ -198,6 +198,159 @@ intervals or predictions. Overlapping MATTR windows are not independent
 replicates, and a pooled lexical network does not identify a person's mental
 lexicon. A well-formatted figure does not supply those missing assumptions.
 
+## Plot local vocabulary diversity {#plot-local-vocabulary-diversity}
+
+One text can contain passages with very different amounts of repetition. This
+example overlays local type-token ratios for 25-, 50- and 100-token windows,
+so you can inspect both variation through the text and sensitivity to the
+window choice. The following chunks form a complete, runnable example after
+[installing ldfreq](../index.html#installation); no additional plotting package
+or downloaded corpus is required.
+
+The 431-token English passage below was written for this demonstration. It
+alternates more varied and more repetitive wording to illustrate the method;
+it is not participant data or evidence of a learner-group difference. Replace
+`trajectory_text` with your own text and run the analysis and drawing chunks
+again. This three-window example requires at least 100 selected tokens. The
+window sizes illustrate a comparison, not universal recommended settings.
+
+### Prepare the text and analysis
+
+```{r trajectory-analysis}
+library(ldfreq)
+
+trajectory_text <- paste(
+  "On a bright autumn morning, a class visited a community garden beside the river.
+   Volunteers welcomed the visitors and explained how an abandoned parking area
+   had become a shared growing space. Narrow paths separated beds of vegetables,
+   herbs, and flowers. Several students photographed insects, while others sketched
+   the arrangement of plants in their notebooks. A gardener described the seasonal
+   changes that shaped the work, from preparing soil in spring to collecting seeds
+   before winter. The class divided into small teams and began exploring.",
+  "Our group went to the garden to look at the plants. We looked at the plants
+   near the path and then we looked at the plants near the wall. The plants near
+   the path needed water. The plants near the wall needed water too. We brought
+   water to the plants near the path. Then we brought water to the plants near
+   the wall. We worked in the garden together, and we talked about the garden
+   while we worked. At the end, we looked at the plants again.",
+  "Beyond the familiar tasks, the visit raised unexpected questions about urban
+   ecology. Flowering borders attracted pollinators, shaded corners retained
+   moisture, and decomposing leaves supported organisms beneath the surface.
+   Students compared textures, recorded observations, and proposed explanations
+   for the uneven growth of neighboring seedlings. Their discussion connected
+   drainage, sunlight, biodiversity, and the history of the site. One volunteer
+   emphasized that apparently untidy habitats could provide valuable shelter.
+   Another demonstrated how careful observation might reveal problems before
+   visible damage appeared. These encounters encouraged curiosity and challenged
+   assumptions about what a productive landscape should resemble.",
+  "Back in the classroom, we talked about what we had seen. We talked about the
+   plants, and we talked about the people who cared for the plants. We wrote
+   about the garden in our books. Some students wrote about watering the plants.
+   Other students wrote about looking at the plants. We shared our books and
+   read what other students had written. We wanted to visit the garden again,
+   because there were more things to see and more things to do.",
+  "The final discussion moved from description toward practical decisions.
+   Participants suggested accessible paths, rainwater storage, and a rotating
+   schedule for maintenance. They considered conflicting priorities, estimated
+   costs, and identified questions that would require consultation with residents.
+   Rather than reaching an immediate agreement, the class assembled a provisional
+   proposal with explicit reasons for each recommendation. The exercise showed
+   how a shared experience could generate observation, repetition, explanation,
+   and argument within a single account. Later revisions would connect these
+   sections more clearly while preserving the details that made the visit memorable."
+)
+
+trajectory_prepared <- lexdiv_tokenize(trajectory_text, tokenizer = "english", case = "lower")
+trajectory_tokens <- trajectory_prepared$tokens$surface
+trajectory_methods <- lexdiv_methods()
+trajectory_plan <- lexdiv_plan(
+  presets = character(),
+  grids = lexdiv_grid(
+    trajectory_methods$method_id[trajectory_methods$metric_id == "mattr"],
+    "window_length", c(25, 50, 100), request_id_prefix = "window"
+  )
+)
+trajectory <- lexdiv_mattr_profile(trajectory_tokens, trajectory_plan)
+```
+
+`lexdiv_mattr_profile()` returns the values and their window positions. The
+function below uses base R to overlay those returned rows. Color and line type
+both identify the window size; the plot contains no title or subtitle. The
+function is defined here as an example, not exported by ldfreq.
+
+### Draw the overlapping trajectories
+
+```{r trajectory-overlay, fig.width=6.5, fig.height=4, dpi=300, dev.args=list(pointsize=11), fig.alt="Local type-token ratio across a 431-token authored passage. Solid blue, dashed orange and dotted green curves show 25-, 50- and 100-token windows; repeated wording produces two visible troughs."}
+draw_trajectory <- function(monochrome = FALSE) {
+  old <- par(mar = c(4.2, 4.3, 2.2, 0.8), mgp = c(2.65, 0.65, 0),
+             tcl = -0.25, family = "sans", las = 1, bty = "l")
+  on.exit(par(old))
+  colors <- if (monochrome) rep("black", 3) else
+    c("#0072B2", "#D55E00", "#009E73")
+  styles <- c(1, 5, 3)
+  plot(trajectory, request_id = "window_1", type = "n",
+       add_global_mean = FALSE, xlim = c(0, length(trajectory_tokens)), ylim = c(0, 1),
+       xaxs = "i", yaxs = "i", yaxt = "n",
+       xlab = "Position in text (window midpoint)",
+       ylab = "Local type-token ratio", cex.lab = 1.05, cex.axis = 0.95)
+  abline(h = seq(0.2, 0.8, 0.2), col = "#E6E6E6", lwd = 0.6)
+  axis(2, at = seq(0, 1, 0.2), las = 1, cex.axis = 0.95)
+  for (i in seq_along(colors)) {
+    rows <- trajectory$windows[
+      trajectory$windows$request_id == paste0("window_", i), ]
+    lines(rows$window_midpoint, rows$value,
+          col = colors[i], lty = styles[i], lwd = 2.1)
+  }
+  legend("top", inset = c(0, -0.12), xpd = NA,
+         legend = c("25-token window", "50-token window", "100-token window"),
+         col = colors, lty = styles, lwd = 2.1, bty = "n", horiz = TRUE,
+         cex = 0.85, seg.len = 2.6, x.intersp = 0.7)
+  invisible(trajectory)
+}
+
+draw_trajectory()
+```
+
+The horizontal axis is each window's midpoint in the selected token sequence.
+The vertical axis is **local TTR**: distinct surface forms divided by the number
+of tokens in that window. Averaging a curve's values gives MATTR for that window
+length. Here, the averages are approximately 0.825, 0.743 and 0.662 for the 25-,
+50- and 100-token windows, respectively.
+
+The troughs correspond to repetitive passages in this constructed example.
+Longer windows change both the scale and the local variation; the curves are
+not interchangeable estimates of a window-free score. Larger windows also
+start later and end earlier because only complete windows are plotted.
+Overlapping windows are dependent observations, not independent participants
+or confidence intervals. These curves do not measure proficiency or writing
+quality. A higher line does not identify a better window choice.
+
+### Export the figure or use monochrome
+
+Run the following code to save a 300-dpi PNG and a vector PDF in your current
+working directory (`getwd()`). These filenames are replaced if they already
+exist. Use the PNG for sharing and inspect the PDF at its intended publication
+size. Place any figure title and explanatory note outside the image.
+
+```{r trajectory-export, eval=FALSE}
+png("ldfreq-trajectory.png", width = 6.5, height = 4,
+    units = "in", res = 300, pointsize = 11, bg = "white")
+draw_trajectory()
+dev.off()
+
+pdf("ldfreq-trajectory.pdf", width = 6.5, height = 4,
+    pointsize = 11, useDingbats = FALSE)
+draw_trajectory()
+dev.off()
+
+# Display in black and white; line types still distinguish the windows.
+draw_trajectory(monochrome = TRUE)
+```
+
+Keep the text, tokenization, full profile and session information with the figure
+when you need to reproduce it. `trajectory$windows` provides the plotted rows;
+`trajectory$summary` retains the MATTR values and their specifications.
+
 ## Save enough to reproduce and report the analysis
 
 Save the full results and preprocessing record, not just a CSV of scores.

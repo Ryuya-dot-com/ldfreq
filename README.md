@@ -14,6 +14,13 @@ or reference-list matches. `ldfreq` helps you inspect those choices and report
 what was actually measured. It records non-computable requests and their reasons,
 and checks that reshaped tables and plots do not mix incompatible specifications.
 
+[![Local vocabulary diversity for three window sizes in an authored example](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report_files/figure-html/trajectory-overlay-1.png)](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity)
+
+**[Reproduce this plot in R](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity).**
+The complete example includes the text, analysis, color/monochrome drawing and
+PNG/PDF export. It illustrates local vocabulary diversity and window-size
+sensitivity with authored text, not learner data.
+
 ## Why use ldfreq?
 
 - **Keep comparisons explicit.** Retain the formula, requested and effective
