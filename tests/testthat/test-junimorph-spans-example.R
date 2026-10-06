@@ -49,8 +49,12 @@ test_that("multi-token reviews preserve source, ambiguity and conditional counts
 })
 
 test_that("overlap, token mismatches and exact Unicode are explicit", {
-  f <- morph_span_fixture(c("あああ", "😀か\u3099 が", "あ あ", "あ", "あ"),
-    list(c("あ", "ああ"), c("😀", "か\u3099", "が"), c("あ", "あ"), "あ", "あ"),
+  # Declare scalar values explicitly instead of mixing a literal non-BMP
+  # character and Unicode escapes in the same platform-parsed string.
+  emoji <- intToUtf8(0x1f600)
+  decomposed <- intToUtf8(c(0x304b, 0x3099))
+  f <- morph_span_fixture(c("あああ", paste0(emoji, decomposed, " が"), "あ あ", "あ", "あ"),
+    list(c("あ", "ああ"), c(emoji, decomposed, "が"), c("あ", "あ"), "あ", "あ"),
     c("あ\tあ\tAUTHORED", "あ\tああ\tAUTHORED", "か\u3099\tか\u3099\tAUTHORED", "が\tが\tAUTHORED"))
   z <- f$e$review_morphology_spans(f$x, f$ref, window = 0)
   o <- z$occurrences[z$occurrences$segment_id == "1", ]

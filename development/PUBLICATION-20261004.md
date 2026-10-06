@@ -3168,3 +3168,48 @@ the new functions. Keep `state.dcf` at `development` while integrating the chang
 into that private PR. No visibility change, main merge, Pages deployment or CRAN
 submission is included. Record the selected new CI result separately from older
 successful checks and from the intentionally skipped release-candidate jobs.
+
+
+### First integration CI and Unicode fixture correction
+
+Commit `8183addbe4247d06a7d64606bb1e2a60fbca72a3` ran at
+<https://github.com/Ryuya-dot-com/ldfreq/actions/runs/37444349754>.
+Mac, Linux release and Linux devel each passed **7,785** assertions with zero
+failures/warnings/skips and `Status: OK`. R 4.1 passed **7,710** assertions with
+zero failures/warnings, eight optional-textstem skips and two NOTEs (optional
+gibasa/textstem unavailable; installed size). Both TUBELEX builders and the PDF
+manual passed. Mac and Linux release each passed the **2,017-assertion** inventory
+check and byte-matched 56 members across source/platform/installed forms.
+Linux also passed all 16 rejection fixtures and three release-record tests.
+
+Windows failed one test before the span-review helper ran: the mixed literal
+emoji / escaped combining-character fixture did not align with its token
+surfaces during annotation import. Its existing separate all-escaped Unicode
+import test passed. Construct the non-BMP and decomposed strings with explicit
+Unicode scalar values instead; retain all original boundary and occurrence
+expectations. This is a fixture construction change, not a runtime normalization
+or position-calculation change. The corrected **50 assertions** pass locally;
+Windows confirmation is pending the updated PR revision. The precise upstream
+parser mechanism has not been independently reproduced outside that CI test.
+
+The first workflow and its required aggregate correctly remain failed; do not
+call the overall run successful. The development-state release classifier at
+<https://github.com/Ryuya-dot-com/ldfreq/actions/runs/37444349755> passed with
+candidate artifact jobs skipped, as intended. No jobs were cancelled.
+
+The corrected archive is `reviews/ldfreq-morphology-link-20261006/evidence/final/ldfreq_0.2.0.tar.gz`,
+**5,611,817 bytes**, SHA256
+`c4b11c1b15a81cfd303dcf97deb07b4604e87fd1a74d9ab5acb51d7f93d69e9f`.
+Its only changed archive members are the test fixture and DESCRIPTION build
+metadata. All **275 compared source files** match the checkout and all **155 inst
+members** match the existing exact-archive installation. Runtime, help, data and
+all compiled guides are unchanged, so no repeated numerical analysis, resource
+conversion, guide render or full local test run is needed for this fixture fix.
+The existing PR workflow verifies every head revision; bundle this fix and its
+evidence into one update, without a separate manual duplicate run.
+
+The two changed local articles and NEWS build successfully; 128 local HTML pages
+have no missing local file targets. NEWS needed a permitted external CRAN-history
+lookup after the restricted-network attempt failed; only that document stage was
+repeated. The public family-reference URL still returns 404. These are local
+site checks, not publication or a full visual layout audit.

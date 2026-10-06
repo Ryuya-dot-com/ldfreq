@@ -13,7 +13,8 @@ Nation BNC/COCA Level 6の25,000語族をCC BY-SA 4.0で同梱し、`bnccoca_dat
 既存語族APIへ接続した。MorphyNet派生表は`morphynet_read_derivations()`で読み、
 出現別の選択／保留へ接続するexampleを追加。J-UniMorphのローカル読込と複数token範囲の判断例も実装済み。
 追加済み資源と配布一覧・検査の不整合は修正し、Macで配布物と導入後の一致を確認した。
-公開工程には現変更の採用CI・公開版の一致確認が残る。
+公開工程では8183addのCIを実行し、Mac・Linux現行／開発版・R 4.1は成功。
+WindowsのUnicode作成fixtureが1件失敗したため文字構築だけを修正し、更新版のCIを確認する。公開版の一致確認も残る。
 研究作業は既存ICNALE全文書の語族比較と形態候補の同一出現への接続まで完了した。
 候補選択の効果は再配布可能な作成例で示し、実作文の文脈判断は未実施として保持する。
 日本語ではJ-UniMorphの候補と複数tokenにまたがる出現範囲の対応を明示exampleとして実装した。
@@ -64,7 +65,13 @@ ldfreqは、その条件・分母・未照合・人の判断と原文の出現�
 | 記述・可視化・統計 | 文書／項目別表、条件別記述例、11 plotのAPA設定・カラー／白黒、元の分布の重ね描き | 自動的な妥当性・CI付与、汎用ネットワーク分析API、検証済みLexOPS接続 |
 | 公開 | 5資源の一覧・COPYRIGHTS整合、Macのsource／platform package／install後で56ファイル一致。欠落・改変等の拒否、構成要素別license記録を確認。既存の保存結果再読込証拠あり | 現checkoutの採用CI、一般利用者の入手経路、公開配布物・サイトの版一致、CRAN受理 |
 
-最新source archiveは`reviews/ldfreq-morphology-link-20261006/evidence/ldfreq_0.2.0.tar.gz`。
+最新source archiveは`reviews/ldfreq-morphology-link-20261006/evidence/final/ldfreq_0.2.0.tar.gz`。
+5,611,817 bytes、SHA256 `c4b11c1b15a81cfd303dcf97deb07b4604e87fd1a74d9ab5acb51d7f93d69e9f`。
+直前の形態接続archiveとの差はUnicode作成fixtureのtestとDESCRIPTIONのbuild情報だけである。
+275 source fileがcheckoutと一致し、155 inst member・21 compiled guide・runtime・資源は不変。
+対象50 assertionsが成功。既存の導入後再現・数値・文書・資源照合の証拠を再利用する。
+
+形態接続初版のsource archiveは`reviews/ldfreq-morphology-link-20261006/evidence/ldfreq_0.2.0.tar.gz`。
 形態接続helper・作成例・対象testとguide／NEWSを追加。275 source fileがcheckoutとbyte一致、
 導入後155 inst memberも一致。40 assertions、変更guideのrenderと導入後script、実140作文の
 全候補件数の直接照合・保存復元を確認。20の不変guideと108の不変runtime／help／資源／license
