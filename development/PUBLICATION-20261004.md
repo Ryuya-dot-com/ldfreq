@@ -3347,3 +3347,76 @@ Once it passes, merge without bypass and omit only the duplicate push-triggered
 CI for the identical merged tree. Do not cancel checks or relabel prior runs.
 No repeated local full suite, numerical analyses, or resource transformations are
 needed for this documentation-only change.
+
+
+### Public publication completed
+
+PR #21 was merged on 2026-10-06 at 11:39:34 UTC (20:39:34 JST).
+Main is `bbab3ee37ded00e247b90ffaab27f1f87195ed87`; its tree
+`bf8c874a49ad748ffc59b3da36df7803f0dff60d` exactly matches final PR head
+`600debee01eb7931e5e874471018720f0d5aa4af`. The final head passes all nine jobs at
+<https://github.com/Ryuya-dot-com/ldfreq/actions/runs/37456525303>. Windows, Mac,
+Linux release/devel each pass 7,785 assertions (FAIL/WARN/SKIP 0), Status OK.
+R 4.1 passes 7,710 with the same eight optional skips and two declared NOTEs.
+The development classifier also passes at run 37456525339; formal candidate
+artifact jobs remain intentionally skipped. Full check logs are preserved.
+
+The existing main ruleset remains active (PR, required checks, deletion and
+non-fast-forward protection). The merge uses no administrator bypass. The
+merge message's skip directive prevents only a redundant push CI for the
+identical tested tree; no check was cancelled or marked successful artificially.
+
+Anonymous TLS-verified checks confirm:
+
+- Repository and Issues return HTTP 200. The pinned c788d909 download matches all
+  345 files of the previously fresh-installed source. The default-main download
+  also matches all 345 tracked files of merged main.
+- Pages deployment run 37456523838 succeeds for
+  `2094951948b18000212f8e67f41d7a937e4ace9a`, with source gh-pages/root. All 128
+  HTML pages and related served assets, 246 files total, byte-match the reviewed
+  payload. `.nojekyll` is the 247th source file and is a hosting directive.
+- Internal AGENTS/development/experiments site URLs return 404. This separates
+  user-facing pkgdown contents from the intentionally Public repository history
+  and development records; it is not a comprehensive security audit.
+
+An initial Python 3.14 HTTPS probe lacked local CA trust. System curl succeeded
+with TLS verification enabled, curlrc disabled, and no authentication/netrc; no
+certificate verification was disabled. An explicit Pages build request was
+needed after changing the source because the prior build still referenced main.
+Only the new gh-pages deployment was requested; the package checks were not
+restarted.
+
+Evidence remains in `reviews/ldfreq-publication-path-20261006/evidence/`: final CI
+and PR/Pages JSON, check logs, publication manifest, anonymous source/main
+comparisons, live-site byte audit and internal-site-path responses. The final
+PR description publishes the outcome and evidence links. These two local
+development-record updates record completion without another documentation-only
+CI push. The four prepared documentation changes are already merged.
+
+**Repository and site publication is complete as a 0.2.0 development version.
+No CRAN submission, formal release-candidate promotion or release tag was made.**
+
+
+## 2026-10-06 Publish the reproducible trajectory example
+
+The user requested adding the shared plot code to the public documentation.
+Add the complete authored passage, English tokenization, 25/50/100-token plan,
+base-R overlay, monochrome option and PNG/PDF export to the existing report
+guide; link its plot preview directly from the homepage. Explicitly distinguish
+local TTR from its mean MATTR and describe dependent overlapping windows,
+complete-window endpoints and the limits of a constructed illustration.
+
+No runtime, test, help, API, dependency or bundled-resource change is made.
+Use distinct trajectory variable names so the guide's earlier two-document
+analysis and saved record remain intact. Rendering the changed article and
+executing the entire extracted guide succeed. Running only the three new chunks
+in a fresh R process, including explicit exports and monochrome, also succeeds:
+431 tokens and the full profile exactly match the prior shared illustration.
+The colored site figure has been visually inspected. All 128 local HTML pages
+have valid file/fragment links. Only the changed guide, home and search index
+were built; other articles and prior runtime/numerical evidence were reused.
+
+Evidence: `reviews/ldfreq-trajectory-guide-20261006/evidence/`. Submit these source
+and existing publication-completion records together through the protected
+main workflow, then deploy the generated changes to gh-pages and confirm
+anonymous bytes and the section anchor. No CRAN submission is included.
