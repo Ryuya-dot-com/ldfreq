@@ -1,6 +1,6 @@
 # ldfreq：研究根拠・利用手順・検証を結ぶロードマップ
 
-更新日：2026-10-06、5資源の配布一覧・Mac導入整合、140作文の語族比較、日本語作文1,777件の読込を確認。J-UniMorphの複数token範囲を28実作文で照合。英語140作文の同じ31,902出現へMorphoLex／MorphyNetを接続し、語族所属・資源候補・出現判断を分離。次は蓄積した変更の採用CIと公開整合。対象：Rパッケージ0.2.0の開発checkout。
+更新日：2026-10-06、5資源の配布一覧・3 OSの導入整合、140作文の語族比較、日本語作文1,777件の読込を確認。J-UniMorphの複数token範囲を28実作文で照合。英語140作文の同じ31,902出現へMorphoLex／MorphyNetを接続し、語族所属・資源候補・出現判断を分離。c788d909のCI全9 jobが成功。導入revisionの固定、取得したGitHub sourceの一致・新規導入、公開用サイト128ページを確認。Public化とgh-pages配備を明示承認に基づき実施。次は公開到達性と保護付きmain統合の確認。対象：Rパッケージ0.2.0の開発checkout。
 
 ## 現在の優先順位と統合計画
 
@@ -13,8 +13,11 @@ Nation BNC/COCA Level 6の25,000語族をCC BY-SA 4.0で同梱し、`bnccoca_dat
 既存語族APIへ接続した。MorphyNet派生表は`morphynet_read_derivations()`で読み、
 出現別の選択／保留へ接続するexampleを追加。J-UniMorphのローカル読込と複数token範囲の判断例も実装済み。
 追加済み資源と配布一覧・検査の不整合は修正し、Macで配布物と導入後の一致を確認した。
-公開工程では8183addのCIを実行し、Mac・Linux現行／開発版・R 4.1は成功。
-WindowsのUnicode作成fixtureが1件失敗したため文字構築だけを修正し、更新版のCIを確認する。公開版の一致確認も残る。
+公開工程ではc788d909のCI全9 jobが成功し、WindowsのUnicode作成fixture修正も確認した。
+ユーザーの明示承認に基づき既存repoをPublicへ変更し、準備済みpkgdownをgh-pagesへ配備した。
+Pages配信元もgh-pages直下へ変更済み。最終文書をPR #21にまとめて反映し、
+既存の必須チェックを満たしてmainへ統合する。配備後の匿名確認とmain統合の完了を記録する。
+CRAN投稿はユーザーから明示的に禁止されており、この公開作業に含めない。
 研究作業は既存ICNALE全文書の語族比較と形態候補の同一出現への接続まで完了した。
 候補選択の効果は再配布可能な作成例で示し、実作文の文脈判断は未実施として保持する。
 日本語ではJ-UniMorphの候補と複数tokenにまたがる出現範囲の対応を明示exampleとして実装した。
@@ -63,9 +66,35 @@ ldfreqは、その条件・分母・未照合・人の判断と原文の出現�
 | 日本語 | gibasa/UniDic実例、分割比較、TUBELEX・WLSP・AoA・BOIの項目照合、WLSP多義性と選択理由の保存。仮名／漢字表記の出現別語彙ID比較、原文を保持する境界見直し→KWIC再作成の例。実gibasaによる8作成文の位置確認と1文の境界／語彙判断接続。作文対訳DB全1,777件の明示文字コード読込、実作文28件・10,932注釈の原文対応と集計 | 無料規準によるNTT全体の代替、同音・多義の自動解決、実作文の仮名分割・語彙同定の精度、漢字知識の推定、L2への規準適合、言語間尺度の同等性 |
 | 意味・文脈 | KWIC判断、判断比較、外部埋め込み取込、頻度／centroid基準、評価・再集計の研究フォルダ | 独立標本での意味判別性能、未知語への一般化、候補辞書の網羅性 |
 | 記述・可視化・統計 | 文書／項目別表、条件別記述例、11 plotのAPA設定・カラー／白黒、元の分布の重ね描き | 自動的な妥当性・CI付与、汎用ネットワーク分析API、検証済みLexOPS接続 |
-| 公開 | 5資源の一覧・COPYRIGHTS整合、Macのsource／platform package／install後で56ファイル一致。欠落・改変等の拒否、構成要素別license記録を確認。既存の保存結果再読込証拠あり | 現checkoutの採用CI、一般利用者の入手経路、公開配布物・サイトの版一致、CRAN受理 |
+| 公開 | 5資源の一覧・COPYRIGHTS整合、Macのsource／platform package／install後で56ファイル一致。欠落・改変等の拒否、構成要素別license記録を確認。既存の保存結果再読込証拠あり | 一般利用者の入手経路、公開配布物・サイトの版一致、CRAN受理 |
 
-最新source archiveは`reviews/ldfreq-morphology-link-20261006/evidence/final/ldfreq_0.2.0.tar.gz`。
+最新の採用CIは[c788d909 / run 37446251926](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/37446251926)。
+全9 job成功。Windows／macOS／Linux現行・開発版は各7,785 assertions、失敗・警告・skipなし、Status: OK。
+R 4.1は7,710 assertions成功、任意textstem関係8 skipと依存未導入・installed sizeの2 NOTE。
+資源照合は3 OSとも56 member一致（Linux／Mac各2,017、Windows2,018 assertions）。
+初回8183addではWindowsのUnicode作成fixtureが1件失敗し、文字構築だけを修正して成功した。
+[PR #21](https://github.com/Ryuya-dot-com/ldfreq/pull/21)はPublic化済みrepoでmain統合を進める。
+Release candidateの分類job成功・artifact job skipと、正式な候補配布物検査を区別する。
+
+公開経路の準備結果は`reviews/ldfreq-publication-path-20261006/evidence/`。
+公開準備時のmainとPagesは`5466bb88`（2026-09-22）で、package versionは同じ0.2.0でも公開APIは30だった。
+READMEのGitHub導入例を検証済み`c788d909`へ固定し、345 source fileのGitHub取得結果を全件照合、
+新規導入後の57 exports・初回分析・同梱辞書・描画を確認。GitHub導入でガイドが省略される場合を明記した。
+空の出力先へpkgdownを構築し、128 HTML page・247 fileのリンク・fragment・内部path不在を確認。
+`.nojekyll`付きサイトZIPは2,439,531 bytes、SHA256
+`b78bc7e8911ad9309c0e6fc992782c77642ec6f30edaf8bc373411eefe35932e`。
+ホーム上部のChrome描画を目視。全ページ・全画面幅の目視とはしない。
+
+最新の公開用source archiveは`reviews/ldfreq-publication-path-20261006/evidence/package/ldfreq_0.2.0.tar.gz`。
+5,612,146 bytes、SHA256 `22a09bf5885182f890d517dc9b831fcbb7cf6f61007b3cda7d303f450995e170`。
+直前archiveとの差はREADMEとDESCRIPTION build情報だけ。275 source file一致、155 inst member不変。
+CONTRIBUTINGの完全検査手順もinstalled-package検査へ修正（package外、サイト側へ反映）。
+変更は文書と公開記録のみ。mainのrulesetはPRと必須チェックを要求するため、
+最終文書を一回のPR更新へまとめる。保護を迂回せず、同一treeのmainマージ時だけ重複CIを省く。
+2026-10-06に既存repoのPublic化・main反映・Pages公開への明示承認を得た。
+CRAN投稿はしない。正式release-candidateの状態変更・配布物検査は今回の範囲外。
+
+直前のCI対象source archiveは`reviews/ldfreq-morphology-link-20261006/evidence/final/ldfreq_0.2.0.tar.gz`。
 5,611,817 bytes、SHA256 `c4b11c1b15a81cfd303dcf97deb07b4604e87fd1a74d9ab5acb51d7f93d69e9f`。
 直前の形態接続archiveとの差はUnicode作成fixtureのtestとDESCRIPTIONのbuild情報だけである。
 275 source fileがcheckoutと一致し、155 inst member・21 compiled guide・runtime・資源は不変。
@@ -197,7 +226,7 @@ checkの外部repository索引取得はネットワーク制限で不成立だ�
 
 | 優先・既存項目 | 今回解く問い／成果物 | 必要な入力・依存 | 完了条件と結果による判断 |
 |---|---|---|---|
-| 1. ローカル整合済み・公開工程は継続：M0 | 同梱内容・出典・検査が同じ候補を表すか | 5資源の一覧、既存notice・変換証拠、修正済みの検査と公開記録 | Macでsource・platform package・install後の一致まで完了。次は候補revisionをまとめた採用CIと公開版の確認。新規研究機能の完成を待たない |
+| 1. ローカル整合済み・公開工程は継続：M0 | 同梱内容・出典・検査が同じ候補を表すか | 5資源の一覧、既存notice・変換証拠、修正済みの検査と公開記録 | c788d909のCI全9 job成功。現行Rの3 OSでsource・platform package・install後の56 member一致まで確認。次は公開版・入手経路の整合。新規研究機能の完成を待たない |
 | 2. 語族比較・形態接続完了：M1・段階5 | 同じ全文書の語単位・候補判断を変えると、どの結果が変わるか | ICNALEの保存済み原文・lemma・語族集計。MorphoLex／MorphyNetの固定版 | Nationによる140文書・31,902 tokenの比較に、同じ出現IDのMorphoLex／MorphyNet候補を接続済み。個別KWIC判断の作成例、件数の直接照合、保存復元を確認。実作文の文脈判断・独立精度評価は未実施 |
 | 3. 限定経路を実装済み：M1/M2・日本語 | 複数短単位にまたがる活用形を、元の位置と複数候補を保って判断できるか | 点検済みJ-UniMorph、既存gibasa/UniDic出力、作成文の期待位置、保存済み28作文 | ローカル読込→出現範囲対応→KWIC選択／保留→保存再読込を明示exampleで確認。実作文では全1,309文字範囲を別実装と照合し、境界一致587／不一致722を保持。文脈上の正確さは未評価。API化、語彙同定・語族・英日共通尺度への拡張は別判断 |
 | 4. 上の実例から選択：M1/M2・形態構造 | 一段の形成関係だけでは答えられない問いは何か | 語基／結果の品詞、接辞ID、複数段階・対立分析、出現レビュー | 必要な問いに限り段階別集計とレビュー適用を例示。API化は下記構造条件とAPI命名規約を満たした場合。資源間不一致を多数決で正解にしない |

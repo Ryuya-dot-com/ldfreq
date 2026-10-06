@@ -3213,3 +3213,137 @@ have no missing local file targets. NEWS needed a permitted external CRAN-histor
 lookup after the restricted-network attempt failed; only that document stage was
 repeated. The public family-reference URL still returns 404. These are local
 site checks, not publication or a full visual layout audit.
+
+
+### Final integration result: c788d909
+
+<https://github.com/Ryuya-dot-com/ldfreq/actions/runs/37446251926> completed
+successfully for `c788d909dcd113492261b4fd99b9787f6d61eb1e`: **all nine jobs pass**,
+including the required aggregate, five R/OS environments, two TUBELEX builders
+and the PDF reference manual. Saved `final/ci.json` identifies the exact revision
+and each job; `final/ci-*.log` preserves each package-check log.
+
+Windows, macOS, Linux release and Linux devel each report **7,785 passes**, zero
+failures/warnings/skips and `Status: OK`. The corrected Unicode span fixture
+passes on Windows without changes to runtime code, Unicode positions or its
+assertions. R 4.1 reports **7,710 passes**, zero failures/warnings, eight optional
+textstem skips and two NOTEs (gibasa/textstem unavailable; installed size).
+These permitted NOTEs are not a zero-NOTE CRAN submission.
+
+The source/platform/installed resource audit matches all **56 members** on
+Windows, macOS and Linux release; **2,018 assertions** on Windows and **2,017**
+on each Unix platform. Linux also passes all inventory rejection and generated
+release-record checks. The initial failed Windows run is preserved above;
+no job was cancelled and no duplicate manual workflow was started.
+
+<https://github.com/Ryuya-dot-com/ldfreq/actions/runs/37446251899> passes the
+release-state classifier/aggregate with candidate artifact jobs skipped for
+`development`, not a formal candidate-artifact pass. PR #21's title and body
+now describe the final resources, workflows, tests, limitations and this exact
+CI revision. Repository visibility, main, site deployment and CRAN remain
+unchanged. The final status updates in this document and the roadmap are local
+development records; they do not change package/archive contents or require a
+third CI push solely to record completed checks.
+
+
+## 2026-10-06 Prepare the public installation and site path
+
+The GitHub API confirms that `Ryuya-dot-com/ldfreq` remains PRIVATE, with
+`main` at `5466bb88bdb7146ec947e4c5ccd8de2b2d4ac263`. Its public Pages site uses
+legacy publishing from `main` at `/`; its latest successful build is from
+2026-09-22. That source has 30 exports despite the same 0.2.0 development version.
+PR #21 remains draft, MERGEABLE/CLEAN, at tested revision `c788d909`.
+There is no existing `gh-pages` branch. Changing Pages to an explicit generated
+site branch is the proposed deployment route; it has not been performed.
+
+README now pins the tested GitHub revision, states R >= 4.1.0 and required vs
+optional dependencies, supplies local built-archive installation instructions,
+and distinguishes rendered archive guides from GitHub installations that omit
+them. Its first-result table uses a plain data frame to avoid a misleading
+schema-unknown header after column subsetting. CONTRIBUTING now recommends
+installed-package R CMD check for its complete suite: nested explicitly sourced
+example files do not reliably resolve through pkgload's development shim.
+No package runtime code, resource, help or measurement formula changed.
+
+Evidence: `reviews/ldfreq-publication-path-20261006/evidence/`.
+
+- Authenticated GitHub tarball retrieval at `c788d909` matches **all 345 tracked
+  source files** byte-for-byte. Building without vignettes and installing to a
+  new local library reproduces 57 exports, the README analysis (12 tokens in
+  each text; TTR 0.75/0.9167, MATTR10 0.8/0.9333), NJ8 coverage, the Nation and
+  MorphoLex loaders, and plotting. The source installation contains no rendered
+  HTML guides. This verifies the downloaded pinned source path, not anonymous
+  availability or a new complete platform test suite.
+- A clean pkgdown 2.2.1 build using the previously verified installed runtime
+  succeeds for the complete site. **128 HTML pages / 247 files** have no missing
+  local file or fragment targets (including absolute links back into this site),
+  local user paths or generated development/experiment/AGENTS pages. The public
+  lifecycle/compatibility explanation remains intentional site content.
+- `site/index.html` is the reviewable preview. Its upper desktop layout was
+  inspected from a headless Chrome render; no clipping/overlap was observed in
+  that viewport. This is not a full visual audit of all pages or breakpoints.
+  CUA had no browser surface, so the installed Chrome CLI used a task-specific
+  profile, which was terminated after capturing the image.
+- `.nojekyll` is present in `ldfreq-site-0.2.0.zip`: **2,439,553 bytes**, SHA256
+  `eaab466e8f979231ea0c686c36cc8e8d9c7f5bf4e344e562624e5c80685899d0`.
+  This is a generated static-site payload, with the package source directories,
+  restricted corpus files and local browser profile outside its root.
+- `package/ldfreq_0.2.0.tar.gz`: **5,612,172 bytes**, SHA256
+  `ebc9ced7e017f1d59b76a042e34e7a45e9c9ca6d184d115a62822dea447b4071`.
+  The only changes from the prior final archive are README and DESCRIPTION
+  build metadata. All **275 source files** match the checkout; **155 inst
+  members**, all compiled guides, runtime R, help and resources remain identical.
+  Retain the prior installed/replay and five-environment CI evidence for those
+  unchanged contents; no new full numerical or resource-conversion run is needed.
+- An initial site call supplied `preview` twice through pkgdown's wrapper and
+  stopped before building; removing the duplicate argument resolved it. A later
+  home-only update needed CRAN-link metadata network access; only that document
+  stage was repeated. These are document execution issues, not package test
+  failures. An audit assertion initially mistook the public LIFECYCLE page for
+  the previously removed internal AGENTS page; inspecting the content and prior
+  record corrected the assertion without deleting valid compatibility guidance.
+
+The existing approval record at the annotation-evaluation entry authorizes
+private branch pushes and PR updates. Making the existing repository Public
+would additionally expose its development records and Git history (not just the
+R archive); ask for that concrete audience change after providing these artifacts.
+Main merge, Pages branch/source changes and public availability checks are the
+remaining publication operations. Formal release-candidate checks and CRAN
+submission remain separate. No visibility change, main merge, site deployment,
+release tag or new CI push was performed during this preparation.
+
+
+## 2026-10-06 Authorized public development publication
+
+The user explicitly approved the pending request to make the existing repository
+Public (including development records/history), integrate the tested development
+implementation and documentation into main, and publish the prepared pkgdown site:
+「素晴らしい。明示的に許可します。CRAN投稿はしないでください」.
+CRAN submission is explicitly excluded. Keep repository release state at
+`development`; public availability does not claim a formal CRAN-ready candidate.
+
+The repository is now Public. Prepared static content was pushed to the new
+`gh-pages` branch (commit `2094951`), and the Pages source was changed from
+main/root to gh-pages/root. Live anonymous verification is recorded below once
+complete. No restricted local corpus or browser-profile directory is in that
+static payload. This is publication of the already-reviewed documentation.
+
+The README now removes the private-access condition. Only the home-document
+stage was rerendered. All 128 HTML pages retain valid local links and fragments;
+the 247-file ZIP is 2,439,531 bytes, SHA256
+`b78bc7e8911ad9309c0e6fc992782c77642ec6f30edaf8bc373411eefe35932e`.
+The refreshed source archive is 5,612,146 bytes, SHA256
+`22a09bf5885182f890d517dc9b831fcbb7cf6f61007b3cda7d303f450995e170`.
+All 275 compared source files match the checkout. The only changes from the
+c788d909 final archive are README and DESCRIPTION build metadata; all 155 inst
+members and runtime/help/test contents remain unchanged. Earlier artifact hashes
+above refer to the preparation snapshots before removal of the access condition.
+
+Main protection is implemented by ruleset 19778066, not classic branch protection
+(the latter API returns 404). It requires a PR and both aggregate checks. Preserve
+that rule; send the accumulated documentation and publication record in one PR
+update. The final-head required CI is required by that existing merge contract.
+Once it passes, merge without bypass and omit only the duplicate push-triggered
+CI for the identical merged tree. Do not cancel checks or relabel prior runs.
+No repeated local full suite, numerical analyses, or resource transformations are
+needed for this documentation-only change.

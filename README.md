@@ -225,11 +225,28 @@ caller and are not bundled.
 ## Installation
 
 The current 0.2.0 version is under development and has not been released on CRAN.
-For users with access to the development repository:
+It requires R 4.1.0 or later. Install the tested snapshot used by this
+documentation:
 
 ```r
-pak::pak("Ryuya-dot-com/ldfreq")
+# Run install.packages("pak") first if pak is not installed.
+pak::pak("Ryuya-dot-com/ldfreq@c788d909dcd113492261b4fd99b9787f6d61eb1e")
 ```
+
+Pinning the revision fixes the implementation, even when development snapshots
+share the same version number. The package's required dependencies are `digest`
+and `stringi`; additional tools are optional for their documented
+workflows. For example, candidate-review examples use `quanteda`.
+
+If you have a built source archive, install it locally:
+
+```r
+# Install digest and stringi first if they are not already available.
+install.packages("ldfreq_0.2.0.tar.gz", repos = NULL, type = "source")
+```
+
+The built archive includes rendered guides. A GitHub source installation may
+omit them; the online guides remain available.
 
 ## A first analysis
 
@@ -248,7 +265,7 @@ prepared <- lexdiv_tokenize_batch(
 analysis <- lexdiv_metrics_text_batch(
   prepared, metrics = c("ttr", "mattr"), window_length = 10
 )
-analysis$results[, c("document_id", "metric_id", "N", "V", "value", "status")]
+as.data.frame(analysis$results)[, c("document_id", "metric_id", "N", "V", "value", "status")]
 
 # The bundled NJ8 table is available offline, with JACET's permission.
 # This is surface-form coverage; it does not silently lemmatize the text.
@@ -366,7 +383,7 @@ results do not change the requested parameters or silently remove documents.
 - [Vocabulary knowledge and use](https://ryuya-dot-com.github.io/ldfreq/articles/vocabulary-knowledge-and-use.html): relate corpus features to learner evidence without inferring ability from frequency.
 - [TUBELEX input recipe](https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.html): optional external token preparation.
 
-After installation, the same articles are available with `vignette(package = "ldfreq")`.
+Use `vignette(package = "ldfreq")` to list guides included in your installation.
 Exact formulas and result specifications are installed under `system.file("spec",
 package = "ldfreq")`. Preserve the full results with `saveRDS()`, together with
 preprocessing and session information; flat exports of selected values alone
