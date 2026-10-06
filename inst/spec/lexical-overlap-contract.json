@@ -1,7 +1,7 @@
 {
   "$schema": "lexical-overlap-contract.schema.json",
   "contract_id": "ldfreq-lexical-overlap",
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "status": "normative",
   "public_api": true,
   "input_contract": {
@@ -111,7 +111,8 @@
     "flemma_override_version_rule": "both-overrides-absent-or-both-present-with-equal-version",
     "declared_label_values_disclosed": true,
     "declared_label_safety": "path-free-caller-labels-with-no-secrets-or-private-hashes",
-    "content_hash_comparison": false
+    "content_hash_comparison": "textstem-dictionary-only",
+    "textstem_dictionary_rule": "when-either-lemma-backend-is-textstem-require-both-present-and-equal-id-version-sha256-hash_method-query_casefold-query_locale; missing-records-never-establish-comparability"
   },
   "privacy_boundary": {
     "raw_text_copied_to_result": false,

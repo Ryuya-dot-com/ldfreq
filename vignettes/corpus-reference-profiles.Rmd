@@ -1,0 +1,180 @@
+---
+title: "Using your own lexical reference data across a corpus"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using your own lexical reference data across a corpus}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ldfreq)
+```
+
+## Choose a question and a reference unit
+
+Suppose you want to describe familiarity and age-of-acquisition values for
+words in a collection of texts. The authors may be native speakers or language
+learners; the same computation applies. Its interpretation depends on the
+reference population, text sampling and word unit, not the author's L1 label.
+
+`lexdiv_norm_profile_batch()` applies one caller-supplied reference table to
+multiple documents. It retains each document and each variable, rather than
+pooling all texts or combining different scales. This guide uses authored
+texts and numbers, not observed norms or a finding about register differences.
+No external dataset or network connection is needed to run it.
+
+## Preserve documents and their metadata
+
+Use a unique document ID independently of writer/speaker ID, since the same
+person may contribute several texts. Real metadata should record corpus/version,
+register, task/topic, author/speaker, documented language background and sampling
+conditions. Keep unknown information missing; do not infer L1 from a genre label.
+
+```{r}
+texts <- data.frame(
+  document_id = c("demo_essay", "demo_turn", "demo_blank"),
+  corpus_id = "authored_demo_v1",
+  register = c("essay_example", "conversation_example", "essay_example"),
+  participant_id = NA_character_,
+  text = c("We read the book and discuss the policy.",
+           "I read the book. I read it again.", "")
+)
+stopifnot(!anyNA(texts$document_id), !anyDuplicated(texts$document_id))
+prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english",
+  normalization = "NFC", case = "lower")
+terms <- lapply(prepared, function(x) x$tokens$surface)
+```
+
+These are plain text examples, not raw XML or unprocessed conversation
+transcripts. Select speaker/turn boundaries and handle transcription markup
+before tokenization. Do not join unrelated documents to make them long enough
+for a metric. For other languages, supply an appropriate external segmentation
+and prepared lookup terms; this English tokenizer and the bundled English
+resources are not evidence of multilingual validation.
+
+## Describe the reference table, variables and population
+
+The toy table uses lowercase surface forms. A real lemma-based resource instead
+needs compatible lemmas, including its POS convention if relevant. Exact
+matching does not silently correct case, accents, spelling or inflection.
+
+```{r}
+norms <- data.frame(term = c("read", "book", "discuss", "policy"),
+  familiarity = c(6, 7, 5, NA_real_),
+  aoa_years = c(6, 4, 9, 12))
+specs <- data.frame(
+  measure_id = c("familiarity", "aoa"),
+  value_column = c("familiarity", "aoa_years"),
+  construct_id = c("subjective_familiarity", "age_of_acquisition"),
+  value_unit = c("seven_point_rating", "years"),
+  direction = c("higher", "descriptive"),
+  language = "English", variety = "unspecified",
+  population_id = "authored_not_participant_data",
+  collection_year = "not_observed",
+  valid_min = c(1, 0), valid_max = c(7, NA_real_))
+resource <- list(resource_id = "authored_norms", resource_version = "1",
+  creator = "Example author", source_reference = "Authored demonstration",
+  data_license = "Example numbers; no external dataset",
+  transformation_id = "none", lookup_unit = "lowercase_surface",
+  resource_key_normalization_id = "caller-prepared-v1")
+
+profiles <- lexdiv_norm_profile_batch(terms, norms, "term", specs, resource)
+profiles$summary[, c("document_id", "measure_id", "weighting", "estimate",
+  "value_unit", "status", "missing_reason")]
+```
+
+`direction` describes the variable; it does not turn a high score into good
+writing. Years and rating points remain separate scales. The same interface can
+use documented frequency measures, but record their units, reference corpus,
+denominator and transformations. A per-million frequency, a log frequency and
+a Zipf value are not interchangeable. For another source, make a separate call
+with its own resource record. The bundled TUBELEX adapter additionally verifies
+its fixed resource; this generic function records caller assertions and does
+not fingerprint or authenticate the supplied table.
+
+## Keep coverage alongside each estimate
+
+Three rates answer different questions:
+
+| Rate | Numerator / denominator | Question |
+|---|---|---|
+| Resource coverage | Matched units / all input units | How much of the document occurs in the reference? |
+| Value coverage | Units with observed values / all input units | How much contributes to this variable's mean? |
+| Annotation coverage | Units with observed values / matched units | How complete is this variable among matched entries? |
+
+In the essay, `policy` matches the reference but lacks familiarity. Other words
+are absent from the reference entirely. Both stay visible, with different
+reasons. Neither receives zero. The blank document retains rows with
+`empty_input`; it does not disappear from the study.
+
+```{r}
+profiles$coverage
+profiles$lookup[profiles$lookup$term == "policy",
+  c("document_id", "term", "measure_id", "lookup_status", "value_status")]
+profiles$diagnostics$documents
+```
+
+Token weighting gives repeated words repeated weight within a document. Type
+weighting counts distinct exact lookup terms once. Neither weights writers or
+documents for a group comparison. Group averages would require another explicit
+decision about equal-document versus token weighting, missing results and
+sampling dependencies. The batch function deliberately returns document rows.
+
+## Join metadata by ID and save the complete analysis
+
+Metric/profile tables are long: each document contributes multiple rows.
+Join metadata by unique document ID, preserving every result row and its order.
+Additional columns in an input data frame are not automatically copied into
+the batch output.
+
+```{r}
+metadata <- texts[, c("document_id", "corpus_id", "register", "participant_id")]
+row_index <- match(profiles$summary$document_id, metadata$document_id)
+stopifnot(!anyNA(row_index), !anyDuplicated(metadata$document_id),
+  !any(setdiff(names(metadata), "document_id") %in% names(profiles$summary)))
+analysis <- cbind(profiles$summary,
+  metadata[row_index, setdiff(names(metadata), "document_id"), drop = FALSE])
+rownames(analysis) <- NULL
+stopifnot(nrow(analysis) == nrow(profiles$summary))
+
+# One variable and weighting, with all documents and missing rows retained.
+report <- analysis[analysis$measure_id == "familiarity" &
+  analysis$weighting == "token", c("document_id", "register", "estimate",
+    "input_units", "observed_value_units", "resource_coverage",
+    "value_coverage", "annotation_coverage", "status", "missing_reason")]
+report
+
+saved <- tempfile(fileext = ".rds")
+saveRDS(list(texts = texts, prepared = prepared, terms = terms,
+  norms = norms, specs = specs, resource = resource, profiles = profiles,
+  analysis = analysis, session = sessionInfo()), saved)
+restored <- readRDS(saved)
+replayed <- lexdiv_norm_profile_batch(restored$terms, restored$norms, "term",
+  restored$specs, restored$resource)
+stopifnot(identical(replayed, restored$profiles),
+  identical(restored$analysis, analysis))
+unlink(saved)
+```
+
+Use a persistent path for an actual study. Save the resource table as well as
+its citation/version and preprocessing; a version label alone does not preserve
+its contents. Obtain the source table under its applicable terms before use.
+Research data saved in your project do not become package data automatically.
+
+For this authored example, the useful answer is which words and denominators
+contribute to each mean. It does not establish a register difference or a
+participant's knowledge. In a real study, examine coverage differences before
+comparing estimates, use appropriate independent documents or speaker/author
+clusters, and justify the reference population. See
+[designing comparisons](designing-comparisons.html) for the broader study design.
+
+## Know when an input stops the calculation
+
+Duplicate IDs, malformed term vectors and invalid reference specifications stop
+the whole call. This follows the single-document norm API. Valid empty,
+unmatched and unannotated documents remain in the output. The global `max_rows`
+limit covers lookup, summary and coverage rows; reduce the requested output or
+choose an explicit larger limit after considering its memory needs. Splitting
+documents does not evade this bound within one call.

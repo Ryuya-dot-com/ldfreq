@@ -351,6 +351,10 @@ print.lexdiv_mattr_profile <- function(x, ...) {
 #'   the canonical MATTR value as a horizontal line.
 #' @param col,lwd,type,main,xlab,ylab,ylim Base-graphics settings.
 #' @param mean_col,mean_lty Settings for the global-mean line.
+#' @param monochrome One `TRUE` or `FALSE` value. Defaults to color; `TRUE`
+#'   overrides `col` and `mean_col` with black. Line types are retained.
+#'   No title is added automatically; place figure titles and notes outside
+#'   the image.
 #' @param ... Additional arguments passed to [graphics::plot()].
 #'
 #' @return Invisibly, the exact window rows displayed.
@@ -359,16 +363,19 @@ plot.lexdiv_mattr_profile <- function(
     x,
     request_id = NULL,
     add_global_mean = TRUE,
-    col = "#2166AC",
+    col = "#0072B2",
     lwd = 2,
     type = "l",
     main = NULL,
     xlab = "Window midpoint (token position)",
     ylab = "Local TTR",
     ylim = c(0, 1),
-    mean_col = "#B2182B",
+    mean_col = "#D55E00",
     mean_lty = 2,
-    ...) {
+    ...,
+    monochrome = FALSE) {
+  monochrome <- .lexprep_scalar_flag(monochrome, "monochrome")
+  if (monochrome) col <- mean_col <- "black"
   if (!inherits(x, "lexdiv_mattr_profile") || !is.list(x)) {
     stop("x must be a lexdiv_mattr_profile object.", call. = FALSE)
   }
@@ -399,9 +406,8 @@ plot.lexdiv_mattr_profile <- function(
       call. = FALSE
     )
   }
-  if (is.null(main)) {
-    main <- sprintf("Local MATTR: %s", request_id)
-  }
+  old_par <- .lex_plot_style(list(...))
+  on.exit(graphics::par(old_par), add = TRUE)
   graphics::plot(
     selected$window_midpoint,
     selected$value,

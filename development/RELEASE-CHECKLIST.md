@@ -57,10 +57,9 @@ signature/attestation, or publication steps below.
       lexical resource distributed with or used by TAALES, and no result
       derived from an unapproved resource is in the repository, package,
       release assets, examples, or vignettes.
-- [ ] Confirm that no New JACET 8000 list bytes or reconstructable full-list
-      output is bundled. Exercise `nj8_profile()` only with
-      project-authored synthetic fixtures or a legitimately obtained
-      caller-authorized local copy.
+- [ ] Verify the bundled NJ8 version, complete 1--8000 ranks, source attribution,
+      permission notice, and source/archive/installed byte identity. Test the
+      default table, explicit external input, and a corrupted-resource failure.
 - [ ] Confirm that no AntBNC payload, full mapping, or derived reconstructable
       list is bundled. Exercise `lexdiv_flemmatize()` in installed examples and
       checks only with project-authored synthetic fixtures; local research runs

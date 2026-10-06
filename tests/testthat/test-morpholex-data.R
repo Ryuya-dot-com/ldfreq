@@ -1,0 +1,73 @@
+test_that("the bundled snapshot retains all worksheets and original identifiers", {
+  x <- morpholex_data()
+  word_sheets <- x$sheets[grepl("^[0-9]+-[0-9]+-[0-9]+$", names(x$sheets))]
+  expect_length(x$sheets, 34L)
+  expect_length(word_sheets, 30L)
+  expect_equal(sum(vapply(word_sheets, nrow, integer(1L))), 68624L)
+  ids <- unlist(lapply(word_sheets, `[[`, "ELP_ItemID"), use.names = FALSE)
+  expect_false(anyNA(ids))
+  expect_equal(anyDuplicated(ids), 0L)
+  expect_true(all(vapply(x$sheets, function(s) all(vapply(s, is.character, logical(1L))), logical(1L))))
+  expect_equal(unname(vapply(x$sheets[c("All prefixes", "All suffixes", "All roots")], nrow, integer(1L))),
+    c(142L, 240L, 15471L))
+  expect_identical(x$provenance$sheet_catalog$sheet, names(x$sheets))
+  expect_identical(x$provenance$sheet_catalog$rows, unname(vapply(x$sheets, nrow, integer(1L))))
+  expect_identical(x$provenance$selected_sheets, names(x$sheets))
+  expect_identical(x$provenance$data_license, "CC BY-NC-SA 4.0")
+  expect_identical(x$provenance$source_sha256,
+    "5bc425fbb710f3d63cab69e77ee731fa466653ed0ace94937cac6c1fd6de52c6")
+  expect_identical(x$sheets[["0-0-0"]]$Word, c("o'", "D'ART", "D'ETAT", "won't", "let's", "ain't"))
+  expect_true(is.na(x$sheets[["0-0-0"]]$POS[1L]))
+  expect_identical(x$sheets[["0-1-0"]]$Word[1L], "ALF")
+  z <- x$sheets[["0-1-0"]]
+  expect_identical(z$Word[match(c("42162", "65908"), z$ELP_ItemID)], c("TRUE", "FALSE"))
+  expect_equal(x$provenance$sheet_catalog$start_column[1:3], c(3L, 4L, 1L))
+  p <- tempfile(); on.exit(unlink(p))
+  saveRDS(x, p)
+  expect_identical(readRDS(p), x)
+})
+
+test_that("sheet selection is explicit, ordered and cannot alter subsequent reads", {
+  x <- morpholex_data(c("All roots", "0-1-1"))
+  expect_identical(names(x$sheets), c("All roots", "0-1-1"))
+  expect_identical(x$provenance$selected_sheets, names(x$sheets))
+  expected <- x$sheets[["All roots"]]$morpheme[1L]
+  x$sheets[["All roots"]]$morpheme[1L] <- "edited"
+  expect_identical(morpholex_data("All roots")$sheets[[1L]]$morpheme[1L], expected)
+  for (bad in list(character(), NA_character_, c("All roots", "All roots"), "", 1, list("All roots")))
+    expect_error(morpholex_data(bad), "unique sheet names")
+  expect_error(morpholex_data("not-a-sheet"), "Unknown MorphoLex sheets")
+})
+
+test_that("bundled parts preserve scope, original rows and unsupported contractions", {
+  e <- new.env(parent = baseenv())
+  for (file in c("word-parts.R", "morpholex-word-parts.R"))
+    sys.source(system.file("examples", file, package = "ldfreq", mustWork = TRUE), e)
+  forms <- c("transmit", "transport", "transmission", "teacher", "teachers")
+  x <- e$read_morpholex_parts(sheets = c("0-1-0", "0-1-1", "1-1-0"), words = c(forms, "quux"))
+  expect_equal(nrow(x$analyses), 5L)
+  expect_true(all(x$analyses$completeness == "complete"))
+  expect_equal(sum(x$parts$role == "root"), 5L)
+  expect_equal(sum(x$parts$role != "root"), 4L)
+  expect_identical(x$unlisted_words, "quux")
+  expect_identical(x$analyses$segmentation[x$analyses$form == "transmit"], "{(transmit)}")
+  expect_identical(x$analyses$segmentation[x$analyses$form == "teachers"], "{(teach)}>er>")
+  expect_false(any(x$parts$process == "inflection"))
+  contractions <- e$read_morpholex_parts(sheets = "0-0-0", words = "won't")
+  expect_identical(contractions$analyses$completeness, "unanalysed")
+  expect_equal(nrow(contractions$parts), 0L)
+  empty <- e$read_morpholex_parts(sheets = "0-1-0", words = "quux")
+  expect_equal(nrow(empty$analyses), 0L)
+  expect_equal(nrow(empty$parts), 0L)
+  expect_error(e$read_morpholex_parts(sheets = "All roots", words = "teach"), "PRS")
+  source <- data.frame(document_id = "d", segment_id = "s", text = paste(forms, collapse = " "))
+  tok <- data.frame(document_id = "d", segment_id = "s", token_index = seq_along(forms), surface = forms)
+  ann <- lexdiv_import_annotations(tok, source,
+    list(language = "en", analyzer = "authored", analyzer_version = "1",
+      dictionary = "none", dictionary_version = "1", unit = "word", normalization = "none"))
+  result <- e$word_parts_profile(ann, x$analyses, x$parts, x$resource)
+  expect_equal(result$summary$root_occurrences, 5L)
+  expect_equal(result$summary$affix_occurrences, 4L)
+  expect_equal(result$summary$complete_coverage, 1)
+  expect_identical(do.call(e$word_parts_profile, result$inputs), result)
+})

@@ -163,8 +163,7 @@ The versioned reason vocabulary is \code{empty_input}, \code{invalid_token},
 \code{insufficient_tokens_for_formula},
 \code{too_short_for_requested_parameter}, \code{zero_denominator},
 \code{no_factor}, \code{non_convergence}, \code{boundary_censored}, and
-\code{unbounded_high}. Some reasons are reserved for admitted or deferred
-methods and need not occur for every metric. Structural request errors, such as
+\code{unbounded_high}. The reasons that can occur depend on the selected method. Structural request errors, such as
 an unknown metric ID or invalid selected parameter, stop the call instead of
 returning a result row.
 }
@@ -175,6 +174,23 @@ the complete status vocabulary are installed in
 \code{system.file("spec", "lexical-diversity-contract.json", package =
 "ldfreq")}. The adjacent schema and hand-case fixture are installed under the
 same \file{spec} directory.
+}
+\references{
+Covington, M. A. and McFall, J. D. (2010). Cutting the Gordian Knot:
+The Moving-Average Type-Token Ratio (MATTR). \emph{Journal of Quantitative
+Linguistics}, 17(2), 94--100. \doi{10.1080/09296171003643098}.
+
+McCarthy, P. M. and Jarvis, S. (2010). MTLD, vocd-D, and HD-D: A validation
+study of sophisticated approaches to lexical diversity assessment.
+\emph{Behavior Research Methods}, 42, 381--392. \doi{10.3758/BRM.42.2.381}.
+
+Tweedie, F. J. and Baayen, R. H. (1998). How Variable May a Constant Be?
+Measures of Lexical Richness in Perspective. \emph{Computers and the
+Humanities}, 32, 323--352. \doi{10.1023/A:1001749303137}.
+
+These references describe the method families. Use the exact formulas,
+variants and parameter values documented here when reporting ldfreq results.
+Expected-TTR D is a separately named exact-expectation curve fit, not CLAN VOCD.
 }
 \examples{
 lexdiv_metric_ids()

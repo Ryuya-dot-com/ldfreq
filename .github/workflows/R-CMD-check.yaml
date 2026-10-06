@@ -48,18 +48,33 @@ jobs:
       - name: Audit the documented public API surface
         if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release' }}
         shell: bash
-        run: Rscript --vanilla development/audit-public-api.R .
+        run: |
+          Rscript --vanilla development/audit-public-api.R .
+          Rscript --vanilla experiments/release-candidate/validate-note-policy.R
+          python3 experiments/validate-contextual-spans.py
 
       - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
           extra-packages: |
             any::rcmdcheck
             textstem=?ignore-before-r=4.4.0
+            gibasa=?ignore-before-r=4.2.0
+            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5 MASS@7.3-60' || '' }}
+          # Keep all ldfreq check dependencies; old Matrix Enhances are not used.
+          dependencies: 'if (getRversion() < "4.2.0") c("Depends", "Imports", "LinkingTo", "Suggests") else "all"'
           needs: check
 
       - uses: r-lib/actions/check-r-package@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
           args: 'c("--no-manual")'
+
+      - name: Check resource inventory rejection cases
+        if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release' }}
+        shell: Rscript {0}
+        run: |
+          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
+            shQuote("experiments/package-resource-inventory/check-resource-inventory.R"), "."))
+          if (!identical(status, 0L)) quit(status = status)
 
       - name: Audit source, platform, and installed resource inventories
         if: ${{ matrix.config.r == 'release' }}
@@ -87,6 +102,38 @@ jobs:
             "package-resource-inventory-evidence.json"
           )
           cat(readLines(evidence_path, warn = FALSE), sep = "\n")
+
+      - name: Verify installed Japanese frequency example
+        if: ${{ matrix.config.r == 'release' }}
+        shell: Rscript {0}
+        run: |
+          source_path <- file.path(Sys.getenv("RUNNER_TEMP"), "tubelex-ja-base-pos.tsv.xz")
+          download.file(paste0(
+            "https://raw.githubusercontent.com/naist-nlp/tubelex/",
+            "7cb5fb36add76b83a266d1967536e1a1d3faa513/",
+            "frequencies/tubelex-ja-base-pos.tsv.xz"), source_path, mode = "wb")
+          library_path <- file.path(Sys.getenv("RUNNER_TEMP"),
+            "ldfreq-package-resource-inventory", "library")
+          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
+            shQuote("experiments/validate-japanese-tubelex.R"),
+            shQuote(source_path), shQuote(library_path)))
+          if (!identical(status, 0L)) quit(status = status)
+
+      - name: Verify installed Japanese polysemy example
+        if: ${{ matrix.config.r == 'release' }}
+        shell: Rscript {0}
+        run: |
+          source_path <- file.path(Sys.getenv("RUNNER_TEMP"), "polysemous.txt")
+          download.file(paste0(
+            "https://raw.githubusercontent.com/masayu-a/WLSP-norms/",
+            "72125c8dc538aeb70b07cb1c76c183e338f0cde9/polysemous.txt"),
+            source_path, mode = "wb")
+          library_path <- file.path(Sys.getenv("RUNNER_TEMP"),
+            "ldfreq-package-resource-inventory", "library")
+          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
+            shQuote("experiments/validate-wlsp-polysemy.R"),
+            shQuote(source_path), shQuote(library_path)))
+          if (!identical(status, 0L)) quit(status = status)
 
   tubelex-build-audit:
     name: ${{ matrix.os }} / TUBELEX builder

@@ -9,24 +9,34 @@ Authors@R:
         email = "komuro.4121@gmail.com",
         role = c("aut", "cre")
     )
-Description: Computes twelve versioned lexical-diversity metrics from ordered token
-    vectors and from raw English text. Results record the selected formula,
-    parameters, token and type counts, and preprocessing choices such as Unicode
-    normalization, case handling, lemmatization, and content-word selection.
-    Separate functions compare Maas and sequential-MTLD definitions, expose
-    local MATTR windows and positional exposure, compute exact term-set or
-    annotated content-word overlap, and measure token- and type-weighted
-    coverage of multiple documents by one explicit reference set. Caller-
-    supplied lexical norm tables can be summarized with exact matching,
-    measure-level provenance, and separate resource and annotation coverage.
-    Lexical level profiles use a caller-supplied New
-    JACET 8000 list and report exact and cumulative token- and type-weighted
-    coverage without redistributing the list. A bundled, versioned TUBELEX
-    aggregate provides frequency, video
-    prevalence, and channel prevalence profiles with explicit match coverage.
-    Convenience adapters accept tidy token tables and 'quanteda' token objects;
-    deterministic wide reshaping and base-R plots support analysis workflows.
-License: MIT + file LICENSE
+Description: Compares lexical diversity and reference-vocabulary profiles while
+    retaining the formula, parameters, preprocessing choices, and match coverage
+    used in each analysis. Computes twelve lexical-diversity measures from
+    ordered tokens or raw English text; compares selected Maas and MTLD
+    definitions; and exposes local MATTR windows. Bundled New JACET 8000 and
+    TUBELEX tables support lexical-level coverage and corpus-relative frequency
+    profiles, with off-list terms and non-computable requests kept explicit.
+    Additional functions provide exact lexical overlap, reference-set coverage,
+    caller-supplied word-family, lexical norm and adjacent n-gram frequency profiles,
+    descriptive comparisons of scored
+    vocabulary response pairs, multi-document workflows, and plots.
+    Bundled MorphoLex English worksheets provide derivational morphology
+    reference data under CC BY-NC-SA 4.0 (noncommercial use).
+    Nation's BNC/COCA Level 6 word-family lists are bundled under CC BY-SA 4.0.
+    A local MorphyNet reader retains derivational relations and source identity.
+    External annotations, local MASC Penn annotations and optional 'quanteda' integration retain
+    supplied token boundaries and source positions for corpus analysis.
+    Contextual review connects caller-supplied lexical candidates and explicit
+    decisions to keyword-in-context displays and original text.
+    External model outputs can be attached with checked source identities
+    while keeping model suggestions separate from reviewer decisions.
+    The methods include Covington and McFall (2010)
+    <doi:10.1080/09296171003643098> and McCarthy and Jarvis (2010)
+    <doi:10.3758/BRM.42.2.381>.
+License: file LICENSE
+License_is_FOSS: no
+License_restricts_use: yes
+Copyright: See inst/COPYRIGHTS.
 URL: https://ryuya-dot-com.github.io/ldfreq/,
     https://github.com/Ryuya-dot-com/ldfreq
 BugReports: https://github.com/Ryuya-dot-com/ldfreq/issues
@@ -37,11 +47,17 @@ Imports:
     stringi
 Encoding: UTF-8
 Suggests:
+    gibasa (>= 1.1.3),
+    ggplot2 (>= 3.4.0),
     jsonlite,
     knitr,
+    lexicon,
+    quanteda (>= 4.5.0),
     readxl,
     rmarkdown,
     textstem,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    udpipe (>= 0.8.16),
+    xml2
 VignetteBuilder: knitr
 Config/testthat/edition: 3

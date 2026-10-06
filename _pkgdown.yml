@@ -15,7 +15,19 @@ reference:
   - title: Raw text and lexical units
     contents:
       - lexdiv_preprocessing
+      - lexdiv_compare_annotations
+      - lexdiv_import_annotations
+      - lexdiv_evaluate_annotations
+      - lexdiv_align_annotations
+      - lexdiv_amod_pairs
+      - lexdiv_ambiguity_review
+      - lexdiv_compare_ambiguity
+      - lexdiv_import_contextual
+      - lexdiv_evaluate_contextual
+      - lexdiv_score_contextual
+      - lexdiv_text_batch
       - lexdiv_flemmatize
+      - lexdiv_family_profile
   - title: Exact lexical overlap and coverage
     contents:
       - lexdiv_overlap
@@ -38,13 +50,56 @@ reference:
   - title: Caller-supplied lexical norms
     contents:
       - lexdiv_norm_profile
+      - lexdiv_norm_profile_batch
+  - title: Scored vocabulary responses
+    contents:
+      - lexdiv_compare_responses
+  - title: Adjacent n-gram frequencies
+    contents:
+      - lexdiv_ngrams
+      - lexdiv_ngram_reference_build
+      - lexdiv_ngram_compare
+      - lexdiv_read_masc
   - title: Reference-resource profiles
     contents:
+      - morpholex_data
+      - bnccoca_data
+      - morphynet_read_derivations
       - nj8_profile
+      - nj8_diagnostics
       - tubelex_profile
+      - tubelex_diagnostics
   - title: Output and visualization
     contents:
       - lexdiv_convenience
   - title: Evidence
     contents:
       - lexdiv_length_evidence
+
+articles:
+  - title: Start here
+    navbar: ~
+    contents:
+      - from-text-to-report
+      - getting-started
+      - english-tokenization
+      - japanese-annotations
+  - title: Research design and reference resources
+    contents:
+      - designing-comparisons
+      - corpus-reference-profiles
+      - japanese-norms
+      - japanese-polysemy
+      - japanese-stimuli
+      - ngram-profiles
+      - annotated-corpora
+      - ambiguity-review
+      - contextual-models
+      - open-access-papers
+      - auditing-vocabulary-profiles
+      - annotation-evaluation
+      - annotation-alignment
+      - dependency-pairs
+      - preprocessing-and-frequency
+      - tubelex-input
+      - vocabulary-knowledge-and-use

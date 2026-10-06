@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graph xmlns="http://www.xces.org/ns/GrAF/1.0/">
+  <node xml:id="t6"><link targets="r8"/></node>
+  <a label="tok" ref="t6"><fs><f name="base" value="."/><f name="msd" value="."/></fs></a>
+  <node xml:id="t0"><link targets="r0"/></node>
+  <a label="tok" ref="t0"><fs><f name="base" value="we"/><f name="msd" value="PRP"/></fs></a>
+  <node xml:id="t1"><link targets="r1 r2 r3"/></node>
+  <a label="tok" ref="t1"><fs><f name="base" value="re-use"/><f name="msd" value="VBP"/></fs></a>
+  <node xml:id="t2"><link targets="r4"/></node>
+  <a label="tok" ref="t2"><fs><f name="base" value="word"/><f name="msd" value="NNS"/><f name="affix" value="s"/></fs></a>
+  <node xml:id="t3"><link targets="r5"/></node>
+  <a label="tok" ref="t3"><fs><f name="base" value="."/><f name="msd" value="."/></fs></a>
+  <node xml:id="t4"><link targets="r6"/></node>
+  <a label="tok" ref="t4"><fs><f name="base" value="we"/><f name="msd" value="PRP"/></fs></a>
+  <node xml:id="t5"><link targets="r7"/></node>
+  <a label="tok" ref="t5"><fs><f name="base" value="go"/><f name="msd" value="VBP"/></fs></a>
+</graph>

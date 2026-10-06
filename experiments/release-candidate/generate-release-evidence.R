@@ -270,9 +270,17 @@ spdx_id <- function(name) paste0("SPDXRef-Package-", gsub("[^A-Za-z0-9.-]", "-",
 root_id <- spdx_id(package_name)
 root_license <- unname(description[[1L, "License"]])
 check(
-  identical(root_license, "MIT + file LICENSE"),
+  identical(root_license, "file LICENSE") &&
+    identical(unname(description[[1L, "License_is_FOSS"]]), "no") &&
+    identical(unname(description[[1L, "License_restricts_use"]]), "yes"),
   "The release-evidence SPDX declaration must be reviewed for a changed package license."
 )
+license_path <- file.path(package_extract, "LICENSE")
+check(file.exists(license_path) &&
+  identical(sha256_file(license_path), sha256_file(file.path(package_root, "LICENSE"))),
+  "The source archive license differs from the checkout.")
+license_text <- paste(readLines(license_path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+root_license_id <- "LicenseRef-ldfreq-component-terms"
 spdx_packages <- list(list(
   name = package_name,
   SPDXID = root_id,
@@ -280,7 +288,7 @@ spdx_packages <- list(list(
   downloadLocation = "NOASSERTION",
   filesAnalyzed = FALSE,
   licenseConcluded = "NOASSERTION",
-  licenseDeclared = "MIT",
+  licenseDeclared = root_license_id,
   comment = paste("Source package DESCRIPTION license field:", root_license)
 ))
 r_requirement <- direct$requirement[direct$package == "R"]
@@ -355,8 +363,15 @@ dependency_sbom <- list(
   ),
   creationInfo = list(
     created = created,
-    creators = list("Tool: ldfreq-generate-release-evidence-1.1.0")
+    creators = list("Tool: ldfreq-generate-release-evidence-1.2.0")
   ),
+  hasExtractedLicensingInfos = list(list(
+    licenseId = root_license_id,
+    name = "ldfreq component-specific license terms",
+    extractedText = license_text,
+    comment = paste("Exact source LICENSE text; component notices and full terms",
+      "are enumerated in the accompanying resource BOM. These are not alternative licenses.")
+  )),
   packages = spdx_packages,
   relationships = relationships
 )
@@ -382,7 +397,8 @@ check(
 )
 written_root <- written_sbom$packages[[match(package_name, written_package_names)]]
 check(
-  identical(written_root$licenseDeclared, "MIT"),
+  identical(written_root$licenseDeclared, root_license_id) &&
+    identical(written_sbom$hasExtractedLicensingInfos[[1L]]$extractedText, license_text),
   "The SPDX package license declaration changed."
 )
 written_r_relationships <- Filter(function(value) {
@@ -402,13 +418,25 @@ resource_manifest_path <- file.path(
 check(file.exists(resource_manifest_path), "The source package has no installed resource manifest.")
 resource_manifest <- jsonlite::read_json(resource_manifest_path, simplifyVector = FALSE)
 check(
-  identical(resource_manifest$schema_version, "1.0.0") &&
+  identical(resource_manifest$schema_version, "1.2.0") &&
     identical(resource_manifest$package_scope, "installed-lexical-resources") &&
     identical(resource_manifest$runtime_policy$network_access, FALSE) &&
     identical(resource_manifest$runtime_policy$implicit_download_or_fallback, FALSE) &&
-    length(resource_manifest$resources) == 1L,
+    length(resource_manifest$resources) > 0L,
   "The release-evidence installed resource boundary changed."
 )
+check(identical(resource_manifest, jsonlite::read_json(file.path(package_root,
+  "inst", "spec", "ldfreq-installed-resource-manifest.json"), simplifyVector = FALSE)),
+  "The source archive resource manifest differs from the checkout.")
+admission_output <- system2(file.path(R.home("bin"), "Rscript"),
+  c("--vanilla", shQuote(file.path(package_root, "experiments", "resource-admission",
+    "validate-tubelex-admission.R")), shQuote(package_root)), stdout = TRUE, stderr = TRUE)
+check(is.null(attr(admission_output, "status")) || identical(attr(admission_output, "status"), 0L),
+  paste("Resource admission validation failed:", paste(admission_output, collapse = "\n")))
+release_inventory_path <- file.path(package_root, "experiments", "resource-admission",
+  "ldfreq-release-resource-inventory.json")
+release_inventory <- jsonlite::read_json(release_inventory_path, simplifyVector = FALSE)
+resource_ids <- vapply(resource_manifest$resources, `[[`, character(1L), "resource_id")
 admission_record_path <- file.path(
   package_root, "experiments", "resource-admission",
   "tubelex-release-admission-candidate.json"
@@ -431,7 +459,9 @@ resource_bom <- list(
   installed_manifest_file = "inst/spec/ldfreq-installed-resource-manifest.json",
   installed_manifest_sha256 = sha256_file(resource_manifest_path),
   installed_manifest = resource_manifest,
+  release_inventory = release_inventory,
   admission_record = list(
+    resource_id = "tubelex-en-treebank-slim",
     scope = admission_record$record_scope,
     decision_id = admission_record$maintainer_decision$decision_id,
     decision = admission_record$maintainer_decision$decision
@@ -463,6 +493,8 @@ provenance <- list(
   evidence = evidence_records,
   resource_boundary = list(
     installed_resource_count = length(resource_manifest$resources),
+    installed_resource_ids = unname(resource_ids),
+    release_inventory_sha256 = sha256_file(release_inventory_path),
     public_resource_api_candidate = TRUE,
     candidate_resources_are_release_admitted = TRUE,
     decision_authority = "package-maintainer",

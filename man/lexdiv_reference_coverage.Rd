@@ -30,7 +30,8 @@ lexdiv_reference_coverage(
   xlab = "document",
   ylab = "coverage",
   ylim = c(0, 1),
-  ...
+  ...,
+  monochrome = FALSE
 )
 }
 \arguments{
@@ -54,10 +55,15 @@ allocation.}
 \item{weighting}{Exactly one of \code{"token"} or \code{"type"}. Plotting
 never combines the two weighting definitions silently.}
 \item{col, pch, main, xlab, ylab, ylim}{Base-graphics settings.}
+\item{monochrome}{One \code{TRUE} or \code{FALSE} value; specify by name. Defaults to color; \code{TRUE} overrides \code{col} with black. No title is added automatically; place figure titles and notes outside the image.}
 \item{...}{Additional arguments passed to the data-frame print method or
 \code{graphics::plot()}, as appropriate.}
 }
 \details{
+Plot defaults use a sans serif font, horizontal tick labels and an open frame.
+Override these with \code{family}, \code{las} or \code{bty} in the plot
+method's \code{...}. Cosmetic graphics parameters are restored after drawing.
+
 Each element of each vector is treated as one complete lexical unit.
 The function performs no tokenization, Unicode normalization, case conversion,
 stemming, lemmatization, synonym expansion, or fuzzy matching. A single string

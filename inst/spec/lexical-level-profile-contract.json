@@ -1,21 +1,23 @@
 {
   "$schema": "lexical-level-profile-contract.schema.json",
   "contract_id": "ldfreq-lexical-level-profile",
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "status": "normative",
   "public_api": true,
   "resource_boundary": {
     "resource_id": "new-jacet8000",
     "caller_supplied": true,
-    "bundled": false,
+    "bundled": true,
     "downloaded": false,
     "full_list_returned": false,
-    "redistribution_claimed": false,
-    "accepted_inputs": ["data-frame", "local-csv", "local-xlsx"],
+    "redistribution_claimed": true,
+    "accepted_inputs": ["bundled-default", "data-frame", "local-csv", "local-xlsx"],
     "official_xlsx_sheet": "新J8",
     "official_xlsx_columns": ["新J8順位", "代表レマ", "品詞"],
-    "observed_use_terms": "personal-research-use-with-citation; commercial-use-requires-prior-JACET-consultation",
-    "public-download-is-not-redistribution-permission": true
+    "observed_use_terms": "bundled rank/entry table redistributed with JACET permission and source attribution; external copies retain their applicable terms",
+    "public-download-is-not-redistribution-permission": true,
+    "bundled_notice": "licenses/nj8/NOTICE.md",
+    "bundled_resource_version": "jacet2016-8000-v1"
   },
   "rank_to_level": {
     "valid_ranks": [1, 8000],
@@ -66,7 +68,7 @@
   },
   "batch": {
     "contract_id": "ldfreq-lexical-level-profile-batch",
-    "contract_version": "0.1.0",
+    "contract_version": "0.2.0",
     "accepted_containers": ["plain-named-list", "explicit-id-and-list-column-data-frame"],
     "document_order": "input-order",
     "resource_read_validate_normalize_hash_count": 1,
@@ -87,6 +89,8 @@
     "returned_plot_data": true
   },
   "provenance": {
+    "bundled_citation_recorded": true,
+    "bundled_status_recorded": true,
     "local_file_sha256": true,
     "canonical_rank_entry_sha256": true,
     "preprocessing_reference_retained": true,

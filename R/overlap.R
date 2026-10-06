@@ -1,7 +1,7 @@
 # Exact type-set overlap for explicit terms and annotated content words.
 
 .lexoverlap_contract_id <- "ldfreq-lexical-overlap"
-.lexoverlap_contract_version <- "0.1.0"
+.lexoverlap_contract_version <- "0.2.0"
 .lexoverlap_result_schema_id <- "lexdiv-type-overlap-result"
 .lexoverlap_result_schema_version <- "0.1.0"
 .lexoverlap_content_set_id <- "universal-pos-content-words"
@@ -522,7 +522,7 @@ lexdiv_term_overlap <- function(
 .lexoverlap_preprocessing_record <- function(value, document_id, unit) {
   annotation <- value$provenance$annotation
   flemma <- value$provenance$flemma_annotation
-  list(
+  record <- list(
     document_id = document_id,
     tokenizer_id = value$provenance$tokenizer_id,
     tokenizer_version = value$provenance$tokenizer_version,
@@ -577,9 +577,17 @@ lexdiv_term_overlap <- function(
       NULL
     }
   )
+  if (identical(unit, "lemma") && !is.null(annotation$dictionary)) {
+    fields <- c("id", "version", "sha256", "hash_method", "query_casefold", "query_locale")
+    record[paste0("dictionary_", fields)] <- annotation$dictionary[fields]
+  }
+  record
 }
 
 .lexoverlap_comparability <- function(record_a, record_b, unit) {
+  dictionary_required <- identical(unit, "lemma") &&
+    (identical(record_a$annotation_method, "textstem") ||
+      identical(record_b$annotation_method, "textstem"))
   components <- data.frame(
     component = c(
       "tokenizer_id", "tokenizer_version", "normalization", "case",
@@ -606,6 +614,12 @@ lexdiv_term_overlap <- function(
         stringsAsFactors = FALSE
       )
     )
+  }
+  if (dictionary_required) {
+    fields <- c("dictionary_id", "dictionary_version", "dictionary_sha256",
+      "dictionary_hash_method", "dictionary_query_casefold", "dictionary_query_locale")
+    components <- rbind(components,
+      data.frame(component = fields, record_field = fields, stringsAsFactors = FALSE))
   }
   if (identical(unit, "flemma")) {
     components <- rbind(
@@ -646,6 +660,11 @@ lexdiv_term_overlap <- function(
   }, character(1L))
   matches <- (is.na(value_a) & is.na(value_b)) |
     (!is.na(value_a) & !is.na(value_b) & value_a == value_b)
+  if (dictionary_required) {
+    required_rows <- startsWith(components$component, "dictionary_")
+    matches[required_rows] <- !is.na(value_a[required_rows]) &
+      !is.na(value_b[required_rows]) & matches[required_rows]
+  }
   if (identical(unit, "flemma")) {
     resource_version_row <- components$component == "flemma_resource_version"
     matches[resource_version_row] <-
@@ -774,7 +793,8 @@ lexdiv_term_overlap <- function(
 #'   aggregates exclusion reasons; and `comparability` shows whether the two
 #'   preprocessing and annotation settings match. Flemma comparison uses
 #'   caller-declared resource and override versions; missing versions are not
-#'   treated as matches. Raw text, text hashes, resource bytes/hashes, and
+#'   treated as matches. Textstem lemma comparisons additionally require matching dictionary records.
+#'   Raw text, text hashes, flemma resource bytes/hashes, and
 #'   absolute paths are not copied into the result.
 #' @export
 lexdiv_content_overlap <- function(

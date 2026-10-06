@@ -24,6 +24,13 @@ result <- lexdiv_metrics(tokens, metrics = c("ttr", "rttr", "yule_k"))
 result
 ```
 
+For a named character vector or an ID/text table, use
+`lexdiv_tokenize_batch()` and `lexdiv_metrics_text_batch()`; see
+[English tokenization and document input](english-tokenization.html).
+Use `tokenizer = "english"` to select the English lexical rules. The examples
+below retain the original Unicode default so their measurement choices stay
+explicit.
+
 ## Raw text without hidden preprocessing
 
 The shortest raw-text workflow is a direct call to `lexdiv_metrics_text()`.
@@ -217,14 +224,14 @@ High coverage alone cannot validate segmentation. For multiple documents,
 loading one verified resource snapshot per call. See
 `vignette("designing-comparisons", package = "ldfreq")` for a worked design.
 
-## Caller-supplied lexical frequency levels
+## New JACET 8000 lexical levels
 
-`nj8_profile()` maps ranks in a caller-supplied New JACET 8000 table
-to eight 1,000-rank levels. The package contains no copy of the list and never
-downloads one. Exact and cumulative token/type rates keep off-list items in the
-denominator. The official `j8_2016.xlsx` workbook can be passed directly; its
-`新J8` sheet and Japanese rank/lemma column names are detected automatically.
-
+`nj8_profile()` maps New JACET 8000 ranks to eight 1,000-rank levels.
+Omit `wordlist` to use the bundled table, redistributed with JACET permission
+and source attribution. Exact and cumulative token/type rates keep off-list
+items in the denominator. An explicit data frame, CSV, or official-layout XLSX
+remains supported. The next example deliberately supplies a small synthetic
+table so that each level can be checked by hand.
 ```{r}
 synthetic_nj8 <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
@@ -352,6 +359,17 @@ metric scales are present.
 ```{r, fig.width=5, fig.height=3}
 plot(tidy_long, metric_id = "ttr")
 ```
+
+Plots use color by default. Set `monochrome = TRUE` for black and gray output,
+for example `plot(tidy_long, metric_id = "ttr", monochrome = TRUE)`.
+In both color modes, metric and screening plots use triangles for points below
+the advisory threshold and circles for other points. Explicit `pch` values are retained.
+No title or subtitle is added automatically: put figure numbers, titles and
+notes outside the image in the manuscript. This option changes presentation
+only; the selected rows and invisible return are the same in both modes.
+The default font is sans serif, tick labels are horizontal and the frame is
+open. Explicit `family`, `las` and `bty` arguments override these defaults.
+See the report guide for exporting at the final publication size.
 
 ## Explicit method profiles
 

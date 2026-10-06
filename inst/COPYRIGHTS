@@ -9,6 +9,51 @@ License: BSD-3-Clause
 Files: extdata/tubelex/7cb5fb36/tubelex_en_treebank_7cb5fb36_slim.csv.gz
 Notice: licenses/tubelex/NOTICE.md
 Source: https://github.com/naist-nlp/tubelex/tree/7cb5fb36add76b83a266d1967536e1a1d3faa513
+Additional file: examples/tubelex-tokenize.py adapts the upstream English
+ apostrophe, number-replacement, and word-filter functions under BSD-3-Clause.
 Changes: The bundled index filters the published aggregate table to the
  canonical four-column lookup index described in the installed notice. No raw
  subtitle text or source identifiers are included.
+
+New JACET 8000 rank/representative-lemma table
+Copyright: Japan Association of College English Teachers (JACET)
+License: Redistributed with permission from JACET; source attribution required
+Files: extdata/nj8/2016/NJ8.csv
+Notice: licenses/nj8/NOTICE.md
+Source: JACET Basic Word Revision Committee (Ed.). (2016).
+ The New JACET List of 8000 Basic Words. Tokyo: Kirihara Shoten.
+Changes: Restore nan at rank 6926 and lowercase true/false at ranks 326/2382
+ in the supplied snapshot, verified against the official workbook.
+ Normalize CSV serialization. This data is not licensed under MIT.
+
+MorphyNet derivational example data
+Creators: Khuyagbaatar Batsuren, Gabor Bella, Fausto Giunchiglia
+License: CC BY-SA 3.0, including selection and source mapping
+Files: extdata/morphynet-example/eng.derivational.example.tsv
+ extdata/morphynet-example/source-rows.csv
+Notice: licenses/morphynet/NOTICE.md
+License text: licenses/morphynet/CC-BY-SA-3.0.txt
+Source: https://github.com/kbatsuren/MorphyNet
+
+Nation's BNC/COCA Level 6 word-family lists
+Creator: I. S. P. (Paul) Nation
+License: CC BY-SA 4.0, including the data conversion
+Files: extdata/bnccoca/ac81c7a6/bnccoca.rds
+Notice: licenses/bnccoca/NOTICE.md
+License text: licenses/bnccoca/CC-BY-SA-4.0.txt
+Source: https://www.wgtn.ac.nz/lals/resources/paul-nations-resources/vocabulary-analysis-programs
+
+MorphoLex-en English morphological database and data dictionary
+Attribution: Claudia H. Sanchez-Gutierrez, Hugo Mailhot, S. Helene Deacon,
+ Maximiliano A. Wilson; original accents and full citation in the notice
+License: CC BY-NC-SA 4.0 (noncommercial use, attribution, ShareAlike)
+Files: extdata/morpholex/5bc425fb/morpholex_en.rds
+ extdata/morpholex/5bc425fb/MorphoLEX_en-Data_Dictionary.pdf
+Notice: licenses/morpholex/NOTICE.md
+License text: licenses/morpholex/CC-BY-NC-SA-4.0.md
+Source: https://github.com/hugomailhot/MorphoLex-en
+Changes: All 34 worksheets converted to character-valued R data frames;
+ original row/column order and cell whitespace retained, empty cells as NA.
+ Presentation uses generated column names. No formatting, formulas, inferred
+ parts, or linguistic corrections. PDF is unchanged. Source hashes and
+ full conversion description in notice. This material is not MIT licensed.

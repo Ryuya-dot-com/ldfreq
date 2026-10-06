@@ -16,6 +16,13 @@ binary packages. The decision records:
 - the no-network and no-fallback runtime boundary; and
 - the approved bundled-resource and public-profile scopes.
 
+The TUBELEX decision remains resource-specific. The release inventory also
+records the authorized NJ8, MorphoLex, Nation BNC/COCA and MorphyNet excerpt
+components with their own terms. The validator compares identities, approval,
+scope, license and member records for all five components, not just TUBELEX.
+`example-only` identifies the MorphyNet excerpt; it does not make the complete
+external table a bundled resource or a public reference inventory.
+
 CRAN makes the package maintainer accountable for ensuring that third-party
 material is used under the license granted by its author. It does not require an
 independent reviewer. Independent legal or provenance review remains welcome,

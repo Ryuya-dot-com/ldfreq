@@ -1,12 +1,24 @@
 # These fixtures are byte-pinned inputs. Never rewrite their line endings.
 tests/fixtures/resource-loader/* -text
 
+# MASC example annotations refer to exact source character offsets.
+inst/extdata/masc-example/* -text
+
 # Resource identities and build-tool hashes are also exact byte contracts.
 experiments/tubelex-source-build/* -text
 inst/COPYRIGHTS -text
 inst/extdata/tubelex/7cb5fb36/* -text
 inst/extdata/tubelex/7cb5fb36/build-provenance.json whitespace=-blank-at-eof
 inst/licenses/tubelex/NOTICE.md -text
+inst/extdata/nj8/2016/* -text
+inst/licenses/nj8/NOTICE.md -text
+inst/extdata/morpholex/** -text
+inst/licenses/morpholex/** -text
+inst/extdata/bnccoca/** -text
+inst/licenses/bnccoca/** -text
+inst/extdata/morphynet-example/** -text
+inst/licenses/morphynet/** -text
+inst/examples/tubelex-tokenize.py -text
 inst/spec/ldfreq-resource-inventory*.json -text
 inst/spec/tubelex-release-admission-candidate*.json -text
 legal/tubelex/NOTICE.md -text

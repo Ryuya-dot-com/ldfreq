@@ -1,0 +1,340 @@
+---
+title: "English tokenization and document input"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{English tokenization and document input}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ldfreq)
+```
+
+## Choose what counts as a word
+
+An essay can include contractions, web addresses and dates. Counting pieces of
+a URL as vocabulary changes both lexical diversity and vocabulary-list coverage.
+Before comparing texts, choose the same segmentation and inspect representative
+examples from your corpus. ldfreq offers an English lexical tokenizer that runs
+in R with its existing `stringi` dependency, without Python, model downloads,
+or an external service.
+
+Select it explicitly with `tokenizer = "english"`. The default `"unicode"`
+retains the original segmentation for compatibility with existing analyses.
+
+Tokenization does not correct learner spelling or grammar. Preserve the source
+and declare any correction policy separately. The
+[reviewed-text example](auditing-vocabulary-profiles.html#handle-learner-errors-without-losing-the-observed-text)
+keeps approved, rejected and unresolved edits and compares complete original
+and revised texts without treating off-list words as errors.
+
+```{r}
+text <- "John’s well-known book costs 3.14. See https://example.org on 2026-10-04."
+english <- lexdiv_tokenize(text, tokenizer = "english", case = "lower")
+english$tokens
+english$provenance$excluded_spans
+```
+
+`John's` and `well-known` each count as one surface word. The price, URL, and
+date do not enter the lexical denominator. Apostrophe and hyphen typography are
+canonicalized after the requested Unicode normalization and case conversion:
+left/right curly apostrophes become `'`, and Unicode hyphen/non-breaking hyphen
+become `-`. This does not expand contractions or provide lemmas.
+
+| Input | English lexical rule |
+|---|---|
+| `can't`, `won't`, `John's` | Keep whole; no grammatical interpretation |
+| `well-known`, `COVID-19`, `2nd` | Keep as one word |
+| `U.S.A.`, `e.g.` | Keep dotted initialisms with periods |
+| `Dr.` | Retain `Dr`; discard the final punctuation |
+| `3.14`, `-12`, `1,000`, `2e-3`, `75%` | One number-like span; exclude by default |
+| `2026-10-04`, `3/4`, `10:30` | One number-like span; exclude by default |
+| HTTP(S)/www URL, dotted-domain email address | Exclude recognized full span |
+| Standalone punctuation, emoji, combining mark | Ignore |
+
+With `keep_numbers = TRUE`, number-like expressions are retained and flagged
+with `is_number = TRUE`. Numeric recognition is not date or number validation;
+for example, an invalid calendar date can still be a number-like expression.
+URL recognition can include trailing punctuation. Bare domains without www or
+HTTP(S), malformed addresses, abbreviations requiring a dictionary, and
+language-specific segmentation are outside these rules. Check token rows when
+those cases are important to your corpus.
+
+Offsets count Unicode code points in the **processed text**, after normalization,
+case conversion and typography changes. They are not byte positions or offsets
+into the original text. The full source is not retained, but tokens and
+`excluded_spans` contain observed text; this is an analysis record, not redaction.
+The exclusion table lists recognized URLs, emails and removed numbers, not every
+punctuation character. SHA-256 fingerprints detect accidental edits when the
+object is reused. They do not establish authenticity or reconstruct source text.
+
+## Check the effect on your results
+
+The two rules answer different operational questions. This small sensitivity
+example illustrates the consequences; it does not establish that either rule
+is universally superior.
+
+```{r}
+comparison_text <- "Read read at https://example.org on 2026-10-04."
+prepared <- lapply(c("unicode", "english"), function(rule) {
+  lexdiv_tokenize(comparison_text, tokenizer = rule, case = "lower")
+})
+names(prepared) <- c("unicode", "english")
+comparison <- lexdiv_metrics_text_batch(prepared, metrics = "ttr")
+knitr::kable(comparison$results[, c("document_id", "N", "V", "value")])
+lapply(prepared, function(x) x$tokens$surface)
+```
+
+Here, removing non-lexical spans changes the number of tokens and types, and
+therefore TTR. A higher TTR under one rule is not evidence of better writing or
+better tokenization. Report the tokenizer ID/version and settings along with
+the metric definition and parameters. For NJ8, a retained surface form such as
+`John's`, `can't` or `U.S.A.` can still be off-list. Lemma analyses require an
+explicit annotation step, and the coverage report must remain with the scores.
+Both R tokenizers differ from the bundled TUBELEX Treebank segmentation; see
+the separate [TUBELEX input guide](tubelex-input.html) when source-aligned
+segmentation is required.
+
+## Declare spelling, name, numeral and symbol policies
+
+These are measurement choices, not automatically errors in the writer's text.
+Keep source forms, analysis keys and reference-lookup keys separate. The raw
+tokenizer does not infer national variety, proper names or the meaning of a
+number. Current behavior and possible alternatives are:
+
+| Item | Current English lexical tokenizer | Study-specific alternative |
+|---|---|---|
+| `colour` / `color` | Separate surface forms; no variety conversion | Reviewed equivalence for counting, lookup, or both, declared separately |
+| `Rose` / `rose` | Retains both; `case = "lower"` merges their spellings | Annotate the original case; select proper-noun occurrences using supplied POS |
+| `2026`, `3.14`, `75%` | Removed with `keep_numbers = FALSE`; retained with `TRUE` | Retain for numeracy/discourse questions; record the numeric-expression rule |
+| `two`, `2nd`, `COVID-19` | Retained even with `keep_numbers = FALSE` | Use explicit linguistic annotation or reviewed categories if broader exclusion is needed |
+| Punctuation, `$`, `+`, emoji | Standalone marks are not lexical tokens | Import complete annotations when these marks or their boundaries matter |
+| `can't`, `well-known` | Internal apostrophes/hyphens retained | A different segmentation needs its own declared tokenizer/reference compatibility |
+
+### English spelling varieties
+
+`colour` and `color` are accepted variety spellings
+([Cambridge Dictionary](https://dictionary.cambridge.org/dictionary/english/color)).
+The bundled NJ8 snapshot matches `color`, `center` and `theater`, but does not
+match the surface queries `colour`, `centre` and `theatre`. This is a lookup
+boundary, not evidence that the British spellings are errors or more advanced
+words. NJ8's `expand_parenthetical` only expands alternatives actually present
+in the resource; it is not a comprehensive British/American conversion table.
+
+```{r}
+spelling_lookup <- nj8_profile(c("colour", "color", "centre", "center",
+  "theatre", "theater"), unit = "surface")
+spelling_lookup$lookup[, c("surface_term", "lookup_term", "matched", "level")]
+```
+
+For surface-form research, keep the distinction. For a declared equivalence
+analysis, retain a versioned, reviewed mapping and show the original result
+alongside it. Mapping only the lookup key can improve reference coverage without
+changing the diversity calculation. Merging types is a separate decision.
+There is no universal need to prefer US over UK forms, and English varieties
+are not exhausted by those two labels. Avoid global suffix substitutions or
+rewriting names/titles. Some mappings depend on POS and sense; for example,
+[practise is a UK verb form](https://dictionary.cambridge.org/dictionary/english/practise),
+while [practice also serves as a noun](https://dictionary.cambridge.org/dictionary/english/practice).
+Spelling equivalence is distinct from inflectional lemmatization and synonymy.
+
+For frequency resources such as TUBELEX, querying the US form is **not** a
+pooled frequency for both spellings. Pooling requires compatible underlying
+counts and denominators and a declared grouping; do not add log/Zipf values.
+Document ranges cannot simply be added because a document may contain both
+forms. Surface-form psycholinguistic properties such as orthographic length or
+form-specific familiarity must remain attached to the displayed form unless
+there is evidence for combining them. No frequency/norm pooling is implemented
+by the example below.
+
+### Proper nouns and numerals
+
+`word_inclusion = "content"` means `ADJ`, `ADV`, `NOUN`, **`PROPN`** and `VERB`.
+It therefore includes proper nouns; it is not a "remove names" switch. For a
+different selection, import complete annotations and create an explicit view.
+Capitalization alone cannot decide whether a token is a name: `Rose` can name a
+person, while an ordinary noun may start a sentence. Keep case for annotation,
+then separately declare case handling for counting. A POS filter is not full
+named-entity recognition: some words within names/titles retain other POS tags,
+as explained in the [UD PROPN specification](https://universaldependencies.org/u/pos/PROPN.html).
+Excluding complete entities requires reviewed spans or an identified NER layer.
+Replacing all names with `<NAME>` creates an artificial repeated type; it is
+neither simple exclusion nor an unchanged lexical-diversity analysis. Selection
+also does not anonymize the saved source or audit tables.
+
+`is_number` is a tokenizer pattern flag, not a semantic numeral annotation.
+With English tokenization it recognizes digit-based numeric expressions,
+including dates and percentages. `two` and `IV` are not caught by that flag;
+`2nd` and alphanumeric product names remain word-like tokens. In contrast,
+[UD NUM](https://universaldependencies.org/u/pos/NUM.html) includes cardinal
+number words, but ordinarily places English ordinals such as `second` under
+ADJ. Thus even removing `NUM` does not mean removing every expression with a
+numerical meaning. The legacy `tokenizer = "unicode"` has a narrower pure-number
+rule; state which tokenizer was used.
+
+Retaining `1,000` and `1000` does not automatically merge their forms or parse
+their values. The tokenizer is not a locale-aware numeric parser and does not
+validate dates. For quantity analysis, define decimal/grouping conventions,
+units, dates, identifiers and ambiguous forms separately. Replacing all numeric
+expressions with `<NUM>` would again change the measured type distribution.
+
+### Symbols and boundaries
+
+[UD distinguishes symbols from punctuation](https://universaldependencies.org/u/pos/SYM.html):
+currency signs, mathematical operators and emoji can carry meaning. Ignoring
+them can be reasonable for a declared word-based measure, but cannot support a
+claim about their absence or their communicative functions. The raw English
+tokenizer turns `C++` into `C`, `R&D` into `R` and `D`, and `#topic` into `topic`.
+It does not interpret `&` as `and`, expand currency signs, preserve social-media
+entities or provide a punctuation-error measure. Curly apostrophes and lexical
+hyphens are canonicalized; an em dash separates words. Inspect such cases before
+using a lexical tokenizer for specialist texts.
+
+For punctuation/symbol research, use complete externally supplied segmentation
+with `lexdiv_import_annotations()`. It retains every supplied surface and aligns
+it to the original text; a reviewed token can therefore preserve `C++`. This
+does not make its POS automatically correct. Use the same tokenization policy
+across comparison groups and retain the source record.
+
+For adjacent n-grams, do not remove marks and renumber the remaining words.
+Dropping `+` from `cats + dogs` must not silently create an adjacent `cats dogs`
+pair under a policy that treats excluded positions as boundaries. The example
+retains full original token positions, so `lexdiv_ngrams()` respects the gap.
+`lexdiv_as_quanteda()` can also retain such gaps as padding. A raw lexical
+tokenizer has already removed punctuation before numbering tokens; it cannot
+reconstruct these boundaries later. Sentence/segment boundaries must be supplied
+explicitly. Windowed diversity on a selected word sequence has a different
+contract: its windows count selected tokens, not original character distance.
+
+### Run the policy comparison
+
+The installed example supplies eight authored documents and their complete
+token rows, including a technical name, missing POS and an empty document. It
+compares name/numeral selections and spelling equivalence through existing
+functions. Three illustrative noun aliases are explicitly reviewed; this is
+not an automatically validated or comprehensive spelling dictionary.
+
+```{r}
+policy_example <- new.env(parent = environment())
+sys.source(system.file("examples", "lexical-counting-policy.R", package = "ldfreq",
+  mustWork = TRUE), envir = policy_example)
+counting <- policy_example$lexical_counting_example
+subset(counting$metrics, metric_id == "ttr" &
+  document_id %in% c("variants", "names", "numerals") &
+  policy %in% c("words_and_numerals", "without_names_or_numerals", "spelling_equivalence"),
+  select = c(policy, document_id, selected_known, types_known, reportable_value))
+subset(counting$coverage, document_id == "variants" & policy == "words_and_numerals")
+```
+
+For `The colour is color.`, surface TTR is 1 and TTR with declared spelling
+equivalence is 0.75. Exact NJ8 token coverage is 2/4; reviewed alias lookup is
+3/4. The lookup comparison is also available without merging diversity types.
+In `Rose saw a rose.`, lowercased surface TTR increases from 0.75 to 1 after
+removing the supplied PROPN occurrence. Excluding names does not have a fixed
+direction of effect; inspect N and V together.
+
+`$annotation` retains full source/positions, `$selections` keeps every token and
+its exclusion reason, and `$runs` retains complete metric/reference objects and
+query-to-source links. `$aliases` and `$alias_info` retain the mapping, review
+metadata and fingerprint. `conditional_value` summarizes only selected tokens
+with known POS. If a selection cannot be resolved because POS is missing,
+`reportable_value` stays missing; neither the unknown token nor its document is
+silently treated as a complete case. Reference coverage is explicitly conditional
+on selected known tokens. The three-token MATTR window is illustrative only.
+
+```{r}
+policy_path <- tempfile(fileext = ".rds")
+saveRDS(list(result = counting, session = sessionInfo()), policy_path)
+stopifnot(identical(readRDS(policy_path)$result, counting))
+unlink(policy_path)
+```
+
+For a study, save to a persistent path and retain the annotation model/version
+and review procedure. The authored tags here demonstrate accounting and source
+alignment, not POS/NER accuracy, psycholinguistic validity or a preferred
+universal exclusion policy.
+
+## Analyze an ID/text table
+
+Use one row per document, with explicit unique IDs and character text. Other
+columns, such as writer or task, stay in the study table for a later join by ID.
+Empty text is a valid zero-token document. `NA` text is an error naming the
+document; decide whether it denotes missing data before analysis rather than
+silently replacing it with an empty string.
+
+```{r}
+essays <- data.frame(
+  essay_id = c("essay_02", "essay_01", "empty"),
+  response = c("The student reads a book and discusses the book.",
+               "A reader explores a story with a friend.", "")
+)
+tokens <- lexdiv_tokenize_batch(
+  essays, id_col = "essay_id", text_col = "response",
+  tokenizer = "english", case = "lower"
+)
+analysis <- lexdiv_metrics_text_batch(
+  tokens, metrics = c("ttr", "mattr"), window_length = 5
+)
+analysis$results
+levels <- nj8_profile_batch(tokens, unit = "surface")
+levels$coverage
+```
+
+The output keeps the input document order. Empty documents retain metric rows
+with missing values and reasons, plus a preprocessing record. They have no token
+audit rows. Short documents never reduce another document's requested window.
+For raw text alone, `lexdiv_metrics_text_batch(essays, id_col = "essay_id",
+text_col = "response", tokenizer = "english", case = "lower", ...)` combines
+the two steps. For existing tokenizations, omit tokenizer arguments: their
+recorded settings are authoritative. Annotated tokenizations can be analyzed
+with `unit = "lemma"` or `"flemma"` and the same explicit word-inclusion policy
+used by `lexdiv_metrics_text()`.
+
+## Import CSV or UTF-8 text files
+
+Base R is sufficient. Read ID/text columns as character to retain identifiers
+such as `001` and literal responses such as `TRUE`. Choose missing-value markers
+deliberately for your data.
+
+```{r, eval=FALSE}
+essays <- read.csv(
+  "essays.csv", fileEncoding = "UTF-8", colClasses = "character",
+  na.strings = "<MISSING>", check.names = FALSE
+)
+tokens <- lexdiv_tokenize_batch(essays, tokenizer = "english", case = "lower")
+
+# Explicit file-to-ID mapping, with each file representing one document.
+files <- c(essay_01 = "texts/essay_01.txt", essay_02 = "texts/essay_02.txt")
+texts <- vapply(files, function(path) {
+  paste(readLines(path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
+}, character(1))
+tokens <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
+```
+
+This file recipe joins lines with newline separators and does not record source
+file bytes. The tokenization hash identifies the string passed to the tokenizer.
+Retain the original corpus and its import procedure separately when byte-level
+source reconstruction is needed.
+
+## Save the complete analysis
+
+```{r}
+record <- list(tokens = tokens, diversity = analysis, nj8 = levels,
+               session = sessionInfo())
+path <- tempfile(fileext = ".rds")
+saveRDS(record, path)
+stopifnot(identical(readRDS(path), record))
+unlink(path)
+wide <- lexdiv_widen(analysis$results)
+```
+
+Use `wide` for a join or a CSV export, while keeping the RDS record for the
+tokenization and exclusion decisions. In methods, state that the English
+tokenizer preserves contractions and hyphenated words, identify the number
+policy and case/normalization choices, and distinguish surface coverage from
+lemma coverage. Cite ldfreq and the New JACET 8000 source recorded in
+`levels$provenance` when reporting NJ8 results. The
+[text-to-report example](from-text-to-report.html) develops the interpretation
+and reporting of the resulting metrics.

@@ -97,7 +97,13 @@ columns: \code{component}, \code{value_a}, \code{value_b}, and
 
 The compared components depend on \code{unit}. Surface comparison uses
 tokenizer settings and UPOS backend identity. Lemma comparison additionally
-uses the lemma method and backend. Flemma comparison instead adds the fixed
+uses the lemma method and backend. If either lemma backend is textstem, both
+dictionary IDs, versions, content hashes, hash methods, query casefold rules and
+locales must be present and equal. Older saved annotations lacking this record
+fail strict comparison even if both lack it; reannotate with a known dictionary
+or explicitly use the existing mismatch policy to retain the uncertainty.
+These checks establish recorded processing agreement, not linguistic validity.
+Flemma comparison instead adds the fixed
 flemma adapter/parser and its resource/override settings; it intentionally
 ignores lemma method/backend because \code{lexdiv_flemmatize()} consumes
 surface forms rather than lemmas.
@@ -107,8 +113,8 @@ Strict comparison requires both caller-declared resource versions to be present
 and equal. When neither side used overrides, the override setting is comparable
 without an override version. If either side used overrides, both sides must use
 overrides and declare the same non-missing version. Missing labels are
-unverifiable, different labels are mismatches, and no raw or canonical content
-hash is compared. Because declared labels appear in the table, callers must not
+unverifiable, different labels are mismatches, and no flemma resource or
+override content hash is compared. Because declared labels appear in the table, callers must not
 put paths, secrets, private hashes, or machine-specific details in them.
 }
 \section{Empty sets and invalid input}{

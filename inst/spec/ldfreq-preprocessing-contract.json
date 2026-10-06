@@ -1,36 +1,98 @@
 {
   "$schema": "ldfreq-preprocessing-contract.schema.json",
   "contract_id": "ldfreq-preprocessing",
-  "contract_version": "0.2.0",
+  "contract_version": "0.4.0",
   "status": "normative",
   "public_api": true,
   "tokenizer": {
     "tokenizer_id": "ldfreq-unicode-word-tokenizer",
     "tokenizer_version": "0.1.0",
     "input": "one-plain-valid-utf8-character-string",
-    "token_classes": ["unicode-letter", "unicode-mark", "unicode-number"],
-    "preserved_internal_connectors": ["apostrophe", "right-single-quotation-mark", "hyphen-minus", "hyphen", "non-breaking-hyphen"],
+    "token_classes": [
+      "unicode-letter",
+      "unicode-mark",
+      "unicode-number"
+    ],
+    "preserved_internal_connectors": [
+      "apostrophe",
+      "right-single-quotation-mark",
+      "hyphen-minus",
+      "hyphen",
+      "non-breaking-hyphen"
+    ],
     "punctuation_tokens": false,
     "empty_text": "valid-zero-token-result",
     "offset_coordinate_space": "processed-text-unicode-code-points",
-    "required_provenance": ["source_text_sha256", "processed_text_sha256", "token_table_sha256", "token_pattern", "input_characters", "processed_characters"],
+    "required_provenance": [
+      "source_text_sha256",
+      "processed_text_sha256",
+      "token_table_sha256",
+      "token_pattern",
+      "input_characters",
+      "processed_characters"
+    ],
     "token_table_fingerprint": "sha256-of-utf8-tab-separated-token_index-start-end-surface-is_number-rows-joined-with-newlines-no-final-newline",
     "annotation_columns_in_fingerprint": false,
     "validation": "require-supported-contract-pattern-and-hashes; check-offset-bounds-normalization-case-number-policy-and-token-fingerprint",
-    "validation_limit": "detects-accidental-inconsistency-not-authenticity-or-reconstruction-of-unretained-text"
+    "validation_limit": "detects-accidental-inconsistency-not-authenticity-or-reconstruction-of-unretained-text",
+    "default": "unicode",
+    "choices": [
+      "unicode",
+      "english"
+    ],
+    "english": {
+      "tokenizer_id": "ldfreq-english-word-tokenizer",
+      "tokenizer_version": "0.1.0",
+      "scope": "deterministic-English-lexical-rules-not-Treebank-or-multilingual-segmentation",
+      "typography": "after-Unicode-and-case-normalization-map-U+2018-U+2019-to-apostrophe-and-U+2010-U+2011-to-hyphen-minus",
+      "words": "letter-containing-alphanumeric-sequences-with-internal-apostrophes-or-hyphens; no-leading-combining-marks",
+      "contractions": "keep-whole-without-expansion-or-lemmatization",
+      "initialisms": "two-or-more-ASCII-letter-period-pairs-retained-with-periods",
+      "numbers": "Unicode-number-sequences-with-optional-sign-separators-decimal-leading-dot-or-comma-exponent-percent-or-permille; numeric-dates-and-ranges-are-number-like",
+      "number_interpretation": "lexical-recognition-only-not-date-or-number-validation",
+      "urls": "http-or-https-scheme-or-www-prefix-through-non-whitespace-non-bracket-non-quote-characters; may-include-trailing-punctuation",
+      "emails": "dotted-domain-email-pattern; excludes-recognized-full-span",
+      "excluded_spans_columns": [
+        "start",
+        "end",
+        "surface",
+        "reason"
+      ],
+      "excluded_reasons": [
+        "url",
+        "email",
+        "number"
+      ],
+      "excluded_spans_coordinate_space": "processed-text-unicode-code-points",
+      "excluded_spans_fingerprint": "sha256-of-utf8-tab-separated-start-end-surface-reason-rows-joined-with-newlines-no-final-newline",
+      "punctuation_and_unrecognized_symbols": "ignored-not-enumerated-in-excluded-spans",
+      "keep_numbers": "retains-number-like-spans-with-is_number-TRUE; URLs-and-email-still-excluded"
+    }
   },
   "normalization": {
-    "choices": ["NFC", "NFKC", "none"],
+    "choices": [
+      "NFC",
+      "NFKC",
+      "none"
+    ],
     "default": "NFC",
-    "case_choices": ["preserve", "lower"],
+    "case_choices": [
+      "preserve",
+      "lower"
+    ],
     "case_default": "preserve",
     "lowercase_locale": "en",
     "pure_number_default": "remove",
     "alphanumeric_tokens": "retain"
   },
   "annotation": {
-    "lemma_methods": ["supplied", "textstem"],
-    "flemma_methods": ["caller-supplied-antbnc"],
+    "lemma_methods": [
+      "supplied",
+      "textstem"
+    ],
+    "flemma_methods": [
+      "caller-supplied-antbnc"
+    ],
     "implicit_backend_selection": false,
     "implicit_model_download": false,
     "supplied_backend_identity_required": true,
@@ -39,7 +101,25 @@
     "backend_identity_safety": "path-free-caller-labels-with-no-secrets-or-private-hashes",
     "upos_backend_identity": "required-explicit-separate-from-lemma-backend-when-upos-present",
     "textstem_with_caller_upos": "separate-upos-backend-identity-required",
-    "upos_inventory": ["ADJ", "ADP", "ADV", "AUX", "CCONJ", "DET", "INTJ", "NOUN", "NUM", "PART", "PRON", "PROPN", "PUNCT", "SCONJ", "SYM", "VERB", "X"],
+    "upos_inventory": [
+      "ADJ",
+      "ADP",
+      "ADV",
+      "AUX",
+      "CCONJ",
+      "DET",
+      "INTJ",
+      "NOUN",
+      "NUM",
+      "PART",
+      "PRON",
+      "PROPN",
+      "PUNCT",
+      "SCONJ",
+      "SYM",
+      "VERB",
+      "X"
+    ],
     "unsupported_upos": "error",
     "annotation_layer_validation": "columns-provenance-and-row-alignment-required",
     "flemma_backend_identity": {
@@ -57,12 +137,21 @@
       "strict_overlap_resource_rule": "both-present-and-equal",
       "strict_overlap_override_rule": "both-overrides-absent-or-both-present-with-equal-version",
       "labels_disclosed": true,
-      "labels_must_not_contain": ["paths", "secrets", "private-hashes", "machine-specific-details"],
+      "labels_must_not_contain": [
+        "paths",
+        "secrets",
+        "private-hashes",
+        "machine-specific-details"
+      ],
       "content_identity_inferred": false
     },
     "missing_lemma": "exclude-and-report",
     "missing_upos_for-content-analysis": "exclude-and-report",
-    "content_exclusion_precedence": ["missing_upos", "non_content_upos", "missing_selected_unit"],
+    "content_exclusion_precedence": [
+      "missing_upos",
+      "non_content_upos",
+      "missing_selected_unit"
+    ],
     "unknown_antbnc_form": "normalized-surface-identity-fallback",
     "antbnc_override_precedence": "explicit-override-then-antbnc-then-identity",
     "antbnc_resource_bundled": false,
@@ -71,25 +160,93 @@
     "antbnc_source_file_name_public_provenance": false,
     "antbnc_source_hash_public_provenance": false,
     "antbnc_source_hash_use": "internal-parse-cache-only",
-    "override_content_hash_public_provenance": false
+    "override_content_hash_public_provenance": false,
+    "textstem_dictionary": {
+      "default": "lexicon::hash_lemmas-with-installed-lexicon-version",
+      "custom": "two-character-column-data-frame; unique-lowercase-terms; no-empty-or-missing-values; explicit-path-free-id-and-version",
+      "empty_dictionary": "valid-identity-fallback",
+      "record_fields": [
+        "source",
+        "id",
+        "version",
+        "sha256",
+        "hash_method",
+        "entries",
+        "query_casefold",
+        "query_locale",
+        "unknown_form_policy"
+      ],
+      "hash_method": "sha256-utf8-byte-length-pairs-v1",
+      "hash_payload": "UTF-8 bytes: hash_method then colon then decimal-row-count then colon then concatenated pairs sorted by UTF-8 byte order of term; each pair is decimal-term-byte-length:term followed by decimal-lemma-byte-length:lemma; no separators beyond length colons",
+      "hash_ignores": [
+        "row-order",
+        "column-names",
+        "row-names",
+        "data-frame-subclass"
+      ],
+      "query_casefold": "base-tolower-with-recorded-LC_CTYPE",
+      "unknown_form_policy": "surface",
+      "content_retained": false,
+      "validation_limit": "structure-only-without-dictionary-payload; fingerprint-not-authenticity",
+      "replay": "save-actual-dictionary-and-prepared-input; preserve-backend-version-and-locale",
+      "context_sensitive": false
+    }
   },
   "lexical_units": {
-    "choices": ["surface", "lemma", "flemma"],
+    "choices": [
+      "surface",
+      "lemma",
+      "flemma"
+    ],
     "default": "surface",
-    "word_inclusion_choices": ["all", "content"],
+    "word_inclusion_choices": [
+      "all",
+      "content"
+    ],
     "word_inclusion_default": "all",
-    "content_upos": ["ADJ", "ADV", "NOUN", "PROPN", "VERB"]
+    "content_upos": [
+      "ADJ",
+      "ADV",
+      "NOUN",
+      "PROPN",
+      "VERB"
+    ]
   },
   "compatibility": {
     "serialized_0_1_0_tokenization": "not-automatically-migrated",
-    "migration": "retokenize-original-text-and-reapply-current-annotations"
+    "migration": "retokenize-original-text-and-reapply-current-annotations",
+    "serialized_0_2_0_unicode_tokenization": "accepted-with-existing-validation-without-rewriting-saved-provenance",
+    "serialized_0_3_0_tokenization": "accepted-with-existing-validation; absent-dictionary-record-does-not-establish-strict-lemma-comparability",
+    "reannotation": "lexdiv_lemmatize-upgrades-contract-and-records-new-annotation-provenance"
   },
   "result_boundary": {
     "metric_core_schema_changed": false,
-    "existing_tokenization_argument_policy": "reject-explicit-normalization-case-or-keep_numbers",
-    "forwarded_metric_parameters": ["expected_ttr_sample_sizes"],
-    "preprocessing_envelope_components": ["results", "token_audit", "preprocessing"],
+    "existing_tokenization_argument_policy": "reject-explicit-normalization-case-keep_numbers-or-tokenizer",
+    "forwarded_metric_parameters": [
+      "expected_ttr_sample_sizes"
+    ],
+    "preprocessing_envelope_components": [
+      "results",
+      "token_audit",
+      "preprocessing"
+    ],
     "excluded_tokens_imputed": false,
-    "coverage_reported": true
+    "coverage_reported": true,
+    "raw_text_batch": {
+      "input": "named-character-vector-or-data-frame-with-explicit-character-id-and-text-columns",
+      "prepared_input": "plain-named-list-of-tokenization-objects-for-metrics-only",
+      "ids": "unique-nonempty-valid-utf8; input-order-retained",
+      "missing_text": "error-with-document-id",
+      "empty_text": "zero-tokens-with-metric-missing-status-and-preprocessing-record",
+      "tokenize_return": "named-list-of-complete-tokenization-objects",
+      "metrics_return_components": [
+        "results",
+        "token_audit",
+        "preprocessing"
+      ],
+      "metric_table": "unchanged-core-and-batch-result-schemas",
+      "token_audit": "document_id-prepended-to-single-text-token-audit; empty-documents-have-no-token-rows",
+      "preprocessing": "input-ordered-named-list-of-complete-single-text-preprocessing-records"
+    }
   }
 }

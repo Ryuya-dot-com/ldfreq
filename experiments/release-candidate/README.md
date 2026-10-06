@@ -19,6 +19,12 @@ than falling back to a non-candidate result.
 BOM, SPDX dependency SBOM, resource BOM, and release-provenance record. The
 archive and PDF manual must already exist.
 
+The SPDX root uses a LicenseRef with the source LICENSE text, preserving the
+component-specific terms instead of labeling the complete collection MIT.
+The resource BOM embeds both the installed manifest and repository admission
+inventory. The run index compares resource IDs and counts against this exact
+BOM, not a historical hard-coded count.
+
 ```sh
 Rscript experiments/release-candidate/generate-release-evidence.R \
   /path/to/ldfreq /path/to/ldfreq_0.2.0.tar.gz \
@@ -28,12 +34,13 @@ Rscript experiments/release-candidate/generate-release-evidence.R \
 `run-as-cran-check.R` runs `R CMD check --as-cran --no-manual` against one
 named tarball. By default, it accepts `Status: OK` or the exact single CRAN
 incoming NOTE whose complete nonblank detail is the maintainer line followed by
-`New submission`. The optional `minimum-r-optional-textstem` policy is restricted
+`New submission`. The optional `minimum-r-optional-backends` policy is restricted
 to the `ubuntu-latest-r-4.1` job on R 4.1.x. It additionally requires the exact
-package-dependency NOTE naming unavailable Suggests package `textstem`; every
-other result fails. The workflow leaves `textstem` uninstalled in that one job,
+package-dependency NOTE naming exactly `gibasa` and `textstem`; every
+other result fails. Their current versions need R >= 4.2 and R >= 4.4,
+respectively. The workflow leaves both uninstalled in that one job,
 sets `_R_CHECK_FORCE_SUGGESTS_=false`, and verifies that the package remains
-checkable without this optional backend.
+checkable without these optional backends.
 
 ```sh
 Rscript experiments/release-candidate/run-as-cran-check.R \
@@ -48,3 +55,13 @@ labels to their recorded OS/R environments and rechecks every source, manual,
 BOM, SBOM, and resource-BOM identity named by provenance. It deliberately leaves
 the final maintainer go/no-go decision pending after recording resource
 admission.
+
+For the R 4.1 diagnostic, CI pins the compatible `Matrix@1.6-5` and `MASS@7.3-60`; Matrix is needed by
+quanteda (>= 1.5-0 Matrix). Current Matrix releases require newer R; the archived
+1.6-5 DESCRIPTION declares R >= 3.5.0. Current-R jobs use their normal dependency
+resolution. This is a CI compatibility pin, not a package runtime dependency.
+
+The R 4.1 dependency setup includes Depends, Imports, LinkingTo and Suggests,
+but excludes third-party Enhances (notably the archived Matrix graph extension).
+ldfreq declares no Enhances. Its full check dependencies remain included except
+for the two documented R-incompatible optional backends.

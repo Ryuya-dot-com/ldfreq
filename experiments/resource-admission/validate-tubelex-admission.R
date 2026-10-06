@@ -120,7 +120,7 @@ check(
 )
 
 check(
-  identical(release_inventory$schema_version, "0.1.0") &&
+  identical(release_inventory$schema_version, "0.2.0") &&
     identical(release_inventory$record_scope, "repository-release-evidence") &&
     identical(
       release_inventory_schema$title,
@@ -135,8 +135,8 @@ check(
     identical(release_inventory$policy$uncertainty_default, "exclude") &&
     identical(release_inventory$policy$runtime_network_access, FALSE) &&
     identical(release_inventory$policy$implicit_download_or_fallback, FALSE) &&
-    identical(as.numeric(release_inventory$release_approved_resource_count), 1) &&
-    length(release_inventory$included_resources) == 1L,
+    identical(as.numeric(release_inventory$release_approved_resource_count),
+      as.numeric(length(release_inventory$included_resources))),
   "The repository release inventory changed its policy or resource count."
 )
 excluded_ids <- vapply(
@@ -148,7 +148,7 @@ check(
   identical(
     excluded_ids,
     c(
-      "ngsl-1.2", "oewn-2025", "nj8", "antbnc-lemma-list",
+      "ngsl-1.2", "oewn-2025", "antbnc-lemma-list",
       "ngsl-31k-workbook", "coca", "ellipse-corpus",
       "python-resource-derived-golden-outputs"
     )
@@ -157,17 +157,40 @@ check(
 )
 
 check(
-  identical(installed_manifest$schema_version, "1.0.0") &&
+  identical(installed_manifest$schema_version, "1.2.0") &&
     identical(installed_manifest$package_scope, "installed-lexical-resources") &&
     identical(installed_manifest$runtime_policy$network_access, FALSE) &&
     identical(installed_manifest$runtime_policy$implicit_download_or_fallback, FALSE) &&
-    length(installed_manifest$resources) == 1L &&
     identical(installed_manifest_schema$title, "ldfreq installed resource manifest") &&
     identical(installed_manifest_schema$additionalProperties, FALSE),
   "The installed resource-manifest contract changed."
 )
-installed <- installed_manifest$resources[[1L]]
-release_resource <- release_inventory$included_resources[[1L]]
+installed_ids <- vapply(installed_manifest$resources, `[[`, character(1L), "resource_id")
+release_ids <- vapply(release_inventory$included_resources, `[[`, character(1L), "resource_id")
+expected_ids <- c("tubelex-en-treebank-slim", "new-jacet8000", "morpholex-en",
+  "bnccoca-level6", "morphynet-en-example")
+check(!anyDuplicated(installed_ids) && !anyDuplicated(release_ids) &&
+  setequal(installed_ids, expected_ids) && setequal(release_ids, installed_ids),
+  "Installed and admitted resource identities are incomplete or duplicated.")
+member_identity <- function(records) lapply(records, function(record) {
+  list(path = record$path, bytes = record$bytes, sha256 = record$sha256)
+})
+shared_fields <- c("resource_id", "resource_version", "runtime_state", "public_api",
+  "license_spdx", "license_name", "source_commit", "source_url", "source_sha256",
+  "raw_source_bundled", "raw_subtitles_or_identifiers_included", "manifest_sha256",
+  "artifact_sha256", "content_sha256", "content_scope")
+for (id in installed_ids) {
+  installed_resource <- installed_manifest$resources[[match(id, installed_ids)]]
+  admitted_resource <- release_inventory$included_resources[[match(id, release_ids)]]
+  check(identical(installed_resource$distribution, "bundled") &&
+    identical(admitted_resource$release_approved, TRUE) &&
+    identical(unname(installed_resource[shared_fields]), unname(admitted_resource[shared_fields])) &&
+    identical(member_identity(installed_resource$package_members),
+      member_identity(admitted_resource$package_members)),
+    sprintf("Installed and admitted resource records disagree: %s", id))
+}
+installed <- installed_manifest$resources[[match(resource$resource_id, installed_ids)]]
+release_resource <- release_inventory$included_resources[[match(resource$resource_id, release_ids)]]
 identity_fields <- c(
   "resource_id", "resource_version", "license_spdx", "source_commit",
   "source_sha256", "raw_source_bundled",
@@ -187,9 +210,6 @@ candidate_identity <- list(
   artifact_sha256 = resource$artifact_sha256,
   content_sha256 = resource$content_sha256
 )
-member_identity <- function(records) lapply(records, function(record) {
-  list(path = record$path, bytes = record$bytes, sha256 = record$sha256)
-})
 check(
   identical(unname(installed[identity_fields]), unname(candidate_identity)) &&
     identical(unname(installed[identity_fields]), unname(release_resource[identity_fields])) &&
@@ -216,6 +236,7 @@ result <- list(
   record_scope = "repository-release-evidence",
   admission_gate_passed = TRUE,
   installed_manifest_consistent = TRUE,
+  installed_resource_count = length(installed_ids),
   decision_id = decision$decision_id,
   remaining_gates = remaining_gates,
   excluded_resource_count = length(excluded_ids),

@@ -8,16 +8,17 @@
   x,
   request_id = NULL,
   add_global_mean = TRUE,
-  col = "#2166AC",
+  col = "#0072B2",
   lwd = 2,
   type = "l",
   main = NULL,
   xlab = "Window midpoint (token position)",
   ylab = "Local TTR",
   ylim = c(0, 1),
-  mean_col = "#B2182B",
+  mean_col = "#D55E00",
   mean_lty = 2,
-  ...
+  ...,
+  monochrome = FALSE
 )
 }
 \arguments{
@@ -33,6 +34,7 @@ whether to add the canonical MATTR value as a horizontal line.}
 
 \item{mean_col, mean_lty}{Settings for the global-mean line.}
 
+\item{monochrome}{One \code{TRUE} or \code{FALSE} value; specify by name. Defaults to color; \code{TRUE} overrides \code{col} and \code{mean_col} with black. Line types are retained, including the dashed mean line. No title is added automatically; place figure titles and notes outside the image.}
 \item{...}{Additional arguments passed to \code{graphics::plot()}.}
 }
 \value{
@@ -42,6 +44,10 @@ Invisibly, the exact window rows displayed.
 Plot one local MATTR trajectory
 }
 \details{
+Plot defaults use a sans serif font, horizontal tick labels and an open frame.
+Override these with \code{family}, \code{las} or \code{bty} in the plot
+method's \code{...}. Cosmetic graphics parameters are restored after drawing.
+
 The x-axis uses each complete window's midpoint and the y-axis uses its local
 TTR. By default, the canonical whole-profile MATTR value is drawn as a dashed
 horizontal line. When a plan contains several window lengths, select exactly

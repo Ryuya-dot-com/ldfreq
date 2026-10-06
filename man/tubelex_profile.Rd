@@ -68,7 +68,10 @@ remain visible.
 
 TUBELEX is a general YouTube subtitle frequency space. Its values are relative
 to that corpus and are not direct measures of proficiency, writing quality,
-academic register, or context-independent lexical sophistication.
+academic register, or context-independent lexical sophistication. In particular,
+lexical employability (using words in communication) requires learner-level
+criteria; neither frequency nor video/channel prevalence demonstrates an
+individual's meaning recall, processing speed or appropriate contextual use.
 }
 \section{Reading lookup and summary values}{
 The lossless \code{lookup} table contains:
@@ -122,6 +125,11 @@ integrity check. \code{failure_reason} is missing for \code{"ok"} and
 \code{"empty"}, and otherwise gives the specific failure reason. Coverage is
 missing when its denominator is zero or the lookup could not be completed.
 }
+\references{
+Nohejl et al. (2025). Beyond Film Subtitles: Is YouTube the Best Approximation
+of Spoken Vocabulary? \emph{Proceedings of COLING 2025}.
+\url{https://aclanthology.org/2025.coling-main.641/}.
+}
 \value{
 A \code{tubelex_profile} list containing \code{status},
 \code{failure_reason}, token- and type-weighted \code{summary}, lossless
@@ -159,5 +167,10 @@ contract_paths <- system.file("spec", contract_files, package = "ldfreq")
 stopifnot(all(nzchar(contract_paths)))
 basename(contract_paths)
 }
-\seealso{\code{\link{lexdiv_tokenize}}, \code{\link{lexdiv_metrics_text}}}
+\seealso{
+\code{\link{lexdiv_tokenize}}, \code{\link{lexdiv_metrics_text}},
+\code{\link{tubelex_diagnostics}};
+\code{vignette("tubelex-input", package = "ldfreq")} for the optional
+external tokenization recipe and its reproducibility boundaries.
+}
 \keyword{text}

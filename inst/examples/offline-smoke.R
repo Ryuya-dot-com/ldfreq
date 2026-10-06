@@ -248,4 +248,116 @@ stopifnot(
   all(screen$passes_screen)
 )
 
+# The real bundled NJ8 resource is available without a file path or network.
+bundled_levels <- nj8_profile(c("true", "false", "nan", "ldfreq_not_a_word"))
+stopifnot(
+  isTRUE(bundled_levels$provenance$resource_bundled),
+  identical(bundled_levels$lookup$rank, c(326L, 2382L, 6926L, NA_integer_)),
+  bundled_levels$diagnostics$missing_rank_count == 0
+)
+
+# English text input requires no Python, network or model download.
+english_texts <- data.frame(document_id = c("essay", "empty"),
+  text = c("The cat can't read. 3.14 https://example.org", ""))
+english_tokens <- lexdiv_tokenize_batch(english_texts, tokenizer = "english", case = "lower")
+english_batch <- lexdiv_metrics_text_batch(english_tokens, metrics = "ttr")
+stopifnot(
+  identical(english_tokens$essay$tokens$surface, c("the", "cat", "can't", "read")),
+  identical(english_tokens$essay$provenance$excluded_spans$reason, c("number", "url")),
+  identical(english_batch$results$document_id, c("essay", "empty")),
+  identical(english_batch$results$status, c("ok", "missing")),
+  identical(names(english_batch$preprocessing), c("essay", "empty"))
+)
+check_print_contract(english_batch)
+
+# Source-linked label evaluation and downstream noun TTR, without a model.
+annotation_demo <- new.env(parent = baseenv())
+sys.source(system.file("examples", "annotation-evaluation.R", package = "ldfreq",
+  mustWork = TRUE), envir = annotation_demo)
+annotation_result <- annotation_demo$annotation_evaluation_example
+stopifnot(
+  is.function(lexdiv_evaluate_annotations),
+  identical(annotation_result$differences$delta_ttr[1:2], c(.5, .5)),
+  all(is.na(annotation_result$differences$delta_ttr[3:5])),
+  annotation_result$evaluation$summary$reference_only == 1,
+  annotation_result$evaluation$summary$prediction_only == 1
+)
+
+# Different token boundaries retain global correspondence beside label agreement.
+alignment_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "annotation-alignment.R", package = "ldfreq",
+  mustWork = TRUE), alignment_env)
+alignment <- alignment_env$annotation_alignment_example$alignment
+stopifnot(is.function(lexdiv_align_annotations),
+  alignment$summary$matched[1] == 4,
+  alignment$annotation_evaluation$summary$agreement_among_paired == 1)
+
+# Basic UD pairs retain endpoint errors even when document counts agree.
+amod_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "amod-pairs.R", package = "ldfreq",
+  mustWork = TRUE), amod_env)
+amod <- amod_env$amod_pairs_example
+stopifnot(is.function(lexdiv_amod_pairs), amod$differences$delta_pairs[2] == 0,
+  amod$differences$fp[2] == 1, amod$differences$fn[2] == 1,
+  all(is.na(amod$differences$delta_pairs[5:6])))
+
+# Families retain four occurrences despite assigning one shared family.
+family_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "word-families.R", package = "ldfreq",
+  mustWork = TRUE), family_env)
+families <- family_env$word_families_example
+stopifnot(is.function(lexdiv_family_profile),
+  families$profile$documents$selected_tokens[1] == 4,
+  families$profile$documents$family_types[1] == 1,
+  is.na(families$profile$documents$family_ttr[2]),
+  all(families$comparison$N == 4))
+if (requireNamespace("quanteda", quietly = TRUE)) {
+  sys.source(system.file("examples", "word-family-review.R", package = "ldfreq",
+    mustWork = TRUE), family_env)
+  reviewed_families <- family_env$word_family_review_example$reviewed
+  stopifnot(reviewed_families$documents$family_ttr[1] == 7/8,
+    reviewed_families$documents$review_selected_tokens[1] == 2)
+}
+
+# Declared parts preserve source tokens and separate affix/token denominators.
+parts_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "word-parts-demo.R", package = "ldfreq",
+  mustWork = TRUE), parts_env)
+parts <- parts_env$word_parts_example$profile
+stopifnot(parts$documents$affix_occurrences[1] == 7,
+  parts$documents$affixes_per_token[1] == 7/5,
+  is.na(parts$documents$affix_occurrences[2]))
+
+# Bundled reference data remain available without Excel or a network request.
+morpholex <- morpholex_data(c("0-1-1", "All roots"))
+stopifnot(nrow(morpholex$sheets[["All roots"]]) == 15471L,
+  identical(morpholex$provenance$data_license, "CC BY-NC-SA 4.0"))
+sys.source(system.file("examples", "morpholex-word-parts.R", package = "ldfreq",
+  mustWork = TRUE), parts_env)
+morpholex_parts <- parts_env$read_morpholex_parts(sheets = "0-1-1", words = "teachers")
+stopifnot(nrow(morpholex_parts$parts) == 2L,
+  !any(morpholex_parts$parts$process == "inflection"))
+
+# The actual Nation inventory preserves both variant membership and omissions.
+stopifnot(is.function(bnccoca_data))
+sys.source(system.file("examples", "bnccoca-families.R", package = "ldfreq",
+  mustWork = TRUE), family_env)
+nation <- family_env$bnccoca_example$profile
+stopifnot(nation$documents$family_types[1] == 2L,
+  nation$documents$unresolved_tokens[2] == 1L,
+  is.na(nation$documents$family_ttr[2]))
+
+stopifnot(is.function(morphynet_read_derivations))
+morphynet_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "morphynet-relations.R", package = "ldfreq",
+  mustWork = TRUE), morphynet_env)
+morphynet <- morphynet_env$morphynet_example
+stopifnot(nrow(morphynet$reference$relations) == 9L,
+  sum(morphynet$candidates$term == "reusability") == 3L)
+if (!is.null(morphynet$reviewed)) {
+  stopifnot(nrow(morphynet$selected) == 1L,
+    morphynet$selected$morpheme == "ity",
+    sum(morphynet$reviewed$occurrences$status == "no_candidates") == 1L)
+}
+
 invisible(TRUE)

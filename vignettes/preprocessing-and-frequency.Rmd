@@ -225,6 +225,649 @@ a surface form that is an independent New JACET headword to a different family
 lemma. `nj8_profile()` records these conflicts and lets an analysis
 retain AntBNC, prefer the word-list headword, or stop for explicit review.
 
+### Resource-defined word families
+
+**Choose a family definition before counting.** A lemma usually links inflected
+forms; a derivational family may also include words such as `reusability`.
+Flemma and word family are not interchangeable. Bauer and Nation
+(1993, <https://doi.org/10.1093/ijl/6.4.253>) describe graded inclusion criteria;
+an inventory's inclusion level is not a frequency band or evidence that a
+learner knows every member.
+
+Experimental `lexdiv_family_profile()` accepts a plain form–family table and
+complete `lexdiv_import_annotations()` output. It needs no corpus download,
+Python, model or additional dependency. This offline example contains **authored
+decisions**, not verified entries from Nation's lists:
+
+```{r}
+family_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "word-families.R", package = "ldfreq",
+  mustWork = TRUE), family_env)
+family_example <- family_env$word_families_example
+families <- family_example$profile
+families$dictionary
+families$documents[c("document_id", "selected_tokens", "matched_tokens",
+  "unresolved_tokens", "family_types", "family_ttr", "status")]
+family_example$comparison
+```
+
+In `use uses reusability use.`, excluding supplied `PUNCT` leaves four tokens.
+They contain three surface types, two authored lemmas/flemmas and one authored
+family: TTR is .75, .50 and .25 respectively. Every comparison uses the same
+four ordered occurrences. The window of three for MATTR is only a short
+arithmetic illustration, not a recommended setting for research.
+
+The `bank quux.` document is incomplete: `bank` has two candidate families and
+`quux` is unlisted. Neither is silently assigned a family, and complete family
+types/TTR are `NA`. Inspect original context and both candidates:
+
+```{r}
+families$occurrences[families$occurrences$status %in% c("ambiguous", "unlisted"),
+  c("document_id", "segment_id", "token_index", "pre", "keyword", "post", "status")]
+families$candidates[families$candidates$document_id == "unresolved", ]
+families$members
+```
+
+#### Use Nation's bundled BNC/COCA inventory
+
+`bnccoca_data()` returns Nation's **Level 6, Version 1.0.0** family lists
+under **CC BY-SA 4.0**, including attribution and ShareAlike conditions.
+Its `dictionary` contains 75,679 headword/member rows in 25,000 families;
+each of the 25 frequency/range bands contains 1,000 families.
+The source is [Nation's official resource page](https://www.wgtn.ac.nz/lals/resources/paul-nations-resources/vocabulary-analysis-programs).
+The source spellings and memberships are preserved, including uppercase keys.
+
+```{r}
+sys.source(system.file("examples", "bnccoca-families.R", package = "ldfreq",
+  mustWork = TRUE), family_env)
+nation <- family_env$bnccoca_example
+nation$profile$documents[c("document_id", "selected_tokens", "matched_tokens",
+  "unresolved_tokens", "family_types", "family_ttr", "status")]
+nation$candidates[c("document_id", "headword", "frequency_band")]
+```
+
+The example explicitly uses `normalization = "nfkc_lower"`. Its first text,
+`use uses colour color`, contains four tokens and two source families.
+The second, `use reusability`, has an unlisted form: **REUSABILITY is absent
+from this snapshot**, even though the earlier authored example assigns it to
+USE. Complete family types and TTR therefore remain `NA`. Inspect the original
+KWIC, rather than inventing a family or interpreting noncoverage as an error:
+
+```{r}
+nation$profile$occurrences[nation$profile$occurrences$status == "unlisted",
+  c("document_id", "pre", "keyword", "post", "status")]
+```
+
+`reference <- bnccoca_data()` exposes `reference$dictionary` and
+`reference$resource` directly for `lexdiv_family_profile(annotations,
+reference$dictionary, reference$resource, normalization = "nfkc_lower")`.
+The result retains the table, source IDs, citation and license. Save the whole
+`reference` as well to retain conversion metadata and supplementary lists.
+The installed example joins frequency bands by **record ID**; matching a
+candidate is not a corpus frequency estimate or a learner knowledge score.
+
+Inclusion **Level 6** and frequency **band 6** are different variables.
+The Level 3 partial lists are a separate resource, not obtainable by filtering
+these frequency bands. The first bands also reflect pedagogical decisions.
+Each member does not have a separate Bauer–Nation affix-level annotation.
+
+`reference$supplementary` keeps proper names, marginal words, transparent
+compounds and acronyms separate, with `NA` frequency bands. Membership in a
+proper-name list does not label the use of that string in context. Placeholder
+slots 26–30 and Range software are excluded. Any explicit combination with
+the core dictionary needs its own declared scope and candidate checks.
+See `?bnccoca_data` and the installed `licenses/bnccoca/NOTICE.md`.
+
+#### Compare counting units without hiding unlisted words
+
+Family membership and dictionary coverage answer different questions. A smaller
+type count can reflect grouping words into families, or dropping words that the
+inventory does not list. Compare units on **the same occurrence IDs**, while
+reporting coverage of the original selection separately.
+
+The following explicitly sourced recipe uses the authored lemmas in the example
+above. It runs no analyzer and adds no exported API. Surface and lemma types use
+the supplied strings verbatim; case/spelling decisions should be made explicitly
+upstream. Family lookup retains its declared `nfkc_lower` normalization.
+
+```{r}
+sys.source(system.file("examples", "family-count-comparison.R", package = "ldfreq",
+  mustWork = TRUE), family_env)
+counts <- family_env$compare_family_counts(nation$profile)
+counts$documents[c("document_id", "selected_tokens", "matched_tokens",
+  "unlisted_tokens", "ambiguous_tokens", "missing_lemma_tokens",
+  "common_tokens", "token_coverage")]
+counts$comparison[c("document_id", "scope", "unit", "N", "V", "ttr", "status")]
+```
+
+For `use uses colour color`, all four occurrences are covered: surface, lemma,
+and family types are 4, 3, and 2. `colour` and `color` remain distinct supplied
+lemmas but share a source family. For `use reusability`, the full selection has
+two tokens and an unavailable family total/TTR. The `common_resolved` comparison
+contains only `use`: N = 1 and TTR = 1 for each unit. **That conditional value is
+not the family TTR of the original two-token text.**
+
+`all_selected` keeps each unit's unavailable totals as `NA` when its assignments
+are incomplete. `common_resolved` is the intersection of selected occurrences
+with a known lemma and an assigned family. `observed_types` counts known values
+without claiming a complete total. Empty selections have zero types and undefined
+TTR. The recipe also accepts an explicit `selected` logical vector in profile row
+order, limited to the profile's known-selected rows; its returned `selection`
+keeps document/segment/token IDs. Do not reuse a vector after reordering rows.
+
+Keep unresolved occurrences available for inspection:
+
+```{r}
+o <- counts$profile$occurrences
+o[counts$selection$selected & o$status != "matched",
+  c("document_id", "token_index", "pre", "keyword", "post", "status")]
+```
+
+Use this subset for type counts and TTR only. Removing unresolved occurrences
+does not justify closing gaps for moving-window measures or n-grams. A string
+match is not an accuracy score, and supplementary-list membership does not
+establish a proper noun in context. Save the full result and the reference:
+
+```{r, eval=FALSE}
+saveRDS(list(counts = counts, reference = nation$reference,
+  session = sessionInfo()), "family-comparison.rds")
+saved <- readRDS("family-comparison.rds")
+recounted <- family_env$compare_family_counts(saved$counts$profile,
+  selected = saved$counts$selection$selected)
+stopifnot(identical(recounted, saved$counts))
+```
+
+This workflow was also checked locally using 140 original essays from
+**ICNALE GRA V2.1**, retaining 31,902 saved lexical tokens and their lemmas.
+Document counts and assignments agreed with a separate direct dictionary lookup;
+30,892 tokens matched the core inventory. This is an implementation check on a
+fixed input, not independent validation of contextual family assignments.
+ICNALE texts and individual records are not included in the package; the example
+above uses authored text. Dataset source: Ishikawa, S. (2024), *The ICNALE Global
+Rating Archives (V2.1)*, Kobe University.
+
+#### Supply a different inventory
+
+For a different inventory, prepare character columns `record_id`, `form`, `family_id`
+and optionally `upos`. Repeated forms are allowed; assign only when all matching
+records agree on one family. Optional POS matching requires exact UD tags.
+If your inventory contains inclusion levels or alternative definitions, select
+the intended rows explicitly **before** lookup and record that rule in
+`family_definition`. Preserve extra level/band columns for inspection.
+
+```{r, eval=FALSE}
+dictionary <- read.csv("my-family-table.csv", colClasses = "character",
+  fileEncoding = "UTF-8")
+resource <- list(resource_id = "my-family-table", resource_version = "1",
+  language = "en", source_reference = "Full inventory citation",
+  data_license = "Terms applying to this locally obtained table",
+  family_definition = "Exact inclusion criteria and filtering used",
+  lookup_unit = "surface")
+families <- lexdiv_family_profile(annotations, dictionary, resource,
+  unit = "surface", normalization = "identity", exclude_pos = c("PUNCT", "SYM"))
+saveRDS(families, "family-profile.rds")
+restored <- readRDS("family-profile.rds")
+replayed <- lexdiv_family_profile(restored$annotations, restored$dictionary,
+  restored$provenance$resource, unit = restored$provenance$unit,
+  normalization = restored$provenance$normalization,
+  exclude_pos = restored$provenance$exclude_pos,
+  context_chars = restored$provenance$context_chars, review = restored$review)
+stopifnot(identical(restored, replayed))
+```
+
+Use `normalization = "nfkc_lower"` only when NFKC, trimming and English
+lowercasing fit the inventory. `unit = "lemma"` or `"flemma"` uses an already
+supplied annotation column; it does not run an analyzer. Family IDs remain
+unchanged. Missing POS makes selection unknown when exclusions are requested;
+`conditional_token_coverage` then describes known-selected tokens only, while
+whole-selection coverage is unavailable. Read coverage beside the unresolved
+counts, not as an annotation-accuracy estimate.
+
+For other metrics, the installed example passes ordered family IDs from a
+**complete** document to `lexdiv_metrics()`. Never remove unresolved tokens and
+join the survivors for MATTR. The pooled summary is also not an average of
+document TTRs. Do not resolve a context-dependent form by changing the global
+table for all its occurrences. Affix decomposition, inventory licensing and
+empirical validation remain separate tasks.
+
+#### Apply contextual judgments to individual occurrences
+
+When a declared inventory distinguishes two families for the same spelling,
+`review_input` prepares the existing `lexdiv_ambiguity_review()` workflow.
+Use `review =` to apply the resulting judgments to the family profile. This
+optional review preparation uses quanteda; basic family lookup and replay of
+saved judgments do not require loading quanteda or running a language model.
+
+```{r}
+if (requireNamespace("quanteda", quietly = TRUE)) {
+  sys.source(system.file("examples", "word-family-review.R", package = "ldfreq",
+    mustWork = TRUE), family_env)
+  contextual <- family_env$word_family_review_example
+  contextual$reviewed$occurrences[
+    contextual$reviewed$occurrences$surface == "bank",
+    c("segment_id", "pre", "keyword", "post", "lookup_status",
+      "status", "family_id", "review_record_id", "reviewer", "reason")]
+  contextual$reviewed$documents[c("document_id", "selected_tokens",
+    "review_selected_tokens", "unresolved_tokens", "family_types", "family_ttr")]
+}
+```
+
+The authored sentences are `The bank lends money.` and `The river bank floods.`
+The two occurrences receive different families under this **illustrative**
+definition. Excluding punctuation still leaves eight tokens. Before review,
+two occurrences are ambiguous and complete family TTR is unavailable. After
+the two supplied judgments, seven families give TTR = 7/8. The original
+dictionary and automatic lookup remain unchanged in the saved result.
+These choices do not assert that every inventory separates the two meanings,
+or that grouping by meaning and grouping by derivation are the same operation.
+
+For your own profile, use its prepared inputs without editing their candidate
+set or resource snapshot. Decisions identify **record IDs**, not family IDs:
+
+```{r, eval=FALSE}
+stopifnot(length(families$review_input$targets) > 0)
+review <- do.call(lexdiv_ambiguity_review,
+  c(list(x = families$annotations), families$review_input))
+write.csv(review$occurrences, "family-decisions.csv", row.names = FALSE, na = "")
+# Review the source/context and fill status, candidate_id, reviewer and reason.
+# Use selected + a record ID, or unresolved + an empty candidate_id.
+# Omit unreviewed rows from this decision file; source tokens remain retained.
+decisions <- read.csv("family-decisions.csv", colClasses = "character",
+  na.strings = "", check.names = FALSE)
+review <- do.call(lexdiv_ambiguity_review,
+  c(list(x = families$annotations), families$review_input, list(decisions = decisions)))
+p <- families$provenance
+reviewed <- lexdiv_family_profile(families$annotations, families$dictionary,
+  p$resource, unit = p$unit, normalization = p$normalization,
+  exclude_pos = p$exclude_pos, context_chars = p$context_chars, review = review)
+saveRDS(reviewed, "reviewed-families.rds")
+```
+
+Character CSV input preserves IDs such as `01` and literal `NA`; empty fields
+are missing. A `selected` judgment applies only to that source occurrence.
+An explicit `unresolved` judgment also withholds a previously automatic match;
+unreviewed occurrences keep their lookup result. Report `review_selected_tokens`
+and `review_unresolved_tokens` beside coverage, and inspect `lookup_status`
+and `lookup_family_id` when explaining what changed. Original contexts and the
+complete review, including judgment reasons, remain in `$review`.
+
+The generic review display lists candidate records by original surface. If
+the same surface has different POS/lemma annotations across occurrences,
+consult `$candidates` using document/segment/token IDs to check eligibility.
+A selected record for the wrong POS or lemma, or a decision on an excluded or
+unknown-selection token, is rejected. Review cannot invent missing inventory
+entries, fix annotations or silently reinclude excluded tokens.
+
+Changes to the source annotations, dictionary contents/order, resource
+definition, selected unit, normalization or exclusions invalidate the review
+snapshot. Recreate the review and reassess judgments; do not copy old IDs into
+a new snapshot. Context-window changes alone do not invalidate judgments.
+Independent reviewers can use the same prepared input and compare their
+results with `lexdiv_compare_ambiguity()` before applying an adjudicated review.
+This preserves disagreement; it does not establish independent judgment or
+linguistic correctness by itself.
+
+### Source-linked roots and affixes
+
+The installed `word-parts.R` recipe counts **supplied analyses** at original
+occurrences. It is an explicitly sourced example helper, not an exported API
+or an automatic morphology analyzer. It needs no Python, model, network or
+quanteda. Family membership remains a separate input and is not inferred.
+
+```{r}
+parts_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "word-parts.R", package = "ldfreq",
+  mustWork = TRUE), parts_env)
+sys.source(system.file("examples", "word-parts-demo.R", package = "ldfreq",
+  mustWork = TRUE), parts_env)
+word_parts <- parts_env$word_parts_example$profile
+word_parts$occurrences[c("surface", "status", "analysis_id",
+  "observed_root_occurrences", "observed_prefix_occurrences",
+  "observed_suffix_occurrences", "observed_inflection_occurrences",
+  "observed_derivation_occurrences")]
+word_parts$documents[c("document_id", "selected_tokens", "complete_coverage",
+  "observed_affix_occurrences", "affix_occurrences", "affixes_per_token", "status")]
+```
+
+These are **authored teaching examples**, not imported MorphoLex or Nation
+entries. The first document contains five selected tokens. `teachers` contributes
+one root, derivational `-er` and inflectional `-s`; comparative `-er` in `smaller`
+has a different ID. The five tokens contain seven affix occurrences, so affixes
+per token is 7/5. The proportion of tokens containing affixes is 1. These are
+different denominators. The alternate authored analysis leaves `transmit`
+undivided: inspect `parts_env$word_parts_example$alternative` to see six affix
+occurrences and five root types, compared with seven and four in the first
+analysis. Neither choice establishes what a learner knows or mentally decomposes.
+
+The second document retains ambiguous `bank`, explicitly unanalysed `went`,
+and unlisted `quux`; its complete totals are unavailable, not zero. Empty
+documents retain zero counts and undefined proportions. A `partial` analysis
+contributes its known parts to `observed_*` counts but leaves full totals
+unavailable. `complete` is always relative to the declared **analysis scope**:
+a complete derivational analysis can omit inflection by design.
+
+Prepare two plain data frames with character identifiers:
+
+| Table | Required columns | Meaning |
+|---|---|---|
+| `analyses` | `analysis_id`, `form`, `completeness` | Unique analysis IDs; exact surface forms; `complete`, `partial` or `unanalysed`. Optional `upos` requires exact UD POS matching. Multiple eligible analyses remain ambiguous. |
+| `parts` | `analysis_id`, `part_index`, `part_id`, `canonical`, `role`, `process`, `boundness` | One row per part, including repeated parts. Roles: `root`, `prefix`, `suffix`. Processes: `none` for roots; `inflection`, `derivation`, `unknown` for affixes. Boundness: `free`, `bound`, `unknown`; affixes must be bound. |
+
+`part_index` is consecutive display order **within each analysis**, not an
+attachment sequence or a derivation tree. A complete analysis must contain a
+root and classify its affix processes. Rootless or other unsupported analyses
+remain partial/unanalysed. Multiple roots are permitted. Parts with a shared ID
+must have consistent canonical form and classification. Homographic affixes
+with different functions need different IDs when the source distinguishes them.
+Additional metadata columns are retained; they are not interpreted as trees,
+validated substring coordinates, or evidence of semantic transparency.
+
+The authored `mit/miss` example uses one root ID with a retained `realization`
+column. This expresses an explicit analytical choice, not a rule that unifies
+similar strings. A **base** can already contain several parts before another
+affix is attached; this recipe counts listed parts and does not reconstruct
+those formation stages. Nonaffixal processes such as conversion or irregular
+inflection are not diagnosed by a zero affix count.
+
+The required `resource` declarations are `resource_id`, `resource_version`,
+`language`, `source_reference`, `data_license`, `analysis_scope`, and
+`analysis_basis`. `word_parts_profile(annotations, analyses, parts, resource,
+exclude_pos = character(), context_chars = 30L, max_rows = 1e6)` accepts complete
+`lexdiv_import_annotations()` output. Matching is exact and case-sensitive;
+there is no lemma fallback or silent normalization. Missing POS makes exclusion
+unknown, and whole-selection coverage is then unavailable. Row ceilings apply
+to each reference table, source tokens and candidate/part expansion, not total
+memory. Keep inputs scoped to the analysis at hand.
+
+```{r}
+# Full tables remain available beside aggregate results.
+word_parts$part_occurrences
+word_parts$frequency
+word_parts$occurrences[word_parts$occurrences$status == "ambiguous",
+  c("document_id", "segment_id", "token_index", "pre", "keyword", "post")]
+word_parts$candidates
+```
+
+`frequency` reports observed part occurrences by document and part ID; absent
+rows are not assertions of complete zero counts. Read it with `documents`.
+Alternative candidates do not contribute to frequency until an analysis is
+uniquely eligible. This recipe supports inspection, but does not yet apply
+occurrence-specific reviewer decisions or automatically choose a candidate.
+
+```{r, eval=FALSE}
+saveRDS(word_parts, "word-parts.rds")
+restored <- readRDS("word-parts.rds")
+stopifnot(identical(do.call(parts_env$word_parts_profile, restored$inputs), restored))
+# For caller-prepared CSV input, preserve IDs and distinguish literal NA from missing.
+analyses <- read.csv("analyses.csv", colClasses = "character", na.strings = "",
+  fileEncoding = "UTF-8", check.names = FALSE)
+parts <- read.csv("parts.csv", colClasses = "character", na.strings = "",
+  fileEncoding = "UTF-8", check.names = FALSE)
+parts$part_index <- as.numeric(parts$part_index) # validated by the recipe
+```
+
+#### Different resources answer different morphological questions
+
+Nation's lists group forms into educational families. MorphoLex provides
+segmentation and morphological variables. [MorphyNet](https://github.com/kbatsuren/MorphyNet)
+separates derivational source–target relations from inflectional lemma–form
+relations. Its English derivational table records `transmit` → `retransmit`
+with prefix `re`, and `transmit` → `transmitter` with suffix `er`. A relation
+is not a complete word segmentation; graph connectivity does not establish a
+Nation family. MorphyNet's 15 languages do not include Japanese. It uses
+CC BY-SA 3.0. A nine-row teaching excerpt is bundled; the full file is read
+from a separately obtained local copy as shown below.
+
+For Japanese, [J-UniMorph](https://github.com/cl-tohoku/J-UniMorph) is a
+CC BY 4.0 candidate for **inflectional features**, not an English-style
+educational family inventory. Its filtered `jpn` snapshot has 12,687 records
+for 107 lemmas. For example, `食べられる` has potential, passive and honorific
+analyses; `開ける` also permits distinct lemma analyses. Keep the original
+features and multiple candidates. These forms can span several UniDic short
+units, so matching them requires an explicit source-span or whole-form unit.
+Joining by a single short-unit token would change the question.
+
+Neither resource is a contextual analyzer supplied by ldfreq. Japanese
+inflection, productive derivation, compound structure and homophony require
+different relations and evidence. UniDic lemmas or shared kanji alone do not
+define a derivational family; verb forms in J-UniMorph do not constitute a
+complete Japanese vocabulary or a frequency norm. See Matsuzaki et al. (2024),
+[J-UniMorph](https://aclanthology.org/2024.sigmorphon-1.2/), for its scope.
+
+#### Inspect MorphyNet formation relations
+
+`morphynet_read_derivations()` reads the official six-column derivational TSV
+in R, preserving original words, POS, affixes and line IDs. It needs no Python,
+model or extra package. For the complete English v1 reference, obtain
+[`eng.derivational.v1.tsv`](https://github.com/kbatsuren/MorphyNet/blob/main/eng/eng.derivational.v1.tsv)
+from the official repository, retain its CC BY-SA 3.0 terms, and read it:
+
+```{r, eval=FALSE}
+reference <- morphynet_read_derivations("eng.derivational.v1.tsv",
+  language = "en", resource_version = "English v1")
+reference$resource$source_sha256
+saveRDS(reference, "morphynet-reference.rds")
+```
+
+The English file checked for this guide has 225,131 relations and SHA-256
+`5920edacc1888b14464fc5cd96beea0a721221d56d1dc0e49de22f4c7c537c50`.
+Language/version are your declarations; the reader does not authenticate every
+possible supplied file. It rejects invalid formats and retains a hash of the
+actual input. POS symbols remain unchanged, including `U`; the source row
+`teach -> teacher` has N/N tags, not an automatically corrected V/N pair.
+Supplied relations can include multiword fields, which are retained literally.
+
+The installed example uses **nine unchanged rows** selected for six words,
+with a mapping to their original source lines. This small excerpt is not a
+reference for estimating vocabulary coverage. The contexts and reviewer
+decisions are authored illustrations:
+
+```{r}
+morphynet_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "morphynet-relations.R", package = "ldfreq",
+  mustWork = TRUE), morphynet_env)
+morphynet <- morphynet_env$morphynet_example
+morphynet$reference$relations[
+  morphynet$reference$relations$target_word == "reusability",
+  c("source_word", "target_word", "source_pos", "target_pos", "morpheme", "affix_position")]
+```
+
+Reusability has incoming relations from `reuse` with `ability`, `reusable`
+with `ity`, and `usability` with `re`. **Do not count these as three affixes in
+one occurrence.** They are separate formation relations that can coexist.
+Nor does their presence supply missing membership in Nation's inventory.
+
+The example builds a candidate table by matching each exact `target_word` to
+the requested surface, then uses the existing review API when quanteda is
+available. Source/target words and POS remain visible beside the relation ID.
+A study must declare what selecting one relation means; context alone does
+not guarantee a unique morphological derivation.
+
+```{r}
+if (!is.null(morphynet$reviewed)) {
+  morphynet$reviewed$occurrences[c("segment_id", "pre", "keyword", "post",
+    "candidate_count", "status", "reason")]
+  morphynet$selected[c("segment_id", "surface", "source_word", "target_word",
+    "morpheme", "affix_position")]
+}
+```
+
+There are five targeted occurrences. The two instances of `reusability`
+retain all three relations; the illustration selects `reusable + ity` for
+one and withholds selection for the other. The single incoming relations of
+`retransmit` and `transmitter` also remain unreviewed until explicitly chosen.
+`teachers` has no candidate in this excerpt: that is not an affix count of
+zero, a lack of inflection or evidence that a learner made an error. The
+complete source token/segment roster, including the empty document, is retained.
+Review summaries describe the declared targets, not all corpus tokens.
+
+```{r, eval=FALSE}
+saveRDS(morphynet, "morphynet-review.rds")
+restored <- readRDS("morphynet-review.rds")
+replayed <- lexdiv_ambiguity_review(restored$annotations, restored$targets,
+  restored$candidates, restored$resource,
+  decisions = restored$reviewed$decisions)
+stopifnot(identical(replayed, restored$reviewed))
+```
+
+Reading saved tables requires no quanteda; regenerating KWIC review does.
+The review API currently matches whitespace-free single-token surfaces.
+Do not delete spaces from multiword targets or silently substitute lemmas to
+force a match. Case normalization, lemma-based alignment, complete derivation
+trees and validated morphological-productivity estimates are separate tasks.
+For adaptation or redistribution, retain source attribution and applicable
+ShareAlike terms; see `licenses/morphynet/NOTICE.md`.
+
+#### Use the bundled MorphoLex reference
+
+MorphoLex-en supplies canonical segmentation and root/affix variables
+(Sánchez-Gutiérrez et al., 2018, <https://doi.org/10.3758/s13428-017-0981-8>).
+The package includes all 34 worksheets (68,624 word records and the aggregate
+prefix/suffix/root tables), plus the original data dictionary, from
+<https://github.com/hugomailhot/MorphoLex-en>. **These data use CC BY-NC-SA 4.0,
+not the MIT license of the R code.** Noncommercial sharing and adaptation
+require attribution and the applicable ShareAlike conditions; commercial use
+is not granted by that license. See the installed `licenses/morpholex/NOTICE.md`.
+
+```{r}
+morpholex <- morpholex_data(c("0-1-1", "All roots"))
+word_rows <- morpholex$sheets[["0-1-1"]]
+word_rows[word_rows$Word %in% c("teacher", "teachers"),
+  c("Word", "MorphoLexSegm", "ROOT1_FamSize", "ROOT1_Freq_HAL")]
+morpholex$provenance$data_license
+```
+
+Tables retain character values, including identifiers and missing cells.
+Convert a numeric measure explicitly when needed, for example
+`as.numeric(word_rows$ROOT1_FamSize)`. `morpholex_data()` without arguments
+returns all sheets; `$provenance$sheet_catalog` lists their names and dimensions.
+Two source `Word` cells (ELP IDs 42162 and 65908) are logical values and appear
+as `TRUE` and `FALSE`; an exact lowercase query will not match them. The source
+values are preserved, so any case normalization should be an explicit decision.
+No `readxl`, Python, model, or internet connection is needed for bundled data.
+The word-parts recipe can use the same snapshot:
+
+```{r}
+sys.source(system.file("examples", "morpholex-word-parts.R", package = "ldfreq",
+  mustWork = TRUE), parts_env)
+forms <- c("transmit", "transport", "transmission", "teacher", "teachers")
+reference <- parts_env$read_morpholex_parts(
+  sheets = c("0-1-0", "0-1-1", "1-1-0"),
+  words = forms)
+reference$analyses
+reference$unlisted_words # absent from the selected sheets, not necessarily the workbook
+source <- data.frame(document_id = "example", segment_id = "s",
+  text = paste(forms, collapse = " "))
+tokens <- data.frame(document_id = "example", segment_id = "s",
+  token_index = seq_along(forms), surface = forms)
+imported <- lexdiv_import_annotations(tokens, source,
+  list(language = "en", analyzer = "authored", analyzer_version = "1",
+    dictionary = "none", dictionary_version = "1", unit = "word", normalization = "none"))
+profile <- parts_env$word_parts_profile(imported, reference$analyses,
+  reference$parts, reference$resource)
+profile$documents[c("root_occurrences", "affix_occurrences", "complete_coverage")]
+```
+
+These five source entries give five root occurrences and four affix occurrences.
+Save the complete reference/profile pair to keep both inputs and results:
+
+```{r, eval=FALSE}
+saveRDS(list(reference = reference, profile = profile), "morpholex-profile.rds")
+# Optional: read an explicitly obtained workbook instead; requires readxl.
+local_reference <- parts_env$read_morpholex_parts(path = "MorphoLEX_en.xlsx",
+  sheets = c("0-1-0", "0-1-1", "1-1-0"), words = forms)
+```
+
+The reader retains all columns of selected source rows, selected sheet names,
+requested/missing words and a workbook SHA-256. It extracts recorded canonical
+parts and checks them against the reported PRS signature and morpheme count.
+Unsupported syntax or inconsistent counts remain `unanalysed`; the recipe
+never repairs an entry by guessing. It does not validate linguistic accuracy
+or the derivation tree, and preserves root boundness as unknown. Original POS
+and numeric variables remain in `source_rows`; POS is not silently mapped to UD.
+
+In the inspected workbook, `transmit` is undivided, `transport` is
+`trans- + port`, and `transmission` uses canonical `transmit + -ion`.
+Both `teacher` and `teachers` use `teach + -er`. Thus, its complete counts describe
+**reported derivational segmentation, excluding inflection**. The whole-word
+TUBELEX frequency, MorphoLex's cumulative root frequency/family size, and
+observed root counts in a target corpus remain separate variables with their
+own reference populations. Do not infer missing inflections, root meanings,
+learner knowledge, or productivity from these counts.
+
+#### Connect families and morphology at the same occurrences
+
+To explain a vocabulary profile, keep family membership, recorded segmentation
+and incoming formation relations alongside the **same source occurrence**.
+The explicitly sourced recipe below reuses `lexdiv_family_profile()`, the
+word-parts recipe and `lexdiv_ambiguity_review()`. It requires optional quanteda
+in a UTF-8 R session. Text and decisions are authored; references are the
+bundled Nation/MorphoLex snapshots and the nine-row MorphyNet teaching excerpt.
+
+```{r morphology-link-example, eval=requireNamespace("quanteda", quietly=TRUE) && isTRUE(l10n_info()[["UTF-8"]])}
+source(system.file("examples", "morphology-link.R", package = "ldfreq"))
+source(system.file("examples", "morphology-link-demo.R", package = "ldfreq"))
+linked <- morphology_link_example$reviewed
+linked$occurrences[, c("surface", "family_status", "morpholex_lookup_status",
+  "morpholex_review_status", "morphynet_candidate_count", "morphynet_review_status")]
+linked$documents[, c("document_id", "eligible_N", "morpholex_selected_complete_N",
+  "reviewed_suffix_instances", "full_suffix_instances", "selected_suffix_relations")]
+```
+
+The five occurrences include two instances of `reusability`. Each has three
+MorphyNet candidates; the example selects `reusable + ity` for one occurrence
+and withholds selection for the other. Only one relation enters the selected
+relation table. The MorphoLex analysis chosen for `teacher` contributes one
+recorded root and one derivational suffix. The `teachers` choice is withheld.
+Full-population suffix totals remain `NA`; an unlisted or unreviewed occurrence
+is not assigned zero affixes. The empty document remains in the output.
+
+Use the outputs for different purposes:
+
+| Output | Unit and use |
+|---|---|
+| `occurrences` | One row per eligible original token, with unchanged source positions/family assignments and separate lookup/review states |
+| `documents` | One row per document; eligible denominator, resource match coverage, selected/withheld counts and explicitly reviewed part/relation totals |
+| `reviews` | Complete KWIC reviews and candidate tables, including reviewer identities and reasons |
+| `reviewed_parts` | Parts of explicitly selected **complete** segmentations, retaining root/prefix/suffix and process labels |
+| `reviewed_relations` | Explicitly selected one-step relations, retaining original source/target words and POS; not a full affix decomposition |
+
+The selection vector must identify eligible rows of the complete family input.
+Context-only punctuation, numbers or other excluded chunks stay outside that
+denominator. Repeated equal surfaces remain separate occurrences. A decision
+for an excluded occurrence is rejected; no row is silently duplicated by a
+one-to-many reference join. Candidate alternatives are kept in the review
+tables, rather than summed as observed morphemes.
+
+Morphology matching uses the supplied surface **exactly**, without a lemma
+fallback or POS inference. The family profile retains its separately declared
+lookup policy. The source annotations record any earlier case/spelling
+transformation; attaching morphology does not change that processing. An
+explicitly selected reference analysis is still not independently verified
+linguistic truth, and MorphoLex's derivational scope still excludes inflection.
+
+```{r morphology-link-save, eval=FALSE}
+saveRDS(linked, "linked-morphology.rds")
+restored <- readRDS("linked-morphology.rds")
+stopifnot(identical(do.call(link_morphology_candidates, restored$inputs), restored))
+# For your corpus, pass its existing family profile, an explicit token selection,
+# the MorphoLex adapter output and your locally read complete MorphyNet reference:
+linked_corpus <- link_morphology_candidates(family, morpholex_reference,
+  morphynet_reference, selected = eligible_tokens)
+# Inspect candidates and submit decisions using each review's occurrence/review IDs.
+```
+
+A local input check with **ICNALE GRA V2.1**, 140 original essays, reused 31,902
+saved lexical tokens and preserved every source ID, position, family assignment
+and document denominator. MorphoLex matched 30,690 occurrences, with 30,680
+passing the adapter's complete-segmentation checks and 10 retained as
+unanalysed. The full English MorphyNet v1 table matched 4,592 occurrences,
+including 401 with multiple incoming relations; 4,348 occurrences matched all
+three inventories. These are exact-surface lookup counts for resources with
+different purposes, not comparative accuracy or learner morphology scores.
+Real-corpus choices remain unreviewed. The restricted texts and individual
+outputs are kept locally; the executable example above supplies public text.
+
 ## Length and parameter sensitivity
 
 Bestgen (2024, <https://doi.org/10.1111/lang.12630>) distinguishes ordinary
@@ -378,16 +1021,17 @@ BNC and COCA evidence plus Japanese educational materials. The workbook labels
 the entries as representative lemmas. This is a ranked pedagogical list, not
 the same estimand as a TUBELEX mean frequency.
 
-`nj8_profile()` accepts a list supplied by the user; `ldfreq` does
-not bundle or download it. The example below uses a small synthetic fixture,
-not the JACET list.
+`nj8_profile()` uses the bundled `jacet2016-8000-v1` table by default.
+JACET has permitted redistribution with source attribution. Cite:
+JACET Basic Word Revision Committee (Ed.). (2016).
+*The New JACET List of 8000 Basic Words*. Tokyo: Kirihara Shoten.
+The installed `licenses/nj8/NOTICE.md` contains the full attribution and the
+three verified corrections to the supplied snapshot. All 8,000 pairs match
+the official workbook. The permission does not relicense the table as MIT.
 
-The downloaded workbook can be passed directly as
-`nj8_profile(annotated, "j8_2016.xlsx", unit = "lemma")` when
-`readxl` is installed. Its embedded notice permits personal research use
-with citation and asks commercial users to consult JACET in advance. Public
-download availability does not itself grant a downstream redistribution
-license, so the file stays outside the package.
+An external copy can still be passed explicitly, for example
+`nj8_profile(annotated, "j8_2016.xlsx", unit = "lemma")` with `readxl` installed.
+The example below uses a small synthetic table for hand-checkable results.
 
 ```{r}
 synthetic_nj8 <- data.frame(

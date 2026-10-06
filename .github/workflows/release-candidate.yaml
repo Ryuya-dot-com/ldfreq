@@ -249,6 +249,10 @@ jobs:
             any::digest
             any::jsonlite
             textstem=?ignore-before-r=4.4.0
+            gibasa=?ignore-before-r=4.2.0
+            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5 MASS@7.3-60' || '' }}
+          # Keep all ldfreq check dependencies; old Matrix Enhances are not used.
+          dependencies: 'if (getRversion() < "4.2.0") c("Depends", "Imports", "LinkingTo", "Suggests") else "all"'
           needs: check
 
       - name: Check the exact source archive as CRAN
@@ -265,7 +269,7 @@ jobs:
           )
           stopifnot(length(archive) == 1L)
           note_policy <- if (identical("${{ matrix.config.r }}", "4.1")) {
-            "minimum-r-optional-textstem"
+            "minimum-r-optional-backends"
           } else {
             "new-submission-only"
           }

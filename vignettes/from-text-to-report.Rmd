@@ -1,0 +1,257 @@
+---
+title: "From English text to a report"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{From English text to a report}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ldfreq)
+```
+
+## Question and unit of analysis
+
+Suppose we want to describe how two texts about reading differ in local
+surface-word variety and coverage by New JACET 8000. These are separate
+questions: repeating familiar words can change diversity without changing
+list membership. The observations here are two project-authored sentences;
+they do not represent learner groups or establish proficiency differences.
+
+We use the same English tokenizer, NFC normalization, lowercase conversion, word selection, and
+10-token MATTR window for both texts. The small window makes the example
+executable; it is not a recommended universal window. In a study, justify the
+common window from the task and document-length distribution before comparing
+results. Keep writer and task IDs with document IDs in the study's own table.
+
+```{r}
+texts <- c(
+  first = "The student reads a book and discusses the book with a friend.",
+  second = "The student explores a story and shares several ideas with a friend."
+)
+prepared <- lexdiv_tokenize_batch(
+  texts, tokenizer = "english", normalization = "NFC", case = "lower"
+)
+diversity <- lexdiv_metrics_text_batch(
+  prepared, metrics = c("ttr", "mattr"), window_length = 10
+)
+metrics <- diversity$results
+knitr::kable(metrics[, c("document_id", "metric_id", "N", "V", "value", "status")])
+```
+
+The first text repeats `the`, `a`, and `book`; the second repeats `a`.
+Both contain 12 tokens, but the first has 9 distinct surface forms and the second
+has 11. MATTR rises from 0.800 to 0.933: on average, the second text contains
+about 1.33 more distinct forms per 10-token window. This describes greater
+local word variety under the common settings; it cannot establish that one text
+is better. For other documents, inspect `status`
+and `missing_reason`: a text below 10 tokens gets no value for this requested
+MATTR, and its presence does not shrink the other documents' windows.
+
+## Add level coverage without changing the word unit
+
+The bundled NJ8 resource is a representative-lemma list. We deliberately request
+surface-form coverage, so `reads` is looked up as `reads`, not silently converted
+to `read`. This answers a surface-matching question. For lemma-based research,
+explicitly annotate every document with the same lemma procedure, report its
+coverage, and select `unit = "lemma"`. Do not switch units only for documents
+with poor matching.
+
+```{r}
+levels <- nj8_profile_batch(prepared, unit = "surface")
+knitr::kable(levels$coverage[, c(
+  "document_id", "eligible_tokens", "matched_tokens", "token_coverage", "type_coverage"
+)])
+levels$lookup[!levels$lookup$matched, c("document_id", "term")]
+```
+
+The unmatched rows show which surface forms contribute to off-list coverage.
+NJ8 token coverage is 83.3% (10/12) for the first text and 75.0% (9/12) for the
+second. Thus, the text with greater local variety has lower surface-list
+coverage in this example. Inflected forms such as `reads` can be off-list even
+when their lemma is familiar.
+They are not automatically rare, difficult, or erroneous words. All eligible
+terms remain in the denominator, including those not in NJ8.
+
+For each document, the cumulative Level 8 token proportion equals its total
+token coverage. Lower cumulative levels describe the fraction found at or below
+that level, not a learner's vocabulary knowledge.
+
+```{r}
+level8 <- subset(levels$summary, weighting == "token" & level == 8)
+stopifnot(isTRUE(all.equal(
+  level8$cumulative_proportion, levels$coverage$token_coverage
+)))
+plot(nj8_profile(prepared[[1]], unit = "surface"), weighting = "token")
+```
+
+## Produce an analysis table and inspect it
+
+`lexdiv_widen()` retains each metric's definition, parameters, and counts.
+Its checks prevent different MATTR windows from entering one metric column
+as if they were the same specification. Coverage is then joined by explicit
+IDs, preserving document order.
+
+```{r}
+analysis <- lexdiv_widen(metrics)
+coverage <- levels$coverage[match(analysis$document_id, levels$coverage$document_id), ]
+stopifnot(identical(analysis$document_id, coverage$document_id))
+analysis$nj8_surface_token_coverage <- coverage$token_coverage
+analysis$nj8_surface_type_coverage <- coverage$type_coverage
+knitr::kable(analysis[, c(
+  "document_id", "ttr__value", "mattr__value",
+  "nj8_surface_token_coverage", "nj8_surface_type_coverage"
+)], col.names = c("Document", "TTR", "MATTR", "NJ8 token coverage", "NJ8 type coverage"),
+digits = 3)
+plot(metrics, metric_id = "mattr")
+```
+
+Report differences in the selected metric and differences in coverage
+separately. These observations support a descriptive answer for the supplied
+texts under the stated settings. They do not answer whether a difference
+persists across writers or tasks; that requires a sampling design and an
+appropriate analysis of independent and repeated observations.
+
+If the research question also concerns frequency in YouTube subtitles, follow
+`vignette("tubelex-input", package = "ldfreq")`. Keep that segmentation and its
+frequency results distinct from the surface units selected above.
+
+## Prepare the figure at its publication size
+
+Plots default to color and have no automatic title or subtitle. In both color
+modes, advisory token floors are encoded by shape as well as color: triangles
+are below the floor and circles are not. This follows the redundant-coding
+principle described by [Wilke (2019, Chapter 20)](https://clauswilke.com/dataviz/redundant-coding.html).
+The common blue/orange defaults are from the Okabe--Ito palette; the dedicated
+`monochrome = TRUE` mode remains available. A palette alone does not guarantee
+legibility: inspect line widths, point shapes, labels and the actual output size.
+
+Use a sans serif font and choose its size at the final figure dimensions.
+[APA's figure guidance](https://www.apa.org/ed/precollege/psn/2020/09/apa-style-student-papers)
+specifies 8--14 point text inside the image; this example uses 11 points.
+Place the figure number, title and explanatory note in the manuscript, outside
+the image. Do not add these as `main`, `sub`, or an embedded caption.
+
+The same plotted data can be exported as vector PDF or a 300-dpi PNG. Replace
+the temporary paths below with your intended output paths; follow the target
+journal's file-format and resolution requirements. The `par()` adjustment
+below reduces unused margins for this particular short-label example, and
+restores the previous settings afterwards. Longer document labels need more
+room, a larger figure, or a custom horizontal dot plot rather than smaller text.
+
+```{r, results='hide'}
+draw_mattr <- function(monochrome = FALSE) {
+  old <- par(mar = c(4.2, 4.5, 1, 1))
+  on.exit(par(old))
+  plot(metrics, metric_id = "mattr", monochrome = monochrome)
+}
+pdf_path <- tempfile(fileext = ".pdf")
+pdf(pdf_path, width = 6.5, height = 4, pointsize = 11, useDingbats = FALSE)
+pdf_rows <- draw_mattr()
+dev.off()
+
+png_path <- tempfile(fileext = ".png")
+png(png_path, width = 6.5, height = 4, units = "in", res = 300, pointsize = 11)
+png_rows <- draw_mattr(monochrome = TRUE)
+dev.off()
+stopifnot(identical(pdf_rows, png_rows))
+unlink(c(pdf_path, png_path))
+```
+
+[Wilke (2019, Chapter 24)](https://clauswilke.com/dataviz/small-axis-labels.html)
+emphasizes checking figures at the size at which they will be read. Increasing
+DPI alone does not enlarge printed text, and shrinking a finished image also
+shrinks its labels. These plot defaults are a starting point, not a guarantee
+of every journal's requirements or accessibility at every device size.
+
+These export examples use Latin-script labels. For Japanese labels, select an
+installed font containing the required glyphs. Where `capabilities("cairo")`
+is true, [`cairo_pdf()`](https://stat.ethz.ch/R-manual/R-devel/library/grDevices/html/cairo.html)
+can cover a wider range of UTF-8 glyphs and embed fonts; check the resulting
+file on the target system. Pass the chosen `family` to `plot()` as well as the
+device, because package plots otherwise use their `"sans"` default.
+
+### Show the observations and respect the design
+
+The metric plot shows one point per computable document, not a bar of group
+means. [Weissgerber et al. (2015)](https://doi.org/10.1371/journal.pbio.1002128)
+show why summary-only bars can conceal distributions and paired changes in
+small-sample continuous data. This does not rule out bars for NJ8 category
+counts or coverage proportions. For annotation changes in the same documents,
+overlay the original values or each condition's distribution on a common scale;
+the vocabulary-audit guide includes raw-value and optional density recipes.
+Use common bandwidths and appropriate bounds for continuous densities; discrete
+counts and very small samples are shown as observations or frequencies.
+Retain the full roster and report the numbers
+and reasons for unavailable values outside the image. Missing scores are not
+zero values.
+
+[Cumming (2014)](https://doi.org/10.1177/0956797613504966) emphasizes effect sizes
+and uncertainty in estimation, while [Gabry et al. (2019)](https://doi.org/10.1111/rssa.12378)
+place visualization within model building and checking. For this workflow,
+we keep descriptive output separate from inference: these figures do not fit
+a model or generate confidence intervals. Choose the estimand, sampling units
+and dependence structure before using an existing modelling package for
+intervals or predictions. Overlapping MATTR windows are not independent
+replicates, and a pooled lexical network does not identify a person's mental
+lexicon. A well-formatted figure does not supply those missing assumptions.
+
+## Save enough to reproduce and report the analysis
+
+Save the full results and preprocessing record, not just a CSV of scores.
+The following round trip keeps list-columns and resource identity intact.
+The saved object contains the input terms; handle it under the study's data
+access rules. It is not intended for automatic public sharing.
+
+```{r}
+record <- list(
+  prepared = prepared, diversity = diversity, metrics = metrics, levels = levels,
+  analysis = analysis, session = sessionInfo()
+)
+path <- tempfile(fileext = ".rds")
+saveRDS(record, path)
+stopifnot(identical(readRDS(path), record))
+unlink(path)
+levels$provenance[c("resource_version", "resource_bundled", "resource_citation")]
+```
+
+A methods statement for this example could read:
+
+> We tokenized both texts with the ldfreq English word tokenizer (0.1.0),
+> using NFC normalization and lowercase
+> surface forms. We calculated TTR over each full text and MATTR with a
+> common 10-token window.
+> New JACET 8000 coverage used the bundled jacet2016-8000-v1 table with the
+> default NFKC/lowercase lookup normalization and parenthetical aliases.
+> Off-list forms remained in the coverage denominator. We retained the full
+> results, preprocessing records, and R/package session information.
+
+In a real report, include the actual package version, selected `method_id`,
+parameters, document counts, exclusions, task/writer structure, and the reason
+for the window choice. Report effect sizes and uncertainty using the study's
+sampling units; these descriptive functions do not choose an inferential model.
+
+## What to cite
+
+Use `citation("ldfreq")` for the software. Cite the resources and methods
+actually used, in addition to the software:
+
+- **New JACET 8000:** JACET Basic Word Revision Committee (Ed.). (2016).
+  *The New JACET List of 8000 Basic Words*. Tokyo: Kirihara Shoten.
+  The original Japanese citation and permission notice are installed in
+  `licenses/nj8/NOTICE.md`.
+- **MATTR:** Covington, M. A., & McFall, J. D. (2010). Cutting the Gordian knot:
+  The moving-average type-token ratio (MATTR). *Journal of Quantitative
+  Linguistics, 17*(2), 94–100. <https://doi.org/10.1080/09296171003643098>.
+- **MTLD and HD-D, if used:** McCarthy, P. M., & Jarvis, S. (2010). MTLD,
+  vocd-D, and HD-D: A validation study of sophisticated approaches to lexical
+  diversity assessment. *Behavior Research Methods, 42*, 381–392.
+  <https://doi.org/10.3758/BRM.42.2.381>.
+- **TUBELEX, if used:** Nohejl et al. (2025). Beyond film subtitles: Is YouTube
+  the best approximation of spoken vocabulary? *COLING 2025*.
+  <https://aclanthology.org/2025.coling-main.641/>.
+
+A method citation does not establish identity with every implementation carrying
+the same metric name. Retain the exact ldfreq definition and selected settings.

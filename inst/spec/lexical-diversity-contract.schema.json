@@ -13,8 +13,7 @@
     "input_contract",
     "output_contract",
     "r_profile_contract",
-    "metrics",
-    "open_design_gates"
+    "metrics"
   ],
   "properties": {
     "$schema": {"type": "string"},
@@ -64,14 +63,6 @@
       "maxItems": 12,
       "uniqueItems": true,
       "items": {"$ref": "#/$defs/metric"}
-    },
-    "open_design_gates": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "metrics", "question", "exit_evidence"],
-        "additionalProperties": true
-      }
     }
   },
   "$defs": {
@@ -98,7 +89,7 @@
         },
         "method_id": {"type": "string", "minLength": 1},
         "label": {"type": "string", "minLength": 1},
-        "stability": {"const": "freeze-ready"},
+        "stability": {"const": "stable"},
         "construct": {"type": "string", "minLength": 1},
         "definition": {"type": "object"},
         "parameters": {"type": "object"},
@@ -127,7 +118,7 @@
         "scope": {"type": "string", "minLength": 1},
         "admitted_stability": {
           "type": "array",
-          "prefixItems": [{"const": "freeze-ready"}],
+          "prefixItems": [{"const": "stable"}],
           "minItems": 1,
           "maxItems": 1
         },

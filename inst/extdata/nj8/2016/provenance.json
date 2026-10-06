@@ -1,0 +1,41 @@
+{
+  "resource_id": "new-jacet8000",
+  "resource_version": "jacet2016-8000-v1",
+  "source_snapshot": {
+    "filename": "NJ8.csv",
+    "sha256": "1433dcd94135f86cfdbcbf5bafc209661678f1104f5062041b737834e99d3cf8",
+    "entries": 7999
+  },
+  "verification_source": {
+    "url": "https://language.sakura.ne.jp/s/doc/voc/j8_2016.xlsx",
+    "sha256": "6ff9e8e7f6893079c6a6ae4287f1fe69083374d2d9919fb4dc297aae086af1a7",
+    "sheet": "新J8",
+    "columns": [
+      "新J8順位",
+      "代表レマ"
+    ],
+    "verified_on": "2026-10-04"
+  },
+  "corrections": [
+    {
+      "rank": 6926,
+      "from": null,
+      "to": "nan"
+    },
+    {
+      "rank": 326,
+      "from": "TRUE",
+      "to": "true"
+    },
+    {
+      "rank": 2382,
+      "from": "FALSE",
+      "to": "false"
+    }
+  ],
+  "transformation": "Correct the three identified entries; retain ranks and other entries; serialize UTF-8 CSV with quoted headers/strings, no BOM, LF line endings.",
+  "entries": 8000,
+  "all_pairs_match_official_workbook": true,
+  "artifact_sha256": "6797238778c4b67bdce9657f16bfbdcc65982c72e4fd29eca93f7fef2d010f59",
+  "build_script": "experiments/nj8-source-build/build-nj8.R"
+}

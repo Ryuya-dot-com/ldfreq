@@ -1,0 +1,235 @@
+---
+title: "Japanese stimulus selection: frequency, familiarity, AoA and BOI"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Japanese stimulus selection: frequency, familiarity, AoA and BOI}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ldfreq)
+```
+
+For a Japanese word-recognition experiment, you may want to vary BOI while
+inspecting frequency, familiarity and acquisition ratings as other item
+characteristics. This guide joins those sources by **study item ID**, retains
+unresolved and unmatched items, and shows distributions and missingness within
+each condition. It provides a review table, not automatic stimulus matching or
+evidence that conditions are balanced. The small item set below illustrates
+data handling; it is not a recommended experimental design.
+
+The code uses existing `lexdiv_norm_profile()` calculations and three installed
+example scripts. These scripts are explicitly sourced helpers, not exported
+package functions. All operations after file acquisition run in R, without
+Python. Source tables and derived norm values are obtained separately; no
+external values are embedded in this guide. Each real-data chunk below requires
+the specified local files and is not executed during package installation.
+
+## Fix the frequency table and lexical unit
+
+Use [TUBELEX (Nohejl et al., 2025)](https://aclanthology.org/2025.coling-main.641/),
+Japanese `tubelex-ja-base-pos.tsv.xz`, at commit
+`7cb5fb36add76b83a266d1967536e1a1d3faa513`. This is the **orthographic base**
+(`orthBase`) table using unidic-lite 1.0.8 (UniDic 2.1.2), not the surface,
+lemma or UniDic 3.1.0 table. The helper checks the exact compressed-file SHA-256:
+`be1a66ac600d5e7efe6a301f63fba5321352742ae5dbaaa231529cdf2ab11710`.
+
+The [upstream format](https://github.com/naist-nlp/tubelex/blob/7cb5fb36add76b83a266d1967536e1a1d3faa513/README.md)
+provides counts and the number of videos/channels containing each key.
+The final `[TOTAL]` row supplies denominators: 165,932,178 tokens, 100,660
+videos and 30,550 channels. Counts include special tokens such as `<num>`;
+the denominator is not recomputed after selecting study items or POS.
+The helper returns `count / total_count * 1e6`, `videos / total_videos` and
+`channels / total_channels`, without smoothing. These last two are proportions,
+unlike the log scores of the bundled **English** `tubelex_profile()`.
+
+Acquire the frequency file explicitly, once:
+
+```{r acquire-frequency, eval=FALSE}
+data_dir <- "japanese-resources"
+dir.create(data_dir, showWarnings = FALSE)
+revision <- "7cb5fb36add76b83a266d1967536e1a1d3faa513"
+frequency_path <- file.path(data_dir, "tubelex-ja-base-pos.tsv.xz")
+if (!file.exists(frequency_path)) {
+  download.file(paste0("https://raw.githubusercontent.com/naist-nlp/tubelex/",
+    revision, "/frequencies/tubelex-ja-base-pos.tsv.xz"),
+    frequency_path, mode = "wb")
+}
+```
+
+Retain the [upstream BSD-3-Clause notice](https://github.com/naist-nlp/tubelex/blob/7cb5fb36add76b83a266d1967536e1a1d3faa513/LICENSE)
+and cite the paper when using TUBELEX. Aggregate-frequency availability does not
+make the original subtitles a redistributable corpus. For the other sources,
+follow the [Japanese norms guide](japanese-norms.html): WLSP-familiarity v4.0
+is CC BY-NC-SA 3.0; the inspected AoA data are CC BY-NC 4.0; the BOI OSF
+project specifies CC BY 4.0. The package code license does not replace those
+terms for your joined table.
+
+## Review the keys before joining
+
+Keep `term` as the norm lookup spelling and `orth_base` as the reviewed frequency
+key. For example, `食べた` can use frequency base `食べる`, while AoA/BOI lookup
+still uses `食べた`; substituting a base-form rating would be a separate decision.
+`人気` in two contexts receives the same base-key frequency. The TUBELEX
+`pos` column is the majority POS for a key, not a disambiguated frequency.
+Neither a reading nor a WLSP record selection splits that aggregate count.
+
+```{r prepare-items, eval=FALSE}
+items <- data.frame(
+  item_id = c("a1", "a2", "a3", "a4", "b1", "b2", "b3", "b4", "b5"),
+  condition = c(rep("A", 4), rep("B", 5)),
+  term = c("学校", "犬", "人気", "食べた", "猫", "椅子", "人気", "未登録の例語", "青い空"),
+  context = c("school", "animal", "popularity", "ate", "animal", "chair",
+              "presence of people", "unmatched illustration", "multiword phrase"),
+  orth_base = c("学校", "犬", "人気", "食べる", "猫", "椅子", "人気", "未登録の例語", NA_character_),
+  base_reason = c(rep("Manually reviewed base for this illustration", 7),
+    "Deliberately absent test key, not an observed lexical base",
+    "Multiple words; no single orthBase assigned")
+)
+source(system.file("examples", "japanese-tubelex.R", package = "ldfreq"))
+frequency <- profile_japanese_tubelex_items(items, frequency_path)
+frequency$items[, c("item_id", "term", "orth_base", "tubelex_lookup_term",
+                    "tubelex_status", "tubelex_per_million")]
+```
+
+The helper performs NFKC then lowercase **after** you supply the base. It keeps
+the original forms and a normalization-change flag. It does not trim strings,
+guess a base, tokenize phrases, or replace an unmatched key with a lemma. A
+missing base is `unresolved_base`, an absent supplied key is `unmatched`, and
+both retain `NA` counts, not zero. Its generic profile contains only queried
+items; `profile_item_ids` maps those rows back to the full item table. Use the
+full table as the denominator for stimulus selection.
+
+For corpus tokens, use the optional gibasa/UniDic recipe in
+[Japanese annotations](japanese-annotations.html). After inspecting `selected`
+from that guide, its original positions and `orthBase` can be connected as follows:
+
+```{r annotation-connection, eval=FALSE}
+token_items <- data.frame(item_id = paste0("token-", seq_len(nrow(selected))),
+  document_id = selected$document_id, segment_id = selected$segment_id,
+  token_index = selected$token_index, term = selected$surface,
+  orth_base = selected$orthBase,
+  base_reason = "gibasa 1.1.3; UniDic 2.1.2 / unidic-lite 1.0.8; reviewed selection")
+token_frequency <- profile_japanese_tubelex_items(token_items, frequency_path)
+saveRDS(list(imported = ja, selection = selection, frequency = token_frequency),
+        "japanese-token-frequency.rds")
+```
+
+This is a reviewed base-key lookup, **not a reproduction of the full TUBELEX
+tokenizer**. Upstream converts fullwidth tilde before tokenization, handles
+numbers/placeholders and uses surface fallback for unknown nodes; the gibasa
+recipe does not reproduce all those steps or expose a verified unknown-node
+flag. Do not normalize raw text before annotation merely to increase coverage:
+that can alter segmentation and source positions. Record any separate text
+transformation, dictionary hashes and excluded tokens. The saved imported
+object retains those declarations and positions. This lookup does not establish
+accuracy on learner errors or equivalence between English and Japanese measures.
+
+## Combine ratings while keeping decisions and missingness
+
+Place the separately acquired, pinned files documented in the norms guide in
+`data_dir`. Review all WLSP candidates before recording your choices; even a
+unique candidate requires an explicit decision. The selections below illustrate
+those decisions for the stated contexts, not validated sense-specific norms.
+
+```{r combine-sources, eval=FALSE}
+source(system.file("examples", "japanese-norms.R", package = "ldfreq"))
+source(system.file("examples", "wlsp-items.R", package = "ldfreq"))
+aoa <- profile_japanese_norm_items(items, file.path(data_dir, "data_AoA.csv"), "aoa")
+boi <- profile_japanese_norm_items(items, file.path(data_dir, "data_boi.csv"), "boi")
+wlsp_path <- file.path(data_dir, "bunruidb-fam.csv")
+review <- review_wlsp_items(items, wlsp_path)
+review$candidates
+decisions <- data.frame(item_id = c("a1", "a2", "a3", "b1", "b2", "b3"),
+  record_id = c("022471", "062994", "033333", "063080", "053482", "002375"),
+  reason = c("School context", "Animal, not occupational metaphor", "Popularity reading ninki",
+             "Animal context", "Furniture context", "Presence reading hitoke"))
+wlsp <- review_wlsp_items(items, wlsp_path, decisions)
+
+# Each item appears once. Never merge by spelling: 人気 has two study IDs.
+joined <- frequency$items
+for (name in c("aoa", "boi", "wlsp")) {
+  result <- list(aoa = aoa, boi = boi, wlsp = wlsp)[[name]]$items
+  index <- match(joined$item_id, result$item_id)
+  stopifnot(!anyDuplicated(result$item_id), !anyNA(index), nrow(result) == nrow(items))
+  fields <- setdiff(names(result), names(items))
+  added <- result[index, fields, drop = FALSE]
+  if (name != "wlsp") names(added) <- sub("^norm_", paste0(name, "_"), fields)
+  stopifnot(!any(names(added) %in% names(joined)))
+  joined[names(added)] <- added
+}
+stopifnot(identical(joined$item_id, items$item_id))
+joined[, c("item_id", "condition", "tubelex_status", "wlsp_status",
+           "aoa_lookup_status", "boi_lookup_status")]
+```
+
+AoA is a mean of seven **rating categories**, not years; category 7 includes
+both 12+ years and unknown age. BOI is a separate seven-point rating. WLSP
+`know` is a published Bayesian estimate, not an NTT seven-point rating. Adult
+native-speaker norms do not measure an individual learner's knowledge or ability
+to employ a word appropriately. The BOI publication/correction scope and WLSP
+estimation caveats remain as documented in the norms guide and helper metadata.
+
+## Inspect every condition and each available subset
+
+```{r inspect-conditions, eval=FALSE}
+measure_columns <- c(frequency = "tubelex_per_million", familiarity = "wlsp_know",
+                     aoa = "aoa_mean", boi = "boi_mean")
+coverage <- do.call(rbind, lapply(split(joined, joined$condition), function(x) {
+  do.call(rbind, lapply(names(measure_columns), function(measure) {
+    value <- x[[measure_columns[[measure]]]]
+    observed <- value[!is.na(value)]
+    q <- if (length(observed)) unname(quantile(observed, c(0, .25, .5, .75, 1))) else rep(NA_real_, 5)
+    data.frame(condition = x$condition[1], measure, total = nrow(x),
+      observed = length(observed), missing = sum(is.na(value)),
+      mean = if (length(observed)) mean(observed) else NA_real_,
+      sd = if (length(observed) > 1) sd(observed) else NA_real_,
+      min = q[1], q25 = q[2], median = q[3], q75 = q[4], max = q[5])
+  }))
+}))
+rownames(coverage) <- NULL
+coverage
+complete <- complete.cases(joined[unname(measure_columns)])
+table(condition = joined$condition, all_four_observed = complete)
+joined[!complete, c("item_id", "condition", "tubelex_status", "wlsp_status",
+                    "aoa_lookup_status", "boi_lookup_status")]
+
+# Show the individual observations, not just condition means.
+pdf("japanese-stimulus-distributions.pdf", width = 8, height = 7)
+par(mfrow = c(2, 2))
+for (measure in names(measure_columns)) {
+  value <- joined[[measure_columns[[measure]]]]
+  if (measure == "frequency") value <- log10(value) # matched positive counts only
+  if (any(is.finite(value))) {
+    stripchart(value ~ joined$condition, vertical = TRUE, method = "stack", pch = 16,
+      xlab = "Condition", ylab = if (measure == "frequency") "log10(per million)" else measure)
+  } else { plot.new(); message(measure, " has no observed values; see the coverage table.") }
+}
+dev.off()
+```
+
+Select potential confounds based on the research question, not on which columns
+make condition means look similar. Decide in advance how to handle missing
+items, acceptable imbalance and correlations among predictors. Equal means or
+non-significant tests do not establish balance. Check the complete subset
+separately: excluding unmatched items can change the lexical population. Record
+any replacements and repeat the inspection on the final item IDs. Do not sum
+these measures into a composite difficulty score.
+
+```{r save-and-reload, eval=FALSE}
+bundle <- list(items = joined, coverage = coverage, complete = complete,
+  frequency = frequency, aoa = aoa, boi = boi, wlsp = wlsp, session = sessionInfo())
+saveRDS(bundle, "japanese-stimulus-review.rds")
+write.csv(joined, "japanese-stimulus-review.csv", row.names = FALSE, fileEncoding = "UTF-8")
+restored <- readRDS("japanese-stimulus-review.rds")
+stopifnot(identical(restored$items, joined), identical(restored$wlsp$decisions, decisions))
+```
+
+RDS preserves source hashes, denominators, mapping decisions and the complete
+profile objects; CSV is a convenient review table but lacks that provenance.
+Keep the acquired files in a permitted local archive. Sharing joined values
+requires respecting each source's terms. To report the analysis, specify the
+study population and task, lexical unit, resource versions, selected WLSP
+estimate, base-form choices, per-condition missingness and retained item IDs.

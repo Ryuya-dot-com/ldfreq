@@ -10,8 +10,22 @@ annotation, lexical-unit, Maas/MTLD sensitivity, and TUBELEX frequency-profile
 surfaces. It also provides local MATTR window and positional-exposure
 diagnostics, exact term and annotated-content-word type overlap,
 many-document coverage by one explicit reference term set, caller-supplied
-lexical-norm profiles with separate resource and annotation coverage, plus a
-caller-supplied New JACET 8000 level-profile surface without bundling that list.
+lexical-norm profiles with separate resource and annotation coverage, plus
+New JACET 8000 level profiles using the bundled table or an external copy.
+\code{\link{bnccoca_data}} supplies Nation's BNC/COCA Level 6 family
+membership and separate supplementary lists under CC BY-SA 4.0, for use with
+\code{\link{lexdiv_family_profile}}.
+\code{\link{morphynet_read_derivations}} reads local MorphyNet formation
+relations, preserving source and target POS, affixes and alternatives. Only a
+nine-row CC BY-SA 3.0 teaching excerpt is bundled, not the full database.
+\code{\link{morpholex_data}} provides the bundled MorphoLex English worksheet
+tables and provenance. Those data and their dictionary use CC BY-NC-SA 4.0
+(noncommercial use, attribution and applicable ShareAlike conditions),
+separately from the MIT license of the independent R code.
+Adjacent bigram/trigram extraction and caller-supplied reference frequencies
+retain segment boundaries, original positions, opportunity totals and coverage.
+\code{\link{lexdiv_ngram_compare}} compares reference choices using the same
+target items, retaining coverage and common-set differences from a baseline.
 Result rows retain method, parameter or denominator, schema, and contract
 provenance.
 }
@@ -19,6 +33,8 @@ provenance.
 Start with \code{lexdiv_metrics()} for explicit tokens,
 \code{lexdiv_metrics_text()} for one raw or annotated text,
 \code{lexdiv_metrics_batch()} for multiple tokenized documents,
+\code{lexdiv_tokenize_batch()} and \code{lexdiv_metrics_text_batch()} for
+named raw texts or explicit ID/text tables,
 \code{lexdiv_as_documents()} for tidy or \pkg{quanteda} token containers,
 \code{lexdiv_widen()} for a pure wide transformation,
 \code{lexdiv_profile()} for explicit parameter variants,
@@ -29,12 +45,29 @@ sensitivity variants, or
 \code{lexdiv_content_overlap()} for two UPOS-annotated texts, or
 \code{lexdiv_reference_coverage()} for several term vectors against one
 reference set, or
-\code{lexdiv_norm_profile()} for exact matching against a caller-supplied
-numeric lexical-norm table, or
+\code{lexdiv_norm_profile()} and \code{lexdiv_norm_profile_batch()} for exact
+matching against a caller-supplied numeric lexical-norm table, or
+\code{lexdiv_ngrams()}, \code{lexdiv_ngram_reference()} and
+\code{lexdiv_ngram_profile()} for adjacent sequences and local reference counts, or
 \code{nj8_profile()} for exact and cumulative pedagogical frequency
-levels from a caller-supplied list, or
+levels from the bundled or an external list, or
 \code{tubelex_profile()} for coverage-aware corpus-relative
 frequency and prevalence.
+}
+\section{Corpus scope}{
+The functions can describe native-speaker and learner texts, including English
+writing and prepared speech transcripts. Within-population register variation,
+matched L1/L2 comparisons and reference-resource sensitivity are distinct
+applications. Participant knowledge scores are not required for descriptive
+corpus analysis. Retain language-background, corpus, register, task and
+author/speaker metadata separately and link them to results by document ID.
+The raw-text helpers do not infer these attributes or parse corpus XML and
+transcription conventions. Document repeated speakers and turn boundaries
+when preparing spoken data.
+
+Native-speaker status does not establish a universal proficiency or quality
+norm. The bundled TUBELEX resource describes YouTube subtitle word forms; it
+does not certify the first-language background or ability of each speaker.
 }
 \section{Start here}{
 Choose the entry point from the form of data you already have:
@@ -54,14 +87,33 @@ Choose the entry point from the form of data you already have:
   \item{A local MATTR trajectory}{Use \code{lexdiv_mattr_profile()} with a
   MATTR-only plan to retain each window value and position's exposure.}
   \item{A caller-supplied lexical-norm table}{Use
-  \code{lexdiv_norm_profile()} for conditional observed matched-only means and
-  separate resource, value, and annotation coverage.}
+  \code{lexdiv_norm_profile()} or \code{lexdiv_norm_profile_batch()} for
+  conditional observed matched-only means and separate resource, value,
+  and annotation coverage.}
   \item{Two texts or term sets}{Use \code{lexdiv_term_overlap()} for explicit
   terms, or \code{lexdiv_content_overlap()} for UPOS-annotated content words.}
+  \item{Adjacent word combinations}{Use \code{\link{lexdiv_ngrams}} with
+  explicit segment IDs and original positions, then construct or import a
+  local reference with \code{lexdiv_ngram_reference()} and look up target
+  sequences with \code{lexdiv_ngram_profile()}. Corpus text is not bundled.}
+  \item{Chunked reference construction}{Use \code{\link{lexdiv_ngram_reference_build}}
+  to accumulate exact counts from whole-document chunks without retaining
+  all occurrence tables. Distinct types and the document roster stay in memory.}
+  \item{Reference-choice sensitivity}{Use \code{\link{lexdiv_ngram_compare}}
+  to retain separate reference coverage and compare frequencies on common
+  target items, with explicit baseline differences and denominators.}
+  \item{Supplied corpus annotations}{Use \code{\link{lexdiv_read_masc}} for
+  the supported MASC Penn layout, and \code{lexdiv_as_quanteda()} to use
+  quanteda without retokenizing or closing excluded positions. Both retain
+  source mappings; see the annotated-corpora guide for the verified scope.}
+  \item{Japanese and other external annotations}{Use
+  \code{\link{lexdiv_import_annotations}} to verify complete supplied surfaces
+  against original segment text and retain source positions and dictionary
+  declarations. See the Japanese annotations guide for an optional gibasa/UniDic
+  recipe; bundled frequency resources remain English.}
   \item{A corpus-relative reference profile}{Use
   \code{tubelex_profile()} for bundled TUBELEX frequency/prevalence,
-  or \code{nj8_profile()} with a legitimately obtained caller copy
-  of New JACET 8000.}
+  or \code{nj8_profile()} for New JACET 8000 levels.}
 }
 
 In the help pages, a \emph{token} is one occurrence. In core metric results, a
@@ -102,6 +154,7 @@ and resource boundaries. The main files are:
   \item \file{reference-coverage-contract.json}
   \item \file{mattr-profile-contract.json}
   \item \file{norm-profile-contract.json}
+  \item \file{adjacent-ngram-contract.json}
   \item \file{lexical-diversity-variant-contract.json}
   \item \file{lexical-level-profile-contract.json}
   \item \file{tubelex-frequency-profile-contract.json}
@@ -175,11 +228,11 @@ They are not direct measures of proficiency, writing quality, academic
 register, or context-independent lexical sophistication.
 }
 \section{Lexical frequency levels}{
-\code{nj8_profile()} maps caller-supplied ranks to Levels 1--8 and
+\code{nj8_profile()} maps bundled or caller-supplied ranks to Levels 1--8 and
 reports exact and cumulative token/type proportions beside off-list coverage.
 The Level 8 cumulative proportion equals matched coverage because off-list
-items remain in the denominator. The package does not bundle or download the
-New JACET 8000 list. Flemma input exposes conflicts between AntBNC families and
+items remain in the denominator. The package bundles the versioned New JACET 8000 table with JACET
+permission and source attribution; an external list can be supplied explicitly. Flemma input exposes conflicts between AntBNC families and
 New JACET headwords instead of silently choosing one mapping.
 }
 \section{Direction and contract scale}{
@@ -247,6 +300,7 @@ a network connection or external runtime.
 \code{\link{lexdiv_overlap}},
 \code{\link{lexdiv_reference_coverage}},
 \code{\link{lexdiv_norm_profile}},
+\code{\link{lexdiv_norm_profile_batch}},
 \code{\link{lexdiv_profile}}, \code{\link{lexdiv_mattr_profile}},
 \code{\link{lexdiv_variant_metrics}},
 \code{\link{nj8_profile}},
@@ -267,6 +321,7 @@ contract_files <- c(
   "reference-coverage-contract.json",
   "mattr-profile-contract.json",
   "norm-profile-contract.json",
+  "norm-profile-batch-contract.json",
   "lexical-diversity-variant-contract.json",
   "lexical-level-profile-contract.json",
   "tubelex-frequency-profile-contract.json"

@@ -7,13 +7,14 @@
 \title{Profile lexical coverage by New JACET 8000 frequency level}
 \description{
 Creates exact and cumulative token- and type-weighted lexical profiles from a
-caller-supplied copy of New JACET 8000. The word list is required at call time
-and is never bundled or downloaded by \pkg{ldfreq}.
+bundled New JACET 8000 table or an explicit caller-supplied copy. The bundled
+table is redistributed with permission from JACET and source attribution.
+No resource is downloaded at runtime.
 }
 \usage{
 nj8_profile(
   terms,
-  wordlist,
+  wordlist = NULL,
   rank_column = NULL,
   word_column = NULL,
   sheet = "\\u65b0J8",
@@ -26,7 +27,7 @@ nj8_profile(
 
 nj8_profile_batch(
   documents,
-  wordlist,
+  wordlist = NULL,
   rank_column = NULL,
   word_column = NULL,
   sheet = "\\u65b0J8",
@@ -50,13 +51,14 @@ nj8_profile_batch(
   scale = "proportion",
   show_cumulative = TRUE,
   include_off_list = TRUE,
-  bar_col = "#4C78A8",
-  cumulative_col = "#E45756",
+  bar_col = "#0072B2",
+  cumulative_col = "#D55E00",
   main = NULL,
   xlab = "New JACET 8000 frequency level",
   ylab = NULL,
   show_legend = TRUE,
-  ...
+  ...,
+  monochrome = FALSE
 )
 }
 \arguments{
@@ -67,7 +69,8 @@ nj8_profile_batch(
   \item{documents}{A plain named list of character vectors or tokenization
   objects, or a data frame containing an explicit ID column and a list-column
   of those inputs.}
-  \item{wordlist}{A data frame containing New JACET 8000 ranks and entries, or
+  \item{wordlist}{\code{NULL} selects the bundled, versioned table. Alternatively,
+  a data frame containing New JACET 8000 ranks and entries, or
   a path to the official local XLSX file or a local CSV file. Direct XLSX input
   requires the suggested \pkg{readxl} package.}
   \item{rank_column, word_column}{Optional names of the rank and entry columns.
@@ -91,8 +94,9 @@ nj8_profile_batch(
   \item{expand_parenthetical}{Whether a terminal parenthetical list such as
   \code{"mom (mum, mummy)"} contributes comma-separated aliases at the same
   rank.}
-  \item{resource_version}{An optional caller-supplied version label. If
-  \code{NULL}, the canonical rank-entry SHA-256 supplies the identity.}
+  \item{resource_version}{An optional version label for an external table. If
+  \code{NULL}, its canonical rank-entry SHA-256 supplies the identity. The
+  bundled table has a fixed version and cannot be relabelled.}
   \item{id_col, terms_col}{Names of the explicit document-ID and lexical-input
   list-columns for data-frame batch input.}
   \item{max_rows}{A positive integer bounding the combined number of returned
@@ -107,11 +111,20 @@ nj8_profile_batch(
   \item{bar_col, cumulative_col}{Colors for the bars and cumulative curve.}
   \item{main, xlab, ylab}{Optional base-graphics labels.}
   \item{show_legend}{Whether to draw the exact/cumulative legend.}
-  \item{...}{For \code{plot()}, additional arguments passed to
+  \item{monochrome}{One \code{TRUE} or \code{FALSE} value; specify by name. Defaults to color; \code{TRUE} overrides bar and curve colors with gray and black. The off-list bar has a separate shade, and bars have black outlines. No title is added automatically; place figure titles and notes outside the image.}
+\item{...}{For \code{plot()}, additional arguments passed to
   \code{graphics::barplot()}; for \code{print()}, additional arguments passed
   to the summary-table print method.}
 }
 \details{
+Plots label every level as 1--8 and keep Off-list separate. The default
+proportion axis is fixed at 0--1 across documents, with unlabelled space above
+for the legend. Count plots scale to the displayed series. An undefined
+proportion (for example, no eligible terms) is not drawn as zero; inspect
+\code{coverage} instead. Use \code{yaxt} or \code{axes} to control the axis.
+Defaults use a sans serif font, horizontal tick labels, and an open frame;
+\code{family}, \code{las} and \code{bty} can be overridden in \code{...}.
+
 Ranks 1--8000 are assigned to eight 1,000-rank levels using
 \code{ceiling(rank / 1000)}. The official XLSX labels its entries as
 representative lemmas, so lemma input is the default. Surface-form matching is
@@ -132,7 +145,7 @@ rank/level are retained. Explicit form-to-flemma overrides can be supplied to
 
 The batch function preserves input document order and accepts the same lexical
 unit and conflict policies as the single-document function. It reads,
-validates, normalizes, and hashes the caller-supplied word list once for the
+validates, normalizes, and hashes the selected word list once for the
 whole batch. It performs no document-ID inference and no recycling. Its
 \code{max_rows} guard is checked before the external resource is processed.
 }
@@ -170,16 +183,22 @@ the exact data plotted, allowing the same values to be used with another
 graphics system.
 }
 \section{Resource identity and path privacy}{
-The complete list is neither bundled nor copied into the result. For a local
+The complete list is not copied into the result. For an external local
 file, provenance retains only its basename, exact file SHA-256, and a canonical
 rank-entry SHA-256. The absolute directory is not stored, printed, or repeated
 in package-generated error messages. A data-frame input has a canonical hash
 but no file hash.
 
-The official workbook permits personal research use with citation and directs
-commercial users to consult JACET in advance. Public download availability is
-not treated as permission for \pkg{ldfreq} to redistribute the list. Users
-remain responsible for obtaining and using their copy under applicable terms.
+The bundled table is redistributed with permission from JACET and source
+attribution. Cite JACET Basic Word Revision Committee (Ed.). (2016).
+\emph{The New JACET List of 8000 Basic Words}. Tokyo: Kirihara Shoten.
+The installed \file{licenses/nj8/NOTICE.md} records the permission and changes.
+All 8,000 rank/entry pairs match the official workbook. The bundled edition
+restores the missing word \code{nan} at rank 6926 and lowercase
+\code{true}/\code{false} at ranks 326/2382 in the supplied snapshot.
+External copies retain their applicable terms; supplying a table does not
+verify that it is the official edition. Provenance distinguishes bundled from
+external input and records the source hash and selected version.
 }
 \section{Batch output}{
 \code{nj8_profile_batch()} returns document-major \code{summary} and
@@ -197,9 +216,8 @@ The exact denominator, normalization, alias, flemma-conflict, batch, plot, and
 resource-boundary rules are installed in
 \file{lexical-level-profile-contract.json}. Locate it with
 \code{system.file("spec", "lexical-level-profile-contract.json", package =
-"ldfreq")}. The contract records that the resource is caller supplied and not
-redistributed by this package. The adapter's measurement contract is normative
-for version 0.1.0.
+"ldfreq")}. The contract distinguishes the bundled default from external
+input. The adapter's measurement contract is normative for version 0.2.0.
 }
 \value{
 \code{nj8_profile()} returns a list of class
@@ -226,13 +244,15 @@ The plot method invisibly returns the summary rows and exact values drawn.
 document-major tables while the external resource provenance is stored once.
 }
 \examples{
+nj8_profile(c("the", "true", "false", "nan"))
+
 wordlist <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
   Word = c("the", "develop", "rare", "extreme")
 )
 profile <- nj8_profile(
   c("The", "develop", "unknown", "the"),
-  wordlist,
+  wordlist = NULL,
   unit = "surface"
 )
 profile$summary
@@ -240,7 +260,7 @@ profile$coverage
 
 batch <- nj8_profile_batch(
   list(doc_a = c("The", "develop"), doc_b = c("rare", "outside")),
-  wordlist,
+  wordlist = NULL,
   unit = "surface"
 )
 batch$coverage

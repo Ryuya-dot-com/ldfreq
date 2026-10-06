@@ -5,9 +5,9 @@ The resource-independent, pre-tokenized twelve-method core introduced in
 preprocessing, exact lexical overlap, many-document reference coverage,
 caller-supplied generic lexical-norm profiles, and resource-backed profiles are
 separate public surfaces with their own contract
-versions and review gates. The Maas/MTLD
+versions. The Maas/MTLD
 sensitivity surface also has a separate variant contract and does not add
-methods to the frozen core registry. Caller-supplied lexical-level profiles
+methods to the frozen core registry. Bundled and external lexical-level profiles
 have a separate contract for resource input, rank bands, denominator, off-list
 handling, and plot data. Package version,
 metric-contract version, result-schema version, preprocessing-contract version,
@@ -32,7 +32,7 @@ This is an explicit numerical-correction exception to frozen evaluation order,
 not a new estimator: the method and core contract IDs remain unchanged, and
 the specification records the corrected evaluation. An independently generated
 80-digit fixture covers the failure. Record the package version as well as the
-method ID when reproducing results. See `development/REVIEW-20260922.md`.
+method ID when reproducing results.
 
 ## Result and orchestration schemas
 
@@ -48,6 +48,34 @@ release.
 Plan and specification hashes are reproducibility labels rather than security
 signatures. Any change to their identity inputs or serialization receives a new
 schema version and new pinned fixtures.
+
+## Annotated corpus interfaces
+
+The experimental external-annotation importer starts at interface 0.1.0.
+It requires complete, ordered surface annotations before exclusions, permits
+only whitespace gaps, and reports segment-local inclusive Unicode codepoint
+positions without normalization. Feature columns and declared dictionary
+metadata remain explicit. It returns plain tables, not a sealed
+`lexdiv_tokenization`; the existing one-to-one annotation comparator is
+unchanged. The Japanese gibasa recipe does not define Japanese frequency
+resource compatibility or change any core metric contract.
+
+The experimental MASC Penn reader is at interface 0.2.0 and the quanteda
+adapter at 0.1.0 in package 0.2.0. Their source-coordinate rules, supported GrAF
+layout, gap preservation, segment mappings and output fields are public
+semantics. Unsupported annotations fail explicitly. They do not redefine the
+existing tokenizer, core metrics or adjacent n-gram contract. Reader coverage
+is verified for Mini-MASC 1.0's Penn layer. Reader 0.2.0 adds the modern
+MASC 3.0.0 documentHeader layout without changing output fields or boundary
+rules. Only 122 of that archive's 392 documents passed those rules in the
+local audit. Whole-corpus MASC and OANC support is not claimed.
+
+The experimental n-gram reference builder starts at version 0.1.0. It retains
+exact counts, denominators, source extraction fingerprints and a whole-document
+roster while dropping chunk occurrence tables. Its reference output uses the
+unchanged adjacent n-gram contract. Chunk boundaries can change row order and
+fingerprints without changing count or profile values. No pruning or silent
+document exclusions are permitted by the builder.
 
 ## Deprecation
 
@@ -131,6 +159,30 @@ schema version. Adding implicit normalization, fuzzy matching, imputation,
 automatic thresholds, composite scores, or a default cross-measure plot is not
 a compatible extension.
 
+The adjacent n-gram contract starts at 0.1.0, separately from core metrics.
+Document/segment boundaries, original-position adjacency, overlapping windows,
+component-wise exact identity, n-specific opportunity totals, completeness,
+sample-zero versus unlisted-key handling, token/type means and coverage,
+typed empty tables, field order and content fingerprints are public semantics.
+Changing these requires a new corresponding contract version. The occurrence
+ceiling is not a whole-result memory bound. Preparation and source metadata are
+caller assertions; fingerprints detect accidental changes, not authenticity.
+Association scores or new segmentation rules must not silently change these
+frequency definitions.
+
+The n-gram reference-comparison interface starts at contract 0.1.0. It reuses
+the existing per-reference profiles and fixes an all-reference intersection
+of defined rates, including defined sample zeros, for common-item means and
+baseline differences. Common coverage, per-document token/type weighting,
+empty/no-common-value states, reference order and pre-allocation row bound
+are public semantics. It does not change the adjacent n-gram 0.1.0 contract.
+
+The generic norm batch contract starts at 0.1.0. It preserves the unchanged
+single-document 0.1.0 tables behind a document-ID column and shared provenance.
+Its global row bound, document order, typed empty outputs and document-local
+missingness are public semantics. Pooling documents or changing its error
+boundary requires a separate contract decision.
+
 Likewise, adding a variant formula, threshold boundary, minimum factor length,
 tail rule, directional aggregation, or compatibility claim requires a new
 variant method or contract identity. Shared labels never imply equivalence with
@@ -140,3 +192,12 @@ A normative measurement contract does not by itself establish redistribution
 rights for its reference data. Resource rights, artifact identity,
 coverage/failure behavior, installed notices, and package inventory are reviewed
 and recorded separately from the public API contract.
+
+## Bundled NJ8 in 0.2.0
+
+The level-profile and batch contracts advance to 0.2.0. An omitted or NULL
+`wordlist` selects the bundled `jacet2016-8000-v1` table. Explicit external
+inputs retain their previous matching, denominator, and conflict rules.
+Results now distinguish bundled and external resource identity and record the
+bundled source citation. The bundled version cannot be relabelled by a caller.
+No core metric formula or numerical value changes as part of this addition.

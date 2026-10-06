@@ -306,23 +306,24 @@ check(
       "versioned-non-exported-implementation-contract"
     ) &&
     identical(lookup_contract$public_api, FALSE) &&
-    identical(lookup_contract$release_approved, TRUE) &&
+    !("release_approved" %in% names(lookup_contract)) &&
     identical(lookup_contract$runtime_policy$network_access, FALSE) &&
     identical(lookup_contract$runtime_policy$fallback, FALSE),
   "The installed non-exported lookup-contract boundary changed."
 )
 check(
-  identical(inventory$schema_version, "1.0.0") &&
+  identical(inventory$schema_version, "1.2.0") &&
     identical(inventory$package_scope, "installed-lexical-resources") &&
     identical(inventory$runtime_policy$network_access, FALSE) &&
     identical(inventory$runtime_policy$implicit_download_or_fallback, FALSE),
   "The installed resource-manifest boundary changed."
 )
-check(
-  length(inventory$resources) == 1L,
-  "The installed manifest changed its bundled resource count."
-)
-inventory_resource <- inventory$resources[[1L]]
+inventory_ids <- vapply(inventory$resources, `[[`, character(1L), "resource_id")
+check(!anyDuplicated(inventory_ids) && setequal(inventory_ids,
+  c("tubelex-en-treebank-slim", "new-jacet8000", "morpholex-en",
+    "bnccoca-level6", "morphynet-en-example")),
+  "The installed manifest changed its bundled resource identities.")
+inventory_resource <- inventory$resources[[match("tubelex-en-treebank-slim", inventory_ids)]]
 check(
   identical(inventory_resource$resource_id, "tubelex-en-treebank-slim") &&
     identical(inventory_resource$distribution, "bundled") &&
@@ -333,7 +334,7 @@ check(
     identical(inventory_resource$raw_subtitles_or_identifiers_included, FALSE),
   "The installed TUBELEX inventory state changed."
 )
-for (member in inventory_resource$package_members) {
+for (member in unlist(lapply(inventory$resources, `[[`, "package_members"), recursive = FALSE)) {
   member_path <- system.file(member$path, package = "ldfreq")
   check(nzchar(member_path) && file.exists(member_path), sprintf(
     "Inventory member is not installed: %s", member$path

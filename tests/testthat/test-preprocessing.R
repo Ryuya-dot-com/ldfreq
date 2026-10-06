@@ -710,7 +710,7 @@ test_that("the installed preprocessing contract matches the public implementatio
   schema <- jsonlite::read_json(schema_path, simplifyVector = FALSE)
 
   expect_identical(contract$contract_id, "ldfreq-preprocessing")
-  expect_identical(contract$contract_version, "0.2.0")
+  expect_identical(contract$contract_version, "0.4.0")
   expect_identical(contract$status, "normative")
   expect_identical(contract$public_api, TRUE)
   expect_identical(
@@ -738,7 +738,7 @@ test_that("the installed preprocessing contract matches the public implementatio
   expect_identical(contract$result_boundary$metric_core_schema_changed, FALSE)
   expect_identical(
     contract$result_boundary$existing_tokenization_argument_policy,
-    "reject-explicit-normalization-case-or-keep_numbers"
+    "reject-explicit-normalization-case-keep_numbers-or-tokenizer"
   )
   expect_identical(schema$properties$contract_id$const, contract$contract_id)
   expect_identical(

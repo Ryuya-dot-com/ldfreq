@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cesHeader xmlns="http://www.xces.org/ns/GrAF/1.0/" version="1.0.4">
+  <fileDesc><titleStmt><title>Authored MASC-format example</title></titleStmt></fileDesc>
+  <profileDesc>
+    <textClass catRef="EXAMPLE"><medium>Written</medium></textClass>
+    <primaryData loc="example.txt" medium="text"/>
+    <annotations>
+      <annotation type="seg" ann.loc="example-seg.xml"/>
+      <annotation type="s" ann.loc="example-s.xml"/>
+      <annotation type="penn" ann.loc="example-penn.xml"/>
+    </annotations>
+  </profileDesc>
+</cesHeader>
