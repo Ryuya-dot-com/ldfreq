@@ -368,6 +368,163 @@ does not supply those missing assumptions.</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="plot-local-vocabulary-diversity">Plot local vocabulary diversity<a class="anchor" aria-label="anchor" href="#plot-local-vocabulary-diversity"></a>
+</h2>
+<p>One text can contain passages with very different amounts of
+repetition. This example overlays local type-token ratios for 25-, 50-
+and 100-token windows, so you can inspect both variation through the
+text and sensitivity to the window choice. The following chunks form a
+complete, runnable example after <a href="https://ryuya-dot-com.github.io/ldfreq/#installation">installing
+ldfreq</a>; no additional plotting package or downloaded corpus is
+required.</p>
+<p>The 431-token English passage below was written for this
+demonstration. It alternates more varied and more repetitive wording to
+illustrate the method; it is not participant data or evidence of a
+learner-group difference. Replace <code>trajectory_text</code> with your
+own text and run the analysis and drawing chunks again. This
+three-window example requires at least 100 selected tokens. The window
+sizes illustrate a comparison, not universal recommended settings.</p>
+<div class="section level3">
+<h3 id="prepare-the-text-and-analysis">Prepare the text and analysis<a class="anchor" aria-label="anchor" href="#prepare-the-text-and-analysis"></a>
+</h3>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">trajectory_text</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span>
+<span>  <span class="st">"On a bright autumn morning, a class visited a community garden beside the river.</span></span>
+<span><span class="st">   Volunteers welcomed the visitors and explained how an abandoned parking area</span></span>
+<span><span class="st">   had become a shared growing space. Narrow paths separated beds of vegetables,</span></span>
+<span><span class="st">   herbs, and flowers. Several students photographed insects, while others sketched</span></span>
+<span><span class="st">   the arrangement of plants in their notebooks. A gardener described the seasonal</span></span>
+<span><span class="st">   changes that shaped the work, from preparing soil in spring to collecting seeds</span></span>
+<span><span class="st">   before winter. The class divided into small teams and began exploring."</span>,</span>
+<span>  <span class="st">"Our group went to the garden to look at the plants. We looked at the plants</span></span>
+<span><span class="st">   near the path and then we looked at the plants near the wall. The plants near</span></span>
+<span><span class="st">   the path needed water. The plants near the wall needed water too. We brought</span></span>
+<span><span class="st">   water to the plants near the path. Then we brought water to the plants near</span></span>
+<span><span class="st">   the wall. We worked in the garden together, and we talked about the garden</span></span>
+<span><span class="st">   while we worked. At the end, we looked at the plants again."</span>,</span>
+<span>  <span class="st">"Beyond the familiar tasks, the visit raised unexpected questions about urban</span></span>
+<span><span class="st">   ecology. Flowering borders attracted pollinators, shaded corners retained</span></span>
+<span><span class="st">   moisture, and decomposing leaves supported organisms beneath the surface.</span></span>
+<span><span class="st">   Students compared textures, recorded observations, and proposed explanations</span></span>
+<span><span class="st">   for the uneven growth of neighboring seedlings. Their discussion connected</span></span>
+<span><span class="st">   drainage, sunlight, biodiversity, and the history of the site. One volunteer</span></span>
+<span><span class="st">   emphasized that apparently untidy habitats could provide valuable shelter.</span></span>
+<span><span class="st">   Another demonstrated how careful observation might reveal problems before</span></span>
+<span><span class="st">   visible damage appeared. These encounters encouraged curiosity and challenged</span></span>
+<span><span class="st">   assumptions about what a productive landscape should resemble."</span>,</span>
+<span>  <span class="st">"Back in the classroom, we talked about what we had seen. We talked about the</span></span>
+<span><span class="st">   plants, and we talked about the people who cared for the plants. We wrote</span></span>
+<span><span class="st">   about the garden in our books. Some students wrote about watering the plants.</span></span>
+<span><span class="st">   Other students wrote about looking at the plants. We shared our books and</span></span>
+<span><span class="st">   read what other students had written. We wanted to visit the garden again,</span></span>
+<span><span class="st">   because there were more things to see and more things to do."</span>,</span>
+<span>  <span class="st">"The final discussion moved from description toward practical decisions.</span></span>
+<span><span class="st">   Participants suggested accessible paths, rainwater storage, and a rotating</span></span>
+<span><span class="st">   schedule for maintenance. They considered conflicting priorities, estimated</span></span>
+<span><span class="st">   costs, and identified questions that would require consultation with residents.</span></span>
+<span><span class="st">   Rather than reaching an immediate agreement, the class assembled a provisional</span></span>
+<span><span class="st">   proposal with explicit reasons for each recommendation. The exercise showed</span></span>
+<span><span class="st">   how a shared experience could generate observation, repetition, explanation,</span></span>
+<span><span class="st">   and argument within a single account. Later revisions would connect these</span></span>
+<span><span class="st">   sections more clearly while preserving the details that made the visit memorable."</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">trajectory_prepared</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span><span class="va">trajectory_text</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span>
+<span><span class="va">trajectory_tokens</span> <span class="op">&lt;-</span> <span class="va">trajectory_prepared</span><span class="op">$</span><span class="va">tokens</span><span class="op">$</span><span class="va">surface</span></span>
+<span><span class="va">trajectory_methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_methods</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">trajectory_plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_plan</a></span><span class="op">(</span></span>
+<span>  presets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  grids <span class="op">=</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_grid</a></span><span class="op">(</span></span>
+<span>    <span class="va">trajectory_methods</span><span class="op">$</span><span class="va">method_id</span><span class="op">[</span><span class="va">trajectory_methods</span><span class="op">$</span><span class="va">metric_id</span> <span class="op">==</span> <span class="st">"mattr"</span><span class="op">]</span>,</span>
+<span>    <span class="st">"window_length"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">50</span>, <span class="fl">100</span><span class="op">)</span>, request_id_prefix <span class="op">=</span> <span class="st">"window"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">trajectory</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_mattr_profile.html">lexdiv_mattr_profile</a></span><span class="op">(</span><span class="va">trajectory_tokens</span>, <span class="va">trajectory_plan</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="../reference/lexdiv_mattr_profile.html">lexdiv_mattr_profile()</a></code> returns the values and their
+window positions. The function below uses base R to overlay those
+returned rows. Color and line type both identify the window size; the
+plot contains no title or subtitle. The function is defined here as an
+example, not exported by ldfreq.</p>
+</div>
+<div class="section level3">
+<h3 id="draw-the-overlapping-trajectories">Draw the overlapping trajectories<a class="anchor" aria-label="anchor" href="#draw-the-overlapping-trajectories"></a>
+</h3>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">draw_trajectory</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">monochrome</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">old</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.2</span>, <span class="fl">4.3</span>, <span class="fl">2.2</span>, <span class="fl">0.8</span><span class="op">)</span>, mgp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.65</span>, <span class="fl">0.65</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>             tcl <span class="op">=</span> <span class="op">-</span><span class="fl">0.25</span>, family <span class="op">=</span> <span class="st">"sans"</span>, las <span class="op">=</span> <span class="fl">1</span>, bty <span class="op">=</span> <span class="st">"l"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">old</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">colors</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">monochrome</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="fl">3</span><span class="op">)</span> <span class="kw">else</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#0072B2"</span>, <span class="st">"#D55E00"</span>, <span class="st">"#009E73"</span><span class="op">)</span></span>
+<span>  <span class="va">styles</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trajectory</span>, request_id <span class="op">=</span> <span class="st">"window_1"</span>, type <span class="op">=</span> <span class="st">"n"</span>,</span>
+<span>       add_global_mean <span class="op">=</span> <span class="cn">FALSE</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">trajectory_tokens</span><span class="op">)</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>       xaxs <span class="op">=</span> <span class="st">"i"</span>, yaxs <span class="op">=</span> <span class="st">"i"</span>, yaxt <span class="op">=</span> <span class="st">"n"</span>,</span>
+<span>       xlab <span class="op">=</span> <span class="st">"Position in text (window midpoint)"</span>,</span>
+<span>       ylab <span class="op">=</span> <span class="st">"Local type-token ratio"</span>, cex.lab <span class="op">=</span> <span class="fl">1.05</span>, cex.axis <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.8</span>, <span class="fl">0.2</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"#E6E6E6"</span>, lwd <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">2</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0.2</span><span class="op">)</span>, las <span class="op">=</span> <span class="fl">1</span>, cex.axis <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">colors</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">rows</span> <span class="op">&lt;-</span> <span class="va">trajectory</span><span class="op">$</span><span class="va">windows</span><span class="op">[</span></span>
+<span>      <span class="va">trajectory</span><span class="op">$</span><span class="va">windows</span><span class="op">$</span><span class="va">request_id</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"window_"</span>, <span class="va">i</span><span class="op">)</span>, <span class="op">]</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">rows</span><span class="op">$</span><span class="va">window_midpoint</span>, <span class="va">rows</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>          col <span class="op">=</span> <span class="va">colors</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, lty <span class="op">=</span> <span class="va">styles</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, lwd <span class="op">=</span> <span class="fl">2.1</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"top"</span>, inset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="op">-</span><span class="fl">0.12</span><span class="op">)</span>, xpd <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>         legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"25-token window"</span>, <span class="st">"50-token window"</span>, <span class="st">"100-token window"</span><span class="op">)</span>,</span>
+<span>         col <span class="op">=</span> <span class="va">colors</span>, lty <span class="op">=</span> <span class="va">styles</span>, lwd <span class="op">=</span> <span class="fl">2.1</span>, bty <span class="op">=</span> <span class="st">"n"</span>, horiz <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>         cex <span class="op">=</span> <span class="fl">0.85</span>, seg.len <span class="op">=</span> <span class="fl">2.6</span>, x.intersp <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="va">trajectory</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">draw_trajectory</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="from-text-to-report_files/figure-html/trajectory-overlay-1.png" class="r-plt" alt="Local type-token ratio across a 431-token authored passage. Solid blue, dashed orange and dotted green curves show 25-, 50- and 100-token windows; repeated wording produces two visible troughs." width="1950"></p>
+<p>The horizontal axis is each window’s midpoint in the selected token
+sequence. The vertical axis is <strong>local TTR</strong>: distinct
+surface forms divided by the number of tokens in that window. Averaging
+a curve’s values gives MATTR for that window length. Here, the averages
+are approximately 0.825, 0.743 and 0.662 for the 25-, 50- and 100-token
+windows, respectively.</p>
+<p>The troughs correspond to repetitive passages in this constructed
+example. Longer windows change both the scale and the local variation;
+the curves are not interchangeable estimates of a window-free score.
+Larger windows also start later and end earlier because only complete
+windows are plotted. Overlapping windows are dependent observations, not
+independent participants or confidence intervals. These curves do not
+measure proficiency or writing quality. A higher line does not identify
+a better window choice.</p>
+</div>
+<div class="section level3">
+<h3 id="export-the-figure-or-use-monochrome">Export the figure or use monochrome<a class="anchor" aria-label="anchor" href="#export-the-figure-or-use-monochrome"></a>
+</h3>
+<p>Run the following code to save a 300-dpi PNG and a vector PDF in your
+current working directory (<code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code>). These filenames are
+replaced if they already exist. Use the PNG for sharing and inspect the
+PDF at its intended publication size. Place any figure title and
+explanatory note outside the image.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png</a></span><span class="op">(</span><span class="st">"ldfreq-trajectory.png"</span>, width <span class="op">=</span> <span class="fl">6.5</span>, height <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>    units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">300</span>, pointsize <span class="op">=</span> <span class="fl">11</span>, bg <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></span>
+<span><span class="fu">draw_trajectory</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/grDevices/pdf.html" class="external-link">pdf</a></span><span class="op">(</span><span class="st">"ldfreq-trajectory.pdf"</span>, width <span class="op">=</span> <span class="fl">6.5</span>, height <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>    pointsize <span class="op">=</span> <span class="fl">11</span>, useDingbats <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">draw_trajectory</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Display in black and white; line types still distinguish the windows.</span></span>
+<span><span class="fu">draw_trajectory</span><span class="op">(</span>monochrome <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>Keep the text, tokenization, full profile and session information
+with the figure when you need to reproduce it.
+<code>trajectory$windows</code> provides the plotted rows;
+<code>trajectory$summary</code> retains the MATTR values and their
+specifications.</p>
+</div>
+</div>
+<div class="section level2">
 <h2 id="save-enough-to-reproduce-and-report-the-analysis">Save enough to reproduce and report the analysis<a class="anchor" aria-label="anchor" href="#save-enough-to-reproduce-and-report-the-analysis"></a>
 </h2>
 <p>Save the full results and preprocessing record, not just a CSV of
@@ -375,7 +532,7 @@ scores. The following round trip keeps list-columns and resource
 identity intact. The saved object contains the input terms; handle it
 under the study’s data access rules. It is not intended for automatic
 public sharing.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  prepared <span class="op">=</span> <span class="va">prepared</span>, diversity <span class="op">=</span> <span class="va">diversity</span>, metrics <span class="op">=</span> <span class="va">metrics</span>, levels <span class="op">=</span> <span class="va">levels</span>,</span>
 <span>  analysis <span class="op">=</span> <span class="va">analysis</span>, session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>

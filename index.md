@@ -16,6 +16,15 @@ choices and report what was actually measured. It records non-computable
 requests and their reasons, and checks that reshaped tables and plots do
 not mix incompatible specifications.
 
+[![Local vocabulary diversity for three window sizes in an authored
+example](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report_files/figure-html/trajectory-overlay-1.png)](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity)
+
+**[Reproduce this plot in
+R](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity).**
+The complete example includes the text, analysis, color/monochrome
+drawing and PNG/PDF export. It illustrates local vocabulary diversity
+and window-size sensitivity with authored text, not learner data.
+
 ## Why use ldfreq?
 
 - **Keep comparisons explicit.** Retain the formula, requested and
@@ -272,20 +281,19 @@ lists are supplied by the caller and are not bundled.
 ## Installation
 
 The current 0.2.0 version is under development and has not been released
-on CRAN. It requires R 4.1.0 or later. For users with access to the
-development repository, install the tested snapshot used by this
-documentation:
+on CRAN. It requires R 4.1.0 or later. Install the tested snapshot used
+by this documentation:
 
 ``` r
 # Run install.packages("pak") first if pak is not installed.
 pak::pak("Ryuya-dot-com/ldfreq@c788d909dcd113492261b4fd99b9787f6d61eb1e")
 ```
 
-The explicit revision matters: `main` currently contains an older
-implementation with the same development version number. The package’s
-required dependencies are `digest` and `stringi`; additional tools are
-optional for their documented workflows. For example, candidate-review
-examples use `quanteda`.
+Pinning the revision fixes the implementation, even when development
+snapshots share the same version number. The package’s required
+dependencies are `digest` and `stringi`; additional tools are optional
+for their documented workflows. For example, candidate-review examples
+use `quanteda`.
 
 If you have a built source archive, install it locally:
 
@@ -314,7 +322,7 @@ prepared <- lexdiv_tokenize_batch(
 analysis <- lexdiv_metrics_text_batch(
   prepared, metrics = c("ttr", "mattr"), window_length = 10
 )
-analysis$results[, c("document_id", "metric_id", "N", "V", "value", "status")]
+as.data.frame(analysis$results)[, c("document_id", "metric_id", "N", "V", "value", "status")]
 
 # The bundled NJ8 table is available offline, with JACET's permission.
 # This is surface-form coverage; it does not silently lemmatize the text.

@@ -11,18 +11,21 @@ specification updates.
 
 ## Local verification
 
-From the repository root, run:
-
-``` r
-testthat::test_local()
-```
-
-Then build and check the source package:
+From the repository root, build and check the source package:
 
 ``` sh
 R CMD build .
 R CMD check --no-manual ldfreq_*.tar.gz
 ```
+
+This installs the package before running its tests. Some example recipes
+source other installed example files, so an uninstalled
+[`testthat::test_local()`](https://testthat.r-lib.org/reference/test_package.html)
+run does not exercise the same file lookup and can fail to locate those
+files. Use the installed-package check for the complete suite. When only
+documentation or build records change, retain earlier test evidence for
+unchanged code and verify the affected documents or artifacts instead of
+repeating the full suite.
 
 Do not add production lexical resources without a separate review of
 source identity, redistribution rights, installed notices, package size,
