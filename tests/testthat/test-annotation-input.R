@@ -89,6 +89,31 @@ test_that("omissions, normalization, reordered tokens and invalid IDs fail expli
   expect_error(do.call(lexdiv_import_annotations, changed), "extra")
 })
 
+test_that("partially emitted CRLF tokens allow only whitespace gaps", {
+  f <- annotation_input()
+  f$segments <- data.frame(document_id = "d", segment_id = "s", text = "\r\n\r\nA \r\n\r\nB")
+  f$data <- data.frame(document_id = "d", segment_id = "s", token_index = 1:6,
+    surface = c("\r", "\r", "A", "\r", "\r", "B"))
+  x <- do.call(lexdiv_import_annotations, f)
+  expect_identical(x$tokens$start, c(1L, 3L, 5L, 7L, 9L, 11L))
+  expect_identical(x$tokens$end, x$tokens$start)
+  expect_identical(x$segments$text, f$segments$text)
+  expect_identical(x$tokens$surface, f$data$surface)
+  f$data <- x$tokens
+  expect_identical(do.call(lexdiv_import_annotations, f), x)
+  f$data$start[2] <- 2
+  expect_error(do.call(lexdiv_import_annotations, f), "codepoint positions")
+  f$data <- data.frame(document_id = "d", segment_id = "s", token_index = 1:3,
+    surface = c("\r", "\r", "A"))
+  for (omitted in c("X", ".")) {
+    f$segments$text <- paste0("\r\n", omitted, "\r\nA")
+    expect_error(do.call(lexdiv_import_annotations, f), "align exactly")
+  }
+  f$segments$text <- "\r\n\r\n"
+  f$data <- f$data[1:2, ]
+  expect_identical(do.call(lexdiv_import_annotations, f)$tokens$start, c(1L, 3L))
+})
+
 test_that("document and segment boundaries survive metric and ngram workflows", {
   f <- annotation_input(); x <- do.call(lexdiv_import_annotations, f)
   words <- x$tokens[1:7, ]

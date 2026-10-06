@@ -127,16 +127,15 @@ schema_source_path <- file.path(
 inventory <- jsonlite::read_json(inventory_source_path, simplifyVector = FALSE)
 inventory_schema <- jsonlite::read_json(schema_source_path, simplifyVector = FALSE)
 check(
-  identical(inventory$schema_version, "1.1.0") &&
+  identical(inventory$schema_version, "1.2.0") &&
     identical(inventory$package_scope, "installed-lexical-resources") &&
     identical(inventory$runtime_policy$network_access, FALSE) &&
     identical(inventory$runtime_policy$implicit_download_or_fallback, FALSE),
   "Installed resource-manifest boundary changed."
 )
-check(
-  length(inventory$resources) == 2L,
-  "The installed manifest must declare the two bundled resources."
-)
+resource_ids <- vapply(inventory$resources, `[[`, character(1L), "resource_id")
+check(length(resource_ids) > 0L && !anyDuplicated(resource_ids),
+  "The installed manifest must declare distinct bundled resources.")
 check(
   identical(inventory_schema$title, "ldfreq installed resource manifest") &&
     identical(inventory_schema$additionalProperties, FALSE),
@@ -193,6 +192,8 @@ expected_extdata <- sort(
   sub("^extdata/", "", c(member_paths[startsWith(member_paths, "extdata/")], example_paths)),
   method = "radix"
 )
+expected_licenses <- sort(sub("^licenses/", "",
+  member_paths[startsWith(member_paths, "licenses/")]), method = "radix")
 check(length(expected_extdata) > 0L, "No extdata payload is declared.")
 check(
   identical(
@@ -201,6 +202,8 @@ check(
   ),
   "The source tree contains undeclared or missing extdata payloads."
 )
+check(identical(relative_files(file.path(package_root, "inst", "licenses")), expected_licenses),
+  "The source tree contains undeclared or missing license files.")
 
 run_r_command <- function(arguments, working_directory, label) {
   old_directory <- setwd(working_directory)
@@ -390,6 +393,8 @@ for (layer_name in names(layer_roots)) {
     identical(relative_files(file.path(root, "extdata")), expected_extdata),
     sprintf("%s contains undeclared or missing extdata payloads.", layer_name)
   )
+  check(identical(relative_files(file.path(root, "licenses")), expected_licenses),
+    sprintf("%s contains undeclared or missing license files.", layer_name))
 }
 
 archive_record <- function(path) {
@@ -431,6 +436,7 @@ evidence <- list(
   audited_members = member_records,
   extdata_members = expected_extdata,
   installed_resource_count = length(inventory$resources),
+  installed_resource_ids = unname(resource_ids),
   authored_example_members = example_paths,
   undeclared_extdata_observed = FALSE,
   assertions = assertions

@@ -1769,3 +1769,1402 @@ PR #21 once these changes are combined. Commit-specific CI is recorded in the
 PR to avoid another source push solely to copy workflow URLs. Main merge,
 visibility changes, site deployment and CRAN submission are not part of this
 update.
+
+## Optional UDPipe workflow and overlaid distributions (2026-10-06)
+
+Added the explicitly sourced `inst/examples/udpipe-amod.R` recipe and extended
+the dependency guide from original sentence inputs through a real parser,
+source-endpoint comparison, original count distributions and saved-output
+replay. UDPipe and ggplot2 are optional suggestions; public exports and S3
+methods are unchanged. No model or corpus is distributed. The official UDPipe
+R documentation and UD 2.5 model repository were consulted; model terms are
+recorded separately from the R code license.
+
+The helper consumes the complete UDPipe output (`x`, `conllu`, `errors`) and
+one original sentence per segment. It uses UDPipe's own CoNLL-U reader and
+the existing exact-surface annotation importer, preserving the original roster,
+empty inputs and missing labels. It refuses reported failures, source/ID
+mismatches, multiple sentences per input, multiword-token rows, empty nodes
+and enhanced dependencies. It does not reconstruct source text, invent global
+document offsets, silently filter unsupported rows or rerun inference on replay.
+
+The user's subsequent visualization instruction supersedes the earlier
+signed-change figure recommendations in this record. The audit guide now
+overlays original TTR observations; the dependency guide overlays document
+frequencies at each original integer pair count. Difference tables remain
+available for auditing. The optional continuous TTR density recipe uses a
+common numeric bandwidth, reflection at the 0--1 bounds, and solid/dashed
+lines in both color modes. The ggplot2 3.4.0 release documentation confirms
+the required `bounds` and linewidth support. These are marginal descriptive
+distributions, not an uncertainty or paired-effect estimator. Constant series
+are rejected; tiny/discrete examples use observations/frequencies. No in-figure
+title, subtitle or caption is introduced. The Japanese stimulus guide's
+all-missing branch now reports its message outside the figure.
+
+Workspace evidence: `reviews/ldfreq-udpipe-workflow-20261006/evidence/`.
+
+- **31 new recipe expectations and 17 existing API/smoke expectations passed**,
+  with no failures, warnings or skips, using the installed helper. Authored
+  CoNLL-U covers Unicode, literal `NA`/underscore surfaces, empty inputs,
+  source/ID changes, unsupported structures, missing labels and saved replay.
+  Core `R/`, NAMESPACE, resource bytes and help files are unchanged; the prior
+  numerical and public-plot evidence remains applicable to those files.
+- Real parsing used UDPipe **0.8.16**, English EWT UD 2.5 model SHA-256
+  `784bd0fa85e3d831fd02a55290d0acfd05c953159dc38cc33d52e1b28add9957`.
+  Four authored inputs, including an empty document, produced pair totals
+  **2, 2, 0, 0**, equal to the reference totals. In the first sentence, one
+  endpoint mismatch yields one FP and one FN despite an unchanged count.
+  This is workflow evidence, not independent parser-accuracy validation.
+  A Unicode original is retained exactly; a multiple-sentence input is refused.
+  The model remains only in the local evidence directory. An older model path
+  proved to be a zero-byte file; a separate valid download was used.
+- **Four affected guides execute and render**, including the optional model
+  path separately. The latter reproduces the saved raw output and extracted
+  pairs. Eight current figures cover original TTR, authored/parser count
+  distributions and continuous density rendering, each in color/monochrome.
+  Plotted numbers are identical between modes. Bounds, finite density values,
+  line types, title absence, invalid bandwidths and constant-series refusal
+  were checked. The density figure uses deterministic beta-quantile rendering
+  inputs, not observations from a research corpus. Color density, monochrome
+  density, original TTR and parser count figures were visually inspected.
+  Earlier `parser-differences-*.png` artifacts are superseded and are not shipped.
+- Two evidence-generation issues were localized and corrected. The first
+  validation driver tried to retrieve a globally sourced helper from the
+  knitting environment; `source(..., local = TRUE)` fixed that scope mismatch.
+  The tests and preceding model execution had succeeded. Later, standalone
+  `purl()` lacked the optional-chunk flag; an explicit offline environment
+  restored those chunks as commented code. The parsed executable expressions
+  were identical before/after that extraction correction. Neither issue was
+  a numerical or parser failure; successful runtime tests were not repeated.
+- The checked archive candidate passed
+  `R CMD check --no-tests --no-manual --no-vignettes`, **Status: OK**, including
+  all help examples. After the comment-only extraction correction, the archive
+  was rebuilt and installed; a fresh R process reproduced both saved-output
+  import and pair extraction without a model and executed the installed
+  offline guide script. The full check was not repeated for restored comments.
+  These are separate evidence stages, not a claim that the final archive ran
+  all tests or a full check in a single process.
+- Final archive SHA-256:
+  `22f8bc92898282f9c67ddd2ab92a5708358c1e68443b9aebdc75a84d909b11c4`.
+  **227 audited source members** match the checkout. There are **21 installed
+  guides**: four newly rendered and seventeen whose source is byte-identical
+  to the previously validated compiled guides. Model files, raw parser records,
+  workspace instructions and private development files are absent. API audit
+  still reports **53 exports, 34 S3 registrations and 33 public topics**.
+
+This update is locally validated. It does not change main, publish a website,
+submit to CRAN or establish independent accuracy in a target population.
+
+## External-reference check and sentence-boundary correction (2026-10-06)
+
+Following the request to consider priorities, paused further visualization
+work and took the existing Stage 5 candidate into a bounded real-data check.
+The question was whether the current source-aligned amod workflow processes
+all supplied sentences, and whether equal pair counts conceal occurrence errors.
+The result determines input guidance and the scope of claims; it does not
+create a new requirement for universal accuracy before distributing the API.
+
+Used the complete public UD English ESLSpok test split at commit
+`3feb27b9759454c4cf02263b371963137bee0d2b`, source SHA-256
+`7d3b37af353205dc3b2964937e7c511e7763cdca25ec9c830638a2540ffe04be`.
+It contains **232 sentences, 2,266 tokens and 200 source-file ID groups**.
+These are sampled sentences, not complete interviews or verified independent
+participant records. The distributed `# text` is the coordinate reference;
+its whitespace and segmentation are not assumed to reproduce original audio
+or an untouched full transcript.
+
+Sources: the [pinned treebank README](https://github.com/UniversalDependencies/UD_English-ESLSpok/blob/3feb27b9759454c4cf02263b371963137bee0d2b/README.md),
+its LICENSE.txt, and the sampling/annotation/split sections of
+[Kyle, Eguchi, Miller, and Sither (2022)](https://aclanthology.org/2022.bea-1.7/).
+The pinned distribution declares CC BY-SA 4.0. Dependencies/XPOS were manually
+annotated; UPOS was converted then manually checked; lemmas are absent.
+This is an external reference, not new blind human annotation commissioned
+for ldfreq. No lemma accuracy or language-wide generalization is assessed.
+
+Kept the existing English EWT UD 2.5 model (SHA recorded above), feature
+ADJ--amod--NOUN including subtypes, and surface unit. The model README says
+UD 2.5 training with original splits; ESLSpok entered UD in 2.12. This supports
+the absence of this annotated treebank from the declared training release,
+not an exhaustive raw-text contamination audit. No model was trained or
+selected using these test results. All 232 references pass source/tree checks.
+
+Initial fixed-setting results with `tokenizer = "tokenizer"`:
+
+- **229/232 sentences processed**; three were refused because UDPipe split a
+  supplied sentence into multiple sentences. Their prediction counts remain
+  missing, not zero. All three have zero reference amod pairs in this sample.
+- On the paired set, **55 TP, 6 FP and 5 FN**, against 60 reference pairs:
+  precision **0.9016393**, recall **0.9166667**, F1 **0.9090909**. The operational
+  recall including all reference-complete inputs equals the conditional recall
+  here because the three failed predictions contain no reference pairs.
+
+Corrected the guide to use the existing UDPipe
+[presegmented tokenizer](https://ufal.mff.cuni.cz/udpipe/1/api-reference).
+It respects the caller's sentence line while predicting token boundaries;
+tagging/parsing operate on that sentence. An explicit guard prevents silently
+removing embedded CR/LF. A paragraph on one line is not automatically a sentence.
+The importer still refuses saved multi-sentence output and unsupported UD
+structures; no guessed head remapping or concatenation was introduced.
+
+The corrected setting processes **232/232 sentences** with the same 55/6/5
+occurrence counts. It fixes processing coverage, not the remaining annotation
+errors. Pair counts agree in **223/232 sentences**, including **one sentence
+with one FP and one FN**. Fifty sentences contain reference pairs, so most
+count agreements are zeros. The eleven discrepancies occur in ten sentences;
+`review-queue.csv` retains original contexts, both annotations at the dependent
+span, head surfaces, and an explicit unreviewed status. These mismatches include
+POS, relation and attachment differences; the reference was not rewritten to
+match predictions. No new graph was needed to identify this priority.
+
+The second setting was checked after seeing the initial failures on this same
+test split. It is a development check, **not an untouched final test**. The
+numbers describe this finite sample; no population confidence intervals are
+claimed from independent-token assumptions. Whole-document diversity, rankings,
+other registers, L1 performance and Japanese require separate evidence.
+
+Evidence is in `reviews/ldfreq-eslspok-evaluation-20261006/evidence/`:
+
+- `experiments/evaluate-eslspok-amod.R` pins source/model bytes, retains every
+  sentence and status, caches complete raw output, and saves source-linked
+  comparisons. `experiments/check-eslspok-counts.py` independently reads integer
+  CoNLL-U rows, aligns Unicode source spans, selects the feature and checks
+  occurrence sets and counts. Both settings pass this separate check.
+- An initial driver error used R's partial `$error` lookup against UDPipe's
+  `$errors`; exact `[["error"]]` indexing fixed the driver. Raw inference output
+  was already saved and reused. Each corpus setting was inferred once; the
+  review-table addition reused its saved predictions. Downloading initially
+  encountered sandbox DNS and Python CA configuration failures; macOS curl
+  retrieved the same public URLs with certificate validation enabled.
+- The changed guide executes offline and with the actual model. Its authored
+  example's plotted rows match the previous version exactly, so unchanged
+  figure checks are reused. Twenty other guides, runtime R code, helpers,
+  tests, resources and help retain their previous byte-checked evidence.
+- The updated source archive builds and installs. A fresh R process reimports
+  and re-extracts all **229 initial and 232 corrected accepted sentences**
+  identically from saved output, without loading the model. The installed
+  guide script executes offline; all 21 guides remain indexed. No full
+  numerical suite, unchanged manual or remote CI was rerun for this change.
+- Final archive SHA-256:
+  `18ff8e9c4bee053dfe285bd269c0267c02bd911f99c3c8600fe25e686936064b`.
+  All **227 audited source members** match the checkout. The source archive
+  contains the updated guide and NEWS, and excludes experiment scripts,
+  corpus/model files and development notes. No public API or mandatory
+  dependency was added. No commit, push or deployment occurred in this step.
+
+## Learner-text errors and explicit reviewed versions (2026-10-06)
+
+The user's follow-up asks how learner spelling and grammatical errors enter
+the analysis. This belongs to current roadmap priority 2 (input/interpretation
+boundaries), without replacing the package's annotation-to-document evaluation
+purpose with a general correction engine. Existing annotation comparison and
+alignment correctly require the same original source; changing the text needs
+separate versions and fresh tokenization/annotation.
+
+Research consulted:
+
+- [Nagata, Sato, and Takamura (2018)](https://aclanthology.org/C18-1202/),
+  *Exploring the Influence of Spelling Errors on Lexical Variation Measures*.
+  Read the primary PDF's methods/results passages on original versus manually
+  corrected Japanese EFL essays. TTR and Yule's K had different sensitivities
+  under their preprocessing. Unidentifiable and concatenation/split corrections
+  were excluded. Do not generalize this to universal robustness or import the
+  paper's correction categories as mandatory rules for spelling varieties,
+  names or code-switching. This was targeted reading, not a page-by-page
+  replication or an independent experiment.
+- [Berzak et al. (2016)](https://aclanthology.org/P16-1070/), *Universal
+  Dependencies for Learner English*. Read the parallel original/corrected
+  annotation design and literal-reading scheme, including its exceptions for
+  misspellings and malformed forms. This supports distinguishing source errors
+  from annotation errors; it does not license silently normalizing all syntax.
+- [Bryant, Felice, and Briscoe (2017)](https://aclanthology.org/P17-1074/),
+  ERRANT. Checked the stated role of extracting/categorizing edits from paired
+  original/corrected sentences. Its categories do not establish intended
+  meaning or correction validity. No ERRANT/Python dependency was introduced.
+- Read-only Zotero searches found Kojima and Yamashita (2014), *Reliability of
+  lexical richness measures based on word lists in short second language
+  productions* (`GEVLP3RD`, DOI 10.1016/j.system.2013.10.019). Its metadata and
+  abstract concern short-text measure reliability, not enough to establish a
+  spelling-correction policy. Exact Nagata/title and Berzak searches did not
+  retrieve these target papers; fallback fulltext hits were not treated as
+  matches. The local API helper probe was sandbox-blocked, so the connected
+  Zotero tools were used. No library/settings changes or attachment retrieval.
+
+Added `inst/examples/reviewed-text.R` and `reviewed-text-demo.R`, explicitly
+sourced examples rather than public exports. The ledger uses original Unicode
+code-point spans, exact original/replacement strings, category, decision,
+reviewer and reason. Only approved selected categories apply. Source tables and
+writer/task metadata, rejected/unresolved proposals, original context, revised
+edit spans and document hashes are retained. Insertions/deletions are explicit
+empty intervals; conflicting active edits stop. No automatic proposals, fuzzy
+replacement, lemma substitution or guessed cross-version token alignment.
+
+Six authored documents compare unchanged, spelling-reviewed and expanded-review
+versions through existing surface TTR/MATTR and NJ8 batch APIs. The spelling
+example changes TTR from 4/5 to 3/5; article insertion changes N from 4 to 5 with
+TTR still 1. Word-boundary repair changes N from 3 to 4 and the requested
+four-token MATTR becomes computable. Real-word substitution demonstrates why
+dictionary membership alone cannot identify errors. The unknown intended form,
+rejected name change and empty document remain visible. These observations are
+constructed accounting checks, not learner data or correction-accuracy evidence.
+
+Expanded the existing audit guide and linked it from the tokenizer guide and
+README; NEWS describes the scope. The guide separates primary-version choice
+from mandatory source retention, spelling from grammar/lexical rewriting,
+source errors from parser/OCR errors and OOV status, and raw code-point edits
+from processed-token offsets. Model proposals, if supplied externally, require
+their own provenance and review. No new plot, corpus, model or dependency.
+
+Evidence: `reviews/ldfreq-reviewed-text-20261006/evidence/`.
+
+- Focused test file: **57 passing expectations**, no failures/warnings/skips.
+  Tests cover source preservation, metadata, policy selection, rejected and
+  unresolved proposals, empty input, insertion/deletion, non-BMP and combining
+  characters, revised spans, conflicts, stale source, malformed inputs,
+  denominator changes and existing same-source rejection. RDS replay matches.
+- Both modified guides render and extracted scripts execute. Their HTML
+  includes the new section/link and no absolute workspace paths. No figure
+  logic changed; previous figure evidence remains applicable.
+- Nineteen other compiled guides were reused after source-byte checks.
+  Runtime `R/`, `man/`, `inst/extdata/` and `NAMESPACE` match the preceding
+  verified source package. No unchanged numerical suite/model inference was
+  repeated and no new full `R CMD check` or remote CI is claimed.
+- The source archive builds and installs; **230 source members** match the
+  checkout (DESCRIPTION gains build metadata). All 21 guides and both new
+  examples are included; development notes, corpus/model files and incidental
+  plot outputs are excluded. The public surface remains 53 exports.
+- A fresh process from the installed archive reproduces all three versions,
+  tokenization, metrics and NJ8 objects identically from saved inputs. Both
+  installed guide scripts run. An initial inventory assertion incorrectly
+  counted R's generated `doc/index.html` as a guide; the evidence script now
+  excludes it. Analysis replay had already passed; no package fix was needed.
+- Archive SHA-256:
+  `7e41b86087e60cfe9daebc115835eda14d3a146bba57aaa3c553e1992679cb1a`.
+  Full saved results and flat previews are local evidence, not bundled data.
+  No commit, push, merge, public deployment or CRAN submission in this step.
+
+Remaining research boundary: on real paired documents, independent decisions
+and a declared correction scope are needed to study score/ranking effects.
+The ledger does not detect all errors or validate intended meaning; its proposal
+counts cannot estimate corpus error prevalence. This is a candidate within
+stage 5, not a new universal prerequisite for distributing the bounded tools.
+
+## Spelling varieties, names, numerals and symbols (2026-10-06)
+
+The user's next questions concern legitimate spelling variants and counting
+policies, rather than correcting learner errors. The canonical roadmap keeps
+this under priority 2. Inspected the actual English/Unicode tokenizers, UPOS
+selection, NJ8 aliases, complete annotation import and original-position n-gram
+contracts before choosing the implementation scope.
+
+Observed on the bundled resource: surface `colour`, `centre`, `theatre` queries
+are off-list while `color`, `center`, `theater` match. This is not evidence of
+errors or advanced vocabulary. Current content-word selection includes PROPN.
+English `keep_numbers = FALSE` excludes recognized digit-based expressions but
+retains `Two`, `2nd`, `COVID-19`; its pattern flag is not a NUM annotation.
+The raw lexical tokenizer also reduces `C++` to `C` and `R&D` to `R`, `D`.
+Complete external token rows can preserve these forms and exclusion boundaries.
+
+Primary definitions checked on the Web:
+
+- Cambridge Dictionary's [color](https://dictionary.cambridge.org/dictionary/english/color),
+  [practice](https://dictionary.cambridge.org/dictionary/english/practice),
+  [practise](https://dictionary.cambridge.org/dictionary/english/practise) and
+  [spelling comparison](https://dictionary.cambridge.org/plus/quiz/grammar/spelling-5)
+  entries support the example equivalences and the need to consider grammatical
+  role. Direct fetches of some pages returned 403; their indexed dictionary
+  entries were available. No dictionary database was downloaded or redistributed.
+- UD v2 [PROPN](https://universaldependencies.org/u/pos/PROPN.html),
+  [NUM](https://universaldependencies.org/u/pos/NUM.html),
+  [SYM](https://universaldependencies.org/u/pos/SYM.html) and
+  [PUNCT](https://universaldependencies.org/u/pos/PUNCT.html) definitions:
+  name spans and proper-noun tags are not identical; digit patterns and semantic
+  numeral labels are not identical; symbols can convey lexical/discourse meaning.
+  These are annotation definitions, not evidence of automatic tagger accuracy.
+
+Added `inst/examples/lexical-counting-policy.R`, an explicitly sourced offline
+example using existing APIs, with eight authored documents and five policies.
+It retains full source annotations, supplied tags, missing POS and empty input;
+separates source forms, counting keys and reference query keys; records three
+reviewed noun aliases with metadata and a hash; and protects PROPN occurrences
+from those noun aliases. Alias lookup and type merging are separate choices.
+Full token positions survive filtering, so n-grams do not bridge excluded
+symbols, names, numbers or unknown-tag positions. This is not automatic NER,
+a general variety converter, a punctuation scorer or numeric-value parsing.
+
+For `The colour is color.`, surface TTR is 1 and declared-equivalence TTR is
+0.75; NJ8 token coverage is 2/4 versus 3/4 with aliases. Coverage can be compared
+without changing diversity keys. Removing the supplied PROPN from `Rose saw a
+rose.` increases lowercased TTR from 0.75 to 1, demonstrating that the direction
+of exclusion effects is not fixed. Unknown POS retains conditional values but
+makes the full-policy reportable value unavailable. Complete annotations keep
+`C++` and prevent a `cats dogs` adjacent pair across `+`. These are authored
+accounting checks, not empirical validity or model performance results.
+
+Expanded the English guide, linked the vocabulary-audit guide and README, and
+updated NEWS and the number-argument help/source comments. The guide also
+distinguishes POS exclusion from complete named-entity exclusion, pattern-based
+number recognition from NUM and ordinal annotation, selected-token MATTR windows
+from original-position n-grams, and lexical analysis from anonymization. It
+explains why TUBELEX variant-frequency pooling needs original counts/denominators,
+why document ranges cannot be added blindly, and why form-specific norms should
+not be merged automatically. No such pooling is implemented or implied by aliases.
+
+Evidence: `reviews/ldfreq-counting-policy-20261006/evidence/`.
+
+- **39 new example/policy expectations and 92 existing English-text expectations
+  pass (131 total)**, with no failures, errors, warnings or skips. No unchanged
+  full numerical suite or model inference was repeated.
+- All runtime `R/` parsed expressions match the preceding verified archive;
+  the preprocessing source change is comment-only. NAMESPACE and bundled
+  reference bytes are identical. No new export or dependency was introduced.
+- Both changed guides render and their extracted scripts execute. Nineteen
+  other compiled guides were reused after byte-checking their source. The
+  modified HTML contains the section/link and no local absolute workspace paths.
+- The source archive builds and installs; **232 audited source members** match
+  the checkout (DESCRIPTION acquires build metadata), with all 21 compiled
+  guides. Development records, corpus/model files and generated plot outputs
+  are excluded. Public exports remain 53. No new full R CMD check or remote CI
+  is claimed for this example/help change.
+- Fresh-process replay from the installed archive reproduces the full example,
+  all policies, metrics, reference lookups and n-grams identically to the saved
+  object. Saved source/tag rows also reimport identically, and both shipped
+  guide scripts execute. Complete RDS evidence and flat previews are retained.
+- Archive SHA-256:
+  `0d1e6ebc9fd928a9bc2cca6b186fe97c1ecd30cd170ee751bedf8a36e5f4b1ed`.
+  No commit, push, merge, public deployment or CRAN submission in this step.
+
+The work clarifies current options without changing tokenization defaults or
+promising a comprehensive orthographic lexicon. Real-corpus evaluation and
+reviewed study-specific annotations remain separate stage-5 work.
+
+## Resource-defined word-family profiles (2026-10-06)
+
+Implemented the next bounded feature in the canonical roadmap:
+`lexdiv_family_profile()` maps complete imported source annotations to a
+caller-supplied `record_id`/`form`/`family_id` table with optional exact UD POS.
+Resource ID, version, language, citation, license, lookup unit and family
+definition are required. Original surface/lemma/flemma keys and occurrences
+remain distinct from assigned families; no suffix stripping or identity
+fallback is used. Extra inventory metadata is retained in the full dictionary.
+
+The result exposes all source occurrences, candidate records, original KWIC,
+matched member counts, document and pooled summaries, complete inputs and
+resource/result hashes. Multiple records for one family do not inflate counts;
+different candidate families remain unresolved. POS exclusion, unknown
+selection, missing unit/POS, unlisted forms and ambiguous families have separate
+statuses. Complete family totals/TTR are NA with unresolved non-excluded tokens;
+observed types and conditional coverage remain explicitly conditional. Empty
+and fully excluded documents have zero family types and undefined TTR/coverage.
+Expanded candidates are bounded before their allocation.
+
+The authored installed example compares identical selected occurrences in
+`use uses reusability use.`: N = 4 throughout; V = 3/2/2/1 for surface,
+lemma, flemma and family respectively. TTR = .75/.50/.50/.25. Existing core
+MATTR is used with a deliberately illustrative window of 3; unresolved tokens
+are never removed to close gaps. The example's USE and BANK memberships are
+authored decisions, not verified entries from Nation or learner observations.
+
+Help, README, NEWS, DESCRIPTION, NAMESPACE, pkgdown navigation, API inventory,
+the existing preprocessing guide and offline smoke example now agree on the
+new operation. The API-name decision distinguishes it from AntBNC flemma
+behavior. No class, plotting method, dependency, corpus, model or inventory is
+added. There are now 54 exports, 34 S3 registrations, 35 Rd files (34 public
+topics) and the same 21 guides. Public docs contain no development workspace
+paths. The roadmap front records this implementation without changing the
+research priority of source-linked whole-document evaluation.
+
+Evidence: `reviews/ldfreq-word-family-20261006/evidence/`.
+
+- **98 new family expectations and 72 existing annotation-input/API-name/smoke
+  expectations pass (170 total)**, with zero failures, warnings or skips in
+  the completed focused run. Tests include exact hand counts, repeated forms,
+  normalization collisions, POS/missingness, empty resources/documents, distinct
+  composite source IDs, row limits, CSV identifier preservation, RDS replay,
+  resource-order invariance and a separate record-by-record lookup oracle.
+  One initial expected error message was corrected: edited source surfaces are
+  rejected by alignment before the generic changed-object check. Runtime code
+  did not need modification to pass this test.
+- The changed guide rendered and its extracted script executed; 20 unchanged
+  compiled guides were reused after Rmd byte comparisons. All pre-existing
+  runtime R files, bundled extdata and specifications match the prior verified
+  counting-policy archive, so unchanged numerical/model work was not repeated.
+- The exact archive passes **R CMD check --no-tests --no-manual --no-vignettes:
+  Status OK**, including installation, static code/help checks and all help
+  examples. Tests and changed-guide execution are separate evidence, not a
+  full one-process test/check/vignette rebuild. Initial dependency checking
+  stopped because the existing optional gibasa library was absent from R_LIBS;
+  the completed command includes `tmp/japanese-r/library`, with no new install.
+- **236 audited source members** match the checkout byte-for-byte; DESCRIPTION
+  agrees after build whitespace folding, and all 21 compiled guides are present.
+  Private development records, external corpora/models and generated Rplots
+  are absent. Archive SHA-256:
+  `588eb8628daa863df24b6765ba8d5e2160f1703652c5adf5a6888d7b6d9aad5c`.
+- A fresh process loading the archive's checked installation reproduced the
+  complete saved profile, annotation reimport and installed example identically,
+  and executed the installed guide script. The subsequent metadata assertion
+  initially compared DESCRIPTION wrapping literally; only Imports/Suggests
+  wrapping differed. A focused normalized-field check passed, recorded in
+  `description-validation.log`; completed replay/render operations were reused.
+
+This is software/accounting validation with authored data. Actual family
+inventory coverage and inclusion-level choices, contextual human-decision
+application, affix decomposition and empirical validity remain uncompleted.
+KWIC/candidates support inspection but do not yet apply occurrence-specific
+review decisions. No commit, push, merge, remote CI, site deployment or CRAN
+submission occurred in this step.
+
+## Occurrence-specific review of family assignments (2026-10-06)
+
+Refined the family workflow to close its documented gap between KWIC inspection
+and downstream counts. `lexdiv_family_profile(review = ...)` now accepts the
+existing `lexdiv_ambiguity_review()` result; `$review_input` prepares that API's
+targets, record candidates and resource metadata. No second judgment interface,
+new export, class, dependency or plot was introduced. Creating a review uses
+the existing optional quanteda route; applying a saved review calls no quanteda
+functions. Method version is now 0.2.0, with a versioned family-review snapshot.
+
+Explicit record selection assigns a family only to that occurrence. Explicit
+`unresolved` withholds a previous automatic match, while unreviewed occurrences
+keep their lookup result. Original lookup status/family, final assignment,
+reviewer/reason, full review and source inputs remain available. Document counts
+include selected/unresolved judgment totals and withheld automatic matches.
+The generic surface display can contain a union across POS/lemma contexts;
+application additionally checks exact per-occurrence record eligibility.
+Excluded and unknown-selection tokens cannot be reintroduced by review.
+
+The prepared snapshot binds the complete source, dictionary (including record
+order/extra fields), resource definition, lexical unit, normalization and POS
+exclusions. Changed policy or data rejects a previous review; display-width
+changes alone are allowed. These checks detect inconsistent reuse, not incorrect
+linguistic judgment or a falsified reviewer identity. Neither new inventory
+entries nor automatic sense inference are supplied by this refinement.
+
+The new authored example uses `The bank lends money.` and `The river bank floods.`
+under an explicitly illustrative two-BANK-family definition. The two ambiguous
+occurrences become FINANCE/RIVER choices without changing the shared dictionary.
+N remains 8 after excluding punctuation; V becomes 7 and TTR 7/8. An empty
+document remains zero types with undefined TTR. This is not a claim that all
+family inventories separate these meanings or that sense equals derivational
+family. Help, README, NEWS, the API record, offline smoke and the existing
+preprocessing guide cover this boundary and character-ID CSV/RDS use.
+
+Evidence: `reviews/ldfreq-family-review-20261006/evidence/`.
+
+- The completed initial focused run passed **270 expectations**: 144 family,
+  73 existing ambiguity-review and 53 existing reviewer-comparison expectations.
+  After adding a version marker to the family snapshot and tests for lemma
+  eligibility/unknown selection, the final family run passed **149 expectations**.
+  These give **275 distinct focused expectations** with zero failures, warnings
+  or skips in the completed runs; the unchanged 126 review expectations are
+  reused evidence, not claimed as one final combined invocation.
+- Tests cover occurrence-specific selections, explicit withholding, partial
+  review, stale source/resource/policy, edited or incomplete review inputs,
+  wrong POS/lemma candidates, excluded/unknown-selection tokens, unchanged
+  display policies, normalized keys with original surfaces, literal `NA` and
+  leading-zero record IDs, empty candidate displays and reviewed RDS replay.
+  Existing family accounting tests still pass; the offline smoke also runs the
+  optional contextual family example.
+- Only `R/family-profile.R` differs among runtime R files from the preceding
+  family archive. Bundled extdata/specifications are byte-identical. The changed
+  guide renders and its extracted script executes; 20 unchanged compiled guides
+  were reused after source-byte comparison. No model inference or full unchanged
+  numerical suite was repeated.
+- Exact archive `R CMD check --no-tests --no-manual --no-vignettes`:
+  **Status OK**, including installation and all help examples. Existing optional
+  gibasa library was supplied through R_LIBS from the start. Focused tests and
+  guide execution above remain separate from this scoped package check.
+- **237 audited source files** match the checkout; all DESCRIPTION fields agree
+  after build whitespace folding. All 21 compiled guides are present, with no
+  private development/corpus/model files or absolute local workspace paths in
+  compiled guides. Archive SHA-256:
+  `dee9a7d66fdce112ef0af40f3b1d920c2f70907e861a33cebe9a0c112adedca0`.
+- A fresh process reproduced the complete reviewed RDS profile **without loading
+  quanteda**, and reimported original annotations identically. CSV initially
+  failed an overstrict whole-review equality assertion: inspection isolated
+  differences to display row names and their content hash. The follow-up checks
+  compare character decision values without display row names, unchanged source
+  occurrences/candidates/review identity, and all downstream occurrence/member/
+  document/summary tables; all agree. This is semantic CSV restoration, distinct
+  from complete RDS identity. Completed RDS/reimport checks were not repeated.
+- The installed contextual example reproduces its complete saved result; the
+  installed offline smoke and changed guide script execute successfully.
+
+The canonical roadmap now marks occurrence-review application as implemented.
+Actual inventory coverage/inclusion criteria, independent human-reference
+validation and affix decomposition remain open. No external resources were
+acquired, no Zotero records changed, and no commit/push/remote CI/publication
+operation was performed.
+
+
+## Source-linked word parts and local MorphoLex recipe (2026-10-06)
+
+Added explicitly sourced example helpers, not public exports:
+`word-parts.R`, `word-parts-demo.R`, and `morpholex-word-parts.R`.
+The profile joins caller-provided analysis/part tables to complete imported
+annotations by exact surface and optional UD POS. Root/prefix/suffix roles,
+inflection/derivation, boundness and explicit part IDs stay separate. Multiple
+roots and repeated parts count separately; different eligible analyses remain
+ambiguous rather than contributing multiple copies to observed counts.
+Source KWIC, candidates, partial/unanalysed/unlisted entries, unknown selection,
+empty documents and original inputs survive aggregation. Complete totals and
+proportions require a fully resolved selection; observed counts are separate.
+
+The optional reader uses the already suggested readxl with explicit sheets
+and words. It retains selected original rows (including unused norm/POS
+columns), canonical segmentation, requested/missing forms, source sheets and a
+workbook SHA-256. Extracted parts must agree with reported PRS/Nmorph fields;
+unsupported entries remain unanalysed. Completeness is declared relative to
+MorphoLex derivational segmentation, excluding inflection. No root boundness,
+meaning, actual substring spans or derivation tree is guessed. No dataset,
+model, new dependency, class, export or S3 method was added.
+
+The existing preprocessing guide, README, NEWS and offline smoke document and
+exercise this route. Formation-stage validation, nonaffixal-process analysis,
+occurrence-specific reviewer application and a generic exported morphology API
+remain unimplemented. Extra metadata preservation is not structure validation.
+Neither authored examples nor five external records validate morphology
+accuracy, corpus coverage or learner knowledge.
+
+Evidence: `reviews/ldfreq-word-parts-20261006/evidence/`.
+
+- Final focused test: **88 expectations**, zero failures/warnings/skips. Checks
+  arithmetic, affix/token vs affixed-token denominators, repeated/compound roots,
+  UTF-8 positions, same-spelling affix IDs, partial and unknown states, POS
+  eligibility, empty references/documents, malformed inputs, bounded candidate
+  and part expansion, RDS and character-ID CSV, and optional reader failures.
+  The initial run exposed a zero-row key bug that created a phantom frequency
+  row. The shared local key helper now returns character(0) for zero rows;
+  focused retests cover both empty reference and wholly empty source.
+- Local MorphoLex workbook read and joined to a source-authored five-word text:
+  transmit, transport, transmission, teacher, teachers. Five root occurrences,
+  four affix occurrences, three root types and three affix types agree with the
+  actual selected records. Teachers receives no invented plural -s. Workbook
+  SHA256: `5bc425fbb710f3d63cab69e77ee731fa466653ed0ace94937cac6c1fd6de52c6`.
+  Complete local output is saved in `morpholex-local.rds`; source data stay
+  outside the package. Only these rows and parsing/accounting were checked.
+- All runtime R files, help files, NAMESPACE, extdata and specs match the prior
+  family-review archive byte for byte. Its core/family/help-example evidence is
+  reused. The changed guide rendered and its extracted script executed;
+  20 other compiled guides were reused after source-byte comparison.
+- Exact archive check:
+  `R CMD check --no-tests --no-manual --no-vignettes --no-examples`:
+  **Status OK**. Optional gibasa library was provided via R_LIBS. The targeted
+  tests, installed smoke and guide execution are separate completed checks;
+  this does not claim one full package test/example/vignette run.
+- **241 audited source files** match the checkout; all DESCRIPTION fields match
+  after build whitespace folding; all 21 compiled guides are included. No
+  external workbook, private development folder or local workspace path is
+  included in the package/compiled guides. Archive SHA256:
+  `72939f0e6ac11d2ad52847a7cf5ddb11d4bc19e84cb4808fc11b978f25499497`.
+- A fresh process using the checked archive installation reproduced the entire
+  authored result in both conditions and the actual MorphoLex profile from saved
+  inputs, without loading quanteda or readxl. Installed offline smoke and the
+  installed changed guide script also succeeded. Public API audit remains
+  54 exports, 34 S3 methods and 34 public help topics.
+
+No commit, push, remote CI, site deployment, library write to Zotero, or CRAN
+submission occurred. The canonical roadmap records these recipes as implemented
+and distinguishes them from the remaining morphology API/validation work.
+
+
+## Bundled MorphoLex reference and component licenses (2026-10-06)
+
+The user challenged treating noncommercial conditions as a major disadvantage
+and instructed continuation after the correction. Commercial availability is
+not a mandatory project requirement. The roadmap now explicitly withdraws
+noncommercial licensing as the reason to require local-only data access.
+CRAN does not categorically exclude NC licenses; CC BY-NC-SA 4.0 is in R's
+license database. Acceptance of this particular distribution remains untested.
+
+Added public `morpholex_data(sheets = NULL)`, a plain-list data reader, separate
+from the explicitly sourced morphology recipes. It exposes all 34 original
+worksheet tables (68,624 word records, 142 prefix rows, 240 suffix rows, 15,471
+root rows, Presentation), or a caller-ordered subset, with source/checksum,
+license, conversion and sheet-origin metadata. All values are character;
+missing cells remain NA. Numeric/logical cells use R text representation,
+exterior blank margins are omitted, and formatting/formulas are not retained.
+The original dictionary PDF and unchanged upstream license accompany the data.
+No linguistic repairs, inferred parts, morphology model or new dependency
+were introduced. The parts recipe defaults to bundled data without readxl;
+explicit local paths still use readxl and the same source identity.
+
+MorphoLex data/dictionary are CC BY-NC-SA 4.0. The original R code remains MIT;
+TUBELEX and NJ8 terms remain unchanged. DESCRIPTION now uses `file LICENSE`
+with `License_is_FOSS: no` and `License_restricts_use: yes`; it also names the
+MorphoLex restriction in its Description. LICENSE, LICENSE.md, COPYRIGHTS,
+resource notice, README, NEWS, public help, navigation and the existing guide
+state the respective terms. An R rebuild script pins all upstream checksums.
+Source Word cells for ELP IDs 42162 and 65908 are boolean cells: their R values
+TRUE/FALSE are preserved and their exact-case lookup consequence is documented.
+
+Evidence: `reviews/ldfreq-morpholex-bundle-20261006/evidence/`.
+
+- Independent Python standard-library XLSX XML comparison against the R
+  conversion covers all 34 sheets and **953,978 cells**: 291,116 text, 662,749
+  numeric, 2 boolean, 111 blank. Text/boolean/missingness are exact; numeric
+  cells are compared at relative tolerance 1e-14, absolute tolerance 1e-15 to
+  allow different decimal spellings of the same double. All agree. Initial
+  verifier assumptions about A1 origins and exclusively text/numeric cells
+  were corrected against actual XML (Presentation C2; 0-1-0 D1; two booleans).
+  No source values were changed to satisfy the verifier. Final snapshot and
+  exact archive tables match the verified values.
+- **133 targeted expectations** passed: 45 new data/adapter checks and 88
+  existing word-parts checks, zero failures, warnings or skips. Public API
+  audit passes: 55 exports, 34 S3 registrations, 35 public help topics.
+- A public help example initially failed because `%in%` needed escaping in Rd.
+  The Rd source was corrected; source-extracted and installed help examples
+  subsequently execute. Targeted tests had already passed; this was a help
+  syntax failure, not a failed numerical test.
+- Changed guide rendered and its extracted script executed. All 20 unchanged
+  guide Rmd sources were compared byte-for-byte before their compiled versions
+  were reused. Existing runtime R files, NJ8/TUBELEX and specs are byte-identical
+  to the preceding word-parts archive; no unchanged full numerical suite rerun.
+- Exact archive scoped check, using the existing optional gibasa library:
+  `R CMD check --no-tests --no-manual --no-vignettes --no-examples`:
+  **Status OK**. External repository-index requests failed under network
+  restrictions; checks used installed dependencies. Tests, help/guide execution
+  and offline smoke are separate evidence, not one complete --as-cran run.
+- **248 audited source files** match the checkout. DESCRIPTION matches after
+  build whitespace folding; the R-generated build/partial.rdb is treated as
+  generated output. All 21 compiled guides, license/dictionary and data are
+  present, with no private directories, XLSX or local paths in compiled guides.
+  RDS is **1,185,716 bytes**; combined extdata **4,010,789 bytes**; archive
+  **5,012,796 bytes**. Archive SHA256:
+  `e5864a717907978da4ee049c4d0ed357363ce09b82272b8a0f6069a1405a5e8b`.
+- Fresh checked-archive installation reproduces the entire previously saved
+  local-workbook reference and five-word profile, including the same unlisted
+  query, without readxl/quanteda loaded. The first comparison used five queries
+  against an old six-query reference; aligning the query vector to the saved
+  input resolves that mismatch without changing the reader. Full RDS replay,
+  installed help example, offline smoke and changed guide script all succeed.
+- Changed local pkgdown home/license, reference/index, news and article pages
+  built successfully after allowing public URL reads and normal cache writes.
+  The sandbox-blocked initial site stage was resumed, not the successful tests.
+  Pages contain license disclosure, no absolute workspace paths, and no stale
+  non-bundling statement. No site was deployed.
+
+Source fidelity and arithmetic checks do not establish morphological accuracy,
+complete inflection coverage, corpus representativeness or learner knowledge.
+No commit, push, remote CI, Zotero write, CRAN submission, or external message
+occurred. The final archive and local site are reviewable development outputs.
+
+
+## Nation BNC/COCA bundle and distinct morphology resources (2026-10-06)
+
+The current task asked about Nation, MorphyNet and Japanese resources. The
+completed package path is Nation's actual Level 6 family inventory, reused by
+the existing family profiler. MorphyNet and J-UniMorph were inspected as
+separate relation/feature resources; they are not bundled or exposed as new
+analyzers. The active roadmap records their scope, candidate ambiguity and
+next implementation conditions without changing the main research purpose.
+
+`bnccoca_data()` returns the complete basic table (75,679 rows, 25,000
+families), a separate supplementary table (29,798 rows), source catalog,
+scalar family-resource declarations and conversion provenance. All 25 frequency
+bands have 1,000 families. Slots 26--30 contain placeholders and are excluded;
+Range executables/configuration are neither executed nor bundled. The official
+umbrella resource page supplies CC BY-SA 4.0 or GPL as appropriate; the data
+and conversion use CC BY-SA 4.0, with notice, attribution and full license.
+No new dependency, analyzer, class or alternative family API is added.
+
+The actual list assigns USE/USES and COLOUR/COLOR to their respective shared
+families; REUSABILITY is absent. The installed example preserves six source
+occurrences over two documents: 4/4 matched with two families in the first,
+1/2 matched and complete family counts/TTR unavailable in the second. This
+supersedes no authored fixture and supplies no guessed missing membership.
+Level 6 inclusion, frequency bands and the separate Level 3 partial inventory
+are explained in help, README and the existing preprocessing guide.
+
+Evidence: `reviews/ldfreq-bnccoca-20261006/evidence/`.
+
+- Official archive SHA256:
+  `ac81c7a60e5c76cd2bbf0c59b0501808f0d4fa026b2936919dd54329a9bb6a69`.
+  Independent Python stdlib parsing compares every value in **105,477 data
+  rows and 34 catalog rows** to CSV exported from the exact installed archive.
+  Source order, spellings, family membership, IDs, source lines and hashes agree.
+- Independent parsing found UTF-8 BOMs in source lists 5, 18 and 19, despite
+  the general instructions recommending no BOM. R consumes these markers;
+  the independent decoder was corrected to UTF-8-sig and the conversion notice
+  records the encoding transformation. No word spelling was altered.
+- A catalog row-name inspection found temporary file paths inherited from
+  named hash vectors. The builder now removes those names; a regression check
+  confirms plain numeric row names. The final resource contains no local path
+  metadata. Earlier provisional output is not the final resource.
+- New targeted suite: **29 expectations**, no failures/warnings/skips. The
+  existing family-profile suite also passed before metadata-only cleanup;
+  its runtime and analysis data are unchanged. This is not a full numerical
+  suite rerun. API audit passes: **56 exports**, 34 S3 registrations,
+  36 public help topics (37 Rd files).
+- The first guide render under pkgload reached an older installed helper via
+  base `system.file()` and failed to find its nested example. A separate
+  installed package library resolved the lookup. The guide then rendered;
+  this was an installation-path issue, not a failing numerical test.
+- The final archive scoped check used the existing optional gibasa library:
+  `R CMD check --no-tests --no-manual --no-vignettes --no-examples`:
+  **Status OK**. Network-restricted repository-index access used installed
+  dependencies. Do not describe this as one full --as-cran check.
+- Fresh installation of the **exact archive** reproduces the complete reference
+  and example, then replays saved RDS inputs without readxl/quanteda loaded.
+  Installed help, the offline smoke script and the changed guide's extracted
+  R script pass separately. These results supplement the scoped check.
+- **255 source files** byte-match the checkout; DESCRIPTION fields also agree.
+  All 21 compiled guides are included. Twenty unchanged Rmd sources were
+  byte-compared before reusing their compiled output. All **84** prior runtime,
+  data and spec files are unchanged against the MorphoLex archive.
+- New RDS: **509,712 bytes**; all extdata: **4,520,501 bytes**; source archive:
+  **5,535,445 bytes**. Final archive SHA256:
+  `888021b7bcac0f04bd72295e2f747c3c30dc5a9ca22b71a0bc95e27bd3d92997`.
+  No private directories, original ZIP/XLSX/executable, or absolute workspace
+  paths in compiled guides. Local home/license, relevant reference pages,
+  NEWS and article rebuilt and checked for attribution and stale claims.
+
+`experiments/check-morphology-references.py` also pins and checks the separate
+MorphyNet English derivational file (225,131 six-column rows) and J-UniMorph
+filtered jpn file (12,687 records, 107 lemmas, 10,848 forms). J-UniMorph retains
+1,439 forms with multiple records, including potential/passive/honorific
+candidates for 食べられる and alternative lemmas for 開ける. Their verified
+licenses are respectively CC BY-SA 3.0 and CC BY 4.0. These source observations
+are not contextual tagging accuracy, inventory-wide linguistic validation or
+proof of suitability for a learner population. MorphyNet graph components are
+not Nation families; J-UniMorph forms are not necessarily UniDic short units.
+
+No commit, push, remote CI, deployment, CRAN submission, Zotero write or
+external message occurred. This artifact is a reviewable local development
+build, not a verified public release.
+
+
+## MorphyNet local reader and occurrence review (2026-10-06)
+
+Added `morphynet_read_derivations(path, language, resource_version, max_rows)`
+for the six-field source/target/POS/morpheme/position format. It preserves
+literal fields, alternatives and duplicates, assigns hash-scoped relation IDs
+and line numbers, and records the full input SHA-256, supplied language/version,
+source citation and CC BY-SA 3.0 terms without exposing the local path. It is
+not an analyzer, affix counter, family generator, POS mapper or authenticator
+of arbitrary user-provided files. No new dependency or S3 class is introduced.
+
+The example uses existing `lexdiv_ambiguity_review()` with optional quanteda.
+All three incoming reusability relations remain candidates for two occurrences;
+one illustrative judgment selects reusable + ity, and another is withheld.
+Single-candidate retransmit/transmitter remain unreviewed until a decision is
+made. An unlisted teachers occurrence remains no_candidates. The original
+17-token/five-segment roster, including an empty document, is retained.
+Selecting one edge is an explicit study choice, not rejection of the other
+potentially coexisting relations or a complete morphological decomposition.
+
+Only nine unchanged source rows and their original line mapping are bundled,
+with full license and attribution. The complete English v1 file remains local
+input. Full-table trials measured 2,349,940 bytes as RDS or 1,628,932 bytes as
+compressed original TSV, which would exceed the CRAN policy's general 5 MB
+data guideline when added to the current 4,520,501 bytes. This is a measured
+packaging tradeoff, not a licensing prohibition or a CRAN rejection. Separate
+full-data distribution remains a future packaging decision; no extra data
+package, download service or startup network request was introduced.
+
+Evidence: `reviews/ldfreq-morphynet-20261006/evidence/`.
+
+- The complete pinned English file has 225,131 rows and SHA-256
+  `5920edacc1888b14464fc5cd96beea0a721221d56d1dc0e49de22f4c7c537c50`.
+  Python stdlib independently compared all six fields, line numbers and
+  generated IDs to the final installed reader's CSV. All match. All nine
+  excerpt rows match the original lines, including every incoming relation
+  for the six declared example targets. Source words/POS are never corrected.
+- New suite: **52 expectations**, zero failures/warnings/skips. Existing
+  ambiguity-review: **73 expectations** passed in the earlier targeted run;
+  its code and fixtures are byte-unchanged. No full numerical suite rerun.
+- Boundary tests caught NUL truncation when readLines used warn=FALSE. The
+  reader now checks raw bytes and parses a raw connection, retaining exact
+  input identity and rejecting NUL. Invalid UTF-8, malformed/trailing columns,
+  empty/blank fields, invalid position, row limits, Unicode-blank metadata,
+  BOM, missing final newline, duplicates and literal NA are covered.
+- Under pkgload, the new test's isolated base-parent environment bypassed the
+  package system.file resolver. The test now uses the namespace as its parent;
+  the normal installed-package example had already worked. This was test
+  resource lookup, not an error in the supplied relation data. The final source
+  test and exact-archive installed example both pass.
+- API audit: **57 exports**, 34 S3 registrations, 37 public help topics
+  (38 Rd files). Help, examples, NEWS, README, package overview, license,
+  COPYRIGHTS and navigation agree on complete local input vs the small excerpt.
+- `R CMD check --no-tests --no-manual --no-vignettes --no-examples` using the
+  existing optional gibasa library: **Status OK**. Repository-index requests
+  are network-restricted; installed dependencies were used. This is a scoped
+  check supplemented by separately executed tests/help/examples, not a full
+  --as-cran or all-OS validation.
+- The exact archive's fresh installation reproduces the entire external input
+  table and saved example. Saved reference/review objects can be read with
+  quanteda/readxl unloaded; regenerating KWIC correctly uses quanteda.
+  Review replay, installed help, offline smoke and the changed guide's
+  extracted script pass. DESCRIPTION fields match after whitespace folding.
+- **263 source files** byte-match checkout. All 21 compiled guides are present;
+  20 unchanged Rmds were compared before reusing compiled results. All **86**
+  pre-existing runtime/data/spec files match the Nation archive. The new
+  runtime is R/morphynet.R; prior algorithms and bundled inventories are unchanged.
+- Archive **5,552,330 bytes**, total extdata **4,521,543 bytes**, SHA-256
+  `2aaca4fc8ab68c7eebb62379f9dfe4e27f3241a01f85975cf8e4fd65d497f1e2`.
+  Private development directories, full MorphyNet table and executables are
+  absent. Local home/license, reference, NEWS and guide pages build and retain
+  CC BY-SA 3.0 attribution, no absolute workspace paths, and the documented anchor.
+
+Source fidelity, authored decisions and replay do not establish morphological
+accuracy, semantic uniqueness, coverage outside the tested reference, learner
+knowledge or productivity. Multiple edges are not summed as observed affixes.
+The current KWIC route requires whitespace-free single-token target surfaces;
+complete derivation trees, lemma/multiword alignment and Japanese form-span
+alignment remain separate tasks. No commit, push, deployment, remote CI,
+CRAN submission, Zotero mutation or external message occurred.
+
+## 2026-10-06 roadmap evidence review after MorphyNet
+
+This is a planning/documentation update, not another package build or release.
+The current roadmap now prioritizes a concrete release-inventory gap before
+additional feature work:
+
+- `inst/spec/ldfreq-installed-resource-manifest.json` and
+  `experiments/resource-admission/ldfreq-release-resource-inventory.json`
+  still list only TUBELEX and NJ8. MorphoLex, Nation BNC/COCA and the MorphyNet
+  excerpt are present in the source tree but absent from these inventories.
+- Both inventories record `COPYRIGHTS` as 1,401 bytes with SHA-256
+  `467853be2cc1944f88b434a9ce802b0b5d9b358d483e24f849b6d97c7f647beb`.
+  The current `inst/COPYRIGHTS` is 3,066 bytes with SHA-256
+  `27056951661decd9211a8f7e4558717d6144d64b480dbdac60f0ee207909be2c`.
+- The resource-admission and package-resource-inventory validators retain
+  two-resource assertions. The latter also checks every declared member's
+  size/hash and rejects undeclared extdata. These static discrepancies must
+  be corrected; no remote CI failure was observed or newly induced here.
+- Release-candidate state is still `development`; its workflow's state check
+  does not establish that the conditional candidate-build jobs ran.
+
+Existing scoped checks, full-table conversion comparisons, installed examples
+and round trips remain evidence for their recorded scope. They do not prove
+that the current resource inventories are complete. The next implementation
+should update the existing inventories/validators and validate the changed
+distribution path, reusing unchanged numerical and conversion evidence.
+
+The research plan also reuses the existing 140-document ICNALE results.
+`analysis/icnale-gra/results/dictionary-review/summary.csv` in the workspace
+reports unchanged MATTR50/HD-D42 and NJ8 mean coverage from 0.9629180903 to
+0.9646497995 after 55 occurrence changes across 43 documents. The script labels
+this as assistant context review without independent human validation.
+New family/morphology conditions, Japanese form-span handling and broader
+annotation accuracy remain distinct future work. No analysis was rerun and
+no private corpus content was copied into the package.
+
+## 2026-10-06 five-resource inventory and distribution checks
+
+Closed the inventory mismatch identified in the preceding roadmap review.
+The installed schema is now 1.2.0 and the repository inventory schema 0.2.0.
+Both records cover TUBELEX, NJ8, MorphoLex, Nation BNC/COCA and the nine-row
+MorphyNet excerpt. The last is explicitly example-only; the full external
+MorphyNet database is not declared bundled. Each shipped data/notice/license
+member has a byte count and SHA-256. Null separate-manifest/decoded-content
+hashes denote inapplicable representations, not unverified member bytes.
+The shared COPYRIGHTS file is registered once with its current identity.
+
+The admission validator compares all component records, not just TUBELEX.
+The package audit rejects undeclared license files as well as extdata.
+Tracing its consumers also found a one-resource assumption in the release
+index and an obsolete whole-package MIT assumption in SPDX generation.
+The index now compares IDs/counts to the exact resource BOM; the SPDX record
+uses a LicenseRef containing the source component-specific LICENSE text.
+The resource BOM includes the full admission inventory while labeling the
+older approval decision as TUBELEX-specific. No license permissions changed.
+
+Evidence: workspace `reviews/ldfreq-resource-inventory-20261006/evidence/`.
+
+- `regressions.log`: 16 actual CLI cases pass, including valid/reordered
+  inventories and rejection of missing/duplicate resources, mismatched terms,
+  unapproved entries, excerpt-scope drift, member drift, missing data/license,
+  equal-size tampering, stale COPYRIGHTS, undeclared data/license files,
+  duplicate paths and invalid relative paths. Three additional checks execute
+  production record-generation/aggregation expressions with local fixture
+  inputs: component terms, complete admission BOM with archive mismatch
+  rejection, and resource count/ID comparison. These fixtures are not CI runs.
+- Both JSON records validate against their Draft 2020-12 schemas with Python
+  jsonschema. Independent Python size/SHA-256 comparison verifies all 21
+  declared resource members. Workflow YAML parses; the regression command is
+  registered once in the Ubuntu release-R job. Remote CI was not triggered.
+- `package-audit/package-resource-inventory-evidence.json`: **2,317 assertions**,
+  **5 resources**, **56 audited members**, source archive / Mac platform
+  archive / fresh installed library byte-identical. Environment: Darwin,
+  aarch64-apple-darwin23, R 4.6.1 (2026-06-24). No undeclared extdata observed.
+- `installed-resource-test.log`: the installed TUBELEX audit passes **101
+  assertions**, including its existing bounded loader/tamper checks and the
+  updated all-resource member check. It uses the exact new archive install.
+- `archive-audit.json`: **263 source files** match the checkout. All **21
+  compiled guides** were reused after byte-comparing every Rmd source.
+  **156 runtime/help/data/license/example/guide input files** are unchanged.
+  Existing numerical, complete conversion and example-replay evidence remains
+  applicable to those inputs; no broad numerical rerun or new full check.
+- Source archive `ldfreq_0.2.0.tar.gz`: **5,554,356 bytes**, SHA-256
+  `6d293b51d7f20706902d0a55aca39330e9d70b503aa73d6100007d821928de9f`.
+  Extdata remains **4,521,543 bytes**.
+- Mac platform archive `ldfreq_0.2.0.tgz`: **6,186,774 bytes**, SHA-256
+  `cd287fcdef05ef4b6b3e954f01e991da01077d43ce1c14f916b435fd0d7849ae`.
+  These identify this run, not reproducible archive generation across builds.
+- NEWS and the local news page describe the completed change. The first page
+  build failed resolving the public crandb host under network restrictions;
+  rerunning only `build_news()` with network access succeeded. No package
+  tests or build were repeated because of that documentation failure.
+
+The resource-inventory gap is closed locally. A clean-candidate full release
+workflow, other OS checks, same-version public artifacts/site and CRAN
+submission/acceptance remain distinct unfinished stages. `state.dcf` remains
+`development`. No commit, push, remote publication or corpus/model analysis
+was performed. The next research task remains the roadmap's ICNALE
+family/morphology extension, using the existing saved analysis.
+
+## 2026-10-06 common-token family comparison
+
+Completed the family-counting part of the planned ICNALE extension. The new
+explicitly sourced `inst/examples/family-count-comparison.R` recipe reuses the
+existing family API; public exports remain 57. It reports whole-selection
+coverage and missing totals separately from surface/lemma/family types and TTR
+on the same resolved occurrence IDs. It retains complete profiles, source IDs
+and explicit selection. No identity fallback or moving-window measure on a
+gap-closed subset is introduced. The Nation example supplies authored lemmas;
+the existing guide and NEWS explain the comparison.
+
+Local corpus evidence: workspace `analysis/icnale-gra/results/family-comparison/`.
+The script reuses 140 original essays and 31,902 saved English lexical tokens
+and baseline textstem lemmas. All source/processed hashes and token spans agree.
+The imported representation retains all non-whitespace text; 3,654 context-only
+gap chunks remain outside the lexical denominator. Original coordinates are
+verified under the one-codepoint transformations that hold for this input,
+with failure on unsupported normalization changes.
+
+Core Nation lookup matches 30,892 tokens, leaves 1,010 unlisted and encounters
+no multiple-family candidates. Supplementary string matches (103 tokens) stay
+separate, without POS inference or inclusion in the core count. Whole-selection
+family V/TTR is unavailable for 135 of 140 documents. On each document's common
+resolved set, mean types are surface 108.9857, lemma 100.6857 and family 97.45.
+These are conditional descriptive results, not annotation accuracy or learner
+knowledge. Later contextual lemma revisions are not mixed into this condition.
+
+- A separate direct lookup agrees with all lexical assignments. Saved token
+  IDs/coordinates, denominators and all 840 comparison rows agree with direct
+  counts (`independent-checks.csv`).
+- `replay.log` records a fresh R process replay of complete profiles and
+  comparisons, including IDs/settings, without retokenizing, lemmatizing or
+  repeating rating associations/bootstraps. The complete RDS retains sources,
+  reference, selection, candidates and provenance locally.
+- Targeted `test-bnccoca-data.R` tests pass: hand-counted complete/partial cases,
+  missing lemmas, ambiguous families, exclusions, empty documents/common sets,
+  invalid selections, modified profiles and RDS replay. An initial test expected
+  integer indices although the fixture supplied doubles; it now correctly
+  asserts preservation of supplied indices.
+- The local report was rendered from saved outputs. Its two existing plots
+  no longer embed titles; axes identify the outcome/counting unit. Rendered
+  images were inspected. No new difference plot was added.
+
+Distribution evidence: workspace
+`reviews/ldfreq-family-comparison-20261006/evidence/`.
+
+- The changed guide rendered using current installed examples. Twenty unchanged
+  compiled guides were reused after byte comparison of Rmd inputs.
+- The exact source archive installs into a fresh library. The authored example,
+  saving/recounting and extracted guide R script execute (`installed-replay.log`).
+- `archive-audit.json`: 264 source files match the checkout; all 149 installed
+  inst members match archive bytes. Runtime R, Rd help, data and licenses are
+  unchanged from the inventory archive. Prior numerical/resource validation
+  remains applicable and was not repeated.
+- Archive scans found no local-user paths or selected private-corpus file/record
+  markers. Corpus text and individual derived records remain in the separate
+  local analysis folder. Public documentation gives only a brief dataset/version,
+  sample size and implementation-check description.
+- Source archive `ldfreq_0.2.0.tar.gz`: **5,560,690 bytes**, SHA-256
+  `620bb962116f22425fb3628536db555b96325a165c4d005a8a0e55d699a87436`.
+- Local article and NEWS pages are updated. Article generation succeeded;
+  NEWS initially failed resolving public CRAN metadata under network isolation.
+  Only NEWS generation was retried with network access and succeeded.
+
+No full R CMD check, new platform binary, remote CI, commit/push, remote site
+publication or CRAN submission was performed. Candidate state remains
+`development`; installation checks do not establish all-OS release completion.
+Morphological-candidate linkage remains the next part of the local analysis,
+independently of the remaining release checks.
+
+## 2026-10-06 Japanese kana/kanji occurrence review
+
+Added `inst/examples/japanese-orthography.R`, a self-contained optional quanteda
+example using the existing annotation importer and ambiguity-review API. The
+Japanese annotation guide and NEWS describe original spelling, reviewed lexical
+identity and the separate evidence needed to infer kanji production knowledge.
+No public API, required dependency, automatic converter or corpus data was added.
+
+The authored example retains complete source annotations and compares declared
+target occurrences only. Three apple spellings have three surface types and one
+selected lexical ID. Three HASHI occurrences yield two contextual selections
+and one unresolved occurrence; whole-target lexical types remain NA. On the
+same two selected occurrences, surface types = 1 and lexical types = 2. A target
+with no candidates, a document without targets and an empty document remain
+distinct. These are demonstration decisions, not independently judged corpus
+annotations or an accuracy/knowledge evaluation.
+
+Evidence: workspace `reviews/ldfreq-japanese-orthography-20261006/evidence/`.
+
+- Current checkout installs into a separate library (`install.log`). The new
+  installed example is byte-identical to its source, SHA256
+  `029387a8b85cce349b148add21cf8c863eaf4026e000cbf4e539f51be202ba0f`.
+- Focused tests pass **24 assertions** under C.UTF-8, both in development and
+  against that installation. Hand-counted populations/types, original kana and
+  character spans, unresolved alternatives, RDS saving/replay and rejection of
+  a candidate belonging to another surface are covered (`verification.log`).
+- The changed guide renders with the new optional example. Rendered text
+  contains the Japanese strings, count output and stated limitations, with no
+  local user path (`content-check.log`). This is content verification, not a
+  browser layout audit. The separately optional gibasa branch was not run here.
+- Initial standalone `purl()` extraction printed three missing-`run_gibasa`
+  option-evaluation diagnostics: that extraction does not execute the setup
+  chunk before evaluating later options. Guide rendering itself succeeded.
+  Only extraction/replay was repeated with the optional flag explicitly FALSE;
+  it executes the new example and checks its counts (`extracted-replay.log`).
+- All **81 R/help files** are byte-identical to the previously verified family
+  comparison archive. Existing core evidence is retained; no whole-package
+  numerical test run was repeated for this example/guide-only change.
+
+The guide also corrects an outdated statement: source-span segmentation
+comparison already exists in `lexdiv_align_annotations()`, while label comparison
+requires identical token rows. Neither determines the correct segmentation by
+itself. Multi-token candidate review and J-UniMorph linkage remain future work.
+
+No new source archive, platform binary, full R CMD check, remote CI, site
+publication or CRAN submission was performed. The previous source archive does
+not contain this example or the changed guide; its evidence remains scoped to
+that earlier artifact. Real learner-corpus validation is still pending.
+
+## 2026-10-06 Japanese boundary review and actual analyzer probe
+
+Extended the same spelling example with separate boundary and lexical decisions.
+Both complete annotation alternatives keep `はしではしをつかいます。` unchanged.
+Source positions 4--5 connect `は / し` to the reviewed `はし`. The reviewed input
+is imported afresh and its KWIC decisions have a new review identity. No fragment
+lemma/POS is propagated to the joined token. The author's intended bridge and
+chopsticks readings are explicitly declared, not inferred as a gold standard.
+
+Whole-sequence surface counts excluding only the full stop are N/V = 7/7 for
+the split alternative and 6/5 for the reviewed alternative. Empty documents are
+retained. Exact-span-only scoring would remove the changed occurrence; the guide
+now explains why these full-sequence counts and contextual target counts have
+different populations. No automatic editor, multi-token candidate API or new
+export was introduced.
+
+Evidence: workspace `reviews/ldfreq-japanese-boundaries-20261006/evidence/`.
+
+- A fresh gibasa 1.1.3 run with local unidic-lite 1.0.8 (UniDic 2.1.2) processed
+  eight authored diagnostic sentences using the existing guide's analyzer
+  function. `probe.rds` retains all raw expanded features and session metadata.
+  The selected sentence actually produced `はし / で / は / し / を / つかい /
+  ます / 。`. Other recorded outputs include `すん -> 済む`. These observations
+  do not estimate population error rates or establish independent accuracy.
+- `verify-actual.R` reuses that saved probe, imports all eight complete source
+  annotations, records dictionary/configuration hashes, and checks original
+  positions. The selected sentence passes actual-input alignment, new lexical
+  review and RDS replay (`actual-verification.log`, `actual-boundary-review.rds`,
+  `actual-token-audit.csv`, `changed-source-spans.csv`, `surface-counts.csv`).
+  No second analyzer pass was needed for these downstream checks.
+- Focused development and installed tests pass **46 assertions** in C.UTF-8
+  (the earlier 24 plus 22 boundary-workflow expectations). Tests cover exact
+  source spans, hand-counted complete populations, empty documents, restored
+  targets, saved alignment and rejection of old review IDs after resegmentation.
+- The changed guide renders; its extracted script executes both examples.
+  Rendered content includes the boundary table, counts and scope, without a
+  local user path. This is content verification, not browser visual inspection.
+  Twenty unchanged compiled guides are reused after matching their Rmd sources.
+- Source archive `ldfreq_0.2.0.tar.gz`: **5,575,560 bytes**, SHA256
+  `9b5fe544f095c43e78f67fb9803289aaeb369caa1b8f66e9e565e79b63f6e87b`.
+  All **266 source files** compared to the checkout and all **150 inst members**
+  compared to the fresh archive installation are byte-identical
+  (`archive-audit.json`). The source includes the new tests and both Japanese
+  examples. R/help/data/license and public API are unchanged.
+- Exact archive installation, the examples, RDS round-trip and installed guide
+  script pass (`archive-replay-final.log`). The first smoke assertion expected
+  integer storage for metric N, whose API output uses doubles. Only that
+  verification assertion was corrected to check numeric count values; no
+  runtime edit, reinstall or full test rerun was needed.
+
+The latest archive now includes the spelling and boundary changes that were
+absent from the earlier family-comparison archive. No full R CMD check, new
+platform binary, remote CI, site publication or CRAN submission was performed.
+Actual learner-corpus validation, automatic disambiguation and J-UniMorph
+multi-token candidate linkage remain outside this completed example change.
+
+## 2026-10-06 NINJAL learner-essay input and partial-whitespace import fix
+
+The next Japanese workflow step uses actual locally acquired essays. Official
+download and filename guidance were checked at
+<https://mmsrv.ninjal.ac.jp/essay/essay_05.html> and
+<https://mmsrv.ninjal.ac.jp/essay/essay_04.html>. The TXT ZIP and essay/writer
+workbooks are supplied under CC BY-NC-ND 4.0. Corpus text, source metadata,
+individual annotations and review queues remain in the workspace's local
+`analysis/ninjal-essay/`, outside the package and site. No correction XML was
+downloaded or used in this step.
+
+The distribution downloaded on 2026-10-06 has **1,777** TXT members matching
+1,777 unique essay metadata records; the overview page's historical 1,754 is
+not used as the archive count. The writer workbook has 1,589 unique writer IDs.
+There are 1,764 UTF-8 and 13 explicitly inspected CP932 texts; 179 UTF-8 members
+have a leading BOM. One essay has no writer-table match, and one filename is
+irregular. Metadata mappings are used rather than filename parsing. Unmatched
+L1 stays missing; source nonresponse labels remain verbatim. Country is not L1.
+
+`inst/examples/ninjal-essays.R` is an explicitly sourced local reader, not a
+new export. It accepts already-read character metadata tables and a local ZIP,
+with explicit per-file encoding where needed. Failed decoding, failed byte
+round-trip, conflicting BOM, duplicate join keys and missing requested files
+are rejected. Only a leading UTF-8 BOM is removed and recorded; all other
+characters and line endings are preserved. It retains raw/text/ZIP hashes,
+source filenames, document/writer/task IDs and missing metadata status.
+Optional readxl reads XLSX files in the guide; no dependency was added.
+The new test ZIP contains three wholly authored UTF-8/CP932/empty records.
+
+Raw file identity is recorded in `analysis/ninjal-essay/raw/source-manifest.json`:
+
+- `sakubun_txt.zip`, 1,602,811 bytes, SHA256
+  `686607d589ef2250440fb904b6f213c62b3aa6d0b41abcfa827888dae055801c`.
+- `sakubun.xlsx`, 149,797 bytes, SHA256
+  `89433a79573cac7881999a971c07c359db711dd34038f693823f7d30bc152079`.
+- `shipitsusha.xlsx`, 57,015 bytes, SHA256
+  `1fc17b0486909e338173b8657ad78c7c440335e0f1207d3d533671a96c3bb62d`.
+
+All 1,777 R-decoded strings and raw-byte hashes agreed with an independent
+Python decoder/hash comparison, including all CP932 members. The explicit
+encoding manifest, imported RDS and per-file import audit are retained locally.
+
+### Real input exposed a whitespace-alignment defect
+
+The diagnostic subset consists of four task-01 essays per reported L1 label
+(Chinese, Korean, English, Finnish, Sinhala, German and Japanese), selected in
+radix essay-ID order: 28 distinct writers. This is not a random or representative
+sample and does not estimate L1 differences. The existing guide's gibasa 1.1.3
+function and unidic-lite 1.0.8 (UniDic 2.1.2) were used without rewriting text.
+Dictionary/configuration hashes, raw features and selection rules are saved.
+
+The first annotation import stopped at an actual CR/LF sequence: the analyzer
+emitted CR tokens while omitting LF, but the importer required a whitespace-
+prefixed token to start immediately at the cursor. `R/annotation-input.R` now
+finds its earliest exact match across **whitespace-only** gaps. Non-whitespace
+omissions, normalized replacements and inconsistent supplied positions still
+fail. Original text and positions are retained; valid earlier imports and the
+public API remain unchanged. Help and the guide describe the rule. Regression
+cases cover partial CRLF, whitespace-only text, omitted letters/punctuation,
+supplied positions and identical reimport.
+
+After this fix, all **10,932 annotation rows** aligned with the 28 original
+texts. An independent substring and non-whitespace coverage check passed.
+Excluding auxiliary symbols and whitespace, while retaining particles and
+auxiliary verbs, gives 9,554 tokens. Of these, 139 lack lemma annotations; the
+common surface/base/lemma population is 9,415. Full-population lemma type counts
+remain NA when features are missing. Lemma labels are not assumed to be unique
+lexeme identities. The local review table includes 1,830 kana-surface/Han-lemma
+occurrences plus missing-lemma candidates, all initially unreviewed. These are
+not verified errors, unknown words or measures of kanji knowledge.
+
+The input is the complete distributed TXT, including titles and transcription
+notation. No cleaned-body claim, human accuracy reference, automatic correction,
+or corrected-XML comparison is made. This establishes local input, alignment
+and counting behavior; segmentation and lexical-identification accuracy remain
+unevaluated. Authored review examples remain the distributable demonstration.
+
+### Validation and distributable artifact
+
+Evidence: workspace `reviews/ldfreq-ninjal-input-20261006/evidence/`.
+
+- Related development tests pass **745 assertions**, with no failures, errors,
+  warnings or skips (`focused-tests.rds`, `focused-tests-summary.log`). Scope:
+  annotation input/alignment/evaluation, ambiguity review/comparison, family
+  profiles, amod pairs, Japanese orthography and the new reader example.
+- Installed importer/reader tests pass **84 assertions** (64 importer, 20 reader).
+  The changed Japanese guide renders and its extracted script executes.
+  Saved actual annotations reimport identically in a fresh R process
+  (`verify-installed.R`, `installed-verification.log`).
+- Twenty unchanged compiled guides are reused after byte-matching their Rmd
+  sources. The changed guide's content and script were checked, without a
+  browser layout audit. No successful numerical experiment or full guide set
+  was rerun merely for this input fix.
+- New source archive `ldfreq_0.2.0.tar.gz`: **5,586,141 bytes**, SHA256
+  `49fb056fdbfacada735064c75458ec7ec83bd93dc069166f3d941fe95ab3d0d9`.
+  All **269 source files** compared with the checkout are byte-identical;
+  DESCRIPTION is separately checked by field values because R CMD build
+  rewraps it and adds generated fields. All **151 inst members** match a fresh
+  installation of the exact archive (`archive-audit.json`). Relative to the
+  preceding archive, the only changed runtime R file is `annotation-input.R`.
+  No local user paths, local analysis directory or diagnostic private corpus
+  filenames occur in the archive; authored ZIP members were verified explicitly.
+- With the exact archive installed, all **1,777** imported documents and the
+  **28-document** annotation object replay identically. The installed guide
+  script also passes (`verify-archive.R`, `archive-replay.log`). This reuses the
+  saved analyzer output; it does not rerun the analyzer or call this a second
+  independent accuracy assessment.
+- `R CMD check --no-tests --no-manual --ignore-vignettes` reports **Status: OK**
+  on macOS / R 4.6.1 / UTF-8 (`ldfreq.Rcheck/00check.log`). The check library
+  lacks optional gibasa (INFO); actual analyzer validation used the separate
+  existing local gibasa library. Tests and the changed guide were verified in
+  the separate steps above, not by this scoped check. This is not one full
+  check with every optional dependency and vignette enabled.
+
+There are still 57 exports; no new required dependency, platform binary,
+remote CI run, site publication or CRAN submission was introduced. The roadmap
+now distinguishes real-corpus input validation from independent linguistic
+accuracy evaluation; J-UniMorph multi-token linkage remains a later task.
+
+## 2026-10-06 J-UniMorph records and multi-token span review
+
+Implemented the roadmap's bounded Japanese morphology path as explicitly
+sourced example helpers, retaining the existing single-token ambiguity API.
+`inst/examples/junimorph-spans.R` supplies `read_junimorph()` and
+`review_morphology_spans()`; `junimorph-spans-demo.R` provides authored text,
+complete authored annotations, six authored format-demonstration rows, choices
+and an unresolved occurrence. These are not exported functions or a bundled
+J-UniMorph excerpt. No required dependency or corpus data was added.
+
+The official <https://github.com/cl-tohoku/J-UniMorph> README was checked again:
+`jpn` is the filtered three-column input, distinct from the hit-count source,
+and the dataset is CC BY 4.0. The already-acquired local `jpn` has 12,687 rows,
+107 lemma labels and 10,848 forms; its Git blob is
+`6b001fa9d33139bd9b85ffe70f74c1143ae9df24`, SHA256
+`6ba4589cd43846c8afab5bdf5f4c498e03e32849f95c3e5c9840be2975d4b888`.
+The reader preserves all original fields, row order, duplicate records and
+source-row candidate IDs, alongside resource metadata and file identity. A
+separate `read.delim()` comparison confirmed all three fields of every row.
+The table itself remains outside the package.
+
+Exact source-form searches retain overlapping hits. Every hit has its original
+segment-local Unicode start/end; endpoints that agree with complete imported
+token boundaries also receive token-from/to and token-count fields. A substring
+ending or starting inside an analyzer token remains a `boundary_mismatch`,
+requiring boundary review before a lexical candidate decision. Nothing is
+silently resegmented, normalized or counted as a new word. The span KWIC uses
+original codepoint windows, explicitly distinguished from the existing
+quanteda token-window API. It preserves spaces and newlines within each segment.
+
+Selected, unresolved, unreviewed, no-candidate and boundary-mismatch cases are
+separate. Decisions require source/reference/target identity, an existing
+occurrence, a candidate belonging to that exact form, and a reviewer/reason.
+Changes to segmentation or the candidate table invalidate old decisions.
+Overlapping selected spans remain flagged and cannot be added as word counts.
+Document summaries count diagnostic spans; absent requested forms and empty
+documents remain visible. The implementation scans each form per segment and
+is an explicit local workflow, not a corpus-scale matching engine.
+
+The authored demonstration has five target spans, of which two are selected,
+one unresolved, one unreviewed and one without candidates. Two selected forms
+map to one lemma label on exactly the same selected population; the complete
+target lemma count is unavailable. All 26 original annotation tokens remain
+unchanged before and after review. These declared teaching decisions do not
+establish independent linguistic accuracy.
+
+Evidence: workspace `reviews/ldfreq-junimorph-spans-20261006/evidence/`.
+
+- **50 development assertions**, and the same **50 installed assertions**, pass
+  without failures, errors, warnings or skips. They exercise source positions,
+  repeated and multi-token occurrences, exact combining-character/emoji
+  handling, overlapping hits/selections, boundary mismatches, candidate
+  membership, stale segmentation/reference/target decisions, missing and empty
+  cases, explicit metadata, malformed files and RDS replay (`tests.rds`,
+  `tests.log`, `installed-verification.log`). During implementation, the
+  isolated-environment check required namespacing `stats::setNames`; restored
+  UTF-8 targets are explicitly marked before radix sorting. Both paths pass.
+- The existing **28-essay** source/annotation object was reused without another
+  learner-corpus analyzer run. Full-table matching produced **1,309 exact
+  spans**, of which **587** agree with token boundaries and **722** do not.
+  Of the aligned spans, **409** cover multiple tokens and **98** have multiple
+  candidate records. **619** of all exact spans overlap another span. R checked
+  all substrings and reconstructed all aligned spans from the original token
+  surfaces. These are matching diagnostics, not error/accuracy estimates.
+- An independent Python overlapping substring search reproduced **all 1,309
+  source ranges**, and independently mapped all **587** aligned ranges and
+  **409** multi-token ranges (`verify-independent.py`, `independent.log`). It
+  reads the downloaded ZIP and explicit encodings; real text/individual
+  records are not written to publication evidence. Real outputs and an empty
+  decision template stay in `analysis/ninjal-essay/morphology-spans/`. All
+  actual-corpus candidate decisions remain unreviewed, with zero selections.
+- A new gibasa 1.1.3 / unidic-lite 1.0.8 run on **five authored sentences plus
+  an empty document** checks actual token spans against the full resource.
+  All five target occurrences align; candidate counts are 3, 3, 1, 2 and 0.
+  Author-declared selections/withholding survive saving and fresh-process
+  replay (`actual-authored.rds`, `verify-actual.R`, `actual-verification.log`).
+  Dictionary and configuration hashes match the earlier validated setup.
+- The changed guide renders and its extracted script executes. Twenty
+  unchanged compiled guides are reused after source equality checks. This is
+  content/execution verification, not a browser layout audit.
+- Source archive `ldfreq_0.2.0.tar.gz`: **5,600,278 bytes**, SHA256
+  `42ce455b83829d7df16cedda383a02dc721a507ac2729e7949655a6b818495d4`.
+  All **272 compared source files** equal the checkout; build-normalized
+  DESCRIPTION values are checked separately. All **153 inst members** equal
+  the exact archive's fresh installation (`archive-audit.json`). No local
+  paths or analysis/development/experiments directories are included.
+- The exact archive replays both the 28-essay review and actual-authored
+  decisions identically, runs its installed guide script, and retains **57
+  exports** (`verify-archive.R`, `archive-replay.log`). Runtime R, Rd, bundled
+  resources/licenses and NAMESPACE/LICENSE comprise **108 unchanged members**
+  relative to the previous archive; earlier runtime tests and scoped check
+  evidence remain applicable to that unchanged code, not a new full check.
+
+No full test-suite rerun, new R CMD check, platform binary, remote CI, site
+publication or CRAN submission was performed. This closes the explicit
+local-reader → multi-token source-span → KWIC decision/withholding → replay
+example path. Independent contextual accuracy, automatic normalization,
+general lexical/sense span review and changes to the counted word unit remain
+separate work. The current release is not gated on those research extensions.
+
+## 2026-10-06 English morphology at shared corpus occurrences
+
+The explicit `morphology-link.R` recipe connects an existing family profile to
+MorphoLex segmentations and MorphyNet incoming derivational relations. It keeps
+one row per selected original token, separate resource candidates and separate
+KWIC decisions. Only a selected complete segmentation contributes reviewed
+root/prefix/suffix instances; selected one-step relations are counted separately.
+Full segmentation totals remain unavailable until every eligible occurrence has
+a selected complete analysis. A zero reviewed total is not absence of morphology.
+The authored demonstration, guide and tests exercise repeated surfaces, distinct
+choices, ambiguity, withholding, no candidates, empty documents and saving/replay.
+This is an explicitly sourced example, not a new export or mandatory dependency.
+
+The saved ICNALE GRA V2.1 family profile was reused, preserving all **31,902**
+selected occurrences in **140** essays, source coordinates, original KWIC and
+family assignments. Exact cached surface matching finds **30,690** MorphoLex
+occurrences (30,680 unique complete entries; ten matched unanalysed entries) and
+**4,592** MorphyNet occurrences, including **401** with multiple relation
+candidates. **4,348** occurrences match all three resources. These counts
+describe different resource units and scopes, not comparative accuracy.
+No corpus candidate decisions were made; no learner knowledge, productivity or
+independent contextual accuracy is inferred. Original text and individual
+corpus outputs remain under the local `analysis/icnale-gra/` directory.
+
+Evidence: workspace `reviews/ldfreq-morphology-link-20261006/evidence/`.
+
+- All candidate counts agree with direct lookups against preserved MorphoLex
+  worksheet Word cells and the full 225,131-relation MorphyNet English v1 table.
+  Every document denominator and original selected ID/coordinate/family matches
+  the saved prior analysis. This does not rerun tokenization or family analysis.
+- **40 installed assertions** pass, including an authored alternative MorphoLex
+  segmentation that must not be summed with the selected candidate. The changed
+  guide renders, and its extracted script runs from the exact archive installation.
+- The exact archive reproduces the complete saved 140-essay linkage in a fresh
+  R process and passes the same 40 assertions. DESCRIPTION field values and all
+  **155 installed inst members** match. API audit remains **57 exports / 34 S3
+  registrations**. The five-resource admission validator passes 36 assertions.
+- Source archive: **5,611,720 bytes**, SHA256
+  `e891bf10e54ab08cf25988b29ed18705690a6217d95e7e42e2cb57029adfe6d0`.
+  All **275 compared source files** match the checkout. Twenty unchanged compiled
+  guides and **108 unchanged runtime/help/resource/license members** retain prior
+  evidence. Generated build indexes and normalized DESCRIPTION are distinguished
+  from literal source files. Restricted corpus files and local paths are absent.
+- Added Git byte-preservation attributes for the three new resource directories
+  and their license directories. A `core.autocrlf=true` checkout reproduces all
+  **21 resource-manifest members** exactly. This addresses the known Windows
+  checkout risk before running the accumulated revision through CI.
+- Initial development-mode tests could not resolve nested installed example
+  paths through pkgload's shim. Fresh installation passes without a code workaround.
+  An initial local analysis identity assertion compared inherited data-frame row
+  names; comparing each explicit ID column fixed that verification script.
+  Neither issue changed resource matching or the package's measurement formulas.
+
+The remote was rechecked: `Ryuya-dot-com/ldfreq` is PRIVATE and draft PR #21 is
+open. Its existing successful CI covers `d6eabd14`, not this accumulated revision.
+Anonymous TLS-verified repository and documentation-root requests returned 404
+and 200 respectively; a reachable site alone does not demonstrate publication of
+the new functions. Keep `state.dcf` at `development` while integrating the changes
+into that private PR. No visibility change, main merge, Pages deployment or CRAN
+submission is included. Record the selected new CI result separately from older
+successful checks and from the intentionally skipped release-candidate jobs.

@@ -12,6 +12,16 @@ diagnostics, exact term and annotated-content-word type overlap,
 many-document coverage by one explicit reference term set, caller-supplied
 lexical-norm profiles with separate resource and annotation coverage, plus
 New JACET 8000 level profiles using the bundled table or an external copy.
+\code{\link{bnccoca_data}} supplies Nation's BNC/COCA Level 6 family
+membership and separate supplementary lists under CC BY-SA 4.0, for use with
+\code{\link{lexdiv_family_profile}}.
+\code{\link{morphynet_read_derivations}} reads local MorphyNet formation
+relations, preserving source and target POS, affixes and alternatives. Only a
+nine-row CC BY-SA 3.0 teaching excerpt is bundled, not the full database.
+\code{\link{morpholex_data}} provides the bundled MorphoLex English worksheet
+tables and provenance. Those data and their dictionary use CC BY-NC-SA 4.0
+(noncommercial use, attribution and applicable ShareAlike conditions),
+separately from the MIT license of the independent R code.
 Adjacent bigram/trigram extraction and caller-supplied reference frequencies
 retain segment boundaries, original positions, opportunity totals and coverage.
 \code{\link{lexdiv_ngram_compare}} compares reference choices using the same

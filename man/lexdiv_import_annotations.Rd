@@ -39,8 +39,10 @@ before alignment. This is not a total memory or source-text size limit.}
 \details{
 Surfaces are matched exactly, in order, against the supplied original segment
 text. Unicode whitespace may occur between tokens and before/after them. A
-token starting with whitespace begins at the current cursor; other tokens
-begin after any whitespace at that cursor. All non-whitespace text must be
+token starting with whitespace uses the earliest exact match reachable from
+the current cursor across whitespace only. This also permits analyzers that
+emit CR but omit LF in CRLF sequences. Other tokens begin after any whitespace
+at that cursor. All non-whitespace text must be
 accounted for. Omitted punctuation, replaced characters, wrong ordering, and
 skipped repeated words therefore cause an error. Neither text nor surfaces
 are normalized. Combining marks and supplementary characters count as Unicode

@@ -27,6 +27,7 @@ reference:
       - lexdiv_score_contextual
       - lexdiv_text_batch
       - lexdiv_flemmatize
+      - lexdiv_family_profile
   - title: Exact lexical overlap and coverage
     contents:
       - lexdiv_overlap
@@ -61,6 +62,9 @@ reference:
       - lexdiv_read_masc
   - title: Reference-resource profiles
     contents:
+      - morpholex_data
+      - bnccoca_data
+      - morphynet_read_derivations
       - nj8_profile
       - nj8_diagnostics
       - tubelex_profile

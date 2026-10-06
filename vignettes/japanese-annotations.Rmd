@@ -72,6 +72,11 @@ punctuation, or normalized replacement causes an error. A supplied `start` or
 `end` column must match the derived coordinates. This verifies the alignment,
 not the correctness of POS, lexical units, or the source's sentence boundaries.
 
+Whitespace annotations may be partial. For example, an analyzer can emit CR
+tokens while omitting LF from CRLF line endings. A whitespace-prefixed token
+uses the earliest exact match across whitespace-only gaps; non-whitespace
+characters cannot be skipped. Original line endings and positions are retained.
+
 ```{r measures}
 words <- imported$tokens[imported$tokens$surface != "。", ]
 lexdiv_metrics(words$surface, metrics = "ttr")
@@ -240,6 +245,287 @@ saveRDS(list(imported = ja, selection = selection, metrics = results, ngrams = g
   "japanese-analysis.rds")
 ```
 
+## Kana spellings and contextual lexical identity
+
+Kana spelling is an observation, not evidence that a writer cannot produce a
+kanji. Task instructions, input method and stylistic choices can also matter.
+Keep two outcomes separate: what was written, and which lexical item a reviewed
+occurrence represents. Inferring kanji knowledge requires additional evidence,
+such as a production task with known opportunities and permitted writing aids.
+
+[UniDic's hierarchy](https://clrd.ninjal.ac.jp/unidic/glossary.html) retains
+orthographic variants below lexical entries. `orthBase` alone does **not** merge
+all kana/kanji spellings; choosing `lemma` also pools inflectional variation.
+For an orthography-only comparison, hold lexical identity and grammatical form
+constant. A reading alone cannot distinguish homophones. An analyzer's selected
+entry is a candidate annotation, not independent evidence that the writer meant
+that entry. Segmentation errors require boundary review before lexical review.
+
+The following example reuses the existing KWIC decision API. All text,
+boundaries and candidates are authored; it requires optional **quanteda** in a
+UTF-8 R session, but no downloaded corpus, dictionary, Python or model. The IDs identify illustrative
+lexical items, not word families or a validated inventory of word senses.
+
+```{r kana-review, eval=requireNamespace("quanteda", quietly=TRUE) && isTRUE(l10n_info()[["UTF-8"]])}
+source(system.file("examples", "japanese-orthography.R", package = "ldfreq"))
+spelling <- japanese_orthography_example
+spelling$occurrences[, c("document_id", "segment_id", "pre", "keyword", "post",
+  "status", "lexical_id", "lexical_label", "reason")]
+spelling$counts
+```
+
+Only the declared **target occurrences** enter these counts; particles, verbs
+and punctuation still remain in the source annotations and KWIC context.
+
+| Authored target set | Observed spellings | Reviewed lexical identities |
+|---|---|---|
+| `りんご`, `リンゴ`, `林檎` | 3 types in 3 occurrences | 1 type in the same 3 occurrences |
+| `はし` in crossing and eating contexts | 1 type in 2 selected occurrences | 2 types in the same 2 occurrences |
+| A third `はし` in a seeing context | Its surface is known | Identity remains unresolved |
+| Invented `ぷにょ語` | Its surface is known | No candidate supplied; no identity fallback |
+
+The three HASHI occurrences have selection coverage 2/3. Their full-target
+`lexical_V` remains `NA`; the two resolved occurrences support a conditional
+comparison, with `common_surface_V = 1` and `common_lexical_V = 2`. Do not compare
+a complete surface count with an incomplete lexical count as though their
+populations matched. Even a single supplied candidate stays unreviewed until
+explicitly selected. An absent candidate is not proof of a misspelling.
+
+Original `surface`, `start` and `end` never change. Selected IDs and labels are
+separate columns; the example does not rewrite kana into kanji. Saving the whole
+object preserves the source, candidate inventory, decisions and reviewer reasons:
+
+```{r save-kana-review, eval=FALSE}
+saveRDS(spelling, "japanese-orthography-review.rds")
+restored <- readRDS("japanese-orthography-review.rds")
+```
+
+### Review boundaries before lexical identity
+
+The same example file also supplies `japanese_boundary_example`. In the authored
+sentence `はしではしをつかいます。`, the intended meaning is using chopsticks on
+a bridge. Compare two complete annotations of **the same original text**:
+
+- Split alternative: `はし / で / は / し / を / つかい / ます / 。`
+- Reviewed alternative: `はし / で / はし / を / つかい / ます / 。`
+
+A local probe with gibasa 1.1.3 and unidic-lite 1.0.8 (UniDic 2.1.2) produced
+the split alternative. This is a concrete integration case, not an estimate of
+analyzer accuracy on learner writing. The offline example supplies both
+annotations explicitly and requires neither that analyzer nor its dictionary.
+
+```{r kana-boundaries, eval=requireNamespace("quanteda", quietly=TRUE) && isTRUE(l10n_info()[["UTF-8"]])}
+boundary <- japanese_boundary_example
+subset(boundary$alignment$groups, relation != "exact",
+  select = c(start, end, pre, keyword, post, predicted_n, reference_n))
+boundary$boundary_decisions
+boundary$scores[, c("condition", "document_id", "N", "V", "value", "status")]
+boundary$review$occurrences[, c("start", "end", "keyword", "candidate_id", "reason")]
+```
+
+The [alignment workflow](annotation-alignment.html) links original characters
+4--5 to the two split tokens and the one reviewed token. The decision and its
+reason are saved alongside both complete annotation objects. Import the reviewed
+annotations afresh; editing an imported object's token rows in place invalidates
+its identity. No lemma or POS is inherited automatically from a fragment.
+
+The surface counts exclude only the full stop and retain all other tokens:
+the split alternative has N = 7 and V = 7; the reviewed alternative has N = 6
+and V = 5. These illustrative TTR values describe the supplied sequences, not
+proficiency. Restricting the comparison to exact-span matches would discard the
+changed tokens and fail to measure the effect under study.
+
+Boundary selection does not decide whether either occurrence means bridge,
+chopsticks or edge. Regenerate KWIC review on the new complete annotations and
+record lexical decisions separately. The old split exposes one whole-token
+HASHI, while the reviewed annotation exposes two. Decisions from a previous
+segmentation have a different review ID and cannot be silently reused.
+
+This example accepts an analyst's complete alternative segmentation; it does
+not automatically repair boundaries or select the intended meaning. Keep the
+whole `boundary` object when saving. Do not close gaps left by excluded or
+unresolved tokens when forming n-grams or moving-window measures.
+
+[JASWRIC](https://language.sakura.ne.jp/jaswric/) illustrates the practical issue:
+it supplies original transcriptions and edited texts, including script changes,
+for Japanese L1 student writing. Its supplied morphological analysis is based
+on the edited version. Such paired materials can support a later sensitivity
+study, but the authored example above is not a corpus-based accuracy evaluation.
+Script proportions are descriptive; a kanji-production score additionally needs
+a justified set of eligible words and acceptable spellings.
+
+## Review inflected forms spanning several tokens
+
+A morphological candidate can cover several analyzer tokens. For example,
+`食べられる` can be represented by `食べ / られる`, while its potential, passive
+and honorific analyses remain different candidates. A span identifies a source
+occurrence; it does **not** automatically redefine that occurrence as one word
+in a diversity calculation. Inflectional analyses also differ from lexical
+senses and pedagogical word-family membership.
+
+The following explicitly sourced recipe works offline with authored text,
+annotations and six authored format-demonstration rows. It uses the existing
+annotation importer and stringi's exact search; no new analyzer or exported
+API is introduced. The earlier `lexdiv_ambiguity_review()` workflow continues
+to handle single-token lexical candidates.
+
+```{r morphology-spans-authored}
+source(system.file("examples", "junimorph-spans.R", package = "ldfreq"))
+source(system.file("examples", "junimorph-spans-demo.R", package = "ldfreq"))
+span_demo <- junimorph_spans_example
+span_demo$reviewed$occurrences[, c("pre", "keyword", "post", "start", "end",
+  "token_from", "token_to", "candidate_count", "status")]
+span_demo$counts
+```
+
+This example selects two occurrences, leaves a repeated `食べられる` unresolved,
+keeps `開ける` unreviewed, and identifies an invented form with no supplied
+candidate. A requested but absent form and an empty document are retained in
+the term/document summaries. On the **same two selected spans**, two forms map
+to one lemma label. The complete five-target lemma total is unavailable. All
+26 original annotation tokens remain unchanged before and after the review.
+These are illustrative decisions, not an accuracy assessment.
+
+Unlike the earlier quanteda token-window example, this span recipe's `window`
+is a number of **original Unicode codepoints** on either side. KWIC includes
+original spaces and line endings. Matches cannot cross a supplied segment.
+Exact substring matches whose endpoints fall inside analyzer tokens remain
+visible as `boundary_mismatch`; lexical decisions on them are rejected until
+the analyst supplies and imports a complete reviewed segmentation.
+
+All overlapping matches remain present. `overlap_n` and
+`selected_overlap_n` expose overlapping source ranges; their counts cannot be
+summed as a count of independent words. The recipe never applies longest-match
+selection, merges token rows, removes exclusions or automatically selects a
+single candidate. Its document summaries count diagnostic spans, not word tokens.
+
+### Connect a locally acquired J-UniMorph table
+
+[J-UniMorph](https://github.com/cl-tohoku/J-UniMorph) supplies a three-column
+`jpn` table (lemma, form, feature bundle) under CC BY 4.0. Its filtered table
+and the pre-filtering hit-count file are different inputs. Obtain `jpn`
+separately; the package includes only the reader and authored examples.
+
+```{r junimorph-local-input, eval=FALSE}
+reference <- read_junimorph("local-resources/jpn", list(
+  resource_id = "J-UniMorph",
+  resource_version = "jpn git blob 6b001fa9d33139bd9b85ffe70f74c1143ae9df24",
+  source_reference = "https://github.com/cl-tohoku/J-UniMorph",
+  data_license = "CC BY 4.0"
+))
+# Use the actual revision of your file; its SHA-256 is recorded automatically.
+# ja is the complete annotation import above, before any filtering.
+span_review <- review_morphology_spans(ja, reference)
+span_review$documents
+span_review$candidates[span_review$candidates$form == "食べられる", ]
+
+# After inspecting an occurrence and the corresponding candidate table:
+decision <- span_review$occurrences[chosen_row, c("review_id", "occurrence_id")]
+decision$status <- "selected"             # or "unresolved"
+decision$candidate_id <- chosen_candidate_id # NA_character_ for unresolved
+decision$reviewer <- "analyst-id"
+decision$reason <- "Record the contextual evidence or reason for withholding judgment"
+reviewed <- review_morphology_spans(ja, reference, decisions = decision)
+saveRDS(reviewed, "morphology-span-review.rds")
+restored <- readRDS("morphology-span-review.rds")
+replayed <- review_morphology_spans(restored$source, restored$reference,
+  targets = restored$terms$form, decisions = restored$decisions,
+  window = restored$provenance$window_codepoints)
+stopifnot(identical(restored, replayed))
+```
+
+Source row IDs, original feature strings, duplicate records and file identity
+are preserved. Changing the source annotations, reference table or target set
+invalidates old decisions. Unreviewed and unresolved occurrences are distinct;
+even one listed candidate requires an explicit selection. The workflow accepts
+recorded decisions without claiming to verify their linguistic correctness.
+
+The inspected snapshot has 12,687 rows, 107 lemma labels and 10,848 forms. It is
+a limited inflection reference, not a comprehensive Japanese vocabulary list.
+Matching is exact: kana/kanji variation, spelling errors and missing forms are
+not silently normalized. A missing match is not an unknown-word diagnosis.
+The example scans one form at a time and is intended for bounded local analyses.
+
+In the 28-essay diagnostic subset described below, the full table produced
+1,309 exact spans: 587 agreed with both supplied token boundaries, including
+409 multi-token spans; 722 had a boundary mismatch. Of the aligned spans, 98
+had multiple candidate rows. All real-corpus decisions remain unreviewed;
+these counts measure matching behavior, not error rates or contextual accuracy.
+Nested forms can describe overlapping text and shorter portions of an
+inflectional sequence. Inspect the whole context before interpreting a hit.
+
+## Read locally acquired learner essays
+
+The [NINJAL Essay Database](https://mmsrv.ninjal.ac.jp/essay/essay_05.html)
+distributes a text ZIP and separate essay/writer metadata workbooks. Obtain
+these files directly from the provider under its **CC BY-NC-ND 4.0** terms.
+They are not included in ldfreq. The following explicitly sourced reader needs
+only the local ZIP and metadata tables; optional `readxl` reads the workbooks.
+
+```{r ninjal-local-input, eval=FALSE}
+source(system.file("examples", "ninjal-essays.R", package = "ldfreq"))
+data_dir <- "ninjal-essay-data"
+essays <- as.data.frame(readxl::read_excel(
+  file.path(data_dir, "sakubun.xlsx"), col_types = "text"))
+writers <- as.data.frame(readxl::read_excel(
+  file.path(data_dir, "shipitsusha.xlsx"), col_types = "text"))
+
+# Start with a small, explicitly selected subset of local files.
+files <- head(essays[["日本語作文txt"]], 5)
+corpus <- read_ninjal_essays(file.path(data_dir, "sakubun_txt.zip"),
+  essays, writers, files = files, encoding = "UTF-8")
+corpus$documents[, c("document_id", "writer_id", "task", "l1_reported",
+  "writer_metadata_status", "source_encoding", "utf8_bom_removed")]
+
+# With the optional analyzer configured above:
+analysis <- analyze_unidic(corpus$segments, dic_dir)
+# Import these complete annotations with the actual analyzer/dictionary
+# metadata as above, before selecting lexical forms or excluding punctuation.
+saveRDS(corpus, "ninjal-essays-local.rds")
+```
+
+The UTF-8 default is a declaration, not an encoding guess. For a mixed archive,
+supply a named vector with each selected member's inspected encoding:
+
+```{r ninjal-local-encoding, eval=FALSE}
+files <- essays[["日本語作文txt"]]
+encodings <- setNames(rep("UTF-8", length(files)), files)
+# A local list of member names verified as CP932, not a list of error words.
+cp932_files <- readLines(file.path(data_dir, "verified-cp932-members.txt"), encoding = "UTF-8")
+stopifnot(all(cp932_files %in% files))
+encodings[cp932_files] <- "CP932"
+corpus <- read_ninjal_essays(file.path(data_dir, "sakubun_txt.zip"),
+  essays, writers, files = files, encoding = encodings)
+```
+
+Do not silence a decoding failure by replacing unreadable bytes or guessing a
+different encoding for every failure. The reader rejects failed conversions
+and failed byte round-trips. It records a removed leading UTF-8 BOM separately;
+all subsequent characters and line endings remain unchanged. Imported character
+positions refer to that decoded text, not ZIP bytes. Raw member hashes and the
+archive hash retain the connection to the downloaded files.
+
+IDs come from the official metadata mapping, not filename slicing. A missing
+writer row stays `missing` with an unavailable L1; duplicate join keys stop the
+reader instead of duplicating essays. Source L1 labels, including nonresponse
+labels, are retained verbatim. Collection country is not inferred to be L1.
+
+In a local input check of the distribution downloaded on 2026-10-06, the ZIP
+and essay workbook contained **1,777** matching files/records: 1,764 UTF-8 and
+13 inspected CP932 files; 179 had a leading UTF-8 BOM. One essay lacked a writer
+metadata match. These are observations of those downloaded files, not the
+overview page's historical total or guarantees about future editions.
+
+A diagnostic subset of 28 essays from one task (four per seven reported L1
+labels, including Japanese) produced 10,932 supplied annotation rows. All source
+spans and non-whitespace text were checked. The selected lexical population had
+9,554 tokens, of which 139 had no lemma annotation. Missing lemma is not an error
+rate or a verified unknown-word classification. The input contains complete
+distributed TXT, including titles and transcription notation. This verifies
+input, alignment and counting, not segmentation accuracy, kanji knowledge or
+group differences. Keep corpus text and individual review tables locally;
+the earlier authored examples provide the distributable workflow.
+
 ## Frequency resources and interpretation
 
 The bundled `tubelex_profile()` and `nj8_profile()` resources are **English**;
@@ -253,6 +539,12 @@ TUBELEX table. It records denominators and key transformations without claiming
 to reproduce upstream tokenization. Its unigram tables cannot supply n-gram
 co-occurrences.
 
+Surface frequency for a kana spelling and frequency for a reviewed lexical
+entry answer different questions. Do not silently substitute the frequency of
+its kanji spelling or sum homophones merely because they share a reading.
+Use a compatible lexical-unit table or report that the requested frequency is
+unavailable; a lexical selection does not create sense-specific frequencies.
+
 For an external Japanese norm table, prepare and check unique keys and use
 `lexdiv_norm_profile()` with the table's actual metadata and missingness. For
 n-gram frequencies, supply permitted local reference counts through the
@@ -264,6 +556,7 @@ Analyzing Japanese learner texts, native-speaker texts, or instructional
 materials is possible with this input path. Software alignment tests do not
 validate learner-error tokenization, lexical sophistication, or equivalence
 between English and Japanese scores. Evaluate those questions against suitable
-annotated data and external outcomes. Comparing segmentations with splits and
-merges remains a separate development task: `lexdiv_compare_annotations()`
-still requires identical token rows and cannot perform that comparison.
+annotated data and external outcomes. Use `lexdiv_align_annotations()` for
+source-span comparisons involving splits and merges; the label comparison in
+`lexdiv_compare_annotations()` requires identical token rows. Span alignment
+alone does not establish which segmentation is linguistically correct.

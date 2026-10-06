@@ -43,6 +43,39 @@ and checks that reshaped tables and plots do not mix incompatible specifications
 These are features for describing and comparing texts. A score alone does not
 establish proficiency, writing quality, measurement validity, or reliability.
 
+The text workflow supports surface forms, lemmas and AntBNC flemmas.
+For resource-defined word families, experimental `lexdiv_family_profile()`
+matches complete imported annotations to a caller-supplied form–family table.
+It retains token occurrences, member counts, unresolved candidates and KWIC;
+`use` and `reusability` remain two tokens even if a declared table places them
+in one family. See the [word-family example](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#resource-defined-word-families).
+An optional `review` connects the existing ambiguity-review workflow to
+occurrence-specific family choices, retaining reviewers, reasons and original
+lookup results. Changed source, inventory or counting policies require a new
+review snapshot; one decision never changes every occurrence of a spelling.
+Flemmas and derivational families are distinct. `bnccoca_data()` supplies
+Nation's BNC/COCA Level 6 lists: 25,000 families and 75,679 headword/member
+records, with 29,798 supplementary records kept separate. The data use
+**CC BY-SA 4.0**, with attribution and ShareAlike conditions; see the
+[source and conversion notice](https://github.com/Ryuya-dot-com/ldfreq/blob/main/inst/licenses/bnccoca/NOTICE.md).
+Family membership does not establish a learner's knowledge of every member.
+The bundled version groups `use`/`uses` and `colour`/`color`; `reusability`
+is unlisted and remains unresolved. Frequency bands are distinct from the
+Bauer–Nation Level 6 inclusion criterion.
+
+`morphynet_read_derivations()` reads a separately obtained MorphyNet TSV in R,
+retaining formation relations, original POS symbols, source hashes and
+alternatives. An [installed example](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#inspect-morphynet-formation-relations)
+connects a nine-row, CC BY-SA 3.0 excerpt to existing KWIC review. Multiple
+incoming relations are not summed as affixes or converted to Nation families.
+The full database is not bundled; optional KWIC review uses quanteda.
+An explicitly sourced [roots-and-affixes recipe](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#source-linked-roots-and-affixes)
+links supplied parts to original occurrences, retaining analysis scope, alternatives,
+partial analyses and coverage. `morpholex_data()` reads the bundled MorphoLex-en
+tables with their provenance and CC BY-NC-SA 4.0 terms. The word-parts recipe
+can use these tables offline or an optional local workbook;
+these recipes are not exported APIs or automatic morphology analyzers.
+
 ## Corpus scope
 
 The same analysis functions accept native-speaker and learner texts. Research
@@ -125,7 +158,7 @@ per-condition missingness and distributions, and saves a complete RDS record.
 Adult native-speaker norms do not measure individual L2
 knowledge or acquisition history.
 
-## Relationship to other R packages
+## Relationship to existing tools
 
 | Existing tool | Its focus | Where ldfreq fits |
 |---|---|---|
@@ -135,6 +168,7 @@ knowledge or acquisition history.
 | [gibasa](https://paithiov909.github.io/gibasa/) | MeCab morphological analysis from R using separately supplied dictionaries | Import complete Japanese annotations with original-text alignment and retain lexical-form choices and dictionary metadata alongside analysis results |
 | [text](https://www.r-text.org/) | Transformer embeddings and language analysis from R using Python | Attach source-aligned external outputs to KWIC reviews, human decisions and explicit missing-output coverage; model inference is not reimplemented |
 | [zipfR](https://r-forge.r-project.org/projects/zipfr/) | Statistical models for word-frequency distributions and vocabulary growth | Use ldfreq for document-level descriptive measures and reference-list profiles |
+| [KH Coder](https://khcoder.net/diagram.html) | An application for quantitative content analysis: exploratory word analysis, explicit concept-coding rules, KWIC, correspondence analysis and co-occurrence networks | Complement content analysis with lexical-measure definitions, NJ8/TUBELEX/norm profiles and preprocessing sensitivity; direct KH Coder interoperability is not implemented or validated |
 
 Existing R packages already implement many of these metrics and document their
 parameters. The contribution here is their integration with explicit comparison
@@ -142,6 +176,27 @@ conditions and resource coverage, not a claim to have invented the measures.
 Same-named metrics can differ in formula, log base, aggregation, or short-text
 handling. See [definition and preprocessing comparisons](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html).
 No speed or empirical-validity advantage over these packages is claimed.
+
+KH Coder already uses R and documents
+[exporting plotting commands as R Source](https://khcoder.net/scr_r.html).
+R integration, Japanese support and returning to source context therefore do
+not by themselves distinguish ldfreq. A complementary study could link content
+codes and lexical measures through explicit document IDs, without treating a
+topic/code as a lexical type or corpus co-occurrence as a direct measure of
+mental lexical organization. Its documented
+[document-by-word exports](https://khcoder.net/FAQ.html) are an exchange route
+to assess, not a tested ldfreq connector. An unordered count matrix cannot
+recover original-token MATTR, MTLD, adjacent n-grams or occurrence-level KWIC.
+Record tokenization, selected POS, text versions, aggregation units and export
+filters; complete token/source exports require separate validation. Current
+compatibility with KH Coder 5 has not been tested.
+
+KH Coder is an optional companion, not a prerequisite for ldfreq. Its current
+[official distributions](https://khcoder.net/dl3.html) include paid editions
+and a restricted free Windows edition; the
+[Mac distribution](https://khcoder.net/mac_com.html) is paid and requires
+Apple Silicon. These distribution conditions are distinct from the older
+public source release. The ldfreq workflow does not require a KH Coder purchase.
 
 N-gram extraction is also established functionality in
 [quanteda](https://quanteda.io/reference/tokens_ngrams.html), and
@@ -220,7 +275,9 @@ email addresses and number-like spans. Named text vectors and ID/text data
 frames share the same batch interface. Existing calls keep the original
 `tokenizer = "unicode"` default; select the English rules explicitly.
 See [English tokenization and document input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html)
-for segmentation examples, CSV/text-file input, and limitations.
+for segmentation examples, CSV/text-file input, and limitations. An offline
+counting-policy example separates spelling equivalence from lookup aliases,
+proper-noun/numeral selection, and symbol boundaries without altering the source.
 
 These two authored sentences illustrate the workflow, not a population effect.
 TTR uses the full document denominator; MATTR uses the selected local window.
@@ -261,6 +318,7 @@ a high match rate does not prove that arbitrary tokens use the right segmentatio
 | Twelve diversity measures | `lexdiv_metrics()`, `lexdiv_metrics_text()`, `lexdiv_metrics_batch()` |
 | Named raw texts or document ID/text tables | `lexdiv_tokenize_batch()`, `lexdiv_metrics_text_batch()` |
 | Raw text, lemmas, or externally supplied AntBNC flemmas | `lexdiv_tokenize()`, `lexdiv_lemmatize()`, `lexdiv_flemmatize()` |
+| Count families under an explicit inventory | `lexdiv_family_profile()` retains occurrences, candidates, member counts, KWIC and incomplete coverage |
 | Record or choose the lemma dictionary | `lexdiv_lemmatize(method = "textstem", dictionary = ...)` records content identity and lookup locale |
 | Audit annotation changes on the same documents | `lexdiv_compare_annotations()` retains changed labels and both provenance records |
 | Evaluate external labels against a supplied reference | `lexdiv_evaluate_annotations()` returns per-label errors, document coverage and source context on the same segmentation |
@@ -298,10 +356,10 @@ results do not change the requested parameters or silently remove documents.
 - [Getting started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html): inputs, result tables, annotation, and parameter plans.
 - [From text to a report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html): one complete workflow and what to cite.
 - [Designing comparisons](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html): questions, common settings, sensitivity, answers, and limits.
-- [Audit annotations and vocabulary profiles](https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.html): connect changed labels to original context, document-score differences, selection/reference coverage and saved-input replay.
+- [Audit annotations and vocabulary profiles](https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.html): connect changed labels to original context, document-score differences, selection/reference coverage and saved-input replay. Includes a reviewed-text example that preserves learner errors in the original and compares explicitly approved spelling/grammar edits under separate policies.
 - [Evaluate annotations and their effect on document scores](https://ryuya-dot-com.github.io/ldfreq/articles/annotation-evaluation.html): explicit references, label-specific errors, missing predictions and English/Japanese examples.
 - [Compare token boundaries and document scores](https://ryuya-dot-com.github.io/ldfreq/articles/annotation-alignment.html): source-based split/merge correspondence, conditional label coverage, and full-document TTR/MATTR sensitivity.
-- [Trace adjective–noun dependencies](https://ryuya-dot-com.github.io/ldfreq/articles/dependency-pairs.html): source-linked basic UD pairs, missing annotations, and occurrence differences hidden by equal document counts; offline English/Japanese examples.
+- [Trace adjective–noun dependencies](https://ryuya-dot-com.github.io/ldfreq/articles/dependency-pairs.html): source-linked basic UD pairs, missing annotations, and occurrence differences hidden by equal document counts; offline English/Japanese examples and an optional real-parser workflow using a local UDPipe model in R.
 - [Your own reference data across a corpus](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html): custom norms, document metadata, missingness, and reproducible saving.
 - [Analyze open-access papers](https://ryuya-dot-com.github.io/ldfreq/articles/open-access-papers.html): a reproducible example using three CC BY papers, with explicit text extraction, attribution and unknown author language backgrounds.
 - [Preprocessing and frequency](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html): lexical units, formula variants, and resource coverage.
@@ -332,6 +390,26 @@ The bundled resource is a slim aggregate at source commit `7cb5fb36`; no raw
 subtitles are included. Its source, changes, and complete license are recorded
 in the [TUBELEX notice](https://github.com/Ryuya-dot-com/ldfreq/blob/main/inst/licenses/tubelex/NOTICE.md).
 NGSL, Open English WordNet, and AntBNC data are not bundled.
+
+MorphoLex-en is bundled under **CC BY-NC-SA 4.0**, which permits noncommercial
+sharing and adaptation with attribution and applicable ShareAlike conditions;
+it does not grant commercial-use permission. Cite Sánchez-Gutiérrez, Mailhot,
+Deacon, and Wilson (2018), [MorphoLex: A derivational morphological database
+for 70,000 English words](https://doi.org/10.3758/s13428-017-0981-8).
+All 34 worksheets and the original data dictionary are included, with no
+inferred parts or corrections. The [MorphoLex notice](https://github.com/Ryuya-dot-com/ldfreq/blob/main/inst/licenses/morpholex/NOTICE.md)
+records the conversion, source checksums and full license location.
+
+```r
+reference <- morpholex_data(c("0-1-1", "All roots"))
+words <- reference$sheets[["0-1-1"]]
+words[words$Word %in% c("teacher", "teachers"),
+      c("Word", "MorphoLexSegm", "ROOT1_FamSize")]
+reference$provenance$data_license
+```
+
+Columns retain source values as character strings; convert selected numeric
+measures explicitly. See `?morpholex_data` for sheet names and interpretation.
 
 Use `citation("ldfreq")` for the software and cite the methods and resources
 used in the analysis. The R code is MIT licensed. Bundled resources retain

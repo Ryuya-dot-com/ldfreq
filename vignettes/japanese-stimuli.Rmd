@@ -205,7 +205,7 @@ for (measure in names(measure_columns)) {
   if (any(is.finite(value))) {
     stripchart(value ~ joined$condition, vertical = TRUE, method = "stack", pch = 16,
       xlab = "Condition", ylab = if (measure == "frequency") "log10(per million)" else measure)
-  } else { plot.new(); title(main = paste(measure, "has no observed values")) }
+  } else { plot.new(); message(measure, " has no observed values; see the coverage table.") }
 }
 dev.off()
 ```

@@ -68,6 +68,14 @@ jobs:
         with:
           args: 'c("--no-manual")'
 
+      - name: Check resource inventory rejection cases
+        if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release' }}
+        shell: Rscript {0}
+        run: |
+          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
+            shQuote("experiments/package-resource-inventory/check-resource-inventory.R"), "."))
+          if (!identical(status, 0L)) quit(status = status)
+
       - name: Audit source, platform, and installed resource inventories
         if: ${{ matrix.config.r == 'release' }}
         shell: Rscript {0}

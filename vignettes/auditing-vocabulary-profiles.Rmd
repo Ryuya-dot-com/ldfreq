@@ -227,13 +227,12 @@ the difference is `NA`, not zero. `delta` is after minus before, and
 `absolute_delta` describes its magnitude. A three-token window is chosen for
 hand verification, not recommended for a substantive corpus study.
 
-### Show changes for the same documents
+### Show each condition on the original scale
 
-This horizontal dot plot shows the signed TTR change for each paired document,
-retaining the document IDs. Unlike a group mean, it exposes changes that could
-cancel out across documents. It uses the existing difference table; no new
-metric or uncertainty model is introduced. Shape and color both distinguish a
-decrease from no change in this authored example. The dashed line is zero change.
+This small example shows both TTR values for each document on their original
+0–1 scale. Condition is distinguished by color and symbol. The larger open
+circle and smaller triangle remain visible when values coincide. Four documents
+are too few to motivate a smooth distribution estimate.
 
 ```{r annotation-changes, fig.width=6.5, fig.height=3.5}
 document_changes <- subset(effects$differences,
@@ -243,23 +242,22 @@ document_changes[, c("document_id", "difference_status", "missing_reason_before"
 paired <- subset(document_changes, difference_status == "paired")
 stopifnot(nrow(document_changes) == 6L, nrow(paired) == 4L)
 
-draw_changes <- function(paired, monochrome = FALSE) {
+draw_values <- function(paired, monochrome = FALSE) {
   old <- par(mar = c(4.2, 5.2, 1, 1), family = "sans", las = 1,
     bty = "l", mgp = c(2.6, .7, 0), tcl = -.25)
   on.exit(par(old))
   y <- rev(seq_len(nrow(paired)))
-  decreased <- paired$delta < 0
-  plot(paired$delta, y, type = "n", yaxt = "n", ylab = "",
-    xlab = "TTR Difference (After - Before)",
-    xlim = range(c(0, paired$delta)))
+  colors <- if (monochrome) c("black", "black") else c("#0072B2", "#D55E00")
+  plot(paired$value_before, y, type = "n", yaxt = "n", ylab = "",
+    xlab = "TTR", xlim = c(0, 1), ylim = c(.5, nrow(paired) + 1))
   axis(2, at = y, labels = paired$document_id)
-  abline(v = 0, col = "grey50", lty = 2)
-  points(paired$delta, y,
-    col = if (monochrome) "black" else ifelse(decreased, "#D55E00", "#0072B2"),
-    pch = ifelse(decreased, 17, 19))
+  points(paired$value_before, y, col = colors[1], pch = 21, bg = "white", cex = 1.5, lwd = 1.5)
+  points(paired$value_after, y, col = colors[2], pch = 17, cex = .8)
+  legend("topleft", c("Before", "After"), col = colors, pch = c(21, 17),
+    pt.bg = "white", pt.cex = c(1.5, .8), bty = "n")
   invisible(paired)
 }
-draw_changes(paired)
+draw_values(paired)
 ```
 
 Four of six documents have paired TTR values; `excluded` and `empty` remain in
@@ -267,9 +265,49 @@ the displayed status table and are not plotted as zero. The `lemma` document's
 TTR decreases by one third; the other three paired documents have zero change.
 This is a sensitivity illustration, not evidence that the new annotations
 are more accurate or that a population effect has been estimated. The four
-rows can be drawn in monochrome with `draw_changes(paired, monochrome = TRUE)`.
+rows can be drawn in monochrome with `draw_values(paired, monochrome = TRUE)`.
 For actual research, preserve the participant/task structure and annotation
 conditions in the full table before calculating any uncertainty interval.
+
+For a study with enough observations to inspect a smooth continuous distribution,
+the following optional ggplot2 recipe overlays the two densities. Supply a common
+positive bandwidth in TTR units and use the same document subset for both curves.
+Inspect bandwidth sensitivity; the curves describe marginal distributions and
+do not display which document changed or provide confidence intervals. The
+[boundary correction](https://ggplot2.tidyverse.org/reference/geom_density.html)
+reflects tails at 0 and 1, rather than simply cropping an unbounded density.
+
+```{r density-recipe}
+draw_ttr_densities <- function(paired, bw, monochrome = FALSE) {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) stop("Install optional ggplot2.")
+  x <- paired$value_before; y <- paired$value_after
+  stopifnot(is.numeric(x), is.numeric(y), length(x) == length(y), length(x) >= 2L,
+    all(is.finite(c(x, y))), all(c(x, y) >= 0 & c(x, y) <= 1),
+    length(unique(x)) > 1L, length(unique(y)) > 1L,
+    is.numeric(bw), length(bw) == 1L, is.finite(bw), bw > 0,
+    is.logical(monochrome), length(monochrome) == 1L, !is.na(monochrome))
+  d <- data.frame(value = c(x, y), condition = factor(
+    rep(c("Before", "After"), each = length(x)), levels = c("Before", "After")))
+  colors <- if (monochrome) c("black", "black") else c("#0072B2", "#D55E00")
+  ggplot2::ggplot(d, ggplot2::aes(x = value, color = condition, linetype = condition)) +
+    ggplot2::geom_density(bw = bw, bounds = c(0, 1), linewidth = .7, key_glyph = "path") +
+    ggplot2::geom_rug(sides = "b", alpha = .35, show.legend = FALSE) +
+    ggplot2::scale_color_manual(values = colors) +
+    ggplot2::scale_linetype_manual(values = c("solid", "dashed")) +
+    ggplot2::scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, .2)) +
+    ggplot2::labs(x = "TTR", y = "Density", color = NULL, linetype = NULL) +
+    ggplot2::theme_classic(base_size = 11, base_family = "sans") +
+    ggplot2::theme(legend.position = "top")
+}
+```
+
+Use `draw_ttr_densities(study_pairs, bw = chosen_bandwidth)` on your reviewed
+study table; add `monochrome = TRUE` for black solid/dashed lines. A density's
+area is normalized separately for each condition, so report the sample sizes
+and missingness alongside the figure. A constant series is rejected: for it,
+use the raw observations or an empirical distribution. Do not treat the numerical
+minimum of two observations as a recommendation for density estimation. Preserve
+the full roster and pairing metadata even when displaying marginal densities.
 
 ### Keep selection coverage separate from reference coverage
 
@@ -423,6 +461,162 @@ normalization or a flemma headword-conflict decision. Keep the original
 `profile$lookup` for occurrence positions and the prepared objects for annotation
 details. No automatic spelling correction, compound splitting or numeric-label
 removal is performed by the diagnostics.
+
+## Handle learner errors without losing the observed text
+
+Choose the primary text version from the research question, and always retain
+the original. When studying observed production, spelling and grammatical
+patterns may be part of the outcome. When studying lexical choices apart from
+orthographic control, an explicitly reviewed spelling version may be useful.
+A grammatically rewritten version answers a different question: inserted words,
+substituted vocabulary and changed constructions can alter the features being
+measured. Do not treat its higher coverage or different diversity score as an
+improvement in the learner's ability.
+
+Three problems require different actions:
+
+| Observation | What to inspect | Analysis decision |
+|---|---|---|
+| `freind` and `friend` in one essay | Original context and a defensible intended form | A reviewed spelling edit may merge types; retain both versions |
+| `She has beautiful garden.` or `I went too school.` | Grammar and intended meaning, even when every word is in a dictionary | Declare whether article insertion or real-word substitution belongs in the analysis policy |
+| An unexpected lemma/POS or an off-list word | Parser output, token boundaries, reference coverage and source text | Correct an annotation separately; off-list status alone does not establish a learner error |
+
+Names, specialist vocabulary, acceptable spelling varieties and code-switching
+must not automatically become errors. An unclear form should remain unresolved
+rather than be assigned a plausible meaning. OCR/transcription mistakes are a
+separate data-production issue: verify against the source where possible and
+record that provenance instead of attributing them to the writer. Rejected and
+unresolved proposals remain in the ledger; no proposals does not mean error-free.
+
+For valid English spelling variants, proper nouns, numeral expressions and
+symbols, see the [counting-policy comparison](english-tokenization.html#declare-spelling-name-numeral-and-symbol-policies).
+It separates unchanged source forms, optional counting equivalence, reference
+lookup aliases and token selection; these choices need not rewrite the text.
+
+[Nagata, Sato, and Takamura (2018)](https://aclanthology.org/C18-1202/)
+compared original and manually spelling-corrected Japanese EFL essays and found
+different sensitivities for TTR and Yule's K. Their preprocessing excluded
+unidentifiable corrections and word concatenation/split corrections. This is
+evidence to check each measure and correction policy, not a guarantee that a
+particular measure is unaffected by errors in another corpus. A spelling variant
+can increase the number of types, but not every repair reduces diversity:
+deletions, insertions and changes to word boundaries can change both numerator
+and denominator.
+
+For syntax, [Berzak et al. (2016)](https://aclanthology.org/P16-1070/)
+describe parallel annotation of original and corrected learner sentences.
+Their literal-reading principle emphasizes observed constructions, with
+explicit exceptions for misspellings and malformed words. State the annotation
+scheme rather than assuming either that all intended forms should replace the
+source or that annotating the source requires no interpretation.
+
+### Run a reviewed-text sensitivity analysis
+
+The installed, explicitly sourced example below applies a supplied edit ledger.
+It does not detect or propose corrections, and is not an exported package API.
+The six documents and review decisions are authored demonstrations, not learner
+data or independently validated gold corrections. No corpus or model download
+is needed.
+
+```{r reviewed-text-demo, results='hide'}
+review_example <- new.env(parent = environment())
+sys.source(system.file("examples", "reviewed-text-demo.R", package = "ldfreq",
+  mustWork = TRUE), envir = review_example)
+text_review <- review_example$result
+```
+
+```{r}
+subset(text_review$metrics, metric_id == "ttr" &
+  document_id %in% c("spelling", "grammar", "boundary"),
+  select = c(document_id, version, N, V, value, status))
+text_review$versions$expanded_review$edits[, c("document_id", "pre", "original",
+  "replacement", "post", "category", "decision", "applied")]
+```
+
+`original` applies no edits; `spelling_reviewed` applies only approved spelling
+edits; `expanded_review` also applies approved grammar, word-boundary and
+real-word edits. Every version starts from the same original document table.
+For `A freind met a friend.`, lowercased surface TTR changes from 4/5 to 3/5;
+inserting the article in `She has beautiful garden.` changes N from 4 to 5
+while TTR stays 1. Splitting `alot` changes N from 3 to 4, making the illustrative
+four-token MATTR window computable. An unchanged score therefore does not show
+that the source or counted vocabulary stayed unchanged. Four tokens is a tiny
+demonstration window, not a study recommendation.
+
+To use your own data, source `reviewed-text.R` and call
+`apply_reviewed_edits(documents, edits, categories, policy)`. Supply:
+
+- A `documents` data frame with unique `document_id` and nonmissing UTF-8 `text`.
+  Writer, task, occasion and other metadata columns are preserved. Empty strings
+  are retained; unknown/missing source texts must be resolved explicitly, not
+  converted to empty essays.
+- An `edits` data frame with unique `edit_id`, `document_id`, `start`, `end`,
+  `original`, `replacement`, `category`, `decision`, `reviewer` and `reason`.
+  `decision` is `approved`, `rejected` or `unresolved`; completed decisions
+  require a reviewer. Extra columns can record proposal tool/model versions and
+  adjudication records. Categories are study-defined; choose them before examining
+  the resulting scores.
+- Explicit selected `categories` and a `policy` description. Only approved edits
+  in those categories are applied. Use `character(0)` for the unchanged version.
+  This example requires an explicit study policy; it does not impose a universal
+  taxonomy of learner errors.
+
+Coordinates are **1-based inclusive Unicode code points in the original,
+unnormalized document**, not byte offsets, token numbers or normalized-text
+positions. An insertion before position `start` uses `end = start - 1` and
+`original = ""`; deletion uses `replacement = ""`. Each original substring must
+match exactly. Overlapping applied edits and edits sharing a start position
+stop for review; unresolved alternatives can remain in the ledger. Each applied
+edit gets positions in the revised document, including an empty interval for
+deletion. These edit spans are not a complete token alignment between versions.
+
+The return value keeps both document tables, all proposals with original KWIC,
+applied/rejected/unresolved counts, policy and source/revised SHA-256 hashes.
+These counts describe submitted proposals, not the prevalence of all learner
+errors. The example reuses `lexdiv_tokenize_batch()`,
+`lexdiv_metrics_text_batch()` and `nj8_profile_batch()` on **every complete
+version**, retaining N, V, non-computable requests and reference coverage in
+`text_review$metrics`, `$coverage` and `$runs`. Join document results by
+`document_id` and version, preserving writer/task identifiers from the source
+table. Do not average only the conditions with successful lookup or silently
+drop short/empty texts.
+
+Re-tokenize rewritten strings. For lemma/POS/dependency analyses, also rerun the
+annotation pipeline under the same recorded settings for each version. Token
+indices and processed-text offsets are local to each version; edits here are
+anchored before normalization. `lexdiv_compare_annotations()` and
+`lexdiv_align_annotations()` require the same original source and intentionally
+reject rewritten text. Do not disguise text correction as a lemma change or
+reuse original dependency heads after a word insertion.
+
+```{r}
+review_path <- tempfile(fileext = ".rds")
+saveRDS(list(result = text_review, session = sessionInfo()), review_path)
+saved_review <- readRDS(review_path)$result
+stopifnot(identical(do.call(review_example$apply_reviewed_edits,
+  saved_review$versions$expanded_review$inputs),
+  saved_review$versions$expanded_review))
+unlink(review_path)
+```
+
+Use a persistent local path for a study, saving complete sources and ledgers
+under their access conditions. For human review, define the policy and retain
+individual decisions and adjudication where applicable. Compare all conditions
+with fixed counting units, parameters and reference versions; separate a
+spelling-only analysis from grammar or lexical rewriting. If displaying results,
+show each version's original values or overlaid distributions, not a difference-axis
+plot; retain paired tables for inspection and respect repeated observations
+within writers in inference.
+
+External spell checkers, GEC systems or language models may supply **proposals**
+for review; this example neither invokes them nor sends text to a service.
+Record their identity/settings if used and retain the human decision separately.
+[ERRANT (Bryant, Felice, and Briscoe, 2017)](https://aclanthology.org/P17-1074/)
+extracts and categorizes edits from original/corrected sentence pairs; those
+categories do not independently establish that the proposed correction was the
+writer's intended meaning. A broad rewrite may change lexical choice and syntax
+beyond the declared policy. Independent evaluation on real paired documents
+remains a research task; this example verifies accounting and replay only.
 
 ## Keep window sensitivity separate from vocabulary coverage
 

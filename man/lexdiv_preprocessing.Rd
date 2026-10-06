@@ -61,10 +61,11 @@ lexdiv_metrics_text(
 or \code{"none"}.}
 \item{case}{Either \code{"preserve"} or locale-fixed English
 \code{"lower"}.}
-\item{keep_numbers}{Whether tokens consisting only of Unicode numbers are
-retained. Under \code{tokenizer = "english"}, this includes number-like
-expressions such as decimals, percentages, dates and numeric ranges.
-Alphanumeric words remain eligible under either setting.}
+\item{keep_numbers}{Whether numeric tokens are retained. With \code{"unicode"},
+this concerns tokens consisting only of Unicode numbers; with \code{"english"},
+it also covers recognized numeric expressions such as dates and percentages.
+This is a pattern rule, not a semantic NUM tag: spelled-out numbers and
+alphanumeric forms such as \code{"two"}, \code{"2nd"}, and \code{"COVID-19"} remain.}
 \item{tokenizer}{\code{"unicode"} preserves the original word rules;
 \code{"english"} selects the English lexical rules described below.}
 \item{x}{For \code{lexdiv_lemmatize()}, an object created by

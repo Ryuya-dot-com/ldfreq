@@ -1,8 +1,8 @@
 {
   "$schema": "ldfreq-release-resource-inventory.schema.json",
-  "schema_version": "0.1.0",
+  "schema_version": "0.2.0",
   "record_scope": "repository-release-evidence",
-  "reviewed_on": "2026-10-04",
+  "reviewed_on": "2026-10-06",
   "package_scope": "public-api-resource-release-candidate",
   "policy": {
     "release_requires_independent_approval": false,
@@ -11,7 +11,7 @@
     "runtime_network_access": false,
     "implicit_download_or_fallback": false
   },
-  "release_approved_resource_count": 2,
+  "release_approved_resource_count": 5,
   "included_resources": [
     {
       "resource_id": "tubelex-en-treebank-slim",
@@ -51,8 +51,8 @@
         },
         {
           "path": "COPYRIGHTS",
-          "bytes": 1401,
-          "sha256": "467853be2cc1944f88b434a9ce802b0b5d9b358d483e24f849b6d97c7f647beb"
+          "bytes": 3066,
+          "sha256": "27056951661decd9211a8f7e4558717d6144d64b480dbdac60f0ee207909be2c"
         },
         {
           "path": "examples/tubelex-tokenize.py",
@@ -99,6 +99,130 @@
           "path": "licenses/nj8/NOTICE.md",
           "bytes": 1786,
           "sha256": "c676ae232916910290454f5e27d643f69958d72caad53a3cd6fe259535596232"
+        }
+      ],
+      "distribution_state": "development-candidate",
+      "release_approved": true,
+      "open_gates": [
+        "final source, installed, and binary inventory audit"
+      ]
+    },
+    {
+      "resource_id": "morpholex-en",
+      "resource_version": "5bc425fbb710f3d63cab69e77ee731fa466653ed0ace94937cac6c1fd6de52c6",
+      "runtime_state": "public",
+      "public_api": true,
+      "license_spdx": "CC-BY-NC-SA-4.0",
+      "source_commit": null,
+      "source_url": "https://github.com/hugomailhot/MorphoLex-en",
+      "source_sha256": "5bc425fbb710f3d63cab69e77ee731fa466653ed0ace94937cac6c1fd6de52c6",
+      "raw_source_bundled": false,
+      "raw_subtitles_or_identifiers_included": false,
+      "manifest_sha256": null,
+      "artifact_sha256": "85d03be16c3013ab984c55bce8799699ac6a4b03992b2df0c07ab2b79dc8b2b1",
+      "content_sha256": null,
+      "content_scope": "All 34 workbook sheets converted to character tables, with embedded provenance and the original data dictionary. Not the original workbook.",
+      "package_members": [
+        {
+          "path": "extdata/morpholex/5bc425fb/morpholex_en.rds",
+          "bytes": 1185716,
+          "sha256": "85d03be16c3013ab984c55bce8799699ac6a4b03992b2df0c07ab2b79dc8b2b1"
+        },
+        {
+          "path": "extdata/morpholex/5bc425fb/MorphoLEX_en-Data_Dictionary.pdf",
+          "bytes": 143626,
+          "sha256": "af01e0db5e953ad3b7bbc06ea06b3c8a1af6dac60e7600d826a5e079e4068575"
+        },
+        {
+          "path": "licenses/morpholex/NOTICE.md",
+          "bytes": 3246,
+          "sha256": "0f7547a2f5ce174e965ce54f76a18b9a3c3d4812c34aea9c21a5d48760c34506"
+        },
+        {
+          "path": "licenses/morpholex/CC-BY-NC-SA-4.0.md",
+          "bytes": 19129,
+          "sha256": "051131b5ef3596dad9bf0cffee19c248ff9751596a86b25c70f0cd82d6f6d713"
+        }
+      ],
+      "distribution_state": "development-candidate",
+      "release_approved": true,
+      "open_gates": [
+        "final source, installed, and binary inventory audit"
+      ]
+    },
+    {
+      "resource_id": "bnccoca-level6",
+      "resource_version": "1.0.0; sha256:ac81c7a60e5c76cd2bbf0c59b0501808f0d4fa026b2936919dd54329a9bb6a69",
+      "runtime_state": "public",
+      "public_api": true,
+      "license_spdx": "CC-BY-SA-4.0",
+      "source_commit": null,
+      "source_url": "https://www.wgtn.ac.nz/lals/resources/paul-nations-resources/vocabulary-analysis-programs/range/BNC_COCA_25000.zip",
+      "source_sha256": "ac81c7a60e5c76cd2bbf0c59b0501808f0d4fa026b2936919dd54329a9bb6a69",
+      "raw_source_bundled": false,
+      "raw_subtitles_or_identifiers_included": false,
+      "manifest_sha256": null,
+      "artifact_sha256": "c44bce49580066d8216f34f9643203fe0041a5735664ac9bbf580fcbe5e12ad1",
+      "content_sha256": null,
+      "content_scope": "25,000 Level 6 families (75,679 rows) and 29,798 separate supplementary rows. Placeholder lists 26-30 and Range software excluded.",
+      "package_members": [
+        {
+          "path": "extdata/bnccoca/ac81c7a6/bnccoca.rds",
+          "bytes": 509712,
+          "sha256": "c44bce49580066d8216f34f9643203fe0041a5735664ac9bbf580fcbe5e12ad1"
+        },
+        {
+          "path": "licenses/bnccoca/NOTICE.md",
+          "bytes": 3248,
+          "sha256": "da93ad9348bd61b8dfd97d2ee99b6cc401e8a7d294b8961f3f983c2a944cc60f"
+        },
+        {
+          "path": "licenses/bnccoca/CC-BY-SA-4.0.txt",
+          "bytes": 20138,
+          "sha256": "28a9529c7d0bb4dc51f4bf5c116a3d16ef247a052f7591466768ddf563fd1cf5"
+        }
+      ],
+      "distribution_state": "development-candidate",
+      "release_approved": true,
+      "open_gates": [
+        "final source, installed, and binary inventory audit"
+      ]
+    },
+    {
+      "resource_id": "morphynet-en-example",
+      "resource_version": "eng.derivational.v1; nine-relation-excerpt-v1",
+      "runtime_state": "example-only",
+      "public_api": false,
+      "license_spdx": "CC-BY-SA-3.0",
+      "source_commit": null,
+      "source_url": "https://github.com/kbatsuren/MorphyNet/blob/main/eng/eng.derivational.v1.tsv",
+      "source_sha256": "5920edacc1888b14464fc5cd96beea0a721221d56d1dc0e49de22f4c7c537c50",
+      "raw_source_bundled": false,
+      "raw_subtitles_or_identifiers_included": false,
+      "manifest_sha256": null,
+      "artifact_sha256": "d6aae849b1a04f394ea2987a5304afe3f8f337507a9ac7f5ff64795ebe508b44",
+      "content_sha256": null,
+      "content_scope": "Nine unchanged English v1 relation rows selected for examples, with original source-line mapping. The complete MorphyNet table is not bundled.",
+      "package_members": [
+        {
+          "path": "extdata/morphynet-example/eng.derivational.example.tsv",
+          "bytes": 316,
+          "sha256": "d6aae849b1a04f394ea2987a5304afe3f8f337507a9ac7f5ff64795ebe508b44"
+        },
+        {
+          "path": "extdata/morphynet-example/source-rows.csv",
+          "bytes": 726,
+          "sha256": "6f05d15db28c70c363d2bdd2fa7b34242fc8d5fb7455dfc80db10f7d33b8c901"
+        },
+        {
+          "path": "licenses/morphynet/NOTICE.md",
+          "bytes": 2445,
+          "sha256": "1a53aa15a5bab19439d26ba1e1bb69fdfd8f2b30c86a2080b34f2e0aa5023b94"
+        },
+        {
+          "path": "licenses/morphynet/CC-BY-SA-3.0.txt",
+          "bytes": 22240,
+          "sha256": "3f941b3b89cf7b8370ceb83cc76d2120d471b58735d8ca60238a751a48d7f72f"
         }
       ],
       "distribution_state": "development-candidate",

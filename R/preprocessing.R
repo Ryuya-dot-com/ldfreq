@@ -619,9 +619,11 @@
 #' @param normalization Unicode normalization applied before token extraction:
 #'   `"NFC"`, `"NFKC"`, or `"none"`.
 #' @param case Either `"preserve"` or locale-fixed English `"lower"`.
-#' @param keep_numbers Whether tokens consisting only of Unicode numbers are
-#'   retained. Alphanumeric tokens such as `"COVID-19"` are retained under
-#'   either setting.
+#' @param keep_numbers Whether numeric tokens are retained. With `"unicode"`,
+#'   this concerns tokens consisting only of Unicode numbers; with `"english"`,
+#'   it also covers recognized numeric expressions such as dates and percentages.
+#'   This is a pattern rule, not a semantic NUM tag: spelled-out numbers and
+#'   alphanumeric forms such as `"two"`, `"2nd"`, and `"COVID-19"` remain.
 #' @param tokenizer `"unicode"` preserves the original word rules.
 #'   `"english"` uses the English lexical rules, excludes URLs and email
 #'   addresses, recognizes number-like expressions and dotted initialisms,

@@ -301,4 +301,63 @@ stopifnot(is.function(lexdiv_amod_pairs), amod$differences$delta_pairs[2] == 0,
   amod$differences$fp[2] == 1, amod$differences$fn[2] == 1,
   all(is.na(amod$differences$delta_pairs[5:6])))
 
+# Families retain four occurrences despite assigning one shared family.
+family_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "word-families.R", package = "ldfreq",
+  mustWork = TRUE), family_env)
+families <- family_env$word_families_example
+stopifnot(is.function(lexdiv_family_profile),
+  families$profile$documents$selected_tokens[1] == 4,
+  families$profile$documents$family_types[1] == 1,
+  is.na(families$profile$documents$family_ttr[2]),
+  all(families$comparison$N == 4))
+if (requireNamespace("quanteda", quietly = TRUE)) {
+  sys.source(system.file("examples", "word-family-review.R", package = "ldfreq",
+    mustWork = TRUE), family_env)
+  reviewed_families <- family_env$word_family_review_example$reviewed
+  stopifnot(reviewed_families$documents$family_ttr[1] == 7/8,
+    reviewed_families$documents$review_selected_tokens[1] == 2)
+}
+
+# Declared parts preserve source tokens and separate affix/token denominators.
+parts_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "word-parts-demo.R", package = "ldfreq",
+  mustWork = TRUE), parts_env)
+parts <- parts_env$word_parts_example$profile
+stopifnot(parts$documents$affix_occurrences[1] == 7,
+  parts$documents$affixes_per_token[1] == 7/5,
+  is.na(parts$documents$affix_occurrences[2]))
+
+# Bundled reference data remain available without Excel or a network request.
+morpholex <- morpholex_data(c("0-1-1", "All roots"))
+stopifnot(nrow(morpholex$sheets[["All roots"]]) == 15471L,
+  identical(morpholex$provenance$data_license, "CC BY-NC-SA 4.0"))
+sys.source(system.file("examples", "morpholex-word-parts.R", package = "ldfreq",
+  mustWork = TRUE), parts_env)
+morpholex_parts <- parts_env$read_morpholex_parts(sheets = "0-1-1", words = "teachers")
+stopifnot(nrow(morpholex_parts$parts) == 2L,
+  !any(morpholex_parts$parts$process == "inflection"))
+
+# The actual Nation inventory preserves both variant membership and omissions.
+stopifnot(is.function(bnccoca_data))
+sys.source(system.file("examples", "bnccoca-families.R", package = "ldfreq",
+  mustWork = TRUE), family_env)
+nation <- family_env$bnccoca_example$profile
+stopifnot(nation$documents$family_types[1] == 2L,
+  nation$documents$unresolved_tokens[2] == 1L,
+  is.na(nation$documents$family_ttr[2]))
+
+stopifnot(is.function(morphynet_read_derivations))
+morphynet_env <- new.env(parent = baseenv())
+sys.source(system.file("examples", "morphynet-relations.R", package = "ldfreq",
+  mustWork = TRUE), morphynet_env)
+morphynet <- morphynet_env$morphynet_example
+stopifnot(nrow(morphynet$reference$relations) == 9L,
+  sum(morphynet$candidates$term == "reusability") == 3L)
+if (!is.null(morphynet$reviewed)) {
+  stopifnot(nrow(morphynet$selected) == 1L,
+    morphynet$selected$morpheme == "ity",
+    sum(morphynet$reviewed$occurrences$status == "no_candidates") == 1L)
+}
+
 invisible(TRUE)

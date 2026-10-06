@@ -59,7 +59,14 @@ lexdiv_import_annotations <- function(data, segments, provenance, max_tokens = 1
     space[whitespace[!is.na(whitespace)]] <- TRUE
     cursor <- 1L
     for (j in idx) {
-      if (!begins_space[j]) {
+      if (begins_space[j]) {
+        # An analyzer may emit CR tokens but omit LF in CRLF sequences.
+        # Match the earliest exact surface after whitespace-only gaps; never
+        # advance across an omitted letter, punctuation or other content.
+        while (cursor <= length(space) && space[cursor] &&
+            stringi::stri_sub(source[i], cursor, cursor + width[j] - 1L) != data$surface[j])
+          cursor <- cursor + 1L
+      } else {
         while (cursor <= length(space) && space[cursor]) cursor <- cursor + 1L
       }
       starts[j] <- cursor

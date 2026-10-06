@@ -180,10 +180,13 @@ means. [Weissgerber et al. (2015)](https://doi.org/10.1371/journal.pbio.1002128)
 show why summary-only bars can conceal distributions and paired changes in
 small-sample continuous data. This does not rule out bars for NJ8 category
 counts or coverage proportions. For annotation changes in the same documents,
-use a paired comparison or document-level difference plot; the vocabulary-audit
-guide includes such an example. Retain the full roster and report the numbers
+overlay the original values or each condition's distribution on a common scale;
+the vocabulary-audit guide includes raw-value and optional density recipes.
+Use common bandwidths and appropriate bounds for continuous densities; discrete
+counts and very small samples are shown as observations or frequencies.
+Retain the full roster and report the numbers
 and reasons for unavailable values outside the image. Missing scores are not
-zero changes.
+zero values.
 
 [Cumming (2014)](https://doi.org/10.1177/0956797613504966) emphasizes effect sizes
 and uncertainty in estimation, while [Gabry et al. (2019)](https://doi.org/10.1111/rssa.12378)

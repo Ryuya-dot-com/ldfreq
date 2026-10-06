@@ -10,6 +10,9 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(ldfreq)
+# Optional local model; never acquired or run merely by installing ldfreq.
+model_file <- Sys.getenv("LDFREQ_UDPIPE_MODEL")
+run_udpipe <- nzchar(model_file) && requireNamespace("udpipe", quietly = TRUE)
 ```
 
 ## Which noun does an adjective modify?
@@ -131,29 +134,37 @@ not a new general dependency-evaluation API. It assumes common original text and
 segmentation; use `lexdiv_align_annotations()` to examine segmentation changes
 before defining a cross-segmentation dependency evaluation.
 
-```{r document-differences, fig.width=6.5, fig.height=3.2, dev.args=list(pointsize=11)}
-draw_pair_changes <- function(example, monochrome = FALSE) {
+```{r document-distributions, fig.width=6.5, fig.height=3.2, dev.args=list(pointsize=11)}
+draw_pair_distributions <- function(example, monochrome = FALSE) {
   d <- example$differences
   keep <- d$evaluated & example$reference$documents$tokens > 0
   d <- d[keep, ]
-  changed <- d$delta_pairs != 0
-  old <- par(family = "sans", bty = "l", las = 1, mar = c(4, 7, 1, 1))
+  counts <- seq.int(0, max(d$reference_pairs, d$predicted_pairs))
+  reference_n <- tabulate(match(d$reference_pairs, counts), nbins = length(counts))
+  prediction_n <- tabulate(match(d$predicted_pairs, counts), nbins = length(counts))
+  colors <- if (monochrome) c("black", "black") else c("#0072B2", "#D55E00")
+  old <- par(family = "sans", bty = "l", las = 1, mar = c(4, 4.5, 1, 1))
   on.exit(par(old))
-  plot(d$delta_pairs, seq_len(nrow(d)), type = "n", yaxt = "n",
-    xlim = c(-1.2, .2), xlab = "Pair Count Difference (Prediction - Reference)", ylab = "")
-  abline(v = 0, lty = 2, col = "grey60")
-  axis(2, at = seq_len(nrow(d)), labels = d$document_id, tick = FALSE)
-  points(d$delta_pairs, seq_len(nrow(d)), pch = ifelse(changed, 17, 16),
-    col = if (monochrome) "black" else ifelse(changed, "#D55E00", "#0072B2"))
+  ymax <- max(reference_n, prediction_n)
+  plot(counts, reference_n, type = "n", xaxt = "n", yaxt = "n",
+    ylim = c(0, ymax + 1), xlab = "Adjective–Noun Pairs per Document", ylab = "Documents")
+  axis(1, at = counts)
+  axis(2, at = seq.int(0, ymax))
+  points(counts, reference_n, pch = 21, bg = "white", col = colors[1], cex = 1.5, lwd = 1.5)
+  points(counts, prediction_n, pch = 17, col = colors[2], cex = .8)
+  legend("topright", c("Reference", "Prediction"), col = colors, pch = c(21, 17),
+    pt.bg = "white", pt.cex = c(1.5, .8), bty = "n")
   invisible(d)
 }
-draw_pair_changes(example)
+draw_pair_distributions(example)
 ```
 
-This is an illustration of four nonempty documents, not an estimate of population
-effects or parser accuracy. The zero difference for `wrong_head` is why the
-occurrence comparison must accompany the plot. Use `monochrome = TRUE` for black
-symbols. Place manuscript figure numbers, titles and explanatory notes outside
+This overlays the observed count distributions for four nonempty documents;
+it does not estimate population effects or parser accuracy. An open circle and
+a smaller triangle remain visible when frequencies coincide. These few discrete
+counts do not justify a smooth density curve. Identical count distributions can
+still conceal different source occurrences, so retain the endpoint comparison.
+Use `monochrome = TRUE` for black symbols. Place figure numbers, titles and notes outside
 the image; see [the report guide](from-text-to-report.html) for final-size export.
 
 ## Save inputs and reproduce the result
@@ -178,3 +189,142 @@ No reference corpus is bundled for this feature. MI requires dependency-specific
 joint counts, compatible marginals and opportunity totals; unigram frequencies
 or adjacent-bigram frequencies do not supply those quantities automatically.
 The present output ends at source-linked occurrences, counts and coverage.
+
+## Connect a real parser in R
+
+The optional [UDPipe R package](https://bnosac.github.io/udpipe/docs/doc2.html)
+can supply tokenization, tags, lemmas and dependency parses without Python.
+This recipe uses its complete `udpipe_annotate()` output and the original
+sentence roster. The `sentence` column and reconstructed offsets in a parser
+table are not a substitute for your original source text.
+
+Install `udpipe` separately and select a local model appropriate to your study.
+For example, the English EWT UD 2.5 model is available through
+`udpipe::udpipe_download_model("english-ewt", model_dir = "models")`.
+This is an explicit download, outside package installation and routine analysis.
+The [model distributor](https://github.com/jwijffels/udpipe.models.ud.2.5) states
+CC BY-NC-SA 4.0 for these models; model terms are separate from the package's
+code license. Check the selected model's terms and training data. No model is
+bundled here, and a general English model is not validated for your register
+or learner population merely because this example runs.
+
+To execute the following optional chunks, set `LDFREQ_UDPIPE_MODEL` to the local
+model file before rendering this guide, or run the code with `model_file` set
+to that path. These chunks are not run in ordinary package builds. The helper
+is an explicitly sourced recipe, not an exported API.
+
+```{r udpipe-source, eval=run_udpipe}
+source(system.file("examples", "udpipe-amod.R", package = "ldfreq", mustWork = TRUE), local = TRUE)
+stopifnot(file.exists(model_file), file.info(model_file)$size > 0)
+model_sha256 <- digest::digest(file = model_file, algo = "sha256")
+model <- udpipe::udpipe_load_model(model_file)
+
+# Four authored inputs, including the empty document. This is not corpus data.
+selected_docs <- c("english", "wrong_head", "zero", "empty")
+roster <- subset(example$inputs$reference$segments, document_id %in% selected_docs,
+                 select = c(document_id, segment_id, text))
+roster$parser_id <- paste0("segment_", seq_len(nrow(roster)))
+# Each caller-supplied sentence occupies one line; never silently remove line breaks.
+stopifnot(!any(grepl("[\r\n]", roster$text)))
+raw_annotation <- udpipe::udpipe_annotate(model, x = roster$text,
+  doc_id = roster$parser_id, tokenizer = "tokenizer=presegmented", tagger = "default", parser = "default")
+metadata <- list(language = "en", analyzer = "udpipe",
+  analyzer_version = as.character(packageVersion("udpipe")),
+  dictionary = "embedded-in-model", dictionary_version = model_sha256,
+  unit = "UDPipe-syntactic-word", normalization = "none",
+  model = basename(model_file), model_sha256 = model_sha256,
+  model_source = "https://github.com/jwijffels/udpipe.models.ud.2.5",
+  model_license = "CC BY-NC-SA 4.0",
+  tokenizer = "tokenizer=presegmented", tagger = "default", parser = "default")
+parsed <- import_udpipe_sentences(raw_annotation, roster, metadata)
+actual <- lexdiv_amod_pairs(parsed, unit = "lemma")
+actual$occurrences[c("document_id", "dependent_term", "head_term", "pre", "keyword", "post")]
+actual$documents[c("document_id", "tokens", "pairs", "types", "token_coverage", "status")]
+```
+
+Change the model metadata when using a different model. Save the complete raw
+output, including `x`, `conllu` and `errors`. The recipe verifies that `x`
+matches the ordered original roster and rejects parser errors, unknown/reordered
+IDs, multiple sentences in one input segment, multiword-token ranges, empty
+nodes and enhanced edges. It maps integer token IDs without renumbering and
+imports all surfaces, including punctuation, before selecting pairs. Annotation
+underscores become missing fields through UDPipe's reader; literal surface
+strings such as `NA` or `_` are preserved. Empty inputs stay in the roster.
+Missing annotation values remain missing and receive the existing sentence-level
+coverage treatment; a parser-reported failure stops this recipe for inspection.
+
+For full documents, first supply and retain a sentence roster with its mapping
+to the original document. This recipe does not automatically split raw documents
+or invent document-global offsets. The
+[presegmented tokenizer](https://ufal.mff.cuni.cz/udpipe/1/api-reference)
+respects the supplied sentence line while still predicting token boundaries.
+Use it only after deciding the sentence boundaries; passing a whole paragraph
+on one line would force that paragraph into one parse. Newlines within a segment
+require an explicit, recorded boundary decision, not silent whitespace replacement.
+Saved outputs with multiple parser sentences per segment are still rejected.
+Never silently discard unsupported rows to make an
+import succeed. A saved annotated table alone cannot attest that filtering or
+normalization did not occur upstream.
+
+## Compare parser occurrences to the authored example
+
+```{r udpipe-compare, eval=run_udpipe}
+ref_occ <- subset(example$reference$occurrences, document_id %in% roster$document_id)
+key <- c("document_id", "segment_id", "dependent_start", "dependent_end", "head_start", "head_end")
+ref <- ref_occ[key]; ref$in_reference <- rep(TRUE, nrow(ref))
+pred <- actual$occurrences[key]; pred$in_prediction <- rep(TRUE, nrow(pred))
+occurrence_comparison <- merge(ref, pred, by = key, all = TRUE, sort = FALSE)
+occurrence_comparison$in_reference[is.na(occurrence_comparison$in_reference)] <- FALSE
+occurrence_comparison$in_prediction[is.na(occurrence_comparison$in_prediction)] <- FALSE
+occurrence_comparison$outcome <- with(occurrence_comparison,
+  ifelse(in_reference & in_prediction, "tp", ifelse(in_reference, "fn", "fp")))
+
+document_comparison <- actual$documents
+ref_rows <- match(document_comparison$document_id, example$reference$documents$document_id)
+document_comparison$reference_pairs <- example$reference$documents$pairs[ref_rows]
+document_comparison$delta_pairs <- document_comparison$pairs - document_comparison$reference_pairs
+stopifnot(!anyNA(ref_rows), all(document_comparison$status %in% c("complete", "empty")))
+document_comparison[c("document_id", "reference_pairs", "pairs", "delta_pairs", "status")]
+occurrence_comparison
+```
+
+Endpoint comparison assumes the same original text and sentence boundaries.
+This short illustration also requires complete annotations; it stops before
+reporting comparisons if any document is incomplete. For a research sample,
+report those failures rather than excluding them from the study roster.
+
+With UDPipe 0.8.16 and English EWT UD 2.5 model SHA-256
+`784bd0fa85e3d831fd02a55290d0acfd05c953159dc38cc33d52e1b28add9957`,
+the *Big red balloons float.* input illustrates the need for this comparison:
+two pairs are returned, but *big* modifies the predicted noun *float* instead
+of *balloons* in the authored reference. An unchanged count conceals a false
+positive and a false negative relative to that reference. These small, visible
+authored cases demonstrate a workflow, not independent accuracy estimates.
+
+```{r udpipe-plot, eval=run_udpipe, fig.width=6.5, fig.height=3.2, dev.args=list(pointsize=11)}
+# Overlay the original count distributions; color is the default.
+parser_plot <- list(differences = transform(document_comparison, evaluated = TRUE,
+                      predicted_pairs = pairs),
+                    reference = actual)
+draw_pair_distributions(parser_plot)
+# draw_pair_distributions(parser_plot, monochrome = TRUE)
+```
+
+```{r udpipe-replay, eval=run_udpipe}
+record <- list(raw_annotation = raw_annotation, segments = roster, provenance = metadata,
+               imported = parsed, pairs = actual, comparison = occurrence_comparison,
+               document_comparison = document_comparison, session = sessionInfo())
+record_path <- tempfile(fileext = ".rds") # Use a study-specific path to retain it.
+saveRDS(record, record_path)
+saved <- readRDS(record_path)
+reimported <- import_udpipe_sentences(saved$raw_annotation, saved$segments, saved$provenance)
+stopifnot(identical(reimported, saved$imported),
+          identical(lexdiv_amod_pairs(reimported, unit = "lemma"), saved$pairs))
+unlink(record_path)
+```
+
+Replay needs the optional UDPipe package to read its saved output, but does not
+load a model or rerun inference. Keep the reader version as well as the original
+analyzer/model metadata; a reader-version change is a provenance change, not
+proof that the linguistic results changed. Use `lexdiv_amod_pairs(saved$imported)`
+with the original `unit` argument to replay extraction without UDPipe at all.

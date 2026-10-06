@@ -19,6 +19,12 @@ than falling back to a non-candidate result.
 BOM, SPDX dependency SBOM, resource BOM, and release-provenance record. The
 archive and PDF manual must already exist.
 
+The SPDX root uses a LicenseRef with the source LICENSE text, preserving the
+component-specific terms instead of labeling the complete collection MIT.
+The resource BOM embeds both the installed manifest and repository admission
+inventory. The run index compares resource IDs and counts against this exact
+BOM, not a historical hard-coded count.
+
 ```sh
 Rscript experiments/release-candidate/generate-release-evidence.R \
   /path/to/ldfreq /path/to/ldfreq_0.2.0.tar.gz \

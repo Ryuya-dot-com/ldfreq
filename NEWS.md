@@ -1,5 +1,196 @@
 # ldfreq 0.2.0 (development)
 
+## Linking family and morphology decisions
+
+- Added an explicitly sourced workflow connecting existing family occurrences
+  to MorphoLex segmentations and MorphyNet formation candidates. One selected
+  corpus token retains one output row; lookup coverage, candidate alternatives,
+  contextual decisions and part/relation counts remain separate. Excluded or
+  unresolved occurrences cannot silently enter complete totals.
+- Added an executable teaching example and save/replay instructions. The local
+  ICNALE GRA V2.1 check reuses saved tokens and family assignments; corpus text
+  and individual outputs are not bundled. Public exports and required
+  dependencies are unchanged.
+
+## Japanese morphology spans
+
+- Added explicit local J-UniMorph-format reading and multi-token span review
+  examples. Original rows, feature bundles, file identity and source positions
+  survive KWIC decisions and saving. Exact matches with incompatible token
+  boundaries, overlapping spans, multiple candidates and unresolved decisions
+  remain explicit. Span review does not merge tokens or change word counts.
+- Added an executable authored example and a local-resource recipe to the
+  Japanese guide. No J-UniMorph table, learner text, new export or required
+  dependency is bundled. Real-input matching is distinguished from accuracy.
+
+## Japanese corpus input
+
+- Added an explicitly sourced reader for locally acquired NINJAL Essay Database
+  text ZIPs and metadata tables. Explicit UTF-8/CP932 decoding, byte round-trip
+  checks, BOM records, original line endings and metadata IDs are retained;
+  missing writer records remain visible. No corpus data is bundled.
+- Fixed external-annotation alignment when an analyzer emits CR tokens but
+  omits intervening LF characters. Whitespace-prefixed tokens now use the first
+  exact match across whitespace-only gaps. Omitted non-whitespace characters,
+  changed surfaces and incorrect supplied positions still cause an error.
+
+## Japanese spelling and contextual lexical identity
+
+- Extended the spelling example with separate boundary and lexical reviews:
+  complete alternative annotations retain the same kana source, alignment
+  links the changed span, and KWIC review is regenerated for the reviewed
+  segmentation. Full-sequence counts include the changed tokens; previous
+  review IDs cannot be silently reused after resegmentation.
+- Added an optional, offline example retaining hiragana, katakana and kanji
+  surfaces while reviewing lexical identity at individual KWIC occurrences.
+  Authored spelling variants share an explicitly selected ID; homophones can
+  receive different IDs or remain unresolved. Full and common-set counts keep
+  their denominators visible, including missing candidates and empty documents.
+- Expanded the Japanese annotation guide to distinguish orthographic production,
+  lexical identity and evidence of kanji knowledge. No automatic kana-to-kanji
+  converter, new exported API or corpus data is added.
+
+## Comparing word-counting units
+
+- Added an explicitly sourced recipe comparing surface, supplied lemma and
+  family types/TTR on a shared set of occurrence IDs. Whole-selection coverage,
+  unresolved assignments and unavailable totals remain visible alongside the
+  conditional comparison. Source IDs and complete profiles survive RDS saving.
+- Extended the Nation example and preprocessing guide with hand-countable
+  examples, including an unlisted word that changes the comparison denominator.
+  No new exported API, analyzer or identity fallback is introduced.
+
+## Resource inventory
+
+- The installed inventory now includes MorphoLex, Nation BNC/COCA and the
+  MorphyNet excerpt alongside NJ8 and TUBELEX, with data scope, source identity
+  and component-specific license files. The excerpt is marked as example-only.
+- Distribution checks now compare all declared data and license files across
+  source, platform packages and installations. Release records retain the
+  package's component-specific terms rather than declaring the collection MIT.
+
+## MorphyNet formation relations and contextual review
+
+- Added `morphynet_read_derivations()` for local six-column TSV files, with
+  explicit language/version, source hash and line IDs. Original POS, spelling,
+  alternatives and multiword fields are retained; no POS mapping, lemmatization
+  or family/segmentation inference is performed.
+- Added nine attributed CC BY-SA 3.0 example relations, an original-row map,
+  and an optional quanteda KWIC workflow using `lexdiv_ambiguity_review()`.
+  Selection and withholding apply to individual occurrences; other relations
+  remain visible. These decisions do not assert a unique true derivation.
+- The full English v1 file is supported as local input; it is not bundled.
+  The excerpt is for teaching and must not be used as a coverage inventory.
+
+## Nation's BNC/COCA word families
+
+- Added `bnccoca_data()` with the complete 25-band Level 6 inventory
+  (25,000 families; 75,679 headword/member rows), source IDs, frequency bands,
+  hashes, citation and CC BY-SA 4.0 terms. The 29,798 supplementary rows are
+  separate; placeholder slots and Range software are excluded.
+- An offline example connects the actual lists to `lexdiv_family_profile()`.
+  It retains unmatched forms, original occurrences and saved-result replay.
+  `use`/`uses` and `colour`/`color` share source families; `reusability` is
+  unlisted in this snapshot. No membership is inferred from spelling.
+- Documented the distinction between educational families, MorphyNet
+  derivational relations and Japanese J-UniMorph inflectional features.
+  The subsequent MorphyNet reader is described above; J-UniMorph remains a
+  researched candidate. Neither adds a contextual analyzer.
+
+## Bundled MorphoLex English reference data
+
+- Added `morpholex_data()` for all 34 worksheets, including 68,624 word
+  records and the prefix/suffix/root aggregates. Character-valued source
+  tables retain IDs, missingness, case, order and whitespace. Source identity,
+  conversion details, and the original data dictionary accompany the data.
+- MorphoLex is redistributed under **CC BY-NC-SA 4.0**, including its
+  noncommercial and applicable ShareAlike conditions. The independent R code
+  remains MIT licensed. `DESCRIPTION` now refers to a component-specific
+  `LICENSE` and declares the bundled distribution's use restrictions.
+- The word-parts recipe reads bundled tables by default, without `readxl` or
+  network access. An explicit workbook path still uses optional `readxl`.
+  Data inclusion does not turn the recipe into a validated morphology analyzer.
+
+## Source-linked roots and affixes examples
+
+- Added explicitly sourced recipes for caller-provided morphological analyses:
+  separate root/prefix/suffix roles, inflection/derivation, boundness and part IDs;
+  source KWIC, alternative candidates, partial analyses and denominators remain
+  visible. Complete counts require complete selected occurrences; observed part
+  counts are available separately. Saved inputs support RDS replay.
+- Added a MorphoLex reader with explicit sheet/word selection, retained source
+  rows, declared derivational scope and unsupported-entry handling. Local
+  workbooks use existing suggested `readxl`; bundled data are read in base R.
+  The guide distinguishes declared parts
+  from derivation trees, learner knowledge and morphological productivity.
+
+## Source-linked word-family profiles
+
+- Family profiles now prepare the existing ambiguity-review interface and
+  accept its complete result via `review`. Record selections and explicit
+  unresolved judgments apply per occurrence; lookup results, reviewer/reason
+  and full review remain available. Source, inventory and policy mismatches
+  stop reuse, and candidate membership is checked against each occurrence's
+  POS/unit. Added an optional contextual-review example with CSV/RDS guidance.
+- Added experimental `lexdiv_family_profile()` for caller-supplied form-to-family
+  tables and explicit resource definitions. It preserves source occurrences,
+  family-member counts, candidate records, KWIC and empty documents. Surface,
+  supplied lemma and supplied flemma keys remain distinct from assigned families.
+- Unlisted forms, ambiguous families, missing lexical/POS annotations and
+  exclusions remain explicit. Complete family totals and TTR are unavailable
+  when selected occurrences remain unresolved. Multiple records assigning the
+  same family do not inflate ambiguity or token counts.
+- Added an authored offline example comparing surface, lemma, flemma and family TTR/MATTR
+  on the same occurrences. This example adds no model, automatic affix analysis,
+  new dependency or learner-knowledge inference.
+
+## Spelling varieties and lexical counting policies
+
+- Added an explicitly sourced example comparing declared spelling equivalence,
+  exact/alias NJ8 lookup and supplied POS selections for names, numerals and
+  symbols. Full annotations retain source positions, unresolved POS and empty
+  documents; n-gram extraction preserves gaps left by excluded tokens.
+- Expanded the English guide and number-argument help: content-word selection
+  includes PROPN, numeric pattern flags are not semantic NUM tags, and the
+  lexical tokenizer does not preserve specialist forms such as C++ or all
+  punctuation/symbol boundaries. The example shows the existing complete-input
+  import route. No tokenizer defaults, resource bytes, runtime algorithms,
+  exported functions or mandatory dependencies changed.
+
+## Reviewed learner-text versions
+
+- Added explicitly sourced, offline examples that apply approved text edits
+  under a declared policy while retaining original documents, writer/task
+  metadata, rejected/unresolved proposals, source context and text hashes.
+  Source-checked code-point spans support insertion, deletion and word-boundary
+  changes; overlapping applied edits stop for review.
+- Extended the vocabulary-audit guide with research-based distinctions between
+  learner errors, annotation errors and off-list words. The example reruns
+  existing surface TTR/MATTR and NJ8 profiles for original, spelling-reviewed
+  and broader-reviewed text, preserving denominators and missing results.
+  No automatic correction, new export, dependency or corpus is added; existing
+  annotation comparisons continue to require the same source text.
+
+## Optional UDPipe dependency workflow
+
+- The sentence-input guide now explicitly preserves caller-supplied sentence
+  boundaries with UDPipe's presegmented tokenizer; embedded line breaks must
+  be resolved explicitly. Saved multi-sentence outputs remain unsupported.
+- Added an explicitly sourced recipe for complete saved UDPipe outputs from
+  caller-supplied sentences, preserving original text, empty inputs, source IDs,
+  model identity and parser errors. Unsupported sentence splits, multiword rows,
+  empty nodes and enhanced edges stop for review rather than being discarded.
+- Extended the dependency guide from actual English parsing to source-endpoint
+  comparisons, overlaid count distributions and replay without model inference. The
+  authored example is not an independent parser-accuracy study. UDPipe is an
+  optional suggestion; no model, corpus or new exported function is bundled.
+- Removed a remaining in-figure missing-data title from the Japanese stimulus
+  guide; the missingness explanation is now reported outside the image.
+- Replaced difference-axis figures with original-value and overlaid frequency
+  displays. The annotation guide adds an optional ggplot2 density-overlay
+  recipe using a common bandwidth, TTR boundary correction and solid/dashed
+  lines in both color modes. Difference tables remain available for auditing.
+
 ## Source-linked adjective–noun dependencies
 
 - Added experimental `lexdiv_amod_pairs()` for supplied basic UD trees, selecting
@@ -29,8 +220,8 @@
 - NJ8 proportion plots share 0--1 ticks across documents; legends use reserved
   space. All eight levels and Off-list are labelled, with Off-list wrapped at
   narrow widths. Undefined proportions now stop instead of appearing as zero.
-- Added publication-size PDF/PNG export instructions and a document-level
-  annotation-change plot. Sources and limits of descriptive versus inferential
+- Added publication-size PDF/PNG export instructions and document-level
+  original-value displays. Sources and limits of descriptive versus inferential
   graphics are explained in the report guide. No inferential model was added.
 
 ## Source alignment across token segmentations

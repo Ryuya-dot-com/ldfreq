@@ -44,11 +44,61 @@ than a second competing single-document facade. `lexdiv_tokenize_batch()` adds
 validated raw-text tables and IDs; `lexdiv_metrics_text_batch()` additionally
 retains joined result/audit tables and complete document-local preprocessing.
 
+`lexdiv_family_profile()` adds a distinct resource-defined family operation.
+It cannot be a flemma option without changing that adapter's AntBNC mapping,
+identity-fallback and tokenization-object contracts. The new function instead
+requires complete imported annotations, allows multiple family candidates,
+abstains on unresolved occurrences and returns explicit document tables.
+There is no new class, generic, alias or metric formula;
+the example reuses core metrics only for complete selected sequences. The
+optional `review` argument now accepts the existing ambiguity-review result,
+prepared through `$review_input`; this reuses its judgments and source checks
+without a competing reviewer API or new dependency. Per-occurrence record
+eligibility and a full family-policy snapshot guard application. The default
+lookup behavior is unchanged; affix analysis remains outside this contract.
+
+The explicitly sourced `word-parts.R` helper and optional
+`morpholex-word-parts.R` reader remain example recipes, not exports. Their
+separate analyses/parts tables retain source IDs, canonical parts, roles,
+processes and declared scope. Candidate ambiguity and partial analyses are
+explicit; no derivation tree or occurrence-review application is implemented.
+The MorphoLex parts reader retains original selected rows and workbook identity.
+It defaults to the bundled snapshot, and supports an optional external workbook.
+`morpholex_data()` is a separate, narrow public data reader: no existing entry
+point exposes the complete heterogeneous sheets and provenance. It returns a
+plain list without introducing a class, S3 method, morphology analyzer or new
+dependency. The full data and dictionary retain CC BY-NC-SA 4.0 conditions;
+the independent code remains MIT. The distribution declares use restrictions.
+
+`bnccoca_data()` adds one resource-branded data reader, not a second family
+profiler or analyzer. Existing entry points do not expose Nation's actual
+inventory and supplementary categories. Its plain list supplies the dictionary
+and scalar resource declaration to `lexdiv_family_profile()`, beside separated
+supplements, a source-file catalog and conversion provenance. No arguments,
+new class, dependency, automatic grouping or convenience aliases are needed.
+CC BY-SA 4.0 applies to the data/conversion. J-UniMorph remains a researched
+candidate; no new general morphological analyzer is implied.
+
+`morphynet_read_derivations()` adds a local-file reader for six-column source
+relations, not a family adapter or inference engine. Neither existing reader
+accepts this source/target/POS/affix schema. It validates fields and row bounds,
+retains alternatives, raw POS and file identity, and returns plain relations,
+resource and provenance components. Explicit language/version declarations
+prevent file-name guessing. The sourced example reuses the existing optional
+quanteda review API. A single selected edge is a declared study choice, not
+unique truth or the complete affix structure. Only an attributed nine-row
+CC BY-SA 3.0 excerpt is installed; full data remain local input. No class,
+dependency or generic reviewer is added.
+
 ## Export inventory
 
 | Export | Role and return boundary | Batch relation | Print | Plot | Analysis-ready access |
 |---|---|---|---|---|---|
-| `lexdiv_amod_pairs()` | Experimental basic-UD ADJ–amod–NOUN extraction from complete source-checked annotations; validates trees and distinguishes missing sentences from zero pairs | Explicit document/sentence IDs; observed counts beside complete totals and coverage | Base list | No: select counts, types or coverage explicitly; guide illustrates paired changes | `$occurrences`, `$counts`, `$segments`, `$documents`, `$summary`, complete `$annotations` and `$provenance` |
+| `morphynet_read_derivations()` | Local six-field derivational TSV reader; preserves source/target/POS, affix position, alternatives and file identity | Reference resource; not a document profiler | Base list | No | `$relations`, scalar `$resource` for candidate review, `$provenance`; example preserves source row mapping and occurrence decisions |
+| `bnccoca_data()` | Bundled Nation BNC/COCA Level 6 membership, Version 1.0.0; no inferred members | Reference resource, not document data | Base list | No | `$dictionary`, separate `$supplementary`, `$catalog`, `$resource` for family lookup, `$provenance` for source/conversion identity |
+| `morpholex_data()` | Bundled MorphoLex-en worksheet values and provenance; all sheets or an explicit ordered subset | Reference resource, not document data | Base list | No | `$sheets` (character-valued original data frames), `$provenance` including source identity, license and complete sheet catalog |
+| `lexdiv_family_profile()` | Experimental exact form/POS lookup against a caller-defined family table; optional source/policy-bound occurrence review; retains original lookup, ambiguity and missingness | Complete imported annotations with document IDs; pooled summary explicitly separate from document metrics | Base list | No | `$occurrences`, `$candidates`, `$members`, `$documents`, `$summary`, complete `$annotations`, `$dictionary`, `$review_input`, `$review`, `$provenance` |
+| `lexdiv_amod_pairs()` | Experimental basic-UD ADJ–amod–NOUN extraction from complete source-checked annotations; validates trees and distinguishes missing sentences from zero pairs | Explicit document/sentence IDs; observed counts beside complete totals and coverage | Base list | No: select counts, types or coverage explicitly; guide overlays original count distributions | `$occurrences`, `$counts`, `$segments`, `$documents`, `$summary`, complete `$annotations` and `$provenance` |
 | `lexdiv_score_contextual()` | Experimental supervised centroid-cosine and training-frequency baselines over separate imported reviews | Same supplied inventory, disjoint documents, explicit training/reference audit | Base list | No | `$centroid`, `$frequency`, `$candidates`, `$prototypes`, both occurrence audits and complete inputs |
 | `lexdiv_evaluate_contextual()` | Experimental complete-inventory ranking and descriptive comparison to an explicit reference review | Overall and per-target counts, coverage, and term-specific confusion; source IDs preserved | Base list | No | `$summary`, `$terms`, `$pairs`, `$confusion`, `$review_queue`, complete inputs and policy |
 | `lexdiv_import_contextual()` | Experimental source-checked external embeddings/scores, distinct from human decisions; no inference | One complete review with all-occurrence coverage and ID-paired output | Base list | No | `$occurrences`, `$embeddings`, `$suggestions`, `$summary`, complete `$review` and model `$provenance` |

@@ -269,6 +269,18 @@ inventory_relative_paths <- gsub(
     nchar(check_root_prefix) + 1L
   )
 )
+resource_bom_path <- all_source_files[
+  basename(all_source_files) == provenance$evidence$resource_bom$file
+]
+resource_bom <- jsonlite::read_json(resource_bom_path, simplifyVector = FALSE)
+expected_resource_ids <- vapply(resource_bom$installed_manifest$resources,
+  `[[`, character(1L), "resource_id")
+check(length(expected_resource_ids) > 0L && !anyDuplicated(expected_resource_ids) &&
+  identical(unname(unlist(provenance$resource_boundary$installed_resource_ids)),
+    unname(expected_resource_ids)) &&
+  identical(as.numeric(provenance$resource_boundary$installed_resource_count),
+    as.numeric(length(expected_resource_ids))),
+  "Resource BOM and provenance resource identities disagree.")
 inventory_labels <- sub("/.*$", "", inventory_relative_paths)
 inventory_labels <- sub("^release-check-", "", inventory_labels)
 expected_inventory_labels <- c(
@@ -319,7 +331,10 @@ for (index in seq_along(inventories)) {
     paste("Resource inventory artifact drift:", inventory_label)
   )
   check(
-    identical(as.numeric(inventory_record$installed_resource_count), 1) &&
+    identical(as.numeric(inventory_record$installed_resource_count),
+      as.numeric(length(expected_resource_ids))) &&
+      identical(unname(unlist(inventory_record$installed_resource_ids)),
+        unname(expected_resource_ids)) &&
       identical(inventory_record$undeclared_extdata_observed, FALSE),
     paste("Resource boundary changed:", inventory_label)
   )
