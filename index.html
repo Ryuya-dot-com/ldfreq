@@ -161,7 +161,7 @@
 <p>The current 0.2.0 version is under development and has not been released on CRAN. It requires R 4.1.0 or later. Install the tested snapshot used by this documentation:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run install.packages("pak") first if pak is not installed.</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@c788d909dcd113492261b4fd99b9787f6d61eb1e"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@3f2d802f472b54860edc38e2005522aafc975094"</span><span class="op">)</span></span></code></pre></div>
 <p>Pinning the revision fixes the implementation, even when development snapshots share the same version number. The package’s required dependencies are <code>digest</code> and <code>stringi</code>; additional tools are optional for their documented workflows. For example, candidate-review examples use <code>quanteda</code>.</p>
 <p>If you have a built source archive, install it locally:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -172,6 +172,7 @@
 <div class="section level2">
 <h2 id="a-first-analysis">A first analysis<a class="anchor" aria-label="anchor" href="#a-first-analysis"></a>
 </h2>
+<p>For TXT files, folders or ID/text CSV files, start with the <a href="https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files">executable file-input tutorial</a>. It includes sample files, metadata joins and complete analysis saving.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
 <span></span>

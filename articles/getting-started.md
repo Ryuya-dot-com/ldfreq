@@ -27,9 +27,12 @@ and
 [`lexdiv_metrics_text_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md);
 see [English tokenization and document
 input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.md).
-Use `tokenizer = "english"` to select the English lexical rules. The
-examples below retain the original Unicode default so their measurement
-choices stay explicit.
+For files on disk, the [TXT/folder/CSV
+walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files)
+runs with installed sample files and shows where to substitute your own
+data. Use `tokenizer = "english"` to select the English lexical rules.
+The examples below retain the original Unicode default so their
+measurement choices stay explicit.
 
 ## Raw text without hidden preprocessing
 

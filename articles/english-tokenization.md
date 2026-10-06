@@ -397,29 +397,271 @@ the same explicit word-inclusion policy used by
 
 ## Import CSV or UTF-8 text files
 
-Base R is sufficient. Read ID/text columns as character to retain
-identifiers such as `001` and literal responses such as `TRUE`. Choose
-missing-value markers deliberately for your data.
+Start here if your essays are saved as files rather than typed into R.
+This walkthrough runs offline with three project-authored, MIT-licensed
+documents: two short English texts and one intentionally empty file.
+They are teaching examples, not learner observations. Reading Japanese
+text uses the same input steps; its subsequent annotation is a [separate
+workflow](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.md).
 
-``` r
-essays <- read.csv(
-  "essays.csv", fileEncoding = "UTF-8", colClasses = "character",
-  na.strings = "<MISSING>", check.names = FALSE
-)
-tokens <- lexdiv_tokenize_batch(essays, tokenizer = "english", case = "lower")
+The small `read_text_file()` helper below is an **explicitly sourced
+example**, not an exported ldfreq function. It uses base R for reading
+and the existing digest dependency for hashes. It preserves paragraph
+breaks, original line endings and the final newline, records a removed
+UTF-8 byte-order mark (BOM), and rejects failed decoding rather than
+replacing characters. It does not tokenize, correct spelling or
+normalize the text. This avoids silently losing file details by
+splitting into lines and joining them again.
 
-# Explicit file-to-ID mapping, with each file representing one document.
-files <- c(essay_01 = "texts/essay_01.txt", essay_02 = "texts/essay_02.txt")
-texts <- vapply(files, function(path) {
-  paste(readLines(path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
-}, character(1))
-tokens <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
+### Start with one file
+
+Run this setup once. The installed sample directory has the following
+layout:
+
+``` text
+text-input/
+  texts/001.txt
+  texts/002.txt
+  texts/003.txt     # intentionally empty
+  essays.csv       # the same three documents, one row per document
+  metadata.csv     # writer/task information, in a different row order
+  japanese.txt     # UTF-8 reading example only
 ```
 
-This file recipe joins lines with newline separators and does not record
-source file bytes. The tokenization hash identifies the string passed to
-the tokenizer. Retain the original corpus and its import procedure
-separately when byte-level source reconstruction is needed.
+``` r
+library(ldfreq)
+input_helpers <- new.env(parent = baseenv())
+sys.source(system.file("examples", "text-file-input.R",
+  package = "ldfreq", mustWork = TRUE), input_helpers)
+input_dir <- system.file("examples", "text-input",
+  package = "ldfreq", mustWork = TRUE)
+
+one_path <- file.path(input_dir, "texts", "001.txt")
+stopifnot(file.exists(one_path))
+one_file <- input_helpers$read_text_file(one_path, encoding = "UTF-8")
+cat(one_file$text)
+#> The students read a story and discuss the story with a friend.
+#> They write notes about the characters, compare their ideas, and return to the story to explain their choices.
+one_file$source[c("source_encoding", "source_bytes", "characters", "utf8_bom_removed")]
+#>   source_encoding source_bytes characters utf8_bom_removed
+#> 1           UTF-8          173        173            FALSE
+```
+
+For your own project, replace only `input_dir` with the folder
+containing your data, for example `input_dir <- "data"`. Relative paths
+start at [`getwd()`](https://rdrr.io/r/base/getwd.html); an RStudio
+project makes that location easier to keep consistent. Use
+[`file.path()`](https://rdrr.io/r/base/file.path.html) to build paths,
+including paths containing spaces or Japanese characters. If
+`system.file(..., mustWork = TRUE)` reports that the example is missing,
+update ldfreq using the [installation
+instructions](https://ryuya-dot-com.github.io/ldfreq/#installation).
+
+Check that the displayed text and paragraph breaks match your file.
+Bytes, characters and analyzed words are different counts. This example
+treats the whole file as **one document**, including both lines; a
+newline does not create a new essay.
+
+### Read several files with explicit document IDs
+
+List the selected files before reading them. This example searches only
+`texts/`, not its subdirectories. Change the mapping table explicitly
+for your own files; IDs must be unique and need not be filename stems.
+With subdirectories, retain their relative paths so that two files named
+`essay.txt` are distinguishable.
+
+``` r
+selected_files <- file.path("texts", list.files(
+  file.path(input_dir, "texts"), pattern = "[.]txt$",
+  recursive = FALSE, ignore.case = TRUE))
+if (!length(selected_files)) stop("No TXT files selected; check input_dir and the folder.")
+selected_files
+#> [1] "texts/001.txt" "texts/002.txt" "texts/003.txt"
+
+file_map <- data.frame(
+  document_id = c("001", "002", "003"),
+  file = file.path("texts", c("001.txt", "002.txt", "003.txt"))
+)
+stopifnot(!anyNA(file_map$document_id), all(nzchar(trimws(file_map$document_id))),
+  !anyDuplicated(file_map$document_id), !anyDuplicated(file_map$file),
+  setequal(selected_files, file_map$file))
+file_map
+#>   document_id          file
+#> 1         001 texts/001.txt
+#> 2         002 texts/002.txt
+#> 3         003 texts/003.txt
+
+decoded_files <- lapply(file_map$file, function(name) {
+  input_helpers$read_text_file(file.path(input_dir, name), encoding = "UTF-8")
+})
+file_documents <- data.frame(document_id = file_map$document_id,
+  text = vapply(decoded_files, `[[`, character(1), "text"))
+file_sources <- do.call(rbind, lapply(decoded_files, `[[`, "source"))
+file_sources$document_id <- file_map$document_id
+file_sources$source_file <- file_map$file  # retain project-relative paths
+file_sources[c("document_id", "source_file", "source_bytes", "characters")]
+#>   document_id   source_file source_bytes characters
+#> 1         001 texts/001.txt          173        173
+#> 2         002 texts/002.txt          199        199
+#> 3         003 texts/003.txt            0          0
+stopifnot(identical(file_documents$text[1], one_file$text),
+  identical(file_documents$text[3], ""))
+```
+
+The mapping table determines document order; directory order does not
+assign writer or task IDs. All three documents remain present, including
+the empty file. Keep the original files as well as these hashes: a hash
+identifies bytes but cannot reconstruct them.
+
+### Alternatively, read a CSV containing the texts
+
+Use this route instead of the folder loop when your data have one
+ID/text row per document. A quoted CSV field can contain commas,
+quotation marks and line breaks. Do not split such a CSV with
+[`readLines()`](https://rdrr.io/r/base/readLines.html) or treat each
+physical line as one document.
+
+``` r
+csv_input <- input_helpers$read_text_file(file.path(input_dir, "essays.csv"))
+csv_documents <- read.csv(text = csv_input$text,
+  colClasses = "character", na.strings = "<MISSING>", check.names = FALSE)
+stopifnot(identical(csv_documents, file_documents))
+```
+
+The two routes now contain exactly the same IDs and text strings. For
+your CSV, select the real ID/text columns with `id_col` and `text_col`
+in the batch call below. Reading columns as character preserves IDs such
+as `001`, and literal responses such as `TRUE` or `NA`. Here only
+`<MISSING>` denotes missing data; choose a marker that is not an actual
+response. `""` denotes an empty response, not an unavailable response.
+ldfreq rejects `NA` text and names the document; resolve its meaning in
+your study record instead of replacing it with `""`.
+
+### Analyze, attach metadata and inspect the result
+
+Use `file_documents` below, or substitute `csv_documents`. Normalization
+and case conversion happen here as declared analysis choices, after file
+reading. The 10-token window is for this short demonstration, not a
+recommended window for a research corpus. Keep your chosen window common
+across comparable texts.
+
+``` r
+file_tokens <- lexdiv_tokenize_batch(file_documents,
+  id_col = "document_id", text_col = "text", tokenizer = "english",
+  normalization = "NFC", case = "lower")
+file_analysis <- lexdiv_metrics_text_batch(file_tokens,
+  metrics = c("ttr", "mattr"), window_length = 10)
+file_analysis$results[c("document_id", "metric_id", "N", "V", "value",
+  "status", "missing_reason")]
+#> <lexdiv_batch_results: 3 documents; 6 metric records; schema unknown>
+#>   document_id metric_id     value  status missing_reason  N  V
+#> 1         001       ttr 0.7000000      ok           <NA> 30 21
+#> 2         001     mattr 0.9190476      ok           <NA> 30 21
+#> 3         002       ttr 0.8387097      ok           <NA> 31 26
+#> 4         002     mattr 0.9818182      ok           <NA> 31 26
+#> 5         003       ttr        NA missing    empty_input  0  0
+#> 6         003     mattr        NA missing    empty_input  0  0
+
+metadata_input <- input_helpers$read_text_file(file.path(input_dir, "metadata.csv"))
+file_metadata <- read.csv(text = metadata_input$text,
+  colClasses = "character", na.strings = "<MISSING>", check.names = FALSE)
+stopifnot(!anyNA(file_metadata$document_id), !anyDuplicated(file_metadata$document_id),
+  setequal(file_metadata$document_id, file_documents$document_id))
+file_report <- lexdiv_widen(file_analysis$results)
+metadata_row <- match(file_report$document_id, file_metadata$document_id)
+stopifnot(identical(file_report$document_id, file_metadata$document_id[metadata_row]))
+file_report[c("writer_id", "task")] <- file_metadata[metadata_row, c("writer_id", "task")]
+file_report[c("document_id", "writer_id", "task", "ttr__value", "mattr__value")]
+#> <lexdiv_wide_results: 3 rows; 5 columns>
+#>   document_id writer_id    task ttr__value mattr__value
+#> 1         001  writer_a reading  0.7000000    0.9190476
+#> 2         002  writer_b reading  0.8387097    0.9818182
+#> 3         003  writer_a reading         NA           NA
+```
+
+Metadata are deliberately in a different order: join by ID, never by row
+number. This example requires metadata for exactly the selected
+documents; subset a larger study table explicitly and inspect unmatched
+IDs. Several documents may share a writer ID, so three documents do not
+mean three independent participants. Document `003` stays in the report
+with unavailable metrics and their reasons. It is not a zero-diversity
+essay.
+
+``` r
+plot(file_analysis, metric_id = "mattr")
+```
+
+![](english-tokenization_files/figure-html/file-input-plot-1.png)
+
+Only the two computable values are drawn; the full roster remains in the
+table. Triangles indicate the package’s advisory short-text status, not
+missing values. Two observations call for points, not a density curve.
+Add `monochrome = TRUE` for black-and-white output. The [report
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#prepare-the-figure-at-its-publication-size)
+shows publication-size PDF/PNG export and figure notes outside the
+image.
+
+### Save the input, decisions and results together
+
+``` r
+file_record <- list(documents = file_documents, sources = file_sources,
+  file_map = file_map, csv_source = csv_input$source,
+  metadata = file_metadata, metadata_source = metadata_input$source,
+  tokens = file_tokens, analysis = file_analysis, report = file_report,
+  session = sessionInfo())
+output_dir <- tempfile("ldfreq-file-example-")
+dir.create(output_dir)
+saveRDS(file_record, file.path(output_dir, "analysis.rds"), version = 2)
+write.csv(file_report, file.path(output_dir, "document-results.csv"),
+  row.names = FALSE, na = "<MISSING>", fileEncoding = "UTF-8")
+restored_files <- readRDS(file.path(output_dir, "analysis.rds"))
+stopifnot(identical(restored_files, file_record))
+```
+
+The temporary output directory is for the executable demonstration. For
+your study, use a persistent folder such as `output_dir <- "results"`
+and retain the original input files. The CSV is an analysis table; the
+RDS preserves text, decoding records, tokenization, unavailable results
+and metadata. In a fresh R session,
+`saved <- readRDS("results/analysis.rds")` restores that record without
+reading or annotating the corpus again. Keep source-containing records
+under the same access conditions as the original material.
+
+### Japanese text, encoding and common input problems
+
+Reading is independent of the annotation language:
+
+``` r
+japanese_input <- input_helpers$read_text_file(file.path(input_dir, "japanese.txt"))
+cat(japanese_input$text)
+#> 学生は図書館で本を読みました。
+#> 友だちと物語について話しました。
+```
+
+For Japanese word analysis, pass the decoded text into the [Japanese
+annotation
+workflow](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.md);
+the English tokenizer is not a Japanese morphological analyzer. UTF-8
+file encoding and the R session’s locale are also different settings.
+
+| Observation | What to check or change |
+|----|----|
+| File or folder not found | Check [`getwd()`](https://rdrr.io/r/base/getwd.html), `input_dir` and [`file.exists()`](https://rdrr.io/r/base/files.html); inspect the selected file list before changing the text. |
+| No TXT files selected | Check the folder and extension. Enable subdirectory selection only deliberately and update the mapping with relative paths. |
+| Duplicate or unmatched IDs | Fix the file/metadata mapping; do not let a join duplicate essays or assign IDs from row numbers. |
+| Invalid decoding or byte round-trip failure | Inspect the file’s declared encoding. For a **known** CP932 file, call `input_helpers$read_text_file(path, encoding = "CP932")`; do not retry encodings until one happens to succeed. |
+| A UTF-8 BOM is present | The helper removes only the leading BOM and records `utf8_bom_removed`. A conflicting encoding declaration is rejected. |
+| A file is empty or a CSV value is missing | Keep empty text distinct from `NA`. The former remains a zero-token document; the latter requires a study decision before analysis. |
+| A file exceeds the 10 MiB example limit | Review file selection and available memory before explicitly increasing `max_bytes`. This example reads each selected file and retains the corpus in memory. |
+
+LF, CRLF and final-newline presence are retained by the text-file
+helper. Subsequent token positions refer to the declared analysis
+string, not original byte offsets. Known CP932 bytes are decoded to
+UTF-8, and a round-trip check rejects lossy conversion. Successful
+decoding alone cannot establish that an encoding declaration is correct:
+inspect the text too. The helper supports UTF-8 and CP932 only, not PDF,
+Word, OCR, automatic encoding detection or automatic Unicode/spelling
+normalization.
 
 ## Save the complete analysis
 

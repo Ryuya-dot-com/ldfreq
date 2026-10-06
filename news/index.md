@@ -2,6 +2,17 @@
 
 ## ldfreq 0.2.0 (development)
 
+### Reading your own text files
+
+- Expanded the English input guide with executable single-file, folder
+  and CSV routes, explicit document/metadata IDs, empty-document
+  handling, plotting and complete RDS saving. Small authored texts are
+  supplied as teaching files.
+- Added an explicitly sourced UTF-8/CP932 file-reading example retaining
+  original line endings and source hashes, recording a removed UTF-8 BOM
+  and rejecting failed or lossy decoding. It adds no exported API or
+  dependency.
+
 ### Linking family and morphology decisions
 
 - Added an explicitly sourced workflow connecting existing family

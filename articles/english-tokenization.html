@@ -563,35 +563,303 @@ tokenizations can be analyzed with <code>unit = "lemma"</code> or
 by <code><a href="../reference/lexdiv_preprocessing.html">lexdiv_metrics_text()</a></code>.</p>
 </div>
 <div class="section level2">
-<h2 id="import-csv-or-utf-8-text-files">Import CSV or UTF-8 text files<a class="anchor" aria-label="anchor" href="#import-csv-or-utf-8-text-files"></a>
+<h2 id="import-text-files">Import CSV or UTF-8 text files<a class="anchor" aria-label="anchor" href="#import-text-files"></a>
 </h2>
-<p>Base R is sufficient. Read ID/text columns as character to retain
-identifiers such as <code>001</code> and literal responses such as
-<code>TRUE</code>. Choose missing-value markers deliberately for your
-data.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">essays</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span></span>
-<span>  <span class="st">"essays.csv"</span>, fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span>, colClasses <span class="op">=</span> <span class="st">"character"</span>,</span>
-<span>  na.strings <span class="op">=</span> <span class="st">"&lt;MISSING&gt;"</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_tokenize_batch</a></span><span class="op">(</span><span class="va">essays</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span>
+<p>Start here if your essays are saved as files rather than typed into
+R. This walkthrough runs offline with three project-authored,
+MIT-licensed documents: two short English texts and one intentionally
+empty file. They are teaching examples, not learner observations.
+Reading Japanese text uses the same input steps; its subsequent
+annotation is a <a href="japanese-annotations.html">separate
+workflow</a>.</p>
+<p>The small <code>read_text_file()</code> helper below is an
+<strong>explicitly sourced example</strong>, not an exported ldfreq
+function. It uses base R for reading and the existing digest dependency
+for hashes. It preserves paragraph breaks, original line endings and the
+final newline, records a removed UTF-8 byte-order mark (BOM), and
+rejects failed decoding rather than replacing characters. It does not
+tokenize, correct spelling or normalize the text. This avoids silently
+losing file details by splitting into lines and joining them again.</p>
+<div class="section level3">
+<h3 id="start-with-one-file">Start with one file<a class="anchor" aria-label="anchor" href="#start-with-one-file"></a>
+</h3>
+<p>Run this setup once. The installed sample directory has the following
+layout:</p>
+<pre class="text"><code>text-input/
+  texts/001.txt
+  texts/002.txt
+  texts/003.txt     # intentionally empty
+  essays.csv       # the same three documents, one row per document
+  metadata.csv     # writer/task information, in a different row order
+  japanese.txt     # UTF-8 reading example only</code></pre>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span><span class="va">input_helpers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"text-file-input.R"</span>,</span>
+<span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">input_helpers</span><span class="op">)</span></span>
+<span><span class="va">input_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"text-input"</span>,</span>
+<span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Explicit file-to-ID mapping, with each file representing one document.</span></span>
-<span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>essay_01 <span class="op">=</span> <span class="st">"texts/essay_01.txt"</span>, essay_02 <span class="op">=</span> <span class="st">"texts/essay_02.txt"</span><span class="op">)</span></span>
-<span><span class="va">texts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">files</span>, <span class="kw">function</span><span class="op">(</span><span class="va">path</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="va">path</span>, encoding <span class="op">=</span> <span class="st">"UTF-8"</span>, warn <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="op">}</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_tokenize_batch</a></span><span class="op">(</span><span class="va">texts</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span></code></pre></div>
-<p>This file recipe joins lines with newline separators and does not
-record source file bytes. The tokenization hash identifies the string
-passed to the tokenizer. Retain the original corpus and its import
-procedure separately when byte-level source reconstruction is
-needed.</p>
+<span><span class="va">one_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">input_dir</span>, <span class="st">"texts"</span>, <span class="st">"001.txt"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">one_path</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">one_file</span> <span class="op">&lt;-</span> <span class="va">input_helpers</span><span class="op">$</span><span class="fu">read_text_file</span><span class="op">(</span><span class="va">one_path</span>, encoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">one_file</span><span class="op">$</span><span class="va">text</span><span class="op">)</span></span>
+<span><span class="co">#&gt; The students read a story and discuss the story with a friend.</span></span>
+<span><span class="co">#&gt; They write notes about the characters, compare their ideas, and return to the story to explain their choices.</span></span>
+<span><span class="va">one_file</span><span class="op">$</span><span class="va">source</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"source_encoding"</span>, <span class="st">"source_bytes"</span>, <span class="st">"characters"</span>, <span class="st">"utf8_bom_removed"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   source_encoding source_bytes characters utf8_bom_removed</span></span>
+<span><span class="co">#&gt; 1           UTF-8          173        173            FALSE</span></span></code></pre></div>
+<p>For your own project, replace only <code>input_dir</code> with the
+folder containing your data, for example
+<code>input_dir &lt;- "data"</code>. Relative paths start at
+<code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code>; an RStudio project makes that location easier to
+keep consistent. Use <code><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path()</a></code> to build paths, including
+paths containing spaces or Japanese characters. If
+<code>system.file(..., mustWork = TRUE)</code> reports that the example
+is missing, update ldfreq using the <a href="https://ryuya-dot-com.github.io/ldfreq/#installation">installation
+instructions</a>.</p>
+<p>Check that the displayed text and paragraph breaks match your file.
+Bytes, characters and analyzed words are different counts. This example
+treats the whole file as <strong>one document</strong>, including both
+lines; a newline does not create a new essay.</p>
+</div>
+<div class="section level3">
+<h3 id="read-several-files-with-explicit-document-ids">Read several files with explicit document IDs<a class="anchor" aria-label="anchor" href="#read-several-files-with-explicit-document-ids"></a>
+</h3>
+<p>List the selected files before reading them. This example searches
+only <code>texts/</code>, not its subdirectories. Change the mapping
+table explicitly for your own files; IDs must be unique and need not be
+filename stems. With subdirectories, retain their relative paths so that
+two files named <code>essay.txt</code> are distinguishable.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">selected_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"texts"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">input_dir</span>, <span class="st">"texts"</span><span class="op">)</span>, pattern <span class="op">=</span> <span class="st">"[.]txt$"</span>,</span>
+<span>  recursive <span class="op">=</span> <span class="cn">FALSE</span>, ignore.case <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">selected_files</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"No TXT files selected; check input_dir and the folder."</span><span class="op">)</span></span>
+<span><span class="va">selected_files</span></span>
+<span><span class="co">#&gt; [1] "texts/001.txt" "texts/002.txt" "texts/003.txt"</span></span>
+<span></span>
+<span><span class="va">file_map</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"001"</span>, <span class="st">"002"</span>, <span class="st">"003"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"texts"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"001.txt"</span>, <span class="st">"002.txt"</span>, <span class="st">"003.txt"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">file_map</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/trimws.html" class="external-link">trimws</a></span><span class="op">(</span><span class="va">file_map</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">file_map</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">file_map</span><span class="op">$</span><span class="va">file</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setequal</a></span><span class="op">(</span><span class="va">selected_files</span>, <span class="va">file_map</span><span class="op">$</span><span class="va">file</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">file_map</span></span>
+<span><span class="co">#&gt;   document_id          file</span></span>
+<span><span class="co">#&gt; 1         001 texts/001.txt</span></span>
+<span><span class="co">#&gt; 2         002 texts/002.txt</span></span>
+<span><span class="co">#&gt; 3         003 texts/003.txt</span></span>
+<span></span>
+<span><span class="va">decoded_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">file_map</span><span class="op">$</span><span class="va">file</span>, <span class="kw">function</span><span class="op">(</span><span class="va">name</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">input_helpers</span><span class="op">$</span><span class="fu">read_text_file</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">input_dir</span>, <span class="va">name</span><span class="op">)</span>, encoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="va">file_documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="va">file_map</span><span class="op">$</span><span class="va">document_id</span>,</span>
+<span>  text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">decoded_files</span>, <span class="va">`[[`</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, <span class="st">"text"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">file_sources</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">decoded_files</span>, <span class="va">`[[`</span>, <span class="st">"source"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">file_sources</span><span class="op">$</span><span class="va">document_id</span> <span class="op">&lt;-</span> <span class="va">file_map</span><span class="op">$</span><span class="va">document_id</span></span>
+<span><span class="va">file_sources</span><span class="op">$</span><span class="va">source_file</span> <span class="op">&lt;-</span> <span class="va">file_map</span><span class="op">$</span><span class="va">file</span>  <span class="co"># retain project-relative paths</span></span>
+<span><span class="va">file_sources</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"source_file"</span>, <span class="st">"source_bytes"</span>, <span class="st">"characters"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   document_id   source_file source_bytes characters</span></span>
+<span><span class="co">#&gt; 1         001 texts/001.txt          173        173</span></span>
+<span><span class="co">#&gt; 2         002 texts/002.txt          199        199</span></span>
+<span><span class="co">#&gt; 3         003 texts/003.txt            0          0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">file_documents</span><span class="op">$</span><span class="va">text</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">one_file</span><span class="op">$</span><span class="va">text</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">file_documents</span><span class="op">$</span><span class="va">text</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, <span class="st">""</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The mapping table determines document order; directory order does not
+assign writer or task IDs. All three documents remain present, including
+the empty file. Keep the original files as well as these hashes: a hash
+identifies bytes but cannot reconstruct them.</p>
+</div>
+<div class="section level3">
+<h3 id="alternatively-read-a-csv-containing-the-texts">Alternatively, read a CSV containing the texts<a class="anchor" aria-label="anchor" href="#alternatively-read-a-csv-containing-the-texts"></a>
+</h3>
+<p>Use this route instead of the folder loop when your data have one
+ID/text row per document. A quoted CSV field can contain commas,
+quotation marks and line breaks. Do not split such a CSV with
+<code><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines()</a></code> or treat each physical line as one
+document.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">csv_input</span> <span class="op">&lt;-</span> <span class="va">input_helpers</span><span class="op">$</span><span class="fu">read_text_file</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">input_dir</span>, <span class="st">"essays.csv"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">csv_documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span>text <span class="op">=</span> <span class="va">csv_input</span><span class="op">$</span><span class="va">text</span>,</span>
+<span>  colClasses <span class="op">=</span> <span class="st">"character"</span>, na.strings <span class="op">=</span> <span class="st">"&lt;MISSING&gt;"</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">csv_documents</span>, <span class="va">file_documents</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The two routes now contain exactly the same IDs and text strings. For
+your CSV, select the real ID/text columns with <code>id_col</code> and
+<code>text_col</code> in the batch call below. Reading columns as
+character preserves IDs such as <code>001</code>, and literal responses
+such as <code>TRUE</code> or <code>NA</code>. Here only
+<code>&lt;MISSING&gt;</code> denotes missing data; choose a marker that
+is not an actual response. <code>""</code> denotes an empty response,
+not an unavailable response. ldfreq rejects <code>NA</code> text and
+names the document; resolve its meaning in your study record instead of
+replacing it with <code>""</code>.</p>
+</div>
+<div class="section level3">
+<h3 id="analyze-attach-metadata-and-inspect-the-result">Analyze, attach metadata and inspect the result<a class="anchor" aria-label="anchor" href="#analyze-attach-metadata-and-inspect-the-result"></a>
+</h3>
+<p>Use <code>file_documents</code> below, or substitute
+<code>csv_documents</code>. Normalization and case conversion happen
+here as declared analysis choices, after file reading. The 10-token
+window is for this short demonstration, not a recommended window for a
+research corpus. Keep your chosen window common across comparable
+texts.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">file_tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_tokenize_batch</a></span><span class="op">(</span><span class="va">file_documents</span>,</span>
+<span>  id_col <span class="op">=</span> <span class="st">"document_id"</span>, text_col <span class="op">=</span> <span class="st">"text"</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>,</span>
+<span>  normalization <span class="op">=</span> <span class="st">"NFC"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span>
+<span><span class="va">file_analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch</a></span><span class="op">(</span><span class="va">file_tokens</span>,</span>
+<span>  metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"mattr"</span><span class="op">)</span>, window_length <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">file_analysis</span><span class="op">$</span><span class="va">results</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"metric_id"</span>, <span class="st">"N"</span>, <span class="st">"V"</span>, <span class="st">"value"</span>,</span>
+<span>  <span class="st">"status"</span>, <span class="st">"missing_reason"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_batch_results: 3 documents; 6 metric records; schema unknown&gt;</span></span>
+<span><span class="co">#&gt;   document_id metric_id     value  status missing_reason  N  V</span></span>
+<span><span class="co">#&gt; 1         001       ttr 0.7000000      ok           &lt;NA&gt; 30 21</span></span>
+<span><span class="co">#&gt; 2         001     mattr 0.9190476      ok           &lt;NA&gt; 30 21</span></span>
+<span><span class="co">#&gt; 3         002       ttr 0.8387097      ok           &lt;NA&gt; 31 26</span></span>
+<span><span class="co">#&gt; 4         002     mattr 0.9818182      ok           &lt;NA&gt; 31 26</span></span>
+<span><span class="co">#&gt; 5         003       ttr        NA missing    empty_input  0  0</span></span>
+<span><span class="co">#&gt; 6         003     mattr        NA missing    empty_input  0  0</span></span>
+<span></span>
+<span><span class="va">metadata_input</span> <span class="op">&lt;-</span> <span class="va">input_helpers</span><span class="op">$</span><span class="fu">read_text_file</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">input_dir</span>, <span class="st">"metadata.csv"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">file_metadata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span>text <span class="op">=</span> <span class="va">metadata_input</span><span class="op">$</span><span class="va">text</span>,</span>
+<span>  colClasses <span class="op">=</span> <span class="st">"character"</span>, na.strings <span class="op">=</span> <span class="st">"&lt;MISSING&gt;"</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">file_metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">file_metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setequal</a></span><span class="op">(</span><span class="va">file_metadata</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">file_documents</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">file_report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">file_analysis</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span>
+<span><span class="va">metadata_row</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">file_report</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">file_metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">file_report</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">file_metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">[</span><span class="va">metadata_row</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">file_report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"writer_id"</span>, <span class="st">"task"</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">file_metadata</span><span class="op">[</span><span class="va">metadata_row</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"writer_id"</span>, <span class="st">"task"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">file_report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"writer_id"</span>, <span class="st">"task"</span>, <span class="st">"ttr__value"</span>, <span class="st">"mattr__value"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_wide_results: 3 rows; 5 columns&gt;</span></span>
+<span><span class="co">#&gt;   document_id writer_id    task ttr__value mattr__value</span></span>
+<span><span class="co">#&gt; 1         001  writer_a reading  0.7000000    0.9190476</span></span>
+<span><span class="co">#&gt; 2         002  writer_b reading  0.8387097    0.9818182</span></span>
+<span><span class="co">#&gt; 3         003  writer_a reading         NA           NA</span></span></code></pre></div>
+<p>Metadata are deliberately in a different order: join by ID, never by
+row number. This example requires metadata for exactly the selected
+documents; subset a larger study table explicitly and inspect unmatched
+IDs. Several documents may share a writer ID, so three documents do not
+mean three independent participants. Document <code>003</code> stays in
+the report with unavailable metrics and their reasons. It is not a
+zero-diversity essay.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">file_analysis</span>, metric_id <span class="op">=</span> <span class="st">"mattr"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="english-tokenization_files/figure-html/file-input-plot-1.png" class="r-plt" alt="" width="624"></p>
+<p>Only the two computable values are drawn; the full roster remains in
+the table. Triangles indicate the package’s advisory short-text status,
+not missing values. Two observations call for points, not a density
+curve. Add <code>monochrome = TRUE</code> for black-and-white output.
+The <a href="from-text-to-report.html#prepare-the-figure-at-its-publication-size">report
+guide</a> shows publication-size PDF/PNG export and figure notes outside
+the image.</p>
+</div>
+<div class="section level3">
+<h3 id="save-the-input-decisions-and-results-together">Save the input, decisions and results together<a class="anchor" aria-label="anchor" href="#save-the-input-decisions-and-results-together"></a>
+</h3>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">file_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>documents <span class="op">=</span> <span class="va">file_documents</span>, sources <span class="op">=</span> <span class="va">file_sources</span>,</span>
+<span>  file_map <span class="op">=</span> <span class="va">file_map</span>, csv_source <span class="op">=</span> <span class="va">csv_input</span><span class="op">$</span><span class="va">source</span>,</span>
+<span>  metadata <span class="op">=</span> <span class="va">file_metadata</span>, metadata_source <span class="op">=</span> <span class="va">metadata_input</span><span class="op">$</span><span class="va">source</span>,</span>
+<span>  tokens <span class="op">=</span> <span class="va">file_tokens</span>, analysis <span class="op">=</span> <span class="va">file_analysis</span>, report <span class="op">=</span> <span class="va">file_report</span>,</span>
+<span>  session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"ldfreq-file-example-"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">output_dir</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">file_record</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"analysis.rds"</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">file_report</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"document-results.csv"</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>, na <span class="op">=</span> <span class="st">"&lt;MISSING&gt;"</span>, fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="va">restored_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"analysis.rds"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">restored_files</span>, <span class="va">file_record</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The temporary output directory is for the executable demonstration.
+For your study, use a persistent folder such as
+<code>output_dir &lt;- "results"</code> and retain the original input
+files. The CSV is an analysis table; the RDS preserves text, decoding
+records, tokenization, unavailable results and metadata. In a fresh R
+session, <code>saved &lt;- readRDS("results/analysis.rds")</code>
+restores that record without reading or annotating the corpus again.
+Keep source-containing records under the same access conditions as the
+original material.</p>
+</div>
+<div class="section level3">
+<h3 id="japanese-text-encoding-and-common-input-problems">Japanese text, encoding and common input problems<a class="anchor" aria-label="anchor" href="#japanese-text-encoding-and-common-input-problems"></a>
+</h3>
+<p>Reading is independent of the annotation language:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">japanese_input</span> <span class="op">&lt;-</span> <span class="va">input_helpers</span><span class="op">$</span><span class="fu">read_text_file</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">input_dir</span>, <span class="st">"japanese.txt"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">japanese_input</span><span class="op">$</span><span class="va">text</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 学生は図書館で本を読みました。</span></span>
+<span><span class="co">#&gt; 友だちと物語について話しました。</span></span></code></pre></div>
+<p>For Japanese word analysis, pass the decoded text into the <a href="japanese-annotations.html">Japanese annotation workflow</a>; the
+English tokenizer is not a Japanese morphological analyzer. UTF-8 file
+encoding and the R session’s locale are also different settings.</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Observation</th>
+<th>What to check or change</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>File or folder not found</td>
+<td>Check <code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code>, <code>input_dir</code> and
+<code><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists()</a></code>; inspect the selected file list before
+changing the text.</td>
+</tr>
+<tr class="even">
+<td>No TXT files selected</td>
+<td>Check the folder and extension. Enable subdirectory selection only
+deliberately and update the mapping with relative paths.</td>
+</tr>
+<tr class="odd">
+<td>Duplicate or unmatched IDs</td>
+<td>Fix the file/metadata mapping; do not let a join duplicate essays or
+assign IDs from row numbers.</td>
+</tr>
+<tr class="even">
+<td>Invalid decoding or byte round-trip failure</td>
+<td>Inspect the file’s declared encoding. For a <strong>known</strong>
+CP932 file, call
+<code>input_helpers$read_text_file(path, encoding = "CP932")</code>; do
+not retry encodings until one happens to succeed.</td>
+</tr>
+<tr class="odd">
+<td>A UTF-8 BOM is present</td>
+<td>The helper removes only the leading BOM and records
+<code>utf8_bom_removed</code>. A conflicting encoding declaration is
+rejected.</td>
+</tr>
+<tr class="even">
+<td>A file is empty or a CSV value is missing</td>
+<td>Keep empty text distinct from <code>NA</code>. The former remains a
+zero-token document; the latter requires a study decision before
+analysis.</td>
+</tr>
+<tr class="odd">
+<td>A file exceeds the 10 MiB example limit</td>
+<td>Review file selection and available memory before explicitly
+increasing <code>max_bytes</code>. This example reads each selected file
+and retains the corpus in memory.</td>
+</tr>
+</tbody>
+</table>
+<p>LF, CRLF and final-newline presence are retained by the text-file
+helper. Subsequent token positions refer to the declared analysis
+string, not original byte offsets. Known CP932 bytes are decoded to
+UTF-8, and a round-trip check rejects lossy conversion. Successful
+decoding alone cannot establish that an encoding declaration is correct:
+inspect the text too. The helper supports UTF-8 and CP932 only, not PDF,
+Word, OCR, automatic encoding detection or automatic Unicode/spelling
+normalization.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="save-the-complete-analysis">Save the complete analysis<a class="anchor" aria-label="anchor" href="#save-the-complete-analysis"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>tokens <span class="op">=</span> <span class="va">tokens</span>, diversity <span class="op">=</span> <span class="va">analysis</span>, nj8 <span class="op">=</span> <span class="va">levels</span>,</span>
 <span>               session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>

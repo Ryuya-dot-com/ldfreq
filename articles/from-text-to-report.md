@@ -2,6 +2,12 @@
 
 ## Question and unit of analysis
 
+If your texts are in TXT files or a CSV, begin with the executable
+[file-input
+walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
+It shows explicit document IDs, metadata joins, empty texts and saving
+before returning to the reporting steps here.
+
 Suppose we want to describe how two texts about reading differ in local
 surface-word variety and coverage by New JACET 8000. These are separate
 questions: repeating familiar words can change diversity without
