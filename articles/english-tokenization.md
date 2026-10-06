@@ -398,10 +398,12 @@ the same explicit word-inclusion policy used by
 ## Import CSV or UTF-8 text files
 
 Start here if your essays are saved as files rather than typed into R.
-This walkthrough runs offline with three project-authored, MIT-licensed
-documents: two short English texts and one intentionally empty file.
-They are teaching examples, not learner observations. Reading Japanese
-text uses the same input steps; its subsequent annotation is a [separate
+This walkthrough runs offline with 30 constructed English texts and one
+intentionally empty file, all project-authored and MIT-licensed. Shared
+topic passages and different amounts of repetition illustrate variation
+in vocabulary diversity; they are not independent learner observations
+or proficiency data. Reading Japanese text uses the same input steps;
+its subsequent annotation is a [separate
 workflow](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.md).
 
 The small `read_text_file()` helper below is an **explicitly sourced
@@ -422,8 +424,10 @@ layout:
 text-input/
   texts/001.txt
   texts/002.txt
-  texts/003.txt     # intentionally empty
-  essays.csv       # the same three documents, one row per document
+  ...
+  texts/030.txt
+  texts/031.txt     # intentionally empty
+  essays.csv       # the same 31 documents, one row per document
   metadata.csv     # writer/task information, in a different row order
   japanese.txt     # UTF-8 reading example only
 ```
@@ -439,12 +443,21 @@ input_dir <- system.file("examples", "text-input",
 one_path <- file.path(input_dir, "texts", "001.txt")
 stopifnot(file.exists(one_path))
 one_file <- input_helpers$read_text_file(one_path, encoding = "UTF-8")
-cat(one_file$text)
-#> The students read a story and discuss the story with a friend.
-#> They write notes about the characters, compare their ideas, and return to the story to explain their choices.
+# Wrap the preview only; one_file$text retains its original line breaks.
+cat(strwrap(one_file$text, width = 68), sep = "\n")
+#> The class visited a library near the station. Students chose books
+#> about places they hoped to visit and read a few pages in silence.
+#> One student found a map inside an old travel guide. Another
+#> compared two descriptions of the same city. The teacher asked
+#> everyone to explain one surprising detail to a partner. They then
+#> returned to the shelves to find evidence for their explanations.
+#> Before leaving, the group wrote questions that a later reading
+#> session could explore. I explained the experience in a short
+#> message to a friend. Choosing specific examples made the account
+#> clearer and helped me remember details that I had almost forgotten.
 one_file$source[c("source_encoding", "source_bytes", "characters", "utf8_bom_removed")]
 #>   source_encoding source_bytes characters utf8_bom_removed
-#> 1           UTF-8          173        173            FALSE
+#> 1           UTF-8          643        643            FALSE
 ```
 
 For your own project, replace only `input_dir` with the folder
@@ -459,7 +472,7 @@ instructions](https://ryuya-dot-com.github.io/ldfreq/#installation).
 
 Check that the displayed text and paragraph breaks match your file.
 Bytes, characters and analyzed words are different counts. This example
-treats the whole file as **one document**, including both lines; a
+treats the whole file as **one document**, including both paragraphs; a
 newline does not create a new essay.
 
 ### Read several files with explicit document IDs
@@ -476,20 +489,29 @@ selected_files <- file.path("texts", list.files(
   recursive = FALSE, ignore.case = TRUE))
 if (!length(selected_files)) stop("No TXT files selected; check input_dir and the folder.")
 selected_files
-#> [1] "texts/001.txt" "texts/002.txt" "texts/003.txt"
+#>  [1] "texts/001.txt" "texts/002.txt" "texts/003.txt" "texts/004.txt"
+#>  [5] "texts/005.txt" "texts/006.txt" "texts/007.txt" "texts/008.txt"
+#>  [9] "texts/009.txt" "texts/010.txt" "texts/011.txt" "texts/012.txt"
+#> [13] "texts/013.txt" "texts/014.txt" "texts/015.txt" "texts/016.txt"
+#> [17] "texts/017.txt" "texts/018.txt" "texts/019.txt" "texts/020.txt"
+#> [21] "texts/021.txt" "texts/022.txt" "texts/023.txt" "texts/024.txt"
+#> [25] "texts/025.txt" "texts/026.txt" "texts/027.txt" "texts/028.txt"
+#> [29] "texts/029.txt" "texts/030.txt" "texts/031.txt"
 
-file_map <- data.frame(
-  document_id = c("001", "002", "003"),
-  file = file.path("texts", c("001.txt", "002.txt", "003.txt"))
-)
+# Explicit naming rule for these sample files; replace this mapping for your data.
+file_map <- data.frame(document_id = sprintf("%03d", 1:31),
+  file = file.path("texts", sprintf("%03d.txt", 1:31)))
 stopifnot(!anyNA(file_map$document_id), all(nzchar(trimws(file_map$document_id))),
   !anyDuplicated(file_map$document_id), !anyDuplicated(file_map$file),
   setequal(selected_files, file_map$file))
-file_map
+head(file_map)
 #>   document_id          file
 #> 1         001 texts/001.txt
 #> 2         002 texts/002.txt
 #> 3         003 texts/003.txt
+#> 4         004 texts/004.txt
+#> 5         005 texts/005.txt
+#> 6         006 texts/006.txt
 
 decoded_files <- lapply(file_map$file, function(name) {
   input_helpers$read_text_file(file.path(input_dir, name), encoding = "UTF-8")
@@ -499,19 +521,22 @@ file_documents <- data.frame(document_id = file_map$document_id,
 file_sources <- do.call(rbind, lapply(decoded_files, `[[`, "source"))
 file_sources$document_id <- file_map$document_id
 file_sources$source_file <- file_map$file  # retain project-relative paths
-file_sources[c("document_id", "source_file", "source_bytes", "characters")]
-#>   document_id   source_file source_bytes characters
-#> 1         001 texts/001.txt          173        173
-#> 2         002 texts/002.txt          199        199
-#> 3         003 texts/003.txt            0          0
+file_sources[c(1:3, nrow(file_sources)),
+  c("document_id", "source_file", "source_bytes", "characters")]
+#>    document_id   source_file source_bytes characters
+#> 1          001 texts/001.txt          643        643
+#> 2          002 texts/002.txt          773        773
+#> 3          003 texts/003.txt          875        875
+#> 31         031 texts/031.txt            0          0
 stopifnot(identical(file_documents$text[1], one_file$text),
-  identical(file_documents$text[3], ""))
+  identical(file_documents$text[31], ""))
 ```
 
 The mapping table determines document order; directory order does not
-assign writer or task IDs. All three documents remain present, including
-the empty file. Keep the original files as well as these hashes: a hash
-identifies bytes but cannot reconstruct them.
+assign writer or task IDs. The preview shows the first three documents
+and the empty file; all 31 remain in the saved tables. Keep the original
+files as well as these hashes: a hash identifies bytes but cannot
+reconstruct them.
 
 ### Alternatively, read a CSV containing the texts
 
@@ -528,39 +553,57 @@ csv_documents <- read.csv(text = csv_input$text,
 stopifnot(identical(csv_documents, file_documents))
 ```
 
-The two routes now contain exactly the same IDs and text strings. For
-your CSV, select the real ID/text columns with `id_col` and `text_col`
-in the batch call below. Reading columns as character preserves IDs such
-as `001`, and literal responses such as `TRUE` or `NA`. Here only
-`<MISSING>` denotes missing data; choose a marker that is not an actual
-response. `""` denotes an empty response, not an unavailable response.
-ldfreq rejects `NA` text and names the document; resolve its meaning in
-your study record instead of replacing it with `""`.
+These sample files use LF line endings, so the two routes contain
+exactly the same IDs and text strings. CSV parsing is a separate step:
+[`read.csv()`](https://rdrr.io/r/utils/read.table.html) converts CRLF
+inside quoted fields to LF. For your own TXT/CSV comparison, check the
+parsed strings and record that transformation; do not assume identical
+source character positions merely because the displayed prose looks the
+same. The original CSV hash is retained separately from its parsed text.
+For your CSV, select the real ID/text columns with `id_col` and
+`text_col` in the batch call below. Reading columns as character
+preserves IDs such as `001`, and literal responses such as `TRUE` or
+`NA`. Here only `<MISSING>` denotes missing data; choose a marker that
+is not an actual response. `""` denotes an empty response, not an
+unavailable response. ldfreq rejects `NA` text and names the document;
+resolve its meaning in your study record instead of replacing it with
+`""`.
 
 ### Analyze, attach metadata and inspect the result
 
 Use `file_documents` below, or substitute `csv_documents`. Normalization
 and case conversion happen here as declared analysis choices, after file
-reading. The 10-token window is for this short demonstration, not a
-recommended window for a research corpus. Keep your chosen window common
-across comparable texts.
+reading. The 50-token window is common to all documents. The 30 nonempty
+teaching texts are 107–149 tokens long and can all use that window. For
+a research corpus, justify the window for your task and length
+distribution; keep it common across comparable texts rather than
+shrinking it for short documents.
 
 ``` r
 file_tokens <- lexdiv_tokenize_batch(file_documents,
   id_col = "document_id", text_col = "text", tokenizer = "english",
   normalization = "NFC", case = "lower")
 file_analysis <- lexdiv_metrics_text_batch(file_tokens,
-  metrics = c("ttr", "mattr"), window_length = 10)
-file_analysis$results[c("document_id", "metric_id", "N", "V", "value",
+  metrics = c("ttr", "mattr"), window_length = 50)
+file_results <- file_analysis$results[c("document_id", "metric_id", "N", "V", "value",
   "status", "missing_reason")]
-#> <lexdiv_batch_results: 3 documents; 6 metric records; schema unknown>
-#>   document_id metric_id     value  status missing_reason  N  V
-#> 1         001       ttr 0.7000000      ok           <NA> 30 21
-#> 2         001     mattr 0.9190476      ok           <NA> 30 21
-#> 3         002       ttr 0.8387097      ok           <NA> 31 26
-#> 4         002     mattr 0.9818182      ok           <NA> 31 26
-#> 5         003       ttr        NA missing    empty_input  0  0
-#> 6         003     mattr        NA missing    empty_input  0  0
+# Preview three nonempty documents and the empty document; retain all result rows.
+rbind(head(file_results, 6), subset(file_results, document_id == "031"))
+#> <lexdiv_batch_results: 4 documents; 8 metric records; schema unknown>
+#>    document_id metric_id     value  status missing_reason   N  V
+#> 1          001       ttr 0.7757009      ok           <NA> 107 83
+#> 2          001     mattr 0.8293103      ok           <NA> 107 83
+#> 3          002       ttr 0.7131783      ok           <NA> 129 92
+#> 4          002     mattr 0.7905000      ok           <NA> 129 92
+#> 5          003       ttr 0.5918367      ok           <NA> 147 87
+#> 6          003     mattr 0.6665306      ok           <NA> 147 87
+#> 61         031       ttr        NA missing    empty_input   0  0
+#> 62         031     mattr        NA missing    empty_input   0  0
+with(file_results, table(metric_id, status))
+#>          status
+#> metric_id missing ok
+#>     mattr       1 30
+#>     ttr         1 30
 
 metadata_input <- input_helpers$read_text_file(file.path(input_dir, "metadata.csv"))
 file_metadata <- read.csv(text = metadata_input$text,
@@ -571,32 +614,37 @@ file_report <- lexdiv_widen(file_analysis$results)
 metadata_row <- match(file_report$document_id, file_metadata$document_id)
 stopifnot(identical(file_report$document_id, file_metadata$document_id[metadata_row]))
 file_report[c("writer_id", "task")] <- file_metadata[metadata_row, c("writer_id", "task")]
-file_report[c("document_id", "writer_id", "task", "ttr__value", "mattr__value")]
-#> <lexdiv_wide_results: 3 rows; 5 columns>
-#>   document_id writer_id    task ttr__value mattr__value
-#> 1         001  writer_a reading  0.7000000    0.9190476
-#> 2         002  writer_b reading  0.8387097    0.9818182
-#> 3         003  writer_a reading         NA           NA
+file_report[c(1:3, nrow(file_report)),
+  c("document_id", "writer_id", "task", "ttr__value", "mattr__value")]
+#> <lexdiv_wide_results: 4 rows; 5 columns>
+#>    document_id         writer_id                 task ttr__value mattr__value
+#> 1          001 example_writer_01 authored-description  0.7757009    0.8293103
+#> 2          002 example_writer_02 authored-description  0.7131783    0.7905000
+#> 3          003 example_writer_03 authored-description  0.5918367    0.6665306
+#> 31         031 example_writer_01 authored-description         NA           NA
 ```
 
 Metadata are deliberately in a different order: join by ID, never by row
 number. This example requires metadata for exactly the selected
 documents; subset a larger study table explicitly and inspect unmatched
-IDs. Several documents may share a writer ID, so three documents do not
-mean three independent participants. Document `003` stays in the report
-with unavailable metrics and their reasons. It is not a zero-diversity
-essay.
+IDs. Several documents may share a writer ID. Here all writer/task IDs
+are fictional and the texts share authored passages; they cannot support
+population inference. Document `031` stays in the report with
+unavailable metrics and their reasons. It is not a zero-diversity essay.
 
 ``` r
-plot(file_analysis, metric_id = "mattr")
+plot(file_analysis, metric_id = "mattr", xlab = "Document", las = 2)
 ```
 
 ![](english-tokenization_files/figure-html/file-input-plot-1.png)
 
-Only the two computable values are drawn; the full roster remains in the
-table. Triangles indicate the package’s advisory short-text status, not
-missing values. Two observations call for points, not a density curve.
-Add `monochrome = TRUE` for black-and-white output. The [report
+All 30 computable values are drawn in document-ID order; the empty
+document remains in the table and is not drawn as zero. Rotated labels
+and an 8-by-4-inch figure keep all 30 IDs readable. The points show each
+document’s actual value; ID order does not represent time, proficiency
+or a treatment gradient. Shared passages and repetition explain this
+constructed spread, not differences between learner groups. Add
+`monochrome = TRUE` for black-and-white output. The [report
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#prepare-the-figure-at-its-publication-size)
 shows publication-size PDF/PNG export and figure notes outside the
 image.
