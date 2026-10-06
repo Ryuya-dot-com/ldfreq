@@ -27,6 +27,8 @@ result
 For a named character vector or an ID/text table, use
 `lexdiv_tokenize_batch()` and `lexdiv_metrics_text_batch()`; see
 [English tokenization and document input](english-tokenization.html).
+For files on disk, the [TXT/folder/CSV walkthrough](english-tokenization.html#import-text-files)
+runs with installed sample files and shows where to substitute your own data.
 Use `tokenizer = "english"` to select the English lexical rules. The examples
 below retain the original Unicode default so their measurement choices stay
 explicit.

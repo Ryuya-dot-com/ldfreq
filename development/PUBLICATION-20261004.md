@@ -3420,3 +3420,90 @@ Evidence: `reviews/ldfreq-trajectory-guide-20261006/evidence/`. Submit these sou
 and existing publication-completion records together through the protected
 main workflow, then deploy the generated changes to gh-pages and confirm
 anonymous bytes and the section anchor. No CRAN submission is included.
+
+
+### Trajectory guide publication completed
+
+[PR #22](https://github.com/Ryuya-dot-com/ldfreq/pull/22) is merged at
+`c9e977d9f5bbe1c5045023d4f893f5167de4a4d0`. Its complete tree equals final head
+`233f895d7454468f118132126eec0510b739c338`, which passes all nine jobs in
+[run 37467395411](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/37467395411).
+The development classifier also passes at run 37467395234, with formal candidate
+artifact jobs intentionally skipped. The two public source documents match
+anonymous raw-main downloads.
+
+The initial fa9acc2 head passed all nine jobs at run 37463936813. A final one-line
+link repair uses an absolute installation URL so that opening the installed
+vignette does not depend on the website directory layout. The first CI run was
+allowed to finish before pushing that repair; only the local automatic-merge
+monitor was stopped, not a GitHub job. Required checks were not bypassed, and
+only the redundant identical-tree main push CI was omitted. No local numerical
+rerun or full local package check was needed for the URL-only correction.
+
+The public site serves gh-pages `c096d1cad3de7d424b70563cb57200f485d84323`. All
+eight changed files match the prepared payload anonymously: home/article HTML,
+the trajectory PNG, home/article/contribution Markdown, search index and llms
+index. Markdown generation also synchronizes previously stale contribution and
+installation text with the already-updated HTML. A text-presence assertion first
+failed on ordinary Markdown line wrapping; normalizing whitespace resolved the
+check without changing content. The site has 128 HTML pages and 248 files.
+
+The public desktop homepage was rendered and visually inspected: the plot and
+its direct guide link are visible without overlap or clipping. The section
+anchor is `#plot-local-vocabulary-diversity`. The full-guide execution, independent
+copy/paste execution with exports and monochrome, exact original-profile match,
+local link audit, live byte audit, screenshot and final CI/PR/Pages records are in
+`reviews/ldfreq-trajectory-guide-20261006/evidence/`. `publication-result.json`
+identifies the final source and site commits.
+
+## 2026-10-07 Executable local-file input tutorial
+
+Implemented roadmap A: one TXT, an explicitly mapped folder, and ID/text CSV
+input converge on the existing batch analysis. The tutorial retains empty
+documents, joins deliberately reordered writer/task metadata by document ID,
+shows the original MATTR values as points, and saves the complete record beside
+an inspection CSV. The new section is linked from the report and getting-started
+guides. Authored teaching files, including Japanese UTF-8 text, are under
+`inst/examples/text-input/`; no real corpus or reference resource is added.
+
+`inst/examples/text-file-input.R` is a sourced helper, not a new export. Its
+explicit UTF-8/CP932 decoding preserves line endings and final newlines, records
+a removed leading UTF-8 BOM, hashes source bytes separately from decoded text,
+and rejects failed/lossy decoding, NUL and files over the declared byte limit.
+The corpus remains an ordinary ID/text data frame; existing batch validation
+handles identities and missing text. No R/ runtime file, namespace, metric,
+required dependency or bundled reference data changed.
+
+The old open PR #16 was read before implementation. Its two public APIs and new
+corpus class target 0.1.0.9000 and are not merged into this narrower teaching
+change. Its explicit-byte approach and the current NINJAL input example informed
+the small reader. PR #16 remains untouched; this is not a blanket rejection of
+that independent API proposal.
+
+Mac installed-package evidence: all 55 targeted assertions pass, covering exact
+UTF-8 and CP932 strings, CRLF/LF/final-newline/empty/BOM handling, a Japanese
+filename, lossy/invalid input rejection, special CSV strings and quoted multiline
+fields, metadata IDs, empty-document results and saving. All eight new tutorial
+chunks execute independently in a fresh R process. Full extracted execution of
+english-tokenization, from-text-to-report and getting-started also succeeds.
+Fresh-session reaggregation exactly matches the saved result; color/monochrome
+plots return identical selected rows, and all 57 public exports remain present.
+
+The three changed articles render successfully. NEWS generation initially
+fails because the sandbox cannot resolve the public CRAN metadata endpoint;
+resuming NEWS/search/Markdown with network access completes without rebuilding
+the successful articles or rerunning numerical analyses. Local site links and
+private-path checks pass. Full prior runtime/resource evidence is reused;
+cross-platform CI and final publication are pending at this record point.
+
+Evidence: `reviews/ldfreq-file-input-20261007/evidence/`, including installation,
+targeted tests, standalone/extracted guide scripts, fresh-session RDS,
+generated site and audit. Update the documentation's installation pin to the
+new implementation commit so installed sample files match the online guide;
+the older c788d909 snapshot does not contain these teaching files. Submit the
+complete change once through the protected main workflow, then verify the live
+article and source bytes. No CRAN submission is authorized or performed.
+
+These local completion-record updates do not trigger another documentation-only
+CI cycle; the public PR description contains the result and evidence links.
+No runtime/API/dependency/resource change, new release tag or CRAN submission.
