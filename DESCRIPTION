@@ -49,6 +49,7 @@ Encoding: UTF-8
 Suggests:
     gibasa (>= 1.1.3),
     ggplot2 (>= 3.4.0),
+    httr2 (>= 1.0.0),
     jsonlite,
     knitr,
     lexicon,

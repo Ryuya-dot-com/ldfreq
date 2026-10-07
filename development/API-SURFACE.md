@@ -92,6 +92,15 @@ dependency or generic reviewer is added.
 
 ## Export inventory
 
+The explicitly sourced `candidate-proposals.R` recipe handles categorical
+choices/abstentions without fabricating scores for `lexdiv_import_contextual()`.
+Its offline prepare/import helpers retain source/candidate identity, all-review
+coverage and separate human/model columns. The optional OpenAI caller uses httr2,
+explicit paid opt-in and saved request/result files; it is not an export or an
+automatic preprocessing step. It adds httr2 only to Suggests. Provider-neutral
+category transport remains an example contract pending broader use; no new
+class, evaluator or implicit human decision is introduced.
+
 | Export | Role and return boundary | Batch relation | Print | Plot | Analysis-ready access |
 |---|---|---|---|---|---|
 | `morphynet_read_derivations()` | Local six-field derivational TSV reader; preserves source/target/POS, affix position, alternatives and file identity | Reference resource; not a document profiler | Base list | No | `$relations`, scalar `$resource` for candidate review, `$provenance`; example preserves source row mapping and occurrence decisions |

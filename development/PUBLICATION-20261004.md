@@ -3840,3 +3840,116 @@ rendering, site/link checks and publication evidence are stored in
 reviews/ldfreq-japanese-files-20261007/evidence/. Protected final-head checks,
 main integration and live-site verification are pending at this record point.
 No CRAN submission or independent annotation/proficiency validation is included.
+
+## 2026-10-07 Japanese file workflow publication completed
+
+Final head `059fae698ce376b40ef9988eada266291776f62d` passes all nine jobs in
+R-CMD-check run 37579030450 and both protected required checks; development
+classification succeeds in run 37579030204, with formal candidate artifact
+jobs intentionally skipped. Current macOS/Windows/Linux and R devel each have
+7,877 assertions, no failures/warnings/skips, and Status: OK. R 4.1 has 7,802
+assertions, eight optional-dependency skips and two NOTEs: unavailable suggested
+gibasa/textstem and installed size 9.3Mb. R devel took longer in dependency
+preparation, then completed successfully. No CI cancellation, rerun, timeout
+increase or protection bypass was used.
+
+PR #27 merged to main `261a5be6b5dde353c80375b0faf1c7fe3a026aab`; its tree
+`76f1657eb63645c8cbd9e72835c3f4905d713a0d` equals the verified head. The merge
+subject skips only the duplicate same-tree main push CI. All 17 changed public
+source files match anonymous retrieval. README pins installation to
+`f632b8ddab037984223cafb68e3fecd3598dc3f9`, the implementation snapshot before
+the README-only final commit. Actual pak installation into a separate library
+passes: all 135 installed files under inst match the source, the Japanese
+recipe executes, and its full saved review replays identically. The user's R
+library was not replaced.
+
+Pages `8ab6e8eecb669734a702fe8148b0262425274ef6` deploys in successful run
+37581547628, and the Pages API agrees on the built commit. All 18 changed
+live files match verified bytes through anonymous certificate-verified requests.
+The site has 252 files / 129 HTML pages with no missing links/anchors. Live
+browser inspection confirms the walkthrough, compact accounting tables and
+save/resume section. Other articles and assets were reused. The eight reference
+Markdown companions are now consistent with their previously updated HTML.
+The final home-only rebuild required network access for pkgdown CRAN metadata;
+successful article calculations were retained rather than restarted.
+
+Evidence: reviews/ldfreq-japanese-files-20261007/evidence/, including focused
+tests, installed/fresh-session replay, GitHub install and file comparison, site
+audit and screenshots, final CI/job logs, merge identity, anonymous source
+hashes, staged site audit and live hashes. Completion-only records remain local;
+the merged PR description records these results. No CRAN submission, release
+tag, new exported API or independent linguistic/novice-user validation.
+
+## 2026-10-07 Japanese real-essay review pilot (local evidence)
+
+The next J1 work unit is complete for four purposively selected documents from
+the saved 28-essay diagnostic sample. Cached gibasa 1.1.3 / unidic-lite 1.0.8
+annotations were reused without invoking an analyzer. Complete source text,
+CRLF and dictionary features are retained. One document's standalone title is
+excluded by source coordinates; two spans in another document have provisional
+alternative boundaries. Eight lexical occurrences were selected and one left
+unresolved by Codex. These are exploratory judgments, not independently
+adjudicated gold annotations. The other 24 documents and unsubmitted occurrences
+remain unreviewed.
+
+Across the same four files, selected N is 976 for original whole-file input,
+969 for original body input and 968 for body input with the proposed boundaries.
+The affected document changes from N/V 179/89 to 178/87; MATTR with window 50
+changes from 0.6595385 to 0.6575194. No inference about writing improvement or
+proficiency is made. The three new tokens have missing dictionary features;
+these are separated from 31 unchanged missing-lemma occurrences. The fixed
+selection retains POS1 symbols, numbers, particles and missing POS, and excludes
+auxiliary symbols/whitespace. It does not establish a universal Japanese word
+definition. The body target roster has 29 occurrences: selected 8, unresolved 1,
+unreviewed 8, no supplied candidate 12. A title target stays in the source review.
+
+Fresh-session verification checks the source RDS hash, unchanged text/features,
+both complete imports, 16 accounting rows, 32 independent TTR/MATTR values,
+16 target-count rows, exact saved-review replay and reversed CSV decision
+application. Valid old decisions are rejected after segmentation changes, and
+body ranges cutting through tokens are rejected. Initial local-run segment
+ordering and verifier scalar-substr mistakes were corrected in the local scripts;
+they were not package defects. The final run and verification both succeed.
+
+Private evidence: workspace analysis/ninjal-essay/review-pilot/, including run.R,
+verify.R, run.log, verify.log, README.txt, source-linked CSVs and analysis-local.rds.
+Context CSV additionally exposes body membership and selected labels. No corpus
+text, individual IDs or KWIC are added to the repository, package or public site.
+Only internal roadmap/evidence documents change in the repository. Existing
+publication checks remain valid; no package rebuild, CI run, deployment, public
+API change, dependency addition or CRAN submission is required by this local pilot.
+
+## 2026-10-07 Optional categorical proposals and paid OpenAI recipe
+
+Added explicitly sourced prepare/import/call recipes, an offline authored
+Japanese demonstration, and a guide section connecting model proposals to
+existing human review. No exported API, class, core formula or required
+runtime dependency changes; httr2 is added to Suggests. The provider-neutral
+proposal table preserves selection, abstention, insufficient inventory,
+boundary-review requests and missing output separately from human decisions.
+
+The OpenAI route requires the user's credential and explicit paid opt-in. It
+sends one request with bounded input/output, does not retry or change models,
+and reuses saved request/result pairs. A reserved run with no saved result
+blocks automatic resubmission. Keys, HTTP authentication headers and request
+objects are not written to results. Standard examples, guide builds and tests
+do not contact the model. The live test uses only four authored sentences.
+
+The authorized GPT-4.1-mini-2025-04-14 request returned HTTP 200, four proposals,
+777 input tokens and 350 output tokens: three selections and one insufficient
+inventory case. One linguistically ambiguous illustration received a definite
+choice, so this establishes transport, not accuracy or justified abstention.
+71 focused assertions pass, including payment gating, mismatched inputs,
+invalid candidates, partial/empty output, refusal, truncation, malformed output,
+HTTP/transport failure, replay and credential omission. Fresh-session replay
+without a credential and with network disabled preserves source offsets,
+reordered proposal mapping, human decisions and coverage. No second paid call
+was made. The existing numerical tests remain applicable to unchanged R/ code.
+
+The changed contextual article renders successfully, including the complete
+existing offline examples; paid chunks remain unevaluated. The first news
+build could not resolve CRAN metadata in the sandbox. Only that failed news
+step was repeated with network access and then succeeded. Public/source CI,
+GitHub installation and live-site verification are pending at this record point.
+Evidence: workspace reviews/ldfreq-candidate-proposals-20261007/. Credentials
+remain outside the repository and installed artifacts. No CRAN submission.
