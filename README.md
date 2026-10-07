@@ -55,6 +55,9 @@ sensitivity with authored text, not learner data.
 These are features for describing and comparing texts. A score alone does not
 establish proficiency, writing quality, measurement validity, or reliability.
 
+The Japanese workflow also connects [source-linked frequency profiles](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#connect-document-selections-to-reference-frequency)
+to full-token coverage, common-span comparisons and saved-input replay.
+
 The text workflow supports surface forms, lemmas and AntBNC flemmas.
 For resource-defined word families, experimental `lexdiv_family_profile()`
 matches complete imported annotations to a caller-supplied form–family table.

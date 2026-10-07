@@ -92,6 +92,13 @@ dependency or generic reviewer is added.
 
 ## Export inventory
 
+The sourced `japanese-frequency-documents.R` recipes reuse the existing norm batch
+API for document summaries, retain full anchored key/selection tables and all-token
+coverage, and compare same-source/same-reference complete observed spans. Original
+text, unresolved keys, exclusions and empty documents remain available. The optional
+Japanese TUBELEX reader adds a complete local `reference` component for batches and
+replay; no new export, class, core formula or dependency is introduced.
+
 The explicitly sourced `japanese-document-profile.R` recipe consumes an unchanged
 complete annotation import, a complete anchored selection and caller-supplied
 POS groups. It returns document accounting, codepoint/feature tables, source
