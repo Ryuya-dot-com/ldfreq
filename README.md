@@ -153,7 +153,12 @@ original text, derives source positions, retains lexical-form/POS columns and
 dictionary metadata, and connects to the existing metrics and n-gram functions.
 The [Japanese guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html)
 provides an R-only gibasa/UniDic recipe, explicit missing-feature handling, and
-gap-preserving exclusions. A Japanese dictionary is optional and separately
+gap-preserving exclusions. Start with the executable
+[Japanese file-to-review walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#japanese-file-workflow):
+read authored files, retain title/body boundaries, review contextual identities,
+and save whole-body measures separately from target counts. This first example
+uses prepared annotations and needs no analyzer or dictionary.
+A Japanese dictionary is optional and separately
 obtained; the package does not bundle one or establish cross-language score
 equivalence. The Unicode tokenizer alone is not a Japanese word segmenter.
 

@@ -1,5 +1,14 @@
 # ldfreq 0.2.0 (development)
 
+## Japanese files, body selection and contextual review
+
+- Added an executable Japanese file-to-review walkthrough with authored TXT/CSV
+  inputs. It preserves titles and original positions, records body-range and
+  punctuation exclusions, separates all-body measures from reviewed target
+  identities, retains unresolved and empty cases, and saves the complete RDS.
+  It reuses existing imports, quanteda review and metrics without a new API,
+  analyzer, model or required dependency.
+
 ## Getting started from R help
 
 - Reworked introductory help and examples for raw text, token vectors, multiple
