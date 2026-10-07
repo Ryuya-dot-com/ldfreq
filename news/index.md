@@ -2,6 +2,25 @@
 
 ## ldfreq 0.2.0 (development)
 
+### Japanese files, body selection and contextual review
+
+- Added an executable Japanese file-to-review walkthrough with authored
+  TXT/CSV inputs. It preserves titles and original positions, records
+  body-range and punctuation exclusions, separates all-body measures
+  from reviewed target identities, retains unresolved and empty cases,
+  and saves the complete RDS. It reuses existing imports, quanteda
+  review and metrics without a new API, analyzer, model or required
+  dependency.
+
+### Getting started from R help
+
+- Reworked introductory help and examples for raw text, token vectors,
+  multiple documents and Nation word families. Examples explain expected
+  counts, missing values, output components and complete RDS saving,
+  with links to file-input and morphology tutorials. Lemma and
+  content-word selection are demonstrated separately so changes in
+  counting unit and denominator remain visible.
+
 ### Word families, roots and affixes
 
 - Added a standalone tutorial connecting family counts on shared

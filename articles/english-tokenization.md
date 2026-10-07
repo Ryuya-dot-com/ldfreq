@@ -687,8 +687,8 @@ cat(japanese_input$text)
 ```
 
 For Japanese word analysis, pass the decoded text into the [Japanese
-annotation
-workflow](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.md);
+file-to-review
+workflow](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#japanese-file-workflow);
 the English tokenizer is not a Japanese morphological analyzer. UTF-8
 file encoding and the R session’s locale are also different settings.
 

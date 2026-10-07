@@ -84,6 +84,28 @@ plot(x, ..., monochrome = FALSE)
 
 ## Details
 
+For a first analysis, create a table with one row per document and
+columns `document_id` and `text`, then call
+`lexdiv_metrics_text_batch()` directly. Replace the example texts with
+your own; retain a unique ID even for an empty document. Use `id_col`
+and `text_col` if your columns have different names. TXT-folder and CSV
+input are shown in the linked file-input tutorial.
+
+Read `result$results` for one row per document and metric. In the first
+example, *essay_a* has five tokens and four types (TTR 0.8), *essay_b*
+has five tokens and five types (TTR 1), and *empty* has zero tokens with
+`missing_reason = "empty_input"`. These short authored texts explain the
+output, not a comparison of writing ability.
+`lexdiv_widen(result$results)` puts metrics into columns without
+recalculating them. Keep the complete `result` when saving: the wide
+table alone does not retain the token audit and preprocessing records.
+
+Use `lexdiv_tokenize_batch()` separately when you want to inspect or
+annotate the tokens before scoring or reuse them with a reference
+vocabulary. Its output is a named list: `prepared$essay_a$tokens` shows
+one document. Do not supply tokenization settings again when scoring
+that prepared list.
+
 Plot defaults use a sans serif font, horizontal tick labels and an open
 frame. Override these with `family`, `las` or `bty` in the plot method's
 `...`. Cosmetic graphics parameters are restored after drawing.
@@ -141,55 +163,46 @@ as
 Use `lexdiv_widen(x$results)` to create a metric table; save the
 complete object to retain its audits.
 
+## See also
+
+[`lexdiv_metrics_text`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md),
+[`lexdiv_convenience`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md),
+[Read your own TXT or CSV
+files](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files),
+[From text to a research
+report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html)
+
 ## Examples
 
 ``` r
+library(ldfreq)
+
+# 1. One row per text; keep the empty document in the input.
 texts <- data.frame(
   document_id = c("essay_a", "essay_b", "empty"),
-  text = c("The cat can't read the book.", "A reader reads a story.", "")
+  text = c("Cats chase cats and dogs.", "The reader reads a story.", "")
 )
-prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
-prepared$essay_a$tokens
-#>   token_index start end surface is_number
-#> 1           1     1   3     the     FALSE
-#> 2           2     5   7     cat     FALSE
-#> 3           3     9  13   can't     FALSE
-#> 4           4    15  18    read     FALSE
-#> 5           5    20  22     the     FALSE
-#> 6           6    24  27    book     FALSE
 result <- lexdiv_metrics_text_batch(
-  prepared, metrics = c("ttr", "mattr"), window_length = 4
+  texts, tokenizer = "english", case = "lower", metrics = "ttr"
 )
-result
-#> <lexdiv_text_batch_results: 3 documents; 11 audited tokens>
-#> <lexdiv_batch_results: 3 documents; 6 metric records; schema 0.1.0>
-#>   document_id metric_id     value  status missing_reason N V
-#> 1     essay_a       ttr 0.8333333      ok           <NA> 6 5
-#> 2     essay_a     mattr 1.0000000      ok           <NA> 6 5
-#> 3     essay_b       ttr 0.8000000      ok           <NA> 5 4
-#> 4     essay_b     mattr 0.8750000      ok           <NA> 5 4
-#> 5       empty       ttr        NA missing    empty_input 0 0
-#> 6       empty     mattr        NA missing    empty_input 0 0
-#>   below_quality_floor
-#> 1               FALSE
-#> 2                TRUE
-#> 3               FALSE
-#> 4                TRUE
-#> 5                TRUE
-#> 6                TRUE
+result$results  # TTR: essay_a = 0.8, essay_b = 1; empty = NA
+#> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
+#>   document_id metric_id value  status missing_reason N V below_quality_floor
+#> 1     essay_a       ttr   0.8      ok           <NA> 5 4               FALSE
+#> 2     essay_b       ttr   1.0      ok           <NA> 5 5               FALSE
+#> 3       empty       ttr    NA missing    empty_input 0 0                TRUE
 result$token_audit
 #>    document_id token_index surface selected_unit unit_match_rule upos eligible
-#> 1      essay_a           1     the           the            <NA> <NA>     TRUE
-#> 2      essay_a           2     cat           cat            <NA> <NA>     TRUE
-#> 3      essay_a           3   can't         can't            <NA> <NA>     TRUE
-#> 4      essay_a           4    read          read            <NA> <NA>     TRUE
-#> 5      essay_a           5     the           the            <NA> <NA>     TRUE
-#> 6      essay_a           6    book          book            <NA> <NA>     TRUE
-#> 7      essay_b           1       a             a            <NA> <NA>     TRUE
-#> 8      essay_b           2  reader        reader            <NA> <NA>     TRUE
-#> 9      essay_b           3   reads         reads            <NA> <NA>     TRUE
-#> 10     essay_b           4       a             a            <NA> <NA>     TRUE
-#> 11     essay_b           5   story         story            <NA> <NA>     TRUE
+#> 1      essay_a           1    cats          cats            <NA> <NA>     TRUE
+#> 2      essay_a           2   chase         chase            <NA> <NA>     TRUE
+#> 3      essay_a           3    cats          cats            <NA> <NA>     TRUE
+#> 4      essay_a           4     and           and            <NA> <NA>     TRUE
+#> 5      essay_a           5    dogs          dogs            <NA> <NA>     TRUE
+#> 6      essay_b           1     the           the            <NA> <NA>     TRUE
+#> 7      essay_b           2  reader        reader            <NA> <NA>     TRUE
+#> 8      essay_b           3   reads         reads            <NA> <NA>     TRUE
+#> 9      essay_b           4       a             a            <NA> <NA>     TRUE
+#> 10     essay_b           5   story         story            <NA> <NA>     TRUE
 #>    exclusion_reason
 #> 1              <NA>
 #> 2              <NA>
@@ -201,12 +214,11 @@ result$token_audit
 #> 8              <NA>
 #> 9              <NA>
 #> 10             <NA>
-#> 11             <NA>
 lexdiv_widen(result$results)
-#> <lexdiv_wide_results: 3 rows; 23 columns>
+#> <lexdiv_wide_results: 3 rows; 12 columns>
 #>   document_id ttr__value ttr__status ttr__missing_reason  ttr__method_id
-#> 1     essay_a  0.8333333          ok                <NA> ttr_v_over_n_v1
-#> 2     essay_b  0.8000000          ok                <NA> ttr_v_over_n_v1
+#> 1     essay_a        0.8          ok                <NA> ttr_v_over_n_v1
+#> 2     essay_b        1.0          ok                <NA> ttr_v_over_n_v1
 #> 3       empty         NA     missing         empty_input ttr_v_over_n_v1
 #>   ttr__below_quality_floor       ttr__metric_contract_id
 #> 1                    FALSE ldfreq-lexical-diversity-core
@@ -216,34 +228,59 @@ lexdiv_widen(result$results)
 #> 1                        0.1.0                          
 #> 2                        0.1.0                          
 #> 3                        0.1.0                          
-#>   ttr__effective_parameters ttr__N ttr__V mattr__value mattr__status
-#> 1                                6      5        1.000            ok
-#> 2                                5      4        0.875            ok
-#> 3                                0      0           NA       missing
-#>   mattr__missing_reason       mattr__method_id mattr__below_quality_floor
-#> 1                  <NA> mattr_sliding_step1_v1                       TRUE
-#> 2                  <NA> mattr_sliding_step1_v1                       TRUE
-#> 3           empty_input mattr_sliding_step1_v1                       TRUE
-#>       mattr__metric_contract_id mattr__metric_contract_version
-#> 1 ldfreq-lexical-diversity-core                          0.1.0
-#> 2 ldfreq-lexical-diversity-core                          0.1.0
-#> 3 ldfreq-lexical-diversity-core                          0.1.0
-#>   mattr__requested_parameters mattr__effective_parameters mattr__N mattr__V
-#> 1                           4                           4        6        5
-#> 2                           4                           4        5        4
-#> 3                           4                                    0        0
+#>   ttr__effective_parameters ttr__N ttr__V
+#> 1                                5      4
+#> 2                                5      5
+#> 3                                0      0
+
+# 2. The plot displays the two computed scores; the empty row stays in
+# results.
+plot(result, metric_id = "ttr")
+
+plot(result, metric_id = "ttr", monochrome = TRUE)
+
+
+# 3. Save the whole analysis. Use your own output path for a research
+# project.
+path <- tempfile(fileext = ".rds")
+saveRDS(result, path)
+restored <- readRDS(path)
+restored$results
+#> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
+#>   document_id metric_id value  status missing_reason N V below_quality_floor
+#> 1     essay_a       ttr   0.8      ok           <NA> 5 4               FALSE
+#> 2     essay_b       ttr   1.0      ok           <NA> 5 5               FALSE
+#> 3       empty       ttr    NA missing    empty_input 0 0                TRUE
+unlink(path)  # Clean up only this temporary demonstration file.
+
+# 4. Optional workflow: prepare tokens once, then reuse them.
+prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
+prepared$essay_a$tokens
+#>   token_index start end surface is_number
+#> 1           1     1   4    cats     FALSE
+#> 2           2     6  10   chase     FALSE
+#> 3           3    12  15    cats     FALSE
+#> 4           4    17  19     and     FALSE
+#> 5           5    21  24    dogs     FALSE
+# A 4-token window illustrates MATTR here; it is not a research
+# recommendation.
+lexdiv_metrics_text_batch(prepared, metrics = "mattr", window_length = 4)$results
+#> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
+#>   document_id metric_id value  status missing_reason N V below_quality_floor
+#> 1     essay_a     mattr 0.875      ok           <NA> 5 4                TRUE
+#> 2     essay_b     mattr 1.000      ok           <NA> 5 5                TRUE
+#> 3       empty     mattr    NA missing    empty_input 0 0                TRUE
 nj8_profile_batch(prepared, unit = "surface")$coverage
 #>   document_id input_tokens eligible_tokens excluded_tokens selection_coverage
-#> 1     essay_a            6               6               0                  1
+#> 1     essay_a            5               5               0                  1
 #> 2     essay_b            5               5               0                  1
 #> 3       empty            0               0               0                 NA
 #>   matched_tokens off_list_tokens token_coverage eligible_types matched_types
-#> 1              5               1      0.8333333              5             4
-#> 2              4               1      0.8000000              4             3
+#> 1              2               3            0.4              4             2
+#> 2              4               1            0.8              5             4
 #> 3              0               0             NA              0             0
 #>   off_list_types type_coverage
-#> 1              1          0.80
-#> 2              1          0.75
+#> 1              2           0.5
+#> 2              1           0.8
 #> 3              0            NA
-plot(result, metric_id = "ttr")
 ```

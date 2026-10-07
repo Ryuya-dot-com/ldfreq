@@ -96,9 +96,18 @@ English words. *Behavior Research Methods*, 50, 1568–1580.
 
 <https://github.com/hugomailhot/MorphoLex-en>
 
+## See also
+
+[`bnccoca_data`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md),
+[Word families, roots and affixes
+tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html).
+The tutorial explains how to source the word-parts recipes; those
+helpers are not exported package functions.
+
 ## Examples
 
 ``` r
+# "0-1-1" is a source worksheet: zero prefixes, one root, one suffix.
 reference <- morpholex_data(c("0-1-1", "All roots"))
 words <- reference$sheets[["0-1-1"]]
 words[words$Word %in% c("teacher", "teachers"),
@@ -106,6 +115,7 @@ words[words$Word %in% c("teacher", "teachers"),
 #>          Word MorphoLexSegm ROOT1_FamSize ROOT1_Freq_HAL
 #> 6247  teacher {(teach)}>er>             4          84480
 #> 6248 teachers {(teach)}>er>             4          84480
+# Both records contain teach and -er. Plural -s is outside this resource's scope.
 roots <- reference$sheets[["All roots"]]
 roots$HAL_freq <- as.numeric(roots$HAL_freq)
 reference$provenance$data_license

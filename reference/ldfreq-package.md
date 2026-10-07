@@ -1,98 +1,48 @@
 # Reproducible Lexical Diversity and Frequency Profiles
 
-The ldfreq package computes explicitly versioned lexical-diversity
-metrics from ordered tokens and provides separate auditable raw-text,
-annotation, lexical-unit, Maas/MTLD sensitivity, and TUBELEX
-frequency-profile surfaces. It also provides local MATTR window and
-positional-exposure diagnostics, exact term and annotated-content-word
-type overlap, many-document coverage by one explicit reference term set,
-caller-supplied lexical-norm profiles with separate resource and
-annotation coverage, plus New JACET 8000 level profiles using the
-bundled table or an external copy.
-[`bnccoca_data`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md)
-supplies Nation's BNC/COCA Level 6 family membership and separate
-supplementary lists under CC BY-SA 4.0, for use with
-[`lexdiv_family_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_family_profile.md).
-[`morphynet_read_derivations`](https://ryuya-dot-com.github.io/ldfreq/reference/morphynet_read_derivations.md)
-reads local MorphyNet formation relations, preserving source and target
-POS, affixes and alternatives. Only a nine-row CC BY-SA 3.0 teaching
-excerpt is bundled, not the full database.
-[`morpholex_data`](https://ryuya-dot-com.github.io/ldfreq/reference/morpholex_data.md)
-provides the bundled MorphoLex English worksheet tables and provenance.
-Those data and their dictionary use CC BY-NC-SA 4.0 (noncommercial use,
-attribution and applicable ShareAlike conditions), separately from the
-MIT license of the independent R code. Adjacent bigram/trigram
-extraction and caller-supplied reference frequencies retain segment
-boundaries, original positions, opportunity totals and coverage.
-[`lexdiv_ngram_compare`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md)
-compares reference choices using the same target items, retaining
-coverage and common-set differences from a baseline. Result rows retain
-method, parameter or denominator, schema, and contract provenance.
-
-## Details
-
-Start with
-[`lexdiv_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
-for explicit tokens,
+Analyze lexical diversity in one or many texts, and describe vocabulary
+using explicit reference lists. Start with
 [`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md)
-for one raw or annotated text,
-[`lexdiv_metrics_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
-for multiple tokenized documents,
-[`lexdiv_tokenize_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md)
-and
+for one English text or
 [`lexdiv_metrics_text_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md)
-for named raw texts or explicit ID/text tables,
-[`lexdiv_as_documents()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
-for tidy or quanteda token containers,
-[`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
-for a pure wide transformation,
-[`lexdiv_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-for explicit parameter variants,
-[`lexdiv_mattr_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_mattr_profile.md)
-for one or more canonical MATTR trajectories,
-[`lexdiv_variant_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md)
-for separately contracted Maas/MTLD sensitivity variants, or
-[`lexdiv_term_overlap()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_overlap.md)
-for two explicit term vectors,
-[`lexdiv_content_overlap()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_overlap.md)
-for two UPOS-annotated texts, or
-[`lexdiv_reference_coverage()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_reference_coverage.md)
-for several term vectors against one reference set, or
-[`lexdiv_norm_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile.md)
-and
-[`lexdiv_norm_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile_batch.md)
-for exact matching against a caller-supplied numeric lexical-norm table,
-or
-[`lexdiv_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngrams.md),
-[`lexdiv_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngrams.md)
-and
-[`lexdiv_ngram_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngrams.md)
-for adjacent sequences and local reference counts, or
-[`nj8_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/nj8_profile.md)
-for exact and cumulative pedagogical frequency levels from the bundled
-or an external list, or
-[`tubelex_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md)
-for coverage-aware corpus-relative frequency and prevalence.
+for several. Results retain the words counted, analysis settings and
+reasons for unavailable scores.
 
-## Corpus scope
+## Your first analysis
 
-The functions can describe native-speaker and learner texts, including
-English writing and prepared speech transcripts. Within-population
-register variation, matched L1/L2 comparisons and reference-resource
-sensitivity are distinct applications. Participant knowledge scores are
-not required for descriptive corpus analysis. Retain
-language-background, corpus, register, task and author/speaker metadata
-separately and link them to results by document ID. The raw-text helpers
-do not infer these attributes or parse corpus XML and transcription
-conventions. Document repeated speakers and turn boundaries when
-preparing spoken data.
+After installing the package, run:
 
-Native-speaker status does not establish a universal proficiency or
-quality norm. The bundled TUBELEX resource describes YouTube subtitle
-word forms; it does not certify the first-language background or ability
-of each speaker.
+    library(ldfreq)
+    result <- lexdiv_metrics_text(
+      "Cats chase cats and dogs.",
+      tokenizer = "english", case = "lower", metrics = "ttr"
+    )
+    result$results
 
-## Start here
+The text has five word occurrences (`N = 5`) and four distinct lowercase
+forms (`V = 4`). Its type-token ratio is `4/5 = 0.8`, with
+`status = "ok"`. TTR depends on text length; this is a small calculation
+example, not evidence of writing ability. Use `result$token_audit` to
+inspect the counted words. Other metrics can return `NA` when a text is
+too short for their requested settings; read `missing_reason` beside the
+value.
+
+Open
+[`?lexdiv_metrics_text`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md)
+for the full help and
+`example("lexdiv_metrics_text", package = "ldfreq")` to run its
+examples. Several related functions share that help page, so its
+examples also include optional annotation workflows. No model, Python or
+optional R package is required for the first analysis above.
+
+For an end-to-end workflow, see [From text to a research
+report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html).
+For your own files, see [TXT-folder and CSV
+input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
+For counting units and morphology, see [Word families, roots and
+affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html).
+
+## Choose your input
 
 Choose the entry point from the form of data you already have:
 
@@ -102,6 +52,22 @@ Choose the entry point from the form of data you already have:
   [`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md).
   It calls the explicit tokenizer and returns its preprocessing audit
   beside the metric rows.
+
+- Several raw texts or a document/text table:
+
+  Use
+  [`lexdiv_metrics_text_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md).
+  Inspect `result$results` and keep the complete object when saving. The
+  examples show both ID/text input and a prepared-token workflow.
+
+- Word families:
+
+  Use
+  [`lexdiv_family_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_family_profile.md)
+  with complete imported annotations and an explicit inventory. Its
+  self-contained example uses
+  [`bnccoca_data`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md)
+  and explains unlisted words and coverage.
 
 - One ordered token vector:
 
@@ -216,6 +182,55 @@ identity. A *lemma* is an annotation-provided base form. An AntBNC
 distinctions. *Coverage* is the proportion of eligible tokens or types
 that received a usable annotation or resource match; it is not a
 proficiency score.
+
+## Available analyses and reference resources
+
+The ldfreq package computes explicitly versioned lexical-diversity
+metrics from ordered tokens and provides separate auditable raw-text,
+annotation, lexical-unit, Maas/MTLD sensitivity, and TUBELEX
+frequency-profile surfaces. It also provides local MATTR window and
+positional-exposure diagnostics, exact term and annotated-content-word
+type overlap, many-document coverage by one explicit reference term set,
+caller-supplied lexical-norm profiles with separate resource and
+annotation coverage, plus New JACET 8000 level profiles using the
+bundled table or an external copy.
+[`bnccoca_data`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md)
+supplies Nation's BNC/COCA Level 6 family membership and separate
+supplementary lists under CC BY-SA 4.0, for use with
+[`lexdiv_family_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_family_profile.md).
+[`morphynet_read_derivations`](https://ryuya-dot-com.github.io/ldfreq/reference/morphynet_read_derivations.md)
+reads local MorphyNet formation relations, preserving source and target
+POS, affixes and alternatives. Only a nine-row CC BY-SA 3.0 teaching
+excerpt is bundled, not the full database.
+[`morpholex_data`](https://ryuya-dot-com.github.io/ldfreq/reference/morpholex_data.md)
+provides the bundled MorphoLex English worksheet tables and provenance.
+Those data and their dictionary use CC BY-NC-SA 4.0 (noncommercial use,
+attribution and applicable ShareAlike conditions), separately from the
+MIT license of the independent R code. Adjacent bigram/trigram
+extraction and caller-supplied reference frequencies retain segment
+boundaries, original positions, opportunity totals and coverage.
+[`lexdiv_ngram_compare`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md)
+compares reference choices using the same target items, retaining
+coverage and common-set differences from a baseline. Result rows retain
+method, parameter or denominator, schema, and contract provenance.
+
+## Corpus scope
+
+The functions can describe native-speaker and learner texts, including
+English writing and prepared speech transcripts. Within-population
+register variation, matched L1/L2 comparisons and reference-resource
+sensitivity are distinct applications. Participant knowledge scores are
+not required for descriptive corpus analysis. Retain
+language-background, corpus, register, task and author/speaker metadata
+separately and link them to results by document ID. The raw-text helpers
+do not infer these attributes or parse corpus XML and transcription
+conventions. Document repeated speakers and turn boundaries when
+preparing spoken data.
+
+Native-speaker status does not establish a universal proficiency or
+quality norm. The bundled TUBELEX resource describes YouTube subtitle
+word forms; it does not certify the first-language background or ability
+of each speaker.
 
 ## Input boundary
 
@@ -443,37 +458,44 @@ connection or external runtime.
 ## Examples
 
 ``` r
-metric_ids <- lexdiv_metric_ids()
-head(metric_ids)
-#> [1] "ttr"    "rttr"   "cttr"   "herdan" "maas"   "msttr" 
+library(ldfreq)
 
-smoke_path <- system.file("examples", "offline-smoke.R", package = "ldfreq")
-stopifnot(nzchar(smoke_path))
-source(smoke_path, local = TRUE)
-
-contract_files <- c(
-  "lexical-diversity-contract.json",
-  "ldfreq-preprocessing-contract.json",
-  "lexical-overlap-contract.json",
-  "reference-coverage-contract.json",
-  "mattr-profile-contract.json",
-  "norm-profile-contract.json",
-  "norm-profile-batch-contract.json",
-  "lexical-diversity-variant-contract.json",
-  "lexical-level-profile-contract.json",
-  "tubelex-frequency-profile-contract.json"
+# One raw English text: inspect the score and the counted words.
+result <- lexdiv_metrics_text(
+  "Cats chase cats and dogs.",
+  tokenizer = "english", case = "lower", metrics = "ttr"
 )
-contract_paths <- system.file("spec", contract_files, package = "ldfreq")
-stopifnot(all(nzchar(contract_paths)))
-basename(contract_paths)
-#>  [1] "lexical-diversity-contract.json"        
-#>  [2] "ldfreq-preprocessing-contract.json"     
-#>  [3] "lexical-overlap-contract.json"          
-#>  [4] "reference-coverage-contract.json"       
-#>  [5] "mattr-profile-contract.json"            
-#>  [6] "norm-profile-contract.json"             
-#>  [7] "norm-profile-batch-contract.json"       
-#>  [8] "lexical-diversity-variant-contract.json"
-#>  [9] "lexical-level-profile-contract.json"    
-#> [10] "tubelex-frequency-profile-contract.json"
+result$results  # N = 5, V = 4, TTR = 0.8
+#> <lexdiv_results: 1 metric; contract 0.1.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr   0.8     ok           <NA> 5 4               FALSE
+result$token_audit
+#>   token_index surface selected_unit unit_match_rule upos eligible
+#> 1           1    cats          cats            <NA> <NA>     TRUE
+#> 2           2   chase         chase            <NA> <NA>     TRUE
+#> 3           3    cats          cats            <NA> <NA>     TRUE
+#> 4           4     and           and            <NA> <NA>     TRUE
+#> 5           5    dogs          dogs            <NA> <NA>     TRUE
+#>   exclusion_reason
+#> 1             <NA>
+#> 2             <NA>
+#> 3             <NA>
+#> 4             <NA>
+#> 5             <NA>
+
+# Several texts: names identify documents, including the empty one.
+texts <- c(essay_a = "Cats chase cats and dogs.", essay_b = "The reader reads a story.",
+  empty = "")
+batch <- lexdiv_metrics_text_batch(
+  texts, tokenizer = "english", case = "lower", metrics = "ttr"
+)
+batch$results  # TTR = 0.8, 1, NA; the empty text has reason "empty_input".
+#> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
+#>   document_id metric_id value  status missing_reason N V below_quality_floor
+#> 1     essay_a       ttr   0.8      ok           <NA> 5 4               FALSE
+#> 2     essay_b       ttr   1.0      ok           <NA> 5 5               FALSE
+#> 3       empty       ttr    NA missing    empty_input 0 0                TRUE
+
+# Other entry points: ?lexdiv_metrics for pre-tokenized words;
+# ?lexdiv_family_profile for a complete Nation word-family example.
 ```

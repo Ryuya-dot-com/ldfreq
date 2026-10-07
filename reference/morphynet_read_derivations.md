@@ -107,7 +107,9 @@ Proceedings of the 18th SIGMORPHON Workshop, 39–48.
 
 [`lexdiv_ambiguity_review`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ambiguity_review.md),
 [`morpholex_data`](https://ryuya-dot-com.github.io/ldfreq/reference/morpholex_data.md),
-[`bnccoca_data`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md)
+[`bnccoca_data`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md),
+[Word families, roots and affixes
+tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html)
 
 ## Examples
 
@@ -125,6 +127,7 @@ reference$relations[reference$relations$target_word == "reusability", ]
 #> 4          N  ability         suffix
 #> 6          N      ity         suffix
 #> 7          N       re         prefix
+# Three incoming relations, not three counted affixes in one segmentation.
 # For a complete, separately obtained English v1 file:
 # reference <- morphynet_read_derivations("eng.derivational.v1.tsv", "en", "English v1")
 ```

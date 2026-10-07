@@ -127,6 +127,21 @@ columns are `document_id`, `batch_schema_id`, and
 
 ## Details
 
+Start with `lexdiv_metrics(c("a", "a", "b", "c"), metrics = "ttr")`.
+Each vector element is one word occurrence: `N = 4` tokens contain
+`V = 3` distinct types, so `value = 0.75`. The result is already a data
+frame; use `result$value` to access its scores. For a raw sentence, use
+[`lexdiv_metrics_text`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md)
+instead of putting the whole sentence in one vector element. TTR varies
+with text length and is not an essay-quality score.
+
+The examples then show a computed value, an empty document, an invalid
+token, and a text shorter than a requested window. An `NA` value has a
+reason: inspect `status` and `missing_reason` before interpreting it or
+combining results. Choosing `metrics = "ttr"` keeps the first example
+small; omitting `metrics` requests all methods, some of which cannot be
+computed for short inputs.
+
 The current versioned set contains TTR, RTTR/Guiraud, CTTR, Herdan's C,
 natural-log Maas a-squared, complete non-overlapping MSTTR, step-one
 MATTR, bidirectional MTLD, sample-size-normalized hypergeometric HD-D on
@@ -248,15 +263,62 @@ variants and parameter values documented here when reporting ldfreq
 results. Expected-TTR D is a separately named exact-expectation curve
 fit, not CLAN VOCD.
 
+## See also
+
+[`lexdiv_metrics_text`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md),
+[`lexdiv_text_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md),
+[Getting
+started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html)
+
 ## Examples
 
 ``` r
+library(ldfreq)
+
+# One vector element per token, in its original order.
+tokens <- c("a", "a", "b", "c")
+result <- lexdiv_metrics(tokens, metrics = "ttr")
+result  # N = 4, V = 3, value = 0.75, status = "ok"
+#> <lexdiv_results: 1 metric; contract 0.1.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr  0.75     ok           <NA> 4 3               FALSE
+result$value
+#> [1] 0.75
+
+# Empty, invalid, and too-short inputs are different conditions.
+lexdiv_metrics(character(), metrics = "ttr")  # missing / empty_input
+#> <lexdiv_results: 1 metric; contract 0.1.0>
+#>   metric_id value  status missing_reason N V below_quality_floor
+#> 1       ttr    NA missing    empty_input 0 0                TRUE
+lexdiv_metrics(c("a", NA_character_), metrics = "ttr")  # invalid_input / invalid_token
+#> <lexdiv_results: 1 metric; contract 0.1.0>
+#>   metric_id value        status missing_reason  N  V below_quality_floor
+#> 1       ttr    NA invalid_input  invalid_token NA NA                  NA
+lexdiv_metrics(c("a", "b"), metrics = "mattr", window_length = 3)
+#> <lexdiv_results: 1 metric; contract 0.1.0>
+#>   metric_id value  status                    missing_reason N V
+#> 1     mattr    NA missing too_short_for_requested_parameter 2 2
+#>   below_quality_floor
+#> 1                TRUE
+# The last result is missing / too_short_for_requested_parameter, not zero.
+
+# Named lists keep each document separate, including the empty document.
+documents <- list(doc_a = c("a", "a", "b"), doc_b = character())
+batch <- lexdiv_metrics_batch(documents, metrics = "ttr")
+batch  # doc_a: N = 3, V = 2, TTR = 2/3; doc_b: missing / empty_input
+#> <lexdiv_batch_results: 2 documents; 2 metric records; schema 0.1.0>
+#>   document_id metric_id     value  status missing_reason N V
+#> 1       doc_a       ttr 0.6666667      ok           <NA> 3 2
+#> 2       doc_b       ttr        NA missing    empty_input 0 0
+#>   below_quality_floor
+#> 1               FALSE
+#> 2                TRUE
+
+# Further methods. Sample size 2 is for this tiny illustration only.
 lexdiv_metric_ids()
 #>  [1] "ttr"            "rttr"           "cttr"           "herdan"        
 #>  [5] "maas"           "msttr"          "mattr"          "mtld"          
 #>  [9] "hdd"            "expected_ttr_d" "yule_k"         "yule_i"        
-
-tokens <- c("a", "a", "b", "c")
 lexdiv_metrics(tokens, metrics = c("ttr", "hdd"), sample_size = 2)
 #> <lexdiv_results: 2 metrics; contract 0.1.0>
 #>   metric_id     value status missing_reason N V below_quality_floor
@@ -270,21 +332,6 @@ lexdiv_metrics(
 #> <lexdiv_results: 1 metric; contract 0.1.0>
 #>        metric_id     value status missing_reason  N V below_quality_floor
 #> 1 expected_ttr_d 0.1164681     ok           <NA> 80 3               FALSE
-
-lexdiv_metrics(character(), metrics = "ttr")
-#> <lexdiv_results: 1 metric; contract 0.1.0>
-#>   metric_id value  status missing_reason N V below_quality_floor
-#> 1       ttr    NA missing    empty_input 0 0                TRUE
-lexdiv_metrics(c("a", NA_character_), metrics = "ttr")
-#> <lexdiv_results: 1 metric; contract 0.1.0>
-#>   metric_id value        status missing_reason  N  V below_quality_floor
-#> 1       ttr    NA invalid_input  invalid_token NA NA                  NA
-lexdiv_metrics(c("a", "b"), metrics = "mattr", window_length = 3)
-#> <lexdiv_results: 1 metric; contract 0.1.0>
-#>   metric_id value  status                    missing_reason N V
-#> 1     mattr    NA missing too_short_for_requested_parameter 2 2
-#>   below_quality_floor
-#> 1                TRUE
 
 mtld <- lexdiv_metrics(rep(c("a", "b"), 10), metrics = "mtld")
 mtld$diagnostics[[1]]
@@ -306,20 +353,6 @@ mtld$diagnostics[[1]]
 #> $reverse_tail_credit
 #> [1] 0
 #> 
-
-documents <- list(doc_a = c("a", "a", "b"), doc_b = character())
-lexdiv_metrics_batch(documents, metrics = c("ttr", "mtld"))
-#> <lexdiv_batch_results: 2 documents; 4 metric records; schema 0.1.0>
-#>   document_id metric_id     value  status                  missing_reason N V
-#> 1       doc_a       ttr 0.6666667      ok                            <NA> 3 2
-#> 2       doc_a      mtld        NA missing insufficient_tokens_for_formula 3 2
-#> 3       doc_b       ttr        NA missing                     empty_input 0 0
-#> 4       doc_b      mtld        NA missing                     empty_input 0 0
-#>   below_quality_floor
-#> 1               FALSE
-#> 2                TRUE
-#> 3                TRUE
-#> 4                TRUE
 
 contract_path <- system.file(
   "spec", "lexical-diversity-contract.json", package = "ldfreq"

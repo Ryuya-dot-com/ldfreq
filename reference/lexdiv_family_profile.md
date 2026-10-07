@@ -1,12 +1,12 @@
 # Count resource-defined word families while retaining source occurrences
 
-Matches complete imported annotations against a caller-supplied
-word-family table. This experimental function retains original tokens,
-candidate records, context, resource definitions, document counts and
-unresolved occurrences. It runs no morphological analyzer. Use
-[`bnccoca_data`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md)
-for the bundled Nation inventory or supply a differently defined table
-explicitly.
+Count the word families represented in each document using an explicit
+form-to-family inventory. The example below imports a small token table
+and uses the bundled Nation inventory from
+[`bnccoca_data`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md).
+Original word occurrences and unresolved matches remain available for
+inspection. This experimental function requires prepared tokens; it does
+not tokenize raw text or run a morphological analyzer.
 
 ## Usage
 
@@ -93,6 +93,41 @@ lexdiv_family_profile(annotations, dictionary, resource,
   quanteda calls. Default `NULL` uses lookup alone.
 
 ## Details
+
+The first example is self-contained and needs no optional package or
+download. It has three steps: import complete tokens with their original
+text, load the family inventory, and call `lexdiv_family_profile()`. The
+short texts and token boundaries were written for teaching; they are not
+analyzer output. Nation's list uses uppercase forms, so the example
+explicitly selects `normalization = "nfkc_lower"` to match the lowercase
+input.
+
+Start by reading `profile$documents`. For *listed*, the four tokens *use
+uses colour color* match two families: `family_types = 2`,
+`family_ttr = 2/4 = 0.5`, and `token_coverage = 1`. For *unlisted*,
+*use* matches but *reusability* does not occur in this inventory:
+coverage is 0.5 and `observed_family_types = 1`, while the
+whole-document `family_types` and `family_ttr` remain `NA`. Do not
+interpret the observed count as the complete vocabulary or replace
+unresolved families with zero. The empty document has zero family types
+and undefined TTR and coverage.
+
+Read `profile$members` for the matched forms within each family and
+`profile$occurrences` to trace every match or missing assignment back to
+its original position and context. The pooled `profile$summary` combines
+documents; it does not replace their individual rows. Save the complete
+`profile` as RDS to retain the inputs, inventory and analysis choices.
+
+To use your own data, prepare the `segments` and `tokens` tables shown
+below, keeping punctuation and the original segment text. The example
+texts have no punctuation. To exclude punctuation in other texts, supply
+documented UD `upos` tags and set `exclude_pos = c("PUNCT", "SYM")`
+after import. Lemmas are only needed for `unit = "lemma"`; they are not
+needed for this surface lookup. A
+[`lexdiv_tokenize()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md)
+result is a different object and cannot be passed directly as
+`annotations`. See the linked word-family tutorial for CSV inputs,
+shared-token comparisons and review.
 
 Only one distinct candidate family permits assignment. Multiple records
 for that same family retain their record IDs but count as one family
@@ -197,68 +232,113 @@ of Lexicography*, 6(4), 253–279.
 ## See also
 
 [`lexdiv_import_annotations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md),
+[`bnccoca_data`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md),
 [`lexdiv_flemmatize`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_flemmatize.md),
 [`lexdiv_metrics`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md),
-[`lexdiv_compare_ambiguity`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_ambiguity.md)
+[`lexdiv_compare_ambiguity`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_ambiguity.md),
+[Word families, roots and affixes
+tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html)
 
 ## Examples
 
 ``` r
-env <- new.env(parent = baseenv())
-sys.source(system.file("examples", "word-families.R", package = "ldfreq",
-  mustWork = TRUE), env)
-x <- env$word_families_example
-x$profile$documents
+library(ldfreq)
+
+# 1. Complete authored texts and their tokens. Empty documents have no
+# token rows.
+segments <- data.frame(
+  document_id = c("listed", "unlisted", "empty"), segment_id = "s1",
+  text = c("use uses colour color", "use reusability", "")
+)
+tokens <- data.frame(
+  document_id = c(rep("listed", 4), rep("unlisted", 2)), segment_id = "s1",
+  token_index = c(1:4, 1:2),
+  surface = c("use", "uses", "colour", "color",
+    "use", "reusability")
+)
+# Describe how these tokens were prepared; use your actual metadata for
+# real data.
+annotations <- lexdiv_import_annotations(tokens, segments, list(
+  language = "en", analyzer = "authored-example",
+  analyzer_version = "1",
+  dictionary = "none", dictionary_version = "not-applicable",
+  unit = "word", normalization = "none"
+))
+
+# 2. Load Nation's bundled inventory. It does not include REUSABILITY.
+reference <- bnccoca_data()
+profile <- lexdiv_family_profile(
+  annotations, reference$dictionary, reference$resource,
+  normalization = "nfkc_lower"
+)
+
+# 3. Read document totals together with coverage and status.
+profile$documents[c("document_id", "selected_tokens", "matched_tokens",
+  "token_coverage", "observed_family_types", "family_types",
+  "family_ttr", "status")]
+#>   document_id selected_tokens matched_tokens token_coverage
+#> 1      listed               4              4            1.0
+#> 2    unlisted               2              1            0.5
+#> 3       empty               0              0             NA
+#>   observed_family_types family_types family_ttr     status
+#> 1                     2            2        0.5   complete
+#> 2                     1           NA         NA incomplete
+#> 3                     0            0         NA      empty
+# listed: 4 tokens, 2 families, TTR 0.5, coverage 1, complete
+# unlisted: 2 tokens, coverage 0.5; whole-document family count/TTR are NA
+# empty: 0 tokens, 0 families; TTR and coverage are NA
+profile$members
+#>   document_id        family_id surface  query n
+#> 1      listed bnccoca:01:06348     use    use 1
+#> 2      listed bnccoca:01:06348    uses   uses 1
+#> 3      listed bnccoca:01:00998  colour colour 1
+#> 4      listed bnccoca:01:00998   color  color 1
+#> 5    unlisted bnccoca:01:06348     use    use 1
+profile$occurrences[c("document_id", "keyword", "status", "family_id")]
+#>   document_id     keyword   status        family_id
+#> 1      listed         use  matched bnccoca:01:06348
+#> 2      listed        uses  matched bnccoca:01:06348
+#> 3      listed      colour  matched bnccoca:01:00998
+#> 4      listed       color  matched bnccoca:01:00998
+#> 5    unlisted         use  matched bnccoca:01:06348
+#> 6    unlisted reusability unlisted             <NA>
+
+# Save all inputs and choices, not only the displayed document table.
+path <- tempfile(fileext = ".rds")
+saveRDS(profile, path)
+restored <- readRDS(path)
+restored$documents
 #>   document_id tokens excluded_tokens known_selected_tokens
-#> 1    complete      5               1                     4
-#> 2  unresolved      3               1                     2
+#> 1      listed      4               0                     4
+#> 2    unlisted      2               0                     2
 #> 3       empty      0               0                     0
 #>   unknown_selection_tokens selected_tokens matched_tokens unlisted_tokens
 #> 1                        0               4              4               0
-#> 2                        0               2              0               1
+#> 2                        0               2              1               1
 #> 3                        0               0              0               0
 #>   ambiguous_tokens missing_unit_tokens missing_pos_tokens withheld_tokens
 #> 1                0                   0                  0               0
-#> 2                1                   0                  0               0
+#> 2                0                   0                  0               0
 #> 3                0                   0                  0               0
 #>   unresolved_tokens review_selected_tokens review_unresolved_tokens
 #> 1                 0                      0                        0
-#> 2                 2                      0                        0
+#> 2                 1                      0                        0
 #> 3                 0                      0                        0
 #>   conditional_token_coverage token_coverage observed_family_types family_types
-#> 1                          1              1                     1            1
-#> 2                          0              0                     0           NA
+#> 1                        1.0            1.0                     2            2
+#> 2                        0.5            0.5                     1           NA
 #> 3                         NA             NA                     0            0
 #>   family_ttr     status
-#> 1       0.25   complete
+#> 1        0.5   complete
 #> 2         NA incomplete
 #> 3         NA      empty
-x$profile$members
-#>   document_id family_id     surface       query n
-#> 1    complete       USE         use         use 2
-#> 2    complete       USE        uses        uses 1
-#> 3    complete       USE reusability reusability 1
-x$profile$occurrences[c("document_id", "keyword", "status", "family_id")]
-#>   document_id     keyword    status family_id
-#> 1    complete         use   matched       USE
-#> 2    complete        uses   matched       USE
-#> 3    complete reusability   matched       USE
-#> 4    complete         use   matched       USE
-#> 5    complete           .  excluded      <NA>
-#> 6  unresolved        bank ambiguous      <NA>
-#> 7  unresolved        quux  unlisted      <NA>
-#> 8  unresolved           .  excluded      <NA>
-x$comparison
-#>      unit metric_id     value N V
-#> 1 surface       ttr 0.7500000 4 3
-#> 2 surface     mattr 1.0000000 4 3
-#> 3   lemma       ttr 0.5000000 4 2
-#> 4   lemma     mattr 0.6666667 4 2
-#> 5  flemma       ttr 0.5000000 4 2
-#> 6  flemma     mattr 0.6666667 4 2
-#> 7  family       ttr 0.2500000 4 1
-#> 8  family     mattr 0.3333333 4 1
+unlink(path)
+
+# Advanced, separate authored review example; inspect the script before
+# adapting it.
+# Optional: install.packages("quanteda") to run the review example.
 if (requireNamespace("quanteda", quietly = TRUE)) {
+  env <- new.env(parent = baseenv())
   sys.source(system.file("examples", "word-family-review.R", package = "ldfreq",
     mustWork = TRUE), env)
   env$word_family_review_example$reviewed$documents

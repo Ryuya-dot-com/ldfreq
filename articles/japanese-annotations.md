@@ -21,6 +21,14 @@ lexical analyses. This is an integration and audit contribution, not a
 new Japanese segmentation algorithm or a validated Japanese proficiency
 scale.
 
+For a complete first workflow, start with [Read files, review words and
+save the analysis](#japanese-file-workflow). It uses small authored
+TXT/CSV files and prepared annotations, so you can learn the decisions
+without installing an analyzer. Then use the [gibasa
+recipe](#use-gibasa-and-a-local-unidic-dictionary-in-r) to supply your
+own annotations. File reading and morphological analysis are separate
+steps.
+
 ## An offline example
 
 The package’s token-table importer supports R \>= 4.1. The optional
@@ -104,6 +112,321 @@ establish the reliability of a diversity measure. Choose
 length-appropriate measures and report non-computable requests rather
 than changing their parameters silently.
 
+## Read files, review words and save the analysis
+
+Suppose the first line is a title and your question concerns vocabulary
+in the body. Deleting the title changes later character positions;
+counting every target hit includes words outside your intended sample.
+This example retains the whole file, selects the body by its original
+positions, and reports body word counts separately from the lexical
+identities you review.
+
+The five authored files contain spelling variants, homophones, an
+invented unlisted form, punctuation only, and an empty file. Their
+annotations are **prepared by the example’s author**, not produced by a
+hidden tokenizer. All files are MIT teaching material; no learner corpus
+or dictionary is bundled. Optional quanteda \>= 4.5.0 and a UTF-8 R
+session are needed for KWIC review. No Python or external model is
+required for this walkthrough.
+
+To run the complete example at once:
+
+``` r
+source(system.file("examples", "japanese-file-workflow.R", package = "ldfreq"))
+as.data.frame(ja_file_record$metrics)  # All retained body words
+ja_file_record$counts          # Reviewed target occurrences only
+ja_file_output                 # Directory containing the complete RDS and count CSV
+```
+
+The following steps show the same recipe. The files and annotations are
+separate inputs; replacing a TXT file also requires complete annotations
+of its new text.
+
+### 1. Read the original files and import prepared annotations
+
+``` r
+sys.source(system.file("examples", "text-file-input.R", package = "ldfreq", mustWork = TRUE),
+  envir = environment())
+ja_file_dir <- system.file("examples", "text-input", "japanese-workflow",
+  package = "ldfreq", mustWork = TRUE)
+ja_document_ids <- c("variants", "homophones", "unlisted", "no_targets", "empty")
+ja_files <- lapply(ja_document_ids, function(id)
+  read_text_file(file.path(ja_file_dir, paste0(id, ".txt")), encoding = "UTF-8"))
+ja_file_manifest <- cbind(document_id = ja_document_ids,
+  do.call(rbind, lapply(ja_files, `[[`, "source")))
+ja_file_segments <- data.frame(document_id = ja_document_ids, segment_id = "s1",
+  text = vapply(ja_files, `[[`, character(1), "text"))
+ja_file_annotations <- utils::read.csv(
+  text = read_text_file(file.path(ja_file_dir, "annotations.csv"))$text,
+  colClasses = "character", check.names = FALSE, na.strings = "<MISSING>")
+ja_file_annotations$token_index <- as.numeric(ja_file_annotations$token_index)
+ja_file_import <- ldfreq::lexdiv_import_annotations(ja_file_annotations, ja_file_segments,
+  list(language = "ja", analyzer = "authored", analyzer_version = "1",
+    dictionary = "none", dictionary_version = "not-applicable",
+    unit = "authored-file-workflow", normalization = "none"))
+```
+
+Each original file is one segment here. Whitespace gaps, including its
+line breaks, are preserved. These are not inferred sentence boundaries.
+The importer checks every non-whitespace character against
+`annotations.csv` before any title or punctuation is excluded.
+`ja_file_manifest` records encoding, byte hashes and a removed leading
+BOM, if any. The [file input
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files)
+explains explicit UTF-8/CP932 decoding in more detail.
+
+| Object | One row represents | Keep it for |
+|----|----|----|
+| `ja_file_segments` | One original file/segment, including empty files | Original text and document IDs |
+| `ja_file_import$tokens` | One prepared token with original character positions | Complete annotation before selection |
+| `ja_file_selection` | One original token and its inclusion reason | Body and punctuation exclusions |
+| `ja_file_after$occurrences` | One target occurrence, not one candidate | Context, status and recorded decisions |
+| `ja_file_record` | The complete saved analysis | Reopening without the analyzer or source files |
+
+### 2. Select the body without rewriting the text
+
+``` r
+# One segment and one contiguous body range per document in this small recipe.
+# Empty original files have NA/NA bounds. Titles remain in the complete import.
+ja_body_ranges <- data.frame(document_id = ja_document_ids,
+  start = c(5L, 4L, 1L, 1L, NA_integer_),
+  end = c(nchar(ja_file_segments$text[1:4], type = "chars"), NA_integer_),
+  reason = c("Exclude authored title line", "Exclude authored title line",
+    "Entire file", "Entire file", "Empty original file"))
+```
+
+The first body starts at character 5, after the title `リンゴ` and its
+newline. The second starts at character 4, after `はし` and its newline.
+Those are explicit decisions about these files, **not a rule that every
+first line is a title**. Empty files retain unavailable bounds. The
+helper is limited to one segment and one contiguous body range per
+document; it rejects a range that cuts through a token. A boundary
+change requires a new complete annotation, as shown
+[below](#review-boundaries-before-lexical-identity).
+
+This recipe excludes only the literal full stop `。` after selecting the
+body. It retains particles and verbs. Other datasets need their own
+declared policy for punctuation, numbers and proper nouns. Neither the
+complete import nor its original token indices are edited.
+
+Show the body-range validation and selection code
+
+``` r
+select_japanese_example_body <- function(imported, ranges) {
+  s <- imported$segments; t <- imported$tokens
+  if (anyDuplicated(s$document_id) || anyDuplicated(ranges$document_id) ||
+      !setequal(s$document_id, ranges$document_id))
+    stop("Supply one segment and one body-range row per document.")
+  r <- ranges[match(s$document_id, ranges$document_id), ]
+  width <- nchar(s$text, type = "chars")
+  empty <- width == 0L
+  if (!is.numeric(r$start) || !is.numeric(r$end) ||
+      any(!is.na(r$start[empty]) | !is.na(r$end[empty])) ||
+      anyNA(r$start[!empty]) || anyNA(r$end[!empty]) ||
+      any(!is.finite(r$start[!empty]) | !is.finite(r$end[!empty])) ||
+      any(r$start[!empty] != floor(r$start[!empty]) | r$end[!empty] != floor(r$end[!empty])) ||
+      any(r$start[!empty] < 1 | r$end[!empty] > width[!empty] | r$start[!empty] > r$end[!empty]))
+    stop("Use inclusive codepoint bounds within nonempty text, and NA/NA for empty files.")
+  row <- match(t$document_id, s$document_id)
+  inside <- t$start >= r$start[row] & t$end <= r$end[row]
+  overlap <- t$end >= r$start[row] & t$start <= r$end[row]
+  if (any(overlap & !inside))
+    stop("A body range cuts through a token; review the range or complete annotation first.")
+  # Explicit example policy: retain particles/verbs; exclude only the full stop.
+  punctuation <- t$surface == "。"
+  data.frame(t[c("document_id", "segment_id", "token_index", "start", "end", "surface")],
+    in_body = inside, retained = inside & !punctuation,
+    reason = ifelse(!inside, "outside_body", ifelse(punctuation, "full_stop", "retained")))
+}
+ja_file_selection <- select_japanese_example_body(ja_file_import, ja_body_ranges)
+```
+
+### 3. Inspect KWIC and record contextual decisions
+
+``` r
+ja_file_candidates <- data.frame(
+  term = c("りんご", "リンゴ", "林檎", rep("はし", 3)),
+  candidate_id = c(rep("apple", 3), "bridge", "chopsticks", "edge"),
+  label = c(rep("林檎", 3), "橋", "箸", "端"))
+ja_file_targets <- c("りんご", "リンゴ", "林檎", "はし", "ぷにょ語")
+ja_file_resource <- list(resource_id = "authored-ja-file-candidates", resource_version = "1",
+  source_reference = "ldfreq authored Japanese file workflow", data_license = "MIT")
+ja_file_before <- ldfreq::lexdiv_ambiguity_review(ja_file_import, ja_file_targets,
+  ja_file_candidates, ja_file_resource)
+ja_file_context <- ja_file_before$occurrences
+# Match by document + original token index, never by a sorted display's row number.
+ja_file_key <- paste(ja_file_selection$document_id, ja_file_selection$token_index, sep = ":")
+ja_file_context$in_body <- ja_file_selection$in_body[match(
+  paste(ja_file_context$document_id, ja_file_context$token_index, sep = ":"), ja_file_key)]
+ja_file_context[c("document_id", "surface", "pre", "post", "in_body", "status")]
+#>   document_id  surface                        pre                     post
+#> 1    variants   リンゴ                            りんご と リンゴ と 林檎
+#> 2    variants   りんご                     リンゴ     と リンゴ と 林檎 。
+#> 3    variants   リンゴ           リンゴ りんご と               と 林檎 。
+#> 4    variants     林檎 リンゴ りんご と リンゴ と                       。
+#> 5  homophones     はし                                はし を 渡る 。 はし
+#> 6  homophones     はし                       はし       を 渡る 。 はし で
+#> 7  homophones     はし       はし はし を 渡る 。     で 食べる 。 はし を
+#> 8  homophones     はし       。 はし で 食べる 。               を 見る 。
+#> 9    unlisted ぷにょ語                                                  。
+#>   in_body        status
+#> 1   FALSE    unreviewed
+#> 2    TRUE    unreviewed
+#> 3    TRUE    unreviewed
+#> 4    TRUE    unreviewed
+#> 5   FALSE    unreviewed
+#> 6    TRUE    unreviewed
+#> 7    TRUE    unreviewed
+#> 8    TRUE    unreviewed
+#> 9    TRUE no_candidates
+
+# Authored demonstration decisions only. Title hits and the invented word
+# remain unsubmitted. In a study, inspect context and use your own decisions.
+ja_file_decisions <- ja_file_context[
+  ja_file_context$in_body & ja_file_context$surface != "ぷにょ語",
+  c("review_id", "occurrence_id")]
+ja_file_decisions$status <- c(rep("selected", 5), "unresolved")
+ja_file_decisions$candidate_id <- c(rep("apple", 3), "bridge", "chopsticks", NA_character_)
+ja_file_decisions$reviewer <- "authored-example"
+ja_file_decisions$reason <- c(rep("Author intends fruit", 3),
+  "Author intends crossing a bridge", "Author intends eating with chopsticks",
+  "Seeing context leaves the intended item unresolved")
+ja_file_after <- ldfreq::lexdiv_ambiguity_review(ja_file_import, ja_file_targets,
+  ja_file_candidates, ja_file_resource, decisions = ja_file_decisions)
+```
+
+Title hits remain visible with `in_body = FALSE`; they are unsubmitted
+and do not enter the body counts. The body contains three spellings
+intended as the fruit, two contextually identified uses of `はし`, a
+third unresolved `はし`, and an invented word with no candidate. Even a
+single candidate needs an explicit decision. The assignments in the code
+express the author’s intended meanings; they are not automatic
+correction or evidence of annotation accuracy.
+
+For your own research, use the [CSV decision
+worksheet](https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.html#edit-decision-worksheet)
+to inspect, edit and reapply decisions by their fixed IDs. Keep
+title/body membership beside the worksheet; do not delete the original
+annotations to hide title hits. Changing the source, segmentation or
+candidate inventory requires a new review. The body range is a separate
+selection: save it with the review and rerun the selection/count steps
+when it changes. The review ID does not certify a body range that was
+never part of its input.
+
+### 4. Report whole-body measures and target counts separately
+
+| Document   | Body tokens | Surface types |   TTR | Status  |
+|:-----------|------------:|--------------:|------:|:--------|
+| variants   |           5 |             4 | 0.800 | ok      |
+| homophones |           9 |             6 | 0.667 | ok      |
+| unlisted   |           1 |             1 | 1.000 | ok      |
+| no_targets |           0 |             0 |    NA | missing |
+| empty      |           0 |             0 |    NA | missing |
+
+The first two bodies contain 5 and 9 tokens, with 4 and 6 surface types.
+These TTR values illustrate accounting on tiny texts, not a recommended
+proficiency measure. Punctuation-only and empty documents both have no
+retained words; their source counts distinguish them, while TTR remains
+missing for both.
+
+| Document   | Targets | Selected | Unresolved | No candidate | Coverage |
+|:-----------|--------:|---------:|-----------:|-------------:|---------:|
+| variants   |       3 |        3 |          0 |            0 |     1.00 |
+| homophones |       3 |        2 |          1 |            0 |     0.67 |
+| unlisted   |       1 |        0 |          0 |            1 |     0.00 |
+| no_targets |       0 |        0 |          0 |            0 |       NA |
+| empty      |       0 |        0 |          0 |            0 |       NA |
+
+| Document | Selected surface types | Selected lexical types | All-target lexical types |
+|:---|---:|---:|---:|
+| variants | 3 | 1 | 1 |
+| homophones | 1 | 2 | NA |
+| unlisted | 0 | 0 | NA |
+| no_targets | 0 | 0 | 0 |
+| empty | 0 | 0 | 0 |
+
+The variant spellings have 3 surface types and 1 selected lexical
+identity on the same 3 targets. The two selected homophone occurrences
+have 1 surface type and 2 identities. The third homophone is unresolved,
+so the complete target lexical-type count stays `NA`, with coverage 2/3.
+The invented form also stays unavailable, rather than receiving its own
+identity as a fallback. For a document with no targets, zero target
+types is an empty-set count, not a claim that its writer knows zero
+words; selection coverage is unavailable.
+
+`ja_file_metrics` uses every retained body word. `ja_file_counts`
+describes only the declared targets. Do not replace the former’s V with
+the latter’s selected identity count. An all-word lexical-identity
+measure would require an explicit identity policy and adequate coverage
+for the whole word population.
+
+Show how the body measures and target tables are calculated
+
+``` r
+ja_file_words <- ja_file_import$tokens[ja_file_selection$retained, ]
+ja_file_sequences <- stats::setNames(lapply(ja_document_ids, function(id)
+  ja_file_words$surface[ja_file_words$document_id == id]), ja_document_ids)
+ja_file_metrics <- ldfreq::lexdiv_metrics_batch(ja_file_sequences, metrics = "ttr")
+# Keep all documents. Target identity counts do not describe all body words.
+ja_file_occurrences <- ja_file_after$occurrences
+ja_file_occurrences$in_body <- ja_file_context$in_body[
+  match(ja_file_occurrences$occurrence_id, ja_file_context$occurrence_id)]
+ja_file_counts <- do.call(rbind, lapply(ja_document_ids, function(id) {
+  o <- ja_file_occurrences[ja_file_occurrences$document_id == id & ja_file_occurrences$in_body, ]
+  selected <- o$status == "selected"
+  v <- length(unique(o$candidate_id[selected]))
+  data.frame(document_id = id,
+    source_N = sum(ja_file_import$tokens$document_id == id),
+    outside_body_N = sum(ja_file_selection$document_id == id & !ja_file_selection$in_body),
+    target_N = nrow(o), selected_N = sum(selected),
+    unreviewed_N = sum(o$status == "unreviewed"), unresolved_N = sum(o$status == "unresolved"),
+    no_candidates_N = sum(o$status == "no_candidates"),
+    selection_coverage = if (nrow(o)) sum(selected) / nrow(o) else NA_real_,
+    target_surface_V = length(unique(o$surface)),
+    target_lexical_V = if (all(selected)) v else NA_integer_,
+    common_surface_V = length(unique(o$surface[selected])), common_lexical_V = v)
+}))
+ja_file_record <- list(files = ja_file_manifest, imported = ja_file_import,
+  body_ranges = ja_body_ranges, selection = ja_file_selection,
+  before = ja_file_before, after = ja_file_after, decisions = ja_file_decisions,
+  metrics = ja_file_metrics, counts = ja_file_counts,
+  policy = "One original file per segment; declared body ranges; exclude literal full stops; exact authored single-token candidates",
+  session = utils::sessionInfo())
+```
+
+### 5. Save enough to resume
+
+``` r
+ja_file_output <- tempfile("japanese-file-review-")
+dir.create(ja_file_output)
+saveRDS(ja_file_record, file.path(ja_file_output, "analysis.rds"), version = 2)
+utils::write.csv(ja_file_counts, file.path(ja_file_output, "target-counts.csv"),
+  row.names = FALSE, fileEncoding = "UTF-8", na = "NA")
+ja_file_restored <- readRDS(file.path(ja_file_output, "analysis.rds"))
+stopifnot(identical(ja_file_restored, ja_file_record))
+```
+
+The recipe uses a temporary directory to avoid overwriting study files.
+In your project, save the same complete `ja_file_record` to a chosen
+persistent path:
+
+``` r
+saveRDS(ja_file_record, "japanese-file-analysis.rds", version = 2)
+saved <- readRDS("japanese-file-analysis.rds")
+saved$counts
+saved$body_ranges
+saved$selection[saved$selection$reason != "retained", ]
+```
+
+The RDS retains the original text, input hashes, annotations, body
+ranges, inclusion reasons, candidates, before/after decisions, measures
+and session. The CSV is an inspection table and cannot replace that
+complete record. You can read the RDS without Python or a dictionary;
+reapplying KWIC decisions requires quanteda. For other analyzers, import
+their complete original surfaces and actual metadata into the same
+workflow; never replace source text with a normalized form to make the
+import succeed.
+
 ## Use gibasa and a local UniDic dictionary in R
 
 [gibasa](https://paithiov909.github.io/gibasa/) supplies the MeCab
@@ -183,6 +506,23 @@ analyze_unidic <- function(segments, dic_dir) {
 analysis <- analyze_unidic(ja_segments, dic_dir)
 ja_annotations <- analysis$tokens
 ja_annotations[c("surface", "orthBase", "lemma", "lForm", "POS1")]
+#>    surface orthBase lemma        lForm     POS1
+#> 1     国際     国際  国際     コクサイ     名詞
+#> 2     連合     連合  連合     レンゴウ     名詞
+#> 3       で       で    で           デ     助詞
+#> 4     国際     国際  国際     コクサイ     名詞
+#> 5     協力     協力  協力 キョウリョク     名詞
+#> 6       を       を    を           ヲ     助詞
+#> 7     学ぶ     学ぶ  学ぶ       マナブ     動詞
+#> 8       。       。    。         <NA> 補助記号
+#> 9     ＡＩ     ＡＩ  ＡＩ     エーアイ     名詞
+#> 10      で       で    で           デ     助詞
+#> 11    学び     学ぶ  学ぶ       マナブ     動詞
+#> 12    まし     ます  ます         マス   助動詞
+#> 13      た       た    た           タ   助動詞
+#> 14      。       。    。         <NA> 補助記号
+#> 15    qzxv     <NA>  <NA>         <NA>     名詞
+#> 16      😀     <NA>  <NA>         <NA> 補助記号
 ```
 
 Use the feature schema for the **actual dictionary**, not the default
@@ -209,6 +549,23 @@ ja <- lexdiv_import_annotations(ja_annotations, ja_segments, c(list(
 ), dictionary_hashes))
 ja$tokens[c("document_id", "segment_id", "token_index", "surface",
   "orthBase", "lemma", "start", "end")]
+#>    document_id segment_id token_index surface orthBase lemma start end
+#> 1        essay         s1           1    国際     国際  国際     1   2
+#> 2        essay         s1           2    連合     連合  連合     3   4
+#> 3        essay         s1           3      で       で    で     5   5
+#> 4        essay         s1           4    国際     国際  国際     6   7
+#> 5        essay         s1           5    協力     協力  協力     8   9
+#> 6        essay         s1           6      を       を    を    10  10
+#> 7        essay         s1           7    学ぶ     学ぶ  学ぶ    11  12
+#> 8        essay         s1           8      。       。    。    13  13
+#> 9        essay         s2           1    ＡＩ     ＡＩ  ＡＩ     1   2
+#> 10       essay         s2           2      で       で    で     3   3
+#> 11       essay         s2           3    学び     学ぶ  学ぶ     4   5
+#> 12       essay         s2           4    まし     ます  ます     6   7
+#> 13       essay         s2           5      た       た    た     8   8
+#> 14       essay         s2           6      。       。    。     9   9
+#> 15       essay         s2           7    qzxv     <NA>  <NA>    11  14
+#> 16       essay         s2           8      😀     <NA>  <NA>    15  15
 ```
 
 Metadata and hashes record the declared dictionary snapshot. They do not
@@ -252,7 +609,16 @@ results <- lexdiv_metrics_batch(by_document, metrics = "ttr")
 grams <- lexdiv_ngrams(selected, "ja-unidic-lite-1.0.8-orthBase-selection-v1",
   documents = ja$documents$document_id)
 results
+#> <lexdiv_batch_results: 2 documents; 2 metric records; schema 0.1.0>
+#>   document_id metric_id value  status missing_reason  N V below_quality_floor
+#> 1       essay       ttr  0.75      ok           <NA> 12 9               FALSE
+#> 2       empty       ttr    NA missing    empty_input  0 0                TRUE
 grams$documents
+#>   document_id n input_tokens opportunities ngram_types         status
+#> 1       essay 2           12            10          10             ok
+#> 2       essay 3           12             8           8             ok
+#> 3       empty 2            0             0           0 empty_document
+#> 4       empty 3            0             0           0 empty_document
 ```
 
 The diversity calculation describes the retained sequence. N-grams also

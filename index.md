@@ -193,10 +193,16 @@ retains lexical-form/POS columns and dictionary metadata, and connects
 to the existing metrics and n-gram functions. The [Japanese
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html)
 provides an R-only gibasa/UniDic recipe, explicit missing-feature
-handling, and gap-preserving exclusions. A Japanese dictionary is
-optional and separately obtained; the package does not bundle one or
-establish cross-language score equivalence. The Unicode tokenizer alone
-is not a Japanese word segmenter.
+handling, and gap-preserving exclusions. Start with the executable
+[Japanese file-to-review
+walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#japanese-file-workflow):
+read authored files, retain title/body boundaries, review contextual
+identities, and save whole-body measures separately from target counts.
+This first example uses prepared annotations and needs no analyzer or
+dictionary. A Japanese dictionary is optional and separately obtained;
+the package does not bundle one or establish cross-language score
+equivalence. The Unicode tokenizer alone is not a Japanese word
+segmenter.
 
 For experimental stimuli, the [Japanese norms
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.html)
@@ -293,7 +299,7 @@ by this documentation:
 
 ``` r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@d2568c9d8d0bfa3955bba31cd53bbff8d0f751b3")
+pak::pak("Ryuya-dot-com/ldfreq@f632b8ddab037984223cafb68e3fecd3598dc3f9")
 ```
 
 Pinning the revision fixes the implementation, even when development
@@ -313,6 +319,17 @@ The built archive includes rendered guides. A GitHub source installation
 may omit them; the online guides remain available.
 
 ## A first analysis
+
+After [`library(ldfreq)`](https://ryuya-dot-com.github.io/ldfreq/), open
+[`?ldfreq`](https://ryuya-dot-com.github.io/ldfreq/reference/ldfreq-package.md)
+for a short first analysis and an input map.
+[`?lexdiv_metrics_text`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md)
+explains the counted words and scores;
+[`?lexdiv_family_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_family_profile.md)
+contains a complete Nation word-family example. Run
+`example("lexdiv_metrics_text", package = "ldfreq")` to execute the text
+examples. These help pages include expected values and explain missing
+results.
 
 For TXT files, folders or ID/text CSV files, start with the [executable
 file-input

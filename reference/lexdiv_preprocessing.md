@@ -1,9 +1,10 @@
 # Versioned raw-text preprocessing for lexical-diversity metrics
 
-Tokenize one raw text under an explicit Unicode contract, attach lemmas
-and optional Universal POS tags with backend provenance, and select
-surface, lemma, or separately annotated flemma units before calling the
-versioned lexical-diversity core.
+Compute lexical diversity directly from one text with
+`lexdiv_metrics_text()`. Use `lexdiv_tokenize()` first when you want to
+inspect the words, or `lexdiv_lemmatize()` to attach supplied base forms
+and optional part-of-speech tags. The examples start with a complete
+English sentence and then change one analysis choice at a time.
 
 ## Usage
 
@@ -189,6 +190,32 @@ print(x, ...)
 
 ## Details
 
+For a first analysis, choose `metrics = "ttr"`, `tokenizer = "english"`
+and an explicit case policy. In the first example, `case = "lower"`
+makes *Cats* and *cats* the same type: five word occurrences (`N`)
+contain four distinct forms (`V`), so TTR is `V/N = 4/5 = 0.8`. TTR
+depends on text length; this small example teaches the calculation, not
+a design for comparing essay quality.
+
+Read `result$results` for scores and their status, `result$token_audit`
+for the words included or excluded, and `result$preprocessing` for the
+recorded settings. With the default metric selection, a short sentence
+produces `NA` for methods requiring more tokens. Check `missing_reason`;
+the function does not shorten a requested MATTR window to make a value
+available. A small demonstration window is not a recommended research
+setting. See
+[`lexdiv_metrics`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
+for status definitions and
+[`lexdiv_text_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md)
+for several texts.
+
+The supplied-lemma example keeps all five tokens first (TTR
+`3/5 = 0.6`), then selects content words (TTR `2/4 = 0.5`). Removing
+*and* changes the denominator as well as the type count. These are
+authored annotations; no tagger is run. Surface input needs no optional
+package. Only the final textstem example needs that separately installed
+package, and it is skipped when unavailable.
+
 The default `"unicode"` tokenizer extracts Unicode letter, mark, and
 number sequences, retaining internal apostrophes and hyphens while
 excluding punctuation tokens. Start and end offsets refer to the
@@ -308,11 +335,55 @@ methods return `x` invisibly.
 
 [`lexdiv_flemmatize`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_flemmatize.md),
 [`lexdiv_metrics`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md),
-[`tubelex_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md)
+[`lexdiv_text_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md),
+[`tubelex_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md),
+[From text to a research
+report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html),
+[Read your own TXT or CSV
+files](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files)
 
 ## Examples
 
 ``` r
+library(ldfreq)
+
+# 1. Paste one English text here. Lowercase before counting distinct forms.
+result <- lexdiv_metrics_text(
+  "Cats chase cats and dogs.",
+  tokenizer = "english", case = "lower", metrics = "ttr"
+)
+result$results  # N = 5, V = 4, TTR = 0.8, status = "ok"
+#> <lexdiv_results: 1 metric; contract 0.1.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr   0.8     ok           <NA> 5 4               FALSE
+result$token_audit
+#>   token_index surface selected_unit unit_match_rule upos eligible
+#> 1           1    cats          cats            <NA> <NA>     TRUE
+#> 2           2   chase         chase            <NA> <NA>     TRUE
+#> 3           3    cats          cats            <NA> <NA>     TRUE
+#> 4           4     and           and            <NA> <NA>     TRUE
+#> 5           5    dogs          dogs            <NA> <NA>     TRUE
+#>   exclusion_reason
+#> 1             <NA>
+#> 2             <NA>
+#> 3             <NA>
+#> 4             <NA>
+#> 5             <NA>
+
+# A 50-word MATTR window does not fit this five-word text.
+short <- lexdiv_metrics_text(
+  "Cats chase cats and dogs.",
+  tokenizer = "english", case = "lower", metrics = "mattr",
+  window_length = 50
+)
+short$results  # NA; missing_reason = "too_short_for_requested_parameter"
+#> <lexdiv_results: 1 metric; contract 0.1.0>
+#>   metric_id value  status                    missing_reason N V
+#> 1     mattr    NA missing too_short_for_requested_parameter 5 4
+#>   below_quality_floor
+#> 1                TRUE
+
+# 2. Inspect the English tokenizer's retained and excluded spans.
 english <- lexdiv_tokenize(
   "John's well-known book costs 3.14. See https://example.org.",
   tokenizer = "english", case = "lower"
@@ -329,13 +400,15 @@ english$provenance$excluded_spans
 #> 1    30  33                 3.14 number
 #> 2    40  59 https://example.org.    url
 
-tokenization <- lexdiv_tokenize("Cats and cat ran run.")
+# 3. Change the counting unit while retaining the same five tokens.
+tokenization <- lexdiv_tokenize("Cats and cat ran run.", tokenizer = "english")
 surface <- lexdiv_metrics_text(tokenization, metrics = "ttr")
-surface$results
+surface$results  # Case preserved: N = 5, V = 5, TTR = 1
 #> <lexdiv_results: 1 metric; contract 0.1.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr     1     ok           <NA> 5 5               FALSE
 
+# These labels were written for this example. No automatic analysis is run.
 annotated <- lexdiv_lemmatize(
   tokenization,
   lemmas = c("cat", "and", "cat", "run", "run"),
@@ -345,13 +418,20 @@ annotated <- lexdiv_lemmatize(
   upos_backend_id = "documented-example-upos",
   upos_backend_version = "1"
 )
+lemma_all <- lexdiv_metrics_text(annotated, unit = "lemma", metrics = "ttr")
+lemma_all$results  # Same N = 5; V = 3, TTR = 0.6
+#> <lexdiv_results: 1 metric; contract 0.1.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr   0.6     ok           <NA> 5 3               FALSE
+
+# 4. Now change word inclusion: exclude "and" using the supplied POS tags.
 lemma_content <- lexdiv_metrics_text(
   annotated,
   unit = "lemma",
   word_inclusion = "content",
   metrics = "ttr"
 )
-lemma_content$results
+lemma_content$results  # N = 4, V = 2, TTR = 0.5
 #> <lexdiv_results: 1 metric; contract 0.1.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr   0.5     ok           <NA> 4 2               FALSE
@@ -369,6 +449,7 @@ lemma_content$token_audit
 #> 4             <NA>
 #> 5             <NA>
 
+# Optional: install.packages("textstem") to run this lookup example.
 if (requireNamespace("textstem", quietly = TRUE)) {
   textstem_tokens <- lexdiv_tokenize(
     "The cats were running and studies.",

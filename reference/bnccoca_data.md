@@ -89,13 +89,17 @@ of Lexicography, 6(4), 253–279.
 
 ## See also
 
-[`lexdiv_family_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_family_profile.md),
-[`morpholex_data`](https://ryuya-dot-com.github.io/ldfreq/reference/morpholex_data.md)
+[`lexdiv_family_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_family_profile.md)
+for a complete token-to-family example,
+[`morpholex_data`](https://ryuya-dot-com.github.io/ldfreq/reference/morpholex_data.md),
+[Word families, roots and affixes
+tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html)
 
 ## Examples
 
 ``` r
 reference <- bnccoca_data()
+# The dictionary maps forms to families; it is not a table of corpus counts.
 reference$dictionary[reference$dictionary$form %in%
   c("USE", "USES", "REUSABILITY", "COLOUR", "COLOR"),
   c("form", "headword", "frequency_band")]
@@ -104,7 +108,9 @@ reference$dictionary[reference$dictionary$form %in%
 #> 999   COLOR   COLOUR              1
 #> 6348    USE      USE              1
 #> 6374   USES      USE              1
+# USE/USES share a headword; COLOUR/COLOR share another. REUSABILITY has no row.
 
+# A longer installed workflow; the direct API example is in ?lexdiv_family_profile.
 env <- new.env(parent = baseenv())
 sys.source(system.file("examples", "bnccoca-families.R", package = "ldfreq",
   mustWork = TRUE), env)
