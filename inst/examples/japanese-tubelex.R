@@ -75,6 +75,9 @@ profile_japanese_tubelex_items <- function(items, path) {
   out[paste0("tubelex_", fields[4:10])] <- norms[index,
     c("count", "videos", "channels", "pos", measures), drop = FALSE]
   list(items = out, profile = profile, profile_item_ids = items$item_id[queried],
+    # Retain the complete inspected aggregate for local document profiles/replay.
+    # This is not a queried-only excerpt or newly bundled package data.
+    reference = list(norms = norms, key = "word", measure_specs = specs, resource = metadata),
     source = list(metadata = metadata, sha256 = hash, totals = totals,
       file = "tubelex-ja-base-pos.tsv.xz",
       source_url = paste0("https://raw.githubusercontent.com/naist-nlp/tubelex/", version,

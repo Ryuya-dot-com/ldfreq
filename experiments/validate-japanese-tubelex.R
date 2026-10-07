@@ -22,6 +22,12 @@ stopifnot(identical(x[names(items)], items),
   identical(r$profile_item_ids, items$item_id[-6L]),
   all(r$profile$summary$input_units[r$profile$summary$weighting == "token"] == 6),
   all(r$profile$summary$input_units[r$profile$summary$weighting == "type"] == 5))
+reference <- r$reference
+stopifnot(sum(reference$norms$count) == r$source$totals$count,
+  nrow(reference$norms) > nrow(items),
+  identical(reference$resource, r$source$metadata),
+  identical(ldfreq::lexdiv_norm_profile(x$tubelex_lookup_term[-6L],
+    reference$norms, reference$key, reference$measure_specs, reference$resource), r$profile))
 for (subset in list(items[FALSE, ], items[6L, ], items[c(5L, 7L), ])) {
   z <- profile_japanese_tubelex_items(subset, path)
   stopifnot(identical(z$items[names(subset)], subset), all(is.na(z$items$tubelex_count)))

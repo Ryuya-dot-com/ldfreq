@@ -4032,3 +4032,89 @@ The previously verified site is the baseline; unrelated pages are reused and
 Markdown companions are generated from current HTML. Public CI, GitHub install
 and live-site verification remain to be completed. Evidence is in
 reviews/ldfreq-japanese-profiles-20261007/. No CRAN submission or paid API call.
+
+### Publication completed
+
+Final head `6b7d347b14fa5b3ca28a84dceab1594251343864` passes all nine jobs in
+R-CMD-check run 37616468679 and both protected required checks. Classification
+run 37616468684 succeeds in development mode; formal-candidate artifact/matrix
+jobs remain intentionally skipped. macOS/Windows/Linux release and R devel each
+pass 8,004 assertions without failures, warnings or skips, with Status: OK.
+R 4.1 passes 7,929 assertions with eight optional textstem skips and two NOTEs
+(unavailable suggested gibasa/textstem and installed size 9.4Mb). The devel job
+spent longer in dependency setup and then completed; no cancellation, rerun,
+timeout increase or protection bypass was used.
+
+PR #29 merged to main `bb18ef78ee15eca0aeff8a71c0f6ec59668a2d7d`.
+Its tree `883647be441f8febd9e2b91289210492a61b753f` equals the tested final
+head. The merge subject skips only duplicate same-tree main push CI. All twelve
+changed source files match anonymous retrieval. README pins implementation
+snapshot `2240ffde9054d199b5666b5b72d574d06569ae8c`; actual pak installation
+into a separate library succeeds. All 139 installed files from inst match,
+and both the authored results and fresh-session saved-input replay agree with
+the tested source. The user's R library was not changed.
+
+Pages `e1b758583da3ab8fd6ed1ac37191f438b2070db3` deploys successfully in
+run 37619824300, and the Pages API reports that commit built. All eight changed
+live files match verified bytes through anonymous certificate-verified requests.
+The complete site retains 252 files / 129 HTML pages without missing internal
+links/anchors; unrelated pages reuse the previous verified site. Live Chrome
+inspection confirms the new code and document/character tables. The existing
+headless inspection procedure was reused with a separate temporary profile.
+
+Evidence is in reviews/ldfreq-japanese-profiles-20261007/, including CI/job
+logs, actual installed-file identities and replay, source/site hashes and the
+live screenshot. Completion-only internal records remain local; the merged PR
+description records the result. The checkout follows integrated main. Stale
+pre-implementation wording in the current roadmap is reconciled with the actual
+J2 and optional-proposal evidence; J3 retains its existing scope and priority.
+No CRAN submission, release tag, paid call or independent linguistic validation.
+
+## 2026-10-07 Japanese document-frequency recipes
+
+Added explicitly sourced recipes connecting complete document profiles, anchored
+key/reason tables and the existing norm batch calculation. Full-token coverage
+includes unresolved keys; native norm denominators include resolved keys only.
+Means, type identities, missing annotations and observed zero remain explicit.
+Same-source/same-reference comparisons retain a conservative intersection of
+identical original spans observed for every supplied measure in all conditions;
+changed token indices do not break correspondence, while changed boundaries
+are not combined automatically. The optional TUBELEX reader also returns its
+complete inspected reference for local batch use and saved-input replay.
+No exported API, core formula, class or required dependency changes.
+
+59 focused assertions pass, including changed/stale/missing/duplicate anchors,
+Unicode blank keys, empty and all-unresolved inputs, reference duplication,
+missing values versus zero, shifted token indices, original-text mismatch,
+common-span rejection cases, replay, and the title-free color/monochrome plot.
+The installed real-TUBELEX check succeeds, including full-reference retention
+and equality with the existing item calculation. A new R session replays the
+authored example, and the actual public optional TUBELEX code chunk reproduces
+the earlier four-document whole-source results with only its local path changed.
+After both checks passed, the local inspection script removed its current working
+directory and emitted a shell-cleanup message. Cleanup now restores the workspace
+before removal; the successful analysis/replay evidence was retained.
+
+The private J2 inputs provide four conditions without reanalysis or new review.
+Direct reading of the original TSV independently verifies 192 measure summaries,
+32 document accounting rows and 931 common observed source spans. Original-body
+969 tokens have 935 matches, 31 unresolved keys and three absent keys; the boundary
+proposal has 968 tokens, 931 matches, 34 unresolved and the same three absent keys.
+Original text, annotations and earlier exploratory decisions remain unchanged.
+The first connection attempts exposed whitespace tokens rejected by the existing
+stimulus reader and fullwidth spaces normalized into blank keys. The caller now
+explicitly retains those source rows without sending whitespace to word lookup;
+the reader's established item contract and tokenizer assumptions are unchanged.
+
+Private evidence is in analysis/ninjal-essay/frequency-profiles/. Its complete
+multi-condition RDS is about 38 MB because it retains full references. No corpus
+text, individual IDs, KWIC or Japanese aggregate is added to distribution. These
+are arithmetic/integration checks, not independent linguistic accuracy or
+proficiency validation. No API call was made.
+
+Both changed Japanese articles, NEWS and home render successfully. Unchanged
+pages reuse the prior verified site. All 129 HTML pages have valid internal links;
+the prepared site has 253 files including the new coverage image. Color and
+monochrome plots were inspected. Public CI, actual GitHub installation and live
+publication remain pending. Evidence: reviews/ldfreq-japanese-frequency-20261007/.
+No CRAN submission.
