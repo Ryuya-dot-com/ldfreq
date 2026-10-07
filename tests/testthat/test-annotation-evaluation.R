@@ -1,9 +1,9 @@
 annotation_evaluation_fixture <- function() {
   segments <- data.frame(document_id = c("en", "ja", "partial", "empty"),
-    segment_id = "s1", text = c("cats cats run.", "猫見る。", "a b c", ""))
+    segment_id = "s1", text = c("cats cats run.", "\u732b\u898b\u308b\u3002", "a b c", ""))
   data <- data.frame(document_id = rep(c("en", "ja", "partial"), c(4, 3, 3)),
     segment_id = "s1", token_index = c(1:4, 1:3, 1:3),
-    surface = c("cats", "cats", "run", ".", "猫", "見る", "。", "a", "b", "c"),
+    surface = c("cats", "cats", "run", ".", "\u732b", "\u898b\u308b", "\u3002", "a", "b", "c"),
     upos = c("NOUN", "NOUN", "VERB", "PUNCT", "NOUN", "VERB", "PUNCT",
       NA_character_, "NOUN", NA_character_),
     review_status = c(rep("selected", 7), "unresolved", "selected", "unreviewed"))
@@ -91,9 +91,9 @@ test_that("context uses original segment-local codepoints without normalization"
   expect_identical(y$pairs$pre, rep("", 10))
   expect_identical(y$pairs$post, rep("", 10))
   segments <- data.frame(document_id = "unicode", segment_id = "s",
-    text = "\U0001f600 \u304b\u3099猫")
+    text = "\U0001f600 \u304b\u3099\u732b")
   data <- data.frame(document_id = "unicode", segment_id = "s", token_index = 1:3,
-    surface = c("\U0001f600", "\u304b\u3099", "猫"), upos = "NOUN")
+    surface = c("\U0001f600", "\u304b\u3099", "\u732b"), upos = "NOUN")
   f$predicted <- f$reference <- lexdiv_import_annotations(data, segments,
     f$reference$provenance$annotation)
   f$context_chars <- 2

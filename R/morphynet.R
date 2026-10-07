@@ -14,7 +14,9 @@ morphynet_read_derivations <- function(path, language, resource_version, max_row
   if (any(bytes == as.raw(0L)))
     stop("Cannot read relation text: embedded NUL bytes.", call. = FALSE)
   sha <- digest::digest(bytes, algo = "sha256", serialize = FALSE)
-  connection <- rawConnection(bytes)
+  payload <- if (length(bytes) >= 3L && identical(bytes[1:3], as.raw(c(239, 187, 191))))
+    bytes[-(1:3)] else bytes
+  connection <- rawConnection(payload)
   on.exit(close(connection))
   lines <- readLines(connection, n = max_rows + 1L, warn = FALSE, encoding = "UTF-8")
   if (!length(lines)) stop("The relation file is empty.", call. = FALSE)
@@ -49,7 +51,7 @@ morphynet_read_derivations <- function(path, language, resource_version, max_row
     license_url = "https://creativecommons.org/licenses/by-sa/3.0/",
     scope = "Supplied one-step derivational relations; not complete segmentation or educational families")
   list(relations = relations, resource = resource,
-    provenance = list(reader = "ldfreq-morphynet-derivations", reader_version = "0.1.0",
+    provenance = list(reader = "ldfreq-morphynet-derivations", reader_version = "0.1.1",
       source_sha256 = sha, rows = nrow(relations), max_rows = max_rows,
       transformation = paste("Six UTF-8 fields preserved literally; source lines and scoped IDs added.",
         "Initial BOM and line endings are encoding delimiters; no spelling or POS normalization.",

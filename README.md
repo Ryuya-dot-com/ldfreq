@@ -215,6 +215,10 @@ not establish equivalence to CLAN vocd-D. `lexdiv_methods()` reports each
 method's classification. Default computations and presets exclude it; request
 `metrics = "expected_ttr_d"` to compute it explicitly. See
 `?lexdiv_metrics` for the migration example and keep the full saved results.
+The [worked migration comparison](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html#check-the-effect-on-your-documents)
+shows how to check paired scores, missing cases and rank correlation on your
+own texts. All 30 authored tutorial essays retain their values; this does not
+estimate effects in a learner population.
 
 `below_quality_floor` is an advisory screen, not a quality score. TTR's value
 of 1 merely checks for non-empty input. MATTR's fixed 50-token floor does not
@@ -268,14 +272,14 @@ caller and are not bundled.
 
 ## Installation
 
-Version 0.3.0 is a development prerelease and has not been released on CRAN.
+Version 0.3.0.9001 is a development prerelease and has not been released on CRAN.
 The fixed tag below preserves this measurement-contract migration.
 It requires R 4.1.0 or later. Install the tested snapshot used by this
 documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0-dev.1")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9001")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
@@ -287,7 +291,7 @@ If you have a built source archive, install it locally:
 
 ```r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9001.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation may

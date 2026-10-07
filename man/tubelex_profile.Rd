@@ -73,6 +73,19 @@ lexical employability (using words in communication) requires learner-level
 criteria; neither frequency nor video/channel prevalence demonstrates an
 individual's meaning recall, processing speed or appropriate contextual use.
 }
+\section{Locales and resource failures}{
+The bundled CSV is decoded as UTF-8 independently of \code{LC_CTYPE}.
+C/POSIX sessions can use ASCII or explicitly UTF-8-encoded query terms.
+An accented character may be displayed with a Unicode escape in a C console
+even though its bytes and lookup result are correct.
+
+For \code{status = "resource_error"}, printing reports the failure reason.
+For \code{schema_mismatch}, it also shows the failed schema checks and current
+\code{LC_CTYPE}, and suggests checking resource integrity and UTF-8 decoding.
+Older loaders could fail in non-UTF-8 locales; this hint does not establish the
+cause of every schema failure. The machine-readable reason and diagnostics
+remain available without printing.
+}
 \section{Reading lookup and summary values}{
 The lossless \code{lookup} table contains:
 \describe{

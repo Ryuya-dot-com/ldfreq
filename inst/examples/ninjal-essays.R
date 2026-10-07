@@ -6,8 +6,8 @@ read_ninjal_essays <- function(zip_path, essay_metadata, writer_metadata,
                                files = NULL, encoding = "UTF-8") {
   essay <- as.data.frame(essay_metadata, stringsAsFactors = FALSE)
   writer <- as.data.frame(writer_metadata, stringsAsFactors = FALSE)
-  required <- list(essay = c("作文ID", "執筆者ID", "日本語作文txt", "作文テーマ"),
-    writer = c("執筆者ID", "母語"))
+  required <- list(essay = c("\u4f5c\u6587ID", "\u57f7\u7b46\u8005ID", "\u65e5\u672c\u8a9e\u4f5c\u6587txt", "\u4f5c\u6587\u30c6\u30fc\u30de"),
+    writer = c("\u57f7\u7b46\u8005ID", "\u6bcd\u8a9e"))
   for (name in names(required)) {
     table <- if (name == "essay") essay else writer
     if (anyDuplicated(names(table)) || !all(required[[name]] %in% names(table)))
@@ -17,7 +17,7 @@ read_ninjal_essays <- function(zip_path, essay_metadata, writer_metadata,
         stop("Read metadata columns as character: ", column, call. = FALSE)
     }
   }
-  for (key in list(essay[["作文ID"]], essay[["日本語作文txt"]], writer[["執筆者ID"]]))
+  for (key in list(essay[["\u4f5c\u6587ID"]], essay[["\u65e5\u672c\u8a9e\u4f5c\u6587txt"]], writer[["\u57f7\u7b46\u8005ID"]]))
     if (anyNA(key) || any(!nzchar(trimws(key))) || anyDuplicated(key))
       stop("Essay IDs, filenames and writer-table IDs must be nonmissing and unique.", call. = FALSE)
   if (!is.character(zip_path) || length(zip_path) != 1L || is.na(zip_path) || !file.exists(zip_path))
@@ -25,11 +25,11 @@ read_ninjal_essays <- function(zip_path, essay_metadata, writer_metadata,
   inventory <- utils::unzip(zip_path, list = TRUE)
   if (anyDuplicated(inventory$Name))
     stop("ZIP member names must be unique.", call. = FALSE)
-  if (is.null(files)) files <- essay[["日本語作文txt"]]
+  if (is.null(files)) files <- essay[["\u65e5\u672c\u8a9e\u4f5c\u6587txt"]]
   if (!is.character(files) || !is.null(dim(files)) || !length(files) || anyNA(files) ||
       any(!nzchar(files)) || anyDuplicated(files))
     stop("files must contain unique, nonmissing filenames.", call. = FALSE)
-  row <- match(files, essay[["日本語作文txt"]])
+  row <- match(files, essay[["\u65e5\u672c\u8a9e\u4f5c\u6587txt"]])
   member <- match(files, inventory$Name)
   if (anyNA(row) || anyNA(member))
     stop("Each requested file must occur in both the ZIP and essay metadata.", call. = FALSE)
@@ -67,10 +67,10 @@ read_ninjal_essays <- function(zip_path, essay_metadata, writer_metadata,
       sha256 = digest::digest(bytes, algo = "sha256", serialize = FALSE))
   }
   decoded <- lapply(seq_along(files), read_member)
-  writer_row <- match(essay[["執筆者ID"]][row], writer[["執筆者ID"]])
-  documents <- data.frame(document_id = essay[["作文ID"]][row],
-    writer_id = essay[["執筆者ID"]][row], source_file = files,
-    task = essay[["作文テーマ"]][row], l1_reported = writer[["母語"]][writer_row],
+  writer_row <- match(essay[["\u57f7\u7b46\u8005ID"]][row], writer[["\u57f7\u7b46\u8005ID"]])
+  documents <- data.frame(document_id = essay[["\u4f5c\u6587ID"]][row],
+    writer_id = essay[["\u57f7\u7b46\u8005ID"]][row], source_file = files,
+    task = essay[["\u4f5c\u6587\u30c6\u30fc\u30de"]][row], l1_reported = writer[["\u6bcd\u8a9e"]][writer_row],
     writer_metadata_status = ifelse(is.na(writer_row), "missing", "matched"),
     source_encoding = encoding, utf8_bom_removed = vapply(decoded, `[[`, logical(1), "bom"),
     source_bytes = vapply(decoded, `[[`, integer(1), "bytes"),

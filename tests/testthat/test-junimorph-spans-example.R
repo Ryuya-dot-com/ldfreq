@@ -24,7 +24,7 @@ test_that("multi-token reviews preserve source, ambiguity and conditional counts
   sys.source(system.file("examples", "junimorph-spans-demo.R", package = "ldfreq", mustWork = TRUE), e)
   x <- e$junimorph_spans_example
   o <- x$reviewed$occurrences
-  expect_identical(o$form, c("食べられる", "食べられる", "食べます", "開ける", "ぷにょる"))
+  expect_identical(o$form, c("\u98df\u3079\u3089\u308c\u308b", "\u98df\u3079\u3089\u308c\u308b", "\u98df\u3079\u307e\u3059", "\u958b\u3051\u308b", "\u3077\u306b\u3087\u308b"))
   expect_equal(o$start, c(6, 8, 4, 3, 1))
   expect_equal(o$end, c(10, 12, 7, 5, 4))
   expect_equal(o$token_count, c(2, 2, 2, 1, 1))
@@ -39,7 +39,7 @@ test_that("multi-token reviews preserve source, ambiguity and conditional counts
   expect_equal(x$reviewed$documents$selected, c(2, 0))
   expect_equal(x$reviewed$documents$selection_coverage[1], 2/5)
   expect_true(is.na(x$reviewed$documents$selection_coverage[2]))
-  expect_equal(x$reviewed$terms$exact_spans[x$reviewed$terms$form == "未出現"], 0)
+  expect_equal(x$reviewed$terms$exact_spans[x$reviewed$terms$form == "\u672a\u51fa\u73fe"], 0)
   path <- tempfile(); on.exit(unlink(path)); saveRDS(x, path)
   restored <- readRDS(path)
   expect_identical(restored, x)
@@ -53,9 +53,9 @@ test_that("overlap, token mismatches and exact Unicode are explicit", {
   # character and Unicode escapes in the same platform-parsed string.
   emoji <- intToUtf8(0x1f600)
   decomposed <- intToUtf8(c(0x304b, 0x3099))
-  f <- morph_span_fixture(c("あああ", paste0(emoji, decomposed, " が"), "あ あ", "あ", "あ"),
-    list(c("あ", "ああ"), c(emoji, decomposed, "が"), c("あ", "あ"), "あ", "あ"),
-    c("あ\tあ\tAUTHORED", "あ\tああ\tAUTHORED", "か\u3099\tか\u3099\tAUTHORED", "が\tが\tAUTHORED"))
+  f <- morph_span_fixture(c("\u3042\u3042\u3042", paste0(emoji, decomposed, " \u304c"), "\u3042 \u3042", "\u3042", "\u3042"),
+    list(c("\u3042", "\u3042\u3042"), c(emoji, decomposed, "\u304c"), c("\u3042", "\u3042"), "\u3042", "\u3042"),
+    c("\u3042\t\u3042\tAUTHORED", "\u3042\t\u3042\u3042\tAUTHORED", "\u304b\u3099\t\u304b\u3099\tAUTHORED", "\u304c\t\u304c\tAUTHORED"))
   z <- f$e$review_morphology_spans(f$x, f$ref, window = 0)
   o <- z$occurrences[z$occurrences$segment_id == "1", ]
   expect_equal(o$start, c(1, 1, 2, 2, 3))
@@ -67,15 +67,15 @@ test_that("overlap, token mismatches and exact Unicode are explicit", {
   u <- z$occurrences[z$occurrences$segment_id == "2", ]
   expect_equal(u$start, c(2, 5))
   expect_equal(u$end, c(3, 5))
-  expect_identical(u$form, c("か\u3099", "が"))
-  expect_equal(sum(z$occurrences$form == "ああ"), 2) # No whitespace/segment crossing.
+  expect_identical(u$form, c("\u304b\u3099", "\u304c"))
+  expect_equal(sum(z$occurrences$form == "\u3042\u3042"), 2) # No whitespace/segment crossing.
   expect_false(anyDuplicated(z$occurrences$occurrence_id) > 0)
   d <- z$occurrences[2, c("review_id", "occurrence_id")]
   d$status <- "selected"; d$candidate_id <- "row-2"; d$reviewer <- "test"; d$reason <- "fixture"
   expect_error(f$e$review_morphology_spans(f$x, f$ref, decisions = d), "boundaries")
   # With all single-character boundaries, both nested spans can be reviewed,
   # but their overlap remains explicit instead of silently choosing the longest.
-  f2 <- morph_span_fixture("ああ", list(c("あ", "あ")), c("あ\tあ\tX", "あ\tああ\tY"))
+  f2 <- morph_span_fixture("\u3042\u3042", list(c("\u3042", "\u3042")), c("\u3042\t\u3042\tX", "\u3042\t\u3042\u3042\tY"))
   a <- f2$e$review_morphology_spans(f2$x, f2$ref)
   d <- a$occurrences[1:2, c("review_id", "occurrence_id")]
   d$status <- "selected"; d$candidate_id <- c("row-1", "row-2"); d$reviewer <- "test"; d$reason <- "fixture"
@@ -85,7 +85,7 @@ test_that("overlap, token mismatches and exact Unicode are explicit", {
 })
 
 test_that("reference rows and decisions cannot be silently substituted", {
-  f <- morph_span_fixture("ああ", list(c("あ", "あ")), c("あ\tあ\tX", "あ\tあ\tX", "あ\tああ\tY"))
+  f <- morph_span_fixture("\u3042\u3042", list(c("\u3042", "\u3042")), c("\u3042\t\u3042\tX", "\u3042\t\u3042\tX", "\u3042\t\u3042\u3042\tY"))
   expect_equal(nrow(f$ref$records), 3)
   expect_identical(f$ref$records$source_row, 1:3)
   a <- f$e$review_morphology_spans(f$x, f$ref)
@@ -99,20 +99,20 @@ test_that("reference rows and decisions cannot be silently substituted", {
   d$status <- "selected"; d$review_id <- "stale"
   expect_error(f$e$review_morphology_spans(f$x, f$ref, decisions = d), "review_id differs")
   d$review_id <- a$provenance$review_id
-  new_segmentation <- morph_span_fixture("ああ", list("ああ"), c("あ\tあ\tX", "あ\tあ\tX", "あ\tああ\tY"))
+  new_segmentation <- morph_span_fixture("\u3042\u3042", list("\u3042\u3042"), c("\u3042\t\u3042\tX", "\u3042\t\u3042\tX", "\u3042\t\u3042\u3042\tY"))
   expect_error(f$e$review_morphology_spans(new_segmentation$x, f$ref, decisions = d), "review_id differs")
-  new_reference <- morph_span_fixture("ああ", list(c("あ", "あ")), c("あ\tあ\tZ", "あ\tあ\tX", "あ\tああ\tY"))
+  new_reference <- morph_span_fixture("\u3042\u3042", list(c("\u3042", "\u3042")), c("\u3042\t\u3042\tZ", "\u3042\t\u3042\tX", "\u3042\t\u3042\u3042\tY"))
   expect_error(f$e$review_morphology_spans(f$x, new_reference$ref, decisions = d), "review_id differs")
-  expect_error(f$e$review_morphology_spans(f$x, f$ref, targets = "あ", decisions = d), "review_id differs")
+  expect_error(f$e$review_morphology_spans(f$x, f$ref, targets = "\u3042", decisions = d), "review_id differs")
   d$reason <- " "
   expect_error(f$e$review_morphology_spans(f$x, f$ref, decisions = d), "nonblank")
   changed <- f$ref; changed$records$features[1] <- "changed"
   expect_error(f$e$review_morphology_spans(f$x, changed), "unmodified")
-  changed <- f$x; changed$tokens$surface[1] <- "い"
+  changed <- f$x; changed$tokens$surface[1] <- "\u3044"
   expect_error(f$e$review_morphology_spans(changed, f$ref), "align")
   expect_error(f$e$review_morphology_spans(f$x, f$ref, window = -1), "window")
-  expect_error(f$e$review_morphology_spans(f$x, f$ref, targets = "あ あ"), "targets")
-  empty <- f$e$review_morphology_spans(f$x, f$ref, targets = "未出現")
+  expect_error(f$e$review_morphology_spans(f$x, f$ref, targets = "\u3042 \u3042"), "targets")
+  empty <- f$e$review_morphology_spans(f$x, f$ref, targets = "\u672a\u51fa\u73fe")
   expect_equal(nrow(empty$occurrences), 0)
   expect_equal(empty$documents$exact_spans, c(0, 0))
   path <- tempfile(); on.exit(unlink(path)); writeLines("a\tb", path)

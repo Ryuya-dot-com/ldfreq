@@ -1,5 +1,5 @@
 test_that("Unicode tokenization is deterministic and parameterized", {
-  text <- enc2utf8("Café — John's well-being, 2026; COVID-19 and 3.14.")
+  text <- enc2utf8("Caf\u00e9 \u2014 John's well-being, 2026; COVID-19 and 3.14.")
   first <- lexdiv_tokenize(text)
   second <- lexdiv_tokenize(text)
 
@@ -7,7 +7,7 @@ test_that("Unicode tokenization is deterministic and parameterized", {
   expect_s3_class(first, "lexdiv_tokenization")
   expect_identical(
     first$tokens$surface,
-    enc2utf8(c("Café", "John's", "well-being", "COVID-19", "and"))
+    enc2utf8(c("Caf\u00e9", "John's", "well-being", "COVID-19", "and"))
   )
   expect_identical(first$tokens$token_index, 1:5)
   expect_false(any(first$tokens$is_number))
@@ -20,7 +20,7 @@ test_that("Unicode tokenization is deterministic and parameterized", {
   expect_identical(
     with_numbers$tokens$surface,
     enc2utf8(c(
-      "Café", "John's", "well-being", "2026", "COVID-19", "and", "3", "14"
+      "Caf\u00e9", "John's", "well-being", "2026", "COVID-19", "and", "3", "14"
     ))
   )
   expect_identical(
@@ -30,11 +30,11 @@ test_that("Unicode tokenization is deterministic and parameterized", {
 })
 
 test_that("normalization and case choices remain visible", {
-  decomposed <- enc2utf8("Cafe\u0301 CAFÉ")
+  decomposed <- enc2utf8("Cafe\u0301 CAF\u00c9")
   nfc <- lexdiv_tokenize(decomposed, normalization = "NFC", case = "lower")
   none <- lexdiv_tokenize(decomposed, normalization = "none", case = "preserve")
 
-  expect_identical(nfc$tokens$surface, enc2utf8(c("café", "café")))
+  expect_identical(nfc$tokens$surface, enc2utf8(c("caf\u00e9", "caf\u00e9")))
   expect_false(identical(nfc$tokens$surface, none$tokens$surface))
   expect_identical(nfc$provenance$normalization, "NFC")
   expect_identical(nfc$provenance$case, "lower")
@@ -46,7 +46,7 @@ test_that("normalization and case choices remain visible", {
 
 test_that("empty and punctuation-only texts return valid zero-token objects", {
   empty <- lexdiv_tokenize("")
-  punctuation <- lexdiv_tokenize("... — !!!")
+  punctuation <- lexdiv_tokenize("... \u2014 !!!")
 
   expect_identical(nrow(empty$tokens), 0L)
   expect_identical(nrow(punctuation$tokens), 0L)
