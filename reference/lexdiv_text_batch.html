@@ -120,7 +120,25 @@ table contains several.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Plot defaults use a sans serif font, horizontal tick labels and an open frame.
+    <p>For a first analysis, create a table with one row per document and columns
+<code>document_id</code> and <code>text</code>, then call
+<code>lexdiv_metrics_text_batch()</code> directly. Replace the example texts with
+your own; retain a unique ID even for an empty document. Use <code>id_col</code>
+and <code>text_col</code> if your columns have different names. TXT-folder and CSV
+input are shown in the linked file-input tutorial.</p>
+<p>Read <code>result$results</code> for one row per document and metric. In the first
+example, <em>essay_a</em> has five tokens and four types (TTR 0.8),
+<em>essay_b</em> has five tokens and five types (TTR 1), and <em>empty</em>
+has zero tokens with <code>missing_reason = "empty_input"</code>. These short
+authored texts explain the output, not a comparison of writing ability.
+<code>lexdiv_widen(result$results)</code> puts metrics into columns without
+recalculating them. Keep the complete <code>result</code> when saving: the wide
+table alone does not retain the token audit and preprocessing records.</p>
+<p>Use <code>lexdiv_tokenize_batch()</code> separately when you want to inspect or
+annotate the tokens before scoring or reuse them with a reference vocabulary.
+Its output is a named list: <code>prepared$essay_a$tokens</code> shows one document.
+Do not supply tokenization settings again when scoring that prepared list.</p>
+<p>Plot defaults use a sans serif font, horizontal tick labels and an open frame.
 Override these with <code>family</code>, <code>las</code> or <code>bty</code> in the plot
 method's <code>...</code>. Cosmetic graphics parameters are restored after drawing.</p>
 <p>Input order is retained. Short and zero-token documents remain in the metric
@@ -162,55 +180,43 @@ metric rows invisibly, with the same selection rules as
 <code><a href="lexdiv_convenience.html">plot.lexdiv_batch_results()</a></code>. Use <code>lexdiv_widen(x$results)</code> to
 create a metric table; save the complete object to retain its audits.</p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="lexdiv_preprocessing.html">lexdiv_metrics_text</a></code>, <code><a href="lexdiv_convenience.html">lexdiv_convenience</a></code>,
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files">Read your own TXT or CSV files</a>,
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html">From text to a research report</a></p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">texts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 1. One row per text; keep the empty document in the input.</span></span></span>
+<span class="r-in"><span><span class="va">texts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"essay_a"</span>, <span class="st">"essay_b"</span>, <span class="st">"empty"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"The cat can't read the book."</span>, <span class="st">"A reader reads a story."</span>, <span class="st">""</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cats chase cats and dogs."</span>, <span class="st">"The reader reads a story."</span>, <span class="st">""</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_tokenize_batch</span><span class="op">(</span><span class="va">texts</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">prepared</span><span class="op">$</span><span class="va">essay_a</span><span class="op">$</span><span class="va">tokens</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   token_index start end surface is_number</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1           1     1   3     the     FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2           2     5   7     cat     FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3           3     9  13   can't     FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4           4    15  18    read     FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5           5    20  22     the     FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6           6    24  27    book     FALSE</span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_text_batch</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">prepared</span>, metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"mattr"</span><span class="op">)</span>, window_length <span class="op">=</span> <span class="fl">4</span></span></span>
+<span class="r-in"><span>  <span class="va">texts</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">result</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_text_batch_results: 3 documents; 11 audited tokens&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_batch_results: 3 documents; 6 metric records; schema 0.1.0&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id metric_id     value  status missing_reason N V</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a       ttr 0.8333333      ok           &lt;NA&gt; 6 5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     essay_a     mattr 1.0000000      ok           &lt;NA&gt; 6 5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     essay_b       ttr 0.8000000      ok           &lt;NA&gt; 5 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     essay_b     mattr 0.8750000      ok           &lt;NA&gt; 5 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5       empty       ttr        NA missing    empty_input 0 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6       empty     mattr        NA missing    empty_input 0 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   below_quality_floor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1               FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3               FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                TRUE</span>
+<span class="r-in"><span><span class="va">result</span><span class="op">$</span><span class="va">results</span>  <span class="co"># TTR: essay_a = 0.8, essay_b = 1; empty = NA</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id metric_id value  status missing_reason N V below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a       ttr   0.8      ok           &lt;NA&gt; 5 4               FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     essay_b       ttr   1.0      ok           &lt;NA&gt; 5 5               FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       empty       ttr    NA missing    empty_input 0 0                TRUE</span>
 <span class="r-in"><span><span class="va">result</span><span class="op">$</span><span class="va">token_audit</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    document_id token_index surface selected_unit unit_match_rule upos eligible</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      essay_a           1     the           the            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      essay_a           2     cat           cat            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      essay_a           3   can't         can't            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      essay_a           4    read          read            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5      essay_a           5     the           the            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6      essay_a           6    book          book            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7      essay_b           1       a             a            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8      essay_b           2  reader        reader            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9      essay_b           3   reads         reads            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10     essay_b           4       a             a            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11     essay_b           5   story         story            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      essay_a           1    cats          cats            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      essay_a           2   chase         chase            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      essay_a           3    cats          cats            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      essay_a           4     and           and            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5      essay_a           5    dogs          dogs            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6      essay_b           1     the           the            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7      essay_b           2  reader        reader            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8      essay_b           3   reads         reads            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9      essay_b           4       a             a            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10     essay_b           5   story         story            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    exclusion_reason</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1              &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2              &lt;NA&gt;</span>
@@ -222,12 +228,11 @@ create a metric table; save the complete object to retain its audits.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8              &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9              &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10             &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11             &lt;NA&gt;</span>
 <span class="r-in"><span><span class="fu"><a href="lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_wide_results: 3 rows; 23 columns&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_wide_results: 3 rows; 12 columns&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   document_id ttr__value ttr__status ttr__missing_reason  ttr__method_id</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a  0.8333333          ok                &lt;NA&gt; ttr_v_over_n_v1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     essay_b  0.8000000          ok                &lt;NA&gt; ttr_v_over_n_v1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a        0.8          ok                &lt;NA&gt; ttr_v_over_n_v1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     essay_b        1.0          ok                &lt;NA&gt; ttr_v_over_n_v1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3       empty         NA     missing         empty_input ttr_v_over_n_v1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ttr__below_quality_floor       ttr__metric_contract_id</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1                    FALSE ldfreq-lexical-diversity-core</span>
@@ -237,37 +242,61 @@ create a metric table; save the complete object to retain its audits.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1                        0.1.0                          </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                        0.1.0                          </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3                        0.1.0                          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ttr__effective_parameters ttr__N ttr__V mattr__value mattr__status</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                6      5        1.000            ok</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                                5      4        0.875            ok</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                                0      0           NA       missing</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   mattr__missing_reason       mattr__method_id mattr__below_quality_floor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                  &lt;NA&gt; mattr_sliding_step1_v1                       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                  &lt;NA&gt; mattr_sliding_step1_v1                       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3           empty_input mattr_sliding_step1_v1                       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       mattr__metric_contract_id mattr__metric_contract_version</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 ldfreq-lexical-diversity-core                          0.1.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 ldfreq-lexical-diversity-core                          0.1.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 ldfreq-lexical-diversity-core                          0.1.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   mattr__requested_parameters mattr__effective_parameters mattr__N mattr__V</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                           4                           4        6        5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                           4                           4        5        4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                           4                                    0        0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ttr__effective_parameters ttr__N ttr__V</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                5      4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                                5      5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                                0      0</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 2. The plot displays the two computed scores; the empty row stays in</span></span></span>
+<span class="r-in"><span><span class="co"># results.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span>, metric_id <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="lexdiv_text_batch-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span>, metric_id <span class="op">=</span> <span class="st">"ttr"</span>, monochrome <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="lexdiv_text_batch-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 3. Save the whole analysis. Use your own output path for a research</span></span></span>
+<span class="r-in"><span><span class="co"># project.</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">result</span>, <span class="va">path</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">restored</span><span class="op">$</span><span class="va">results</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id metric_id value  status missing_reason N V below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a       ttr   0.8      ok           &lt;NA&gt; 5 4               FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     essay_b       ttr   1.0      ok           &lt;NA&gt; 5 5               FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       empty       ttr    NA missing    empty_input 0 0                TRUE</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>  <span class="co"># Clean up only this temporary demonstration file.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 4. Optional workflow: prepare tokens once, then reuse them.</span></span></span>
+<span class="r-in"><span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_tokenize_batch</span><span class="op">(</span><span class="va">texts</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">prepared</span><span class="op">$</span><span class="va">essay_a</span><span class="op">$</span><span class="va">tokens</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   token_index start end surface is_number</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           1     1   4    cats     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           2     6  10   chase     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3           3    12  15    cats     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4           4    17  19     and     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5           5    21  24    dogs     FALSE</span>
+<span class="r-in"><span><span class="co"># A 4-token window illustrates MATTR here; it is not a research</span></span></span>
+<span class="r-in"><span><span class="co"># recommendation.</span></span></span>
+<span class="r-in"><span><span class="fu">lexdiv_metrics_text_batch</span><span class="op">(</span><span class="va">prepared</span>, metrics <span class="op">=</span> <span class="st">"mattr"</span>, window_length <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">$</span><span class="va">results</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id metric_id value  status missing_reason N V below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a     mattr 0.875      ok           &lt;NA&gt; 5 4                TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     essay_b     mattr 1.000      ok           &lt;NA&gt; 5 5                TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       empty     mattr    NA missing    empty_input 0 0                TRUE</span>
 <span class="r-in"><span><span class="fu"><a href="nj8_profile.html">nj8_profile_batch</a></span><span class="op">(</span><span class="va">prepared</span>, unit <span class="op">=</span> <span class="st">"surface"</span><span class="op">)</span><span class="op">$</span><span class="va">coverage</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   document_id input_tokens eligible_tokens excluded_tokens selection_coverage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a            6               6               0                  1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a            5               5               0                  1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2     essay_b            5               5               0                  1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3       empty            0               0               0                 NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   matched_tokens off_list_tokens token_coverage eligible_types matched_types</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1              5               1      0.8333333              5             4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2              4               1      0.8000000              4             3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1              2               3            0.4              4             2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2              4               1            0.8              5             4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3              0               0             NA              0             0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   off_list_types type_coverage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1              1          0.80</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2              1          0.75</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1              2           0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2              1           0.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3              0            NA</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span>, metric_id <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="lexdiv_text_batch-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

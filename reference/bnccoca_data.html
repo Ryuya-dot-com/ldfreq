@@ -124,12 +124,15 @@ International Journal of Lexicography, 6(4), 253–279.
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="lexdiv_family_profile.html">lexdiv_family_profile</a></code>, <code><a href="morpholex_data.html">morpholex_data</a></code></p></div>
+    <div class="dont-index"><p><code><a href="lexdiv_family_profile.html">lexdiv_family_profile</a></code> for a complete token-to-family
+example, <code><a href="morpholex_data.html">morpholex_data</a></code>,
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html">Word families, roots and affixes tutorial</a></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu">bnccoca_data</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># The dictionary maps forms to families; it is not a table of corpus counts.</span></span></span>
 <span class="r-in"><span><span class="va">reference</span><span class="op">$</span><span class="va">dictionary</span><span class="op">[</span><span class="va">reference</span><span class="op">$</span><span class="va">dictionary</span><span class="op">$</span><span class="va">form</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"USE"</span>, <span class="st">"USES"</span>, <span class="st">"REUSABILITY"</span>, <span class="st">"COLOUR"</span>, <span class="st">"COLOR"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"form"</span>, <span class="st">"headword"</span>, <span class="st">"frequency_band"</span><span class="op">)</span><span class="op">]</span></span></span>
@@ -138,7 +141,9 @@ International Journal of Lexicography, 6(4), 253–279.
 <span class="r-out co"><span class="r-pr">#&gt;</span> 999   COLOR   COLOUR              1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6348    USE      USE              1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6374   USES      USE              1</span>
+<span class="r-in"><span><span class="co"># USE/USES share a headword; COLOUR/COLOR share another. REUSABILITY has no row.</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A longer installed workflow; the direct API example is in ?lexdiv_family_profile.</span></span></span>
 <span class="r-in"><span><span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"bnccoca-families.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span></span>
 <span class="r-in"><span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">env</span><span class="op">)</span></span></span>

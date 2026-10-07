@@ -141,16 +141,25 @@ MorphoLex: A derivational morphological database for 70,000 English words.
     <h2 id="source">Source<a class="anchor" aria-label="anchor" href="#source"></a></h2>
     <p><a href="https://github.com/hugomailhot/MorphoLex-en" class="external-link">https://github.com/hugomailhot/MorphoLex-en</a></p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="bnccoca_data.html">bnccoca_data</a></code>,
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html">Word families, roots and affixes tutorial</a>.
+The tutorial explains how to source the word-parts recipes; those helpers
+are not exported package functions.</p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu">morpholex_data</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0-1-1"</span>, <span class="st">"All roots"</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># "0-1-1" is a source worksheet: zero prefixes, one root, one suffix.</span></span></span>
+<span class="r-in"><span><span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu">morpholex_data</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0-1-1"</span>, <span class="st">"All roots"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">words</span> <span class="op">&lt;-</span> <span class="va">reference</span><span class="op">$</span><span class="va">sheets</span><span class="op">[[</span><span class="st">"0-1-1"</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">words</span><span class="op">[</span><span class="va">words</span><span class="op">$</span><span class="va">Word</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"teacher"</span>, <span class="st">"teachers"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Word"</span>, <span class="st">"MorphoLexSegm"</span>, <span class="st">"ROOT1_FamSize"</span>, <span class="st">"ROOT1_Freq_HAL"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          Word MorphoLexSegm ROOT1_FamSize ROOT1_Freq_HAL</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6247  teacher {(teach)}&gt;er&gt;             4          84480</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6248 teachers {(teach)}&gt;er&gt;             4          84480</span>
+<span class="r-in"><span><span class="co"># Both records contain teach and -er. Plural -s is outside this resource's scope.</span></span></span>
 <span class="r-in"><span><span class="va">roots</span> <span class="op">&lt;-</span> <span class="va">reference</span><span class="op">$</span><span class="va">sheets</span><span class="op">[[</span><span class="st">"All roots"</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">roots</span><span class="op">$</span><span class="va">HAL_freq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">roots</span><span class="op">$</span><span class="va">HAL_freq</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">reference</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">data_license</span></span></span>

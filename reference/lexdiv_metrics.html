@@ -166,7 +166,20 @@ document-major, requested-metric-minor long form. Its first three columns are
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The current versioned set contains TTR, RTTR/Guiraud, CTTR, Herdan's C, natural-log
+    <p>Start with <code>lexdiv_metrics(c("a", "a", "b", "c"), metrics = "ttr")</code>.
+Each vector element is one word occurrence: <code>N = 4</code> tokens contain
+<code>V = 3</code> distinct types, so <code>value = 0.75</code>. The result is already a
+data frame; use <code>result$value</code> to access its scores. For a raw sentence,
+use <code><a href="lexdiv_preprocessing.html">lexdiv_metrics_text</a></code> instead of putting the whole sentence
+in one vector element. TTR varies with text length and is not an essay-quality
+score.</p>
+<p>The examples then show a computed value, an empty document, an invalid token,
+and a text shorter than a requested window. An <code>NA</code> value has a reason:
+inspect <code>status</code> and <code>missing_reason</code> before interpreting it or
+combining results. Choosing <code>metrics = "ttr"</code> keeps the first example
+small; omitting <code>metrics</code> requests all methods, some of which cannot be
+computed for short inputs.</p>
+<p>The current versioned set contains TTR, RTTR/Guiraud, CTTR, Herdan's C, natural-log
 Maas a-squared, complete non-overlapping MSTTR, step-one MATTR, bidirectional
 MTLD, sample-size-normalized hypergeometric HD-D on the TTR scale, Yule's K,
 deterministic expected-TTR curve-fit D, and type-based Yule's I. Expected-TTR D
@@ -271,15 +284,60 @@ Humanities</em>, 32, 323–352. <a href="https://doi.org/10.1023/A%3A10017493031
 variants and parameter values documented here when reporting ldfreq results.
 Expected-TTR D is a separately named exact-expectation curve fit, not CLAN VOCD.</p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="lexdiv_preprocessing.html">lexdiv_metrics_text</a></code>, <code><a href="lexdiv_text_batch.html">lexdiv_text_batch</a></code>,
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html">Getting started</a></p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">lexdiv_metric_ids</span><span class="op">(</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># One vector element per token, in its original order.</span></span></span>
+<span class="r-in"><span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="va">tokens</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span>  <span class="co"># N = 4, V = 3, value = 0.75, status = "ok"</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value status missing_reason N V below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr  0.75     ok           &lt;NA&gt; 4 3               FALSE</span>
+<span class="r-in"><span><span class="va">result</span><span class="op">$</span><span class="va">value</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.75</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Empty, invalid, and too-short inputs are different conditions.</span></span></span>
+<span class="r-in"><span><span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span>  <span class="co"># missing / empty_input</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value  status missing_reason N V below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr    NA missing    empty_input 0 0                TRUE</span>
+<span class="r-in"><span><span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="cn">NA_character_</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span>  <span class="co"># invalid_input / invalid_token</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value        status missing_reason  N  V below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr    NA invalid_input  invalid_token NA NA                  NA</span>
+<span class="r-in"><span><span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"mattr"</span>, window_length <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value  status                    missing_reason N V</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     mattr    NA missing too_short_for_requested_parameter 2 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                TRUE</span>
+<span class="r-in"><span><span class="co"># The last result is missing / too_short_for_requested_parameter, not zero.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Named lists keep each document separate, including the empty document.</span></span></span>
+<span class="r-in"><span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>doc_a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span>, doc_b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">batch</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_batch</span><span class="op">(</span><span class="va">documents</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">batch</span>  <span class="co"># doc_a: N = 3, V = 2, TTR = 2/3; doc_b: missing / empty_input</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_batch_results: 2 documents; 2 metric records; schema 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id metric_id     value  status missing_reason N V</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       doc_a       ttr 0.6666667      ok           &lt;NA&gt; 3 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       doc_b       ttr        NA missing    empty_input 0 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1               FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                TRUE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Further methods. Sample size 2 is for this tiny illustration only.</span></span></span>
+<span class="r-in"><span><span class="fu">lexdiv_metric_ids</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "ttr"            "rttr"           "cttr"           "herdan"        </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "maas"           "msttr"          "mattr"          "mtld"          </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "hdd"            "expected_ttr_d" "yule_k"         "yule_i"        </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="va">tokens</span>, metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"hdd"</span><span class="op">)</span>, sample_size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 2 metrics; contract 0.1.0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id     value status missing_reason N V below_quality_floor</span>
@@ -293,21 +351,6 @@ Expected-TTR D is a separately named exact-expectation curve fit, not CLAN VOCD.
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        metric_id     value status missing_reason  N V below_quality_floor</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 expected_ttr_d 0.1164681     ok           &lt;NA&gt; 80 3               FALSE</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value  status missing_reason N V below_quality_floor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr    NA missing    empty_input 0 0                TRUE</span>
-<span class="r-in"><span><span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="cn">NA_character_</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value        status missing_reason  N  V below_quality_floor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr    NA invalid_input  invalid_token NA NA                  NA</span>
-<span class="r-in"><span><span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"mattr"</span>, window_length <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value  status                    missing_reason N V</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     mattr    NA missing too_short_for_requested_parameter 2 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   below_quality_floor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                TRUE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">mtld</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"mtld"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">mtld</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></span>
@@ -329,20 +372,6 @@ Expected-TTR D is a separately named exact-expectation curve fit, not CLAN VOCD.
 <span class="r-out co"><span class="r-pr">#&gt;</span> $reverse_tail_credit</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>doc_a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span>, doc_b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">lexdiv_metrics_batch</span><span class="op">(</span><span class="va">documents</span>, metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"mtld"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_batch_results: 2 documents; 4 metric records; schema 0.1.0&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id metric_id     value  status                  missing_reason N V</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       doc_a       ttr 0.6666667      ok                            &lt;NA&gt; 3 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       doc_a      mtld        NA missing insufficient_tokens_for_formula 3 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       doc_b       ttr        NA missing                     empty_input 0 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       doc_b      mtld        NA missing                     empty_input 0 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   below_quality_floor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1               FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                TRUE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">contract_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"spec"</span>, <span class="st">"lexical-diversity-contract.json"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span></span></span>
