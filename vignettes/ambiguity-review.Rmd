@@ -135,6 +135,285 @@ needed. This interface holds one current decision per occurrence; it does not
 automatically adjudicate disagreements. Keep each review intact, including its
 content fingerprint, and change decision inputs rather than the output table.
 
+## Edit a decision worksheet and apply it again {#edit-decision-worksheet}
+
+Use this workflow when you want to inspect occurrences in R or a spreadsheet,
+record some decisions, and resume later. It uses the existing review API and
+base R; the reading function defined below is a tutorial recipe, not an
+exported ldfreq function. Run the section from its first chunk in a fresh R
+session. It requires the optional quanteda package and the installed text-file
+example from the [documented installation](https://ryuya-dot-com.github.io/ldfreq/#installation).
+
+### Know which table you are opening
+
+| Table | One row represents | Use |
+|---|---|---|
+| Annotation import `$segments` / `$tokens` | One original segment / token | Check source text, boundaries, positions and available labels; retain the complete import |
+| Review `$occurrences` | One target occurrence | Inspect KWIC, candidate count, current status and exact original context |
+| Review `$candidates` | One supplied term–candidate pair | Inspect the inventory; its rows are not corpus occurrences |
+| Review `$decisions` | One submitted occurrence decision | Record `selected` or `unresolved`, candidate ID, reviewer and reason |
+| Text-batch `$token_audit` | One audited token occurrence | Inspect the analysis selection and exclusion reasons; this is a different output contract |
+
+An English `lexdiv_tokenization` object and a complete external annotation import
+are different inputs. This section starts with `lexdiv_import_annotations()`.
+For lemma/POS correction on an existing English tokenization, use the
+[annotation sensitivity example](auditing-vocabulary-profiles.html#connect-annotation-changes-to-document-results).
+For external annotations, reimport a complete corrected table and check
+[position alignment](annotation-alignment.html). Editing a sense decision does
+not change tokenization, lemma/POS or the source text.
+
+### Prepare and save a small complete review
+
+These authored sentences deliberately include two occurrences of the same
+word, a target without candidates, a document without any target, and an empty
+document. The three candidate IDs are strings with leading zeros. They are
+illustrations, not entries from a sense dictionary or independently validated
+annotations.
+
+```{r worksheet-prepare, eval=has_quanteda}
+library(ldfreq)
+worksheet_segments <- data.frame(
+  document_id = c("en", "en", "other", "empty"),
+  segment_id = c("s1", "s2", "s1", "s1"),
+  text = c("The bank lent money.", "The river bank flooded.", "Clouds move.", ""))
+worksheet_tokens <- data.frame(
+  document_id = c(rep("en", 10), rep("other", 3)),
+  segment_id = c(rep("s1", 5), rep("s2", 5), rep("s1", 3)),
+  token_index = c(1:5, 1:5, 1:3),
+  surface = c("The", "bank", "lent", "money", ".",
+    "The", "river", "bank", "flooded", ".", "Clouds", "move", "."))
+worksheet_annotations <- lexdiv_import_annotations(
+  worksheet_tokens, worksheet_segments,
+  list(language = "en", analyzer = "authored", analyzer_version = "1",
+    dictionary = "none", dictionary_version = "not-applicable",
+    unit = "authored-example", normalization = "none"))
+worksheet_candidates <- data.frame(term = c("bank", "bank", "money"),
+  candidate_id = c("001", "002", "003"),
+  label = c("financial institution", "river edge", "medium of exchange"))
+worksheet_resource <- list(
+  resource_id = "authored-worksheet", resource_version = "1",
+  source_reference = "ldfreq authored worksheet example", data_license = "MIT")
+worksheet_before <- lexdiv_ambiguity_review(worksheet_annotations,
+  c("bank", "money", "river", "absent"), worksheet_candidates, worksheet_resource)
+
+review_dir <- tempfile("ldfreq-review-")
+dir.create(review_dir)
+saveRDS(worksheet_before, file.path(review_dir, "review-before.rds"), version = 2)
+```
+
+For your study, use a persistent project directory such as `"results/review-a"`
+and start with your own complete review. Keep each reviewer's directory and
+later adjudication separate. The saved RDS contains the source text and inherits
+its sharing conditions. Do not overwrite your original files or earlier rounds.
+
+### Export context, candidates and editable decisions
+
+The context and candidate CSVs are reference tables. The worksheet contains
+fixed identifiers and location cues beside four editable decision columns.
+Only the decision columns are sent back to the review API. Filtering a display
+is fine; retain all worksheet rows when saving this complete-sheet workflow.
+
+```{r worksheet-export, eval=has_quanteda}
+worksheet_context <- worksheet_before$occurrences[c("review_id", "occurrence_id",
+  "document_id", "segment_id", "token_index", "surface", "pre", "keyword", "post",
+  "start", "end", "segment_text", "candidate_count", "status")]
+worksheet <- worksheet_before$occurrences[c("review_id", "occurrence_id",
+  "document_id", "segment_id", "token_index", "surface",
+  "status", "candidate_id", "reviewer", "reason")]
+worksheet$status[
+  !worksheet$status %in% c("selected", "unresolved")] <- NA_character_
+write.csv(worksheet_context, file.path(review_dir, "context.csv"),
+  row.names = FALSE, na = "", fileEncoding = "UTF-8")
+write.csv(worksheet_before$candidates, file.path(review_dir, "candidates.csv"),
+  row.names = FALSE, na = "", fileEncoding = "UTF-8")
+write.csv(worksheet, file.path(review_dir, "decisions-blank.csv"),
+  row.names = FALSE, na = "", fileEncoding = "UTF-8")
+worksheet_context[c("document_id", "segment_id", "surface", "pre", "post",
+  "candidate_count", "status")]
+worksheet_before$candidates
+# In interactive R, View(worksheet_context) opens the reference table.
+```
+
+Import CSV columns **as text** in a spreadsheet, including `candidate_id`;
+otherwise `001` may become `1`. Save CSV as UTF-8. You can hide long ID columns
+for display, but retain their complete values. Use the IDs to associate a row
+with context, even when the same word occurs several times in one sentence.
+A candidate must belong to that occurrence's surface, not just exist elsewhere
+in the inventory.
+
+| Fields | What to enter |
+|---|---|
+| `review_id`, `occurrence_id`, `document_id`, `segment_id`, `token_index`, `surface` | Keep unchanged; row order may change |
+| `status` | `selected`, `unresolved`, or blank for an unsubmitted row |
+| `candidate_id` | A valid candidate ID for `selected`; blank for `unresolved` |
+| `reviewer`, `reason` | Both required for a submitted decision; leave both blank on an unsubmitted row |
+
+Blank status is not a decision to leave a meaning unresolved. A row with all
+four decision cells blank remains `unreviewed`, or `no_candidates` when the
+inventory has no entry. A partly filled row is rejected so that a typed reason
+or candidate is not silently discarded. The template retains existing submitted
+decisions when you start from a previously reviewed object; clearing all four
+cells explicitly removes that decision in the new round. The old RDS remains
+the record of the preceding round.
+
+The following code **simulates editing** so the tutorial runs without manual
+steps. In your study, edit a copy named `decisions-edited.csv` and skip this
+simulation. Here the financial-bank occurrence is selected, the river-bank
+occurrence is deliberately left unresolved, and the other two rows are left
+unsubmitted. The river-bank sentence is clear; its unresolved status illustrates
+workflow accounting, not a claim that its interpretation is unknowable.
+
+```{r worksheet-edit, eval=has_quanteda}
+edited_sheet <- worksheet
+finance_row <- which(edited_sheet$segment_id == "s1" &
+  edited_sheet$surface == "bank")
+river_row <- which(edited_sheet$segment_id == "s2" &
+  edited_sheet$surface == "bank")
+edited_sheet$status[c(finance_row, river_row)] <- c("selected", "unresolved")
+edited_sheet$candidate_id[finance_row] <- "001"
+edited_sheet$reviewer[c(finance_row, river_row)] <- "example-reviewer"
+edited_sheet$reason[c(finance_row, river_row)] <- c(
+  'The context mentions lending, so choose "financial institution".',
+  "Demo: keep this case for a later review.\nNo selection submitted.")
+# Simulate sorting the worksheet before saving.
+edited_sheet <- edited_sheet[rev(seq_len(nrow(edited_sheet))), ]
+write.csv(edited_sheet, file.path(review_dir, "decisions-edited.csv"),
+  row.names = FALSE, na = "", fileEncoding = "UTF-8")
+```
+
+### Read, check and apply the edited file
+
+This recipe uses the strict UTF-8 reader from the file-input tutorial. It keeps
+the CSV's byte hash and then parses every column as character. Only empty cells
+mean missing; literal `NA` and `TRUE` remain text. Quoted commas and line breaks
+in reasons are supported. CSV parsing can convert CRLF inside quoted fields to
+LF, as explained in the [file-input guide](english-tokenization.html#import-text-files).
+
+The reader requires the complete original row set, permits sorting, checks the
+fixed cells by occurrence ID, and rejects partial or invalid status entries.
+The existing review API then checks candidate membership, required decision
+fields and whether the source/candidate snapshot still matches.
+
+```{r worksheet-reader, eval=has_quanteda}
+input_helpers <- new.env(parent = baseenv())
+sys.source(system.file("examples", "text-file-input.R", package = "ldfreq",
+  mustWork = TRUE), input_helpers)
+read_review_sheet <- function(path, before) {
+  decoded <- input_helpers$read_text_file(path, encoding = "UTF-8")
+  sheet <- read.csv(text = decoded$text, colClasses = "character",
+    na.strings = "", check.names = FALSE)
+  fixed <- c("review_id", "occurrence_id", "document_id",
+    "segment_id", "token_index", "surface")
+  editable <- c("status", "candidate_id", "reviewer", "reason")
+  if (anyDuplicated(names(sheet)) || !setequal(names(sheet), c(fixed, editable)))
+    stop(
+      "Keep the original worksheet columns; edit only the four decision fields.")
+  if (anyNA(sheet[fixed]) || anyDuplicated(sheet$occurrence_id) ||
+      !setequal(sheet$occurrence_id, before$occurrences$occurrence_id))
+    stop(
+      "Keep every original occurrence ID exactly once, including unsubmitted rows.")
+  row <- match(sheet$occurrence_id, before$occurrences$occurrence_id)
+  for (field in fixed) {
+    if (!identical(sheet[[field]],
+      as.character(before$occurrences[[field]][row])))
+      stop("A fixed worksheet field changed: ", field)
+  }
+  submitted <- !is.na(sheet$status)
+  if (any(!sheet$status[submitted] %in% c("selected", "unresolved")))
+    stop("Status must be selected, unresolved, or blank.")
+  if (any(rowSums(!is.na(sheet[editable]))[!submitted] != 0L))
+    stop(
+      "An unsubmitted row is partly filled; finish or clear its four decision fields.")
+  list(sheet = sheet, source = decoded$source,
+    decisions = sheet[submitted,
+      c("review_id", "occurrence_id", editable), drop = FALSE])
+}
+```
+
+```{r worksheet-apply, eval=has_quanteda}
+worksheet_saved <- readRDS(file.path(review_dir, "review-before.rds"))
+worksheet_input <- read_review_sheet(
+  file.path(review_dir, "decisions-edited.csv"), worksheet_saved)
+worksheet_after <- lexdiv_ambiguity_review(worksheet_saved$source,
+  worksheet_saved$summary$term, worksheet_saved$candidates,
+  worksheet_saved$provenance$resource, decisions = worksheet_input$decisions,
+  window = worksheet_saved$provenance$window)
+worksheet_change <- lexdiv_compare_ambiguity(worksheet_saved, worksheet_after)
+stopifnot(identical(worksheet_saved$source, worksheet_after$source),
+  identical(worksheet_saved$occurrences$occurrence_id,
+    worksheet_after$occurrences$occurrence_id),
+  identical(worksheet_after$occurrences$status,
+    c("selected", "unreviewed", "no_candidates", "unresolved")),
+  identical(worksheet_after$occurrences$candidate_id[1], "001"))
+worksheet_after$occurrences[c("document_id", "segment_id", "surface",
+  "candidate_id", "status")]
+```
+
+The `worksheet_change` object compares two stages of one review. It is not
+independent inter-rater agreement. The returned review contains **all four**
+target occurrences, even though only two decisions were submitted. Submitted
+decisions replace the current decision set; they are not an incremental patch.
+Use a template from the latest saved review to retain its existing decisions.
+Do not edit the returned review object directly or replace its content fingerprint.
+
+If application fails, correct the worksheet and apply it again from the saved
+baseline. Changing the source text, annotations, targets or candidate inventory
+requires a new review and renewed decisions; changing IDs to force acceptance
+would destroy that correspondence. The snapshot checks detect outdated inputs,
+not whether a human chose the linguistically correct candidate or assigned a
+valid choice to the intended occurrence.
+
+### Summarize all documents and save the completed round
+
+Count one row per target occurrence, not per candidate or decision. Start from
+the complete source document list to retain the empty document and the document
+without targets. Here "reviewed" means a submitted selection **or** an explicit
+unresolved judgment. Its denominator is the searched target occurrences, not
+all words, writers, or only occurrences with candidates.
+
+```{r worksheet-summary, eval=has_quanteda}
+worksheet_report <- data.frame(
+  document_id = unique(worksheet_after$source$segments$document_id))
+occ <- worksheet_after$occurrences
+where <- match(occ$document_id, worksheet_report$document_id)
+worksheet_report$target_occurrences <- tabulate(where,
+  nbins = nrow(worksheet_report))
+for (state in c("selected", "unresolved", "unreviewed", "no_candidates")) {
+  worksheet_report[[state]] <- tabulate(where[occ$status == state],
+    nbins = nrow(worksheet_report))
+}
+worksheet_report$reviewed_proportion <- with(worksheet_report,
+  ifelse(target_occurrences > 0,
+    (selected + unresolved) / target_occurrences, NA_real_))
+stopifnot(identical(rowSums(worksheet_report[
+  c("selected", "unresolved", "unreviewed", "no_candidates")]),
+  as.numeric(worksheet_report$target_occurrences)),
+  identical(worksheet_report$target_occurrences, c(4L, 0L, 0L)),
+  is.na(worksheet_report$reviewed_proportion[2]),
+  is.na(worksheet_report$reviewed_proportion[3]))
+knitr::kable(worksheet_report, digits = 2, col.names = c("Document", "Targets",
+  "Selected", "Unresolved", "Unreviewed", "No candidates", "Reviewed / targets"))
+worksheet_after$summary  # The absent target also remains, with zero occurrences.
+
+worksheet_record <- list(before = worksheet_saved, input = worksheet_input,
+  after = worksheet_after, comparison = worksheet_change,
+  documents = worksheet_report, session = sessionInfo())
+saveRDS(worksheet_record, file.path(review_dir, "review-after.rds"), version = 2)
+write.csv(worksheet_report, file.path(review_dir, "review-counts.csv"),
+  row.names = FALSE, na = "", fileEncoding = "UTF-8")
+stopifnot(identical(readRDS(file.path(review_dir, "review-after.rds")),
+  worksheet_record))
+```
+
+Two of four target occurrences have been reviewed; one has a selected candidate.
+The zero-target documents have an undefined reviewed proportion (`NA`), not 0%.
+These counts describe review progress, not annotation accuracy or lexical ability.
+The original word forms and token boundaries are unchanged, so a surface-based
+MATTR analysis of the same text is unchanged too. A declared
+[word-family workflow](preprocessing-and-frequency.html#apply-contextual-judgments-to-individual-occurrences)
+can apply reviewed membership candidates to its own accounting; a sense choice
+does not automatically redefine a word family or recover sense-specific frequency.
+
 ## Compare two reviews and return to open cases
 
 `lexdiv_compare_ambiguity()` compares two reviews of the same source and candidate
