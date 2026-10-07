@@ -242,7 +242,7 @@ documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@d2568c9d8d0bfa3955bba31cd53bbff8d0f751b3")
+pak::pak("Ryuya-dot-com/ldfreq@e6919ad23ed7c2e003ff174e611b3d3bca6124d0")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
@@ -261,6 +261,13 @@ The built archive includes rendered guides. A GitHub source installation may
 omit them; the online guides remain available.
 
 ## A first analysis
+
+After `library(ldfreq)`, open `?ldfreq` for a short first analysis and an input
+map. `?lexdiv_metrics_text` explains the counted words and scores;
+`?lexdiv_family_profile` contains a complete Nation word-family example.
+Run `example("lexdiv_metrics_text", package = "ldfreq")` to execute the text
+examples. These help pages include expected values and explain missing results.
+
 
 For TXT files, folders or ID/text CSV files, start with the
 [executable file-input tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
