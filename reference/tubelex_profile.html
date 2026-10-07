@@ -9,7 +9,7 @@ byte-pinned TUBELEX-EN Treebank aggregate bundled with ldfreq."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,6 +135,19 @@ academic register, or context-independent lexical sophistication. In particular,
 lexical employability (using words in communication) requires learner-level
 criteria; neither frequency nor video/channel prevalence demonstrates an
 individual's meaning recall, processing speed or appropriate contextual use.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="locales-and-resource-failures">Locales and resource failures<a class="anchor" aria-label="anchor" href="#locales-and-resource-failures"></a></h2>
+    <p>The bundled CSV is decoded as UTF-8 independently of <code>LC_CTYPE</code>.
+C/POSIX sessions can use ASCII or explicitly UTF-8-encoded query terms.
+An accented character may be displayed with a Unicode escape in a C console
+even though its bytes and lookup result are correct.</p>
+<p>For <code>status = "resource_error"</code>, printing reports the failure reason.
+For <code>schema_mismatch</code>, it also shows the failed schema checks and current
+<code>LC_CTYPE</code>, and suggests checking resource integrity and UTF-8 decoding.
+Older loaders could fail in non-UTF-8 locales; this hint does not establish the
+cause of every schema failure. The machine-readable reason and diagnostics
+remain available without printing.</p>
     </div>
     <div class="section level2">
     <h2 id="reading-lookup-and-summary-values">Reading lookup and summary values<a class="anchor" aria-label="anchor" href="#reading-lookup-and-summary-values"></a></h2>

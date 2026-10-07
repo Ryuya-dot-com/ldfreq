@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -284,12 +284,60 @@ Recreate old plans explicitly for new computation; see
 <code><a href="../reference/lexdiv_metrics.html">?lexdiv_metrics</a></code> for migration details. The <a href="https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/external-metrics" class="external-link">external
 comparisons</a> show the actual koRpus and TAALED outputs and account
 for remaining differences.</p>
+<div class="section level3">
+<h3 id="check-the-effect-on-your-documents">Check the effect on your documents<a class="anchor" aria-label="anchor" href="#check-the-effect-on-your-documents"></a>
+</h3>
+<p>Use the same ordered tokens for both definitions. This example reads
+the 30 authored teaching essays and the empty file distributed with the
+package; replace <code>folder</code> with your own input directory to
+check a study’s documents.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">folder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"text-input"</span>, <span class="st">"texts"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span></span>
+<span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">folder</span>, pattern <span class="op">=</span> <span class="st">"[.]txt$"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">texts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">files</span>, <span class="kw">function</span><span class="op">(</span><span class="va">path</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="va">path</span>, encoding <span class="op">=</span> <span class="st">"UTF-8"</span>, warn <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="op">}</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">texts</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">tools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_path_sans_ext</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_tokenize_batch</a></span><span class="op">(</span><span class="va">texts</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>,</span>
+<span>  normalization <span class="op">=</span> <span class="st">"NFC"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span>
+<span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">prepared</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">$</span><span class="va">tokens</span><span class="op">$</span><span class="va">surface</span><span class="op">)</span></span>
+<span><span class="va">current</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span><span class="va">tokens</span>, metrics <span class="op">=</span> <span class="st">"mtld"</span><span class="op">)</span></span>
+<span><span class="va">legacy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">tokens</span>, <span class="va">lexdiv_variant_metrics</span>,</span>
+<span>  variants <span class="op">=</span> <span class="st">"mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1"</span><span class="op">)</span></span>
+<span><span class="va">migration</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">tokens</span><span class="op">)</span>, N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lengths.html" class="external-link">lengths</a></span><span class="op">(</span><span class="va">tokens</span><span class="op">)</span>,</span>
+<span>  current <span class="op">=</span> <span class="va">current</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>  legacy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">legacy</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">$</span><span class="va">value</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">paired</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">migration</span><span class="op">$</span><span class="va">current</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">migration</span><span class="op">$</span><span class="va">legacy</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>paired <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">paired</span><span class="op">)</span>, excluded <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="va">paired</span><span class="op">)</span>,</span>
+<span>  spearman <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">migration</span><span class="op">$</span><span class="va">current</span><span class="op">[</span><span class="va">paired</span><span class="op">]</span>, <span class="va">migration</span><span class="op">$</span><span class="va">legacy</span><span class="op">[</span><span class="va">paired</span><span class="op">]</span>,</span>
+<span>    method <span class="op">=</span> <span class="st">"spearman"</span><span class="op">)</span>,</span>
+<span>  mean_absolute_change <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">migration</span><span class="op">$</span><span class="va">current</span><span class="op">[</span><span class="va">paired</span><span class="op">]</span> <span class="op">-</span></span>
+<span>    <span class="va">migration</span><span class="op">$</span><span class="va">legacy</span><span class="op">[</span><span class="va">paired</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   paired excluded spearman mean_absolute_change</span></span>
+<span><span class="co">#&gt; 1     30        1        1                    0</span></span></code></pre></div>
+<p>All 30 paired scores agree (Spearman = 1; mean absolute change = 0);
+the empty document remains missing. These texts have 107–149 tokens and
+MTLD values 48.76–165.21. They do not estimate the effect on low-scoring
+learner essays. Report the paired count, missing cases, ranks and
+numerical changes for your own sample before combining old and new
+results. Correlation alone can conceal a systematic shift in values.
+With fewer than two finite pairs or constant scores, rank correlation is
+not defined.</p>
+<p>Both methods above use strict <code>&lt;</code>. Changing only the
+comparison to <code>&lt;=</code> is a different sensitivity analysis:
+for teaching essay <code>024</code>, a transparent no-minimum reference
+gives 86.1956 with <code>&lt;</code> and 64.3163 with
+<code>&lt;=</code>. The <a href="https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/mtld-migration" class="external-link">executed
+migration record</a> preserves the document-level outputs, operator-only
+reference and exact input hashes. The boundary effect depends on the
+token sequence, so there is no universal percentage adjustment.</p>
 <p>Expected-TTR D is experimental and excluded from defaults.
 Near-all-unique texts yield large estimates because the target curve
 approaches one. The numerical correction in package 0.2.0 does not
 establish equivalence to CLAN vocd-D. If explicitly selected, report
 <code>near_saturation</code>, fit diagnostics, sample sizes, and package
 version; all-unique input has an unbounded fit.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="reference-frequency-answers-a-separate-question">Reference frequency answers a separate question<a class="anchor" aria-label="anchor" href="#reference-frequency-answers-a-separate-question"></a>
@@ -299,7 +347,7 @@ YouTube subtitles, use TUBELEX as a separate corpus-relative measure.
 Its Treebank segmentation is not supplied by the general Unicode
 tokenizer in this package. Prepare and record a compatible external
 pipeline; these hand-prepared terms illustrate only one sentence.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"I"</span>, <span class="st">"do"</span>, <span class="st">"n't"</span>, <span class="st">"think"</span>, <span class="st">"it"</span>, <span class="st">"'s"</span>, <span class="st">"a"</span>, <span class="st">"book"</span><span class="op">)</span></span>
 <span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="va">terms</span><span class="op">)</span></span>
 <span><span class="va">frequency</span><span class="op">$</span><span class="va">summary</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weighting"</span>, <span class="st">"coverage"</span>, <span class="st">"mean_zipf"</span><span class="op">)</span><span class="op">]</span></span>

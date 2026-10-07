@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,10 @@
 <div id="api-and-measurement-lifecycle" class="section level1">
 
 <p>The resource-independent, pre-tokenized twelve-method core introduced in <code>0.1.0</code> is retained as a historical contract. Package 0.3.0 advances the core to contract 0.2.0: MTLD has no minimum factor length and a new method ID, and experimental expected-TTR D is excluded from defaults. The explicit legacy min10 method remains available through <code><a href="reference/lexdiv_variant_metrics.html">lexdiv_variant_metrics()</a></code>. This is a documented breaking change with a minor package-version increment. Raw-text preprocessing, exact lexical overlap, many-document reference coverage, caller-supplied generic lexical-norm profiles, and resource-backed profiles are separate public surfaces with their own contract versions. The Maas/MTLD sensitivity surface also has a separate variant contract and does not add methods to the core registry. Bundled and external lexical-level profiles have a separate contract for resource input, rank bands, denominator, off-list handling, and plot data. Package version, metric-contract version, result-schema version, preprocessing-contract version, and resource-profile contract version are independent identities and are recorded separately.</p>
+<div class="section level2">
+<h2 id="development-versions">Development versions<a class="anchor" aria-label="anchor" href="#development-versions"></a></h2>
+<p>Current development builds use a fourth component, starting with 0.3.0.9001. <code><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion()</a></code> and <code><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation()</a></code> therefore distinguish them from formal releases. The earlier <code>v0.3.0-dev.1</code> tag contains DESCRIPTION version 0.3.0; retain that exact tag/commit when identifying that historical snapshot. It is not rewritten or relabeled. Since 0.3.0 has already been distributed, subsequent versions must sort after it; a future formal version must also sort after its development predecessors (for example, 0.3.1 after 0.3.0.9001). The citation takes its version from installed DESCRIPTION metadata.</p>
+</div>
 <div class="section level2">
 <h2 id="method-identity">Method identity<a class="anchor" aria-label="anchor" href="#method-identity"></a></h2>
 <p>A <code>method_id</code> fixes the formula, scale, boundary and tail rules, operation semantics, aggregation, and canonical defaults. A substantive change receives a new method ID; an existing method ID is never silently redefined.</p>

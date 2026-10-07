@@ -1,5 +1,28 @@
 # Changelog
 
+## ldfreq 0.3.0.9001 (development)
+
+- Decode the bundled TUBELEX CSV through an explicitly UTF-8 text
+  connection. ASCII and accented queries now work under C/POSIX locales.
+  Schema-failure printing shows the failed checks, current LC_CTYPE and
+  an encoding hint.
+- Remove MorphyNet’s initial UTF-8 BOM explicitly, retaining the
+  original byte hash and the documented delimiter policy in non-UTF-8
+  locales (reader 0.1.1). Make the NINJAL recipe’s metadata keys and
+  Unicode test fixtures locale-neutral.
+- Add a C-locale installed-package CI job. Prepare and cache R-devel
+  dependencies in a separate job; retain full checks and all vignette
+  rebuilds within the existing per-job limits.
+- Use a fourth-component development version in DESCRIPTION and derive
+  the citation’s version from installed metadata. The earlier
+  v0.3.0-dev.1 snapshot remains unchanged; later formal versions must
+  sort after development versions.
+- Add an executed MTLD migration comparison for the 30 authored English
+  essays: all paired scores agree, Spearman rho = 1, with one empty
+  document excluded explicitly. This teaching sample does not estimate
+  effects in a learner population. Document an operator-only threshold
+  example and the min10 precedent in TAALED.
+
 ## ldfreq 0.3.0 (development)
 
 ### Core review corrections

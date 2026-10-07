@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,14 @@
       <small>Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0.9001" id="ldfreq-0309001-development">ldfreq 0.3.0.9001 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-0309001-development"></a></h2>
+<ul><li>Decode the bundled TUBELEX CSV through an explicitly UTF-8 text connection. ASCII and accented queries now work under C/POSIX locales. Schema-failure printing shows the failed checks, current LC_CTYPE and an encoding hint.</li>
+<li>Remove MorphyNet’s initial UTF-8 BOM explicitly, retaining the original byte hash and the documented delimiter policy in non-UTF-8 locales (reader 0.1.1). Make the NINJAL recipe’s metadata keys and Unicode test fixtures locale-neutral.</li>
+<li>Add a C-locale installed-package CI job. Prepare and cache R-devel dependencies in a separate job; retain full checks and all vignette rebuilds within the existing per-job limits.</li>
+<li>Use a fourth-component development version in DESCRIPTION and derive the citation’s version from installed metadata. The earlier v0.3.0-dev.1 snapshot remains unchanged; later formal versions must sort after development versions.</li>
+<li>Add an executed MTLD migration comparison for the 30 authored English essays: all paired scores agree, Spearman rho = 1, with one empty document excluded explicitly. This teaching sample does not estimate effects in a learner population. Document an operator-only threshold example and the min10 precedent in TAALED.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="ldfreq-030-development">ldfreq 0.3.0 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-030-development"></a></h2>
 <div class="section level3">

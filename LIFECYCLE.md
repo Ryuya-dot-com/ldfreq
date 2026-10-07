@@ -18,6 +18,20 @@ data. Package version, metric-contract version, result-schema version,
 preprocessing-contract version, and resource-profile contract version
 are independent identities and are recorded separately.
 
+## Development versions
+
+Current development builds use a fourth component, starting with
+0.3.0.9001.
+[`packageVersion()`](https://rdrr.io/r/utils/packageDescription.html)
+and [`citation()`](https://rdrr.io/r/utils/citation.html) therefore
+distinguish them from formal releases. The earlier `v0.3.0-dev.1` tag
+contains DESCRIPTION version 0.3.0; retain that exact tag/commit when
+identifying that historical snapshot. It is not rewritten or relabeled.
+Since 0.3.0 has already been distributed, subsequent versions must sort
+after it; a future formal version must also sort after its development
+predecessors (for example, 0.3.1 after 0.3.0.9001). The citation takes
+its version from installed DESCRIPTION metadata.
+
 ## Method identity
 
 A `method_id` fixes the formula, scale, boundary and tail rules,
