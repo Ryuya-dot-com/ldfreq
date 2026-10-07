@@ -118,7 +118,7 @@ limited to caching and must not become public provenance or an
 overlap-comparability key.
 
 Preprocessing objects are validated against their recorded contract version.
-Objects serialized under the current `0.2.0` contract are revalidated whenever
+Objects serialized under the current `0.4.0` contract are revalidated whenever
 they are consumed. If provenance is incomplete, unsupported, or manually
 altered, recreate the object from the original text and reapply current
 annotations and explicit backend labels; do not edit provenance in place.

@@ -4236,3 +4236,20 @@ Windows R4.1/CP932 and the separate non-ASCII test-name warnings are still open.
 No resource data, permission scope, repository visibility, or CRAN state changes.
 The planned fixed development tag is v0.3.0-dev.1; main CI, prerelease publication,
 GitHub installation and site verification are pending at this point.
+
+PR #31 first revision 5cb3bf0: macOS check, PDF manual and both resource builders
+passed. Windows computed 8,272 assertions successfully but failed the two new
+input-byte checks: Git changed LF to CRLF. The CRLF-transformed local input has
+exactly the reported Windows hash, establishing the cause. Added the existing
+`-text` attribute policy for external-metrics fixtures. A separate Git checkout
+with core.autocrlf=true preserves the original SHA-256 after this change. No
+formula, expected numerical value, or external frozen output was changed.
+The first run remains recorded; no successful job is cancelled or manually rerun.
+
+The first run also passed Linux R4.1 and R devel. At the final correction push,
+only Linux R-release dependency setup remained, before package checking. Its
+obsolete revision is superseded by the existing workflow concurrency rule;
+completed macOS/R4.1/devel, resource-builder and PDF results are preserved.
+The new head's mandatory CI is used for merge. No extra manual full run is
+requested. A stale preprocessing-contract number in LIFECYCLE was corrected;
+only that home-document page was regenerated, retaining the built articles.
