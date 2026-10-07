@@ -19,7 +19,7 @@ ja_file_annotations <- utils::read.csv(
   colClasses = "character", check.names = FALSE, na.strings = "<MISSING>")
 ja_file_annotations$token_index <- as.numeric(ja_file_annotations$token_index)
 ja_file_import <- ldfreq::lexdiv_import_annotations(ja_file_annotations, ja_file_segments,
-  list(language = "ja", analyzer = "authored", analyzer_version = "1",
+  list(language = "ja", analyzer = "authored", analyzer_version = "2",
     dictionary = "none", dictionary_version = "not-applicable",
     unit = "authored-file-workflow", normalization = "none"))
 
