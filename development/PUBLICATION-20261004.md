@@ -3618,3 +3618,68 @@ Evidence: reviews/ldfreq-review-worksheet-20261007/evidence/. The public guide
 contains only authored sentences and candidates. Local checks and page rendering
 are complete; protected main integration and live publication are pending at
 this record point. CRAN submission remains outside scope.
+
+## 2026-10-07 Decision worksheet publication completed
+
+Final source head `1c4e81e59a3a715005c19b8024e82daf53517d0b` passes all nine
+R-CMD-check jobs in run 37556206419 and both protected required checks. Windows,
+macOS, Linux release and Linux devel each report 7,843 passing assertions, no
+failures/warnings/skips, and Status: OK. R 4.1 reports 7,768 passing assertions,
+eight optional-dependency skips and two NOTEs (unavailable suggested gibasa/
+textstem and installed size). The development-state classifier passes in run
+37556206329; formal release-candidate artifact jobs are intentionally skipped.
+These results do not represent a formal release-candidate artifact check.
+
+PR #24 merged through the existing protections to main
+`741e74acc82437fb025da133b96c77fec160b89d`. Main and the tested PR have identical
+tree `4ecef135eb38c1b41505892eb95f81e5338e60e5`. The merge subject skips only the
+redundant same-tree push CI. No CI cancellation, protection bypass, release tag
+or CRAN submission occurred. The documented d2568c9 installation pin remains
+applicable: runtime, installed examples, dependencies and reference data are
+unchanged, and the new inline recipe was verified with that installed snapshot.
+Three public source documents retrieved anonymously match the tested head.
+
+GitHub Pages commit `17a8ebbd8bba28e033df4d5a736312cddbe6bae8` deploys successfully
+in run 37558099317. All seven changed public files match the verified local
+artifacts byte-for-byte through anonymous requests with certificate verification.
+The local link audit covers 128 HTML pages in the 249-file site. Live browser
+inspection confirms the new section, object-role table and four-state document
+summary are readable. The zero-target and empty documents remain in the table
+with an undefined reviewed proportion rather than a zero proportion.
+
+Evidence is in `reviews/ldfreq-review-worksheet-20261007/evidence/`: final CI,
+classification and R 4.1 records, merge identity, anonymous source hashes, Pages
+records, live-file hashes and live browser screenshots. The 29 focused checks,
+fresh-session replay and limited local ICNALE pilot are described above; no
+independent linguistic accuracy claim follows from these operation checks.
+Completion-only roadmap/evidence edits remain local to avoid another unchanged
+CI cycle. The merged PR description records the final publication results.
+
+## 2026-10-07 Standalone word-family and affix tutorial
+
+The new word-families-and-affixes guide follows research questions through
+shared-occurrence type counts, coverage, root/prefix/suffix and process labels,
+reference scope, occurrence-specific CSV decisions and complete saving. It
+reuses installed recipes and public APIs without changing runtime, dependencies
+or reference data. New sentences and judgments are explicitly authored;
+MorphyNet relation selection is a reporting convention, not a uniquely proven
+derivation. The empty source document and unlisted occurrences are retained.
+Home, article navigation and the detailed preprocessing guide link to it.
+
+On the existing documented d2568c9 installation, extracted runnable chunks
+execute and 24 independent expected-accounting/replay checks pass. The supplied
+CSV-input recipe retains the empty document and rejects a fractional token
+index rather than truncating it. A separate
+R session regenerates family comparisons, authored part counts and the complete
+linked review identically. There are still 57 exports. Initial purl extraction
+could not evaluate a chunk option defined in a preceding chunk; supplying its
+extraction environment included all review chunks, which then executed and
+were verified. This was an extraction setup issue, not a successful review
+check to count before the correction.
+
+The new navigation required one site-wide render. All 129 HTML pages pass the
+local link audit; the new article's counts and affix tables have been inspected
+in the browser. Shorter table headings improve readability without changing
+the arithmetic. Evidence is under reviews/ldfreq-families-tutorial-20261007/evidence/.
+Final-head protected checks, main merge and actual public-site verification
+remain pending at this record point. CRAN submission is excluded.

@@ -83,6 +83,7 @@ articles:
       - from-text-to-report
       - getting-started
       - english-tokenization
+      - word-families-and-affixes
       - japanese-annotations
   - title: Research design and reference resources
     contents:
