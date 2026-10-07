@@ -2,11 +2,12 @@
 \alias{lexdiv_family_profile}
 \title{Count resource-defined word families while retaining source occurrences}
 \description{
-Matches complete imported annotations against a caller-supplied word-family
-table. This experimental function retains original tokens, candidate records,
-context, resource definitions, document counts and unresolved occurrences.
-It runs no morphological analyzer. Use \code{\link{bnccoca_data}} for the
-bundled Nation inventory or supply a differently defined table explicitly.
+Count the word families represented in each document using an explicit
+form-to-family inventory. The example below imports a small token table and
+uses the bundled Nation inventory from \code{\link{bnccoca_data}}.
+Original word occurrences and unresolved matches remain available for
+inspection. This experimental function requires prepared tokens; it does
+not tokenize raw text or run a morphological analyzer.
 }
 \usage{
 lexdiv_family_profile(annotations, dictionary, resource,
@@ -56,6 +57,38 @@ Creating the single-token, whitespace-free surface review uses optional
 review requires no quanteda calls. Default \code{NULL} uses lookup alone.}
 }
 \details{
+The first example is self-contained and needs no optional package or download.
+It has three steps: import complete tokens with their original text, load the
+family inventory, and call \code{lexdiv_family_profile()}. The short texts and
+token boundaries were written for teaching; they are not analyzer output.
+Nation's list uses uppercase forms, so the example explicitly selects
+\code{normalization = "nfkc_lower"} to match the lowercase input.
+
+Start by reading \code{profile$documents}. For \emph{listed}, the four tokens
+\emph{use uses colour color} match two families: \code{family_types = 2},
+\code{family_ttr = 2/4 = 0.5}, and \code{token_coverage = 1}. For
+\emph{unlisted}, \emph{use} matches but \emph{reusability} does not occur in
+this inventory: coverage is 0.5 and \code{observed_family_types = 1}, while
+the whole-document \code{family_types} and \code{family_ttr} remain \code{NA}.
+Do not interpret the observed count as the complete vocabulary or replace
+unresolved families with zero. The empty document has zero family types and
+undefined TTR and coverage.
+
+Read \code{profile$members} for the matched forms within each family and
+\code{profile$occurrences} to trace every match or missing assignment back to
+its original position and context. The pooled \code{profile$summary} combines
+documents; it does not replace their individual rows. Save the complete
+\code{profile} as RDS to retain the inputs, inventory and analysis choices.
+
+To use your own data, prepare the \code{segments} and \code{tokens} tables
+shown below, keeping punctuation and the original segment text. The example
+texts have no punctuation. To exclude punctuation in other texts, supply
+documented UD \code{upos} tags and set \code{exclude_pos = c("PUNCT", "SYM")}
+after import. Lemmas are only needed for \code{unit = "lemma"}; they are not
+needed for this surface lookup. A \code{lexdiv_tokenize()} result is a different
+object and cannot be passed directly as \code{annotations}. See the linked
+word-family tutorial for CSV inputs, shared-token comparisons and review.
+
 Only one distinct candidate family permits assignment. Multiple records for
 that same family retain their record IDs but count as one family candidate.
 Different families are \code{ambiguous}; absent keys are \code{unlisted}.
@@ -142,18 +175,62 @@ Bauer, L., and Nation, P. (1993). Word families.
 \doi{10.1093/ijl/6.4.253}.
 }
 \seealso{\code{\link{lexdiv_import_annotations}},
-\code{\link{lexdiv_flemmatize}}, \code{\link{lexdiv_metrics}},
-\code{\link{lexdiv_compare_ambiguity}}}
+\code{\link{bnccoca_data}}, \code{\link{lexdiv_flemmatize}},
+\code{\link{lexdiv_metrics}}, \code{\link{lexdiv_compare_ambiguity}},
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html}{Word families, roots and affixes tutorial}}
 \examples{
-env <- new.env(parent = baseenv())
-sys.source(system.file("examples", "word-families.R", package = "ldfreq",
-  mustWork = TRUE), env)
-x <- env$word_families_example
-x$profile$documents
-x$profile$members
-x$profile$occurrences[c("document_id", "keyword", "status", "family_id")]
-x$comparison
+library(ldfreq)
+
+# 1. Complete authored texts and their tokens. Empty documents have no
+# token rows.
+segments <- data.frame(
+  document_id = c("listed", "unlisted", "empty"), segment_id = "s1",
+  text = c("use uses colour color", "use reusability", "")
+)
+tokens <- data.frame(
+  document_id = c(rep("listed", 4), rep("unlisted", 2)), segment_id = "s1",
+  token_index = c(1:4, 1:2),
+  surface = c("use", "uses", "colour", "color",
+    "use", "reusability")
+)
+# Describe how these tokens were prepared; use your actual metadata for
+# real data.
+annotations <- lexdiv_import_annotations(tokens, segments, list(
+  language = "en", analyzer = "authored-example",
+  analyzer_version = "1",
+  dictionary = "none", dictionary_version = "not-applicable",
+  unit = "word", normalization = "none"
+))
+
+# 2. Load Nation's bundled inventory. It does not include REUSABILITY.
+reference <- bnccoca_data()
+profile <- lexdiv_family_profile(
+  annotations, reference$dictionary, reference$resource,
+  normalization = "nfkc_lower"
+)
+
+# 3. Read document totals together with coverage and status.
+profile$documents[c("document_id", "selected_tokens", "matched_tokens",
+  "token_coverage", "observed_family_types", "family_types",
+  "family_ttr", "status")]
+# listed: 4 tokens, 2 families, TTR 0.5, coverage 1, complete
+# unlisted: 2 tokens, coverage 0.5; whole-document family count/TTR are NA
+# empty: 0 tokens, 0 families; TTR and coverage are NA
+profile$members
+profile$occurrences[c("document_id", "keyword", "status", "family_id")]
+
+# Save all inputs and choices, not only the displayed document table.
+path <- tempfile(fileext = ".rds")
+saveRDS(profile, path)
+restored <- readRDS(path)
+restored$documents
+unlink(path)
+
+# Advanced, separate authored review example; inspect the script before
+# adapting it.
+# Optional: install.packages("quanteda") to run the review example.
 if (requireNamespace("quanteda", quietly = TRUE)) {
+  env <- new.env(parent = baseenv())
   sys.source(system.file("examples", "word-family-review.R", package = "ldfreq",
     mustWork = TRUE), env)
   env$word_family_review_example$reviewed$documents

@@ -1,5 +1,13 @@
 # ldfreq 0.2.0 (development)
 
+## Getting started from R help
+
+- Reworked introductory help and examples for raw text, token vectors, multiple
+  documents and Nation word families. Examples explain expected counts, missing
+  values, output components and complete RDS saving, with links to file-input
+  and morphology tutorials. Lemma and content-word selection are demonstrated
+  separately so changes in counting unit and denominator remain visible.
+
 ## Word families, roots and affixes
 
 - Added a standalone tutorial connecting family counts on shared occurrences,

@@ -74,13 +74,15 @@ Proceedings of the 18th SIGMORPHON Workshop, 39--48.
 \url{https://github.com/kbatsuren/MorphyNet}
 }
 \seealso{\code{\link{lexdiv_ambiguity_review}}, \code{\link{morpholex_data}},
-\code{\link{bnccoca_data}}}
+\code{\link{bnccoca_data}},
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html}{Word families, roots and affixes tutorial}}
 \examples{
 path <- system.file("extdata", "morphynet-example", "eng.derivational.example.tsv",
   package = "ldfreq", mustWork = TRUE)
 reference <- morphynet_read_derivations(path, language = "en",
   resource_version = "English v1; nine-row teaching excerpt")
 reference$relations[reference$relations$target_word == "reusability", ]
+# Three incoming relations, not three counted affixes in one segmentation.
 # For a complete, separately obtained English v1 file:
 # reference <- morphynet_read_derivations("eng.derivational.v1.tsv", "en", "English v1")
 }

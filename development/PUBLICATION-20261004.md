@@ -3683,3 +3683,76 @@ in the browser. Shorter table headings improve readability without changing
 the arithmetic. Evidence is under reviews/ldfreq-families-tutorial-20261007/evidence/.
 Final-head protected checks, main merge and actual public-site verification
 remain pending at this record point. CRAN submission is excluded.
+
+## 2026-10-07 Word-family and affix tutorial publication completed
+
+Final head `075aa84bae9d569f27da18be4ba4c1b15bb76053` passes all nine
+R-CMD-check jobs in run 37560238098 and both required protected checks.
+Windows, macOS, Linux release and Linux devel each report 7,843 passing
+assertions, no failures/warnings/skips and Status: OK. R 4.1 reports 7,768
+passing assertions, eight optional-dependency skips and two NOTEs: unavailable
+suggested gibasa/textstem and installed size 9.2Mb. The development-state
+classification passes in run 37560238060; formal release-candidate artifact
+jobs are intentionally skipped. No CI run was cancelled or restarted.
+
+PR #25 merges through the existing protections to main
+`25fcaaf669c8b5481879ea0145c4b044e47eaa9e`, with the same tree as the tested head:
+`52ea766c369271d39f24e94cd9d2cdba544b6c56`. Only redundant same-tree main push CI
+is skipped. The documented installation pin remains applicable because all
+runtime functions, installed recipes, dependencies and reference data used by
+the new tutorial are unchanged. Five anonymously retrieved source files match
+the verified PR head.
+
+Pages commit `f998c9ca95316838b6c303bf9f43339fe51c3c44` deploys successfully in
+run 37562571643. All 79 changed public files match the verified site bytes through
+anonymous requests with certificate verification. The complete prepared site
+contains 251 files and 129 HTML pages with no missing local links/anchors.
+The new article updates navigation across the site; 65 existing page bodies
+are unchanged apart from the navigation entry, and all 18 previous visual assets
+are identical. Live browser inspection confirms the family-count, affix-category
+and reviewed-relation summaries display correctly. No new plot was needed for
+these small arithmetic examples.
+
+Evidence remains in reviews/ldfreq-families-tutorial-20261007/evidence/:
+24 focused checks and fresh-session replay, source/site hashes, unchanged-content
+audit, final CI and classification, merge identity, Pages records and live
+screenshots. The initial gh CLI R 4.1 log capture contained only preparation
+output; the complete successful-job log was obtained directly from the official
+API, with ANSI sequences stored in a file before parsing. No check was rerun to
+resolve this log retrieval issue. Use ubuntu-latest-R-4.1-direct.log for the
+complete old-R result.
+
+Completion-only roadmap/evidence updates remain local to avoid another unchanged
+CI cycle; the merged PR description records these results. The tutorial uses
+authored annotations and judgments, not independent accuracy validation. No
+CRAN submission, release tag, new export or new dependency.
+
+## 2026-10-07 Beginner help and examples
+
+Eight Rd topics now explain the first raw-text/token-vector analysis, several
+texts, and a self-contained Nation family example. Expected N/V, TTR, missing
+reasons, coverage, empty documents and complete RDS saving accompany the code.
+Lemma-only and content-word selection appear as separate steps. Resource help
+links to the standalone family/affix tutorial. Runtime, exports, defaults,
+required dependencies, data and vignettes are unchanged.
+
+A separate local installation runs all eight installed example topics, including
+available optional textstem/quanteda branches. Twenty-five expected-accounting
+and round-trip checks pass. A fresh session reproduces the complete family
+profile identically and verifies saved batch IDs and values. The first batch
+expectation exposed the repeated lowercase 'a' in an authored sentence; the
+sentence was corrected to 'The reader reads a story.' in both new examples,
+then the expected five distinct forms were verified. This was a teaching-example
+expectation correction, not a metric implementation change. Initial validation
+used example(topic) without character.only and was corrected before counting
+any example checks. The public API audit still reports 57 exports and 34 S3
+registrations. These checks are not novice-user usability validation.
+
+Site preparation reuses the previously published, unchanged articles/assets
+and rebuilds only affected reference topics, NEWS, home and search. Reference
+rendering succeeded; NEWS initially lacked network access to pkgdown's CRAN
+metadata endpoint and succeeded when only that step was retried with access.
+Evidence is in reviews/ldfreq-beginner-help-20261007/evidence/. The installation
+pin will be updated because installed help, not just online articles, changes.
+Protected final-head CI, main integration, pinned-source verification and live
+Pages checks remain pending at this record point. No CRAN submission.
