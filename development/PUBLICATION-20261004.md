@@ -3536,3 +3536,85 @@ from decoding; a focused check confirms its CRLF behavior. The text reader keeps
 original TXT line endings. This is an input-fixture/document-build correction,
 not a change to metric arithmetic. Final-head CI and live publication remain
 pending at this record point.
+
+## 2026-10-07 File-input tutorial publication completed
+
+Final source head `da26692ba169d4122fd50babf180c9eb7964e9e4` passes all nine
+R-CMD-check jobs in run 37549222144 and both required status checks. Windows,
+macOS, Linux release and Linux devel each report 7,843 passing assertions, no
+failures/warnings/skips, and Status: OK. R 4.1 reports 7,768 passing assertions,
+eight optional-dependency skips and two NOTEs (unavailable suggested gibasa/
+textstem and installed size); it is not a zero-NOTE check. The development-state
+classifier passes; formal release-candidate artifact jobs are intentionally
+skipped. Initial run 37546762328 completed without cancellation; only its
+Windows vignette failure and dependent required gate failed. The final run
+confirms the newline fixture correction on Windows.
+
+PR #23 merged through the existing protections to main
+`9dda4de4ebe42c18cfc2e1a9f3f6ecfd4c08e8ab`. Main and the tested PR have identical
+tree `00dee4ea84a85f7b45f0b6c5771697c049075d20`. The merge subject skips only the
+redundant same-tree push CI. The documented installation snapshot
+`d2568c9d8d0bfa3955bba31cd53bbff8d0f751b3` differs from the tested head only in
+README's pin. A fresh pak installation from GitHub succeeds; all 36 teaching
+files match source bytes and the seven tutorial chunks execute with 30 finite
+MATTR results and the retained empty document. No existing user library was
+replaced.
+
+GitHub Pages commit `5207ae1909034e4e01c55c27250f94434f66ce42` deploys successfully
+in run 37550485845. All 13 changed public files, including the 30-point PNG,
+English guide, installation pin, companion Markdown and search index, match
+the reviewed files byte-for-byte through anonymous requests. The 128-page local
+link audit passes; the prepared site contains 249 files. A live browser rendering
+confirms all 30 IDs are readable, with no embedded title. Python's local TLS
+trust-store configuration initially prevented HTTP verification; using the macOS
+standard curl with certificate verification completes the same audit. No site
+change or certificate-verification bypass was needed.
+
+Evidence remains in `reviews/ldfreq-file-input-20261007/evidence/`: final CI and
+R 4.1 logs, merge identity, GitHub installation/file comparison, independent
+MATTR check, Pages records, live-file hashes and screenshot. Completion-only
+roadmap/evidence edits remain local to avoid another unchanged CI cycle; the
+merged public PR description records these final results. No CRAN submission,
+release tag or change to runtime APIs, dependencies or reference data.
+
+## 2026-10-07 Decision worksheet workflow and local corpus pilot
+
+The ambiguity guide now supplies six independently executable chunks covering
+reference context/candidate CSVs, a worksheet with four editable decision fields,
+strict UTF-8 reading through the already installed file-input example, complete
+row/fixed-field checks, explicit submission, document status counts and full RDS
+saving. The recipe is defined in the guide, not a new export or installed helper.
+It permits sorting but rejects missing/duplicate/changed identities and partly
+filled unsubmitted rows; existing API validation checks candidate membership and
+the source snapshot. It explains full-set replacement, resuming prior decisions,
+clearing a decision, and the distinction from lemma/POS or source-text correction.
+The report guide links to this workflow; NEWS is updated.
+
+On the existing documented d2568c9 installation, all 29 focused worksheet checks
+pass. These exercise independent expected state counts, sorting and column
+reordering, malformed IDs/columns/rows, partial rows, invalid or missing choices,
+missing/blank decision fields, leading-zero candidates, literal NA/TRUE, Unicode
+reasons, resuming/clearing decisions and a header-only zero-occurrence worksheet.
+Both changed guides render; the six-chunk standalone and fresh-session complete
+RDS replay pass. No R/, NAMESPACE, help, dependencies or reference data changed;
+prior runtime/resource evidence is retained.
+
+The same reader is applied locally to saved ICNALE GRA V2.1 MorphyNet reviews.
+Four purposively inspected occurrences receive two selected and two unresolved
+Codex-assisted decisions. A declared spelling-consistency criterion selects two
+recorded suffix relations; competing N/V -ing labels remain unresolved rather
+than repairing the learner text or inventing a definitive annotation convention.
+All 140 documents and 31,902 occurrences, family identities, candidate counts and
+unchanged MorphoLex review are retained. The final state counts are 2 selected,
+2 unresolved, 4,588 unreviewed and 27,310 without candidates. Two selected suffix
+relations are counted; this is not a corpus-wide productivity or accuracy claim.
+Source text, context and individual judgments remain in the local
+analysis/icnale-gra/results/review-worksheet-pilot/ directory. Fresh-session
+replay reproduces the complete reviewed object. This is a pilot of operation and
+accounting, not an independent human reference, inter-rater reliability or a
+representative validation sample.
+
+Evidence: reviews/ldfreq-review-worksheet-20261007/evidence/. The public guide
+contains only authored sentences and candidates. Local checks and page rendering
+are complete; protected main integration and live publication are pending at
+this record point. CRAN submission remains outside scope.

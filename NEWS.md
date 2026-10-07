@@ -1,5 +1,12 @@
 # ldfreq 0.2.0 (development)
 
+## Reviewing annotation decisions
+
+- Added an executable KWIC worksheet tutorial: separate context/candidate tables,
+  UTF-8 CSV editing, fixed-ID checks, partial-row rejection, reapplication and
+  complete RDS saving. Document counts retain unsubmitted and unresolved cases,
+  documents without targets and empty documents. It uses existing APIs.
+
 ## Reading your own text files
 
 - Expanded the English input guide with executable single-file, folder and
