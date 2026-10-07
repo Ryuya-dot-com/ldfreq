@@ -38,7 +38,7 @@ lexdiv_metrics_text(
   normalization = "NFC",
   case = "preserve",
   keep_numbers = FALSE,
-  metrics = lexdiv_metric_ids(),
+  metrics = setdiff(lexdiv_metric_ids(), "expected_ttr_d"),
   segment_length = 50L,
   window_length = 50L,
   mtld_threshold = 0.72,
@@ -353,7 +353,7 @@ result <- lexdiv_metrics_text(
   tokenizer = "english", case = "lower", metrics = "ttr"
 )
 result$results  # N = 5, V = 4, TTR = 0.8, status = "ok"
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr   0.8     ok           <NA> 5 4               FALSE
 result$token_audit
@@ -377,7 +377,7 @@ short <- lexdiv_metrics_text(
   window_length = 50
 )
 short$results  # NA; missing_reason = "too_short_for_requested_parameter"
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value  status                    missing_reason N V
 #> 1     mattr    NA missing too_short_for_requested_parameter 5 4
 #>   below_quality_floor
@@ -404,7 +404,7 @@ english$provenance$excluded_spans
 tokenization <- lexdiv_tokenize("Cats and cat ran run.", tokenizer = "english")
 surface <- lexdiv_metrics_text(tokenization, metrics = "ttr")
 surface$results  # Case preserved: N = 5, V = 5, TTR = 1
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr     1     ok           <NA> 5 5               FALSE
 
@@ -420,7 +420,7 @@ annotated <- lexdiv_lemmatize(
 )
 lemma_all <- lexdiv_metrics_text(annotated, unit = "lemma", metrics = "ttr")
 lemma_all$results  # Same N = 5; V = 3, TTR = 0.6
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr   0.6     ok           <NA> 5 3               FALSE
 
@@ -432,7 +432,7 @@ lemma_content <- lexdiv_metrics_text(
   metrics = "ttr"
 )
 lemma_content$results  # N = 4, V = 2, TTR = 0.5
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr   0.5     ok           <NA> 4 2               FALSE
 lemma_content$token_audit
@@ -464,7 +464,7 @@ if (requireNamespace("textstem", quietly = TRUE)) {
   lexdiv_metrics_text(textstem_lemmas, unit = "lemma", metrics = "ttr")
 }
 #> <lexdiv_text_results> 6/6 eligible tokens | unit=lemma | inclusion=all
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr     1     ok           <NA> 6 6               FALSE
 ```

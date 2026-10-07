@@ -15,7 +15,7 @@ parameters, and diagnostics are returned beside each value."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,7 @@ parameters, and diagnostics are returned beside each value.</p>
 <span></span>
 <span><span class="fu">lexdiv_metrics</span><span class="op">(</span></span>
 <span>  <span class="va">tokens</span>,</span>
-<span>  metrics <span class="op">=</span> <span class="fu">lexdiv_metric_ids</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu">lexdiv_metric_ids</span><span class="op">(</span><span class="op">)</span>, <span class="st">"expected_ttr_d"</span><span class="op">)</span>,</span>
 <span>  segment_length <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  window_length <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  mtld_threshold <span class="op">=</span> <span class="fl">0.72</span>,</span>
@@ -102,7 +102,8 @@ parameters, and diagnostics are returned beside each value.</p>
 
   <dt id="arg-metrics">metrics<a class="anchor" aria-label="anchor" href="#arg-metrics"></a></dt>
 <dd><p>A plain, non-empty, duplicate-free character vector selected
-  from <code>lexdiv_metric_ids()</code>.</p></dd>
+  from <code>lexdiv_metric_ids()</code>. The default excludes experimental
+  <code>expected_ttr_d</code>; the catalog still lists every supported metric.</p></dd>
 
   <dt id="arg-segment-length">segment_length<a class="anchor" aria-label="anchor" href="#arg-segment-length"></a></dt>
 <dd><p>One plain finite numeric scalar with an integer value
@@ -177,29 +178,34 @@ score.</p>
 and a text shorter than a requested window. An <code>NA</code> value has a reason:
 inspect <code>status</code> and <code>missing_reason</code> before interpreting it or
 combining results. Choosing <code>metrics = "ttr"</code> keeps the first example
-small; omitting <code>metrics</code> requests all methods, some of which cannot be
-computed for short inputs.</p>
+small; omitting <code>metrics</code> requests the eleven default methods, some of
+which cannot be computed for short inputs. Experimental expected-TTR D requires
+explicit selection.</p>
 <p>The current versioned set contains TTR, RTTR/Guiraud, CTTR, Herdan's C, natural-log
 Maas a-squared, complete non-overlapping MSTTR, step-one MATTR, bidirectional
 MTLD, sample-size-normalized hypergeometric HD-D on the TTR scale, Yule's K,
 deterministic expected-TTR curve-fit D, and type-based Yule's I. Expected-TTR D
 fits the model \(2/(\sqrt{1+2n/D}+1)\) to exact finite-population expected TTR
-values. It uses no random sampling or arbitrary D cap and is not CLAN VOCD.
+values. It is experimental: numerical accuracy has been checked, but empirical
+equivalence to published vocd-D or CLAN has not. It uses no random sampling or
+arbitrary D cap and is not CLAN VOCD. From package 0.3.0 it is excluded from
+default computations and presets; select it explicitly when needed.
 From package version 0.2.0, the same expected curve and objective are evaluated
 through the expected duplicate-draw fraction to avoid cancellation near TTR=1.
 The method ID is unchanged because this is a numerical correction, not a new
 estimator. Record the package version as well as method and parameters.
 <code>near_saturation</code> diagnoses a nearly flat curve; it does not establish
 statistical precision or validity.</p>
-<p>The canonical MTLD method requires at least ten tokens per complete factor
-and applies an unclamped linear tail credit. The credit can exceed one for
-a shorter repetitive tail. Consequently, <code>rep("a", 59)</code> gives about
-7.2175 and <code>rep("a", 60)</code> gives 10, although no new type was added.
-This is a frozen variant rule, not a guarantee of length independence for
-every input. Inspect directional/tail diagnostics and sensitivity to the
-sampling design for highly repetitive texts. Passing a length screen does
-not remove this boundary effect; do not silently clamp the tail or compare
-different MTLD variants as the same method.</p>
+<p>From package 0.3.0, the canonical MTLD method has no minimum factor length.
+It closes a factor when running TTR is strictly less than the threshold,
+including at the final token, and averages forward and reverse scores.
+A residual factor receives <code>(1 - tail_TTR) / (1 - threshold)</code> credit.
+Every threshold crossing closes a factor, so residual credit cannot exceed one.
+All-unique input has zero factors and returns <code>missing / no_factor</code>.
+For example, 50 copies of one word form 25 factors and return 2.
+A computable short-input result is not evidence of reliable measurement.
+koRpus 0.13.9 skips a terminal span of at most two tokens, while this method
+checks every token; exact tool equivalence is not claimed.</p>
 <p>An invalid token anywhere has precedence over empty-input and metric-specific
 domain conditions. Invalid documents return <code>status = "invalid_input"</code>,
 <code>missing_reason = "invalid_token"</code>, and unknown <code>N</code>/<code>V</code>. A
@@ -216,7 +222,7 @@ otherwise computable value. Unicode encoding-marker canonicalization is not
 Unicode normalization: canonically equivalent but scalar-distinct strings
 remain distinct types.</p>
 <p>Within the same exact method and design, Maas a-squared and Yule's K
-conventionally decrease as repetition decreases; the other ten v0.1 methods
+conventionally decrease as repetition decreases; the other ten supported methods
 conventionally increase with observed lexical variety or lower repetition.
 These methods primarily operationalize lexical variety and repetition rather
 than the full multidimensional lexical-diversity construct. Direction applies
@@ -256,6 +262,26 @@ separate explicit IDs and versions.</p>
 <code>unbounded_high</code>. The reasons that can occur depend on the selected method. Structural request errors, such as
 an unknown metric ID or invalid selected parameter, stop the call instead of
 returning a result row.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="migration-from-core-contract-">Migration from core contract 0.1.0<a class="anchor" aria-label="anchor" href="#migration-from-core-contract-"></a></h2>
+    <p>Package 0.3.0 uses core contract 0.2.0. MTLD has the new method ID
+<code>mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1</code>. The old
+<code>mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1</code> remains in
+<code><a href="lexdiv_variant_metrics.html">lexdiv_variant_metrics()</a></code>, with the same minimum input length, values,
+and tail behavior (including credit greater than one).</p>
+<p>Read existing RDS results without editing their IDs or values. Old plans and
+specifications must be explicitly recreated with the current <code><a href="lexdiv_profile.html">lexdiv_spec()</a></code>
+and <code><a href="lexdiv_profile.html">lexdiv_plan()</a></code> before new computation. All specification hashes change
+because they include the core contract version, even for unchanged formulas.
+Record the package version, method ID, contract version, parameters and
+preprocessing in reports. Analyze old and new MTLD results separately; the
+wide-table and plot checks reject mixed measurement identities.</p>
+<p>Default results now have eleven rows, and the canonical and length presets
+have eleven and thirteen requests. <code>lexdiv_metric_ids()</code> still lists all
+twelve supported metrics. Explicit <code>metrics = lexdiv_metric_ids()</code> includes
+experimental expected-TTR D. Its estimator and method ID are unchanged.
+Result schemas, tokenization and bundled reference data are unchanged.</p>
     </div>
     <div class="section level2">
     <h2 id="formal-contract">Formal contract<a class="anchor" aria-label="anchor" href="#formal-contract"></a></h2>
@@ -298,7 +324,7 @@ Expected-TTR D is a separately named exact-expectation curve fit, not CLAN VOCD.
 <span class="r-in"><span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="va">tokens</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span>  <span class="co"># N = 4, V = 3, value = 0.75, status = "ok"</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value status missing_reason N V below_quality_floor</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr  0.75     ok           &lt;NA&gt; 4 3               FALSE</span>
 <span class="r-in"><span><span class="va">result</span><span class="op">$</span><span class="va">value</span></span></span>
@@ -306,15 +332,15 @@ Expected-TTR D is a separately named exact-expectation curve fit, not CLAN VOCD.
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Empty, invalid, and too-short inputs are different conditions.</span></span></span>
 <span class="r-in"><span><span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span>  <span class="co"># missing / empty_input</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value  status missing_reason N V below_quality_floor</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr    NA missing    empty_input 0 0                TRUE</span>
 <span class="r-in"><span><span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="cn">NA_character_</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span>  <span class="co"># invalid_input / invalid_token</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value        status missing_reason  N  V below_quality_floor</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr    NA invalid_input  invalid_token NA NA                  NA</span>
 <span class="r-in"><span><span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"mattr"</span>, window_length <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value  status                    missing_reason N V</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1     mattr    NA missing too_short_for_requested_parameter 2 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   below_quality_floor</span>
@@ -339,7 +365,7 @@ Expected-TTR D is a separately named exact-expectation curve fit, not CLAN VOCD.
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "maas"           "msttr"          "mattr"          "mtld"          </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "hdd"            "expected_ttr_d" "yule_k"         "yule_i"        </span>
 <span class="r-in"><span><span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="va">tokens</span>, metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"hdd"</span><span class="op">)</span>, sample_size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 2 metrics; contract 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 2 metrics; contract 0.2.0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id     value status missing_reason N V below_quality_floor</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr 0.7500000     ok           &lt;NA&gt; 4 3               FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2       hdd 0.9166667     ok           &lt;NA&gt; 4 3                TRUE</span>
@@ -348,23 +374,23 @@ Expected-TTR D is a separately named exact-expectation curve fit, not CLAN VOCD.
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"a"</span>, <span class="st">"c"</span><span class="op">)</span>, <span class="fl">20</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  metrics <span class="op">=</span> <span class="st">"expected_ttr_d"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        metric_id     value status missing_reason  N V below_quality_floor</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 expected_ttr_d 0.1164681     ok           &lt;NA&gt; 80 3               FALSE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">mtld</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"mtld"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">mtld</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $forward_score</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.333333</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $reverse_score</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3.333333</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $forward_complete_factors</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $reverse_complete_factors</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $forward_tail_credit</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
@@ -372,6 +398,16 @@ Expected-TTR D is a separately named exact-expectation curve fit, not CLAN VOCD.
 <span class="r-out co"><span class="r-pr">#&gt;</span> $reverse_tail_credit</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Reproduce the previous min10 formula explicitly (50 identical tokens -&gt; 10).</span></span></span>
+<span class="r-in"><span><span class="va">legacy</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_variant_metrics.html">lexdiv_variant_metrics</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="fl">50</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  variants <span class="op">=</span> <span class="st">"mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">legacy</span><span class="op">$</span><span class="va">value</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10</span>
+<span class="r-in"><span><span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="fl">50</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"mtld"</span><span class="op">)</span><span class="op">$</span><span class="va">value</span>  <span class="co"># new definition: 2</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">contract_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"spec"</span>, <span class="st">"lexical-diversity-contract.json"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span></span></span>

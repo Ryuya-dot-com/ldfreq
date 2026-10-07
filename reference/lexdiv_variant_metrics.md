@@ -57,10 +57,12 @@ rows return its square root. For valid integer counts, the natural-log
 the log base or taking the square root changes that numerical range. The
 method ID records both scale and log base.
 
-The MTLD rows distinguish the versioned ldfreq directional-score mean
-from three final-tail factorization and mean-factor-length aggregations.
-Factor lengths and proportions remain available in the diagnostics
-list-column.
+The MTLD rows preserve the legacy core-contract 0.1.0 min10
+directional-score mean and three final-tail factorization and
+mean-factor-length aggregations. All four require at least ten tokens
+per complete factor. The current no-minimum method is available
+separately via `lexdiv_metrics(..., metrics = "mtld")`. Factor lengths
+and proportions remain available in the diagnostics list-column.
 
 Rows described as TAALED-relevant comparators identify only their
 documented formula, factorization, and aggregation scope. They do not
@@ -113,7 +115,7 @@ catalog
 #> 2                      a    common-formula:maas-a-ln
 #> 3              a-squared            TAALED-0.32:maas
 #> 4                      a common-formula:maas-a-log10
-#> 5      tokens-per-factor            ldfreq-core:mtld
+#> 5      tokens-per-factor      ldfreq-core-0.1.0:mtld
 #> 6      tokens-per-factor           TAALED-0.32:mtldo
 #> 7 adjusted-factor-length          TAALED-0.32:mtldav
 #> 8 adjusted-factor-length            TAALED-0.32:mtld
@@ -122,7 +124,7 @@ catalog
 #> 2                                                             formula-comparison-only
 #> 3               formula-aligned-with-taaled-0.32-maas-not-full-pipeline-compatibility
 #> 4                                                             formula-comparison-only
-#> 5                                                                  ldfreq-core-method
+#> 5                                                           legacy-ldfreq-core-method
 #> 6 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility
 #> 7 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility
 #> 8 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility

@@ -14,7 +14,7 @@ library(ldfreq)
 tokens <- c("the", "cat", "saw", "the", "other", "cat")
 result <- lexdiv_metrics(tokens, metrics = c("ttr", "rttr", "yule_k"))
 result
-#> <lexdiv_results: 3 metrics; contract 0.1.0>
+#> <lexdiv_results: 3 metrics; contract 0.2.0>
 #>   metric_id        value status missing_reason N V below_quality_floor
 #> 1       ttr    0.6666667     ok           <NA> 6 4               FALSE
 #> 2      rttr    1.6329932     ok           <NA> 6 4               FALSE
@@ -50,7 +50,7 @@ raw_result <- lexdiv_metrics_text(
 )
 raw_result
 #> <lexdiv_text_results> 5/5 eligible tokens | unit=surface | inclusion=all
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr     1     ok           <NA> 5 5               FALSE
 ```
@@ -104,7 +104,7 @@ lemma_content <- lexdiv_metrics_text(
   metrics = "ttr"
 )
 lemma_content$results
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr   0.5     ok           <NA> 4 2               FALSE
 lemma_content$token_audit
@@ -621,7 +621,7 @@ missing result rather than a smaller implicit window.
 
 ``` r
 lexdiv_metrics(tokens, metrics = "mattr", window_length = 50L)
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value  status                    missing_reason N V
 #> 1     mattr    NA missing too_short_for_requested_parameter 6 4
 #>   below_quality_floor
@@ -637,7 +637,7 @@ lexdiv_metrics(
   rep(c("a", "b", "a", "c"), 20),
   metrics = "expected_ttr_d"
 )
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>        metric_id     value status missing_reason  N V below_quality_floor
 #> 1 expected_ttr_d 0.1164681     ok           <NA> 80 3               FALSE
 ```
@@ -792,19 +792,19 @@ head(screen)
 #> 5 lexdiv-r-screen-result                 0.1.0 lexdiv-r-profile-result
 #> 6 lexdiv-r-screen-result                 0.1.0 lexdiv-r-profile-result
 #>   profile_schema_version                         plan_md5 request_index
-#> 1                  0.1.0 31e7e20ae90d0c6ff7a053965db51996             1
-#> 2                  0.1.0 31e7e20ae90d0c6ff7a053965db51996             1
-#> 3                  0.1.0 31e7e20ae90d0c6ff7a053965db51996             2
-#> 4                  0.1.0 31e7e20ae90d0c6ff7a053965db51996             2
-#> 5                  0.1.0 31e7e20ae90d0c6ff7a053965db51996             3
-#> 6                  0.1.0 31e7e20ae90d0c6ff7a053965db51996             3
+#> 1                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             1
+#> 2                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             1
+#> 3                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             2
+#> 4                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             2
+#> 5                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             3
+#> 6                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             3
 #>   request_id                      specification_id metric_id
-#> 1        ttr  ttr-62b15045a35ae2aa81843cfbdd72bc38       ttr
-#> 2        ttr  ttr-62b15045a35ae2aa81843cfbdd72bc38       ttr
-#> 3       rttr rttr-c53f08ecdf44ad3b47b3a39b0e099ffd      rttr
-#> 4       rttr rttr-c53f08ecdf44ad3b47b3a39b0e099ffd      rttr
-#> 5       cttr cttr-91c9e40b3f2eda5f4594727652fe3438      cttr
-#> 6       cttr cttr-91c9e40b3f2eda5f4594727652fe3438      cttr
+#> 1        ttr  ttr-4fb55d484c9910369ed7bfb8e1bb1631       ttr
+#> 2        ttr  ttr-4fb55d484c9910369ed7bfb8e1bb1631       ttr
+#> 3       rttr rttr-625d1c2f87613e36d94824f3d4ccd257      rttr
+#> 4       rttr rttr-625d1c2f87613e36d94824f3d4ccd257      rttr
+#> 5       cttr cttr-0541216b812c575de688815847d80352      cttr
+#> 6       cttr cttr-0541216b812c575de688815847d80352      cttr
 #>                       method_id N  screen_id minimum_tokens passes_screen
 #> 1               ttr_v_over_n_v1 6  tokens_50             50         FALSE
 #> 2               ttr_v_over_n_v1 6 tokens_100            100         FALSE
@@ -839,19 +839,19 @@ local_mattr$summary
 #> 2    mattr_2     mattr   0.2     ok           <NA> 60 4               FALSE
 head(local_mattr$windows)
 #>                           plan_md5 request_index request_id
-#> 1 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1
-#> 2 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1
-#> 3 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1
-#> 4 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1
-#> 5 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1
-#> 6 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1
+#> 1 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 2 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 3 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 4 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 5 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 6 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
 #>                         specification_id metric_id              method_id
-#> 1 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1
-#> 2 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1
-#> 3 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1
-#> 4 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1
-#> 5 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1
-#> 6 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1
+#> 1 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 2 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 3 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 4 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 5 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 6 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
 #>   window_index window_start window_end window_midpoint window_length
 #> 1            1            1         10             5.5            10
 #> 2            2            2         11             6.5            10
@@ -868,19 +868,19 @@ head(local_mattr$windows)
 #> 6              4   0.4
 head(local_mattr$exposure)
 #>                           plan_md5 request_index request_id
-#> 1 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1
-#> 2 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1
-#> 3 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1
-#> 4 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1
-#> 5 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1
-#> 6 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1
+#> 1 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 2 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 3 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 4 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 5 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 6 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
 #>                         specification_id metric_id              method_id
-#> 1 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1
-#> 2 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1
-#> 3 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1
-#> 4 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1
-#> 5 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1
-#> 6 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1
+#> 1 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 2 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 3 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 4 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 5 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 6 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
 #>   position exposure_count window_inclusion_rate nominal_observation_weight
 #> 1        1              1            0.01960784                0.001960784
 #> 2        2              2            0.03921569                0.003921569
@@ -904,11 +904,12 @@ not change values or parameters or censor documents. Read them together
 with `status`, `missing_reason`, `N`, `V`, and the method and parameter
 identities.
 
-Use
+The presets contain eleven methods; experimental expected-TTR D requires
+explicit selection. Use
 [`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
 and
 [`lexdiv_presets()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-to inspect the twelve versioned methods and their bounded presets.
+to inspect the twelve supported methods and their bounded presets.
 
 ## Definition sensitivity outside the versioned core
 
@@ -933,7 +934,7 @@ variant_catalog
 #> 2                      a    common-formula:maas-a-ln
 #> 3              a-squared            TAALED-0.32:maas
 #> 4                      a common-formula:maas-a-log10
-#> 5      tokens-per-factor            ldfreq-core:mtld
+#> 5      tokens-per-factor      ldfreq-core-0.1.0:mtld
 #> 6      tokens-per-factor           TAALED-0.32:mtldo
 #> 7 adjusted-factor-length          TAALED-0.32:mtldav
 #> 8 adjusted-factor-length            TAALED-0.32:mtld
@@ -942,7 +943,7 @@ variant_catalog
 #> 2                                                             formula-comparison-only
 #> 3               formula-aligned-with-taaled-0.32-maas-not-full-pipeline-compatibility
 #> 4                                                             formula-comparison-only
-#> 5                                                                  ldfreq-core-method
+#> 5                                                           legacy-ldfreq-core-method
 #> 6 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility
 #> 7 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility
 #> 8 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility
@@ -973,8 +974,8 @@ variant_results[, c(
 #> 2     common-formula:maas-a-ln  0.4019240     ok
 #> 3             TAALED-0.32:maas  0.3719663     ok
 #> 4  common-formula:maas-a-log10  0.6098904     ok
-#> 5             ldfreq-core:mtld 10.0000000     ok
-#> 6             ldfreq-core:mtld 10.0000000     ok
+#> 5       ldfreq-core-0.1.0:mtld 10.0000000     ok
+#> 6       ldfreq-core-0.1.0:mtld 10.0000000     ok
 #> 7            TAALED-0.32:mtldo  8.4000000     ok
 #> 8            TAALED-0.32:mtldo  4.8000000     ok
 #> 9           TAALED-0.32:mtldav  9.1111111     ok

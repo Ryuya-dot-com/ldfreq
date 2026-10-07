@@ -1,6 +1,44 @@
 # Changelog
 
-## ldfreq 0.2.0 (development)
+## ldfreq 0.3.0 (development)
+
+### Core review corrections
+
+- Breaking measurement change: core contract 0.2.0 makes no-minimum MTLD
+  the default, under `mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1`.
+  It uses strict `<`, evaluates closure at the final token, and averages
+  directional scores. The old min10 method is unchanged in
+  [`lexdiv_variant_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md).
+
+- Default metric output now has eleven rows. Preset version 0.2.0 has
+  eleven canonical or thirteen length-comparison requests. Saved results
+  retain their original IDs and values; old plans must be explicitly
+  recreated. All new specification hashes include the new core contract
+  version. See
+  [`?lexdiv_metrics`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md).
+
+- Classified deterministic expected-TTR D as experimental in the
+  contract and
+  [`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+  metadata and excluded it from default computations and presets.
+  Explicit selection remains supported; its estimator and method ID are
+  unchanged. CLAN equivalence has not been established.
+
+- Added reproducible, offline fixtures from actual koRpus 0.13.9,
+  quanteda.textstats 0.97.2 and pinned TAALED 0.32 executions on nine
+  identical authored inputs. They document MTLD boundaries and Maas
+  scale differences.
+
+- Fixed a C-locale parse failure caused by a non-ASCII bare test
+  identifier and separated a path-disclosure assertion from
+  locale-dependent sheet rendering.
+
+- Used the existing 30 longer example texts and a common 50-token MATTR
+  window in the README, showing the existing compact print method and
+  RDS saving. Explained the advisory token floor and pinned installation
+  to merged main.
+
+## ldfreq 0.2.0
 
 ### Japanese document frequency workflows
 

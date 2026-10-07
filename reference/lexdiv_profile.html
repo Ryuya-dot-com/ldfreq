@@ -13,7 +13,7 @@ method-plus-parameter specification."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -123,7 +123,7 @@ method-plus-parameter specification.</p>
 
   <dt id="arg-parameter">parameter<a class="anchor" aria-label="anchor" href="#arg-parameter"></a></dt>
 <dd><p>The one user-settable scalar parameter admitted by the
-  selected v0.1 method.</p></dd>
+  selected current method.</p></dd>
 
   <dt id="arg-values">values<a class="anchor" aria-label="anchor" href="#arg-values"></a></dt>
 <dd><p>A non-empty numeric vector whose elements become distinct
@@ -199,7 +199,8 @@ fingerprint over normalized request identity and order.
 Their print methods return the input invisibly after displaying a bounded
 tabular view; the full identity fields remain available on the object.</p>
 <p><code>lexdiv_methods()</code> returns a metadata data frame with human-readable
-labels and definitions, conventional within-method direction, contract scale,
+labels and definitions, <code>stability</code> (including experimental expected-TTR D),
+conventional within-method direction, contract scale,
 exact method identity, parameters, and advisory token floors.
 <code>lexdiv_presets()</code> returns a preset metadata data frame.
 <code>lexdiv_profile()</code> returns one core metric row per plan request with a
@@ -210,12 +211,17 @@ row per source result and named floor. It deliberately has no metric-value colum
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The <code>canonical</code> preset contains the twelve versioned methods at their default
-parameters. The <code>length_50_100</code> preset contains those twelve requests plus
-MSTTR at segment length 100 and MATTR at window length 100. It has fourteen
+    <p>Preset version 0.2.0 excludes experimental expected-TTR D. The
+<code>canonical</code> preset contains eleven methods at their default parameters.
+The <code>length_50_100</code> preset adds MSTTR at segment length 100 and MATTR at
+window length 100. It has thirteen
 specifications: MTLD is
 computed only once because a 50- versus 100-token quality
 screen does not change its calculation.</p>
+<p>Saved core-contract 0.1.0 plans must be recreated explicitly; see the migration
+section in <code><a href="lexdiv_metrics.html">lexdiv_metrics</a></code>. An explicitly constructed
+<code>lexdiv_spec("expected_ttr_d_hypergeom_fit_v1")</code> still selects the
+experimental estimator.</p>
 <p>Duplicate normalized method/parameter specifications from presets, explicit
 specifications, or grids collapse at their first position. Distinct remaining
 specifications must have distinct request IDs. Parameter grids form an ordered
@@ -246,11 +252,11 @@ preset requires an exact, version-pinned method contract and boundary fixtures.<
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">methods</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_methods</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">lexdiv_presets</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       preset_id preset_version specification_count</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     canonical          0.1.0                  12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 length_50_100          0.1.0                  14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                 description</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 The twelve versioned methods at their canonical defaults.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2             Canonical plus MSTTR and MATTR at length 100.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     canonical          0.2.0                  11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 length_50_100          0.2.0                  13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                              description</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 The eleven stable methods at their canonical defaults.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2          Canonical plus MSTTR and MATTR at length 100.</span>
 <span class="r-in"><span><span class="va">mattr_method</span> <span class="op">&lt;-</span> <span class="va">methods</span><span class="op">$</span><span class="va">method_id</span><span class="op">[</span><span class="va">methods</span><span class="op">$</span><span class="va">metric_id</span> <span class="op">==</span> <span class="st">"mattr"</span><span class="op">]</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">mattr_25</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_spec</span><span class="op">(</span></span></span>
@@ -267,7 +273,7 @@ preset requires an exact, version-pinned method contract and boundary fixtures.<
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_plan</span><span class="op">(</span>presets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, specs <span class="op">=</span> <span class="va">mattr_25</span>, grids <span class="op">=</span> <span class="va">grid</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mattr_25</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_spec: mattr-ca44558c9618cedb2e9ae105d042cddd&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_spec: mattr-c60bcc139197f0321525ede59195f383&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  request_id metric_id              method_id       parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    mattr_25     mattr mattr_sliding_step1_v1 window_length=25</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span></span></span>
@@ -276,7 +282,7 @@ preset requires an exact, version-pinned method contract and boundary fixtures.<
 <span class="r-out co"><span class="r-pr">#&gt;</span>              1    mattr_1     mattr mattr_sliding_step1_v1  window_length=50</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              2    mattr_2     mattr mattr_sliding_step1_v1 window_length=100</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plan</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_plan: 3 specifications; schema 0.1.0; id e03d55be9bb5246cdbce41c2458ee7b4&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_plan: 3 specifications; schema 0.1.0; id 385893509c8011275b045ea68daa5cb9&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  request_index request_id metric_id              method_id        parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              1   mattr_25     mattr mattr_sliding_step1_v1  window_length=25</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              2    mattr_1     mattr mattr_sliding_step1_v1  window_length=50</span>
@@ -315,7 +321,7 @@ preset requires an exact, version-pinned method contract and boundary fixtures.<
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">all_lengths</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_plan</span><span class="op">(</span><span class="st">"length_50_100"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_lengths</span><span class="op">$</span><span class="va">specifications</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 13</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

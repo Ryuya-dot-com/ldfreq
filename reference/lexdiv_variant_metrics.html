@@ -9,7 +9,7 @@ changing the versioned twelve-method lexdiv_metrics() core."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,8 +97,10 @@ its square root. For valid integer counts, the natural-log \(a^2\) variant
 ranges from zero to \(1 / \ln(2)\) inclusive; changing the log base or taking
 the square root changes that numerical range. The method ID records both scale
 and log base.</p>
-<p>The MTLD rows distinguish the versioned <span class="pkg">ldfreq</span> directional-score mean from
-three final-tail factorization and mean-factor-length aggregations. Factor
+<p>The MTLD rows preserve the legacy core-contract 0.1.0 min10 directional-score
+mean and three final-tail factorization and mean-factor-length aggregations.
+All four require at least ten tokens per complete factor. The current
+no-minimum method is available separately via <code>lexdiv_metrics(..., metrics = "mtld")</code>. Factor
 lengths and proportions remain available in the diagnostics list-column.</p>
 <p>Rows described as TAALED-relevant comparators identify only their documented
 formula, factorization, and aggregation scope. They do not assert official or
@@ -150,7 +152,7 @@ The print method returns <code>x</code> invisibly.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                      a    common-formula:maas-a-ln</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3              a-squared            TAALED-0.32:maas</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4                      a common-formula:maas-a-log10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5      tokens-per-factor            ldfreq-core:mtld</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5      tokens-per-factor      ldfreq-core-0.1.0:mtld</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6      tokens-per-factor           TAALED-0.32:mtldo</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7 adjusted-factor-length          TAALED-0.32:mtldav</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8 adjusted-factor-length            TAALED-0.32:mtld</span>
@@ -159,7 +161,7 @@ The print method returns <code>x</code> invisibly.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                             formula-comparison-only</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3               formula-aligned-with-taaled-0.32-maas-not-full-pipeline-compatibility</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4                                                             formula-comparison-only</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                                                  ldfreq-core-method</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                                           legacy-ldfreq-core-method</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility</span>

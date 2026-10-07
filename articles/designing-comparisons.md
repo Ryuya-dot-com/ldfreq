@@ -160,41 +160,54 @@ Estimate uncertainty with a design that respects writers, tasks, and
 other sampling dependencies; these descriptive metric functions do not
 perform that inferential analysis.
 
-## A stable definition can still have an awkward boundary
+## Distinguish current MTLD from the legacy min10 calculation
 
-The canonical MTLD definition requires at least ten tokens for a
-complete factor and uses an unclamped linear residual factor. A short
-residual can therefore create a discontinuity even when only one token
-is added.
+From package 0.3.0, core MTLD closes a factor whenever running TTR is
+strictly below the threshold, without a minimum factor length. It checks
+every token, including the last. The earlier min10 method is preserved
+for reproduction.
 
 ``` r
 mtld_boundary <- data.frame(N = c(50L, 51L, 52L, 59L, 60L))
 mtld_boundary$MTLD <- vapply(mtld_boundary$N, function(n) {
   lexdiv_metrics(rep("a", n), metrics = "mtld")$value
 }, numeric(1))
+mtld_boundary$legacy_min10 <- vapply(mtld_boundary$N, function(n) {
+  lexdiv_variant_metrics(rep("a", n),
+    variants = "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1")$value
+}, numeric(1))
 mtld_boundary
-#>    N      MTLD
-#> 1 50 10.000000
-#> 2 51 10.200000
-#> 3 52  7.663158
-#> 4 59  7.217476
-#> 5 60 10.000000
+#>    N     MTLD legacy_min10
+#> 1 50 2.000000    10.000000
+#> 2 51 2.040000    10.200000
+#> 3 52 2.000000     7.663158
+#> 4 59 2.034483     7.217476
+#> 5 60 2.000000    10.000000
 ```
 
-For this intentionally extreme sequence, the 59-token result is about
-7.22 and the 60-token result is 10. This follows the stated factor and
-tail rules; changing or clamping those rules would define a different
-method. Inspect directional/factor diagnostics and length sensitivity
-when MTLD is central to the question. The variant APIs compare their
-explicitly stated definitions; agreement on a label is not proof of
-agreement with another implementation.
+For 50 or 60 identical tokens, current MTLD is 2. With odd token counts,
+the last singleton adds zero residual credit, so a small length effect
+remains. The legacy 59-token result is about 7.22 and the 60-token
+result is 10. Its short repetitive tail can contribute more than one
+factor because closure is blocked until ten tokens. Keep these methods
+separate in reports and saved analyses; a shared metric name does not
+make values interchangeable.
 
-Expected-TTR D has a different limitation: near-all-unique texts yield
-very large estimates because the target curve approaches one. Package
-0.2.0 fixes numerical cancellation here, but numerical accuracy does not
-make that boundary substantively informative. Report `near_saturation`,
-fit diagnostics, sample sizes, and package version; all-unique input has
-an unbounded fit.
+Core contract 0.2.0 gives the no-minimum method a new method ID. Saved
+result RDS files retain their original values and identities. Recreate
+old plans explicitly for new computation; see
+[`?lexdiv_metrics`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
+for migration details. The [external
+comparisons](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/external-metrics)
+show the actual koRpus and TAALED outputs and account for remaining
+differences.
+
+Expected-TTR D is experimental and excluded from defaults.
+Near-all-unique texts yield large estimates because the target curve
+approaches one. The numerical correction in package 0.2.0 does not
+establish equivalence to CLAN vocd-D. If explicitly selected, report
+`near_saturation`, fit diagnostics, sample sizes, and package version;
+all-unique input has an unbounded fit.
 
 ## Reference frequency answers a separate question
 

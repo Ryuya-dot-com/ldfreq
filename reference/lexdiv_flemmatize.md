@@ -157,7 +157,7 @@ flemmas$provenance$flemma_annotation[c(
 #> 
 lexdiv_metrics_text(flemmas, unit = "flemma", metrics = "ttr")
 #> <lexdiv_text_results> 5/5 eligible tokens | unit=flemma | inclusion=all
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr     1     ok           <NA> 5 5               FALSE
 

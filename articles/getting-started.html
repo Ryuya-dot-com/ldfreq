@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@ lemmatized before it calls the same metric core.</p>
 <span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"the"</span>, <span class="st">"cat"</span>, <span class="st">"saw"</span>, <span class="st">"the"</span>, <span class="st">"other"</span>, <span class="st">"cat"</span><span class="op">)</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics</a></span><span class="op">(</span><span class="va">tokens</span>, metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"rttr"</span>, <span class="st">"yule_k"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">result</span></span>
-<span><span class="co">#&gt; &lt;lexdiv_results: 3 metrics; contract 0.1.0&gt;</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_results: 3 metrics; contract 0.2.0&gt;</span></span>
 <span><span class="co">#&gt;   metric_id        value status missing_reason N V below_quality_floor</span></span>
 <span><span class="co">#&gt; 1       ttr    0.6666667     ok           &lt;NA&gt; 6 4               FALSE</span></span>
 <span><span class="co">#&gt; 2      rttr    1.6329932     ok           &lt;NA&gt; 6 4               FALSE</span></span>
@@ -110,7 +110,7 @@ handling are explicit arguments rather than global options.</p>
 <span><span class="op">)</span></span>
 <span><span class="va">raw_result</span></span>
 <span><span class="co">#&gt; &lt;lexdiv_text_results&gt; 5/5 eligible tokens | unit=surface | inclusion=all</span></span>
-<span><span class="co">#&gt; &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span></span>
 <span><span class="co">#&gt;   metric_id value status missing_reason N V below_quality_floor</span></span>
 <span><span class="co">#&gt; 1       ttr     1     ok           &lt;NA&gt; 5 5               FALSE</span></span></code></pre></div>
 <p>Call <code><a href="../reference/lexdiv_preprocessing.html">lexdiv_tokenize()</a></code> separately when you want to
@@ -156,7 +156,7 @@ both layers.</p>
 <span>  metrics <span class="op">=</span> <span class="st">"ttr"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">lemma_content</span><span class="op">$</span><span class="va">results</span></span>
-<span><span class="co">#&gt; &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span></span>
 <span><span class="co">#&gt;   metric_id value status missing_reason N V below_quality_floor</span></span>
 <span><span class="co">#&gt; 1       ttr   0.5     ok           &lt;NA&gt; 4 2               FALSE</span></span>
 <span><span class="va">lemma_content</span><span class="op">$</span><span class="va">token_audit</span></span>
@@ -671,7 +671,7 @@ example, an MATTR window larger than the document yields a structured
 missing result rather than a smaller implicit window.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics</a></span><span class="op">(</span><span class="va">tokens</span>, metrics <span class="op">=</span> <span class="st">"mattr"</span>, window_length <span class="op">=</span> <span class="fl">50L</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span></span>
 <span><span class="co">#&gt;   metric_id value  status                    missing_reason N V</span></span>
 <span><span class="co">#&gt; 1     mattr    NA missing too_short_for_requested_parameter 6 4</span></span>
 <span><span class="co">#&gt;   below_quality_floor</span></span>
@@ -684,7 +684,7 @@ is not CLAN VOCD.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"a"</span>, <span class="st">"c"</span><span class="op">)</span>, <span class="fl">20</span><span class="op">)</span>,</span>
 <span>  metrics <span class="op">=</span> <span class="st">"expected_ttr_d"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span></span>
 <span><span class="co">#&gt;        metric_id     value status missing_reason  N V below_quality_floor</span></span>
 <span><span class="co">#&gt; 1 expected_ttr_d 0.1164681     ok           &lt;NA&gt; 80 3               FALSE</span></span></code></pre></div>
 </div>
@@ -828,19 +828,19 @@ metric values.</p>
 <span><span class="co">#&gt; 5 lexdiv-r-screen-result                 0.1.0 lexdiv-r-profile-result</span></span>
 <span><span class="co">#&gt; 6 lexdiv-r-screen-result                 0.1.0 lexdiv-r-profile-result</span></span>
 <span><span class="co">#&gt;   profile_schema_version                         plan_md5 request_index</span></span>
-<span><span class="co">#&gt; 1                  0.1.0 31e7e20ae90d0c6ff7a053965db51996             1</span></span>
-<span><span class="co">#&gt; 2                  0.1.0 31e7e20ae90d0c6ff7a053965db51996             1</span></span>
-<span><span class="co">#&gt; 3                  0.1.0 31e7e20ae90d0c6ff7a053965db51996             2</span></span>
-<span><span class="co">#&gt; 4                  0.1.0 31e7e20ae90d0c6ff7a053965db51996             2</span></span>
-<span><span class="co">#&gt; 5                  0.1.0 31e7e20ae90d0c6ff7a053965db51996             3</span></span>
-<span><span class="co">#&gt; 6                  0.1.0 31e7e20ae90d0c6ff7a053965db51996             3</span></span>
+<span><span class="co">#&gt; 1                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             1</span></span>
+<span><span class="co">#&gt; 2                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             1</span></span>
+<span><span class="co">#&gt; 3                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             2</span></span>
+<span><span class="co">#&gt; 4                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             2</span></span>
+<span><span class="co">#&gt; 5                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             3</span></span>
+<span><span class="co">#&gt; 6                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             3</span></span>
 <span><span class="co">#&gt;   request_id                      specification_id metric_id</span></span>
-<span><span class="co">#&gt; 1        ttr  ttr-62b15045a35ae2aa81843cfbdd72bc38       ttr</span></span>
-<span><span class="co">#&gt; 2        ttr  ttr-62b15045a35ae2aa81843cfbdd72bc38       ttr</span></span>
-<span><span class="co">#&gt; 3       rttr rttr-c53f08ecdf44ad3b47b3a39b0e099ffd      rttr</span></span>
-<span><span class="co">#&gt; 4       rttr rttr-c53f08ecdf44ad3b47b3a39b0e099ffd      rttr</span></span>
-<span><span class="co">#&gt; 5       cttr cttr-91c9e40b3f2eda5f4594727652fe3438      cttr</span></span>
-<span><span class="co">#&gt; 6       cttr cttr-91c9e40b3f2eda5f4594727652fe3438      cttr</span></span>
+<span><span class="co">#&gt; 1        ttr  ttr-4fb55d484c9910369ed7bfb8e1bb1631       ttr</span></span>
+<span><span class="co">#&gt; 2        ttr  ttr-4fb55d484c9910369ed7bfb8e1bb1631       ttr</span></span>
+<span><span class="co">#&gt; 3       rttr rttr-625d1c2f87613e36d94824f3d4ccd257      rttr</span></span>
+<span><span class="co">#&gt; 4       rttr rttr-625d1c2f87613e36d94824f3d4ccd257      rttr</span></span>
+<span><span class="co">#&gt; 5       cttr cttr-0541216b812c575de688815847d80352      cttr</span></span>
+<span><span class="co">#&gt; 6       cttr cttr-0541216b812c575de688815847d80352      cttr</span></span>
 <span><span class="co">#&gt;                       method_id N  screen_id minimum_tokens passes_screen</span></span>
 <span><span class="co">#&gt; 1               ttr_v_over_n_v1 6  tokens_50             50         FALSE</span></span>
 <span><span class="co">#&gt; 2               ttr_v_over_n_v1 6 tokens_100            100         FALSE</span></span>
@@ -872,19 +872,19 @@ position.</p>
 <span><span class="co">#&gt; 2    mattr_2     mattr   0.2     ok           &lt;NA&gt; 60 4               FALSE</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">local_mattr</span><span class="op">$</span><span class="va">windows</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                           plan_md5 request_index request_id</span></span>
-<span><span class="co">#&gt; 1 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1</span></span>
-<span><span class="co">#&gt; 2 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1</span></span>
-<span><span class="co">#&gt; 3 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1</span></span>
-<span><span class="co">#&gt; 4 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1</span></span>
-<span><span class="co">#&gt; 5 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1</span></span>
-<span><span class="co">#&gt; 6 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1</span></span>
+<span><span class="co">#&gt; 1 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1</span></span>
+<span><span class="co">#&gt; 2 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1</span></span>
+<span><span class="co">#&gt; 3 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1</span></span>
+<span><span class="co">#&gt; 4 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1</span></span>
+<span><span class="co">#&gt; 5 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1</span></span>
+<span><span class="co">#&gt; 6 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1</span></span>
 <span><span class="co">#&gt;                         specification_id metric_id              method_id</span></span>
-<span><span class="co">#&gt; 1 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 2 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 3 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 4 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 5 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 6 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 1 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 2 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 3 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 4 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 5 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 6 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1</span></span>
 <span><span class="co">#&gt;   window_index window_start window_end window_midpoint window_length</span></span>
 <span><span class="co">#&gt; 1            1            1         10             5.5            10</span></span>
 <span><span class="co">#&gt; 2            2            2         11             6.5            10</span></span>
@@ -901,19 +901,19 @@ position.</p>
 <span><span class="co">#&gt; 6              4   0.4</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">local_mattr</span><span class="op">$</span><span class="va">exposure</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                           plan_md5 request_index request_id</span></span>
-<span><span class="co">#&gt; 1 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1</span></span>
-<span><span class="co">#&gt; 2 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1</span></span>
-<span><span class="co">#&gt; 3 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1</span></span>
-<span><span class="co">#&gt; 4 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1</span></span>
-<span><span class="co">#&gt; 5 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1</span></span>
-<span><span class="co">#&gt; 6 23a80b2c7c2329d05775cffd83193aa4             1    mattr_1</span></span>
+<span><span class="co">#&gt; 1 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1</span></span>
+<span><span class="co">#&gt; 2 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1</span></span>
+<span><span class="co">#&gt; 3 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1</span></span>
+<span><span class="co">#&gt; 4 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1</span></span>
+<span><span class="co">#&gt; 5 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1</span></span>
+<span><span class="co">#&gt; 6 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1</span></span>
 <span><span class="co">#&gt;                         specification_id metric_id              method_id</span></span>
-<span><span class="co">#&gt; 1 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 2 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 3 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 4 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 5 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 6 mattr-50cc1823d5f54a312e1d2ea9c951effc     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 1 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 2 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 3 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 4 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 5 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 6 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1</span></span>
 <span><span class="co">#&gt;   position exposure_count window_inclusion_rate nominal_observation_weight</span></span>
 <span><span class="co">#&gt; 1        1              1            0.01960784                0.001960784</span></span>
 <span><span class="co">#&gt; 2        2              2            0.03921569                0.003921569</span></span>
@@ -933,8 +933,10 @@ validity, or reliability. The screens do not change values or parameters
 or censor documents. Read them together with <code>status</code>,
 <code>missing_reason</code>, <code>N</code>, <code>V</code>, and the
 method and parameter identities.</p>
-<p>Use <code><a href="../reference/lexdiv_profile.html">lexdiv_methods()</a></code> and <code><a href="../reference/lexdiv_profile.html">lexdiv_presets()</a></code>
-to inspect the twelve versioned methods and their bounded presets.</p>
+<p>The presets contain eleven methods; experimental expected-TTR D
+requires explicit selection. Use <code><a href="../reference/lexdiv_profile.html">lexdiv_methods()</a></code> and
+<code><a href="../reference/lexdiv_profile.html">lexdiv_presets()</a></code> to inspect the twelve supported methods
+and their bounded presets.</p>
 </div>
 <div class="section level2">
 <h2 id="definition-sensitivity-outside-the-versioned-core">Definition sensitivity outside the versioned core<a class="anchor" aria-label="anchor" href="#definition-sensitivity-outside-the-versioned-core"></a>
@@ -960,7 +962,7 @@ method.</p>
 <span><span class="co">#&gt; 2                      a    common-formula:maas-a-ln</span></span>
 <span><span class="co">#&gt; 3              a-squared            TAALED-0.32:maas</span></span>
 <span><span class="co">#&gt; 4                      a common-formula:maas-a-log10</span></span>
-<span><span class="co">#&gt; 5      tokens-per-factor            ldfreq-core:mtld</span></span>
+<span><span class="co">#&gt; 5      tokens-per-factor      ldfreq-core-0.1.0:mtld</span></span>
 <span><span class="co">#&gt; 6      tokens-per-factor           TAALED-0.32:mtldo</span></span>
 <span><span class="co">#&gt; 7 adjusted-factor-length          TAALED-0.32:mtldav</span></span>
 <span><span class="co">#&gt; 8 adjusted-factor-length            TAALED-0.32:mtld</span></span>
@@ -969,7 +971,7 @@ method.</p>
 <span><span class="co">#&gt; 2                                                             formula-comparison-only</span></span>
 <span><span class="co">#&gt; 3               formula-aligned-with-taaled-0.32-maas-not-full-pipeline-compatibility</span></span>
 <span><span class="co">#&gt; 4                                                             formula-comparison-only</span></span>
-<span><span class="co">#&gt; 5                                                                  ldfreq-core-method</span></span>
+<span><span class="co">#&gt; 5                                                           legacy-ldfreq-core-method</span></span>
 <span><span class="co">#&gt; 6 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility</span></span>
 <span><span class="co">#&gt; 7 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility</span></span>
 <span><span class="co">#&gt; 8 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility</span></span>
@@ -1000,8 +1002,8 @@ method.</p>
 <span><span class="co">#&gt; 2     common-formula:maas-a-ln  0.4019240     ok</span></span>
 <span><span class="co">#&gt; 3             TAALED-0.32:maas  0.3719663     ok</span></span>
 <span><span class="co">#&gt; 4  common-formula:maas-a-log10  0.6098904     ok</span></span>
-<span><span class="co">#&gt; 5             ldfreq-core:mtld 10.0000000     ok</span></span>
-<span><span class="co">#&gt; 6             ldfreq-core:mtld 10.0000000     ok</span></span>
+<span><span class="co">#&gt; 5       ldfreq-core-0.1.0:mtld 10.0000000     ok</span></span>
+<span><span class="co">#&gt; 6       ldfreq-core-0.1.0:mtld 10.0000000     ok</span></span>
 <span><span class="co">#&gt; 7            TAALED-0.32:mtldo  8.4000000     ok</span></span>
 <span><span class="co">#&gt; 8            TAALED-0.32:mtldo  4.8000000     ok</span></span>
 <span><span class="co">#&gt; 9           TAALED-0.32:mtldav  9.1111111     ok</span></span>

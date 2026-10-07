@@ -92,7 +92,7 @@ Original line endings and positions are retained.
 ``` r
 words <- imported$tokens[imported$tokens$surface != "。", ]
 lexdiv_metrics(words$surface, metrics = "ttr")
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id     value status missing_reason N V below_quality_floor
 #> 1       ttr 0.8571429     ok           <NA> 7 6               FALSE
 phrases <- lexdiv_ngrams(words, "authored-ja-surface-no-punctuation-v1",

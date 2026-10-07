@@ -75,8 +75,8 @@ lexdiv_screen(
 
 - parameter:
 
-  The one user-settable scalar parameter admitted by the selected v0.1
-  method.
+  The one user-settable scalar parameter admitted by the selected
+  current method.
 
 - values:
 
@@ -171,12 +171,13 @@ invisibly after displaying a bounded tabular view; the full identity
 fields remain available on the object.
 
 `lexdiv_methods()` returns a metadata data frame with human-readable
-labels and definitions, conventional within-method direction, contract
-scale, exact method identity, parameters, and advisory token floors.
-`lexdiv_presets()` returns a preset metadata data frame.
-`lexdiv_profile()` returns one core metric row per plan request with a
-separate profile envelope. `lexdiv_profile_batch()` adds the existing
-batch envelope and returns document-major, request-minor long form.
+labels and definitions, `stability` (including experimental expected-TTR
+D), conventional within-method direction, contract scale, exact method
+identity, parameters, and advisory token floors. `lexdiv_presets()`
+returns a preset metadata data frame. `lexdiv_profile()` returns one
+core metric row per plan request with a separate profile envelope.
+`lexdiv_profile_batch()` adds the existing batch envelope and returns
+document-major, request-minor long form.
 
 `lexdiv_screen()` returns a `lexdiv_screen_results` data frame with one
 row per source result and named floor. It deliberately has no
@@ -184,11 +185,19 @@ metric-value column.
 
 ## Details
 
-The `canonical` preset contains the twelve versioned methods at their
-default parameters. The `length_50_100` preset contains those twelve
-requests plus MSTTR at segment length 100 and MATTR at window length
-100. It has fourteen specifications: MTLD is computed only once because
-a 50- versus 100-token quality screen does not change its calculation.
+Preset version 0.2.0 excludes experimental expected-TTR D. The
+`canonical` preset contains eleven methods at their default parameters.
+The `length_50_100` preset adds MSTTR at segment length 100 and MATTR at
+window length 100. It has thirteen specifications: MTLD is computed only
+once because a 50- versus 100-token quality screen does not change its
+calculation.
+
+Saved core-contract 0.1.0 plans must be recreated explicitly; see the
+migration section in
+[`lexdiv_metrics`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md).
+An explicitly constructed
+`lexdiv_spec("expected_ttr_d_hypergeom_fit_v1")` still selects the
+experimental estimator.
 
 Duplicate normalized method/parameter specifications from presets,
 explicit specifications, or grids collapse at their first position.
@@ -226,11 +235,11 @@ and boundary fixtures.
 methods <- lexdiv_methods()
 lexdiv_presets()
 #>       preset_id preset_version specification_count
-#> 1     canonical          0.1.0                  12
-#> 2 length_50_100          0.1.0                  14
-#>                                                 description
-#> 1 The twelve versioned methods at their canonical defaults.
-#> 2             Canonical plus MSTTR and MATTR at length 100.
+#> 1     canonical          0.2.0                  11
+#> 2 length_50_100          0.2.0                  13
+#>                                              description
+#> 1 The eleven stable methods at their canonical defaults.
+#> 2          Canonical plus MSTTR and MATTR at length 100.
 mattr_method <- methods$method_id[methods$metric_id == "mattr"]
 
 mattr_25 <- lexdiv_spec(
@@ -247,7 +256,7 @@ grid <- lexdiv_grid(
 )
 plan <- lexdiv_plan(presets = character(), specs = mattr_25, grids = grid)
 print(mattr_25)
-#> <lexdiv_spec: mattr-ca44558c9618cedb2e9ae105d042cddd>
+#> <lexdiv_spec: mattr-c60bcc139197f0321525ede59195f383>
 #>  request_id metric_id              method_id       parameters
 #>    mattr_25     mattr mattr_sliding_step1_v1 window_length=25
 print(grid)
@@ -256,7 +265,7 @@ print(grid)
 #>              1    mattr_1     mattr mattr_sliding_step1_v1  window_length=50
 #>              2    mattr_2     mattr mattr_sliding_step1_v1 window_length=100
 print(plan)
-#> <lexdiv_plan: 3 specifications; schema 0.1.0; id e03d55be9bb5246cdbce41c2458ee7b4>
+#> <lexdiv_plan: 3 specifications; schema 0.1.0; id 385893509c8011275b045ea68daa5cb9>
 #>  request_index request_id metric_id              method_id        parameters
 #>              1   mattr_25     mattr mattr_sliding_step1_v1  window_length=25
 #>              2    mattr_1     mattr mattr_sliding_step1_v1  window_length=50
@@ -295,5 +304,5 @@ head(batch_profile[, c("document_id", "request_id", "metric_id", "status")])
 
 all_lengths <- lexdiv_plan("length_50_100")
 length(all_lengths$specifications)
-#> [1] 14
+#> [1] 13
 ```

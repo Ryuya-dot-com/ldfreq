@@ -225,9 +225,9 @@ lexdiv_widen(result$results)
 #> 2                    FALSE ldfreq-lexical-diversity-core
 #> 3                     TRUE ldfreq-lexical-diversity-core
 #>   ttr__metric_contract_version ttr__requested_parameters
-#> 1                        0.1.0                          
-#> 2                        0.1.0                          
-#> 3                        0.1.0                          
+#> 1                        0.2.0                          
+#> 2                        0.2.0                          
+#> 3                        0.2.0                          
 #>   ttr__effective_parameters ttr__N ttr__V
 #> 1                                5      4
 #> 2                                5      5

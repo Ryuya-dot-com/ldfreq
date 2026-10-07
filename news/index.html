@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,7 +43,19 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0" id="ldfreq-020-development">ldfreq 0.2.0 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-020-development"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.3.0" id="ldfreq-030-development">ldfreq 0.3.0 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-030-development"></a></h2>
+<div class="section level3">
+<h3 id="core-review-corrections-0-3-0">Core review corrections<a class="anchor" aria-label="anchor" href="#core-review-corrections-0-3-0"></a></h3>
+<ul><li><p>Breaking measurement change: core contract 0.2.0 makes no-minimum MTLD the default, under <code>mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1</code>. It uses strict <code>&lt;</code>, evaluates closure at the final token, and averages directional scores. The old min10 method is unchanged in <code><a href="../reference/lexdiv_variant_metrics.html">lexdiv_variant_metrics()</a></code>.</p></li>
+<li><p>Default metric output now has eleven rows. Preset version 0.2.0 has eleven canonical or thirteen length-comparison requests. Saved results retain their original IDs and values; old plans must be explicitly recreated. All new specification hashes include the new core contract version. See <code><a href="../reference/lexdiv_metrics.html">?lexdiv_metrics</a></code>.</p></li>
+<li><p>Classified deterministic expected-TTR D as experimental in the contract and <code><a href="../reference/lexdiv_profile.html">lexdiv_methods()</a></code> metadata and excluded it from default computations and presets. Explicit selection remains supported; its estimator and method ID are unchanged. CLAN equivalence has not been established.</p></li>
+<li><p>Added reproducible, offline fixtures from actual koRpus 0.13.9, quanteda.textstats 0.97.2 and pinned TAALED 0.32 executions on nine identical authored inputs. They document MTLD boundaries and Maas scale differences.</p></li>
+<li><p>Fixed a C-locale parse failure caused by a non-ASCII bare test identifier and separated a path-disclosure assertion from locale-dependent sheet rendering.</p></li>
+<li><p>Used the existing 30 longer example texts and a common 50-token MATTR window in the README, showing the existing compact print method and RDS saving. Explained the advisory token floor and pinned installation to merged main.</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0" id="ldfreq-020">ldfreq 0.2.0<a class="anchor" aria-label="anchor" href="#ldfreq-020"></a></h2>
 <div class="section level3">
 <h3 id="japanese-document-frequency-workflows-0-2-0">Japanese document frequency workflows<a class="anchor" aria-label="anchor" href="#japanese-document-frequency-workflows-0-2-0"></a></h3>
 <ul><li>Added sourced recipes connecting complete Japanese document selections and explicit keys to the existing norm-profile batch calculation, with unresolved keys in full-token coverage, source-linked values and saved-reference replay.</li>

@@ -466,7 +466,7 @@ result <- lexdiv_metrics_text(
   tokenizer = "english", case = "lower", metrics = "ttr"
 )
 result$results  # N = 5, V = 4, TTR = 0.8
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr   0.8     ok           <NA> 5 4               FALSE
 result$token_audit

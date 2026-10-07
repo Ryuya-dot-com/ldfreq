@@ -156,7 +156,7 @@ x$tokens
 #> 4          ja         s1           4      た     4   4
 #> 5          ja         s1           5      。     5   5
 lexdiv_metrics(x$tokens$surface[1:4], metrics = "ttr")
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr     1     ok           <NA> 4 4               FALSE
 lexdiv_ngrams(x$tokens[1:4, ], "authored-surface-v1", term_col = "surface")

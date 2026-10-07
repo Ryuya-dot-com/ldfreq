@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -153,7 +153,7 @@ Original line endings and positions are retained.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">words</span> <span class="op">&lt;-</span> <span class="va">imported</span><span class="op">$</span><span class="va">tokens</span><span class="op">[</span><span class="va">imported</span><span class="op">$</span><span class="va">tokens</span><span class="op">$</span><span class="va">surface</span> <span class="op">!=</span> <span class="st">"。"</span>, <span class="op">]</span></span>
 <span><span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics</a></span><span class="op">(</span><span class="va">words</span><span class="op">$</span><span class="va">surface</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span></span>
 <span><span class="co">#&gt;   metric_id     value status missing_reason N V below_quality_floor</span></span>
 <span><span class="co">#&gt; 1       ttr 0.8571429     ok           &lt;NA&gt; 7 6               FALSE</span></span>
 <span><span class="va">phrases</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ngrams.html">lexdiv_ngrams</a></span><span class="op">(</span><span class="va">words</span>, <span class="st">"authored-ja-surface-no-punctuation-v1"</span>,</span>

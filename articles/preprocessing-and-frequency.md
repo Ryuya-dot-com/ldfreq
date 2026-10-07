@@ -256,7 +256,7 @@ flemma_annotations$tokens[, c(
 #> 5     run    run           TRUE            antbnc
 lexdiv_metrics_text(flemma_annotations, unit = "flemma", metrics = "ttr")
 #> <lexdiv_text_results> 5/5 eligible tokens | unit=flemma | inclusion=all
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr   0.6     ok           <NA> 5 3               FALSE
 ```
@@ -1237,8 +1237,8 @@ profile[profile$metric_id %in% c("mattr", "msttr"), c(
 #>    request_id metric_id value status   N V
 #> 6       msttr     msttr  0.12     ok 160 6
 #> 7       mattr     mattr  0.12     ok 160 6
-#> 13  msttr_100     msttr  0.06     ok 160 6
-#> 14  mattr_100     mattr  0.06     ok 160 6
+#> 12  msttr_100     msttr  0.06     ok 160 6
+#> 13  mattr_100     mattr  0.06     ok 160 6
 ```
 
 The whole-text mean alone hides the local trajectory and the fact that
@@ -1262,11 +1262,11 @@ mattr_plan <- lexdiv_plan(
 local_mattr <- lexdiv_mattr_profile(long_tokens, mattr_plan)
 local_mattr$diagnostics
 #>                           plan_md5 request_index request_id
-#> 1 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
-#> 2 add89c01bd21dccf5886ae40e2fb0acb             2    mattr_2
+#> 1 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
+#> 2 87ff1ea3ad85b576a183aff79ead8d16             2    mattr_2
 #>                         specification_id status missing_reason   N V
-#> 1 mattr-a35378d8f29e55b1f068a78202c4bfe3     ok           <NA> 160 6
-#> 2 mattr-b12a0ee45722bca079d668a3be14e569     ok           <NA> 160 6
+#> 1 mattr-6222b052a319a68f2646f23c693b6edc     ok           <NA> 160 6
+#> 2 mattr-e35ef158983787e77450e852e7ffc5c8     ok           <NA> 160 6
 #>   window_length window_count endpoint_exposure_count maximum_exposure_count
 #> 1            50          111                       1                     50
 #> 2           100           61                       1                     61
@@ -1275,19 +1275,19 @@ local_mattr$diagnostics
 #> 2                   1       0.06       0.06                    0
 head(local_mattr$windows)
 #>                           plan_md5 request_index request_id
-#> 1 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
-#> 2 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
-#> 3 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
-#> 4 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
-#> 5 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
-#> 6 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
+#> 1 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
+#> 2 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
+#> 3 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
+#> 4 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
+#> 5 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
+#> 6 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
 #>                         specification_id metric_id              method_id
-#> 1 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1
-#> 2 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1
-#> 3 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1
-#> 4 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1
-#> 5 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1
-#> 6 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1
+#> 1 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1
+#> 2 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1
+#> 3 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1
+#> 4 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1
+#> 5 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1
+#> 6 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1
 #>   window_index window_start window_end window_midpoint window_length
 #> 1            1            1         50            25.5            50
 #> 2            2            2         51            26.5            50
@@ -1304,19 +1304,19 @@ head(local_mattr$windows)
 #> 6              6  0.12
 head(local_mattr$exposure)
 #>                           plan_md5 request_index request_id
-#> 1 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
-#> 2 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
-#> 3 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
-#> 4 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
-#> 5 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
-#> 6 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1
+#> 1 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
+#> 2 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
+#> 3 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
+#> 4 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
+#> 5 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
+#> 6 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1
 #>                         specification_id metric_id              method_id
-#> 1 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1
-#> 2 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1
-#> 3 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1
-#> 4 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1
-#> 5 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1
-#> 6 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1
+#> 1 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1
+#> 2 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1
+#> 3 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1
+#> 4 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1
+#> 5 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1
+#> 6 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1
 #>   position exposure_count window_inclusion_rate nominal_observation_weight
 #> 1        1              1           0.009009009               0.0001801802
 #> 2        2              2           0.018018018               0.0003603604
@@ -1390,8 +1390,8 @@ variant_results[, c(
 #> 2     common-formula:maas-a-ln  0.3818781     ok
 #> 3             TAALED-0.32:maas  0.3357880     ok
 #> 4  common-formula:maas-a-log10  0.5794722     ok
-#> 5             ldfreq-core:mtld 10.2857143     ok
-#> 6             ldfreq-core:mtld 10.2857143     ok
+#> 5       ldfreq-core-0.1.0:mtld 10.2857143     ok
+#> 6       ldfreq-core-0.1.0:mtld 10.2857143     ok
 #> 7            TAALED-0.32:mtldo 10.2857143     ok
 #> 8            TAALED-0.32:mtldo 10.2857143     ok
 #> 9           TAALED-0.32:mtldav 10.0000000     ok

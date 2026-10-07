@@ -14,7 +14,7 @@ lexdiv_metric_ids()
 
 lexdiv_metrics(
   tokens,
-  metrics = lexdiv_metric_ids(),
+  metrics = setdiff(lexdiv_metric_ids(), "expected_ttr_d"),
   segment_length = 50L,
   window_length = 50L,
   mtld_threshold = 0.72,
@@ -54,7 +54,8 @@ print(x, ...)
 - metrics:
 
   A plain, non-empty, duplicate-free character vector selected from
-  `lexdiv_metric_ids()`.
+  `lexdiv_metric_ids()`. The default excludes experimental
+  `expected_ttr_d`; the catalog still lists every supported metric.
 
 - segment_length:
 
@@ -139,8 +140,9 @@ The examples then show a computed value, an empty document, an invalid
 token, and a text shorter than a requested window. An `NA` value has a
 reason: inspect `status` and `missing_reason` before interpreting it or
 combining results. Choosing `metrics = "ttr"` keeps the first example
-small; omitting `metrics` requests all methods, some of which cannot be
-computed for short inputs.
+small; omitting `metrics` requests the eleven default methods, some of
+which cannot be computed for short inputs. Experimental expected-TTR D
+requires explicit selection.
 
 The current versioned set contains TTR, RTTR/Guiraud, CTTR, Herdan's C,
 natural-log Maas a-squared, complete non-overlapping MSTTR, step-one
@@ -148,23 +150,29 @@ MATTR, bidirectional MTLD, sample-size-normalized hypergeometric HD-D on
 the TTR scale, Yule's K, deterministic expected-TTR curve-fit D, and
 type-based Yule's I. Expected-TTR D fits the model
 \\2/(\sqrt{1+2n/D}+1)\\ to exact finite-population expected TTR values.
-It uses no random sampling or arbitrary D cap and is not CLAN VOCD. From
-package version 0.2.0, the same expected curve and objective are
-evaluated through the expected duplicate-draw fraction to avoid
-cancellation near TTR=1. The method ID is unchanged because this is a
-numerical correction, not a new estimator. Record the package version as
-well as method and parameters. `near_saturation` diagnoses a nearly flat
-curve; it does not establish statistical precision or validity.
+It is experimental: numerical accuracy has been checked, but empirical
+equivalence to published vocd-D or CLAN has not. It uses no random
+sampling or arbitrary D cap and is not CLAN VOCD. From package 0.3.0 it
+is excluded from default computations and presets; select it explicitly
+when needed. From package version 0.2.0, the same expected curve and
+objective are evaluated through the expected duplicate-draw fraction to
+avoid cancellation near TTR=1. The method ID is unchanged because this
+is a numerical correction, not a new estimator. Record the package
+version as well as method and parameters. `near_saturation` diagnoses a
+nearly flat curve; it does not establish statistical precision or
+validity.
 
-The canonical MTLD method requires at least ten tokens per complete
-factor and applies an unclamped linear tail credit. The credit can
-exceed one for a shorter repetitive tail. Consequently, `rep("a", 59)`
-gives about 7.2175 and `rep("a", 60)` gives 10, although no new type was
-added. This is a frozen variant rule, not a guarantee of length
-independence for every input. Inspect directional/tail diagnostics and
-sensitivity to the sampling design for highly repetitive texts. Passing
-a length screen does not remove this boundary effect; do not silently
-clamp the tail or compare different MTLD variants as the same method.
+From package 0.3.0, the canonical MTLD method has no minimum factor
+length. It closes a factor when running TTR is strictly less than the
+threshold, including at the final token, and averages forward and
+reverse scores. A residual factor receives
+`(1 - tail_TTR) / (1 - threshold)` credit. Every threshold crossing
+closes a factor, so residual credit cannot exceed one. All-unique input
+has zero factors and returns `missing / no_factor`. For example, 50
+copies of one word form 25 factors and return 2. A computable
+short-input result is not evidence of reliable measurement. koRpus
+0.13.9 skips a terminal span of at most two tokens, while this method
+checks every token; exact tool equivalence is not claimed.
 
 An invalid token anywhere has precedence over empty-input and
 metric-specific domain conditions. Invalid documents return
@@ -185,7 +193,7 @@ canonicalization is not Unicode normalization: canonically equivalent
 but scalar-distinct strings remain distinct types.
 
 Within the same exact method and design, Maas a-squared and Yule's K
-conventionally decrease as repetition decreases; the other ten v0.1
+conventionally decrease as repetition decreases; the other ten supported
 methods conventionally increase with observed lexical variety or lower
 repetition. These methods primarily operationalize lexical variety and
 repetition rather than the full multidimensional lexical-diversity
@@ -229,6 +237,33 @@ and `unbounded_high`. The reasons that can occur depend on the selected
 method. Structural request errors, such as an unknown metric ID or
 invalid selected parameter, stop the call instead of returning a result
 row.
+
+## Migration from core contract 0.1.0
+
+Package 0.3.0 uses core contract 0.2.0. MTLD has the new method ID
+`mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1`. The old
+`mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1` remains in
+[`lexdiv_variant_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md),
+with the same minimum input length, values, and tail behavior (including
+credit greater than one).
+
+Read existing RDS results without editing their IDs or values. Old plans
+and specifications must be explicitly recreated with the current
+[`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+and
+[`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+before new computation. All specification hashes change because they
+include the core contract version, even for unchanged formulas. Record
+the package version, method ID, contract version, parameters and
+preprocessing in reports. Analyze old and new MTLD results separately;
+the wide-table and plot checks reject mixed measurement identities.
+
+Default results now have eleven rows, and the canonical and length
+presets have eleven and thirteen requests. `lexdiv_metric_ids()` still
+lists all twelve supported metrics. Explicit
+`metrics = lexdiv_metric_ids()` includes experimental expected-TTR D.
+Its estimator and method ID are unchanged. Result schemas, tokenization
+and bundled reference data are unchanged.
 
 ## Formal contract
 
@@ -279,7 +314,7 @@ library(ldfreq)
 tokens <- c("a", "a", "b", "c")
 result <- lexdiv_metrics(tokens, metrics = "ttr")
 result  # N = 4, V = 3, value = 0.75, status = "ok"
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
 #> 1       ttr  0.75     ok           <NA> 4 3               FALSE
 result$value
@@ -287,15 +322,15 @@ result$value
 
 # Empty, invalid, and too-short inputs are different conditions.
 lexdiv_metrics(character(), metrics = "ttr")  # missing / empty_input
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value  status missing_reason N V below_quality_floor
 #> 1       ttr    NA missing    empty_input 0 0                TRUE
 lexdiv_metrics(c("a", NA_character_), metrics = "ttr")  # invalid_input / invalid_token
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value        status missing_reason  N  V below_quality_floor
 #> 1       ttr    NA invalid_input  invalid_token NA NA                  NA
 lexdiv_metrics(c("a", "b"), metrics = "mattr", window_length = 3)
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value  status                    missing_reason N V
 #> 1     mattr    NA missing too_short_for_requested_parameter 2 2
 #>   below_quality_floor
@@ -320,7 +355,7 @@ lexdiv_metric_ids()
 #>  [5] "maas"           "msttr"          "mattr"          "mtld"          
 #>  [9] "hdd"            "expected_ttr_d" "yule_k"         "yule_i"        
 lexdiv_metrics(tokens, metrics = c("ttr", "hdd"), sample_size = 2)
-#> <lexdiv_results: 2 metrics; contract 0.1.0>
+#> <lexdiv_results: 2 metrics; contract 0.2.0>
 #>   metric_id     value status missing_reason N V below_quality_floor
 #> 1       ttr 0.7500000     ok           <NA> 4 3               FALSE
 #> 2       hdd 0.9166667     ok           <NA> 4 3                TRUE
@@ -329,23 +364,23 @@ lexdiv_metrics(
   rep(c("a", "b", "a", "c"), 20),
   metrics = "expected_ttr_d"
 )
-#> <lexdiv_results: 1 metric; contract 0.1.0>
+#> <lexdiv_results: 1 metric; contract 0.2.0>
 #>        metric_id     value status missing_reason  N V below_quality_floor
 #> 1 expected_ttr_d 0.1164681     ok           <NA> 80 3               FALSE
 
 mtld <- lexdiv_metrics(rep(c("a", "b"), 10), metrics = "mtld")
 mtld$diagnostics[[1]]
 #> $forward_score
-#> [1] 10
+#> [1] 3.333333
 #> 
 #> $reverse_score
-#> [1] 10
+#> [1] 3.333333
 #> 
 #> $forward_complete_factors
-#> [1] 2
+#> [1] 6
 #> 
 #> $reverse_complete_factors
-#> [1] 2
+#> [1] 6
 #> 
 #> $forward_tail_credit
 #> [1] 0
@@ -353,6 +388,16 @@ mtld$diagnostics[[1]]
 #> $reverse_tail_credit
 #> [1] 0
 #> 
+
+# Reproduce the previous min10 formula explicitly (50 identical tokens -> 10).
+legacy <- lexdiv_variant_metrics(
+  rep("a", 50),
+  variants = "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1"
+)
+legacy$value
+#> [1] 10
+lexdiv_metrics(rep("a", 50), metrics = "mtld")$value  # new definition: 2
+#> [1] 2
 
 contract_path <- system.file(
   "spec", "lexical-diversity-contract.json", package = "ldfreq"

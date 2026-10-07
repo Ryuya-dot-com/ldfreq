@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -347,7 +347,7 @@ the raw AntBNC mapping.</p>
 <span><span class="co">#&gt; 5     run    run           TRUE            antbnc</span></span>
 <span><span class="fu"><a href="../reference/lexdiv_preprocessing.html">lexdiv_metrics_text</a></span><span class="op">(</span><span class="va">flemma_annotations</span>, unit <span class="op">=</span> <span class="st">"flemma"</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;lexdiv_text_results&gt; 5/5 eligible tokens | unit=flemma | inclusion=all</span></span>
-<span><span class="co">#&gt; &lt;lexdiv_results: 1 metric; contract 0.1.0&gt;</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span></span>
 <span><span class="co">#&gt;   metric_id value status missing_reason N V below_quality_floor</span></span>
 <span><span class="co">#&gt; 1       ttr   0.6     ok           &lt;NA&gt; 5 3               FALSE</span></span></code></pre></div>
 <p>For a real analysis, replace the synthetic fixture with a
@@ -1323,8 +1323,8 @@ parameter variants as different requests:</p>
 <span><span class="co">#&gt;    request_id metric_id value status   N V</span></span>
 <span><span class="co">#&gt; 6       msttr     msttr  0.12     ok 160 6</span></span>
 <span><span class="co">#&gt; 7       mattr     mattr  0.12     ok 160 6</span></span>
-<span><span class="co">#&gt; 13  msttr_100     msttr  0.06     ok 160 6</span></span>
-<span><span class="co">#&gt; 14  mattr_100     mattr  0.06     ok 160 6</span></span></code></pre></div>
+<span><span class="co">#&gt; 12  msttr_100     msttr  0.06     ok 160 6</span></span>
+<span><span class="co">#&gt; 13  mattr_100     mattr  0.06     ok 160 6</span></span></code></pre></div>
 <p>The whole-text mean alone hides the local trajectory and the fact
 that endpoint positions occur in fewer complete windows.
 <code><a href="../reference/lexdiv_mattr_profile.html">lexdiv_mattr_profile()</a></code> reuses the same MATTR specifications
@@ -1344,11 +1344,11 @@ and exposes both quantities without retaining token strings:</p>
 <span><span class="va">local_mattr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_mattr_profile.html">lexdiv_mattr_profile</a></span><span class="op">(</span><span class="va">long_tokens</span>, <span class="va">mattr_plan</span><span class="op">)</span></span>
 <span><span class="va">local_mattr</span><span class="op">$</span><span class="va">diagnostics</span></span>
 <span><span class="co">#&gt;                           plan_md5 request_index request_id</span></span>
-<span><span class="co">#&gt; 1 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
-<span><span class="co">#&gt; 2 add89c01bd21dccf5886ae40e2fb0acb             2    mattr_2</span></span>
+<span><span class="co">#&gt; 1 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
+<span><span class="co">#&gt; 2 87ff1ea3ad85b576a183aff79ead8d16             2    mattr_2</span></span>
 <span><span class="co">#&gt;                         specification_id status missing_reason   N V</span></span>
-<span><span class="co">#&gt; 1 mattr-a35378d8f29e55b1f068a78202c4bfe3     ok           &lt;NA&gt; 160 6</span></span>
-<span><span class="co">#&gt; 2 mattr-b12a0ee45722bca079d668a3be14e569     ok           &lt;NA&gt; 160 6</span></span>
+<span><span class="co">#&gt; 1 mattr-6222b052a319a68f2646f23c693b6edc     ok           &lt;NA&gt; 160 6</span></span>
+<span><span class="co">#&gt; 2 mattr-e35ef158983787e77450e852e7ffc5c8     ok           &lt;NA&gt; 160 6</span></span>
 <span><span class="co">#&gt;   window_length window_count endpoint_exposure_count maximum_exposure_count</span></span>
 <span><span class="co">#&gt; 1            50          111                       1                     50</span></span>
 <span><span class="co">#&gt; 2           100           61                       1                     61</span></span>
@@ -1357,19 +1357,19 @@ and exposes both quantities without retaining token strings:</p>
 <span><span class="co">#&gt; 2                   1       0.06       0.06                    0</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">local_mattr</span><span class="op">$</span><span class="va">windows</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                           plan_md5 request_index request_id</span></span>
-<span><span class="co">#&gt; 1 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
-<span><span class="co">#&gt; 2 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
-<span><span class="co">#&gt; 3 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
-<span><span class="co">#&gt; 4 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
-<span><span class="co">#&gt; 5 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
-<span><span class="co">#&gt; 6 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
+<span><span class="co">#&gt; 1 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
+<span><span class="co">#&gt; 2 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
+<span><span class="co">#&gt; 3 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
+<span><span class="co">#&gt; 4 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
+<span><span class="co">#&gt; 5 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
+<span><span class="co">#&gt; 6 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
 <span><span class="co">#&gt;                         specification_id metric_id              method_id</span></span>
-<span><span class="co">#&gt; 1 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 2 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 3 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 4 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 5 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 6 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 1 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 2 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 3 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 4 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 5 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 6 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1</span></span>
 <span><span class="co">#&gt;   window_index window_start window_end window_midpoint window_length</span></span>
 <span><span class="co">#&gt; 1            1            1         50            25.5            50</span></span>
 <span><span class="co">#&gt; 2            2            2         51            26.5            50</span></span>
@@ -1386,19 +1386,19 @@ and exposes both quantities without retaining token strings:</p>
 <span><span class="co">#&gt; 6              6  0.12</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">local_mattr</span><span class="op">$</span><span class="va">exposure</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                           plan_md5 request_index request_id</span></span>
-<span><span class="co">#&gt; 1 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
-<span><span class="co">#&gt; 2 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
-<span><span class="co">#&gt; 3 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
-<span><span class="co">#&gt; 4 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
-<span><span class="co">#&gt; 5 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
-<span><span class="co">#&gt; 6 add89c01bd21dccf5886ae40e2fb0acb             1    mattr_1</span></span>
+<span><span class="co">#&gt; 1 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
+<span><span class="co">#&gt; 2 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
+<span><span class="co">#&gt; 3 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
+<span><span class="co">#&gt; 4 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
+<span><span class="co">#&gt; 5 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
+<span><span class="co">#&gt; 6 87ff1ea3ad85b576a183aff79ead8d16             1    mattr_1</span></span>
 <span><span class="co">#&gt;                         specification_id metric_id              method_id</span></span>
-<span><span class="co">#&gt; 1 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 2 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 3 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 4 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 5 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1</span></span>
-<span><span class="co">#&gt; 6 mattr-a35378d8f29e55b1f068a78202c4bfe3     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 1 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 2 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 3 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 4 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 5 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1</span></span>
+<span><span class="co">#&gt; 6 mattr-6222b052a319a68f2646f23c693b6edc     mattr mattr_sliding_step1_v1</span></span>
 <span><span class="co">#&gt;   position exposure_count window_inclusion_rate nominal_observation_weight</span></span>
 <span><span class="co">#&gt; 1        1              1           0.009009009               0.0001801802</span></span>
 <span><span class="co">#&gt; 2        2              2           0.018018018               0.0003603604</span></span>
@@ -1468,8 +1468,8 @@ separate contract:</p>
 <span><span class="co">#&gt; 2     common-formula:maas-a-ln  0.3818781     ok</span></span>
 <span><span class="co">#&gt; 3             TAALED-0.32:maas  0.3357880     ok</span></span>
 <span><span class="co">#&gt; 4  common-formula:maas-a-log10  0.5794722     ok</span></span>
-<span><span class="co">#&gt; 5             ldfreq-core:mtld 10.2857143     ok</span></span>
-<span><span class="co">#&gt; 6             ldfreq-core:mtld 10.2857143     ok</span></span>
+<span><span class="co">#&gt; 5       ldfreq-core-0.1.0:mtld 10.2857143     ok</span></span>
+<span><span class="co">#&gt; 6       ldfreq-core-0.1.0:mtld 10.2857143     ok</span></span>
 <span><span class="co">#&gt; 7            TAALED-0.32:mtldo 10.2857143     ok</span></span>
 <span><span class="co">#&gt; 8            TAALED-0.32:mtldo 10.2857143     ok</span></span>
 <span><span class="co">#&gt; 9           TAALED-0.32:mtldav 10.0000000     ok</span></span>
