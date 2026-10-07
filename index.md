@@ -38,6 +38,13 @@ and window-size sensitivity with authored text, not learner data.
 - **Examine sensitivity.** Compare lexical units, parameter settings,
   and selected Maas/MTLD definitions; inspect local MATTR windows and
   positional exposure.
+- **Connect word families, roots and affixes to the original text.**
+  Compare counting units on shared occurrences, distinguish derivation
+  from inflection, and retain reference entries, coverage and review
+  decisions. The executable [word families and affixes
+  tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html)
+  connects Nation, MorphoLex and MorphyNet with CSV decisions and saved
+  results.
 - **Trace annotation errors to the analysis.** Evaluate supplied labels
   against an explicit reference on the same tokenization. Keep missing
   labels and class-specific precision/recall beside source-text context,

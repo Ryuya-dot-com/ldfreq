@@ -8,6 +8,8 @@
   ldfreq](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.md):
 - [English tokenization and document
   input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.md):
+- [Word families, roots, and affixes: from texts to interpretable
+  profiles](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.md):
 - [Japanese annotations: from original text to lexical
   measures](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.md):
 

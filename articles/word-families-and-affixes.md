@@ -1,0 +1,531 @@
+# Word families, roots, and affixes: from texts to interpretable profiles
+
+An essay can repeat one family through several forms, or contain many
+words with the same suffix. These observations answer different
+questions. This tutorial shows how to count them while retaining the
+words, reference entries, unresolved cases and decisions behind each
+result.
+
+Work through the examples in order in a fresh R session. Use the
+[documented
+installation](https://ryuya-dot-com.github.io/ldfreq/index.html#installation).
+The counting examples run offline in R; their displayed tables use
+`knitr` (install it once with `install.packages("knitr")` if needed).
+The final KWIC exercise also requires the optional `quanteda` package
+and a UTF-8 R session. The text, token boundaries, lemmas and decisions
+below are authored teaching material, not learner observations or
+independently validated annotations. Small tables make the arithmetic
+visible; their TTR values are not recommendations for comparing short
+and long essays.
+
+``` r
+library(ldfreq)
+recipes <- new.env(parent = baseenv())
+sys.source(system.file("examples", "family-count-comparison.R",
+  package = "ldfreq", mustWork = TRUE), recipes)
+sys.source(system.file("examples", "word-parts.R",
+  package = "ldfreq", mustWork = TRUE), recipes)
+sys.source(system.file("examples", "morpholex-word-parts.R",
+  package = "ldfreq", mustWork = TRUE), recipes)
+has_review <- requireNamespace("quanteda", quietly = TRUE) &&
+  isTRUE(l10n_info()[["UTF-8"]])
+linked <- NULL
+```
+
+The functions loaded into `recipes` are explicitly sourced example
+helpers, not exported package APIs. They reuse complete imported
+annotations and declared reference tables; they do not run a
+morphological analyzer.
+
+## What changes when words are counted as families?
+
+Start with two short word lists and an empty document. The first list
+makes the counting units easy to compare. The second includes a word
+absent from the chosen family inventory. The supplied lemmas leave
+`colour` and `color` distinct so that spelling normalization is not
+silently mixed with lemmatization.
+
+``` r
+segments <- data.frame(
+  document_id = c("listed", "unlisted", "empty"), segment_id = "s1",
+  text = c("use uses colour color", "use reusability", ""))
+tokens <- data.frame(
+  document_id = c(rep("listed", 4), rep("unlisted", 2)),
+  segment_id = "s1", token_index = c(1:4, 1:2),
+  surface = c("use", "uses", "colour", "color", "use", "reusability"),
+  lemma = c("use", "use", "colour", "color", "use", "reusability"))
+annotations <- lexdiv_import_annotations(tokens, segments,
+  list(language = "en", analyzer = "authored", analyzer_version = "1",
+    dictionary = "authored lemmas", dictionary_version = "1",
+    unit = "word", normalization = "none"))
+nation <- bnccoca_data()
+families <- lexdiv_family_profile(annotations, nation$dictionary,
+  nation$resource, normalization = "nfkc_lower")
+counts <- recipes$compare_family_counts(families)
+knitr::kable(counts$comparison[counts$comparison$scope == "all_selected",
+  c("document_id", "unit", "N", "V", "ttr", "status")], digits = 2,
+  row.names = FALSE, col.names = c("Document", "Unit", "N", "V", "TTR", "Status"))
+```
+
+| Document | Unit    |   N |   V |  TTR | Status     |
+|:---------|:--------|----:|----:|-----:|:-----------|
+| listed   | surface |   4 |   4 | 1.00 | complete   |
+| listed   | lemma   |   4 |   3 | 0.75 | complete   |
+| listed   | family  |   4 |   2 | 0.50 | complete   |
+| unlisted | surface |   2 |   2 | 1.00 | complete   |
+| unlisted | lemma   |   2 |   2 | 1.00 | complete   |
+| unlisted | family  |   2 |  NA |   NA | incomplete |
+| empty    | surface |   0 |   0 |   NA | empty      |
+| empty    | lemma   |   0 |   0 |   NA | empty      |
+| empty    | family  |   0 |   0 |   NA | empty      |
+
+For `use uses colour color`, **four occurrences remain four tokens**.
+There are four surface types, three supplied lemma types and two Nation
+families. Grouping changes the type count, not the number or order of
+source occurrences. A family can contain derivational relatives; a lemma
+or flemma is a different counting unit. An inventory specifies which
+relatives are included.
+
+The bundled Nation BNC/COCA Level 6, Version 1.0.0 inventory does
+**not** list `REUSABILITY`. Therefore, the second document has an
+unavailable whole-document family total and TTR, even though a
+researcher could define another inventory that includes it in USE. Empty
+documents have zero types and undefined TTR.
+
+### Check coverage before interpreting a smaller count
+
+``` r
+knitr::kable(counts$documents[c("document_id", "selected_tokens",
+  "matched_tokens", "unlisted_tokens", "common_tokens", "token_coverage")],
+  digits = 2, row.names = FALSE,
+  col.names = c("Document", "Tokens", "Matched", "Unlisted", "Common subset", "Coverage"))
+```
+
+| Document | Tokens | Matched | Unlisted | Common subset | Coverage |
+|:---------|-------:|--------:|---------:|--------------:|---------:|
+| listed   |      4 |       4 |        0 |             4 |      1.0 |
+| unlisted |      2 |       1 |        1 |             1 |      0.5 |
+| empty    |      0 |       0 |        0 |             0 |       NA |
+
+``` r
+knitr::kable(counts$comparison[
+  counts$comparison$document_id == "unlisted" &
+    counts$comparison$scope == "common_resolved",
+  c("unit", "N", "V", "ttr")], row.names = FALSE)
+```
+
+| unit    |   N |   V | ttr |
+|:--------|----:|----:|----:|
+| surface |   1 |   1 |   1 |
+| lemma   |   1 |   1 |   1 |
+| family  |   1 |   1 |   1 |
+
+``` r
+o <- families$occurrences
+knitr::kable(o[o$status == "unlisted",
+  c("document_id", "pre", "keyword", "post", "status")], row.names = FALSE)
+```
+
+| document_id | pre | keyword     | post | status   |
+|:------------|:----|:------------|:-----|:---------|
+| unlisted    | use | reusability |      | unlisted |
+
+The common resolved subset contains only `use`: all three units have N =
+1, V = 1 and TTR = 1. That is a result **conditional on one retained
+occurrence**, not the family TTR of `use reusability`. Report coverage
+of the original selection beside the comparison. Unlisted does not mean
+misspelled or unknown to the writer. Do not remove unresolved words and
+close the resulting gaps for MATTR or n-grams; the common subset here
+supports type counts and TTR only.
+
+Nation’s inclusion **Level 6** is not frequency **band 6**. Nor does
+family membership establish that a learner knows every member. The
+inventory and its CC BY-SA 4.0 attribution/ShareAlike terms are retained
+in `nation`; see the [resource
+details](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#use-nations-bundled-bnccoca-inventory).
+
+## Which roots and affixes occur in the text?
+
+Use a separate, explicitly authored analysis to learn how part counts
+work. Its five lexical tokens are
+`teachers smaller reuse transmit transmission`. Punctuation remains in
+the imported source and is excluded from the count.
+
+``` r
+sys.source(system.file("examples", "word-parts-demo.R",
+  package = "ldfreq", mustWork = TRUE), recipes)
+parts <- recipes$word_parts_example$profile
+knitr::kable(parts$occurrences[parts$occurrences$document_id == "parts" &
+  parts$occurrences$selected %in% TRUE,
+  c("surface", "observed_root_occurrences", "observed_prefix_occurrences",
+    "observed_suffix_occurrences", "observed_inflection_occurrences",
+    "observed_derivation_occurrences")],
+  col.names = c("Form", "Roots", "Prefixes", "Suffixes", "Inflection", "Derivation"),
+  row.names = FALSE)
+```
+
+| Form         | Roots | Prefixes | Suffixes | Inflection | Derivation |
+|:-------------|------:|---------:|---------:|-----------:|-----------:|
+| teachers     |     1 |        0 |        2 |          1 |          1 |
+| smaller      |     1 |        0 |        1 |          1 |          0 |
+| reuse        |     1 |        1 |        0 |          0 |          1 |
+| transmit     |     1 |        1 |        0 |          0 |          1 |
+| transmission |     1 |        1 |        1 |          0 |          2 |
+
+Here, `teachers` has the root `teach`, derivational suffix `-er` and
+inflectional suffix `-s`. The comparative `-er` in `smaller` has a
+different part ID and function. Prefix/suffix describes **position**;
+inflection/derivation describes **process**. They are two
+classifications of the same affix, not four counts to add together.
+
+``` r
+knitr::kable(parts$frequency[parts$frequency$document_id == "parts",
+  c("part_id", "canonical", "role", "process", "observed_occurrences")],
+  col.names = c("Part ID", "Form", "Position", "Process", "Occurrences"),
+  row.names = FALSE)
+```
+
+| Part ID  | Form  | Position | Process    | Occurrences |
+|:---------|:------|:---------|:-----------|------------:|
+| TEACH    | teach | root     | none       |           1 |
+| ER_AGENT | er    | suffix   | derivation |           1 |
+| S_PL     | s     | suffix   | inflection |           1 |
+| SMALL    | small | root     | none       |           1 |
+| ER_COMP  | er    | suffix   | inflection |           1 |
+| RE_AGAIN | re    | prefix   | derivation |           1 |
+| USE      | use   | root     | none       |           1 |
+| TRANS    | trans | prefix   | derivation |           2 |
+| MIT_MISS | mit   | root     | none       |           2 |
+| ION      | ion   | suffix   | derivation |           1 |
+
+``` r
+knitr::kable(parts$documents[c("document_id", "selected_tokens",
+  "complete_coverage", "observed_affix_occurrences", "affix_occurrences",
+  "affixes_per_token")], digits = 2, row.names = FALSE,
+  col.names = c("Document", "Tokens", "Complete coverage", "Observed affixes",
+    "Total affixes", "Affixes/token"))
+```
+
+| Document | Tokens | Complete coverage | Observed affixes | Total affixes | Affixes/token |
+|:---|---:|---:|---:|---:|---:|
+| parts | 5 | 1 | 7 | 7 | 1.4 |
+| uncertain | 3 | 0 | 0 | NA | NA |
+| empty | 0 | NA | 0 | 0 | NA |
+
+``` r
+# Follow a count back to its original token and supplied analysis.
+knitr::kable(parts$part_occurrences[
+  parts$part_occurrences$surface == "teachers",
+  c("document_id", "token_index", "surface", "part_id", "canonical",
+    "role", "process")], row.names = FALSE,
+  col.names = c("Document", "Token", "Word", "Part ID", "Form", "Position", "Process"))
+```
+
+| Document | Token | Word     | Part ID  | Form  | Position | Process    |
+|:---------|------:|:---------|:---------|:------|:---------|:-----------|
+| parts    |     1 | teachers | TEACH    | teach | root     | none       |
+| parts    |     1 | teachers | ER_AGENT | er    | suffix   | derivation |
+| parts    |     1 | teachers | S_PL     | s     | suffix   | inflection |
+
+The five tokens contain seven affix occurrences: 7/5 = 1.4 affixes per
+token. All five tokens contain an affix, giving a different statistic,
+5/5 = 100%. The repeated `trans-` counts at each occurrence. A part type
+is a distinct declared part ID, whereas an occurrence is an instance at
+an original token. The uncertain document contains ambiguous, unanalysed
+and unlisted forms; its complete total is `NA`, not zero.
+
+This example explicitly groups `mit`/`miss` as realizations of one bound
+root. Its alternative analysis leaves `transmit` undivided, producing
+six affix occurrences rather than seven on the **same five tokens**.
+These are declared analytical alternatives, not evidence of how a
+learner mentally represents the words. The helper counts supplied parts;
+it does not reconstruct a derivation tree, infer semantic transparency
+or diagnose irregular inflection.
+
+## What does each reference resource contribute?
+
+| Resource | Question it can address | What a row does not establish |
+|----|----|----|
+| Nation BNC/COCA | Which listed forms belong to an educational family? | A complete segmentation or knowledge of every member |
+| MorphoLex | What derivational segmentation and morphological variables does this reference record? | All inflections or the writer’s mental decomposition |
+| MorphyNet | Which source-to-target formation relations are recorded? | A unique full decomposition or Nation family membership |
+
+### Inspect recorded segmentation before counting it
+
+``` r
+forms <- c("transmit", "transport", "transmission", "teacher", "teachers")
+morpholex <- recipes$read_morpholex_parts(
+  sheets = c("0-1-0", "0-1-1", "1-1-0"), words = forms)
+knitr::kable(morpholex$analyses[c("form", "completeness")], row.names = FALSE)
+```
+
+| form         | completeness |
+|:-------------|:-------------|
+| transmit     | complete     |
+| transmission | complete     |
+| teacher      | complete     |
+| teachers     | complete     |
+| transport    | complete     |
+
+``` r
+source_words <- do.call(rbind, lapply(morpholex_data(
+  c("0-1-0", "0-1-1", "1-1-0"))$sheets,
+  function(x) x[c("Word", "MorphoLexSegm")]))
+knitr::kable(source_words[source_words$Word %in% forms,
+  c("Word", "MorphoLexSegm")], row.names = FALSE)
+```
+
+| Word         | MorphoLexSegm       |
+|:-------------|:--------------------|
+| transmit     | {(transmit)}        |
+| transmission | {(transmit)}\>ion\> |
+| teacher      | {(teach)}\>er\>     |
+| teachers     | {(teach)}\>er\>     |
+| transport    | {\<trans\<(port)}   |
+
+In this reference, `transmit` is undivided, `transport` is
+`trans- + port`, and `transmission` uses canonical `transmit + -ion`.
+Both `teacher` and `teachers` use `teach + -er`: the reference describes
+derivation and omits the plural inflection. Do not interpret that
+omission as a zero count of all inflectional morphology. A complete
+analysis is complete only within its declared scope. The MorphoLex
+adapter preserves unsupported entries as unanalysed and records
+requested forms missing from the selected sheets.
+
+The bundled MorphoLex-en data use **CC BY-NC-SA 4.0**. Retain their
+citation and noncommercial/ShareAlike conditions when using or adapting
+them. See the [MorphoLex
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#use-the-bundled-morpholex-reference)
+for source variables, provenance and an optional local-workbook route.
+
+### Keep alternative formation relations separate
+
+``` r
+morphynet <- morphynet_read_derivations(system.file("extdata",
+  "morphynet-example", "eng.derivational.example.tsv", package = "ldfreq",
+  mustWork = TRUE), language = "en", resource_version = "Nine-row teaching excerpt")
+r <- morphynet$relations
+knitr::kable(r[r$target_word == "reusability",
+  c("source_word", "target_word", "morpheme", "affix_position")], row.names = FALSE)
+```
+
+| source_word | target_word | morpheme | affix_position |
+|:------------|:------------|:---------|:---------------|
+| reuse       | reusability | ability  | suffix         |
+| reusable    | reusability | ity      | suffix         |
+| usability   | reusability | re       | prefix         |
+
+The incoming relations use `reuse + ability`, `reusable + ity`, and
+`usability + re`. Three relations are not three affixes to sum within
+one occurrence. Relations can coexist; even a full sentence need not
+determine a uniquely correct derivation. A study must state what
+selecting a relation means. The nine-row, CC BY-SA 3.0 teaching excerpt
+is not suitable for corpus coverage estimates. For research, explicitly
+obtain and record the [complete
+reference](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#inspect-morphynet-formation-relations).
+
+## How do I record a judgment without changing the source?
+
+This exercise uses two authored sentences, an unlisted form and an empty
+document. Their lowercase spelling is intentional. Original surfaces are
+retained: the morphology recipe uses exact surface matching, while
+Nation lookup has its separately declared normalization. No POS or lemma
+is inferred.
+
+The following three chunks require `quanteda` in a UTF-8 session. The
+core counting and resource inspection above do not. If `has_review` is
+false, install the optional package as needed and check
+[`l10n_info()`](https://rdrr.io/r/base/l10n_info.html) before this
+exercise; there is no automatic environment change.
+
+``` r
+sys.source(system.file("examples", "morphology-link.R",
+  package = "ldfreq", mustWork = TRUE), recipes)
+review_segments <- data.frame(document_id = c("a", "b", "unlisted", "empty"),
+  segment_id = "s1", text = c("the teacher discussed reusability.",
+    "the teachers questioned reusability.", "quux.", ""))
+review_tokens <- data.frame(document_id = c(rep("a", 5), rep("b", 5), rep("unlisted", 2)),
+  segment_id = "s1", token_index = c(1:5, 1:5, 1:2),
+  surface = c("the", "teacher", "discussed", "reusability", ".",
+    "the", "teachers", "questioned", "reusability", ".", "quux", "."),
+  upos = c(rep(c("DET", "NOUN", "VERB", "NOUN", "PUNCT"), 2), "X", "PUNCT"))
+review_annotations <- lexdiv_import_annotations(review_tokens, review_segments,
+  list(language = "en", analyzer = "authored", analyzer_version = "1",
+    dictionary = "authored POS", dictionary_version = "1", unit = "word",
+    normalization = "none"))
+review_family <- lexdiv_family_profile(review_annotations, nation$dictionary,
+  nation$resource, normalization = "nfkc_lower", exclude_pos = "PUNCT")
+sheets <- grep("^[0-9]+-[0-9]+-[0-9]+$",
+  names(morpholex_data()$sheets), value = TRUE)
+review_morpholex <- recipes$read_morpholex_parts(sheets = sheets,
+  words = unique(review_tokens$surface[review_tokens$upos != "PUNCT"]))
+initial <- recipes$link_morphology_candidates(review_family,
+  review_morpholex, morphynet)
+knitr::kable(initial$occurrences[initial$occurrences$surface == "reusability",
+  c("document_id", "pre", "keyword", "post", "morphynet_candidate_count")],
+  row.names = FALSE, col.names = c("Document", "Left", "Word", "Right", "Candidates"))
+```
+
+| Document | Left                    | Word        | Right | Candidates |
+|:---------|:------------------------|:------------|:------|-----------:|
+| a        | the teacher discussed   | reusability | .     |          3 |
+| b        | the teachers questioned | reusability | .     |          3 |
+
+Record one selected MorphyNet relation and one explicit unresolved
+decision. Here selection is an **authored reporting convention**, not a
+claim that the sentence proves a unique derivation. Candidate IDs come
+from the reference; occurrence IDs distinguish the two uses of the same
+spelling.
+
+``` r
+review <- initial$reviews$morphynet
+decisions <- review$occurrences[review$occurrences$surface == "reusability",
+  c("review_id", "occurrence_id")]
+decisions$status <- c("selected", "unresolved")
+chosen <- r$relation_id[r$target_word == "reusability" &
+  r$source_word == "reusable" & r$morpheme == "ity"]
+stopifnot(length(chosen) == 1L)
+decisions$candidate_id <- c(chosen, NA_character_)
+decisions$reviewer <- "authored-tutorial"
+decisions$reason <- c("Report the reusable + ity relation in this example",
+  "Keep alternative relations without selecting one")
+decision_file <- tempfile(fileext = ".csv")
+write.csv(decisions, decision_file, row.names = FALSE, na = "", fileEncoding = "UTF-8")
+submitted <- read.csv(decision_file, colClasses = "character", na.strings = "",
+  fileEncoding = "UTF-8", check.names = FALSE)
+linked <- recipes$link_morphology_candidates(review_family,
+  review_morpholex, morphynet, morphynet_decisions = submitted)
+knitr::kable(linked$reviewed_relations[c("document_id", "surface",
+  "source_word", "target_word", "morpheme", "affix_position")], row.names = FALSE,
+  col.names = c("Document", "Word", "Source", "Target", "Morpheme", "Position"))
+```
+
+| Document | Word        | Source   | Target      | Morpheme | Position |
+|:---------|:------------|:---------|:------------|:---------|:---------|
+| a        | reusability | reusable | reusability | ity      | suffix   |
+
+``` r
+knitr::kable(linked$documents[c("document_id", "eligible_N",
+  "morphynet_selected_N", "morphynet_unresolved_N", "selected_suffix_relations")],
+  row.names = FALSE,
+  col.names = c("Document", "Eligible tokens", "Selected", "Unresolved", "Suffix relations"))
+```
+
+| Document | Eligible tokens | Selected | Unresolved | Suffix relations |
+|:---------|----------------:|---------:|-----------:|-----------------:|
+| a        |               4 |        1 |          0 |                1 |
+| b        |               4 |        0 |          1 |                0 |
+| unlisted |               1 |        0 |          0 |                0 |
+| empty    |               0 |        0 |          0 |                0 |
+
+Only the selected occurrence contributes one suffix **relation**. The
+second occurrence stays unresolved; all other candidates stay
+unreviewed. Nation membership is unchanged. MorphoLex has not been
+reviewed in this exercise, so no complete-segmentation judgment or
+whole-document affix total is claimed. Lookup and review counts remain
+separate in `linked$documents`.
+
+The short CSV round trip above writes only submitted decisions. For
+editing an entire worksheet in a spreadsheet, use the [complete
+worksheet
+tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.html#edit-decision-worksheet):
+it checks fixed IDs, missing/duplicate rows and partly filled decisions,
+then returns only submitted rows. Start that workflow from
+`initial$reviews$morphynet` (or `$morpholex`) and pass its returned
+decisions to the corresponding `morphynet_decisions` (or
+`morpholex_decisions`) argument. Decisions replace the supplied decision
+set; resume from the latest saved set to retain earlier choices. Changed
+sources or references require a new review.
+
+``` r
+stopifnot(identical(initial$occurrences[c("document_id", "segment_id",
+  "token_index", "surface", "family_id")],
+  linked$occurrences[c("document_id", "segment_id", "token_index", "surface", "family_id")]))
+```
+
+## How do I use my own texts and report the results?
+
+Use the [file-input
+tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files)
+to obtain a document-ID/text table. Family and morphology recipes take
+**complete imported annotations**, not a `lexdiv_tokenization` object or
+filtered vocabulary list. Prepare a segment table containing
+`document_id`, `segment_id`, `text`, and a token table containing those
+IDs, `token_index`, `surface`, plus the annotations you actually
+obtained. Retain punctuation and excluded tokens as context; choose
+exclusions during analysis. Include empty documents in the segment
+table. Check alignment with the [annotation import
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/annotation-alignment.md).
+
+The input below names files you supply; it is not executed as part of
+the teaching example. Declare the actual analyzer/dictionary versions.
+Lemma-based comparisons require a supplied lemma column; missing values
+are not guessed.
+
+``` r
+segments <- read.csv("segments.csv", colClasses = "character",
+  na.strings = character(), fileEncoding = "UTF-8", check.names = FALSE)
+tokens <- read.csv("tokens.csv", colClasses = "character",
+  na.strings = "", fileEncoding = "UTF-8", check.names = FALSE)
+tokens$token_index <- as.numeric(tokens$token_index)
+# Blank source text stays an empty string; blank token annotations are missing.
+# Replace these labels with the actual tool and reference used for these files.
+provenance <- list(language = "en", analyzer = "YOUR ANALYZER",
+  analyzer_version = "YOUR VERSION", dictionary = "YOUR DICTIONARY",
+  dictionary_version = "YOUR VERSION", unit = "word", normalization = "none")
+annotations <- lexdiv_import_annotations(tokens, segments, provenance)
+families <- lexdiv_family_profile(annotations, nation$dictionary,
+  nation$resource, normalization = "nfkc_lower", exclude_pos = c("PUNCT", "SYM"))
+counts <- recipes$compare_family_counts(families)
+```
+
+Keep form/lemma/family comparisons on explicitly shared occurrences, and
+keep the original denominator and coverage beside them. For larger
+samples, show the document values for each unit on the same scale; do
+not interpret totals from different coverage subsets as a lexical-unit
+effect. Affix counts are discrete: show counts and source forms before
+considering distribution plots. Short-text type counts do not by
+themselves measure morphological productivity, and neither reference
+membership nor observed use establishes learner knowledge.
+
+Save the complete objects as well as any convenient CSV table. This
+executable example uses a temporary directory; choose a persistent
+project directory for your research. If the optional review was skipped,
+`linked` is `NULL`.
+
+``` r
+output_dir <- file.path(tempdir(), "ldfreq-morphology-tutorial")
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+bundle <- list(families = families, counts = counts, nation = nation,
+  authored_parts = parts, morpholex = morpholex, morphynet = morphynet,
+  linked = linked, session = sessionInfo())
+saveRDS(bundle, file.path(output_dir, "analysis.rds"))
+write.csv(counts$comparison, file.path(output_dir, "family-counts.csv"),
+  row.names = FALSE, na = "", fileEncoding = "UTF-8")
+saved <- readRDS(file.path(output_dir, "analysis.rds"))
+stopifnot(identical(recipes$compare_family_counts(saved$families), saved$counts))
+stopifnot(identical(do.call(recipes$word_parts_profile,
+  saved$authored_parts$inputs), saved$authored_parts))
+if (!is.null(saved$linked)) {
+  stopifnot(identical(do.call(recipes$link_morphology_candidates,
+    saved$linked$inputs), saved$linked))
+}
+```
+
+For reporting, identify the source population and document selection,
+token boundaries, counting unit, normalization/exclusions, reference
+version and license, original denominator, coverage, unresolved states
+and any review criteria. Keep resource frequency bands, part
+occurrences, selected formation relations and participant knowledge
+measures in separate columns. The saved object retains inputs and
+provenance; CSV output is a convenient view, not a replacement for that
+record.
+
+Source descriptions and attribution are available in
+[`?bnccoca_data`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md),
+[`?morpholex_data`](https://ryuya-dot-com.github.io/ldfreq/reference/morpholex_data.md),
+[`?morphynet_read_derivations`](https://ryuya-dot-com.github.io/ldfreq/reference/morphynet_read_derivations.md)
+and the installed resource notices. For an alternative family inventory,
+partial analyses, repeated roots, POS restrictions and the complete
+table contracts, see the [detailed family and morphology
+reference](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#resource-defined-word-families).

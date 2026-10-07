@@ -282,6 +282,12 @@ word-list headword, or stop for explicit review.
 
 ### Resource-defined word families
 
+For a step-by-step introduction, start with [Word families, roots, and
+affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.md).
+It connects counting units, coverage, part counts and
+occurrence-specific judgments. This section provides the detailed input
+contracts and alternatives.
+
 **Choose a family definition before counting.** A lemma usually links
 inflected forms; a derivational family may also include words such as
 `reusability`. Flemma and word family are not interchangeable. Bauer and

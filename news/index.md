@@ -2,6 +2,14 @@
 
 ## ldfreq 0.2.0 (development)
 
+### Word families, roots and affixes
+
+- Added a standalone tutorial connecting family counts on shared
+  occurrences, root/prefix/suffix and inflection/derivation
+  distinctions, reference scope, occurrence-specific CSV decisions and
+  complete saved results. It uses existing APIs and explicitly sourced
+  recipes, with authored text and declared judgments.
+
 ### Reviewing annotation decisions
 
 - Added an executable KWIC worksheet tutorial: separate

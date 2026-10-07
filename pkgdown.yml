@@ -23,7 +23,8 @@ articles:
   preprocessing-and-frequency: preprocessing-and-frequency.html
   tubelex-input: tubelex-input.html
   vocabulary-knowledge-and-use: vocabulary-knowledge-and-use.html
-last_built: 2026-10-06T10:21Z
+  word-families-and-affixes: word-families-and-affixes.html
+last_built: 2026-10-07T01:59Z
 urls:
   reference: https://ryuya-dot-com.github.io/ldfreq/reference
   article: https://ryuya-dot-com.github.io/ldfreq/articles
