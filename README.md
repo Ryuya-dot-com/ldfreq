@@ -257,7 +257,7 @@ documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@2240ffde9054d199b5666b5b72d574d06569ae8c")
+pak::pak("Ryuya-dot-com/ldfreq@35940f4c4b1c968f70402c63f1e1d818842deb73")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
