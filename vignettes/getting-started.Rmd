@@ -421,7 +421,8 @@ measurement validity, or reliability. The screens do not change values or
 parameters or censor documents. Read them together with `status`,
 `missing_reason`, `N`, `V`, and the method and parameter identities.
 
-Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the twelve versioned
+The presets contain eleven methods; experimental expected-TTR D requires
+explicit selection. Use `lexdiv_methods()` and `lexdiv_presets()` to inspect the twelve supported
 methods and their bounded presets.
 
 ## Definition sensitivity outside the versioned core

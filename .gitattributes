@@ -25,3 +25,6 @@ inst/examples/tubelex-tokenize.py -text
 inst/spec/ldfreq-resource-inventory*.json -text
 inst/spec/tubelex-release-admission-candidate*.json -text
 legal/tubelex/NOTICE.md -text
+
+# External-comparison inputs retain the exact bytes used by the pinned runs.
+tests/fixtures/external-metrics/* -text

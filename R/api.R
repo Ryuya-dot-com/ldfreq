@@ -37,7 +37,7 @@
     function_name = ".metric_mattr"
   ),
   mtld = list(
-    method_id = "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+    method_id = "mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1",
     quality_floor_tokens = 50,
     function_name = ".metric_mtld",
     unavailable_diagnostics_name = ".mtld_unavailable_diagnostics"
@@ -71,7 +71,8 @@
 #' The deterministic `expected_ttr_d` method fits a D curve to exact
 #' finite-population expected TTR values. It is not CLAN VOCD.
 #'
-#' @return A character vector in the default result order.
+#' @return All supported identifiers in registry order, including experimental
+#'   `expected_ttr_d`, which is excluded from default computations.
 #' @export
 lexdiv_metric_ids <- function() {
   names(.lex_metric_registry)
@@ -155,18 +156,19 @@ lexdiv_metric_ids <- function() {
 #'   contains whitespace triggers a warning because it may be un-tokenized
 #'   prose. Use [lexdiv_metrics_text()] for raw text.
 #' @param metrics Plain, non-empty, duplicate-free character vector selected
-#'   from [lexdiv_metric_ids()].
+#'   from [lexdiv_metric_ids()]. The default excludes experimental `expected_ttr_d`.
 #' @param segment_length Requested complete non-overlapping segment length for
 #'   MSTTR. It is never reduced to the document length.
 #' @param window_length Requested step-one window length for MATTR. It is never
 #'   reduced to the document length.
 #' @param mtld_threshold MTLD TTR threshold strictly between zero and one. The
-#'   defined comparator is strict `<`, with a minimum complete-factor length of 10.
+#'   defined comparator is strict `<`, with no minimum complete-factor length.
 #' @param sample_size Requested without-replacement sample size for HD-D. It is
 #'   never reduced to the document length.
 #' @param expected_ttr_sample_sizes Strictly increasing sample sizes used by
 #'   the deterministic expected-TTR D curve fit. They are never reduced to the
-#'   document length. The method uses no random sampling and is not CLAN VOCD.
+#'   document length. This experimental estimator uses no random sampling and
+#'   is not CLAN VOCD; empirical equivalence to published vocd-D is untested.
 #'
 #' @return A `lexdiv_results` data frame with one row per requested metric and
 #'   list-columns for requested/effective parameters and diagnostics. Metric
@@ -179,7 +181,7 @@ lexdiv_metric_ids <- function() {
 #' @export
 lexdiv_metrics <- function(
     tokens,
-    metrics = lexdiv_metric_ids(),
+    metrics = setdiff(lexdiv_metric_ids(), "expected_ttr_d"),
     segment_length = 50L,
     window_length = 50L,
     mtld_threshold = 0.72,

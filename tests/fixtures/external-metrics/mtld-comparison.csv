@@ -1,0 +1,10 @@
+case,N,ldfreq_mtld,ldfreq_status,koRpus_MTLD,TAALED_mtldo,reason
+repeated_9,9,,missing,2.25,2.8350000000000004,ldfreq rejects N<10; koRpus has no minimum factor gate but does not evaluate a final span of at most two tokens; TAALED treats the full final sequence as fractional tail.
+repeated_10,10,10,ok,2.5,3.1111111111111116,ldfreq closes the final ten-token factor; TAALED always credits the final sequence as tail; koRpus omits the final two-token span.
+repeated_19,19,4.55133079847909,ok,2.11111111111111,4.551330798479088,ldfreq and TAALED share an uncapped nine-token tail; koRpus has no ten-token factor gate.
+repeated_50,50,10,ok,2.08333333333333,6.9306930693069315,ldfreq closes five ten-token factors; TAALED treats the last ten tokens as a tail; koRpus counts length-two factors but omits the last two tokens.
+threshold_equal,27,27,ok,16.7235188509874,26.2575,"All three implementations use strict <, but minimum factor length and final-token treatment differ; comparator alone does not explain the difference."
+ordinary_tail,10,14,ok,14,14.000000000000004,All tools use the same residual TTR in this example.
+short_tail,12,4.30769230769231,ok,2.4,4.3076923076923075,ldfreq and TAALED share tail credit above one; koRpus closes short factors but omits an ending two-token span.
+asymmetric,14,8.90291262135922,ok,3.15,8.902912621359224,The ten-token gate changes factor counts; scores average the two directions.
+mixed_120,120,10,ok,4.9,9.655172413793103,The ten-token gate and final-token rule both change results.

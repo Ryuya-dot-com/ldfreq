@@ -66,7 +66,7 @@ lexdiv_screen(
   \item{request_id}{An optional plain ASCII identifier used to join one request
   to its profile result.}
   \item{parameter}{The one user-settable scalar parameter admitted by the
-  selected v0.1 method.}
+  selected current method.}
   \item{values}{A non-empty numeric vector whose elements become distinct
   method specifications after validation and normalization.}
   \item{request_id_prefix}{An optional ASCII prefix for the one-based request
@@ -109,7 +109,8 @@ Their print methods return the input invisibly after displaying a bounded
 tabular view; the full identity fields remain available on the object.
 
 \code{lexdiv_methods()} returns a metadata data frame with human-readable
-labels and definitions, conventional within-method direction, contract scale,
+labels and definitions, \code{stability} (including experimental expected-TTR D),
+conventional within-method direction, contract scale,
 exact method identity, parameters, and advisory token floors.
 \code{lexdiv_presets()} returns a preset metadata data frame.
 \code{lexdiv_profile()} returns one core metric row per plan request with a
@@ -126,12 +127,18 @@ API. The identity hierarchy is metric family, versioned method, and normalized
 method-plus-parameter specification.
 }
 \details{
-The \code{canonical} preset contains the twelve versioned methods at their default
-parameters. The \code{length_50_100} preset contains those twelve requests plus
-MSTTR at segment length 100 and MATTR at window length 100. It has fourteen
+Preset version 0.2.0 excludes experimental expected-TTR D. The
+\code{canonical} preset contains eleven methods at their default parameters.
+The \code{length_50_100} preset adds MSTTR at segment length 100 and MATTR at
+window length 100. It has thirteen
 specifications: MTLD is
 computed only once because a 50- versus 100-token quality
 screen does not change its calculation.
+
+Saved core-contract 0.1.0 plans must be recreated explicitly; see the migration
+section in \code{\link{lexdiv_metrics}}. An explicitly constructed
+\code{lexdiv_spec("expected_ttr_d_hypergeom_fit_v1")} still selects the
+experimental estimator.
 
 Duplicate normalized method/parameter specifications from presets, explicit
 specifications, or grids collapse at their first position. Distinct remaining

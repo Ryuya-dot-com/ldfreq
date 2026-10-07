@@ -1,4 +1,6 @@
-# Independent differential/property audit for the installed public API.
+# Separate implementation/property audit of the declared contract.
+# This detects implementation errors, not empirical validity or tool equivalence.
+# Actual external-tool outputs are tested in test-external-metrics.R.
 #
 # This file deliberately does not call package internals. R CMD check executes
 # it on every supported CI platform after installing the candidate package.
@@ -31,7 +33,7 @@ audit_mtld_direction <- function(tokens, threshold = 0.72) {
     factor_length <- factor_length + 1L
     factor_types[[token]] <- TRUE
     factor_ttr <- length(ls(factor_types, all.names = TRUE)) / factor_length
-    if (factor_length >= 10L && factor_ttr < threshold) {
+    if (factor_ttr < threshold) {
       complete_factors <- complete_factors + 1
       factor_length <- 0L
       factor_types <- new.env(hash = TRUE, parent = emptyenv())
@@ -48,11 +50,11 @@ audit_mtld_direction <- function(tokens, threshold = 0.72) {
 }
 
 audit_mtld <- function(tokens, threshold = 0.72) {
-  if (length(tokens) < 10L) {
+  if (length(tokens) == 0L) {
     return(list(
       status = "missing",
       value = NA_real_,
-      missing_reason = "insufficient_tokens_for_formula"
+      missing_reason = "empty_input"
     ))
   }
 
@@ -76,7 +78,7 @@ set.seed(20260725)
 labels <- c("a", ".dot", "a b", "\u00e9", "e\u0301", "猫", "x/y", "if", "1")
 
 for (iteration in seq_len(500L)) {
-  token_count <- sample(10:200, 1L)
+  token_count <- sample(1:200, 1L)
   tokens <- sample(labels, token_count, replace = TRUE)
   threshold <- sample(c(0.55, 0.63, 0.72, 0.81, 0.9), 1L)
   observed <- lexdiv_metrics(
@@ -260,7 +262,7 @@ for (N in seq_len(7L)) {
 
 cat(sprintf(
   paste0(
-    "Independent differential audit OK: 500 MTLD documents, 1,000 direct ",
+    "Declared-contract implementation audit OK: 500 MTLD documents, 1,000 direct ",
     "formula/window/hypergeometric documents, and %d exhaustive ",
     "three-type MSTTR/MATTR/HD-D comparisons.\n"
   ),

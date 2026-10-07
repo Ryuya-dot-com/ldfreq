@@ -1,4 +1,4 @@
-# Bounded request-plan and profile layer for the versioned v0.1 method set.
+# Bounded request-plan and profile layer for the versioned current method set.
 
 .lex_profile_schema_id <- "lexdiv-r-profile-result"
 .lex_profile_schema_version <- "0.1.0"
@@ -116,7 +116,7 @@
     maas = "(ln(N) - ln(V)) / ln(N)^2",
     msttr = "mean TTR of complete non-overlapping segments",
     mattr = "mean TTR of all step-one overlapping windows",
-    mtld = "mean forward/reverse tokens per sequential factor",
+    mtld = "mean forward/reverse tokens per factor; strict <, no minimum length",
     hdd = "expected sample types divided by sample size",
     expected_ttr_d = "D fitted to exact finite-population expected TTR",
     yule_k = "10000 * (M2 - N) / N^2",
@@ -156,6 +156,7 @@
     )
     list(
       metric_id = metric_id,
+      stability = if (identical(metric_id, "expected_ttr_d")) "experimental" else "stable",
       label = unname(labels[[metric_id]]),
       definition = unname(definitions[[metric_id]]),
       direction = unname(directions[[metric_id]]),
@@ -227,7 +228,7 @@
       !is.numeric(value) || length(value) == 0L ||
         anyNA(value) || any(!is.finite(value))
     ) {
-      stop("Internal error: v0.1 plan parameters must be finite numeric values.", call. = FALSE)
+      stop("Internal error: current plan parameters must be finite numeric values.", call. = FALSE)
     }
     encoded <- vapply(as.double(value), function(item) {
       sprintf("%a", item)
@@ -365,6 +366,7 @@ lexdiv_grid <- function(
 
 .profile_canonical_specs <- function() {
   methods <- .profile_method_definitions()
+  methods <- Filter(function(method) identical(method$stability, "stable"), methods)
   lapply(methods, function(method) {
     lexdiv_spec(
       method_id = method$method_id,
@@ -437,6 +439,14 @@ lexdiv_grid <- function(
   if (!all(required %in% names(specification))) {
     stop("A lexdiv_spec object is incomplete.", call. = FALSE)
   }
+  if (!is.null(specification$identity_key) &&
+      !startsWith(specification$identity_key, paste0(
+        .lex_contract_id, "|", .lex_contract_version, "|"))) {
+    stop(paste(
+      "Saved specification uses a different metric contract.",
+      "Recreate it explicitly with lexdiv_spec(); see ?lexdiv_metrics for migration."
+    ), call. = FALSE)
+  }
   lexdiv_spec(
     method_id = specification$method_id,
     parameters = specification$parameters,
@@ -501,7 +511,7 @@ lexdiv_plan <- function(
   custom_specs <- .profile_specs_argument(specs)
   grid_objects <- .profile_grids_argument(grids)
   preset_candidate_count <- sum(vapply(presets, function(preset_id) {
-    if (identical(preset_id, "canonical")) 12 else 14
+    if (identical(preset_id, "canonical")) 11 else 13
   }, numeric(1L)))
   grid_candidate_count <- sum(vapply(
     grid_objects,
@@ -706,16 +716,17 @@ print.lexdiv_plan <- function(x, ...) {
   plan
 }
 
-#' List the versioned v0.1 methods
+#' List the versioned current methods
 #'
 #' @return A data frame with a human-readable name and definition, score
-#'   direction and scale, exact method identity, default parameters, and the
+#'   direction and scale, stability classification, exact method identity, default parameters, and the
 #'   method's advisory default token floor.
 #' @export
 lexdiv_methods <- function() {
   methods <- .profile_method_definitions()
   output <- data.frame(
     metric_id = vapply(methods, `[[`, character(1L), "metric_id"),
+    stability = vapply(methods, `[[`, character(1L), "stability"),
     label = vapply(methods, `[[`, character(1L), "label"),
     definition = vapply(methods, `[[`, character(1L), "definition"),
     direction = vapply(methods, `[[`, character(1L), "direction"),
@@ -733,7 +744,7 @@ lexdiv_methods <- function() {
   )
   output$default_parameters <- I(lapply(methods, `[[`, "default_parameters"))
   output <- output[c(
-    "metric_id", "label", "definition", "direction", "scale", "method_id",
+    "metric_id", "stability", "label", "definition", "direction", "scale", "method_id",
     "parameter", "default_parameters",
     "default_quality_floor_tokens"
   )]
@@ -741,17 +752,17 @@ lexdiv_methods <- function() {
   output
 }
 
-#' List the bounded v0.1 presets
+#' List the bounded current presets
 #'
 #' @return A data frame containing immutable preset identity and size.
 #' @export
 lexdiv_presets <- function() {
   data.frame(
     preset_id = c("canonical", "length_50_100"),
-    preset_version = rep.int("0.1.0", 2L),
-    specification_count = c(12L, 14L),
+    preset_version = rep.int("0.2.0", 2L),
+    specification_count = c(11L, 13L),
     description = c(
-      "The twelve versioned methods at their canonical defaults.",
+      "The eleven stable methods at their canonical defaults.",
       "Canonical plus MSTTR and MATTR at length 100."
     ),
     stringsAsFactors = FALSE,

@@ -68,10 +68,10 @@ test_that("the cross-language semantic fixture holds for the R API", {
   boundary <- fixture$runtime_specific_cases[[1L]]
   expect_identical(boundary$id, "mtld-threshold-boundary")
   expect_identical(boundary$parameters$minimum_factor_length, 10L)
-  result <- lexdiv_metrics(
+  result <- lexdiv_variant_metrics(
     unlist(boundary$tokens, use.names = FALSE),
-    metrics = "mtld",
-    mtld_threshold = boundary$parameters$threshold
+    variants = boundary$r$method_id,
+    mtld_thresholds = boundary$parameters$threshold
   )
   expect_identical(result$method_id, boundary$r$method_id)
   expect_identical(result$status, boundary$r$status)

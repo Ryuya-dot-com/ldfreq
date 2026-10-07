@@ -299,12 +299,12 @@ test_that("successful results and failures do not disclose absolute paths", {
     broken_path <- file.path(private_directory, "broken.xlsx")
     writeBin(charToRaw("not an XLSX workbook"), broken_path)
     broken_error <- tryCatch(
-      nj8_profile("the", broken_path),
+      nj8_profile("the", broken_path, sheet = "missing_sheet"),
       error = conditionMessage
     )
     expect_identical(
       broken_error,
-      "wordlist XLSX sheet '新J8' could not be read from file 'broken.xlsx'."
+      "wordlist XLSX sheet 'missing_sheet' could not be read from file 'broken.xlsx'."
     )
     expect_false(grepl(private_directory, broken_error, fixed = TRUE))
   }
@@ -347,12 +347,13 @@ test_that("rank and entry validation rejects ambiguous structural inputs", {
 
 test_that("official Japanese XLSX column names are auto-detected", {
   official_shape <- data.frame(
-    `新J8順位` = c(1L, 6926L, 8000L),
-    `代表レマ` = c("the", "nan", "extremist"),
-    品詞 = c("冠詞類", "名詞", "名詞"),
+    rank = c(1L, 6926L, 8000L),
+    word = c("the", "nan", "extremist"),
+    pos = c("\u51a0\u8a5e\u985e", "\u540d\u8a5e", "\u540d\u8a5e"),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
+  names(official_shape) <- c("\u65b0J8\u9806\u4f4d", "\u4ee3\u8868\u30ec\u30de", "\u54c1\u8a5e")
   result <- nj8_profile(c("nan", "extremist"), official_shape)
 
   expect_identical(result$lookup$rank, c(6926L, 8000L))

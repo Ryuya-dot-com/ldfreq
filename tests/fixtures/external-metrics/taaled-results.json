@@ -1,0 +1,239 @@
+{
+  "tool": "TAALED",
+  "source_version": ".32",
+  "python": "3.9.6",
+  "commit": "27b19e1cda26e6f4d869d36afea6874f08825618",
+  "sha256": "9cebf124f3ec0a4fa1c7d8c4fd641c5c77de609c9b4bb057fe3b624bb9e6dd27",
+  "inputs_sha256": "b30093e1dbb8cefae4c95c021f0342644d1061c5cbbd461986205b1e4c6db92a",
+  "parameters": {
+    "mn": 10,
+    "ttrval": 0.72
+  },
+  "results": [
+    {
+      "case": "repeated_9",
+      "metric": "mtld",
+      "value": 2.8350000000000004
+    },
+    {
+      "case": "repeated_9",
+      "metric": "mtldav",
+      "value": 2.8350000000000004
+    },
+    {
+      "case": "repeated_9",
+      "metric": "mtldo",
+      "value": 2.8350000000000004
+    },
+    {
+      "case": "repeated_9",
+      "metric": "ttr",
+      "value": 0.1111111111111111
+    },
+    {
+      "case": "repeated_9",
+      "metric": "maas_log10",
+      "value": 1.0479516371446924
+    },
+    {
+      "case": "repeated_10",
+      "metric": "mtld",
+      "value": 3.1111111111111116
+    },
+    {
+      "case": "repeated_10",
+      "metric": "mtldav",
+      "value": 3.1111111111111116
+    },
+    {
+      "case": "repeated_10",
+      "metric": "mtldo",
+      "value": 3.1111111111111116
+    },
+    {
+      "case": "repeated_10",
+      "metric": "ttr",
+      "value": 0.1
+    },
+    {
+      "case": "repeated_10",
+      "metric": "maas_log10",
+      "value": 1.0
+    },
+    {
+      "case": "repeated_19",
+      "metric": "mtld",
+      "value": 6.4175
+    },
+    {
+      "case": "repeated_19",
+      "metric": "mtldav",
+      "value": 6.4175
+    },
+    {
+      "case": "repeated_19",
+      "metric": "mtldo",
+      "value": 4.551330798479088
+    },
+    {
+      "case": "repeated_19",
+      "metric": "ttr",
+      "value": 0.05263157894736842
+    },
+    {
+      "case": "repeated_19",
+      "metric": "maas_log10",
+      "value": 0.7820114830995407
+    },
+    {
+      "case": "repeated_50",
+      "metric": "mtld",
+      "value": 8.622222222222224
+    },
+    {
+      "case": "repeated_50",
+      "metric": "mtldav",
+      "value": 8.622222222222224
+    },
+    {
+      "case": "repeated_50",
+      "metric": "mtldo",
+      "value": 6.9306930693069315
+    },
+    {
+      "case": "repeated_50",
+      "metric": "ttr",
+      "value": 0.02
+    },
+    {
+      "case": "repeated_50",
+      "metric": "maas_log10",
+      "value": 0.588591910067779
+    },
+    {
+      "case": "threshold_equal",
+      "metric": "mtld",
+      "value": 17.7575
+    },
+    {
+      "case": "threshold_equal",
+      "metric": "mtldav",
+      "value": 17.7575
+    },
+    {
+      "case": "threshold_equal",
+      "metric": "mtldo",
+      "value": 26.2575
+    },
+    {
+      "case": "threshold_equal",
+      "metric": "ttr",
+      "value": 0.7037037037037037
+    },
+    {
+      "case": "threshold_equal",
+      "metric": "maas_log10",
+      "value": 0.07448750363412099
+    },
+    {
+      "case": "ordinary_tail",
+      "metric": "mtld",
+      "value": 14.000000000000004
+    },
+    {
+      "case": "ordinary_tail",
+      "metric": "mtldav",
+      "value": 14.000000000000004
+    },
+    {
+      "case": "ordinary_tail",
+      "metric": "mtldo",
+      "value": 14.000000000000004
+    },
+    {
+      "case": "ordinary_tail",
+      "metric": "ttr",
+      "value": 0.8
+    },
+    {
+      "case": "ordinary_tail",
+      "metric": "maas_log10",
+      "value": 0.09691001300805646
+    },
+    {
+      "case": "short_tail",
+      "metric": "mtld",
+      "value": 5.5600000000000005
+    },
+    {
+      "case": "short_tail",
+      "metric": "mtldav",
+      "value": 5.5600000000000005
+    },
+    {
+      "case": "short_tail",
+      "metric": "mtldo",
+      "value": 4.3076923076923075
+    },
+    {
+      "case": "short_tail",
+      "metric": "ttr",
+      "value": 0.16666666666666666
+    },
+    {
+      "case": "short_tail",
+      "metric": "maas_log10",
+      "value": 0.6681519503694651
+    },
+    {
+      "case": "asymmetric",
+      "metric": "mtld",
+      "value": 7.164444444444444
+    },
+    {
+      "case": "asymmetric",
+      "metric": "mtldav",
+      "value": 7.873333333333333
+    },
+    {
+      "case": "asymmetric",
+      "metric": "mtldo",
+      "value": 8.902912621359224
+    },
+    {
+      "case": "asymmetric",
+      "metric": "ttr",
+      "value": 0.35714285714285715
+    },
+    {
+      "case": "asymmetric",
+      "metric": "maas_log10",
+      "value": 0.3404040851833474
+    },
+    {
+      "case": "mixed_120",
+      "metric": "mtld",
+      "value": 9.75
+    },
+    {
+      "case": "mixed_120",
+      "metric": "mtldav",
+      "value": 9.75
+    },
+    {
+      "case": "mixed_120",
+      "metric": "mtldo",
+      "value": 9.655172413793103
+    },
+    {
+      "case": "mixed_120",
+      "metric": "ttr",
+      "value": 0.05
+    },
+    {
+      "case": "mixed_120",
+      "metric": "maas_log10",
+      "value": 0.30095572625457506
+    }
+  ]
+}

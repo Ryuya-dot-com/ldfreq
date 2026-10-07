@@ -30,7 +30,7 @@ test_that("all frozen hand assertions pass through the package API", {
   )
   expect_identical(fixture$contract_id, contract$contract_id)
   expect_identical(fixture$contract_version, contract$contract_version)
-  expect_identical(fixture$contract_version, "0.1.0")
+  expect_identical(fixture$contract_version, "0.2.0")
   maas_contract <- contract$metrics[[match(
     "maas",
     vapply(contract$metrics, `[[`, character(1L), "metric_id")

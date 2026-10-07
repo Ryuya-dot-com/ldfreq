@@ -13,7 +13,7 @@ method_id_for <- function(metric_id) {
   methods$method_id[[match(metric_id, methods$metric_id)]]
 }
 
-test_that("the v0.1 method and preset registries are bounded and ordered", {
+test_that("the current method and preset registries are bounded and ordered", {
   methods <- methods_function()
   presets <- presets_function()
 
@@ -45,7 +45,7 @@ test_that("the v0.1 method and preset registries are bounded and ordered", {
   )
   expect_true(all(vapply(methods$default_parameters, is.list, logical(1L))))
   expect_identical(presets$preset_id, c("canonical", "length_50_100"))
-  expect_identical(presets$specification_count, c(12L, 14L))
+  expect_identical(presets$specification_count, c(11L, 13L))
 })
 
 test_that("specs materialize defaults and normalize scalar representations", {
@@ -171,17 +171,17 @@ test_that("plans resolve presets, collapse semantic duplicates, and hash order",
   merged <- plan_function(c("canonical", "length_50_100"))
 
   expect_s3_class(canonical, "lexdiv_plan")
-  expect_equal(length(canonical$specifications), 12L)
+  expect_equal(length(canonical$specifications), 11L)
   expect_identical(canonical$plan_md5, canonical_again$plan_md5)
   expect_identical(
     vapply(canonical$specifications, `[[`, character(1L), "request_id"),
     c(
       "ttr", "rttr", "cttr", "herdan", "maas", "msttr", "mattr",
-      "mtld", "hdd", "expected_ttr_d", "yule_k", "yule_i"
+      "mtld", "hdd", "yule_k", "yule_i"
     )
   )
-  expect_equal(length(length_plan$specifications), 14L)
-  expect_equal(length(merged$specifications), 14L)
+  expect_equal(length(length_plan$specifications), 13L)
+  expect_equal(length(merged$specifications), 13L)
   expect_identical(
     tail(vapply(length_plan$specifications, `[[`, character(1L), "request_id"), 2L),
     c("msttr_100", "mattr_100")
@@ -193,7 +193,7 @@ test_that("plans resolve presets, collapse semantic duplicates, and hash order",
     c(50, 100)
   )
   augmented <- plan_function(grids = msttr_grid)
-  expect_equal(length(augmented$specifications), 13L)
+  expect_equal(length(augmented$specifications), 12L)
   expect_equal(sum(vapply(
     augmented$specifications,
     function(x) x$metric_id == "msttr",
@@ -212,15 +212,15 @@ test_that("normative specification and plan fingerprints are golden", {
   canonical <- plan_function()
   length_plan <- plan_function("length_50_100")
 
-  expect_identical(canonical$plan_md5, "f12e159cad221b50a8a499cc70493e3a")
-  expect_identical(length_plan$plan_md5, "31e7e20ae90d0c6ff7a053965db51996")
+  expect_identical(canonical$plan_md5, "6663c2c1c42804ba74f11b4ee16cfcdb")
+  expect_identical(length_plan$plan_md5, "b814e7fd802afac816d4a516fa1f4c4b")
 
   expected <- c(
-    msttr_50 = "msttr-e8b0ba53c13227379e413949e0127ef3",
-    msttr_100 = "msttr-c8fc0569c5e1c28de5b93b754ffc55d6",
-    mattr_50 = "mattr-a35378d8f29e55b1f068a78202c4bfe3",
-    mattr_100 = "mattr-b12a0ee45722bca079d668a3be14e569",
-    mtld_072 = "mtld-c927b02b01a3d4e8e10c6ce5fb689ee6"
+    msttr_50 = "msttr-43bedec90a6da58af85a28342ee7e486",
+    msttr_100 = "msttr-aca3fd6bf24c03c00f69c5ae65f9180a",
+    mattr_50 = "mattr-6222b052a319a68f2646f23c693b6edc",
+    mattr_100 = "mattr-e35ef158983787e77450e852e7ffc5c8",
+    mtld_072 = "mtld-f3c9dc19ce5334b9bd2c0d537d29daac"
   )
   observed <- c(
     msttr_50 = spec_function(
@@ -329,7 +329,7 @@ test_that("canonical profiles preserve core records under a separate envelope", 
   expect_s3_class(result, "lexdiv_profile_results")
   expect_true(inherits(result, "lexdiv_results"))
   expect_identical(names(result), c(envelope, names(core)))
-  expect_identical(result$request_index, seq_len(12L))
+  expect_identical(result$request_index, seq_len(11L))
   expect_identical(result$metric_id, core$metric_id)
   expect_identical(result$method_id, core$method_id)
   expect_equal(result$value, core$value, tolerance = 0)
@@ -342,7 +342,7 @@ test_that("canonical profiles preserve core records under a separate envelope", 
   }
   expect_identical(
     result$default_quality_floor_tokens,
-    c(1, 1, 1, 2, 2, 50, 50, 50, 42, 50, 100, 100)
+    c(1, 1, 1, 2, 2, 50, 50, 50, 42, 100, 100)
   )
   expect_true(all(result$profile_schema_id == "lexdiv-r-profile-result"))
   expect_true(all(result$profile_schema_version == "0.1.0"))
@@ -361,7 +361,7 @@ test_that("length preset adds settings, not methods or quality-floor variants", 
   msttr <- result[result$metric_id == "msttr", , drop = FALSE]
   mattr <- result[result$metric_id == "mattr", , drop = FALSE]
 
-  expect_equal(nrow(result), 14L)
+  expect_equal(nrow(result), 13L)
   expect_equal(nrow(msttr), 2L)
   expect_equal(nrow(mattr), 2L)
   expect_identical(

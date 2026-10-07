@@ -1,8 +1,9 @@
 # Internal implementation of the versioned MTLD variant.
 #
 # This implementation follows the package's metric contract. In particular,
-# the threshold comparison is strict, complete factors require ten tokens, the
-# final-tail credit is not clamped, and directional scores are averaged.
+# the threshold comparison is strict, there is no minimum factor length, and
+# directional scores are averaged. The internal minimum argument preserves the
+# explicit legacy min10 variant; it is not a user-settable core parameter.
 
 .mtld_diagnostics <- function(forward, reverse) {
   list(
@@ -26,7 +27,7 @@
   )
 }
 
-.mtld_direction <- function(token_ids, threshold) {
+.mtld_direction <- function(token_ids, threshold, minimum_factor_length = 1L) {
   n <- length(token_ids)
   complete_factors <- 0L
   factor_length <- 0L
@@ -42,7 +43,7 @@
     }
 
     running_ttr <- factor_type_count / factor_length
-    if (factor_length >= 10L && running_ttr < threshold) {
+    if (factor_length >= minimum_factor_length && running_ttr < threshold) {
       complete_factors <- complete_factors + 1L
       factor_length <- 0L
       factor_type_count <- 0L
@@ -114,7 +115,13 @@
   list(threshold = as.double(threshold))
 }
 
-.metric_mtld <- function(tokens, counts = NULL, parameters = list()) {
+.metric_mtld <- function(
+    tokens, counts = NULL, parameters = list(), minimum_factor_length = 1L) {
+  method_id <- if (minimum_factor_length == 10L) {
+    "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1"
+  } else {
+    "mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1"
+  }
   if (is.null(counts)) {
     counts <- .lex_counts(tokens)
   }
@@ -124,7 +131,7 @@
   if (counts$N == 0L) {
     return(.lex_missing(
       metric_id = "mtld",
-      method_id = "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+      method_id = method_id,
       missing_reason = "empty_input",
       requested_parameters = reported_parameters,
       counts = counts,
@@ -133,10 +140,10 @@
     ))
   }
 
-  if (counts$N < 10L) {
+  if (counts$N < minimum_factor_length) {
     return(.lex_missing(
       metric_id = "mtld",
-      method_id = "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+      method_id = method_id,
       missing_reason = "insufficient_tokens_for_formula",
       requested_parameters = reported_parameters,
       counts = counts,
@@ -146,14 +153,14 @@
   }
 
   token_ids <- match(tokens, unique(tokens))
-  forward <- .mtld_direction(token_ids, threshold)
-  reverse <- .mtld_direction(rev(token_ids), threshold)
+  forward <- .mtld_direction(token_ids, threshold, minimum_factor_length)
+  reverse <- .mtld_direction(rev(token_ids), threshold, minimum_factor_length)
   diagnostics <- .mtld_diagnostics(forward, reverse)
 
   if (!is.finite(forward$score) || !is.finite(reverse$score)) {
     return(.lex_missing(
       metric_id = "mtld",
-      method_id = "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+      method_id = method_id,
       missing_reason = "no_factor",
       requested_parameters = reported_parameters,
       counts = counts,
@@ -164,7 +171,7 @@
 
   .lex_ok(
     metric_id = "mtld",
-    method_id = "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+    method_id = method_id,
     value = (forward$score + reverse$score) / 2,
     requested_parameters = reported_parameters,
     effective_parameters = reported_parameters,

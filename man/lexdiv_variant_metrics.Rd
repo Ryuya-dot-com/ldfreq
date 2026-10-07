@@ -38,8 +38,10 @@ ranges from zero to \eqn{1 / \ln(2)} inclusive; changing the log base or taking
 the square root changes that numerical range. The method ID records both scale
 and log base.
 
-The MTLD rows distinguish the versioned \pkg{ldfreq} directional-score mean from
-three final-tail factorization and mean-factor-length aggregations. Factor
+The MTLD rows preserve the legacy core-contract 0.1.0 min10 directional-score
+mean and three final-tail factorization and mean-factor-length aggregations.
+All four require at least ten tokens per complete factor. The current
+no-minimum method is available separately via \code{lexdiv_metrics(..., metrics = "mtld")}. Factor
 lengths and proportions remain available in the diagnostics list-column.
 
 Rows described as TAALED-relevant comparators identify only their documented

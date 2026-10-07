@@ -56,17 +56,15 @@ test_that("variant metrics warn about likely raw prose", {
   )
 })
 
-test_that("the canonical MTLD row is unchanged in the variant surface", {
+test_that("legacy min10 MTLD keeps its old method and value", {
   tokens <- c(rep("a", 10L), "b", "c", "d", "e")
   method_id <- "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1"
   variant <- lexdiv_variant_metrics(tokens, variants = method_id)
   core <- lexdiv_metrics(tokens, metrics = "mtld")
-
-  expect_identical(variant$method_id, core$method_id)
-  expect_identical(variant$value, core$value)
-  expect_identical(variant$status, core$status)
-  expect_identical(variant$missing_reason, core$missing_reason)
-  expect_identical(variant$diagnostics[[1L]], core$diagnostics[[1L]])
+  expect_identical(variant$method_id, method_id)
+  expect_equal(variant$value, 917 / 103, tolerance = 1e-12)
+  expect_false(identical(variant$method_id, core$method_id))
+  expect_equal(core$value, 63 / 20, tolerance = 1e-12)
 })
 
 test_that("final-tail and mean-factor-length aggregations remain distinct", {

@@ -1,0 +1,482 @@
+{
+  "R": "4.6.1",
+  "versions": {
+    "koRpus": "0.13.9",
+    "koRpus.lang.en": "0.1.4",
+    "quanteda": "4.5.0",
+    "quanteda.textstats": "0.97.2"
+  },
+  "inputs_sha256": "b30093e1dbb8cefae4c95c021f0342644d1061c5cbbd461986205b1e4c6db92a",
+  "parameters": {
+    "mtld_threshold": 0.72,
+    "quanteda_log_base": 2.71828182845905,
+    "case_preserved": true,
+    "tokens_verified_unchanged": true
+  },
+  "results": {
+    "repeated_9": {
+      "case": "repeated_9",
+      "N": 9,
+      "ldfreq": [
+        {
+          "metric_id": "mtld",
+          "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+          "value": null,
+          "status": "missing",
+          "missing_reason": "insufficient_tokens_for_formula"
+        },
+        {
+          "metric_id": "ttr",
+          "method_id": "ttr_v_over_n_v1",
+          "value": 0.111111111111111,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "maas",
+          "method_id": "maas_a2_ln_v1",
+          "value": 0.455119613313419,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "mattr",
+          "method_id": "mattr_sliding_step1_v1",
+          "value": null,
+          "status": "missing",
+          "missing_reason": "too_short_for_requested_parameter"
+        }
+      ],
+      "koRpus": {
+        "mtld": 2.25,
+        "factors": [
+          4,
+          4
+        ],
+        "ttr": 0.111111111111111
+      },
+      "quanteda.textstats": [
+        {
+          "document": "repeated_9",
+          "TTR": 0.111111111111111,
+          "Maas": 0.67462553562211,
+          "lgV0": 0,
+          "lgeV0": 0
+        }
+      ]
+    },
+    "repeated_10": {
+      "case": "repeated_10",
+      "N": 10,
+      "ldfreq": [
+        {
+          "metric_id": "mtld",
+          "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+          "value": 10,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "ttr",
+          "method_id": "ttr_v_over_n_v1",
+          "value": 0.1,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "maas",
+          "method_id": "maas_a2_ln_v1",
+          "value": 0.434294481903252,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "mattr",
+          "method_id": "mattr_sliding_step1_v1",
+          "value": 0.1,
+          "status": "ok",
+          "missing_reason": null
+        }
+      ],
+      "koRpus": {
+        "mtld": 2.5,
+        "factors": [
+          4,
+          4
+        ],
+        "ttr": 0.1
+      },
+      "quanteda.textstats": [
+        {
+          "document": "repeated_10",
+          "TTR": 0.1,
+          "Maas": 0.659010228982261,
+          "lgV0": 0,
+          "lgeV0": 0
+        }
+      ]
+    },
+    "repeated_19": {
+      "case": "repeated_19",
+      "N": 19,
+      "ldfreq": [
+        {
+          "metric_id": "mtld",
+          "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+          "value": 4.55133079847909,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "ttr",
+          "method_id": "ttr_v_over_n_v1",
+          "value": 0.0526315789473684,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "maas",
+          "method_id": "maas_a2_ln_v1",
+          "value": 0.339623271895109,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "mattr",
+          "method_id": "mattr_sliding_step1_v1",
+          "value": 0.1,
+          "status": "ok",
+          "missing_reason": null
+        }
+      ],
+      "koRpus": {
+        "mtld": 2.11111111111111,
+        "factors": [
+          9,
+          9
+        ],
+        "ttr": 0.0526315789473684
+      },
+      "quanteda.textstats": [
+        {
+          "document": "repeated_19",
+          "TTR": 0.0526315789473684,
+          "Maas": 0.582772058265587,
+          "lgV0": 0,
+          "lgeV0": 0
+        }
+      ]
+    },
+    "repeated_50": {
+      "case": "repeated_50",
+      "N": 50,
+      "ldfreq": [
+        {
+          "metric_id": "mtld",
+          "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+          "value": 10,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "ttr",
+          "method_id": "ttr_v_over_n_v1",
+          "value": 0.02,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "maas",
+          "method_id": "maas_a2_ln_v1",
+          "value": 0.255622218635331,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "mattr",
+          "method_id": "mattr_sliding_step1_v1",
+          "value": 0.1,
+          "status": "ok",
+          "missing_reason": null
+        }
+      ],
+      "koRpus": {
+        "mtld": 2.08333333333333,
+        "factors": [
+          24,
+          24
+        ],
+        "ttr": 0.02
+      },
+      "quanteda.textstats": [
+        {
+          "document": "repeated_50",
+          "TTR": 0.02,
+          "Maas": 0.505590959803804,
+          "lgV0": 0,
+          "lgeV0": 0
+        }
+      ]
+    },
+    "threshold_equal": {
+      "case": "threshold_equal",
+      "N": 27,
+      "ldfreq": [
+        {
+          "metric_id": "mtld",
+          "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+          "value": 27,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "ttr",
+          "method_id": "ttr_v_over_n_v1",
+          "value": 0.703703703703704,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "maas",
+          "method_id": "maas_a2_ln_v1",
+          "value": 0.0323495117990471,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "mattr",
+          "method_id": "mattr_sliding_step1_v1",
+          "value": 0.811111111111111,
+          "status": "ok",
+          "missing_reason": null
+        }
+      ],
+      "koRpus": {
+        "mtld": 16.7235188509874,
+        "factors": [
+          1,
+          4.18796992481203
+        ],
+        "ttr": 0.703703703703704
+      },
+      "quanteda.textstats": [
+        {
+          "document": "threshold_equal",
+          "TTR": 0.703703703703704,
+          "Maas": 0.179859700319574,
+          "lgV0": 2.84610625913033,
+          "lgeV0": 6.55340184535054
+        }
+      ]
+    },
+    "ordinary_tail": {
+      "case": "ordinary_tail",
+      "N": 10,
+      "ldfreq": [
+        {
+          "metric_id": "mtld",
+          "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+          "value": 14,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "ttr",
+          "method_id": "ttr_v_over_n_v1",
+          "value": 0.8,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "maas",
+          "method_id": "maas_a2_ln_v1",
+          "value": 0.0420874838905713,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "mattr",
+          "method_id": "mattr_sliding_step1_v1",
+          "value": 0.8,
+          "status": "ok",
+          "missing_reason": null
+        }
+      ],
+      "koRpus": {
+        "mtld": 14,
+        "factors": [
+          0.714285714285714,
+          0.714285714285714
+        ],
+        "ttr": 0.8
+      },
+      "quanteda.textstats": [
+        {
+          "document": "ordinary_tail",
+          "TTR": 0.8,
+          "Maas": 0.205152343127178,
+          "lgV0": 2.102892339814,
+          "lgeV0": 4.84208855382709
+        }
+      ]
+    },
+    "short_tail": {
+      "case": "short_tail",
+      "N": 12,
+      "ldfreq": [
+        {
+          "metric_id": "mtld",
+          "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+          "value": 4.30769230769231,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "ttr",
+          "method_id": "ttr_v_over_n_v1",
+          "value": 0.166666666666667,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "maas",
+          "method_id": "maas_a2_ln_v1",
+          "value": 0.290174705118354,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "mattr",
+          "method_id": "mattr_sliding_step1_v1",
+          "value": 0.166666666666667,
+          "status": "ok",
+          "missing_reason": null
+        }
+      ],
+      "koRpus": {
+        "mtld": 2.4,
+        "factors": [
+          5,
+          5
+        ],
+        "ttr": 0.166666666666667
+      },
+      "quanteda.textstats": [
+        {
+          "document": "short_tail",
+          "TTR": 0.166666666666667,
+          "Maas": 0.538678665920931,
+          "lgV0": 0.313472445454559,
+          "lgeV0": 0.721796979968055
+        }
+      ]
+    },
+    "asymmetric": {
+      "case": "asymmetric",
+      "N": 14,
+      "ldfreq": [
+        {
+          "metric_id": "mtld",
+          "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+          "value": 8.90291262135922,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "ttr",
+          "method_id": "ttr_v_over_n_v1",
+          "value": 0.357142857142857,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "maas",
+          "method_id": "maas_a2_ln_v1",
+          "value": 0.147835615812452,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "mattr",
+          "method_id": "mattr_sliding_step1_v1",
+          "value": 0.3,
+          "status": "ok",
+          "missing_reason": null
+        }
+      ],
+      "koRpus": {
+        "mtld": 3.15,
+        "factors": [
+          5,
+          4
+        ],
+        "ttr": 0.357142857142857
+      },
+      "quanteda.textstats": [
+        {
+          "document": "asymmetric",
+          "TTR": 0.357142857142857,
+          "Maas": 0.384493973701087,
+          "lgV0": 0.88196516743757,
+          "lgeV0": 2.03079984708175
+        }
+      ]
+    },
+    "mixed_120": {
+      "case": "mixed_120",
+      "N": 120,
+      "ldfreq": [
+        {
+          "metric_id": "mtld",
+          "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+          "value": 10,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "ttr",
+          "method_id": "ttr_v_over_n_v1",
+          "value": 0.05,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "maas",
+          "method_id": "maas_a2_ln_v1",
+          "value": 0.130703411209548,
+          "status": "ok",
+          "missing_reason": null
+        },
+        {
+          "metric_id": "mattr",
+          "method_id": "mattr_sliding_step1_v1",
+          "value": 0.6,
+          "status": "ok",
+          "missing_reason": null
+        }
+      ],
+      "koRpus": {
+        "mtld": 4.9,
+        "factors": [
+          25,
+          24
+        ],
+        "ttr": 0.05
+      },
+      "quanteda.textstats": [
+        {
+          "document": "mixed_120",
+          "TTR": 0.05,
+          "Maas": 0.361529267431487,
+          "lgV0": 0.839135943258232,
+          "lgeV0": 1.9321819139419
+        }
+      ]
+    }
+  },
+  "ldfreq_baseline": {
+    "version": "0.2.0",
+    "commit": "1c719ec33ad07e3e15db4f5f2f7de048900f4c14",
+    "mtld_source_sha256": "96af23b8168d0268cbd118438a2191eb442753aac24ada4eb234808b29c44e13"
+  }
+}

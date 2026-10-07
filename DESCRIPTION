@@ -1,7 +1,7 @@
 Package: ldfreq
 Type: Package
 Title: Reproducible Lexical Diversity and Frequency Profiles
-Version: 0.2.0
+Version: 0.3.0
 Authors@R:
     person(
         given = "Ryuya",
@@ -11,7 +11,8 @@ Authors@R:
     )
 Description: Compares lexical diversity and reference-vocabulary profiles while
     retaining the formula, parameters, preprocessing choices, and match coverage
-    used in each analysis. Computes twelve lexical-diversity measures from
+    used in each analysis. Supports eleven default lexical-diversity measures
+    and an experimental expected-TTR D estimator, computed from
     ordered tokens or raw English text; compares selected Maas and MTLD
     definitions; and exposes local MATTR windows. Bundled New JACET 8000 and
     TUBELEX tables support lexical-level coverage and corpus-relative frequency

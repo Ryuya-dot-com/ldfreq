@@ -1,4 +1,7 @@
-metric_mtld <- getFromNamespace(".metric_mtld", "ldfreq")
+metric_mtld <- function(tokens, counts = NULL, parameters = list()) {
+  getFromNamespace(".metric_mtld", "ldfreq")(
+    tokens, counts, parameters, minimum_factor_length = 10L)
+}
 lex_counts <- getFromNamespace(".lex_counts", "ldfreq")
 
 run_mtld <- function(tokens, threshold = 0.72) {
@@ -17,7 +20,7 @@ expect_mtld_value <- function(tokens, expected, tolerance = 1e-12) {
   result
 }
 
-test_that("MTLD enforces its minimum domain and no-factor result", {
+test_that("legacy min10 MTLD enforces its minimum domain and no-factor result", {
   empty <- metric_mtld(character())
   expect_identical(empty$status, "missing")
   expect_identical(empty$missing_reason, "empty_input")
@@ -46,7 +49,7 @@ test_that("MTLD enforces its minimum domain and no-factor result", {
   expect_equal(all_hapax$diagnostics$reverse_tail_credit, 0)
 })
 
-test_that("MTLD reproduces the rational tail and minimum-gate fixtures", {
+test_that("legacy min10 MTLD reproduces the rational tail and minimum-gate fixtures", {
   ordinary_tail <- c(paste0("u", seq_len(8L)), "u1", "u2")
   expect_mtld_value(ordinary_tail, 14)
 
@@ -75,7 +78,7 @@ test_that("MTLD reproduces the rational tail and minimum-gate fixtures", {
   expect_gt(uncapped_tail$diagnostics$reverse_tail_credit, 1)
 })
 
-test_that("MTLD resets factor-local type state after every closure", {
+test_that("legacy min10 MTLD resets factor-local type state after every closure", {
   first_factor <- c(paste0("a", seq_len(7L)), rep("a1", 3L))
   second_factor <- c(paste0("b", seq_len(7L)), rep("b1", 3L))
   result <- expect_mtld_value(c(first_factor, second_factor), 10)
@@ -86,7 +89,7 @@ test_that("MTLD resets factor-local type state after every closure", {
   expect_equal(result$diagnostics$reverse_tail_credit, 0)
 })
 
-test_that("MTLD accepts arbitrary non-empty valid Unicode token keys", {
+test_that("legacy min10 MTLD accepts arbitrary non-empty valid Unicode token keys", {
   unusual_types <- c(
     "\u00e9",
     "e\u0301",
@@ -104,7 +107,7 @@ test_that("MTLD accepts arbitrary non-empty valid Unicode token keys", {
   expect_identical(result$V, 8L)
 })
 
-test_that("MTLD averages directional scores rather than factor counts", {
+test_that("legacy min10 MTLD averages directional scores rather than factor counts", {
   asymmetric <- c(rep("a", 10L), "b", "c", "d", "e")
   result <- expect_mtld_value(asymmetric, 917 / 103)
 
@@ -124,7 +127,7 @@ test_that("MTLD averages directional scores rather than factor counts", {
   )
 })
 
-test_that("MTLD uses a strict threshold boundary", {
+test_that("legacy min10 MTLD uses a strict threshold boundary", {
   boundary <- c(
     paste0("u", seq_len(18L)),
     rep("u1", 7L),
@@ -135,7 +138,7 @@ test_that("MTLD uses a strict threshold boundary", {
   expect_equal(result$diagnostics$reverse_score, 27, tolerance = 1e-12)
 })
 
-test_that("MTLD emits the complete six-field diagnostic interface", {
+test_that("legacy min10 MTLD emits the complete six-field diagnostic interface", {
   expected_names <- c(
     "forward_score",
     "reverse_score",
@@ -155,7 +158,7 @@ test_that("MTLD emits the complete six-field diagnostic interface", {
   )
 })
 
-test_that("MTLD accepts only a valid threshold parameter", {
+test_that("legacy min10 MTLD accepts only a valid threshold parameter", {
   tokens <- rep("a", 10L)
   counts <- lex_counts(tokens)
   default <- metric_mtld(tokens, counts, list())
@@ -175,7 +178,7 @@ test_that("MTLD accepts only a valid threshold parameter", {
   expect_error(metric_mtld(tokens, counts, list(threshold = c(0.7, 0.8))), "strictly between")
 })
 
-test_that("MTLD is invariant to reversal and bijective type relabeling", {
+test_that("legacy min10 MTLD is invariant to reversal and bijective type relabeling", {
   documents <- list(
     c(rep("a", 10L), "b", "c", "d", "e"),
     c(paste0("u", seq_len(18L)), rep("u1", 7L), "x", "x"),

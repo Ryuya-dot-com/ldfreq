@@ -4118,3 +4118,145 @@ the prepared site has 253 files including the new coverage image. Color and
 monochrome plots were inspected. Public CI, actual GitHub installation and live
 publication remain pending. Evidence: reviews/ldfreq-japanese-frequency-20261007/.
 No CRAN submission.
+
+### Publication completed
+
+Final head `1b7316554edf0b8c2d1f140d3b036fd369b4bc36` passes all nine jobs in
+R-CMD-check run 37624014345 and both protected required checks. Classification
+run 37624014341 succeeds in development mode; formal-candidate artifact/matrix
+jobs remain intentionally skipped. macOS/Windows/Linux release and R devel each
+pass 8,063 assertions without failures, warnings or skips, with Status: OK.
+R 4.1 passes 7,988 assertions with eight optional textstem skips and two NOTEs
+(unavailable suggested gibasa/textstem and installed size 9.4Mb). The devel job
+completed within the existing limit after dependency setup. No cancellation,
+rerun, timeout increase or protection bypass was used.
+
+PR #30 merged to main `1c719ec33ad07e3e15db4f5f2f7de048900f4c14`.
+Its tree `b86edd6c8ed685f973eca1cb6a8401f02d3ac120` equals the tested final
+head. The merge subject skips only duplicate same-tree main push CI. All twelve
+changed source files match anonymous retrieval. README pins implementation
+snapshot `35940f4c4b1c968f70402c63f1e1d818842deb73`; actual pak installation
+into a separate library succeeds. All 141 installed files from inst match, and
+the authored full/common profiles and earlier lexical decisions agree with the
+tested source. Fresh-session replay uses saved inputs and the reference without
+an analyzer, resource download or API. The user's R library was not changed.
+
+Pages `55d440c37800bbebb1d0ccb3ffae285b052ffb7f` deploys successfully in
+run 37627906386, and the Pages API reports that commit built. All eleven changed
+live files match verified bytes through anonymous certificate-verified requests.
+The complete site retains 253 files / 129 HTML pages without missing internal
+links/anchors; unrelated pages reuse the previous verified site. Live Chrome
+inspection confirms both new sections, their code and the common-span table.
+The coverage figure was inspected in color and monochrome locally; its published
+PNG is byte-identical. A separate temporary browser profile was removed after
+inspection. Long code blocks retain the site's standard horizontal scrolling.
+
+Evidence is in reviews/ldfreq-japanese-frequency-20261007/, including CI/job
+logs, actual installation and replay, public-source/site identities, Pages
+records and the two live screenshots. Completion-only internal records remain
+local; the merged PR description records the result. The checkout follows
+integrated main. No CRAN submission, release tag, paid API call or independent
+linguistic validation. The broader J3 resource-comparison scope remains separate
+from this completed document-frequency integration.
+
+## 2026-10-07 Core review: local corrections, not a new publication
+
+The seven-point review changes the priority to a feature freeze and core
+definition/external-evidence work. Source at main 1c719ec remains published;
+the local fix/core-review-20261007 branch has not been pushed or merged.
+Expected-TTR D is reclassified as experimental in the contract and method
+catalog, without changing its estimator, numeric method identity or historical
+defaults. Removal from automatic defaults is reserved for the coordinated
+numeric-contract migration. MTLD has not yet changed: a no-minimum default and
+explicit retention of the old min10 variant are the next corrective item.
+
+The actual koRpus 0.13.9, quanteda.textstats 0.97.2 and pinned TAALED 0.32
+implementations were run on nine identical authored token sequences. R input
+tokens were checked unchanged. Input hashes, versions, values and explanations
+are in tests/fixtures/external-metrics; runners and interpretation are in
+experiments/external-metrics. The offline comparison/lifecycle tests pass 60
+assertions. Other focused profile and hand-fixture tests passed. One unrelated
+Japanese installed-example test could not find a recently added example through
+load_all and the older user installation; installing this checkout in a separate
+library and rerunning that test passes all 56 assertions. These are combined
+checks in development and installed environments, not a complete R CMD check.
+
+The reported C-locale parse failure was reproduced at the bare Japanese POS
+identifier. ASCII identifiers plus explicit Unicode column names fix it. A
+separate path-disclosure test now uses an ASCII sheet name, retaining its exact
+message/path checks without assuming locale-independent non-ASCII rendering.
+All 115 R/test files parse under C; twelve native-encoding warnings from other
+test names remain. The level-profile test passes 159 assertions under C. This
+does not establish Windows R 4.1 CP932 support or whole-suite C-locale success.
+
+The README uses the existing 30 authored longer texts and one empty document,
+a common 50-token window, compact print and full RDS saving. Execution verifies
+30 computable MATTR scores, the retained empty case, the advisory flags and
+exact saved-object replay. The contract validates against its JSON schema.
+README installation now points to the already verified merged-main tree instead
+of the former feature-branch pin. No new release, tag, Zenodo deposit, public
+site build or CI has been created. Evidence lives in
+reviews/ldfreq-core-review-20261007/. No CRAN submission or paid API call.
+
+NJ8 clarification: the maintainer supplied a permission message dated September
+25 (year not specified in that reply), with noncommercial use, no publication
+of the complete underlying data, and attribution conditions. The public CSV was
+actually retrieved anonymously and verified to contain exactly rank and word,
+8,000 rows, no other columns, and to match the local SHA-256. Equating all ranks
+with the complete underlying data was an unsupported inference; the proposed
+visibility change/removal was withdrawn before any action. No data, license,
+repository visibility, Pages setting or history was altered on that basis.
+
+## Core-contract migration, 2026-10-07 (package 0.3.0 development)
+
+The no-minimum MTLD definition is now core contract 0.2.0 with a new method ID.
+Legacy min10 remains explicit under its old ID and reproduces the pre-migration
+installed-package RDS. Experimental expected-TTR D now requires explicit selection;
+default output/presets have 11 and 11/13 rows. Existing saved result identities
+are retained; old plans/specifications require explicit recreation. Python hashlib
+independently recomputed the specification/plan hashes from the declared contract.
+The unchanged external koRpus/TAALED/quanteda outputs are reused, not rerun.
+Six of nine new MTLD values match koRpus; three terminal two-token-factor cases
+remain deliberately different and documented. This is not learner validation.
+
+Local focused tests passed. The installed full suite exposed three stale min10
+expectations (two assertions in the batch test and one legacy boundary assertion).
+Those assertions were corrected; the two affected files passed separately, with
+all other passing tests reused. The declared-contract property audit passed 500
+MTLD documents, 1,000 formula/window/hypergeometric documents and 73,809 exhaustive
+window/HD-D comparisons. Both JSON contracts validate. The public API audit passes
+with the existing 57 exports. All 22 vignettes built successfully. Subsequent
+CITATION/README and test-only edits do not invalidate numerical/build evidence;
+the final GitHub CI will build the exact published revision. Site generation
+initially stopped at pkgdown's network/Sass-cache access boundary and was rerun
+with the needed access; this was not a test or numerical failure.
+
+The previously recorded C-locale source/level-profile success remains applicable.
+Windows R4.1/CP932 and the separate non-ASCII test-name warnings are still open.
+No resource data, permission scope, repository visibility, or CRAN state changes.
+The planned fixed development tag is v0.3.0-dev.1; main CI, prerelease publication,
+GitHub installation and site verification are pending at this point.
+
+PR #31 first revision 5cb3bf0: macOS check, PDF manual and both resource builders
+passed. Windows computed 8,272 assertions successfully but failed the two new
+input-byte checks: Git changed LF to CRLF. The CRLF-transformed local input has
+exactly the reported Windows hash, establishing the cause. Added the existing
+`-text` attribute policy for external-metrics fixtures. A separate Git checkout
+with core.autocrlf=true preserves the original SHA-256 after this change. No
+formula, expected numerical value, or external frozen output was changed.
+The first run remains recorded; no successful job is cancelled or manually rerun.
+
+The first run also passed Linux R4.1 and R devel. At the final correction push,
+only Linux R-release dependency setup remained, before package checking. Its
+obsolete revision is superseded by the existing workflow concurrency rule;
+completed macOS/R4.1/devel, resource-builder and PDF results are preserved.
+The new head's mandatory CI is used for merge. No extra manual full run is
+requested. A stale preprocessing-contract number in LIFECYCLE was corrected;
+only that home-document page was regenerated, retaining the built articles.
+
+Core revision 3fa8d3d passed every job in run 37643207654, including Windows
+with the byte-preservation fix. The final source correction changes only two
+Rd phrases: the introductory default count is eleven (D opt-in), and the old
+v0.1 method label is removed. Rd checks and those two reference pages passed;
+all numerical evidence remains applicable. The existing required workflow will
+also check the final documentation revision before merge.
