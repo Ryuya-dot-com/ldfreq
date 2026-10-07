@@ -184,9 +184,12 @@ the lexical identities you review.</p>
 invented unlisted form, punctuation only, and an empty file. Their
 annotations are <strong>prepared by the example’s author</strong>, not
 produced by a hidden tokenizer. All files are MIT teaching material; no
-learner corpus or dictionary is bundled. Optional quanteda &gt;= 4.5.0
-and a UTF-8 R session are needed for KWIC review. No Python or external
-model is required for this walkthrough.</p>
+learner corpus or dictionary is bundled. The CSV also contains authored
+<code>POS1</code> and <code>goshu</code> labels for the descriptive
+profile below; <code>&lt;MISSING&gt;</code> marks unassigned features.
+These are not UniDic results. Optional quanteda &gt;= 4.5.0 and a UTF-8
+R session are needed for KWIC review. No Python or external model is
+required for this walkthrough.</p>
 <p>To run the complete example at once:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"japanese-file-workflow.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
@@ -216,7 +219,7 @@ annotations of its new text.</p>
 <span>  colClasses <span class="op">=</span> <span class="st">"character"</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span>, na.strings <span class="op">=</span> <span class="st">"&lt;MISSING&gt;"</span><span class="op">)</span></span>
 <span><span class="va">ja_file_annotations</span><span class="op">$</span><span class="va">token_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">ja_file_annotations</span><span class="op">$</span><span class="va">token_index</span><span class="op">)</span></span>
 <span><span class="va">ja_file_import</span> <span class="op">&lt;-</span> <span class="fu">ldfreq</span><span class="fu">::</span><span class="fu"><a href="../reference/lexdiv_import_annotations.html">lexdiv_import_annotations</a></span><span class="op">(</span><span class="va">ja_file_annotations</span>, <span class="va">ja_file_segments</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>language <span class="op">=</span> <span class="st">"ja"</span>, analyzer <span class="op">=</span> <span class="st">"authored"</span>, analyzer_version <span class="op">=</span> <span class="st">"1"</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>language <span class="op">=</span> <span class="st">"ja"</span>, analyzer <span class="op">=</span> <span class="st">"authored"</span>, analyzer_version <span class="op">=</span> <span class="st">"2"</span>,</span>
 <span>    dictionary <span class="op">=</span> <span class="st">"none"</span>, dictionary_version <span class="op">=</span> <span class="st">"not-applicable"</span>,</span>
 <span>    unit <span class="op">=</span> <span class="st">"authored-file-workflow"</span>, normalization <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Each original file is one segment here. Whitespace gaps, including
@@ -622,6 +625,336 @@ import succeed.</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="describe-script-word-origin-and-pos-by-document">Describe script, word origin and POS by document<a class="anchor" aria-label="anchor" href="#describe-script-word-origin-and-pos-by-document"></a>
+</h2>
+<p>Use a document profile to describe <strong>what was counted</strong>
+before interpreting a diversity score. The installed
+<code>japanese-document-profile.R</code> recipe takes a complete import,
+its complete selection table, an explicit POS grouping and a condition
+label. It returns ordinary data frames and keeps its inputs. It is an
+explicitly sourced example, not an exported function or a new
+analyzer.</p>
+<p>Continue from the file workflow above:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"japanese-document-profile.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># A declared, deliberately partial example map; other POS remain unmapped.</span></span>
+<span><span class="va">ja_pos_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"名詞"</span> <span class="op">=</span> <span class="st">"content"</span>, <span class="st">"動詞"</span> <span class="op">=</span> <span class="st">"content"</span>, <span class="st">"形容詞"</span> <span class="op">=</span> <span class="st">"content"</span>,</span>
+<span>  <span class="st">"形状詞"</span> <span class="op">=</span> <span class="st">"content"</span>, <span class="st">"副詞"</span> <span class="op">=</span> <span class="st">"content"</span>, <span class="st">"助詞"</span> <span class="op">=</span> <span class="st">"function"</span>, <span class="st">"助動詞"</span> <span class="op">=</span> <span class="st">"function"</span><span class="op">)</span></span>
+<span><span class="va">ja_profile</span> <span class="op">&lt;-</span> <span class="fu">japanese_document_profile</span><span class="op">(</span><span class="va">ja_file_import</span>, <span class="va">ja_file_selection</span>,</span>
+<span>  pos_groups <span class="op">=</span> <span class="va">ja_pos_groups</span>, condition <span class="op">=</span> <span class="st">"authored-body-excluding-full-stops"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">ja_profile</span><span class="op">$</span><span class="va">documents</span><span class="op">$</span><span class="va">retained_N</span>, <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">ja_file_metrics</span><span class="op">)</span><span class="op">$</span><span class="va">N</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The example map groups some POS labels as <code>content</code> or
+<code>function</code>. Pronouns, affixes, conjunctions and other
+unlisted labels remain <strong>unmapped</strong>; this is a deliberately
+partial classification, not a universal content-word definition. For
+your study, supply the labels and grouping that match your dictionary
+and research question. The recipe does not change which tokens you
+selected.</p>
+<table class="table">
+<colgroup>
+<col width="12%">
+<col width="15%">
+<col width="14%">
+<col width="18%">
+<col width="17%">
+<col width="21%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Document</th>
+<th align="right">Source tokens</th>
+<th align="right">Outside body</th>
+<th align="right">Excluded in body</th>
+<th align="right">Retained tokens</th>
+<th align="right">Retained codepoints</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">variants</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">homophones</td>
+<td align="right">13</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">9</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">unlisted</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">no_targets</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">empty</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>For each document, source tokens equal outside-body tokens plus
+exclusions inside the body plus retained tokens. The original file,
+including its title, line endings and spaces, remains available.
+Character counts have two distinct populations:
+<code>original_text</code> covers every original segment, whereas
+<code>retained_tokens</code> covers only the surfaces of retained
+tokens, excluding gaps. The latter is not the length of the original
+body including whitespace.</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="4%">
+<col width="27%">
+<col width="16%">
+<col width="35%">
+<col width="16%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="left">Character category</th>
+<th align="right">Codepoints</th>
+<th align="right">All retained codepoints</th>
+<th align="right">Proportion</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">18</td>
+<td align="left">han</td>
+<td align="right">2</td>
+<td align="right">10</td>
+<td align="right">0.2</td>
+</tr>
+<tr class="even">
+<td align="left">19</td>
+<td align="left">hiragana</td>
+<td align="right">5</td>
+<td align="right">10</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="odd">
+<td align="left">20</td>
+<td align="left">katakana</td>
+<td align="right">3</td>
+<td align="right">10</td>
+<td align="right">0.3</td>
+</tr>
+</tbody>
+</table>
+<p>The three fruit spellings appear in 5 retained tokens totaling 10
+codepoints: 2 Han-script, 5 hiragana and 3 katakana. Their supplied
+origin labels tell a different story:</p>
+<table class="table">
+<colgroup>
+<col width="4%">
+<col width="14%">
+<col width="17%">
+<col width="12%">
+<col width="9%">
+<col width="27%">
+<col width="14%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="left">Document</th>
+<th align="left">Origin label</th>
+<th align="left">Status</th>
+<th align="right">Tokens</th>
+<th align="right">All retained tokens</th>
+<th align="right">Proportion</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">6</td>
+<td align="left">variants</td>
+<td align="left">和</td>
+<td align="left">observed</td>
+<td align="right">2</td>
+<td align="right">5</td>
+<td align="right">0.4</td>
+</tr>
+<tr class="even">
+<td align="left">7</td>
+<td align="left">variants</td>
+<td align="left">漢</td>
+<td align="left">observed</td>
+<td align="right">3</td>
+<td align="right">5</td>
+<td align="right">0.6</td>
+</tr>
+<tr class="odd">
+<td align="left">19</td>
+<td align="left">homophones</td>
+<td align="left">和</td>
+<td align="left">observed</td>
+<td align="right">9</td>
+<td align="right">9</td>
+<td align="right">1.0</td>
+</tr>
+<tr class="even">
+<td align="left">35</td>
+<td align="left">unlisted</td>
+<td align="left">NA</td>
+<td align="left">missing</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1.0</td>
+</tr>
+<tr class="odd">
+<td align="left">48</td>
+<td align="left">no_targets</td>
+<td align="left">NA</td>
+<td align="left">missing</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">61</td>
+<td align="left">empty</td>
+<td align="left">NA</td>
+<td align="left">missing</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<p>All three fruit spellings have the authored <code>漢</code> label;
+the two particles have <code>和</code>. Writing a word in katakana does
+not make this recipe assign it a loanword label. Actual <a href="https://clrd.ninjal.ac.jp/unidic/faq.html" class="external-link">UniDic output</a>
+supplies <code>goshu</code> independently of surface spelling. Its
+labels, including proper-name and symbol categories, are preserved as
+supplied. No origin is inferred for a missing label, and character
+proportions are not scores of kanji knowledge.</p>
+<p>The character unit is the <strong>original Unicode
+codepoint</strong>, with no normalization. Thus precomposed
+<code>が</code> has one codepoint; <code>か</code> followed by a
+combining dakuten has two. These are not grapheme-cluster or
+visual-character counts. The recipe uses <a href="https://www.unicode.org/reports/tr24/" class="external-link">Unicode Script
+properties</a> through stringi and saves its ICU/Unicode versions. Its
+disjoint categories first separate six shared kana signs
+(<code>ー</code>, <code>ｰ</code>, <code>゛</code>, <code>゜</code>,
+<code>ﾞ</code>, <code>ﾟ</code>), then combining marks, decimal digits,
+whitespace, punctuation, symbols, Han, hiragana, katakana, Latin and
+other codepoints. Han-script includes signs such as <code>々</code>; it
+is not an educational kanji inventory. Half-width forms remain
+half-width, and emoji sequences can contain several codepoints in
+different categories.</p>
+<p>Inspect the three tables and the source-linked rows directly:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ja_profile</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"pos_missing_N"</span>, <span class="st">"origin_missing_N"</span>, <span class="st">"pos_unmapped_N"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   document_id pos_missing_N origin_missing_N pos_unmapped_N</span></span>
+<span><span class="co">#&gt; 1    variants             0                0              0</span></span>
+<span><span class="co">#&gt; 2  homophones             0                0              0</span></span>
+<span><span class="co">#&gt; 3    unlisted             1                1              0</span></span>
+<span><span class="co">#&gt; 4  no_targets             0                0              0</span></span>
+<span><span class="co">#&gt; 5       empty             0                0              0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">ja_profile</span><span class="op">$</span><span class="va">tokens</span>, <span class="va">retained</span> <span class="op">&amp;</span></span>
+<span>  <span class="op">(</span><span class="va">pos_status</span> <span class="op">==</span> <span class="st">"missing"</span> <span class="op">|</span> <span class="va">pos_group_status</span> <span class="op">==</span> <span class="st">"unmapped"</span><span class="op">)</span>,</span>
+<span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">document_id</span>, <span class="va">segment_id</span>, <span class="va">start</span>, <span class="va">end</span>, <span class="va">surface</span>, <span class="va">pos_value</span>, <span class="va">pos_group_status</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    document_id segment_id start end  surface pos_value pos_group_status</span></span>
+<span><span class="co">#&gt; 21    unlisted         s1     1   4 ぷにょ語      &lt;NA&gt;          missing</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Output</th>
+<th>Unit and denominator</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>$documents</code></td>
+<td>One document under the declared condition, including empty
+documents; token and codepoint totals are separate.</td>
+</tr>
+<tr class="even">
+<td><code>$characters</code></td>
+<td>One document/population/category; <code>denominator</code> includes
+every codepoint in that population, including whitespace and other
+characters where present.</td>
+</tr>
+<tr class="odd">
+<td><code>$features</code></td>
+<td>One document/feature/category/status; all retained tokens are the
+denominator, including missing and unmapped entries. Features are
+<code>pos</code>, <code>origin</code> and <code>pos_group</code>.</td>
+</tr>
+<tr class="even">
+<td><code>$tokens</code></td>
+<td>Every original token with source anchors, selection reasons, raw
+labels, classification statuses and category-specific <code>char_</code>
+counts.</td>
+</tr>
+</tbody>
+</table>
+<p><code>missing</code> means <code>NA</code>, blank-only text or
+literal <code>*</code>; the raw value survives in <code>$tokens</code>
+and <code>$imported</code>. <code>unmapped</code> means a POS label
+exists but has no entry in your grouping table.
+<code>field_present = FALSE</code> distinguishes an absent input column
+from a present column with missing entries. Feature columns must be
+character vectors. Supply <code>pos_col</code> and
+<code>origin_col</code> if your columns have different names. A zero
+count with a positive denominator is zero; an empty denominator produces
+<code>NA</code> proportions.</p>
+<p>Lexical-review decisions remain in <code>ja_file_record$after</code>:
+a decision about a target’s lexical identity does not validate every
+POS/origin label or change these descriptions automatically. The profile
+keeps the full selection and input; the file-workflow record
+additionally keeps body ranges, decisions and the existing N/V/TTR
+results. Save them together:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ja_profile_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>profile <span class="op">=</span> <span class="va">ja_profile</span>, file_review <span class="op">=</span> <span class="va">ja_file_record</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">ja_profile_record</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ja_file_output</span>, <span class="st">"document-profile.rds"</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">name</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"documents"</span>, <span class="st">"characters"</span>, <span class="st">"features"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">ja_profile</span><span class="op">[[</span><span class="va">name</span><span class="op">]</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ja_file_output</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"profile-"</span>, <span class="va">name</span>, <span class="st">".csv"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    row.names <span class="op">=</span> <span class="cn">FALSE</span>, fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span>, na <span class="op">=</span> <span class="st">"NA"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ja_file_output</span>, <span class="st">"document-profile.rds"</span><span class="op">)</span><span class="op">)</span>, <span class="va">ja_profile_record</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>For a persistent study directory, change the output path explicitly.
+The CSVs are analysis/inspection tables; the full RDS retains the
+original sources and conditions. Recompute from the saved inputs and
+policy without rerunning a model:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">saved_profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ja_file_output</span>, <span class="st">"document-profile.rds"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">profile</span></span>
+<span><span class="va">replayed_profile</span> <span class="op">&lt;-</span> <span class="fu">japanese_document_profile</span><span class="op">(</span><span class="va">saved_profile</span><span class="op">$</span><span class="va">imported</span>, <span class="va">saved_profile</span><span class="op">$</span><span class="va">selection</span>,</span>
+<span>  <span class="va">saved_profile</span><span class="op">$</span><span class="va">policy</span><span class="op">$</span><span class="va">pos_groups</span>, <span class="va">saved_profile</span><span class="op">$</span><span class="va">policy</span><span class="op">$</span><span class="va">condition</span>,</span>
+<span>  pos_col <span class="op">=</span> <span class="va">saved_profile</span><span class="op">$</span><span class="va">policy</span><span class="op">$</span><span class="va">pos_col</span>, origin_col <span class="op">=</span> <span class="va">saved_profile</span><span class="op">$</span><span class="va">policy</span><span class="op">$</span><span class="va">origin_col</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">replayed_profile</span>, <span class="va">saved_profile</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Exact replay here uses the same software versions; retain the saved
+counts and ICU/Unicode metadata when comparing results across software
+upgrades. Changed source or partial/stale selection rows are rejected.
+Reordering the selection table is allowed because its original token
+anchors are checked. No API call, fee or additional dependency is needed
+for these profiles.</p>
+<p>To run both the file workflow and profiling example together in a
+fresh session:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"japanese-document-profile-demo.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ja_profile</span><span class="op">$</span><span class="va">documents</span></span>
+<span><span class="va">ja_file_output</span>  <span class="co"># Temporary folder; choose a persistent output for your study.</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="use-gibasa-and-a-local-unidic-dictionary-in-r">Use gibasa and a local UniDic dictionary in R<a class="anchor" aria-label="anchor" href="#use-gibasa-and-a-local-unidic-dictionary-in-r"></a>
 </h2>
 <p><a href="https://paithiov909.github.io/gibasa/" class="external-link">gibasa</a> supplies
@@ -648,7 +981,7 @@ does not download a dictionary.</p>
 original document IDs. The following strings are new examples, not
 sampled corpus text. The full-width letters and an invented string
 expose normalization and missing-feature decisions.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ja_segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"essay"</span>, <span class="st">"essay"</span>, <span class="st">"empty"</span><span class="op">)</span>,</span>
 <span>  segment_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s1"</span>, <span class="st">"s2"</span>, <span class="st">"s1"</span><span class="op">)</span>,</span>
 <span>  text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"国際連合で国際協力を学ぶ。"</span>, <span class="st">"ＡＩで学びました。 qzxv😀"</span>, <span class="st">""</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -661,7 +994,7 @@ the requested system dictionary is active, and restores the prior
 environment on exit. It does not edit the home configuration or request
 normalization or automatic sentence splitting. Use a path without spaces
 for this gibasa recipe.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">analyze_unidic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">segments</span>, <span class="va">dic_dir</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">rc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/path.expand.html" class="external-link">path.expand</a></span><span class="op">(</span><span class="st">"~/.mecabrc"</span><span class="op">)</span></span>
 <span>  <span class="va">temporary_rc</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">rc</span><span class="op">)</span></span>
@@ -690,7 +1023,7 @@ for this gibasa recipe.</p>
 <span>    surface <span class="op">=</span> <span class="va">raw</span><span class="op">$</span><span class="va">token</span>, raw_feature <span class="op">=</span> <span class="va">raw</span><span class="op">$</span><span class="va">feature</span><span class="op">)</span></span>
 <span>  <span class="va">features</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">expanded</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"doc_id"</span>, <span class="st">"sentence_id"</span>, <span class="st">"token_id"</span>, <span class="st">"token"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>tokens <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">tokens</span>, <span class="va">expanded</span><span class="op">[</span><span class="va">features</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>    configuration_sha256 <span class="op">=</span> <span class="fu">digest</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/digest/man/digest.html" class="external-link">digest</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">rc</span>, algo <span class="op">=</span> <span class="st">"sha256"</span><span class="op">)</span><span class="op">)</span></span>
+<span>    configuration_sha256 <span class="op">=</span> <span class="fu">digest</span><span class="fu">::</span><span class="fu"><a href="https://eddelbuettel.github.io/digest/man/digest.html" class="external-link">digest</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">rc</span>, algo <span class="op">=</span> <span class="st">"sha256"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="fu">analyze_unidic</span><span class="op">(</span><span class="va">ja_segments</span>, <span class="va">dic_dir</span><span class="op">)</span></span>
 <span><span class="va">ja_annotations</span> <span class="op">&lt;-</span> <span class="va">analysis</span><span class="op">$</span><span class="va">tokens</span></span>
@@ -719,10 +1052,10 @@ commas and missing fields. gibasa does not expose MeCab’s unknown-node
 flag in these rows: a missing lemma is observable, but is not an
 independently verified unknown-word classification. Do not fabricate a
 definitive unknown flag from it.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dictionary_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sys.dic"</span>, <span class="st">"unk.dic"</span>, <span class="st">"char.bin"</span>, <span class="st">"matrix.bin"</span>, <span class="st">"dicrc"</span><span class="op">)</span></span>
 <span><span class="va">dictionary_hashes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">dic_dir</span>, <span class="va">dictionary_files</span><span class="op">)</span>,</span>
-<span>  <span class="kw">function</span><span class="op">(</span><span class="va">path</span><span class="op">)</span> <span class="fu">digest</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/digest/man/digest.html" class="external-link">digest</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">path</span>, algo <span class="op">=</span> <span class="st">"sha256"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">path</span><span class="op">)</span> <span class="fu">digest</span><span class="fu">::</span><span class="fu"><a href="https://eddelbuettel.github.io/digest/man/digest.html" class="external-link">digest</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">path</span>, algo <span class="op">=</span> <span class="st">"sha256"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dictionary_files</span>, <span class="st">"_sha256"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">ja</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_import_annotations.html">lexdiv_import_annotations</a></span><span class="op">(</span><span class="va">ja_annotations</span>, <span class="va">ja_segments</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  language <span class="op">=</span> <span class="st">"ja"</span>, analyzer <span class="op">=</span> <span class="st">"gibasa/MeCab"</span>,</span>
@@ -777,7 +1110,7 @@ tokens, retains particles and auxiliary verbs, and requires an observed
 substituting surface forms for missing bases. Change this selection if
 the research question calls for a different lexical population, and
 change the preprocessing label accordingly.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">t</span> <span class="op">&lt;-</span> <span class="va">ja</span><span class="op">$</span><span class="va">tokens</span></span>
 <span><span class="va">punctuation</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">t</span><span class="op">$</span><span class="va">POS1</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">t</span><span class="op">$</span><span class="va">POS1</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"補助記号"</span>, <span class="st">"空白"</span><span class="op">)</span></span>
 <span><span class="va">has_whitespace</span> <span class="op">&lt;-</span> <span class="fu">stringi</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stringi/man/stri_detect.html" class="external-link">stri_detect_regex</a></span><span class="op">(</span><span class="va">t</span><span class="op">$</span><span class="va">surface</span>, <span class="st">"\\p{White_Space}"</span><span class="op">)</span></span>
@@ -811,7 +1144,7 @@ unavailable base leaves a gap, not a new adjacent pair. Do not renumber
 <code>lexdiv_as_quanteda(selected, ja$segments, term_col = "term")</code>
 preserves those gaps for concordances and other quanteda operations in a
 UTF-8 R session.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>imported <span class="op">=</span> <span class="va">ja</span>, selection <span class="op">=</span> <span class="va">selection</span>, metrics <span class="op">=</span> <span class="va">results</span>, ngrams <span class="op">=</span> <span class="va">grams</span><span class="op">)</span>,</span>
 <span>  <span class="st">"japanese-analysis.rds"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -839,7 +1172,7 @@ text, boundaries and candidates are authored; it requires optional
 corpus, dictionary, Python or model. The IDs identify illustrative
 lexical items, not word families or a validated inventory of word
 senses.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"japanese-orthography.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">spelling</span> <span class="op">&lt;-</span> <span class="va">japanese_orthography_example</span></span>
 <span><span class="va">spelling</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>,</span>
@@ -941,7 +1274,7 @@ proof of a misspelling.</p>
 columns; the example does not rewrite kana into kanji. Saving the whole
 object preserves the source, candidate inventory, decisions and reviewer
 reasons:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">spelling</span>, <span class="st">"japanese-orthography-review.rds"</span><span class="op">)</span></span>
 <span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"japanese-orthography-review.rds"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
@@ -965,7 +1298,7 @@ produced the split alternative. This is a concrete integration case, not
 an estimate of analyzer accuracy on learner writing. The offline example
 supplies both annotations explicitly and requires neither that analyzer
 nor its dictionary.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">boundary</span> <span class="op">&lt;-</span> <span class="va">japanese_boundary_example</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">boundary</span><span class="op">$</span><span class="va">alignment</span><span class="op">$</span><span class="va">groups</span>, <span class="va">relation</span> <span class="op">!=</span> <span class="st">"exact"</span>,</span>
 <span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">start</span>, <span class="va">end</span>, <span class="va">pre</span>, <span class="va">keyword</span>, <span class="va">post</span>, <span class="va">predicted_n</span>, <span class="va">reference_n</span><span class="op">)</span><span class="op">)</span></span>
@@ -1041,7 +1374,7 @@ the existing annotation importer and stringi’s exact search; no new
 analyzer or exported API is introduced. The earlier
 <code><a href="../reference/lexdiv_ambiguity_review.html">lexdiv_ambiguity_review()</a></code> workflow continues to handle
 single-token lexical candidates.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"junimorph-spans.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"junimorph-spans-demo.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">span_demo</span> <span class="op">&lt;-</span> <span class="va">junimorph_spans_example</span></span>
@@ -1095,7 +1428,7 @@ supplies a three-column <code>jpn</code> table (lemma, form, feature
 bundle) under CC BY 4.0. Its filtered table and the pre-filtering
 hit-count file are different inputs. Obtain <code>jpn</code> separately;
 the package includes only the reader and authored examples.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu">read_junimorph</span><span class="op">(</span><span class="st">"local-resources/jpn"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  resource_id <span class="op">=</span> <span class="st">"J-UniMorph"</span>,</span>
 <span>  resource_version <span class="op">=</span> <span class="st">"jpn git blob 6b001fa9d33139bd9b85ffe70f74c1143ae9df24"</span>,</span>
@@ -1153,12 +1486,12 @@ its <strong>CC BY-NC-ND 4.0</strong> terms. They are not included in
 ldfreq. The following explicitly sourced reader needs only the local ZIP
 and metadata tables; optional <code>readxl</code> reads the
 workbooks.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"ninjal-essays.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">data_dir</span> <span class="op">&lt;-</span> <span class="st">"ninjal-essay-data"</span></span>
-<span><span class="va">essays</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readxl/man/read_excel.html" class="external-link">read_excel</a></span><span class="op">(</span></span>
+<span><span class="va">essays</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://readxl.tidyverse.org/reference/read_excel.html" class="external-link">read_excel</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">data_dir</span>, <span class="st">"sakubun.xlsx"</span><span class="op">)</span>, col_types <span class="op">=</span> <span class="st">"text"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">writers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readxl/man/read_excel.html" class="external-link">read_excel</a></span><span class="op">(</span></span>
+<span><span class="va">writers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://readxl.tidyverse.org/reference/read_excel.html" class="external-link">read_excel</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">data_dir</span>, <span class="st">"shipitsusha.xlsx"</span><span class="op">)</span>, col_types <span class="op">=</span> <span class="st">"text"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Start with a small, explicitly selected subset of local files.</span></span>
@@ -1176,7 +1509,7 @@ workbooks.</p>
 <p>The UTF-8 default is a declaration, not an encoding guess. For a
 mixed archive, supply a named vector with each selected member’s
 inspected encoding:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">files</span> <span class="op">&lt;-</span> <span class="va">essays</span><span class="op">[[</span><span class="st">"日本語作文txt"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">encodings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"UTF-8"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span><span class="op">)</span>, <span class="va">files</span><span class="op">)</span></span>
 <span><span class="co"># A local list of member names verified as CP932, not a list of error words.</span></span>

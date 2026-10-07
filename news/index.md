@@ -2,6 +2,18 @@
 
 ## ldfreq 0.2.0 (development)
 
+### Japanese document descriptions
+
+- Added an explicitly sourced document-profile recipe with separate
+  original-text and retained-token codepoint counts, raw POS/word-origin
+  distributions and an explicit caller-supplied POS grouping. Missing
+  labels, unmapped POS, exclusions, denominators and empty documents
+  remain visible beside original source anchors.
+- Extended the Japanese file walkthrough with authored annotation
+  features, descriptive tables, CSV export and complete saved-result
+  replay. No new exported function, analyzer, model, required dependency
+  or ability score is added.
+
 ### Optional contextual candidate proposals
 
 - Added explicitly sourced recipes for categorical model proposals and

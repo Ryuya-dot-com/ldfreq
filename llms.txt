@@ -205,9 +205,13 @@ walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotation
 read authored files, retain title/body boundaries, review contextual
 identities, and save whole-body measures separately from target counts.
 This first example uses prepared annotations and needs no analyzer or
-dictionary. A Japanese dictionary is optional and separately obtained;
-the package does not bundle one or establish cross-language score
-equivalence. The Unicode tokenizer alone is not a Japanese word
+dictionary. Continue with [document
+descriptions](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#describe-script-word-origin-and-pos-by-document)
+to separate script/codepoint counts from dictionary word origins and
+declared POS groups, retaining exclusions, missing labels, denominators
+and saved inputs. A Japanese dictionary is optional and separately
+obtained; the package does not bundle one or establish cross-language
+score equivalence. The Unicode tokenizer alone is not a Japanese word
 segmenter.
 
 For experimental stimuli, the [Japanese norms
@@ -305,7 +309,7 @@ by this documentation:
 
 ``` r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@4de009ec531203d0e1b651feebac4a5c0db705f1")
+pak::pak("Ryuya-dot-com/ldfreq@2240ffde9054d199b5666b5b72d574d06569ae8c")
 ```
 
 Pinning the revision fixes the implementation, even when development

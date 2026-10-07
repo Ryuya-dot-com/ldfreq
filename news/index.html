@@ -45,6 +45,11 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="ldfreq-020-development">ldfreq 0.2.0 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-020-development"></a></h2>
 <div class="section level3">
+<h3 id="japanese-document-descriptions-0-2-0">Japanese document descriptions<a class="anchor" aria-label="anchor" href="#japanese-document-descriptions-0-2-0"></a></h3>
+<ul><li>Added an explicitly sourced document-profile recipe with separate original-text and retained-token codepoint counts, raw POS/word-origin distributions and an explicit caller-supplied POS grouping. Missing labels, unmapped POS, exclusions, denominators and empty documents remain visible beside original source anchors.</li>
+<li>Extended the Japanese file walkthrough with authored annotation features, descriptive tables, CSV export and complete saved-result replay. No new exported function, analyzer, model, required dependency or ability score is added.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="optional-contextual-candidate-proposals-0-2-0">Optional contextual candidate proposals<a class="anchor" aria-label="anchor" href="#optional-contextual-candidate-proposals-0-2-0"></a></h3>
 <ul><li>Added explicitly sourced recipes for categorical model proposals and human KWIC review, with an offline Japanese example. Missing candidates, unresolved cases, boundary-review requests and missing output remain distinct.</li>
 <li>Added an optional OpenAI Responses recipe using httr2. Paid requests require explicit opt-in and the user’s API key; saved responses are reused, and no automatic retries or model calls occur in standard examples or tests. Existing exports and numerical calculations are unchanged.</li>
