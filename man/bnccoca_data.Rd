@@ -64,13 +64,18 @@ Bauer, L., and Nation, P. (1993). Word families.
 International Journal of Lexicography, 6(4), 253--279.
 \doi{10.1093/ijl/6.4.253}
 }
-\seealso{\code{\link{lexdiv_family_profile}}, \code{\link{morpholex_data}}}
+\seealso{\code{\link{lexdiv_family_profile}} for a complete token-to-family
+example, \code{\link{morpholex_data}},
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html}{Word families, roots and affixes tutorial}}
 \examples{
 reference <- bnccoca_data()
+# The dictionary maps forms to families; it is not a table of corpus counts.
 reference$dictionary[reference$dictionary$form \%in\%
   c("USE", "USES", "REUSABILITY", "COLOUR", "COLOR"),
   c("form", "headword", "frequency_band")]
+# USE/USES share a headword; COLOUR/COLOR share another. REUSABILITY has no row.
 
+# A longer installed workflow; the direct API example is in ?lexdiv_family_profile.
 env <- new.env(parent = baseenv())
 sys.source(system.file("examples", "bnccoca-families.R", package = "ldfreq",
   mustWork = TRUE), env)

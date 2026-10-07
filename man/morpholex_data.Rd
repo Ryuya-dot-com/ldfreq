@@ -79,11 +79,17 @@ MorphoLex: A derivational morphological database for 70,000 English words.
 \doi{10.3758/s13428-017-0981-8}.
 }
 \source{\url{https://github.com/hugomailhot/MorphoLex-en}}
+\seealso{\code{\link{bnccoca_data}},
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html}{Word families, roots and affixes tutorial}.
+The tutorial explains how to source the word-parts recipes; those helpers
+are not exported package functions.}
 \examples{
+# "0-1-1" is a source worksheet: zero prefixes, one root, one suffix.
 reference <- morpholex_data(c("0-1-1", "All roots"))
 words <- reference$sheets[["0-1-1"]]
 words[words$Word \%in\% c("teacher", "teachers"),
       c("Word", "MorphoLexSegm", "ROOT1_FamSize", "ROOT1_Freq_HAL")]
+# Both records contain teach and -er. Plural -s is outside this resource's scope.
 roots <- reference$sheets[["All roots"]]
 roots$HAL_freq <- as.numeric(roots$HAL_freq)
 reference$provenance$data_license

@@ -55,6 +55,27 @@ For print and plot methods, arguments passed to the corresponding method for
 table contains several.}
 }
 \details{
+For a first analysis, create a table with one row per document and columns
+\code{document_id} and \code{text}, then call
+\code{lexdiv_metrics_text_batch()} directly. Replace the example texts with
+your own; retain a unique ID even for an empty document. Use \code{id_col}
+and \code{text_col} if your columns have different names. TXT-folder and CSV
+input are shown in the linked file-input tutorial.
+
+Read \code{result$results} for one row per document and metric. In the first
+example, \emph{essay_a} has five tokens and four types (TTR 0.8),
+\emph{essay_b} has five tokens and five types (TTR 1), and \emph{empty}
+has zero tokens with \code{missing_reason = "empty_input"}. These short
+authored texts explain the output, not a comparison of writing ability.
+\code{lexdiv_widen(result$results)} puts metrics into columns without
+recalculating them. Keep the complete \code{result} when saving: the wide
+table alone does not retain the token audit and preprocessing records.
+
+Use \code{lexdiv_tokenize_batch()} separately when you want to inspect or
+annotate the tokens before scoring or reuse them with a reference vocabulary.
+Its output is a named list: \code{prepared$essay_a$tokens} shows one document.
+Do not supply tokenization settings again when scoring that prepared list.
+
 Plot defaults use a sans serif font, horizontal tick labels and an open frame.
 Override these with \code{family}, \code{las} or \code{bty} in the plot
 method's \code{...}. Cosmetic graphics parameters are restored after drawing.
@@ -97,18 +118,41 @@ metric rows invisibly, with the same selection rules as
 create a metric table; save the complete object to retain its audits.
 }
 \examples{
+library(ldfreq)
+
+# 1. One row per text; keep the empty document in the input.
 texts <- data.frame(
   document_id = c("essay_a", "essay_b", "empty"),
-  text = c("The cat can't read the book.", "A reader reads a story.", "")
+  text = c("Cats chase cats and dogs.", "The reader reads a story.", "")
 )
-prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
-prepared$essay_a$tokens
 result <- lexdiv_metrics_text_batch(
-  prepared, metrics = c("ttr", "mattr"), window_length = 4
+  texts, tokenizer = "english", case = "lower", metrics = "ttr"
 )
-result
+result$results  # TTR: essay_a = 0.8, essay_b = 1; empty = NA
 result$token_audit
 lexdiv_widen(result$results)
-nj8_profile_batch(prepared, unit = "surface")$coverage
+
+# 2. The plot displays the two computed scores; the empty row stays in
+# results.
 plot(result, metric_id = "ttr")
+plot(result, metric_id = "ttr", monochrome = TRUE)
+
+# 3. Save the whole analysis. Use your own output path for a research
+# project.
+path <- tempfile(fileext = ".rds")
+saveRDS(result, path)
+restored <- readRDS(path)
+restored$results
+unlink(path)  # Clean up only this temporary demonstration file.
+
+# 4. Optional workflow: prepare tokens once, then reuse them.
+prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
+prepared$essay_a$tokens
+# A 4-token window illustrates MATTR here; it is not a research
+# recommendation.
+lexdiv_metrics_text_batch(prepared, metrics = "mattr", window_length = 4)$results
+nj8_profile_batch(prepared, unit = "surface")$coverage
 }
+\seealso{\code{\link{lexdiv_metrics_text}}, \code{\link{lexdiv_convenience}},
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files}{Read your own TXT or CSV files},
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html}{From text to a research report}}

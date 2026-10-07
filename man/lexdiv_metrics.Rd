@@ -88,6 +88,21 @@ short document. Missingness, method identity, sufficient counts, quality flags,
 parameters, and diagnostics are returned beside each value.
 }
 \details{
+Start with \code{lexdiv_metrics(c("a", "a", "b", "c"), metrics = "ttr")}.
+Each vector element is one word occurrence: \code{N = 4} tokens contain
+\code{V = 3} distinct types, so \code{value = 0.75}. The result is already a
+data frame; use \code{result$value} to access its scores. For a raw sentence,
+use \code{\link{lexdiv_metrics_text}} instead of putting the whole sentence
+in one vector element. TTR varies with text length and is not an essay-quality
+score.
+
+The examples then show a computed value, an empty document, an invalid token,
+and a text shorter than a requested window. An \code{NA} value has a reason:
+inspect \code{status} and \code{missing_reason} before interpreting it or
+combining results. Choosing \code{metrics = "ttr"} keeps the first example
+small; omitting \code{metrics} requests all methods, some of which cannot be
+computed for short inputs.
+
 The current versioned set contains TTR, RTTR/Guiraud, CTTR, Herdan's C, natural-log
 Maas a-squared, complete non-overlapping MSTTR, step-one MATTR, bidirectional
 MTLD, sample-size-normalized hypergeometric HD-D on the TTR scale, Yule's K,
@@ -193,9 +208,27 @@ variants and parameter values documented here when reporting ldfreq results.
 Expected-TTR D is a separately named exact-expectation curve fit, not CLAN VOCD.
 }
 \examples{
-lexdiv_metric_ids()
+library(ldfreq)
 
+# One vector element per token, in its original order.
 tokens <- c("a", "a", "b", "c")
+result <- lexdiv_metrics(tokens, metrics = "ttr")
+result  # N = 4, V = 3, value = 0.75, status = "ok"
+result$value
+
+# Empty, invalid, and too-short inputs are different conditions.
+lexdiv_metrics(character(), metrics = "ttr")  # missing / empty_input
+lexdiv_metrics(c("a", NA_character_), metrics = "ttr")  # invalid_input / invalid_token
+lexdiv_metrics(c("a", "b"), metrics = "mattr", window_length = 3)
+# The last result is missing / too_short_for_requested_parameter, not zero.
+
+# Named lists keep each document separate, including the empty document.
+documents <- list(doc_a = c("a", "a", "b"), doc_b = character())
+batch <- lexdiv_metrics_batch(documents, metrics = "ttr")
+batch  # doc_a: N = 3, V = 2, TTR = 2/3; doc_b: missing / empty_input
+
+# Further methods. Sample size 2 is for this tiny illustration only.
+lexdiv_metric_ids()
 lexdiv_metrics(tokens, metrics = c("ttr", "hdd"), sample_size = 2)
 
 lexdiv_metrics(
@@ -203,15 +236,8 @@ lexdiv_metrics(
   metrics = "expected_ttr_d"
 )
 
-lexdiv_metrics(character(), metrics = "ttr")
-lexdiv_metrics(c("a", NA_character_), metrics = "ttr")
-lexdiv_metrics(c("a", "b"), metrics = "mattr", window_length = 3)
-
 mtld <- lexdiv_metrics(rep(c("a", "b"), 10), metrics = "mtld")
 mtld$diagnostics[[1]]
-
-documents <- list(doc_a = c("a", "a", "b"), doc_b = character())
-lexdiv_metrics_batch(documents, metrics = c("ttr", "mtld"))
 
 contract_path <- system.file(
   "spec", "lexical-diversity-contract.json", package = "ldfreq"
@@ -219,3 +245,5 @@ contract_path <- system.file(
 stopifnot(nzchar(contract_path))
 basename(contract_path)
 }
+\seealso{\code{\link{lexdiv_metrics_text}}, \code{\link{lexdiv_text_batch}},
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html}{Getting started}}
