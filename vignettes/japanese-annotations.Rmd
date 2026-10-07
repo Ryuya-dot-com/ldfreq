@@ -12,6 +12,10 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(ldfreq)
 dic_dir <- Sys.getenv("LDFREQ_UNIDIC_LITE_1_0_8", unset = "")
 run_gibasa <- nzchar(dic_dir) && requireNamespace("gibasa", quietly = TRUE)
+run_file_review <- requireNamespace("quanteda", quietly = TRUE) &&
+  isTRUE(l10n_info()[["UTF-8"]])
+knitr::read_chunk(system.file("examples", "japanese-file-workflow.R",
+  package = "ldfreq", mustWork = TRUE))
 ```
 
 For stimulus-item ratings and separately obtained AoA/BOI tables, see
@@ -30,6 +34,13 @@ Use existing R packages for morphology and concordances, and ldfreq to keep
 those input decisions visible in lexical analyses. This is an integration and
 audit contribution, not a new Japanese segmentation algorithm or a validated
 Japanese proficiency scale.
+
+For a complete first workflow, start with
+[Read files, review words and save the analysis](#japanese-file-workflow).
+It uses small authored TXT/CSV files and prepared annotations, so you can learn
+the decisions without installing an analyzer. Then use the
+[gibasa recipe](#use-gibasa-and-a-local-unidic-dictionary-in-r) to supply your own
+annotations. File reading and morphological analysis are separate steps.
 
 ## An offline example
 
@@ -90,6 +101,175 @@ There are six adjacent bigram and five trigram opportunities. These counts
 verify the example's arithmetic; a seven-token text cannot establish the
 reliability of a diversity measure. Choose length-appropriate measures and
 report non-computable requests rather than changing their parameters silently.
+
+## Read files, review words and save the analysis {#japanese-file-workflow}
+
+Suppose the first line is a title and your question concerns vocabulary in the
+body. Deleting the title changes later character positions; counting every
+target hit includes words outside your intended sample. This example retains
+the whole file, selects the body by its original positions, and reports body
+word counts separately from the lexical identities you review.
+
+The five authored files contain spelling variants, homophones, an invented
+unlisted form, punctuation only, and an empty file. Their annotations are
+**prepared by the example's author**, not produced by a hidden tokenizer. All
+files are MIT teaching material; no learner corpus or dictionary is bundled.
+Optional quanteda >= 4.5.0 and a UTF-8 R session are needed for KWIC review.
+No Python or external model is required for this walkthrough.
+
+To run the complete example at once:
+
+```{r ja-files-quick-start, eval=FALSE}
+source(system.file("examples", "japanese-file-workflow.R", package = "ldfreq"))
+as.data.frame(ja_file_record$metrics)  # All retained body words
+ja_file_record$counts          # Reviewed target occurrences only
+ja_file_output                 # Directory containing the complete RDS and count CSV
+```
+
+The following steps show the same recipe. The files and annotations are separate
+inputs; replacing a TXT file also requires complete annotations of its new text.
+
+### 1. Read the original files and import prepared annotations
+
+```{r ja-files-read, eval=run_file_review, results='hide'}
+```
+
+Each original file is one segment here. Whitespace gaps, including its line
+breaks, are preserved. These are not inferred sentence boundaries. The importer
+checks every non-whitespace character against `annotations.csv` before any
+title or punctuation is excluded. `ja_file_manifest` records encoding, byte
+hashes and a removed leading BOM, if any. The [file input guide](english-tokenization.html#import-text-files)
+explains explicit UTF-8/CP932 decoding in more detail.
+
+| Object | One row represents | Keep it for |
+|---|---|---|
+| `ja_file_segments` | One original file/segment, including empty files | Original text and document IDs |
+| `ja_file_import$tokens` | One prepared token with original character positions | Complete annotation before selection |
+| `ja_file_selection` | One original token and its inclusion reason | Body and punctuation exclusions |
+| `ja_file_after$occurrences` | One target occurrence, not one candidate | Context, status and recorded decisions |
+| `ja_file_record` | The complete saved analysis | Reopening without the analyzer or source files |
+
+### 2. Select the body without rewriting the text
+
+```{r ja-files-ranges, eval=run_file_review}
+```
+
+```{r ja-files-scope, eval=run_file_review, echo=FALSE}
+```
+
+The first body starts at character 5, after the title `リンゴ` and its newline.
+The second starts at character 4, after `はし` and its newline. Those are
+explicit decisions about these files, **not a rule that every first line is a
+title**. Empty files retain unavailable bounds. The helper is limited to one
+segment and one contiguous body range per document; it rejects a range that
+cuts through a token. A boundary change requires a new complete annotation,
+as shown [below](#review-boundaries-before-lexical-identity).
+
+This recipe excludes only the literal full stop `。` after selecting the body.
+It retains particles and verbs. Other datasets need their own declared policy
+for punctuation, numbers and proper nouns. Neither the complete import nor its
+original token indices are edited.
+
+<details>
+<summary>Show the body-range validation and selection code</summary>
+
+```{r ja-files-scope-code, ref.label='ja-files-scope', eval=FALSE, echo=TRUE}
+```
+
+</details>
+
+### 3. Inspect KWIC and record contextual decisions
+
+```{r ja-files-review, eval=run_file_review}
+```
+
+Title hits remain visible with `in_body = FALSE`; they are unsubmitted and do
+not enter the body counts. The body contains three spellings intended as the
+fruit, two contextually identified uses of `はし`, a third unresolved `はし`,
+and an invented word with no candidate. Even a single candidate needs an
+explicit decision. The assignments in the code express the author's intended
+meanings; they are not automatic correction or evidence of annotation accuracy.
+
+For your own research, use the
+[CSV decision worksheet](ambiguity-review.html#edit-decision-worksheet) to inspect,
+edit and reapply decisions by their fixed IDs. Keep title/body membership
+beside the worksheet; do not delete the original annotations to hide title hits.
+Changing the source, segmentation or candidate inventory requires a new review.
+The body range is a separate selection: save it with the review and rerun the
+selection/count steps when it changes. The review ID does not certify a body
+range that was never part of its input.
+
+### 4. Report whole-body measures and target counts separately
+
+```{r ja-files-counts, eval=run_file_review, include=FALSE}
+```
+
+```{r ja-files-body-table, eval=run_file_review, echo=FALSE}
+knitr::kable(as.data.frame(ja_file_metrics)[c("document_id", "N", "V", "value", "status")],
+  digits = 3, col.names = c("Document", "Body tokens", "Surface types", "TTR", "Status"))
+```
+
+The first two bodies contain 5 and 9 tokens, with 4 and 6 surface types. These
+TTR values illustrate accounting on tiny texts, not a recommended proficiency
+measure. Punctuation-only and empty documents both have no retained words;
+their source counts distinguish them, while TTR remains missing for both.
+
+```{r ja-files-target-table, eval=run_file_review, echo=FALSE}
+knitr::kable(ja_file_counts[c("document_id", "target_N", "selected_N",
+  "unresolved_N", "no_candidates_N", "selection_coverage")], digits = 2,
+  col.names = c("Document", "Targets", "Selected", "Unresolved", "No candidate", "Coverage"))
+```
+
+```{r ja-files-type-table, eval=run_file_review, echo=FALSE}
+knitr::kable(ja_file_counts[c("document_id", "common_surface_V", "common_lexical_V",
+  "target_lexical_V")], col.names = c("Document", "Selected surface types",
+  "Selected lexical types", "All-target lexical types"))
+```
+
+The variant spellings have 3 surface types and 1 selected lexical identity on
+the same 3 targets. The two selected homophone occurrences have 1 surface type
+and 2 identities. The third homophone is unresolved, so the complete target
+lexical-type count stays `NA`, with coverage 2/3. The invented form also stays
+unavailable, rather than receiving its own identity as a fallback. For a
+document with no targets, zero target types is an empty-set count, not a claim
+that its writer knows zero words; selection coverage is unavailable.
+
+`ja_file_metrics` uses every retained body word. `ja_file_counts` describes only
+the declared targets. Do not replace the former's V with the latter's selected
+identity count. An all-word lexical-identity measure would require an explicit
+identity policy and adequate coverage for the whole word population.
+
+<details>
+<summary>Show how the body measures and target tables are calculated</summary>
+
+```{r ja-files-counts-code, ref.label='ja-files-counts', eval=FALSE, include=TRUE, echo=TRUE}
+```
+
+</details>
+
+### 5. Save enough to resume
+
+```{r ja-files-save, eval=run_file_review}
+```
+
+The recipe uses a temporary directory to avoid overwriting study files. In your
+project, save the same complete `ja_file_record` to a chosen persistent path:
+
+```{r ja-files-persistent-save, eval=FALSE}
+saveRDS(ja_file_record, "japanese-file-analysis.rds", version = 2)
+saved <- readRDS("japanese-file-analysis.rds")
+saved$counts
+saved$body_ranges
+saved$selection[saved$selection$reason != "retained", ]
+```
+
+The RDS retains the original text, input hashes, annotations, body ranges,
+inclusion reasons, candidates, before/after decisions, measures and session.
+The CSV is an inspection table and cannot replace that complete record. You can
+read the RDS without Python or a dictionary; reapplying KWIC decisions requires
+quanteda. For other analyzers, import their complete original surfaces and
+actual metadata into the same workflow; never replace source text with a
+normalized form to make the import succeed.
 
 ## Use gibasa and a local UniDic dictionary in R
 

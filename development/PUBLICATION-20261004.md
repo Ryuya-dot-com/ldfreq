@@ -3756,3 +3756,87 @@ Evidence is in reviews/ldfreq-beginner-help-20261007/evidence/. The installation
 pin will be updated because installed help, not just online articles, changes.
 Protected final-head CI, main integration, pinned-source verification and live
 Pages checks remain pending at this record point. No CRAN submission.
+
+## 2026-10-07 Beginner help publication completed
+
+Final head `f5360f1d935c298d4a3a2f40ab907c566a49e83f` passes all nine jobs
+in R-CMD-check run 37564411086 and both protected required checks. Current
+macOS, Windows, Linux and R devel each report 7,843 assertions, zero failures,
+warnings or skips, and Status: OK. R 4.1 reports 7,768 assertions, eight
+optional-dependency skips and two NOTEs: unavailable suggested gibasa/textstem
+and installed size 9.2Mb. Development-state classification succeeds in run
+37564411146; formal candidate artifact jobs are intentionally skipped. No
+cancellation, retry or timeout increase was used for CI.
+
+PR #26 merged through the protections to main
+`fe25ba0c6c63f681cff602d50a326c057bc5acbd`. Its tree is identical to the tested
+head: `20063a4aff042e9ec6554c0989bbc2afa8a92b29`. The merge subject skips only
+redundant same-tree main push CI. Ten public source files retrieved anonymously
+match the verified head. Runtime, data, exports, dependencies and vignettes
+remain unchanged.
+
+README pins installation to `e6919ad23ed7c2e003ff174e611b3d3bca6124d0`, the help
+snapshot immediately before the README-only final commit. The actual pak call
+successfully installed this revision into a separate verification library;
+the user's R library was not replaced. All eight installed help bodies match
+the source after applying Rd's normal DOI-macro expansion, all 128 files under
+inst match the installation, there are 57 exports, the simple TTR example is
+correct and the complete saved family profile replays identically. An initial
+plain-text comparison omitted the build/install macro stages and was corrected;
+this was a comparison setup issue rather than an installed-help discrepancy.
+Formatting-only edits were checked to preserve all eight example expressions.
+
+Pages commit `5e199941bb6d0e1eacdb17d0e73988e60b96e8e2` deploys successfully in
+run 37569726457, and the Pages API reports the same commit as built. All 13
+changed public files match the verified bytes through certificate-verified
+anonymous requests. The complete site has 252 files and 129 HTML pages with
+no missing links/anchors. All 56 existing files under articles, including the
+22 tutorials and their index, are unchanged. Live browser inspection confirms
+the first-analysis instructions, raw-text example and complete family input/
+coverage example display correctly. Only affected reference pages, home, NEWS
+and search were rebuilt; the remaining article calculations were reused.
+
+Evidence: reviews/ldfreq-beginner-help-20261007/evidence/, including the 25
+focused checks, fresh-session replay, GitHub installation/help comparison,
+public source hashes, CI summaries and direct job logs, merge identity, staged
+and live site hashes, and live screenshots. Completion-only records remain
+local; the merged PR description records the final results. No CRAN submission,
+release tag or new API. Novice-user usability testing remains unperformed.
+
+## 2026-10-07 Japanese file-to-review teaching workflow
+
+The existing Japanese guide now connects authored TXT files and complete CSV
+annotations with original-position body ranges, quanteda KWIC decisions,
+whole-body N/V/TTR, separate target-identity counts and complete RDS saving.
+Two title hits remain in the source and unsubmitted in review, while being
+excluded from body counts. Five documents retain spelling variants, homophones,
+an unlisted form, punctuation-only input and an empty file. A body boundary
+cutting through a token is rejected. Changing a body range is explicitly
+separate from changing the review snapshot. Detailed accounting code remains
+available in expandable sections; compact tables explain the denominators.
+
+The recipe, five TXT files and authored annotation CSV are installed examples,
+not an exported API or analyzer. Existing file-reader/import/review/metric APIs
+are reused; runtime, required dependencies and resource data are unchanged.
+README and the English input guide link to the walkthrough; NEWS records it.
+The earlier Sudachi backend experiment remains outside the installed package.
+
+Local validation: 34 focused assertions pass, with no warning or skip; an
+isolated installed example completes, and a new R session replays the full
+review and independently checks all five N/V/TTR rows from the saved RDS.
+The public API audit remains 57 exports and 34 registered S3 methods.
+Initial isolated-environment checks exposed unqualified stats/utils calls,
+which were qualified. A test/table initially assumed the text-workflow result
+shape; the token-batch API returns the result table directly and those accesses
+were corrected. These were recipe/test integration issues, not core formula
+changes. Existing unchanged full-package calculations were not rerun locally.
+
+The Japanese guide including the optional local gibasa branch and the changed
+English guide render successfully. Other site pages/assets are reused.
+Generating Markdown companions also brought eight reference Markdown files
+into agreement with the already published beginner-help HTML; their source Rd
+and public R help did not change. Local source, focused tests, save/replay,
+rendering, site/link checks and publication evidence are stored in
+reviews/ldfreq-japanese-files-20261007/evidence/. Protected final-head checks,
+main integration and live-site verification are pending at this record point.
+No CRAN submission or independent annotation/proficiency validation is included.
