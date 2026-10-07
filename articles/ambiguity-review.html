@@ -219,6 +219,437 @@ fingerprint, and change decision inputs rather than the output
 table.</p>
 </div>
 <div class="section level2">
+<h2 id="edit-decision-worksheet">Edit a decision worksheet and apply it again<a class="anchor" aria-label="anchor" href="#edit-decision-worksheet"></a>
+</h2>
+<p>Use this workflow when you want to inspect occurrences in R or a
+spreadsheet, record some decisions, and resume later. It uses the
+existing review API and base R; the reading function defined below is a
+tutorial recipe, not an exported ldfreq function. Run the section from
+its first chunk in a fresh R session. It requires the optional quanteda
+package and the installed text-file example from the <a href="https://ryuya-dot-com.github.io/ldfreq/#installation">documented
+installation</a>.</p>
+<div class="section level3">
+<h3 id="know-which-table-you-are-opening">Know which table you are opening<a class="anchor" aria-label="anchor" href="#know-which-table-you-are-opening"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Table</th>
+<th>One row represents</th>
+<th>Use</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Annotation import <code>$segments</code> / <code>$tokens</code>
+</td>
+<td>One original segment / token</td>
+<td>Check source text, boundaries, positions and available labels;
+retain the complete import</td>
+</tr>
+<tr class="even">
+<td>Review <code>$occurrences</code>
+</td>
+<td>One target occurrence</td>
+<td>Inspect KWIC, candidate count, current status and exact original
+context</td>
+</tr>
+<tr class="odd">
+<td>Review <code>$candidates</code>
+</td>
+<td>One supplied term–candidate pair</td>
+<td>Inspect the inventory; its rows are not corpus occurrences</td>
+</tr>
+<tr class="even">
+<td>Review <code>$decisions</code>
+</td>
+<td>One submitted occurrence decision</td>
+<td>Record <code>selected</code> or <code>unresolved</code>, candidate
+ID, reviewer and reason</td>
+</tr>
+<tr class="odd">
+<td>Text-batch <code>$token_audit</code>
+</td>
+<td>One audited token occurrence</td>
+<td>Inspect the analysis selection and exclusion reasons; this is a
+different output contract</td>
+</tr>
+</tbody>
+</table>
+<p>An English <code>lexdiv_tokenization</code> object and a complete
+external annotation import are different inputs. This section starts
+with <code><a href="../reference/lexdiv_import_annotations.html">lexdiv_import_annotations()</a></code>. For lemma/POS correction
+on an existing English tokenization, use the <a href="auditing-vocabulary-profiles.html#connect-annotation-changes-to-document-results">annotation
+sensitivity example</a>. For external annotations, reimport a complete
+corrected table and check <a href="annotation-alignment.html">position
+alignment</a>. Editing a sense decision does not change tokenization,
+lemma/POS or the source text.</p>
+</div>
+<div class="section level3">
+<h3 id="prepare-and-save-a-small-complete-review">Prepare and save a small complete review<a class="anchor" aria-label="anchor" href="#prepare-and-save-a-small-complete-review"></a>
+</h3>
+<p>These authored sentences deliberately include two occurrences of the
+same word, a target without candidates, a document without any target,
+and an empty document. The three candidate IDs are strings with leading
+zeros. They are illustrations, not entries from a sense dictionary or
+independently validated annotations.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span><span class="va">worksheet_segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"en"</span>, <span class="st">"en"</span>, <span class="st">"other"</span>, <span class="st">"empty"</span><span class="op">)</span>,</span>
+<span>  segment_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s1"</span>, <span class="st">"s2"</span>, <span class="st">"s1"</span>, <span class="st">"s1"</span><span class="op">)</span>,</span>
+<span>  text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"The bank lent money."</span>, <span class="st">"The river bank flooded."</span>, <span class="st">"Clouds move."</span>, <span class="st">""</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">worksheet_tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"en"</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"other"</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  segment_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"s1"</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"s2"</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"s1"</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  token_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>,</span>
+<span>  surface <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"The"</span>, <span class="st">"bank"</span>, <span class="st">"lent"</span>, <span class="st">"money"</span>, <span class="st">"."</span>,</span>
+<span>    <span class="st">"The"</span>, <span class="st">"river"</span>, <span class="st">"bank"</span>, <span class="st">"flooded"</span>, <span class="st">"."</span>, <span class="st">"Clouds"</span>, <span class="st">"move"</span>, <span class="st">"."</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">worksheet_annotations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_import_annotations.html">lexdiv_import_annotations</a></span><span class="op">(</span></span>
+<span>  <span class="va">worksheet_tokens</span>, <span class="va">worksheet_segments</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>language <span class="op">=</span> <span class="st">"en"</span>, analyzer <span class="op">=</span> <span class="st">"authored"</span>, analyzer_version <span class="op">=</span> <span class="st">"1"</span>,</span>
+<span>    dictionary <span class="op">=</span> <span class="st">"none"</span>, dictionary_version <span class="op">=</span> <span class="st">"not-applicable"</span>,</span>
+<span>    unit <span class="op">=</span> <span class="st">"authored-example"</span>, normalization <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">worksheet_candidates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bank"</span>, <span class="st">"bank"</span>, <span class="st">"money"</span><span class="op">)</span>,</span>
+<span>  candidate_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"001"</span>, <span class="st">"002"</span>, <span class="st">"003"</span><span class="op">)</span>,</span>
+<span>  label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"financial institution"</span>, <span class="st">"river edge"</span>, <span class="st">"medium of exchange"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">worksheet_resource</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  resource_id <span class="op">=</span> <span class="st">"authored-worksheet"</span>, resource_version <span class="op">=</span> <span class="st">"1"</span>,</span>
+<span>  source_reference <span class="op">=</span> <span class="st">"ldfreq authored worksheet example"</span>, data_license <span class="op">=</span> <span class="st">"MIT"</span><span class="op">)</span></span>
+<span><span class="va">worksheet_before</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ambiguity_review.html">lexdiv_ambiguity_review</a></span><span class="op">(</span><span class="va">worksheet_annotations</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bank"</span>, <span class="st">"money"</span>, <span class="st">"river"</span>, <span class="st">"absent"</span><span class="op">)</span>, <span class="va">worksheet_candidates</span>, <span class="va">worksheet_resource</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">review_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"ldfreq-review-"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">review_dir</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">worksheet_before</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">review_dir</span>, <span class="st">"review-before.rds"</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p>For your study, use a persistent project directory such as
+<code>"results/review-a"</code> and start with your own complete review.
+Keep each reviewer’s directory and later adjudication separate. The
+saved RDS contains the source text and inherits its sharing conditions.
+Do not overwrite your original files or earlier rounds.</p>
+</div>
+<div class="section level3">
+<h3 id="export-context-candidates-and-editable-decisions">Export context, candidates and editable decisions<a class="anchor" aria-label="anchor" href="#export-context-candidates-and-editable-decisions"></a>
+</h3>
+<p>The context and candidate CSVs are reference tables. The worksheet
+contains fixed identifiers and location cues beside four editable
+decision columns. Only the decision columns are sent back to the review
+API. Filtering a display is fine; retain all worksheet rows when saving
+this complete-sheet workflow.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">worksheet_context</span> <span class="op">&lt;-</span> <span class="va">worksheet_before</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"review_id"</span>, <span class="st">"occurrence_id"</span>,</span>
+<span>  <span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"token_index"</span>, <span class="st">"surface"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>,</span>
+<span>  <span class="st">"start"</span>, <span class="st">"end"</span>, <span class="st">"segment_text"</span>, <span class="st">"candidate_count"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">worksheet</span> <span class="op">&lt;-</span> <span class="va">worksheet_before</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"review_id"</span>, <span class="st">"occurrence_id"</span>,</span>
+<span>  <span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"token_index"</span>, <span class="st">"surface"</span>,</span>
+<span>  <span class="st">"status"</span>, <span class="st">"candidate_id"</span>, <span class="st">"reviewer"</span>, <span class="st">"reason"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">worksheet</span><span class="op">$</span><span class="va">status</span><span class="op">[</span></span>
+<span>  <span class="op">!</span><span class="va">worksheet</span><span class="op">$</span><span class="va">status</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"selected"</span>, <span class="st">"unresolved"</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA_character_</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">worksheet_context</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">review_dir</span>, <span class="st">"context.csv"</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>, na <span class="op">=</span> <span class="st">""</span>, fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">worksheet_before</span><span class="op">$</span><span class="va">candidates</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">review_dir</span>, <span class="st">"candidates.csv"</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>, na <span class="op">=</span> <span class="st">""</span>, fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">worksheet</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">review_dir</span>, <span class="st">"decisions-blank.csv"</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>, na <span class="op">=</span> <span class="st">""</span>, fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="va">worksheet_context</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"surface"</span>, <span class="st">"pre"</span>, <span class="st">"post"</span>,</span>
+<span>  <span class="st">"candidate_count"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   document_id segment_id surface           pre           post candidate_count</span></span>
+<span><span class="co">#&gt; 1          en         s1    bank           The   lent money .               2</span></span>
+<span><span class="co">#&gt; 2          en         s1   money The bank lent              .               1</span></span>
+<span><span class="co">#&gt; 3          en         s2   river           The bank flooded .               0</span></span>
+<span><span class="co">#&gt; 4          en         s2    bank     The river      flooded .               2</span></span>
+<span><span class="co">#&gt;          status</span></span>
+<span><span class="co">#&gt; 1    unreviewed</span></span>
+<span><span class="co">#&gt; 2    unreviewed</span></span>
+<span><span class="co">#&gt; 3 no_candidates</span></span>
+<span><span class="co">#&gt; 4    unreviewed</span></span>
+<span><span class="va">worksheet_before</span><span class="op">$</span><span class="va">candidates</span></span>
+<span><span class="co">#&gt;    term candidate_id                 label</span></span>
+<span><span class="co">#&gt; 1  bank          001 financial institution</span></span>
+<span><span class="co">#&gt; 2  bank          002            river edge</span></span>
+<span><span class="co">#&gt; 3 money          003    medium of exchange</span></span>
+<span><span class="co"># In interactive R, View(worksheet_context) opens the reference table.</span></span></code></pre></div>
+<p>Import CSV columns <strong>as text</strong> in a spreadsheet,
+including <code>candidate_id</code>; otherwise <code>001</code> may
+become <code>1</code>. Save CSV as UTF-8. You can hide long ID columns
+for display, but retain their complete values. Use the IDs to associate
+a row with context, even when the same word occurs several times in one
+sentence. A candidate must belong to that occurrence’s surface, not just
+exist elsewhere in the inventory.</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Fields</th>
+<th>What to enter</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>
+<code>review_id</code>, <code>occurrence_id</code>,
+<code>document_id</code>, <code>segment_id</code>,
+<code>token_index</code>, <code>surface</code>
+</td>
+<td>Keep unchanged; row order may change</td>
+</tr>
+<tr class="even">
+<td><code>status</code></td>
+<td>
+<code>selected</code>, <code>unresolved</code>, or blank for an
+unsubmitted row</td>
+</tr>
+<tr class="odd">
+<td><code>candidate_id</code></td>
+<td>A valid candidate ID for <code>selected</code>; blank for
+<code>unresolved</code>
+</td>
+</tr>
+<tr class="even">
+<td>
+<code>reviewer</code>, <code>reason</code>
+</td>
+<td>Both required for a submitted decision; leave both blank on an
+unsubmitted row</td>
+</tr>
+</tbody>
+</table>
+<p>Blank status is not a decision to leave a meaning unresolved. A row
+with all four decision cells blank remains <code>unreviewed</code>, or
+<code>no_candidates</code> when the inventory has no entry. A partly
+filled row is rejected so that a typed reason or candidate is not
+silently discarded. The template retains existing submitted decisions
+when you start from a previously reviewed object; clearing all four
+cells explicitly removes that decision in the new round. The old RDS
+remains the record of the preceding round.</p>
+<p>The following code <strong>simulates editing</strong> so the tutorial
+runs without manual steps. In your study, edit a copy named
+<code>decisions-edited.csv</code> and skip this simulation. Here the
+financial-bank occurrence is selected, the river-bank occurrence is
+deliberately left unresolved, and the other two rows are left
+unsubmitted. The river-bank sentence is clear; its unresolved status
+illustrates workflow accounting, not a claim that its interpretation is
+unknowable.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">edited_sheet</span> <span class="op">&lt;-</span> <span class="va">worksheet</span></span>
+<span><span class="va">finance_row</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">edited_sheet</span><span class="op">$</span><span class="va">segment_id</span> <span class="op">==</span> <span class="st">"s1"</span> <span class="op">&amp;</span></span>
+<span>  <span class="va">edited_sheet</span><span class="op">$</span><span class="va">surface</span> <span class="op">==</span> <span class="st">"bank"</span><span class="op">)</span></span>
+<span><span class="va">river_row</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">edited_sheet</span><span class="op">$</span><span class="va">segment_id</span> <span class="op">==</span> <span class="st">"s2"</span> <span class="op">&amp;</span></span>
+<span>  <span class="va">edited_sheet</span><span class="op">$</span><span class="va">surface</span> <span class="op">==</span> <span class="st">"bank"</span><span class="op">)</span></span>
+<span><span class="va">edited_sheet</span><span class="op">$</span><span class="va">status</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">finance_row</span>, <span class="va">river_row</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"selected"</span>, <span class="st">"unresolved"</span><span class="op">)</span></span>
+<span><span class="va">edited_sheet</span><span class="op">$</span><span class="va">candidate_id</span><span class="op">[</span><span class="va">finance_row</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"001"</span></span>
+<span><span class="va">edited_sheet</span><span class="op">$</span><span class="va">reviewer</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">finance_row</span>, <span class="va">river_row</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"example-reviewer"</span></span>
+<span><span class="va">edited_sheet</span><span class="op">$</span><span class="va">reason</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">finance_row</span>, <span class="va">river_row</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">'The context mentions lending, so choose "financial institution".'</span>,</span>
+<span>  <span class="st">"Demo: keep this case for a later review.\nNo selection submitted."</span><span class="op">)</span></span>
+<span><span class="co"># Simulate sorting the worksheet before saving.</span></span>
+<span><span class="va">edited_sheet</span> <span class="op">&lt;-</span> <span class="va">edited_sheet</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">edited_sheet</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">edited_sheet</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">review_dir</span>, <span class="st">"decisions-edited.csv"</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>, na <span class="op">=</span> <span class="st">""</span>, fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="read-check-and-apply-the-edited-file">Read, check and apply the edited file<a class="anchor" aria-label="anchor" href="#read-check-and-apply-the-edited-file"></a>
+</h3>
+<p>This recipe uses the strict UTF-8 reader from the file-input
+tutorial. It keeps the CSV’s byte hash and then parses every column as
+character. Only empty cells mean missing; literal <code>NA</code> and
+<code>TRUE</code> remain text. Quoted commas and line breaks in reasons
+are supported. CSV parsing can convert CRLF inside quoted fields to LF,
+as explained in the <a href="english-tokenization.html#import-text-files">file-input
+guide</a>.</p>
+<p>The reader requires the complete original row set, permits sorting,
+checks the fixed cells by occurrence ID, and rejects partial or invalid
+status entries. The existing review API then checks candidate
+membership, required decision fields and whether the source/candidate
+snapshot still matches.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">input_helpers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"text-file-input.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
+<span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">input_helpers</span><span class="op">)</span></span>
+<span><span class="va">read_review_sheet</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">path</span>, <span class="va">before</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">decoded</span> <span class="op">&lt;-</span> <span class="va">input_helpers</span><span class="op">$</span><span class="fu">read_text_file</span><span class="op">(</span><span class="va">path</span>, encoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span>  <span class="va">sheet</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span>text <span class="op">=</span> <span class="va">decoded</span><span class="op">$</span><span class="va">text</span>, colClasses <span class="op">=</span> <span class="st">"character"</span>,</span>
+<span>    na.strings <span class="op">=</span> <span class="st">""</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>  <span class="va">fixed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"review_id"</span>, <span class="st">"occurrence_id"</span>, <span class="st">"document_id"</span>,</span>
+<span>    <span class="st">"segment_id"</span>, <span class="st">"token_index"</span>, <span class="st">"surface"</span><span class="op">)</span></span>
+<span>  <span class="va">editable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"status"</span>, <span class="st">"candidate_id"</span>, <span class="st">"reviewer"</span>, <span class="st">"reason"</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sheet</span><span class="op">)</span><span class="op">)</span> <span class="op">||</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setequal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sheet</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">fixed</span>, <span class="va">editable</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Keep the original worksheet columns; edit only the four decision fields."</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">sheet</span><span class="op">[</span><span class="va">fixed</span><span class="op">]</span><span class="op">)</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">sheet</span><span class="op">$</span><span class="va">occurrence_id</span><span class="op">)</span> <span class="op">||</span></span>
+<span>      <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setequal</a></span><span class="op">(</span><span class="va">sheet</span><span class="op">$</span><span class="va">occurrence_id</span>, <span class="va">before</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">occurrence_id</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Keep every original occurrence ID exactly once, including unsubmitted rows."</span><span class="op">)</span></span>
+<span>  <span class="va">row</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">sheet</span><span class="op">$</span><span class="va">occurrence_id</span>, <span class="va">before</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">occurrence_id</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">field</span> <span class="kw">in</span> <span class="va">fixed</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">sheet</span><span class="op">[[</span><span class="va">field</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">before</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[[</span><span class="va">field</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="va">row</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>      <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"A fixed worksheet field changed: "</span>, <span class="va">field</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">submitted</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">sheet</span><span class="op">$</span><span class="va">status</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="op">!</span><span class="va">sheet</span><span class="op">$</span><span class="va">status</span><span class="op">[</span><span class="va">submitted</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"selected"</span>, <span class="st">"unresolved"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Status must be selected, unresolved, or blank."</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">sheet</span><span class="op">[</span><span class="va">editable</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="op">!</span><span class="va">submitted</span><span class="op">]</span> <span class="op">!=</span> <span class="fl">0L</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span></span>
+<span>      <span class="st">"An unsubmitted row is partly filled; finish or clear its four decision fields."</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sheet <span class="op">=</span> <span class="va">sheet</span>, source <span class="op">=</span> <span class="va">decoded</span><span class="op">$</span><span class="va">source</span>,</span>
+<span>    decisions <span class="op">=</span> <span class="va">sheet</span><span class="op">[</span><span class="va">submitted</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"review_id"</span>, <span class="st">"occurrence_id"</span>, <span class="va">editable</span><span class="op">)</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">worksheet_saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">review_dir</span>, <span class="st">"review-before.rds"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">worksheet_input</span> <span class="op">&lt;-</span> <span class="fu">read_review_sheet</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">review_dir</span>, <span class="st">"decisions-edited.csv"</span><span class="op">)</span>, <span class="va">worksheet_saved</span><span class="op">)</span></span>
+<span><span class="va">worksheet_after</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ambiguity_review.html">lexdiv_ambiguity_review</a></span><span class="op">(</span><span class="va">worksheet_saved</span><span class="op">$</span><span class="va">source</span>,</span>
+<span>  <span class="va">worksheet_saved</span><span class="op">$</span><span class="va">summary</span><span class="op">$</span><span class="va">term</span>, <span class="va">worksheet_saved</span><span class="op">$</span><span class="va">candidates</span>,</span>
+<span>  <span class="va">worksheet_saved</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">resource</span>, decisions <span class="op">=</span> <span class="va">worksheet_input</span><span class="op">$</span><span class="va">decisions</span>,</span>
+<span>  window <span class="op">=</span> <span class="va">worksheet_saved</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">window</span><span class="op">)</span></span>
+<span><span class="va">worksheet_change</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_compare_ambiguity.html">lexdiv_compare_ambiguity</a></span><span class="op">(</span><span class="va">worksheet_saved</span>, <span class="va">worksheet_after</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">worksheet_saved</span><span class="op">$</span><span class="va">source</span>, <span class="va">worksheet_after</span><span class="op">$</span><span class="va">source</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">worksheet_saved</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">occurrence_id</span>,</span>
+<span>    <span class="va">worksheet_after</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">occurrence_id</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">worksheet_after</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">status</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"selected"</span>, <span class="st">"unreviewed"</span>, <span class="st">"no_candidates"</span>, <span class="st">"unresolved"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">worksheet_after</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">candidate_id</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="st">"001"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">worksheet_after</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"surface"</span>,</span>
+<span>  <span class="st">"candidate_id"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   document_id segment_id surface candidate_id        status</span></span>
+<span><span class="co">#&gt; 1          en         s1    bank          001      selected</span></span>
+<span><span class="co">#&gt; 2          en         s1   money         &lt;NA&gt;    unreviewed</span></span>
+<span><span class="co">#&gt; 3          en         s2   river         &lt;NA&gt; no_candidates</span></span>
+<span><span class="co">#&gt; 4          en         s2    bank         &lt;NA&gt;    unresolved</span></span></code></pre></div>
+<p>The <code>worksheet_change</code> object compares two stages of one
+review. It is not independent inter-rater agreement. The returned review
+contains <strong>all four</strong> target occurrences, even though only
+two decisions were submitted. Submitted decisions replace the current
+decision set; they are not an incremental patch. Use a template from the
+latest saved review to retain its existing decisions. Do not edit the
+returned review object directly or replace its content fingerprint.</p>
+<p>If application fails, correct the worksheet and apply it again from
+the saved baseline. Changing the source text, annotations, targets or
+candidate inventory requires a new review and renewed decisions;
+changing IDs to force acceptance would destroy that correspondence. The
+snapshot checks detect outdated inputs, not whether a human chose the
+linguistically correct candidate or assigned a valid choice to the
+intended occurrence.</p>
+</div>
+<div class="section level3">
+<h3 id="summarize-all-documents-and-save-the-completed-round">Summarize all documents and save the completed round<a class="anchor" aria-label="anchor" href="#summarize-all-documents-and-save-the-completed-round"></a>
+</h3>
+<p>Count one row per target occurrence, not per candidate or decision.
+Start from the complete source document list to retain the empty
+document and the document without targets. Here “reviewed” means a
+submitted selection <strong>or</strong> an explicit unresolved judgment.
+Its denominator is the searched target occurrences, not all words,
+writers, or only occurrences with candidates.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">worksheet_report</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">worksheet_after</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">segments</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">occ</span> <span class="op">&lt;-</span> <span class="va">worksheet_after</span><span class="op">$</span><span class="va">occurrences</span></span>
+<span><span class="va">where</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">occ</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">worksheet_report</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span></span>
+<span><span class="va">worksheet_report</span><span class="op">$</span><span class="va">target_occurrences</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tabulate.html" class="external-link">tabulate</a></span><span class="op">(</span><span class="va">where</span>,</span>
+<span>  nbins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">worksheet_report</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">state</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"selected"</span>, <span class="st">"unresolved"</span>, <span class="st">"unreviewed"</span>, <span class="st">"no_candidates"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">worksheet_report</span><span class="op">[[</span><span class="va">state</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tabulate.html" class="external-link">tabulate</a></span><span class="op">(</span><span class="va">where</span><span class="op">[</span><span class="va">occ</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="va">state</span><span class="op">]</span>,</span>
+<span>    nbins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">worksheet_report</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">worksheet_report</span><span class="op">$</span><span class="va">reviewed_proportion</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">worksheet_report</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">target_occurrences</span> <span class="op">&gt;</span> <span class="fl">0</span>,</span>
+<span>    <span class="op">(</span><span class="va">selected</span> <span class="op">+</span> <span class="va">unresolved</span><span class="op">)</span> <span class="op">/</span> <span class="va">target_occurrences</span>, <span class="cn">NA_real_</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">worksheet_report</span><span class="op">[</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"selected"</span>, <span class="st">"unresolved"</span>, <span class="st">"unreviewed"</span>, <span class="st">"no_candidates"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">worksheet_report</span><span class="op">$</span><span class="va">target_occurrences</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">worksheet_report</span><span class="op">$</span><span class="va">target_occurrences</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4L</span>, <span class="fl">0L</span>, <span class="fl">0L</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">worksheet_report</span><span class="op">$</span><span class="va">reviewed_proportion</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">worksheet_report</span><span class="op">$</span><span class="va">reviewed_proportion</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">worksheet_report</span>, digits <span class="op">=</span> <span class="fl">2</span>, col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Document"</span>, <span class="st">"Targets"</span>,</span>
+<span>  <span class="st">"Selected"</span>, <span class="st">"Unresolved"</span>, <span class="st">"Unreviewed"</span>, <span class="st">"No candidates"</span>, <span class="st">"Reviewed / targets"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="11%">
+<col width="9%">
+<col width="11%">
+<col width="13%">
+<col width="13%">
+<col width="17%">
+<col width="23%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Document</th>
+<th align="right">Targets</th>
+<th align="right">Selected</th>
+<th align="right">Unresolved</th>
+<th align="right">Unreviewed</th>
+<th align="right">No candidates</th>
+<th align="right">Reviewed / targets</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">en</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="even">
+<td align="left">other</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">empty</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">worksheet_after</span><span class="op">$</span><span class="va">summary</span>  <span class="co"># The absent target also remains, with zero occurrences.</span></span>
+<span><span class="co">#&gt;     term candidate_count occurrences unreviewed selected unresolved</span></span>
+<span><span class="co">#&gt; 1   bank               2           2          0        1          1</span></span>
+<span><span class="co">#&gt; 2  money               1           1          1        0          0</span></span>
+<span><span class="co">#&gt; 3  river               0           1          0        0          0</span></span>
+<span><span class="co">#&gt; 4 absent               0           0          0        0          0</span></span>
+<span><span class="co">#&gt;   no_candidates</span></span>
+<span><span class="co">#&gt; 1             0</span></span>
+<span><span class="co">#&gt; 2             0</span></span>
+<span><span class="co">#&gt; 3             1</span></span>
+<span><span class="co">#&gt; 4             0</span></span>
+<span></span>
+<span><span class="va">worksheet_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>before <span class="op">=</span> <span class="va">worksheet_saved</span>, input <span class="op">=</span> <span class="va">worksheet_input</span>,</span>
+<span>  after <span class="op">=</span> <span class="va">worksheet_after</span>, comparison <span class="op">=</span> <span class="va">worksheet_change</span>,</span>
+<span>  documents <span class="op">=</span> <span class="va">worksheet_report</span>, session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">worksheet_record</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">review_dir</span>, <span class="st">"review-after.rds"</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">worksheet_report</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">review_dir</span>, <span class="st">"review-counts.csv"</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>, na <span class="op">=</span> <span class="st">""</span>, fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">review_dir</span>, <span class="st">"review-after.rds"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="va">worksheet_record</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Two of four target occurrences have been reviewed; one has a selected
+candidate. The zero-target documents have an undefined reviewed
+proportion (<code>NA</code>), not 0%. These counts describe review
+progress, not annotation accuracy or lexical ability. The original word
+forms and token boundaries are unchanged, so a surface-based MATTR
+analysis of the same text is unchanged too. A declared <a href="preprocessing-and-frequency.html#apply-contextual-judgments-to-individual-occurrences">word-family
+workflow</a> can apply reviewed membership candidates to its own
+accounting; a sense choice does not automatically redefine a word family
+or recover sense-specific frequency.</p>
+</div>
+</div>
+<div class="section level2">
 <h2 id="compare-two-reviews-and-return-to-open-cases">Compare two reviews and return to open cases<a class="anchor" aria-label="anchor" href="#compare-two-reviews-and-return-to-open-cases"></a>
 </h2>
 <p><code><a href="../reference/lexdiv_compare_ambiguity.html">lexdiv_compare_ambiguity()</a></code> compares two reviews of the
@@ -226,7 +657,7 @@ same source and candidate snapshot. It does not search again. The next
 decisions are authored to demonstrate a disagreement and a one-sided
 selection; they are not measurements of annotator performance. In a
 study, collect independent decisions before sharing them.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">decisions_b</span> <span class="op">&lt;-</span> <span class="va">review</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"review_id"</span>, <span class="st">"occurrence_id"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="va">decisions_b</span><span class="op">$</span><span class="va">status</span> <span class="op">&lt;-</span> <span class="st">"selected"</span></span>
 <span><span class="va">decisions_b</span><span class="op">$</span><span class="va">candidate_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bank-river"</span>, <span class="st">"bank-river"</span><span class="op">)</span></span>
@@ -297,7 +728,7 @@ that two reviewers worked independently.</p>
 This is a homograph example, not a pair with the same pronunciation.
 Both candidates are retained; the function does not infer a reading from
 the sentence or discard a candidate using upstream POS.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ja_segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="st">"ja"</span>, segment_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s1"</span>, <span class="st">"s2"</span><span class="op">)</span>,</span>
 <span>  text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"その店は人気がある。"</span>, <span class="st">"ここは人気がない。"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">ja_tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="st">"ja"</span>, segment_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s1"</span>, <span class="st">"s2"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -324,7 +755,7 @@ verified reader from the <a href="japanese-norms.html">Japanese norms
 guide</a>. Obtain the pinned WLSP-familiarity v4.0 CSV using that guide
 first. The following chunk is explicit local-file work and is not run
 during installation or site building:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"wlsp-items.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">inventory</span> <span class="op">&lt;-</span> <span class="fu">wlsp_ambiguity_candidates</span><span class="op">(</span><span class="st">"人気"</span>, <span class="st">"japanese-resources/bunruidb-fam.csv"</span><span class="op">)</span></span>
 <span><span class="va">wlsp_review</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ambiguity_review.html">lexdiv_ambiguity_review</a></span><span class="op">(</span><span class="va">ja</span>, <span class="st">"人気"</span>,</span>
@@ -390,7 +821,7 @@ occurrences, report the excluded/unresolved proportion by relevant
 condition. A distribution of chosen senses in this reviewed sample is
 not a general reference-frequency norm or evidence of each learner’s
 ability to use every sense.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
 <span><span class="va">bundle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>review_a <span class="op">=</span> <span class="va">reviewed</span>, review_b <span class="op">=</span> <span class="va">review_b</span>, comparison <span class="op">=</span> <span class="va">comparison</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">bundle</span>, <span class="va">path</span><span class="op">)</span></span>

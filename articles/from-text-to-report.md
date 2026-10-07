@@ -152,6 +152,13 @@ follow
 Keep that segmentation and its frequency results distinct from the
 surface units selected above.
 
+To inspect ambiguous occurrences before reporting, follow the [editable
+decision
+worksheet](https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.html#edit-decision-worksheet).
+It keeps source context, unsubmitted cases, explicit unresolved
+judgments and document-level review counts separate from
+lexical-diversity scores.
+
 ## Prepare the figure at its publication size
 
 Plots default to color and have no automatic title or subtitle. In both
