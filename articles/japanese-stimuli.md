@@ -119,6 +119,12 @@ saveRDS(list(imported = ja, selection = selection, frequency = token_frequency),
         "japanese-token-frequency.rds")
 ```
 
+For full document accounting, unresolved keys in the denominator, and
+common-span comparisons, continue with [document frequency
+profiles](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#connect-document-selections-to-reference-frequency).
+The reader also returns the full inspected table in `$reference` for
+that workflow and local saved-input replay.
+
 This is a reviewed base-key lookup, **not a reproduction of the full
 TUBELEX tokenizer**. Upstream converts fullwidth tilde before
 tokenization, handles numbers/placeholders and uses surface fallback for

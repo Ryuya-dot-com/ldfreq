@@ -2,6 +2,18 @@
 
 ## ldfreq 0.2.0 (development)
 
+### Japanese document frequency workflows
+
+- Added sourced recipes connecting complete Japanese document selections
+  and explicit keys to the existing norm-profile batch calculation, with
+  unresolved keys in full-token coverage, source-linked values and
+  saved-reference replay.
+- Added same-source, same-reference common-span comparisons, an
+  APA-style coverage plot with a monochrome option, and an authored
+  file-to-frequency walkthrough. The optional Japanese TUBELEX reader
+  now retains its full inspected reference table for local batches; no
+  Japanese corpus/table or new export is bundled.
+
 ### Japanese document descriptions
 
 - Added an explicitly sourced document-profile recipe with separate

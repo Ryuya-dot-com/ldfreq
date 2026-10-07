@@ -596,6 +596,223 @@ ja_profile$documents
 ja_file_output  # Temporary folder; choose a persistent output for your study.
 ```
 
+## Connect document selections to reference frequency
+
+A frequency mean can change because the selected words changed, because
+lookup keys changed, or because some words could not be scored. Keep the
+original occurrences and all three denominators visible. This recipe
+connects the document profile above to the existing
+[`lexdiv_norm_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile_batch.md)
+calculation.
+
+The following reference has **fictional teaching numbers, not TUBELEX
+data or Japanese norms**. Its zero and missing value are deliberate
+examples. No download, analyzer or API call is needed. Start with the
+complete file/profile example above.
+
+``` r
+sys.source(system.file("examples", "japanese-frequency-documents.R", package = "ldfreq", mustWork = TRUE),
+  envir = environment())
+```
+
+``` r
+ja_frequency_keys <- ja_profile$tokens[c("document_id", "segment_id", "token_index", "start", "end", "surface")]
+ja_frequency_keys$lookup_term <- ja_frequency_keys$surface
+ja_frequency_keys$key_reason <- "Author-specified surface key for this teaching table"
+# Apply existing authored decisions only at their original source spans.
+for (i in seq_len(nrow(ja_file_after$occurrences))) {
+  o <- ja_file_after$occurrences[i, ]
+  row <- which(ja_frequency_keys$document_id == o$document_id &
+    ja_frequency_keys$segment_id == o$segment_id &
+    ja_frequency_keys$start == o$start & ja_frequency_keys$end == o$end)
+  if (o$status == "selected") {
+    ja_frequency_keys$lookup_term[row] <- ja_file_candidates$label[
+      match(o$candidate_id, ja_file_candidates$candidate_id)]
+    ja_frequency_keys$key_reason[row] <- "Explicit authored lexical decision and table-specific key"
+  } else if (o$surface == "はし") {
+    ja_frequency_keys$lookup_term[row] <- NA_character_
+    ja_frequency_keys$key_reason[row] <- "No selected lexical candidate; key left unresolved"
+  }
+}
+```
+
+This table-specific key mapping reuses the authored lexical decisions.
+It does not generate UniDic `orthBase` values. One ambiguous `はし`
+remains unresolved; the invented `ぷにょ語` has a supplied key but no
+entry in the teaching table. Every original token, including exclusions
+and title words, has an anchored row. In your study, record the source
+and reason for each key. A lexical decision alone does not establish
+compatibility with a particular frequency table.
+
+``` r
+# Fictional values, including one observed zero and one missing annotation.
+ja_demo_norms <- data.frame(word = c("林檎", "と", "を", "橋", "箸", "で", "渡る", "食べる", "見る"),
+  per_million = c(10, 1000, 500, 2, 3, 200, 40, 60, 0),
+  video_proportion = c(.1, .9, .8, .01, .02, .7, .2, .3, 0),
+  channel_proportion = c(.2, .95, .9, .02, .03, .8, .3, .4, NA_real_))
+ja_demo_measures <- names(ja_demo_norms)[-1]
+ja_demo_specs <- data.frame(measure_id = ja_demo_measures, value_column = ja_demo_measures,
+  construct_id = c("corpus_frequency", "video_range", "channel_range"),
+  value_unit = c("occurrences_per_million_tokens", "proportion_of_videos", "proportion_of_channels"),
+  direction = "descriptive", language = "Japanese", variety = "authored_example",
+  population_id = "authored_demo", collection_year = "not_observed",
+  valid_min = 0, valid_max = c(1e6, 1, 1))
+ja_demo_resource <- list(resource_id = "authored_japanese_frequency", resource_version = "1",
+  creator = "ldfreq authors", source_reference = "Fictional teaching values, not corpus estimates",
+  data_license = "MIT", transformation_id = "none",
+  lookup_unit = "authored_keys_with_explicit_lexical_decisions",
+  resource_key_normalization_id = "identity")
+ja_demo_reference <- list(norms = ja_demo_norms, key = "word", measure_specs = ja_demo_specs,
+  resource = ja_demo_resource)
+ja_frequency <- japanese_frequency_documents(ja_profile, ja_frequency_keys, ja_demo_reference)
+```
+
+| Document   | Retained | Key supplied | Matched | Key unresolved | Unmatched | Coverage |
+|:-----------|---------:|-------------:|--------:|---------------:|----------:|---------:|
+| variants   |        5 |            5 |       5 |              0 |         0 |    1.000 |
+| homophones |        9 |            8 |       8 |              1 |         0 |    0.889 |
+| unlisted   |        1 |            1 |       0 |              0 |         1 |    0.000 |
+| no_targets |        0 |            0 |       0 |              0 |         0 |       NA |
+| empty      |        0 |            0 |       0 |              0 |         0 |       NA |
+
+Here `homophones` has 9 retained tokens, 8 supplied keys and 8 matches:
+**full-token coverage is 8/9**, even though all 8 supplied keys match.
+`unlisted` has coverage zero. Documents with no retained tokens have
+`NA` coverage and means. The accounting identity is retained = matched +
+unmatched + unresolved.
+
+``` r
+subset(ja_frequency$norms$summary, measure_id == "per_million",
+  select = c(document_id, weighting, estimate, input_units, observed_value_units, missing_reason))
+#>    document_id weighting estimate input_units observed_value_units
+#> 1     variants     token  406.000           5                    5
+#> 2     variants      type  505.000           2                    2
+#> 7   homophones     token  163.125           8                    8
+#> 8   homophones      type  115.000           7                    7
+#> 13    unlisted     token       NA           1                    0
+#> 14    unlisted      type       NA           1                    0
+#> 19  no_targets     token       NA           0                    0
+#> 20  no_targets      type       NA           0                    0
+#> 25       empty     token       NA           0                    0
+#> 26       empty      type       NA           0                    0
+#>     missing_reason
+#> 1             <NA>
+#> 2             <NA>
+#> 7             <NA>
+#> 8             <NA>
+#> 13 no_matched_keys
+#> 14 no_matched_keys
+#> 19     empty_input
+#> 20     empty_input
+#> 25     empty_input
+#> 26     empty_input
+```
+
+The existing norm summaries use **resolved keys** as input units. Token
+means weight occurrences; type means use unique exact lookup keys, not
+independently identified lexemes. Both means use observed matched values
+only. For `variants`, the fictional token mean is 406 and the type mean
+is 505. For `homophones`, the frequency mean includes the observed zero
+for `見る`; its missing channel value is omitted only from the channel
+mean, whose observed denominator is shown. Always report these
+conditional summaries beside `$documents`, whose coverage includes
+unresolved keys. Type coverage for unresolved lexical identities is not
+estimated. `$occurrences` retains source anchors, keys, reasons,
+statuses and each `value_` column, including excluded occurrences for
+inspection.
+
+``` r
+plot_japanese_frequency_coverage(ja_frequency)
+```
+
+![](japanese-annotations_files/figure-html/ja-frequency-coverage-plot-1.png)
+
+``` r
+# Use monochrome = TRUE for black and white.
+```
+
+The points use the complete retained-token denominator. Rows without a
+point have no retained tokens; they are not plotted at zero. The figure
+has no title or subtitle. Add the figure number, title and note in your
+manuscript.
+
+### Compare selection conditions on common original spans
+
+``` r
+# A second selection policy on unchanged text and unchanged lookup keys.
+ja_content_selection <- ja_profile$selection
+ja_content_keep <- !is.na(ja_profile$tokens$pos_group) & ja_profile$tokens$pos_group == "content"
+ja_content_selection$reason[ja_content_selection$retained & !ja_content_keep] <- "outside_declared_content_group"
+ja_content_selection$retained <- ja_content_selection$retained & ja_content_keep
+ja_content_profile <- japanese_document_profile(ja_profile$imported, ja_content_selection,
+  ja_pos_groups, condition = "authored-content-group")
+ja_content_frequency <- japanese_frequency_documents(ja_content_profile, ja_frequency_keys, ja_demo_reference)
+ja_frequency_comparison <- common_japanese_frequency(list(body = ja_frequency, content = ja_content_frequency))
+```
+
+`$all` retains each full selection. `$common` retains only the same
+original document/segment/start/end/surface with a match and **all
+supplied measures observed in every condition**. This is a conservative
+complete-case comparison: it does not align a long token to two shorter
+ones or impute missing values. Token indices may change after
+segmentation, so commonality uses original spans, not row numbers or
+token indices. Different original texts or reference tables are
+rejected; comparison across reference resources is a separate operation.
+
+| scope  | condition | document   | retained | observed |    mean |
+|:-------|:----------|:-----------|---------:|---------:|--------:|
+| all    | body      | variants   |        5 |        5 | 406.000 |
+| all    | body      | homophones |        9 |        8 | 163.125 |
+| all    | content   | variants   |        3 |        3 |  10.000 |
+| all    | content   | homophones |        6 |        5 |  21.000 |
+| common | body      | variants   |        3 |        3 |  10.000 |
+| common | body      | homophones |        4 |        4 |  26.250 |
+| common | content   | variants   |        3 |        3 |  10.000 |
+| common | content   | homophones |        4 |        4 |  26.250 |
+
+The common rows have identical frequency means here because both
+conditions use the same keys and reference. Differences in their
+full-selection means describe which tokens entered the analysis. They do
+not establish a change in proficiency. The missing channel annotation
+also excludes `見る` from this all-measure common set, although its
+frequency itself is observed as zero. Choose your measure set before
+forming the intersection and report the retained counts.
+
+``` r
+ja_frequency_record <- list(comparison = ja_frequency_comparison, review = ja_profile_record)
+saveRDS(ja_frequency_record, file.path(ja_file_output, "frequency-analysis.rds"), version = 2)
+utils::write.csv(ja_frequency$documents, file.path(ja_file_output, "frequency-documents.csv"),
+  row.names = FALSE, fileEncoding = "UTF-8", na = "NA")
+utils::write.csv(ja_frequency$norms$summary, file.path(ja_file_output, "frequency-summary.csv"),
+  row.names = FALSE, fileEncoding = "UTF-8", na = "NA")
+utils::write.csv(ja_frequency$occurrences, file.path(ja_file_output, "frequency-occurrences.csv"),
+  row.names = FALSE, fileEncoding = "UTF-8", na = "NA")
+```
+
+The full RDS saves original text, complete annotations, earlier lexical
+decisions, selection/key policies, the actual reference table and both
+comparison scopes. CSV tables support inspection and analysis; they do
+not replace that record. Choose a persistent output folder for a study.
+Replay needs the saved reference, not a model, API key or a new
+download:
+
+``` r
+ja_frequency_saved <- readRDS(file.path(ja_file_output, "frequency-analysis.rds"))
+ja_frequency_inputs <- ja_frequency_saved$comparison$all
+ja_frequency_replayed <- lapply(ja_frequency_inputs, function(x)
+  japanese_frequency_documents(x$source_profile, x$keys, x$reference))
+stopifnot(identical(ja_frequency_replayed, ja_frequency_inputs),
+  identical(common_japanese_frequency(ja_frequency_replayed), ja_frequency_saved$comparison))
+```
+
+Run the entire authored workflow in a fresh session with:
+
+``` r
+source(system.file("examples", "japanese-frequency-demo.R", package = "ldfreq"))
+ja_frequency$documents
+ja_file_output
+```
+
 ## Use gibasa and a local UniDic dictionary in R
 
 [gibasa](https://paithiov909.github.io/gibasa/) supplies the MeCab
@@ -1217,6 +1434,61 @@ frequency of its kanji spelling or sum homophones merely because they
 share a reading. Use a compatible lexical-unit table or report that the
 requested frequency is unavailable; a lexical selection does not create
 sense-specific frequencies.
+
+To apply the same document workflow to the **separately acquired, pinned
+Japanese TUBELEX base table**, first follow the acquisition instructions
+in [Japanese stimulus
+selection](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-stimuli.md).
+Continue from the actual `ja` import in the gibasa section; do not pass
+the teaching reference above as TUBELEX. This example selects the whole
+source except auxiliary symbols and whitespace, while retaining
+missing-base tokens in the full denominator.
+
+``` r
+source(system.file("examples", "japanese-frequency-documents.R", package = "ldfreq"))
+source(system.file("examples", "japanese-tubelex.R", package = "ldfreq"))
+t <- ja$tokens
+anchors <- c("document_id", "segment_id", "token_index", "start", "end", "surface")
+mask <- t[anchors]
+mask$in_body <- TRUE
+excluded <- (!is.na(t$POS1) & t$POS1 %in% c("補助記号", "空白")) |
+  stringi::stri_detect_regex(t$surface, "\\p{White_Space}")
+mask$retained <- !excluded
+mask$reason <- ifelse(excluded, "auxiliary_symbol_or_whitespace", "retained")
+profile <- japanese_document_profile(ja, mask,
+  c("名詞" = "content", "動詞" = "content", "助詞" = "function", "助動詞" = "function"),
+  condition = "whole-source-with-missing-bases")
+items <- t[anchors]
+items$item_id <- paste0("source-", seq_len(nrow(t)))
+items$term <- t$surface
+items$orth_base <- t$orthBase
+absent <- is.na(items$orth_base) | !nzchar(stringi::stri_trim_both(items$orth_base)) | items$orth_base == "*"
+items$orth_base[absent] <- NA_character_
+items$base_reason <- ifelse(absent, "No dictionary orthBase assigned",
+  "Recorded unidic-lite 1.0.8 orthBase; not an independent contextual judgment")
+frequency_path <- file.path("japanese-resources", "tubelex-ja-base-pos.tsv.xz")
+eligible <- nzchar(stringi::stri_trim_both(items$term))
+items$base_reason[!eligible] <- "Whitespace token not sent to word-key lookup"
+lookup <- profile_japanese_tubelex_items(items[eligible, ], frequency_path)
+keys <- items[anchors]
+keys$lookup_term <- lookup$items$tubelex_lookup_term[match(items$item_id, lookup$items$item_id)]
+keys$key_reason <- items$base_reason
+reference <- lookup$reference
+reference$source <- lookup$source  # File hash, totals, normalization and versions.
+frequency_documents <- japanese_frequency_documents(profile, keys, reference)
+frequency_documents$documents
+frequency_documents$norms$summary
+saveRDS(list(frequency = frequency_documents, lookup = lookup), "japanese-frequency.rds")
+```
+
+The local reader now returns its complete inspected aggregate in
+`$reference`, so document batches and later replay use the same table
+rather than a queried-only excerpt. Keys receive the reader’s declared
+NFKC/lowercase transformation; original surfaces and positions stay
+unchanged. The majority POS remains reference information, not a POS- or
+sense-specific frequency. Saving the full reference consumes more space
+than saving a summary alone. No Japanese aggregate or source corpus is
+added to the package, and normal examples never download it.
 
 For an external Japanese norm table, prepare and check unique keys and
 use
