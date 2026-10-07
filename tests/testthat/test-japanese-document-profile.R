@@ -1,22 +1,22 @@
 japanese_profile_fixture <- function() {
   e <- new.env(parent = baseenv())
   sys.source(system.file("examples", "japanese-document-profile.R", package = "ldfreq", mustWork = TRUE), e)
-  words <- c("学校", "がっこう", "カタカナ", "ｶﾞ", "か\u3099", "Ａ12", "ー", "々", "🙂", "。", "！", "？")
+  words <- c("\u5b66\u6821", "\u304c\u3063\u3053\u3046", "\u30ab\u30bf\u30ab\u30ca", "\uff76\uff9e", "\u304b\u3099", "\uff2112", "\u30fc", "\u3005", "\U0001f642", "\u3002", "\uff01", "\uff1f")
   segments <- data.frame(document_id = c("unicode", "unicode", "empty", "punct"),
     segment_id = c("s1", "s2", "s1", "s1"),
-    text = c(paste0(paste(words[1:8], collapse = " "), "\r\n"), "🙂。", "", "！？"))
+    text = c(paste0(paste(words[1:8], collapse = " "), "\r\n"), "\U0001f642\u3002", "", "\uff01\uff1f"))
   tokens <- data.frame(document_id = c(rep("unicode", 10), rep("punct", 2)),
     segment_id = c(rep("s1", 8), "s2", "s2", "s1", "s1"), token_index = c(1:8, 1:2, 1:2),
-    surface = words, POS1 = c(rep("名詞", 4), "XPOS", NA, "名詞", "名詞", "記号", rep("補助記号", 3)),
-    goshu = c("漢", "漢", "和", "外", "*", NA, "", "和", rep("記号", 4)))
+    surface = words, POS1 = c(rep("\u540d\u8a5e", 4), "XPOS", NA, "\u540d\u8a5e", "\u540d\u8a5e", "\u8a18\u53f7", rep("\u88dc\u52a9\u8a18\u53f7", 3)),
+    goshu = c("\u6f22", "\u6f22", "\u548c", "\u5916", "*", NA, "", "\u548c", rep("\u8a18\u53f7", 4)))
   provenance <- list(language = "ja", analyzer = "authored", analyzer_version = "1", dictionary = "none",
     dictionary_version = "none", unit = "authored", normalization = "none")
   x <- lexdiv_import_annotations(tokens, segments, provenance)
   mask <- x$tokens[c("document_id", "segment_id", "token_index", "start", "end", "surface")]
   mask$in_body <- TRUE
-  mask$retained <- !words %in% c("。", "！", "？")
+  mask$retained <- !words %in% c("\u3002", "\uff01", "\uff1f")
   mask$reason <- ifelse(mask$retained, "retained", "declared_punctuation")
-  list(e = e, x = x, mask = mask, groups = c("名詞" = "content", "助詞" = "function"))
+  list(e = e, x = x, mask = mask, groups = setNames(c("content", "function"), c("\u540d\u8a5e", "\u52a9\u8a5e")))
 }
 
 test_that("Japanese profiles separate codepoints, origin, POS and denominators", {
@@ -51,10 +51,10 @@ test_that("Japanese profiles separate codepoints, origin, POS and denominators",
   expect_identical(p$imported$segments$text, f$x$segments$text)
   expect_equal(p$tokens$char_kana_shared[4], 1)
   expect_equal(p$tokens$char_mark[5], 1)
-  # Script is not word origin: the authored katakana token has a 和 label.
+  # Script is not word origin: the authored katakana token has a \u548c label.
   expect_equal(p$tokens$char_katakana[3], 4)
-  expect_identical(p$tokens$origin_value[3], "和")
-  d <- f$e$.japanese_profile_characters(c("が", "か\u3099", "", "\U00020000"))
+  expect_identical(p$tokens$origin_value[3], "\u548c")
+  d <- f$e$.japanese_profile_characters(c("\u304c", "\u304b\u3099", "", "\U00020000"))
   expect_equal(rowSums(d), c(1, 2, 0, 1))
   expect_equal(d[, "mark"], c(0, 1, 0, 0))
   expect_equal(d[, "han"], c(0, 0, 0, 1))
@@ -75,9 +75,9 @@ test_that("profile selections reject changed anchors and preserve missing fields
   mask <- f$mask; mask$in_body[1] <- FALSE
   expect_error(run(f$x, mask, f$groups, "test"), "logical")
   expect_error(run(f$x, rbind(f$mask, f$mask[1, ]), f$groups, "test"), "unique")
-  expect_error(run(f$x, f$mask, c("名詞" = "content", "名詞" = "function"), "test"), "unique")
+  expect_error(run(f$x, f$mask, setNames(c("content", "function"), rep("\u540d\u8a5e", 2)), "test"), "unique")
   expect_error(run(f$x, f$mask, c("*" = "content"), "test"), "nonmissing")
-  changed <- f$x; changed$tokens$goshu[1] <- "和"
+  changed <- f$x; changed$tokens$goshu[1] <- "\u548c"
   expect_error(run(changed, f$mask, f$groups, "test"), "Annotations changed")
   t <- f$x$tokens; t$goshu <- NULL
   absent <- lexdiv_import_annotations(t, f$x$segments[c("document_id", "segment_id", "text")],
@@ -111,7 +111,7 @@ test_that("installed authored file workflow connects profiles, decisions and mea
   expect_equal(p$documents$outside_body_N, c(1, 1, 0, 0, 0))
   expect_equal(p$documents$origin_missing_N, c(0, 0, 1, 0, 0))
   a <- subset(p$features, document_id == "variants" & feature == "origin" & status == "observed")
-  expect_equal(a$n[match(c("漢", "和"), a$category)], c(3, 2))
+  expect_equal(a$n[match(c("\u6f22", "\u548c"), a$category)], c(3, 2))
   b <- subset(p$characters, document_id == "variants" & population == "retained_tokens")
   expect_equal(b$n[match(c("han", "hiragana", "katakana"), b$category)], c(2, 5, 3))
   expect_identical(e$ja_profile_record$file_review$after, e$ja_file_after)

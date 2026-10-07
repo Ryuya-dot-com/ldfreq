@@ -26,13 +26,22 @@ test_that("local file decoding retains the declared text, bytes and empty files"
       !names(payloads)[i] %in% c("bom", "cp932"))
     expect_error(e$read_text_file(path, max_bytes = .5), "max_bytes")
   }
-  unicode_path <- file.path(directory, enc2utf8("\u65e5\u672c\u8a9e space.txt"))
-  writeBin(charToRaw(japanese), unicode_path)
-  expect_identical(e$read_text_file(unicode_path)$text, japanese)
-  x <- e$read_text_file(unicode_path)
+  x <- e$read_text_file(file.path(directory, "bom.txt"))
   saved <- file.path(directory, "record.rds")
   saveRDS(x, saved, version = 2)
   expect_identical(readRDS(saved), x)
+})
+
+test_that("representable non-ASCII file paths retain their contents", {
+  skip_if_not(isTRUE(l10n_info()[["UTF-8"]]), "Non-ASCII paths require a representable native encoding")
+  e <- new.env(parent = baseenv())
+  sys.source(system.file("examples", "text-file-input.R", package = "ldfreq", mustWork = TRUE), e)
+  directory <- tempfile("unicode-path-"); dir.create(directory)
+  on.exit(unlink(directory, recursive = TRUE))
+  path <- file.path(directory, "\u65e5\u672c\u8a9e space.txt")
+  text <- "\u308a\u3093\u3054\u3002\r\n"
+  writeBin(charToRaw(text), path)
+  expect_identical(e$read_text_file(path)$text, text)
 })
 
 test_that("file failures cannot silently become empty or replacement text", {

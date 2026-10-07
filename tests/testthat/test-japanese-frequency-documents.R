@@ -120,7 +120,7 @@ test_that("frequency commonality tolerates shifted token indices but not split s
     x <- lexdiv_import_annotations(t, segments, provenance)
     mask <- x$tokens[c("document_id","segment_id","token_index","start","end","surface")]
     mask$in_body <- TRUE; mask$retained <- TRUE; mask$reason <- "retained"
-    p <- e$japanese_document_profile(x,mask,c("名詞"="content"),name)
+    p <- e$japanese_document_profile(x,mask,setNames("content", "\u540d\u8a5e"),name)
     keys <- mask[1:6]; keys$lookup_term <- keys$surface; keys$key_reason <- "authored surface key"
     e$japanese_frequency_documents(p,keys,reference)
   }
@@ -134,7 +134,7 @@ test_that("frequency commonality tolerates shifted token indices but not split s
   x <- lexdiv_import_annotations(empty,segments[2, ],provenance)
   mask <- x$tokens[c("document_id","segment_id","token_index","start","end","surface")]
   mask$in_body <- logical();mask$retained <- logical();mask$reason <- character()
-  p <- e$japanese_document_profile(x,mask,c("名詞"="content"),"empty")
+  p <- e$japanese_document_profile(x,mask,setNames("content", "\u540d\u8a5e"),"empty")
   keys <- mask[1:6];keys$lookup_term <- character();keys$key_reason <- character()
   q <- e$japanese_frequency_documents(p,keys,reference)
   expect_equal(q$documents$retained_N,0)

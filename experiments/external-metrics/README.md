@@ -25,6 +25,9 @@ last sequence as a fractional tail even when a full factor could close there;
 ldfreq checks closure first. koRpus 0.13.9's `mtld.sub.nodata()` loop does not
 evaluate a final sequence of at most two tokens: for 50 repeated tokens it counts
 24 factors rather than 25. Consequently, koRpus is not an unquestioned oracle.
+The ten-token rule has a precedent in TAALED; a min10 variant is not inherently
+an implementation error. It needs an explicit name and boundary/tail rules,
+since the shared minimum does not make the implementations identical.
 The CSV records a reason for each case. A ten-token lower bound for ldfreq is
 false (the 12-token example is below five); effects on an actual L2 distribution
 have not been estimated here.
@@ -88,3 +91,18 @@ Sources: [koRpus](https://reaktanz.de/?c=hacking&s=koRpus),
 [quanteda.textstats source](https://github.com/quanteda/quanteda.textstats/blob/master/R/textstat_lexdiv.R),
 [pinned TAALED source](https://github.com/LCR-ADS-Lab/TAALED/blob/27b19e1cda26e6f4d869d36afea6874f08825618/taaled/ld.py).
 Expected-TTR D has not been compared with CLAN in this work; it is experimental.
+
+
+## Migration and boundary sensitivity
+
+The [executed 30-essay comparison](../mtld-migration/README.md) reports paired
+scores, rank correlation, changes and missingness on the bundled authored
+teaching sample. All 30 pairs match (rho = 1); this does not establish equality
+in learner populations or in the low-score range absent from that sample.
+
+`<` and `<=` are different definitions when a factor reaches exactly 0.72.
+Holding the no-minimum algorithm's other choices fixed, the 27-token
+`threshold_equal` input gives 16.723519 with `<` and 9.973519 with `<=`
+(67.68% larger relative to the latter). The reproducible operator comparison
+is part of that migration script. This is a sequence-specific illustration,
+not a universal adjustment and not a change to the package's strict rule.

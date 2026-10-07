@@ -173,6 +173,52 @@ explicitly for new computation; see `?lexdiv_metrics` for migration details.
 The [external comparisons](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/external-metrics)
 show the actual koRpus and TAALED outputs and account for remaining differences.
 
+### Check the effect on your documents
+
+Use the same ordered tokens for both definitions. This example reads the 30
+authored teaching essays and the empty file distributed with the package;
+replace `folder` with your own input directory to check a study's documents.
+
+```{r}
+folder <- system.file("examples", "text-input", "texts", package = "ldfreq")
+files <- sort(list.files(folder, pattern = "[.]txt$", full.names = TRUE))
+texts <- vapply(files, function(path) {
+  paste(readLines(path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
+}, character(1))
+names(texts) <- tools::file_path_sans_ext(basename(files))
+prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english",
+  normalization = "NFC", case = "lower")
+tokens <- lapply(prepared, function(x) x$tokens$surface)
+current <- lexdiv_metrics_batch(tokens, metrics = "mtld")
+legacy <- lapply(tokens, lexdiv_variant_metrics,
+  variants = "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1")
+migration <- data.frame(document_id = names(tokens), N = lengths(tokens),
+  current = current$value,
+  legacy = vapply(legacy, function(x) x$value, numeric(1)))
+paired <- is.finite(migration$current) & is.finite(migration$legacy)
+data.frame(paired = sum(paired), excluded = sum(!paired),
+  spearman = cor(migration$current[paired], migration$legacy[paired],
+    method = "spearman"),
+  mean_absolute_change = mean(abs(migration$current[paired] -
+    migration$legacy[paired])))
+```
+
+All 30 paired scores agree (Spearman = 1; mean absolute change = 0); the empty
+document remains missing. These texts have 107--149 tokens and MTLD values
+48.76--165.21. They do not estimate the effect on low-scoring learner essays.
+Report the paired count, missing cases, ranks and numerical changes for your
+own sample before combining old and new results. Correlation alone can conceal
+a systematic shift in values. With fewer than two finite pairs or constant
+scores, rank correlation is not defined.
+
+Both methods above use strict `<`. Changing only the comparison to `<=` is a
+different sensitivity analysis: for teaching essay `024`, a transparent
+no-minimum reference gives 86.1956 with `<` and 64.3163 with `<=`. The
+[executed migration record](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/mtld-migration)
+preserves the document-level outputs, operator-only reference and exact input
+hashes. The boundary effect depends on the token sequence, so there is no
+universal percentage adjustment.
+
 Expected-TTR D is experimental and excluded from defaults. Near-all-unique
 texts yield large estimates because the target curve approaches one. The
 numerical correction in package 0.2.0 does not establish equivalence to CLAN

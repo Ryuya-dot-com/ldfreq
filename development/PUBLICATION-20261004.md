@@ -4260,3 +4260,120 @@ Rd phrases: the introductory default count is eleven (D opt-in), and the old
 v0.1 method label is removed. Rd checks and those two reference pages passed;
 all numerical evidence remains applicable. The existing required workflow will
 also check the final documentation revision before merge.
+
+
+### 2026-10-08 JST: fixed development publication
+
+Final PR head `6965eacade54f43e70c82b0bec1088b824707007` passed all nine jobs
+in run 37645428129 and the required development-classification check. PR #31
+merged to `55fedb18a1f7b01bd792cc7d699fa64b83bc42b2` without a CI skip marker.
+Their common tree is `db430e884741d56486c50b06489d006085bfddff`. Main run
+37647372559 concluded as described below; it is not reported as an all-green run.
+No branch-protection setting changed. GitHub's disabled Auto Merge feature was
+not enabled; an ordinary merge followed successful required checks.
+
+Annotated tag `v0.3.0-dev.1` points to that main commit. The GitHub prerelease
+has the R source archive `ldfreq_0.3.0.tar.gz` (6,015,618 bytes, SHA-256
+`fee9f9cd801c21aae595b6c1ffd65670da90e7dec93ba8ca3d2d2f3875748c87`) and
+`SHA256SUMS.txt`. Both assets match anonymous TLS-verified downloads. The archive
+was built from the clean final tree with final help/citation and 22 rendered
+vignettes reused from the successful full build after checking that all 65 R
+and vignette source files were byte-identical. Its isolated installation passes
+the migration and 30-document example. A separate real pak installation from
+the published tag succeeds; a fresh R session reproduces the archive's saved
+new/legacy results and complete 30-document-plus-empty analysis identically.
+The user's R library was not changed.
+
+Pages commit `26e4b5d70f96a12f59964712ee7cec8a4589247e` built successfully in
+run 37647590555. All 47 changed public source files and all 90 changed site
+files match anonymous retrieval, and 129 HTML pages have no missing internal
+links. The prior rendered help-page screenshot confirms the updated version,
+defaults and migration navigation. A later live anchored Chrome screenshot was
+blank (the headless log reports display-link errors), so complete live visual
+inspection of the migration body is not claimed; its HTML bytes/links match.
+A Python TLS trust-store failure during anonymous download was handled with
+certificate-verified system curl, and the site/source audit used the system CA
+bundle. No certificate verification was disabled.
+
+Evidence is in reviews/ldfreq-core-review-20261007/. Completion receipts are
+local edits only, avoiding another source/CI cycle for reporting. The source
+checkout follows integrated main. No CRAN submission, formal-candidate status,
+Zenodo DOI, paid API call, data/license change or NJ8 visibility change. The
+remaining C-locale name warnings and Windows R4.1/CP932 gap are still recorded.
+
+
+Main-CI outcome and evidence reuse: current macOS/Windows/Linux each pass 8,274
+assertions (no failures, warnings or skips), Status: OK. Linux R4.1 passes
+8,199 with eight optional textstem skips and two NOTEs (unavailable suggested
+gibasa/textstem, installed size 9.5Mb). PDF, both resource builders and the
+separate development-classification gate succeed. Main R-devel also passes
+8,274 assertions with no failure/warning/skip, all examples and earlier check
+stages. It reaches vignette rebuilding after about 21 minutes of uncached
+dependency preparation and is cancelled by the workflow's existing 30-minute
+job limit. The main run therefore remains cancelled, with its aggregate
+required check failed; no all-green main claim is made.
+
+Final-PR R-devel job 112874811968 completed the full check, including vignette
+rebuilding, Status: OK. Its source tree, R r90643, Ubuntu runner image
+20261004.327.1, 115 dependency versions and workflow settings match main's
+cancelled job 112881549943. The material difference is a restored dependency
+cache in the PR versus a cache miss on main. The comparison is saved in
+`devel-evidence-reuse.json`; both full logs and the cancelled main run metadata
+are retained. That completed PR evidence covers the unfinished check stage;
+this is combined evidence across two jobs, not one completed main run. No
+rerun, timeout increase, cancellation of successful work or status override
+was used. The cache-cold CI scheduling issue stays open in the roadmap.
+
+
+## C-locale resources and MTLD migration sensitivity (2026-10-08)
+
+Scope: correct the reported bundled-resource failure, distinguish development
+versions, explain actual MTLD migration sensitivity and repair cold-cache CI
+scheduling. No new public API, metric definition, data, model call or CRAN submission.
+
+The public v0.3.0-dev.1 installation reproduced `schema_mismatch` / `word_format`
+for ASCII TUBELEX queries under C LC_CTYPE. An explicitly UTF-8 text connection
+fixes the shared loader. Actual `the`, `cat` and `café` queries return counts
+7,448,605, 8,983 and 244, with the accented UTF-8 bytes preserved. Failure printing
+now reports schema checks, locale and an appropriately conditional encoding hint;
+existing machine-readable reasons remain unchanged.
+
+The complete local C testthat run passed 7,929 assertions with zero failures,
+one quanteda native-encoding warning and 29 explicit skips (28 pre-existing
+UTF-8 constraints plus the isolated non-ASCII filename case). The full installed
+TUBELEX audit passed 101 assertions / 515,292 rows in C. The non-UTF-8 suite also
+revealed MorphyNet BOM stripping depended on readLines' locale behavior; explicit
+byte removal now enforces the existing policy while hashing the original file.
+Fixtures and the NINJAL metadata-key recipe no longer assume native UTF-8.
+The focused UTF-8 regression passed 245 assertions, zero warnings/skips.
+This is not Windows R4.1/CP932 validation.
+
+The executed comparison of the 30 authored essays (107–149 tokens) found all
+new/legacy MTLD scores equal, Spearman = 1, absolute changes = 0; one empty
+file is retained as missing. Neither definition nor the actual external-tool
+outputs were recomputed differently. The sample contains no low-score essays
+and does not estimate population effects. A separate transparent operator
+reference changes only `<` to `<=`: the 27-token boundary fixture gives
+16.723519 versus 9.973519, and authored essay 024 gives 86.195614 versus 64.316331.
+The other 29 essays agree across operators. The user's 12.25/13.34 input is not
+available, so those particular numbers are not claimed as reproduced.
+
+DESCRIPTION is 0.3.0.9001 and CITATION reads the installed metadata. Preserve
+v0.3.0-dev.1 unchanged; subsequent formal versions must sort above this developer
+version. The formal-candidate workflow now derives filenames and version checks
+from metadata and continues to reject a development version as a candidate.
+
+The CI change uses the pinned r-lib action's `cache: always` and separates
+R-devel dependency preparation from full checks into sequential jobs, each
+retaining the existing 30-minute limit. Both use the same dependency inputs/cache
+key. No vignette is dropped or precomputed to bypass checks. A dedicated Linux
+LANG=C / LC_ALL=C job installs the package and runs the full testthat suite.
+Execution of the new CI and public verification is pending at this local record.
+
+Evidence: `reviews/ldfreq-locale-migration-20261008/`. The final source archive
+retains 22 rendered guides; after fixing only an Rd non-ASCII description, it was
+reassembled with `--no-build-vignettes`, preserving completed builds. All 338
+unchanged source members match the checkout byte-for-byte; DESCRIPTION differs
+only by normal R build formatting and generated metadata. The comparison runner,
+input hashes and CSV/JSON results are public under `experiments/mtld-migration`;
+complete local RDS is retained in the evidence directory.

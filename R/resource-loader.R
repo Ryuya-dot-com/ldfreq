@@ -1140,7 +1140,7 @@
     return(failure("invalid_utf8"))
   }
   Encoding(text) <- "UTF-8"
-  connection <- textConnection(text, open = "r", local = TRUE)
+  connection <- textConnection(text, open = "r", local = TRUE, encoding = "UTF-8")
   table <- tryCatch(
     utils::read.table(
       connection,

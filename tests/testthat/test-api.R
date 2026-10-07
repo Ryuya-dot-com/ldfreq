@@ -54,7 +54,8 @@ test_that("the core preserves exact token distinctions", {
   case_distinct <- api_function(c("A", "a"), metrics = "ttr")
   unknown_marker <- "\u00e9"
   Encoding(unknown_marker) <- "unknown"
-  utf8_marker <- enc2utf8(unknown_marker)
+  utf8_marker <- unknown_marker
+  Encoding(utf8_marker) <- "UTF-8"
   marker_equivalent <- api_function(
     c(unknown_marker, utf8_marker),
     metrics = "ttr"

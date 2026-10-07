@@ -1,0 +1,13 @@
+{
+  "package_version": "0.3.0.9001",
+  "R": "R version 4.6.1 (2026-06-24)",
+  "stringi": "1.8.7",
+  "threshold": 0.72,
+  "legacy_method": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+  "current_method": "mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1",
+  "sample": "30 project-authored English teaching examples and one empty document; not a learner sample",
+  "preprocessing": "English tokenizer, NFC, lower case, surface tokens, numbers excluded",
+  "paired_rule": "Both scores finite; missing values retained in document table; no imputation",
+  "ranks": "Average ties; Spearman on the paired documents",
+  "scope": "Descriptive migration sensitivity; not population validity or CLAN comparison"
+}

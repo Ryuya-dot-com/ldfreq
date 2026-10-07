@@ -238,6 +238,12 @@
 #'   `"allow"` records their explicit use for segmentation sensitivity. Character
 #'   vectors remain caller-prepared terms whose segmentation is not verified.
 #'
+#' The bundled CSV is decoded as UTF-8 independently of LC_CTYPE. C/POSIX
+#' sessions can query ASCII and explicitly encoded UTF-8 terms. Schema-failure
+#' printing retains the machine-readable reason and suggests checking the
+#' resource and encoding; a non-UTF-8 locale is a possible cause in older loaders,
+#' not proof of the cause of every schema failure.
+#'
 #' @return A `tubelex_profile` list containing matched-only token- and
 #'   type-weighted summaries, the lossless lookup table, token/type coverage,
 #'   resource and formula provenance, and diagnostics.
@@ -326,6 +332,18 @@ print.tubelex_profile <- function(x, ...) {
       x$provenance$query_normalization
     )
   )
+  if (identical(x$status, "resource_error")) {
+    cat("Resource failure:", x$failure_reason, "\n")
+    if (identical(x$failure_reason, "schema_mismatch")) {
+      violations <- x$diagnostics$resource_diagnostics$schema_violations
+      if (length(violations)) cat("Schema checks:", paste(violations, collapse = ", "), "\n")
+      cat("Check the bundled resource and UTF-8 decoding; LC_CTYPE =",
+        Sys.getlocale("LC_CTYPE"), "\n")
+      if (!isTRUE(l10n_info()[["UTF-8"]])) {
+        cat("Older loaders can fail in a non-UTF-8 locale; update ldfreq or try a UTF-8 locale.\n")
+      }
+    }
+  }
   print(x$summary, row.names = FALSE, ...)
   invisible(x)
 }

@@ -23,7 +23,6 @@ jobs:
       matrix:
         config:
           - {os: ubuntu-latest, r: "release"}
-          - {os: ubuntu-latest, r: "devel"}
           - {os: ubuntu-latest, r: "4.1"}
           - {os: macos-latest, r: "release"}
           - {os: windows-latest, r: "release"}
@@ -55,6 +54,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
+          cache: always
           extra-packages: |
             any::rcmdcheck
             textstem=?ignore-before-r=4.4.0
@@ -134,6 +134,93 @@ jobs:
             shQuote("experiments/validate-wlsp-polysemy.R"),
             shQuote(source_path), shQuote(library_path)))
           if (!identical(status, 0L)) quit(status = status)
+
+  # A cold R-devel library took 21 minutes before checking started. Keep
+  # that completed preparation in the standard cache, in its own time budget.
+  prepare-r-devel:
+    name: ubuntu-latest / prepare R devel dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        with:
+          r-version: "devel"
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-pandoc@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        with:
+          cache: always
+          extra-packages: |
+            any::rcmdcheck
+            textstem=?ignore-before-r=4.4.0
+            gibasa=?ignore-before-r=4.2.0
+          dependencies: '"all"'
+          needs: check
+
+  check-r-devel:
+    name: ubuntu-latest / R devel
+    needs: prepare-r-devel
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+      _R_CHECK_FORCE_SUGGESTS_: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        with:
+          r-version: "devel"
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-pandoc@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        with:
+          cache: always
+          extra-packages: |
+            any::rcmdcheck
+            textstem=?ignore-before-r=4.4.0
+            gibasa=?ignore-before-r=4.2.0
+          dependencies: '"all"'
+          needs: check
+      - uses: r-lib/actions/check-r-package@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        with:
+          args: 'c("--no-manual")'
+          artifact-name: Linux-R-devel-results
+
+  c-locale:
+    name: ubuntu-latest / C locale
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      NOT_CRAN: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        with:
+          r-version: "release"
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        with:
+          cache: always
+          dependencies: 'c("Depends", "Imports", "LinkingTo", "Suggests")'
+      - name: Install and test in a genuine C locale
+        shell: bash
+        env:
+          LANG: C
+          LC_ALL: C
+        run: |
+          R CMD INSTALL .
+          Rscript --vanilla -e 'stopifnot(Sys.getlocale("LC_CTYPE") == "C"); library(ldfreq); stopifnot(tubelex_profile(c("the", "cat"))$status == "ok"); testthat::test_dir("tests/testthat", package = "ldfreq", stop_on_failure = TRUE)'
 
   tubelex-build-audit:
     name: ${{ matrix.os }} / TUBELEX builder
@@ -245,7 +332,7 @@ jobs:
   required:
     name: R-CMD-check required
     if: ${{ always() }}
-    needs: [check, tubelex-build-audit, pdf-manual]
+    needs: [check, check-r-devel, c-locale, tubelex-build-audit, pdf-manual]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions: {}
@@ -253,11 +340,17 @@ jobs:
       - name: Require every matrix check to pass
         env:
           CHECK_RESULT: ${{ needs.check.result }}
+          DEVEL_RESULT: ${{ needs.check-r-devel.result }}
+          C_LOCALE_RESULT: ${{ needs.c-locale.result }}
           TUBELEX_RESULT: ${{ needs.tubelex-build-audit.result }}
           PDF_MANUAL_RESULT: ${{ needs.pdf-manual.result }}
         run: |
           if [ "${CHECK_RESULT}" != "success" ]; then
             echo "::error::R-CMD-check matrix result: ${CHECK_RESULT}"
+            exit 1
+          fi
+          if [ "${DEVEL_RESULT}" != "success" ] || [ "${C_LOCALE_RESULT}" != "success" ]; then
+            echo "::error::R-devel: ${DEVEL_RESULT}; C locale: ${C_LOCALE_RESULT}"
             exit 1
           fi
           if [ "${TUBELEX_RESULT}" != "success" ]; then
