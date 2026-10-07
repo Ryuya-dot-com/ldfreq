@@ -14,6 +14,12 @@ metadata.csv has fictional writer/task IDs in reverse document order; join by ID
 Repeated writer IDs illustrate data structure, not actual repeated measurements.
 japanese.txt illustrates UTF-8 reading only, not English tokenization of Japanese.
 
+japanese-workflow/ contains five authored files and complete prepared annotations.
+The POS1 and goshu columns are authored teaching labels (version 2), not MeCab
+or UniDic output. <MISSING> explicitly marks unassigned features. The three fruit
+spellings share an authored 漢 origin label while their scripts differ; the
+unlisted form has no assigned POS/origin. No learner data or dictionary is included.
+
 Keep original input files and their identifiers when replacing these teaching
 examples with your own permitted data. The common 50-token window is an explicit
 choice for these constructed texts, not a universal research recommendation.

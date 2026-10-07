@@ -162,6 +162,9 @@ gap-preserving exclusions. Start with the executable
 read authored files, retain title/body boundaries, review contextual identities,
 and save whole-body measures separately from target counts. This first example
 uses prepared annotations and needs no analyzer or dictionary.
+Continue with [document descriptions](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#describe-script-word-origin-and-pos-by-document)
+to separate script/codepoint counts from dictionary word origins and declared
+POS groups, retaining exclusions, missing labels, denominators and saved inputs.
 A Japanese dictionary is optional and separately
 obtained; the package does not bundle one or establish cross-language score
 equivalence. The Unicode tokenizer alone is not a Japanese word segmenter.

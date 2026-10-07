@@ -16,6 +16,8 @@ run_file_review <- requireNamespace("quanteda", quietly = TRUE) &&
   isTRUE(l10n_info()[["UTF-8"]])
 knitr::read_chunk(system.file("examples", "japanese-file-workflow.R",
   package = "ldfreq", mustWork = TRUE))
+knitr::read_chunk(system.file("examples", "japanese-document-profile-demo.R",
+  package = "ldfreq", mustWork = TRUE))
 ```
 
 For stimulus-item ratings and separately obtained AoA/BOI tables, see
@@ -114,6 +116,8 @@ The five authored files contain spelling variants, homophones, an invented
 unlisted form, punctuation only, and an empty file. Their annotations are
 **prepared by the example's author**, not produced by a hidden tokenizer. All
 files are MIT teaching material; no learner corpus or dictionary is bundled.
+The CSV also contains authored `POS1` and `goshu` labels for the descriptive
+profile below; `<MISSING>` marks unassigned features. These are not UniDic results.
 Optional quanteda >= 4.5.0 and a UTF-8 R session are needed for KWIC review.
 No Python or external model is required for this walkthrough.
 
@@ -270,6 +274,132 @@ read the RDS without Python or a dictionary; reapplying KWIC decisions requires
 quanteda. For other analyzers, import their complete original surfaces and
 actual metadata into the same workflow; never replace source text with a
 normalized form to make the import succeed.
+
+## Describe script, word origin and POS by document
+
+Use a document profile to describe **what was counted** before interpreting a
+diversity score. The installed `japanese-document-profile.R` recipe takes a
+complete import, its complete selection table, an explicit POS grouping and a
+condition label. It returns ordinary data frames and keeps its inputs. It is
+an explicitly sourced example, not an exported function or a new analyzer.
+
+Continue from the file workflow above:
+
+```{r ja-profile-load, eval=run_file_review}
+```
+
+```{r ja-profile-build, eval=run_file_review}
+```
+
+The example map groups some POS labels as `content` or `function`. Pronouns,
+affixes, conjunctions and other unlisted labels remain **unmapped**; this is
+a deliberately partial classification, not a universal content-word definition.
+For your study, supply the labels and grouping that match your dictionary and
+research question. The recipe does not change which tokens you selected.
+
+```{r ja-profile-documents, eval=run_file_review, echo=FALSE}
+knitr::kable(ja_profile$documents[c("document_id", "source_N", "outside_body_N",
+  "excluded_inside_N", "retained_N", "retained_codepoints")],
+  col.names = c("Document", "Source tokens", "Outside body", "Excluded in body",
+    "Retained tokens", "Retained codepoints"))
+```
+
+For each document, source tokens equal outside-body tokens plus exclusions
+inside the body plus retained tokens. The original file, including its title,
+line endings and spaces, remains available. Character counts have two distinct
+populations: `original_text` covers every original segment, whereas
+`retained_tokens` covers only the surfaces of retained tokens, excluding gaps.
+The latter is not the length of the original body including whitespace.
+
+```{r ja-profile-scripts, eval=run_file_review, echo=FALSE}
+shown_scripts <- subset(ja_profile$characters,
+  document_id == "variants" & population == "retained_tokens" & n > 0)
+knitr::kable(shown_scripts[c("category", "n", "denominator", "proportion")],
+  digits = 2, col.names = c("Character category", "Codepoints", "All retained codepoints", "Proportion"))
+```
+
+The three fruit spellings appear in 5 retained tokens totaling 10 codepoints:
+2 Han-script, 5 hiragana and 3 katakana. Their supplied origin labels tell a
+different story:
+
+```{r ja-profile-origins, eval=run_file_review, echo=FALSE}
+shown_origins <- subset(ja_profile$features, feature == "origin" &
+  (n > 0 | (status == "missing" & denominator == 0)))
+knitr::kable(shown_origins[c("document_id", "category", "status", "n", "denominator", "proportion")],
+  digits = 2, col.names = c("Document", "Origin label", "Status", "Tokens", "All retained tokens", "Proportion"))
+```
+
+All three fruit spellings have the authored `漢` label; the two particles have
+`和`. Writing a word in katakana does not make this recipe assign it a loanword
+label. Actual [UniDic output](https://clrd.ninjal.ac.jp/unidic/faq.html) supplies
+`goshu` independently of surface spelling. Its labels, including proper-name
+and symbol categories, are preserved as supplied. No origin is inferred for a
+missing label, and character proportions are not scores of kanji knowledge.
+
+The character unit is the **original Unicode codepoint**, with no normalization.
+Thus precomposed `が` has one codepoint; `か` followed by a combining dakuten has
+two. These are not grapheme-cluster or visual-character counts. The recipe uses
+[Unicode Script properties](https://www.unicode.org/reports/tr24/) through
+stringi and saves its ICU/Unicode versions. Its disjoint categories first
+separate six shared kana signs (`ー`, `ｰ`, `゛`, `゜`, `ﾞ`, `ﾟ`), then combining
+marks, decimal digits, whitespace, punctuation, symbols, Han, hiragana, katakana,
+Latin and other codepoints. Han-script includes signs such as `々`; it is not an
+educational kanji inventory. Half-width forms remain half-width, and emoji
+sequences can contain several codepoints in different categories.
+
+Inspect the three tables and the source-linked rows directly:
+
+```{r ja-profile-inspect, eval=run_file_review}
+ja_profile$documents[c("document_id", "pos_missing_N", "origin_missing_N", "pos_unmapped_N")]
+subset(ja_profile$tokens, retained &
+  (pos_status == "missing" | pos_group_status == "unmapped"),
+  select = c(document_id, segment_id, start, end, surface, pos_value, pos_group_status))
+```
+
+| Output | Unit and denominator |
+|---|---|
+| `$documents` | One document under the declared condition, including empty documents; token and codepoint totals are separate. |
+| `$characters` | One document/population/category; `denominator` includes every codepoint in that population, including whitespace and other characters where present. |
+| `$features` | One document/feature/category/status; all retained tokens are the denominator, including missing and unmapped entries. Features are `pos`, `origin` and `pos_group`. |
+| `$tokens` | Every original token with source anchors, selection reasons, raw labels, classification statuses and category-specific `char_` counts. |
+
+`missing` means `NA`, blank-only text or literal `*`; the raw value survives in
+`$tokens` and `$imported`. `unmapped` means a POS label exists but has no entry
+in your grouping table. `field_present = FALSE` distinguishes an absent input
+column from a present column with missing entries. Feature columns must be
+character vectors. Supply `pos_col` and
+`origin_col` if your columns have different names. A zero count with a positive
+denominator is zero; an empty denominator produces `NA` proportions.
+
+Lexical-review decisions remain in `ja_file_record$after`: a decision about a
+target's lexical identity does not validate every POS/origin label or change
+these descriptions automatically. The profile keeps the full selection and
+input; the file-workflow record additionally keeps body ranges, decisions and
+the existing N/V/TTR results. Save them together:
+
+```{r ja-profile-save, eval=run_file_review}
+```
+
+For a persistent study directory, change the output path explicitly. The CSVs
+are analysis/inspection tables; the full RDS retains the original sources and
+conditions. Recompute from the saved inputs and policy without rerunning a model:
+
+```{r ja-profile-replay, eval=run_file_review}
+```
+
+Exact replay here uses the same software versions; retain the saved counts and
+ICU/Unicode metadata when comparing results across software upgrades.
+Changed source or partial/stale selection rows are rejected. Reordering the
+selection table is allowed because its original token anchors are checked.
+No API call, fee or additional dependency is needed for these profiles.
+
+To run both the file workflow and profiling example together in a fresh session:
+
+```{r ja-profile-complete, eval=FALSE}
+source(system.file("examples", "japanese-document-profile-demo.R", package = "ldfreq"))
+ja_profile$documents
+ja_file_output  # Temporary folder; choose a persistent output for your study.
+```
 
 ## Use gibasa and a local UniDic dictionary in R
 

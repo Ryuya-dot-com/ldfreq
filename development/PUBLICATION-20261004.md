@@ -3953,3 +3953,82 @@ step was repeated with network access and then succeeded. Public/source CI,
 GitHub installation and live-site verification are pending at this record point.
 Evidence: workspace reviews/ldfreq-candidate-proposals-20261007/. Credentials
 remain outside the repository and installed artifacts. No CRAN submission.
+
+### Publication completed
+
+Final head `81f17e0515b320fc1020fe41dc009720be9a4b54` passes all nine jobs in
+R-CMD-check run 37609009490 and both protected required checks. Classification
+run 37609009521 succeeds in development mode; formal candidate artifact/matrix
+jobs are intentionally skipped. macOS/Windows/Linux release and R devel each
+pass 7,948 assertions without failures, warnings or skips, with Status: OK.
+R 4.1 passes 7,873 assertions, with eight optional textstem skips and two
+NOTEs (unavailable suggested gibasa/textstem and installed size 9.3Mb).
+No CI cancellation, rerun, timeout increase or protection bypass was used.
+
+PR #28 merged to main `5ce6e4cdc74b0c9380723b4b5ae084233d9c466e`.
+Its tree `461dedc80d8482776ae0492158fb9d77984b9018` equals both final head
+and the CI merge candidate. The merge subject skips only duplicate same-tree
+main push CI. All ten changed source files match anonymous retrieval.
+README pins `4de009ec531203d0e1b651feebac4a5c0db705f1`; an actual pak
+installation into a separate library succeeds. All 137 installed files from
+inst match the implementation, and the same saved response replays without
+a key or network from this installed version. The user's R library is unchanged.
+
+Pages `e5f9c4026a0619abf342c3afc3e6ef2827ec8ec1` deploys successfully in
+run 37611677451; the Pages API reports that commit built. All seven changed
+live files match verified bytes through anonymous certificate-verified
+requests. The complete site retains 252 files / 129 HTML pages without missing
+internal links/anchors. Final artifact review detected stale Markdown
+companions despite current HTML. They and llms.txt were regenerated from the
+prepared HTML, preserving unrelated articles; no analysis was rerun. Live
+Chrome inspection confirms the offline worksheet and paid-call/replay section.
+The initial command-line screenshot was blank; a page-readiness check and
+instant scroll corrected capture timing in the local inspection script.
+
+Evidence is in reviews/ldfreq-candidate-proposals-20261007/, including CI/job
+logs, installed-file identities, replay, source/site hashes and live screenshots.
+Completion-only records remain local and the merged PR description records
+these results. The checkout now follows integrated main. No additional paid
+call, CRAN submission, release tag or independent linguistic validation.
+
+Future formal-candidate audit limitation: its existing blanket `OpenAI`
+internal-word pattern now also matches legitimate provider documentation.
+That inactive formal-candidate scanner needs a narrower rule before its next
+use; the current successful development CI does not establish that audit.
+
+## 2026-10-07 Japanese document-profile recipe
+
+Added explicitly sourced document descriptions from a complete annotation import,
+source-anchored selection and declared POS grouping. Original-text and retained-
+token codepoint populations have separate denominators; raw POS/origin categories,
+missing features, unmapped POS, exclusions and empty documents are retained.
+Rules, complete inputs and ICU/Unicode versions are saved. No exported function,
+core formula, analyzer, model, dependency or ability score changes.
+
+The five authored file fixtures now include authored POS1/goshu labels, version 2,
+without pretending to be dictionary output. The existing Japanese guide connects
+file input, review, document descriptions, CSV export and full RDS replay.
+56 new assertions and 34 existing file-workflow assertions pass. Initial checks
+identified an overly strict integer/double comparison in the demo and a test's
+unwanted scalar-name comparison; both were corrected. A fresh-session authored
+profile and lexical-decision replay passes before a log-summary helper failed
+because testthat's S3 method was not loaded. Only that summary step was corrected;
+the successful replay evidence was retained.
+
+The local J1 four-document pilot supplies four conditions without reanalysis or
+new judgments. Independent accounting verifies 16 document rows, 352 codepoint
+rows and 448 feature rows. Original-body N=969 and boundary-proposal N=968 both
+cover 1,903 codepoints. Existing origin-feature omissions (31 retained tokens)
+remain separate from three newly proposed tokens with no assigned POS/origin.
+Complete original annotations, text and the earlier exploratory decisions are
+unchanged. Reverse-order selection replay succeeds. Private artifacts remain in
+analysis/ninjal-essay/document-profiles/; no corpus, individual IDs or KWIC are
+added to the package or public site. These are accounting/integration checks,
+not independent annotation accuracy, a content-word taxonomy or proficiency
+validation. Dictionary-version comparison is not part of this completed slice.
+
+The complete changed Japanese article and authored examples render successfully.
+The previously verified site is the baseline; unrelated pages are reused and
+Markdown companions are generated from current HTML. Public CI, GitHub install
+and live-site verification remain to be completed. Evidence is in
+reviews/ldfreq-japanese-profiles-20261007/. No CRAN submission or paid API call.

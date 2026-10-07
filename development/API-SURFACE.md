@@ -92,6 +92,13 @@ dependency or generic reviewer is added.
 
 ## Export inventory
 
+The explicitly sourced `japanese-document-profile.R` recipe consumes an unchanged
+complete annotation import, a complete anchored selection and caller-supplied
+POS groups. It returns document accounting, codepoint/feature tables, source
+rows, inputs and policy. Character populations and token denominators remain
+separate; missing labels and unmapped POS do not disappear. It adds no export,
+class, analyzer or dependency. Lexical review remains a separate saved component.
+
 The explicitly sourced `candidate-proposals.R` recipe handles categorical
 choices/abstentions without fabricating scores for `lexdiv_import_contextual()`.
 Its offline prepare/import helpers retain source/candidate identity, all-review
