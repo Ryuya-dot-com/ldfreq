@@ -66,7 +66,7 @@ lexdiv_screen(
   \item{request_id}{An optional plain ASCII identifier used to join one request
   to its profile result.}
   \item{parameter}{The one user-settable scalar parameter admitted by the
-  selected v0.1 method.}
+  selected current method.}
   \item{values}{A non-empty numeric vector whose elements become distinct
   method specifications after validation and normalization.}
   \item{request_id_prefix}{An optional ASCII prefix for the one-based request

@@ -4253,3 +4253,10 @@ completed macOS/R4.1/devel, resource-builder and PDF results are preserved.
 The new head's mandatory CI is used for merge. No extra manual full run is
 requested. A stale preprocessing-contract number in LIFECYCLE was corrected;
 only that home-document page was regenerated, retaining the built articles.
+
+Core revision 3fa8d3d passed every job in run 37643207654, including Windows
+with the byte-preservation fix. The final source correction changes only two
+Rd phrases: the introductory default count is eleven (D opt-in), and the old
+v0.1 method label is removed. Rd checks and those two reference pages passed;
+all numerical evidence remains applicable. The existing required workflow will
+also check the final documentation revision before merge.

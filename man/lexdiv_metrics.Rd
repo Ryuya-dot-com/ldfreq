@@ -101,8 +101,9 @@ The examples then show a computed value, an empty document, an invalid token,
 and a text shorter than a requested window. An \code{NA} value has a reason:
 inspect \code{status} and \code{missing_reason} before interpreting it or
 combining results. Choosing \code{metrics = "ttr"} keeps the first example
-small; omitting \code{metrics} requests all methods, some of which cannot be
-computed for short inputs.
+small; omitting \code{metrics} requests the eleven default methods, some of
+which cannot be computed for short inputs. Experimental expected-TTR D requires
+explicit selection.
 
 The current versioned set contains TTR, RTTR/Guiraud, CTTR, Herdan's C, natural-log
 Maas a-squared, complete non-overlapping MSTTR, step-one MATTR, bidirectional
