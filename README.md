@@ -204,6 +204,23 @@ Same-named metrics can differ in formula, log base, aggregation, or short-text
 handling. See [definition and preprocessing comparisons](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html).
 No speed or empirical-validity advantage over these packages is claimed.
 
+From package 0.3.0 (core contract 0.2.0), `mtld` has no minimum factor
+length, uses strict `<`, and checks every token including the last. The
+previous min10 calculation remains explicitly available through
+`lexdiv_variant_metrics()`; it is not silently relabelled. The
+[executed external comparisons](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/external-metrics)
+record identical inputs, tool versions, outputs and reasons for differences.
+`expected_ttr_d` is experimental: accurate computation of this estimator does
+not establish equivalence to CLAN vocd-D. `lexdiv_methods()` reports each
+method's classification. Default computations and presets exclude it; request
+`metrics = "expected_ttr_d"` to compute it explicitly. See
+`?lexdiv_metrics` for the migration example and keep the full saved results.
+
+`below_quality_floor` is an advisory screen, not a quality score. TTR's value
+of 1 merely checks for non-empty input. MATTR's fixed 50-token floor does not
+validate every possible window size: consult `lexdiv_length_evidence()` and
+report the chosen window and available text length separately.
+
 KH Coder already uses R and documents
 [exporting plotting commands as R Source](https://khcoder.net/scr_r.html).
 R integration, Japanese support and returning to source context therefore do
@@ -251,13 +268,14 @@ caller and are not bundled.
 
 ## Installation
 
-The current 0.2.0 version is under development and has not been released on CRAN.
+Version 0.3.0 is a development prerelease and has not been released on CRAN.
+The fixed tag below preserves this measurement-contract migration.
 It requires R 4.1.0 or later. Install the tested snapshot used by this
 documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@35940f4c4b1c968f70402c63f1e1d818842deb73")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0-dev.1")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
@@ -269,7 +287,7 @@ If you have a built source archive, install it locally:
 
 ```r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.2.0.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation may
@@ -291,19 +309,23 @@ It includes sample files, metadata joins and complete analysis saving.
 ```r
 library(ldfreq)
 
-texts <- c(
-  first = "The student reads a book and discusses the book with a friend.",
-  second = "The student explores a story and shares several ideas with a friend."
+# Thirty authored texts and one empty file, supplied with the package.
+paths <- list.files(
+  system.file("examples", "text-input", "texts", package = "ldfreq"),
+  pattern = "\\.txt$", full.names = TRUE
 )
+texts <- setNames(vapply(paths, function(path) {
+  paste(readLines(path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
+}, character(1)), tools::file_path_sans_ext(basename(paths)))
 prepared <- lexdiv_tokenize_batch(
   texts, tokenizer = "english", normalization = "NFC", case = "lower"
 )
 
-# Window 10 illustrates the interface; choose a window for your research design.
+# Use the same declared 50-token window for every document.
 analysis <- lexdiv_metrics_text_batch(
-  prepared, metrics = c("ttr", "mattr"), window_length = 10
+  prepared, metrics = c("ttr", "mattr"), window_length = 50
 )
-as.data.frame(analysis$results)[, c("document_id", "metric_id", "N", "V", "value", "status")]
+print(analysis$results)  # Compact display; full metadata stay in the object.
 
 # The bundled NJ8 table is available offline, with JACET's permission.
 # This is surface-form coverage; it does not silently lemmatize the text.
@@ -312,6 +334,7 @@ levels$coverage
 nj8_diagnostics(levels)$unmatched_terms
 plot(analysis, metric_id = "mattr")
 plot(analysis, metric_id = "mattr", monochrome = TRUE)
+saveRDS(analysis, "analysis.rds")
 ```
 
 All package plots default to color; `monochrome = TRUE` selects black and gray.
@@ -334,7 +357,10 @@ for segmentation examples, CSV/text-file input, and limitations. An offline
 counting-policy example separates spelling equivalence from lookup aliases,
 proper-noun/numeral selection, and symbol boundaries without altering the source.
 
-These two authored sentences illustrate the workflow, not a population effect.
+These authored texts illustrate the workflow, not a population effect. The
+empty file remains visible with a missing result; the plot has 30 scored texts.
+Report the counting unit, tokenizer/case choices, document length, window size,
+and reference version/coverage alongside the results.
 TTR uses the full document denominator; MATTR uses the selected local window.
 NJ8 coverage asks how much of the selected vocabulary matches the list, not how
 much vocabulary a writer knows. For lemma coverage, supply or explicitly generate
@@ -396,8 +422,8 @@ a high match rate does not prove that arbitrary tokens use the right segmentatio
 | Compare reference choices with coverage and a common set of target phrases | `lexdiv_ngram_compare()` |
 | Build local reference counts from whole-document chunks | `lexdiv_ngram_reference_build()` (retains types and document IDs in memory) |
 
-The twelve core measures are TTR, RTTR/Guiraud, CTTR, Herdan C, Maas a-squared,
-MSTTR, MATTR, MTLD, HD-D, deterministic expected-TTR D, and Yule K/I.
+The eleven default measures are TTR, RTTR/Guiraud, CTTR, Herdan C, Maas a-squared,
+MSTTR, MATTR, MTLD, HD-D, and Yule K/I. Experimental expected-TTR D is opt-in.
 `lexdiv_methods()` describes their definitions, scales, parameters, and direction.
 Expected-TTR D fits an exact finite-population expectation; it is not CLAN VOCD.
 

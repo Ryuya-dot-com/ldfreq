@@ -43,7 +43,7 @@ lexdiv_metrics_text(
   normalization = "NFC",
   case = "preserve",
   keep_numbers = FALSE,
-  metrics = lexdiv_metric_ids(),
+  metrics = setdiff(lexdiv_metric_ids(), "expected_ttr_d"),
   segment_length = 50L,
   window_length = 50L,
   mtld_threshold = 0.72,

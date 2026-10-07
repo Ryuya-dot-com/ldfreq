@@ -1,13 +1,17 @@
 # API and measurement lifecycle
 
 The resource-independent, pre-tokenized twelve-method core introduced in
-`0.1.0` remains frozen throughout the pre-1.0 package line. Raw-text
+`0.1.0` is retained as a historical contract. Package 0.3.0 advances the core
+to contract 0.2.0: MTLD has no minimum factor length and a new method ID, and
+experimental expected-TTR D is excluded from defaults. The explicit legacy
+min10 method remains available through `lexdiv_variant_metrics()`. This is a
+documented breaking change with a minor package-version increment. Raw-text
 preprocessing, exact lexical overlap, many-document reference coverage,
 caller-supplied generic lexical-norm profiles, and resource-backed profiles are
 separate public surfaces with their own contract
 versions. The Maas/MTLD
 sensitivity surface also has a separate variant contract and does not add
-methods to the frozen core registry. Bundled and external lexical-level profiles
+methods to the core registry. Bundled and external lexical-level profiles
 have a separate contract for resource input, rank bands, denominator, off-list
 handling, and plot data. Package version,
 metric-contract version, result-schema version, preprocessing-contract version,
@@ -46,8 +50,11 @@ and tokenization are measurement semantics. They are not changed in a patch
 release.
 
 Plan and specification hashes are reproducibility labels rather than security
-signatures. Any change to their identity inputs or serialization receives a new
-schema version and new pinned fixtures.
+signatures. Any change to the identity field set or serialization receives a new schema
+version and new pinned fixtures. A new metric-contract version changes the
+identity values and hashes without changing their serialization or result schema.
+Saved results retain their old IDs and values; old plans must be explicitly
+recreated before new computation. See `?lexdiv_metrics` for migration.
 
 ## Annotated corpus interfaces
 

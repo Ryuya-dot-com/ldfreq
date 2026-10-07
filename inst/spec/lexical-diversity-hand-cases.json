@@ -1,7 +1,7 @@
 {
   "schema_version": "0.1.0",
   "contract_id": "ldfreq-lexical-diversity-core",
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "status": "hand-calculated-normative-metrics",
   "license": "CC0-1.0",
   "numeric_tolerance": {"absolute": 1e-12, "relative": 1e-12},
@@ -103,11 +103,11 @@
       ]
     },
     {
-      "id": "mtld-nine-too-short",
+      "id": "mtld-nine-repeated",
       "tokens": ["a", "a", "a", "a", "a", "a", "a", "a", "a"],
       "sufficient_statistics": {"N": 9, "V": 1, "M2": 81},
       "assertions": [
-        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "missing", "value": null, "missing_reason": "insufficient_tokens_for_formula", "exact": "the initial ten-token factor cannot be formed"}
+        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 2.25, "exact": "four complete two-token factors; singleton residual credit zero; 9/4"}
       ]
     },
     {
@@ -127,19 +127,19 @@
       ]
     },
     {
-      "id": "mtld-minimum-ten-gate",
+      "id": "mtld-no-minimum-gate",
       "tokens": ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"],
       "sufficient_statistics": {"N": 50, "V": 1, "M2": 2500},
       "assertions": [
-        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 10, "exact": "five complete ten-token factors; a no-minimum variant would return 2"}
+        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 2, "exact": "25 complete two-token factors; 50/25=2"}
       ]
     },
     {
-      "id": "mtld-uncapped-short-tail",
+      "id": "mtld-short-tail-closes",
       "tokens": ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "b", "b"],
       "sufficient_statistics": {"N": 12, "V": 2, "M2": 104},
       "assertions": [
-        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 4.3076923076923075, "exact": "tail credit=(1-1/2)/(1-18/25)=25/14; 12/(1+25/14)=56/13", "expected_diagnostics": {"forward_tail_credit": 1.7857142857142858, "reverse_tail_credit": 1.7857142857142858}}
+        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 2, "exact": "six complete two-token factors in both directions; no residual", "expected_diagnostics": {"forward_tail_credit": 0, "reverse_tail_credit": 0}}
       ]
     },
     {
@@ -147,7 +147,7 @@
       "tokens": ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "b", "c", "d", "e"],
       "sufficient_statistics": {"N": 14, "V": 5, "M2": 104},
       "assertions": [
-        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 8.902912621359222, "exact": "mean(forward 14, reverse 392/103)=917/103", "expected_diagnostics": {"forward_score": 14, "reverse_score": 3.8058252427184467}}
+        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 3.15, "exact": "forward five two-token factors and four hapax; reverse lengths 7,2,2,2 and singleton; mean(14/5,14/4)=63/20", "expected_diagnostics": {"forward_score": 2.8, "reverse_score": 3.5}}
       ]
     },
     {
@@ -155,7 +155,7 @@
       "tokens": ["u1", "u2", "u3", "u4", "u5", "u6", "u7", "u8", "u9", "u10", "u11", "u12", "u13", "u14", "u15", "u16", "u17", "u18", "u1", "u1", "u1", "u1", "u1", "u1", "u1", "x", "x"],
       "sufficient_statistics": {"N": 27, "V": 19, "M2": 85},
       "assertions": [
-        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 27, "exact": "at token 25 TTR=18/25=.72 and strict < does not close; legacy <= gives 477/26"}
+        {"metric_id": "mtld", "parameters": {"threshold": 0.72}, "status": "ok", "value": 16.723518850987432, "exact": "forward: 18/25=.72 does not close, 19/27<.72 closes; reverse: four two-token factors and 18/19 tail, credit 25/133; mean(27,3591/557)=9315/557", "expected_diagnostics": {"forward_score": 27, "reverse_score": 6.447037701974866}}
       ]
     }
   ]

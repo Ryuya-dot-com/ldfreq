@@ -133,10 +133,10 @@ test_that("empty and invalid documents remain local to their metric rows", {
   expect_true(all(result$status[invalid_rows] == "invalid_input"))
   expect_true(all(result$missing_reason[invalid_rows] == "invalid_token"))
   expect_true(all(is.na(result$N[invalid_rows])))
-  expect_identical(result$status[valid_rows], c("ok", "missing"))
+  expect_identical(result$status[valid_rows], c("ok", "ok"))
   expect_identical(
     result$missing_reason[valid_rows],
-    c(NA_character_, "insufficient_tokens_for_formula")
+    c(NA_character_, NA_character_)
   )
 })
 

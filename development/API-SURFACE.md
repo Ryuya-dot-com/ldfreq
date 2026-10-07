@@ -1,6 +1,6 @@
 # Public API surface audit
 
-Status: pre-CRAN audit for package version 0.2.0
+Status: pre-CRAN audit for package version 0.3.0
 
 Audited: 2026-10-06
 
@@ -10,6 +10,13 @@ analysis-ready extraction path. It is not installed with the package or
 rendered by pkgdown.
 
 ## Decisions
+
+- The 2026-10-07 core review freezes new feature exports. `lexdiv_methods()`
+  adds a `stability` metadata column and marks expected-TTR D experimental;
+  the coordinated core-contract 0.2.0 migration excludes it from defaults and
+  uses no-minimum MTLD with a new method ID. Old min10 remains explicit, with
+  no new export or numeric result field. Presets now have 11/13 requests. Existing
+  compact result print methods are now used directly in the README.
 
 - Keep the 26 existing canonical export names selected for the initial 0.1.0
   release, and add the substantively distinct `lexdiv_reference_coverage()`,

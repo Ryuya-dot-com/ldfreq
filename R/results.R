@@ -1,7 +1,7 @@
 # Internal result and input helpers for the lexical-diversity core.
 
 .lex_contract_id <- "ldfreq-lexical-diversity-core"
-.lex_contract_version <- "0.1.0"
+.lex_contract_version <- "0.2.0"
 .lex_result_schema_id <- "lexdiv-core-metric-result"
 .lex_result_schema_version <- "0.1.0"
 

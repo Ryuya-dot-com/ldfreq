@@ -89,7 +89,7 @@
         },
         "method_id": {"type": "string", "minLength": 1},
         "label": {"type": "string", "minLength": 1},
-        "stability": {"const": "stable"},
+        "stability": {"enum": ["stable", "experimental"]},
         "construct": {"type": "string", "minLength": 1},
         "definition": {"type": "object"},
         "parameters": {"type": "object"},
@@ -118,9 +118,10 @@
         "scope": {"type": "string", "minLength": 1},
         "admitted_stability": {
           "type": "array",
-          "prefixItems": [{"const": "stable"}],
+          "items": {"enum": ["stable", "experimental"]},
+          "uniqueItems": true,
           "minItems": 1,
-          "maxItems": 1
+          "maxItems": 2
         },
         "identity_model": {
           "type": "object",
@@ -296,7 +297,7 @@
       ],
       "properties": {
         "preset_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
-        "preset_version": {"const": "0.1.0"},
+        "preset_version": {"const": "0.2.0"},
         "specification_count": {"type": "integer", "minimum": 1},
         "resolution": {"type": "string", "minLength": 1},
         "additions": {

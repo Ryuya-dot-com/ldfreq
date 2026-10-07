@@ -48,8 +48,8 @@
     scale = "tokens-per-factor",
     aggregation = "directional-score-mean",
     final_token_rule = "evaluate-closure-before-tail",
-    reference_label = "ldfreq-core:mtld",
-    comparison_scope = "ldfreq-core-method"
+    reference_label = "ldfreq-core-0.1.0:mtld",
+    comparison_scope = "legacy-ldfreq-core-method"
   ),
   mtld_seq_bidir_dirmean_lt_min10_finaltail_linear_v1 = list(
     family = "mtld",
@@ -301,7 +301,7 @@ lexdiv_variant_ids <- function() {
     method_id,
     "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1"
   )) {
-    core <- .metric_mtld(tokens, counts, parameters)
+    core <- .metric_mtld(tokens, counts, parameters, minimum_factor_length = 10L)
     value <- core$value
     status <- core$status
     missing_reason <- core$missing_reason
@@ -401,6 +401,8 @@ lexdiv_variant_ids <- function() {
 #'
 #' The installed `lexical-diversity-variant-contract.json` file records every
 #' exact Maas formula, log base, MTLD tail rule, and aggregation identity.
+#' The min10 methods remain legacy/comparison methods; use
+#' `lexdiv_metrics(tokens, metrics = "mtld")` for the current no-minimum method.
 #'
 #' @param tokens Input accepted by [lexdiv_metrics()].
 #' @param variants A plain, non-empty, duplicate-free vector selected from the

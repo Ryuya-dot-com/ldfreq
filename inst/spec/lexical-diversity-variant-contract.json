@@ -7,7 +7,9 @@
   "default_expansion": {
     "maas_methods": 4,
     "mtld_methods": 4,
-    "mtld_thresholds": [0.72],
+    "mtld_thresholds": [
+      0.72
+    ],
     "maximum_mtld_thresholds": 16
   },
   "maas_methods": [
@@ -51,8 +53,8 @@
       "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
       "aggregation": "mean(N/forward_factor_sum,N/reverse_factor_sum)",
       "final_token_rule": "evaluate-closure-before-tail",
-      "reference_label": "ldfreq-core:mtld",
-      "scope": "ldfreq-core-method"
+      "reference_label": "ldfreq-core-0.1.0:mtld",
+      "scope": "legacy-ldfreq-core-method"
     },
     {
       "method_id": "mtld_seq_bidir_dirmean_lt_min10_finaltail_linear_v1",

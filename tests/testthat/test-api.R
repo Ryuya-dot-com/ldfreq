@@ -5,7 +5,7 @@ test_that("the public API emits the complete result contract", {
   result <- api_function(c("a", "a", "b", "c"))
 
   expect_s3_class(result, "lexdiv_results")
-  expect_identical(result$metric_id, metric_ids_function())
+  expect_identical(result$metric_id, setdiff(metric_ids_function(), "expected_ttr_d"))
   expect_identical(
     names(result),
     c(
@@ -17,11 +17,11 @@ test_that("the public API emits the complete result contract", {
     )
   )
   expect_identical(attr(result, "contract_id"), "ldfreq-lexical-diversity-core")
-  expect_identical(attr(result, "contract_version"), "0.1.0")
+  expect_identical(attr(result, "contract_version"), "0.2.0")
   expect_identical(attr(result, "result_schema_id"), "lexdiv-core-metric-result")
   expect_identical(attr(result, "result_schema_version"), "0.1.0")
   expect_true(all(result$metric_contract_id == "ldfreq-lexical-diversity-core"))
-  expect_true(all(result$metric_contract_version == "0.1.0"))
+  expect_true(all(result$metric_contract_version == "0.2.0"))
   expect_true(all(result$result_schema_id == "lexdiv-core-metric-result"))
   expect_true(all(result$result_schema_version == "0.1.0"))
   expect_true(all(vapply(result$requested_parameters, is.list, logical(1L))))
@@ -225,7 +225,7 @@ test_that("row-level contract provenance survives common transformations", {
 
   expect_identical(
     combined$metric_contract_version,
-    rep("0.1.0", 2L)
+    rep("0.2.0", 2L)
   )
   expect_identical(
     combined$result_schema_version,

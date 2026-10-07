@@ -90,12 +90,17 @@ test_that("preprocessing validation detects missing records and ordinary edits",
     "empty_input")
 })
 
-test_that("MTLD's frozen tail boundary is visible rather than silently redefined", {
+test_that("legacy MTLD tail behavior stays reproducible beside the new method", {
   lengths <- c(50, 51, 52, 59, 60)
   values <- vapply(lengths, function(n) {
+    lexdiv_variant_metrics(rep("a", n),
+      variants = "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1")$value
+  }, numeric(1L))
+  current <- vapply(lengths, function(n) {
     lexdiv_metrics(rep("a", n), metrics = "mtld")$value
   }, numeric(1L))
-  # Exact consequences of the declared minimum-factor and linear-tail rules.
+  expect_equal(current, lengths / floor(lengths / 2))
+  # Exact consequences of the legacy minimum-factor and linear-tail rules.
   expect_equal(values, c(10, 51/5, 52/(5 + 0.5/0.28),
     59/(5 + (8/9)/0.28), 10), tolerance = 1e-13)
 })
