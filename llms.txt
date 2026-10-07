@@ -162,7 +162,13 @@ denominator. The [contextual model
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.html)
 includes an offline example and an optional, explicit Python call using
 a cached Hugging Face model. No model or Python installation is required
-for the R importer.
+for the R importer. The same guide also provides an [offline
+categorical-proposal
+worksheet](https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.html#review-categorical-proposals-without-inventing-scores)
+and an optional OpenAI recipe. Paid requests require your own API key
+and an explicit opt-in; saved responses are reused. Candidate choices,
+abstentions and human judgments remain separate, and ordinary analysis
+makes no model calls.
 [`lexdiv_evaluate_contextual()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_evaluate_contextual.md)
 compares scored candidates to an explicitly declared reference review.
 It abstains on incomplete inventories and ties, keeps all-occurrence
@@ -299,7 +305,7 @@ by this documentation:
 
 ``` r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@f632b8ddab037984223cafb68e3fecd3598dc3f9")
+pak::pak("Ryuya-dot-com/ldfreq@4de009ec531203d0e1b651feebac4a5c0db705f1")
 ```
 
 Pinning the revision fixes the implementation, even when development

@@ -561,6 +561,178 @@ declared anchors, not whether external software actually followed them.
 Source text in JSON/RDS retains its original sharing restrictions; no
 input corpus or model weights are bundled in ldfreq.
 
+## Review categorical proposals, without inventing scores
+
+Sometimes a model returns a candidate choice or an abstention, rather
+than a score for every candidate. Do not turn unchosen candidates into
+zero scores to make them fit
+[`lexdiv_import_contextual()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_contextual.md).
+The explicitly sourced recipe below keeps these categorical proposals in
+separate columns beside the KWIC. Its helpers are installed examples,
+not exported package functions.
+
+This first example is entirely offline. All texts and proposals are
+authored; they demonstrate transport and review, not model accuracy. It
+needs quanteda and UTF-8 for the same reason as the earlier KWIC
+example.
+
+``` r
+proposal_tools <- new.env(parent = baseenv())
+for (script in c("candidate-proposals.R", "candidate-proposals-demo.R")) {
+  sys.source(system.file("examples", script, package = "ldfreq", mustWork = TRUE),
+             envir = proposal_tools)
+}
+illustration <- proposal_tools$candidate_proposals_example
+worksheet <- illustration$imported
+worksheet$summary
+#>   occurrences requested returned selected unresolved candidate_missing
+#> 1           4         3        3        2          1                 0
+#>   boundary_review not_returned not_requested
+#> 1               0            0             1
+worksheet$occurrences[c("document_id", "pre", "keyword", "post",
+  "proposal_status", "proposal_candidate_id", "human_status")]
+#>   document_id                pre keyword             post proposal_status
+#> 1  authored-1 あの 店 は 若者 に    人気       が ある 。        selected
+#> 2  authored-2 深夜 の 公園 に は    人気 が なく 、 誰 も        selected
+#> 3  authored-3            ここ は    人気       が ない 。      unresolved
+#> 4  authored-4                         駅    に 着い た 。   not_requested
+#>   proposal_candidate_id  human_status
+#> 1            popularity    unreviewed
+#> 2        human-presence    unreviewed
+#> 3                  <NA>    unreviewed
+#> 4                  <NA> no_candidates
+```
+
+Three of four occurrences were requested. The authored proposals choose
+*popularity* and *human presence* for two occurrences of `人気`, and
+leave a third unresolved. `駅` was not requested. Every original
+occurrence remains in the worksheet, and the original human-decision
+columns are unchanged.
+
+`prepare_candidate_proposals(review, occurrence_ids)` selects exact
+occurrence IDs from an unchanged ambiguity review and retains complete
+segment text, 1-based inclusive character positions, and the supplied
+candidate IDs/labels. Inspect its `$anchors` and `$candidates` before
+sending anything. Human judgments are not included in this plan.
+`import_candidate_proposals(review, plan, data, model)` accepts these
+four character columns:
+
+| Column | Meaning |
+|----|----|
+| `occurrence_id` | An ID from the selected plan; rows can be reordered or partially returned. |
+| `proposal_status` | `selected`, `unresolved`, `candidate_missing`, or `boundary_review`. |
+| `candidate_id` | A supplied candidate for this occurrence’s surface when selected; otherwise `NA_character_`. |
+| `reason` | A nonblank explanation of the proposal, not evidence that it is correct. |
+
+`candidate_missing` means that the supplied inventory is insufficient;
+`boundary_review` asks a person to inspect tokenization. Neither changes
+the text or token boundaries. Omitted requested rows become
+`not_returned`; unrequested rows become `not_requested`. The result
+retains `$review`, `$plan`, `$model`, `$proposals`, `$occurrences` and
+counts in `$summary`.
+
+Read the original context before entering a human decision. This
+demonstration explicitly enters two authored decisions; it does not
+automatically accept the model’s proposals or constitute independent
+human validation.
+
+``` r
+human_decisions <- illustration$review$occurrences[1:2,
+  c("review_id", "occurrence_id")]
+human_decisions$status <- "selected"
+human_decisions$candidate_id <- c("popularity", "human-presence")
+human_decisions$reviewer <- "authored-review-demonstration"
+human_decisions$reason <- c("Being liked by young people", "Nobody present in the park")
+confirmed <- lexdiv_ambiguity_review(illustration$review$source,
+  illustration$review$summary$term, illustration$review$candidates,
+  illustration$review$provenance$resource, decisions = human_decisions)
+confirmed_worksheet <- proposal_tools$import_candidate_proposals(confirmed,
+  illustration$plan, illustration$proposals, illustration$model)
+confirmed_worksheet$occurrences[c("surface", "proposal_status", "human_status")]
+#>   surface proposal_status  human_status
+#> 1    人気        selected      selected
+#> 2    人気        selected      selected
+#> 3    人気      unresolved    unreviewed
+#> 4      駅   not_requested no_candidates
+proposal_file <- tempfile(fileext = ".rds")
+saveRDS(confirmed_worksheet, proposal_file)
+stopifnot(identical(readRDS(proposal_file), confirmed_worksheet))
+unlink(proposal_file)
+```
+
+## Optionally obtain proposals through your OpenAI account
+
+**This step sends the chosen texts and candidate labels to OpenAI and
+incurs charges on your API account.** It is never run by
+installing/loading ldfreq, the offline examples, ordinary analysis or
+the package tests. Python is not needed. Install the optional `httr2`
+and `jsonlite` packages yourself, and set `OPENAI_API_KEY` in your local
+R environment (for example, in your private `.Renviron`). Do not put the
+key in shared scripts, saved results or a repository.
+
+Inspect the plan and choose text you may send to that service. The
+recipe uses the [Responses
+API](https://developers.openai.com/api/reference/overview) with
+[Structured
+Outputs](https://developers.openai.com/api/docs/guides/structured-outputs).
+The following chunk is not evaluated when the guide is built:
+
+``` r
+# Continue from the offline example above. Set OPENAI_API_KEY privately first.
+# If needed, run install.packages(c("httr2", "jsonlite")) once.
+api_plan <- illustration$plan
+api_plan$anchors
+api_plan$candidates
+dir.create("proposal-runs", showWarnings = FALSE)
+model_id <- "gpt-4.1-mini-2025-04-14" # Explicit snapshot, not a best-model claim.
+run_directory <- file.path("proposal-runs", "japanese-example-01")
+api_run <- proposal_tools$openai_candidate_proposals(
+  api_plan, model = model_id, run_dir = run_directory,
+  allow_paid = TRUE, max_output_tokens = 1024L)
+api_run$status
+api_run$usage
+api_worksheet <- proposal_tools$import_candidate_proposals(
+  illustration$review, api_plan, api_run$proposals, api_run$model)
+api_worksheet$occurrences[c("pre", "keyword", "post", "proposal_status",
+  "proposal_candidate_id", "proposal_reason", "human_status")]
+saveRDS(api_worksheet, file.path(run_directory, "worksheet.rds"))
+
+# Reuse the same request and saved result without sending or paying again.
+replayed <- proposal_tools$openai_candidate_proposals(
+  api_plan, model = model_id, run_dir = run_directory,
+  max_output_tokens = 1024L)
+stopifnot(identical(replayed, api_run))
+```
+
+Each new run sends one request for 1–20 occurrences, with at most 40 KB
+of JSON input. The output-token limit bounds requested generation, **not
+the total currency cost**; input tokens are also billed. Check current
+[model pricing](https://developers.openai.com/api/docs/pricing) before a
+paid run. The model must support Responses and Structured Outputs. No
+model fallback, automatic retry or automatic batch loop is performed.
+
+The run directory contains `request.rds` (plan, instructions, schema and
+settings) and `result.rds` (response, parsed proposals, returned model
+ID, usage and status). Neither stores the authentication key. Keep both
+files: identical requests reuse the result, while changed requests are
+rejected for that directory. If execution stops after reserving a
+directory but before saving a result, the recipe blocks automatic
+resubmission because the first request may already have incurred
+charges. Inspect the run before deliberately choosing a new directory.
+This is a sequential recipe, not a general concurrent job manager.
+
+`partial`, `refused`, `incomplete`, `invalid_output`, `http_error`, and
+`transport_error` are distinct run statuses. Invalid or unsuccessful
+output produces no candidate choices; all requested rows remain
+`not_returned` in the worksheet, and the run status explains why.
+Inspect both. Complete responses can still be linguistically wrong.
+Responses are requested with `store = FALSE`; this is not a claim of
+zero provider retention (see [OpenAI data
+controls](https://developers.openai.com/api/docs/guides/your-data)).
+Saved input and response files contain the selected text and retain its
+sharing restrictions. Human-confirmed judgments remain a separate
+operation.
+
 ## Use existing R tools where they fit
 
 [text](https://www.r-text.org/) already calls Transformer models from R

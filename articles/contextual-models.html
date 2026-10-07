@@ -640,6 +640,196 @@ them. Source text in JSON/RDS retains its original sharing restrictions;
 no input corpus or model weights are bundled in ldfreq.</p>
 </div>
 <div class="section level2">
+<h2 id="review-categorical-proposals-without-inventing-scores">Review categorical proposals, without inventing scores<a class="anchor" aria-label="anchor" href="#review-categorical-proposals-without-inventing-scores"></a>
+</h2>
+<p>Sometimes a model returns a candidate choice or an abstention, rather
+than a score for every candidate. Do not turn unchosen candidates into
+zero scores to make them fit <code><a href="../reference/lexdiv_import_contextual.html">lexdiv_import_contextual()</a></code>.
+The explicitly sourced recipe below keeps these categorical proposals in
+separate columns beside the KWIC. Its helpers are installed examples,
+not exported package functions.</p>
+<p>This first example is entirely offline. All texts and proposals are
+authored; they demonstrate transport and review, not model accuracy. It
+needs quanteda and UTF-8 for the same reason as the earlier KWIC
+example.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">proposal_tools</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">script</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"candidate-proposals.R"</span>, <span class="st">"candidate-proposals-demo.R"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="va">script</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>             envir <span class="op">=</span> <span class="va">proposal_tools</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">illustration</span> <span class="op">&lt;-</span> <span class="va">proposal_tools</span><span class="op">$</span><span class="va">candidate_proposals_example</span></span>
+<span><span class="va">worksheet</span> <span class="op">&lt;-</span> <span class="va">illustration</span><span class="op">$</span><span class="va">imported</span></span>
+<span><span class="va">worksheet</span><span class="op">$</span><span class="va">summary</span></span>
+<span><span class="co">#&gt;   occurrences requested returned selected unresolved candidate_missing</span></span>
+<span><span class="co">#&gt; 1           4         3        3        2          1                 0</span></span>
+<span><span class="co">#&gt;   boundary_review not_returned not_requested</span></span>
+<span><span class="co">#&gt; 1               0            0             1</span></span>
+<span><span class="va">worksheet</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>,</span>
+<span>  <span class="st">"proposal_status"</span>, <span class="st">"proposal_candidate_id"</span>, <span class="st">"human_status"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   document_id                pre keyword             post proposal_status</span></span>
+<span><span class="co">#&gt; 1  authored-1 あの 店 は 若者 に    人気       が ある 。        selected</span></span>
+<span><span class="co">#&gt; 2  authored-2 深夜 の 公園 に は    人気 が なく 、 誰 も        selected</span></span>
+<span><span class="co">#&gt; 3  authored-3            ここ は    人気       が ない 。      unresolved</span></span>
+<span><span class="co">#&gt; 4  authored-4                         駅    に 着い た 。   not_requested</span></span>
+<span><span class="co">#&gt;   proposal_candidate_id  human_status</span></span>
+<span><span class="co">#&gt; 1            popularity    unreviewed</span></span>
+<span><span class="co">#&gt; 2        human-presence    unreviewed</span></span>
+<span><span class="co">#&gt; 3                  &lt;NA&gt;    unreviewed</span></span>
+<span><span class="co">#&gt; 4                  &lt;NA&gt; no_candidates</span></span></code></pre></div>
+<p>Three of four occurrences were requested. The authored proposals
+choose <em>popularity</em> and <em>human presence</em> for two
+occurrences of <code>人気</code>, and leave a third unresolved.
+<code>駅</code> was not requested. Every original occurrence remains in
+the worksheet, and the original human-decision columns are
+unchanged.</p>
+<p><code>prepare_candidate_proposals(review, occurrence_ids)</code>
+selects exact occurrence IDs from an unchanged ambiguity review and
+retains complete segment text, 1-based inclusive character positions,
+and the supplied candidate IDs/labels. Inspect its <code>$anchors</code>
+and <code>$candidates</code> before sending anything. Human judgments
+are not included in this plan.
+<code>import_candidate_proposals(review, plan, data, model)</code>
+accepts these four character columns:</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>occurrence_id</code></td>
+<td>An ID from the selected plan; rows can be reordered or partially
+returned.</td>
+</tr>
+<tr class="even">
+<td><code>proposal_status</code></td>
+<td>
+<code>selected</code>, <code>unresolved</code>,
+<code>candidate_missing</code>, or <code>boundary_review</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>candidate_id</code></td>
+<td>A supplied candidate for this occurrence’s surface when selected;
+otherwise <code>NA_character_</code>.</td>
+</tr>
+<tr class="even">
+<td><code>reason</code></td>
+<td>A nonblank explanation of the proposal, not evidence that it is
+correct.</td>
+</tr>
+</tbody>
+</table>
+<p><code>candidate_missing</code> means that the supplied inventory is
+insufficient; <code>boundary_review</code> asks a person to inspect
+tokenization. Neither changes the text or token boundaries. Omitted
+requested rows become <code>not_returned</code>; unrequested rows become
+<code>not_requested</code>. The result retains <code>$review</code>,
+<code>$plan</code>, <code>$model</code>, <code>$proposals</code>,
+<code>$occurrences</code> and counts in <code>$summary</code>.</p>
+<p>Read the original context before entering a human decision. This
+demonstration explicitly enters two authored decisions; it does not
+automatically accept the model’s proposals or constitute independent
+human validation.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">human_decisions</span> <span class="op">&lt;-</span> <span class="va">illustration</span><span class="op">$</span><span class="va">review</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"review_id"</span>, <span class="st">"occurrence_id"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">human_decisions</span><span class="op">$</span><span class="va">status</span> <span class="op">&lt;-</span> <span class="st">"selected"</span></span>
+<span><span class="va">human_decisions</span><span class="op">$</span><span class="va">candidate_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"popularity"</span>, <span class="st">"human-presence"</span><span class="op">)</span></span>
+<span><span class="va">human_decisions</span><span class="op">$</span><span class="va">reviewer</span> <span class="op">&lt;-</span> <span class="st">"authored-review-demonstration"</span></span>
+<span><span class="va">human_decisions</span><span class="op">$</span><span class="va">reason</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Being liked by young people"</span>, <span class="st">"Nobody present in the park"</span><span class="op">)</span></span>
+<span><span class="va">confirmed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ambiguity_review.html">lexdiv_ambiguity_review</a></span><span class="op">(</span><span class="va">illustration</span><span class="op">$</span><span class="va">review</span><span class="op">$</span><span class="va">source</span>,</span>
+<span>  <span class="va">illustration</span><span class="op">$</span><span class="va">review</span><span class="op">$</span><span class="va">summary</span><span class="op">$</span><span class="va">term</span>, <span class="va">illustration</span><span class="op">$</span><span class="va">review</span><span class="op">$</span><span class="va">candidates</span>,</span>
+<span>  <span class="va">illustration</span><span class="op">$</span><span class="va">review</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">resource</span>, decisions <span class="op">=</span> <span class="va">human_decisions</span><span class="op">)</span></span>
+<span><span class="va">confirmed_worksheet</span> <span class="op">&lt;-</span> <span class="va">proposal_tools</span><span class="op">$</span><span class="fu">import_candidate_proposals</span><span class="op">(</span><span class="va">confirmed</span>,</span>
+<span>  <span class="va">illustration</span><span class="op">$</span><span class="va">plan</span>, <span class="va">illustration</span><span class="op">$</span><span class="va">proposals</span>, <span class="va">illustration</span><span class="op">$</span><span class="va">model</span><span class="op">)</span></span>
+<span><span class="va">confirmed_worksheet</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"surface"</span>, <span class="st">"proposal_status"</span>, <span class="st">"human_status"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   surface proposal_status  human_status</span></span>
+<span><span class="co">#&gt; 1    人気        selected      selected</span></span>
+<span><span class="co">#&gt; 2    人気        selected      selected</span></span>
+<span><span class="co">#&gt; 3    人気      unresolved    unreviewed</span></span>
+<span><span class="co">#&gt; 4      駅   not_requested no_candidates</span></span>
+<span><span class="va">proposal_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">confirmed_worksheet</span>, <span class="va">proposal_file</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">proposal_file</span><span class="op">)</span>, <span class="va">confirmed_worksheet</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">proposal_file</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="optionally-obtain-proposals-through-your-openai-account">Optionally obtain proposals through your OpenAI account<a class="anchor" aria-label="anchor" href="#optionally-obtain-proposals-through-your-openai-account"></a>
+</h2>
+<p><strong>This step sends the chosen texts and candidate labels to
+OpenAI and incurs charges on your API account.</strong> It is never run
+by installing/loading ldfreq, the offline examples, ordinary analysis or
+the package tests. Python is not needed. Install the optional
+<code>httr2</code> and <code>jsonlite</code> packages yourself, and set
+<code>OPENAI_API_KEY</code> in your local R environment (for example, in
+your private <code>.Renviron</code>). Do not put the key in shared
+scripts, saved results or a repository.</p>
+<p>Inspect the plan and choose text you may send to that service. The
+recipe uses the <a href="https://developers.openai.com/api/reference/overview" class="external-link">Responses
+API</a> with <a href="https://developers.openai.com/api/docs/guides/structured-outputs" class="external-link">Structured
+Outputs</a>. The following chunk is not evaluated when the guide is
+built:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Continue from the offline example above. Set OPENAI_API_KEY privately first.</span></span>
+<span><span class="co"># If needed, run install.packages(c("httr2", "jsonlite")) once.</span></span>
+<span><span class="va">api_plan</span> <span class="op">&lt;-</span> <span class="va">illustration</span><span class="op">$</span><span class="va">plan</span></span>
+<span><span class="va">api_plan</span><span class="op">$</span><span class="va">anchors</span></span>
+<span><span class="va">api_plan</span><span class="op">$</span><span class="va">candidates</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"proposal-runs"</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">model_id</span> <span class="op">&lt;-</span> <span class="st">"gpt-4.1-mini-2025-04-14"</span> <span class="co"># Explicit snapshot, not a best-model claim.</span></span>
+<span><span class="va">run_directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"proposal-runs"</span>, <span class="st">"japanese-example-01"</span><span class="op">)</span></span>
+<span><span class="va">api_run</span> <span class="op">&lt;-</span> <span class="va">proposal_tools</span><span class="op">$</span><span class="fu">openai_candidate_proposals</span><span class="op">(</span></span>
+<span>  <span class="va">api_plan</span>, model <span class="op">=</span> <span class="va">model_id</span>, run_dir <span class="op">=</span> <span class="va">run_directory</span>,</span>
+<span>  allow_paid <span class="op">=</span> <span class="cn">TRUE</span>, max_output_tokens <span class="op">=</span> <span class="fl">1024L</span><span class="op">)</span></span>
+<span><span class="va">api_run</span><span class="op">$</span><span class="va">status</span></span>
+<span><span class="va">api_run</span><span class="op">$</span><span class="va">usage</span></span>
+<span><span class="va">api_worksheet</span> <span class="op">&lt;-</span> <span class="va">proposal_tools</span><span class="op">$</span><span class="fu">import_candidate_proposals</span><span class="op">(</span></span>
+<span>  <span class="va">illustration</span><span class="op">$</span><span class="va">review</span>, <span class="va">api_plan</span>, <span class="va">api_run</span><span class="op">$</span><span class="va">proposals</span>, <span class="va">api_run</span><span class="op">$</span><span class="va">model</span><span class="op">)</span></span>
+<span><span class="va">api_worksheet</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>, <span class="st">"proposal_status"</span>,</span>
+<span>  <span class="st">"proposal_candidate_id"</span>, <span class="st">"proposal_reason"</span>, <span class="st">"human_status"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">api_worksheet</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">run_directory</span>, <span class="st">"worksheet.rds"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Reuse the same request and saved result without sending or paying again.</span></span>
+<span><span class="va">replayed</span> <span class="op">&lt;-</span> <span class="va">proposal_tools</span><span class="op">$</span><span class="fu">openai_candidate_proposals</span><span class="op">(</span></span>
+<span>  <span class="va">api_plan</span>, model <span class="op">=</span> <span class="va">model_id</span>, run_dir <span class="op">=</span> <span class="va">run_directory</span>,</span>
+<span>  max_output_tokens <span class="op">=</span> <span class="fl">1024L</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">replayed</span>, <span class="va">api_run</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Each new run sends one request for 1–20 occurrences, with at most 40
+KB of JSON input. The output-token limit bounds requested generation,
+<strong>not the total currency cost</strong>; input tokens are also
+billed. Check current <a href="https://developers.openai.com/api/docs/pricing" class="external-link">model pricing</a>
+before a paid run. The model must support Responses and Structured
+Outputs. No model fallback, automatic retry or automatic batch loop is
+performed.</p>
+<p>The run directory contains <code>request.rds</code> (plan,
+instructions, schema and settings) and <code>result.rds</code>
+(response, parsed proposals, returned model ID, usage and status).
+Neither stores the authentication key. Keep both files: identical
+requests reuse the result, while changed requests are rejected for that
+directory. If execution stops after reserving a directory but before
+saving a result, the recipe blocks automatic resubmission because the
+first request may already have incurred charges. Inspect the run before
+deliberately choosing a new directory. This is a sequential recipe, not
+a general concurrent job manager.</p>
+<p><code>partial</code>, <code>refused</code>, <code>incomplete</code>,
+<code>invalid_output</code>, <code>http_error</code>, and
+<code>transport_error</code> are distinct run statuses. Invalid or
+unsuccessful output produces no candidate choices; all requested rows
+remain <code>not_returned</code> in the worksheet, and the run status
+explains why. Inspect both. Complete responses can still be
+linguistically wrong. Responses are requested with
+<code>store = FALSE</code>; this is not a claim of zero provider
+retention (see <a href="https://developers.openai.com/api/docs/guides/your-data" class="external-link">OpenAI
+data controls</a>). Saved input and response files contain the selected
+text and retain its sharing restrictions. Human-confirmed judgments
+remain a separate operation.</p>
+</div>
+<div class="section level2">
 <h2 id="use-existing-r-tools-where-they-fit">Use existing R tools where they fit<a class="anchor" aria-label="anchor" href="#use-existing-r-tools-where-they-fit"></a>
 </h2>
 <p><a href="https://www.r-text.org/" class="external-link">text</a> already calls Transformer
@@ -678,7 +868,7 @@ workflow on the same task: erroneous joins, missed cases, correction
 time and reproducibility. Human review time, semantic accuracy, norm
 validity and learner knowledge require evidence beyond a software round
 trip; the authored examples supply none of it.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">imported</span>, <span class="va">saved</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">saved</span><span class="op">)</span>, <span class="va">imported</span><span class="op">)</span><span class="op">)</span></span>

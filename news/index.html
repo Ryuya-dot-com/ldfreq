@@ -45,6 +45,11 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="ldfreq-020-development">ldfreq 0.2.0 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-020-development"></a></h2>
 <div class="section level3">
+<h3 id="optional-contextual-candidate-proposals-0-2-0">Optional contextual candidate proposals<a class="anchor" aria-label="anchor" href="#optional-contextual-candidate-proposals-0-2-0"></a></h3>
+<ul><li>Added explicitly sourced recipes for categorical model proposals and human KWIC review, with an offline Japanese example. Missing candidates, unresolved cases, boundary-review requests and missing output remain distinct.</li>
+<li>Added an optional OpenAI Responses recipe using httr2. Paid requests require explicit opt-in and the user’s API key; saved responses are reused, and no automatic retries or model calls occur in standard examples or tests. Existing exports and numerical calculations are unchanged.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="japanese-files-body-selection-and-contextual-review-0-2-0">Japanese files, body selection and contextual review<a class="anchor" aria-label="anchor" href="#japanese-files-body-selection-and-contextual-review-0-2-0"></a></h3>
 <ul><li>Added an executable Japanese file-to-review walkthrough with authored TXT/CSV inputs. It preserves titles and original positions, records body-range and punctuation exclusions, separates all-body measures from reviewed target identities, retains unresolved and empty cases, and saves the complete RDS. It reuses existing imports, quanteda review and metrics without a new API, analyzer, model or required dependency.</li>
 </ul></div>

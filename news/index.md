@@ -2,6 +2,18 @@
 
 ## ldfreq 0.2.0 (development)
 
+### Optional contextual candidate proposals
+
+- Added explicitly sourced recipes for categorical model proposals and
+  human KWIC review, with an offline Japanese example. Missing
+  candidates, unresolved cases, boundary-review requests and missing
+  output remain distinct.
+- Added an optional OpenAI Responses recipe using httr2. Paid requests
+  require explicit opt-in and the user’s API key; saved responses are
+  reused, and no automatic retries or model calls occur in standard
+  examples or tests. Existing exports and numerical calculations are
+  unchanged.
+
 ### Japanese files, body selection and contextual review
 
 - Added an executable Japanese file-to-review walkthrough with authored
