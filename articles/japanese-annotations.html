@@ -172,6 +172,174 @@ length-appropriate measures and report non-computable requests rather
 than changing their parameters silently.</p>
 </div>
 <div class="section level2">
+<h2 id="compare-japanese-word-units">Compare word units on the same original text<a class="anchor" aria-label="anchor" href="#compare-japanese-word-units"></a>
+</h2>
+<p>A different word unit changes the denominator as well as the
+vocabulary being counted. Keep the original documents fixed, import both
+complete annotations, and compare their source spans before calculating
+scores. Here is a second, coarser <strong>authored</strong> annotation
+of the same teaching text; neither annotation is presented as an
+official short-unit or long-unit analysis.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">coarse_rows</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="st">"essay"</span>, segment_id <span class="op">=</span> <span class="st">"s1"</span>,</span>
+<span>  token_index <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>,</span>
+<span>  surface <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"国際連合"</span>, <span class="st">"で"</span>, <span class="st">"国際協力"</span>, <span class="st">"を"</span>, <span class="st">"学ぶ"</span>, <span class="st">"。"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">coarse</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_import_annotations.html">lexdiv_import_annotations</a></span><span class="op">(</span><span class="va">coarse_rows</span>, <span class="va">segments</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  language <span class="op">=</span> <span class="st">"ja"</span>, analyzer <span class="op">=</span> <span class="st">"authored"</span>, analyzer_version <span class="op">=</span> <span class="st">"1"</span>,</span>
+<span>  dictionary <span class="op">=</span> <span class="st">"none"</span>, dictionary_version <span class="op">=</span> <span class="st">"not-applicable"</span>,</span>
+<span>  unit <span class="op">=</span> <span class="st">"authored-coarse"</span>, normalization <span class="op">=</span> <span class="st">"none"</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">unit_alignment</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_align_annotations.html">lexdiv_align_annotations</a></span><span class="op">(</span><span class="va">imported</span>, <span class="va">coarse</span><span class="op">)</span></span>
+<span><span class="va">unit_alignment</span><span class="op">$</span><span class="va">groups</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"keyword"</span>, <span class="st">"relation"</span>, <span class="st">"predicted_n"</span>, <span class="st">"reference_n"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;    keyword relation predicted_n reference_n</span></span>
+<span><span class="co">#&gt; 1 国際連合    split           2           1</span></span>
+<span><span class="co">#&gt; 2       で    exact           1           1</span></span>
+<span><span class="co">#&gt; 3 国際協力    split           2           1</span></span>
+<span><span class="co">#&gt; 4       を    exact           1           1</span></span>
+<span><span class="co">#&gt; 5     学ぶ    exact           1           1</span></span>
+<span><span class="co">#&gt; 6       。    exact           1           1</span></span>
+<span></span>
+<span><span class="va">count_units</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">t</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">$</span><span class="va">tokens</span></span>
+<span>  <span class="va">retained</span> <span class="op">&lt;-</span> <span class="va">t</span><span class="op">$</span><span class="va">surface</span> <span class="op">!=</span> <span class="st">"。"</span>  <span class="co"># This teaching example's explicit selection.</span></span>
+<span>  <span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">documents</span><span class="op">$</span><span class="va">document_id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">t</span><span class="op">$</span><span class="va">surface</span><span class="op">[</span><span class="va">t</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="va">id</span> <span class="op">&amp;</span> <span class="va">retained</span><span class="op">]</span></span>
+<span>  <span class="op">}</span><span class="op">)</span>, <span class="va">x</span><span class="op">$</span><span class="va">documents</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span><span class="va">tokens</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">count_units</span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_batch_results: 2 documents; 2 metric records; schema 0.1.0&gt;</span></span>
+<span><span class="co">#&gt;   document_id metric_id     value  status missing_reason N V</span></span>
+<span><span class="co">#&gt; 1       essay       ttr 0.8571429      ok           &lt;NA&gt; 7 6</span></span>
+<span><span class="co">#&gt; 2       empty       ttr        NA missing    empty_input 0 0</span></span>
+<span><span class="co">#&gt;   below_quality_floor</span></span>
+<span><span class="co">#&gt; 1               FALSE</span></span>
+<span><span class="co">#&gt; 2                TRUE</span></span>
+<span><span class="fu">count_units</span><span class="op">(</span><span class="va">coarse</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_batch_results: 2 documents; 2 metric records; schema 0.1.0&gt;</span></span>
+<span><span class="co">#&gt;   document_id metric_id value  status missing_reason N V below_quality_floor</span></span>
+<span><span class="co">#&gt; 1       essay       ttr     1      ok           &lt;NA&gt; 5 5               FALSE</span></span>
+<span><span class="co">#&gt; 2       empty       ttr    NA missing    empty_input 0 0                TRUE</span></span></code></pre></div>
+<p>The same sentence now has five retained tokens and five types, versus
+seven tokens and six types before. TTR rises from 6/7 to 1 without a
+change in the writer’s text. The empty document stays missing in both
+conditions. Span alignment identifies the merges; it does not decide
+which analysis is best.</p>
+<p>In real data, check the <strong>covered original characters after
+selection</strong>, too. A punctuation token in a fine analysis may be
+inside a retained compound in a coarser analysis. Applying
+<code>!upos %in% c("PUNCT", "SYM")</code> to both tables can therefore
+select different material. Do not remove that internal punctuation by
+rewriting a token silently. Retain the discrepancy or justify a shared
+source-span selection for the research question.</p>
+<div class="section level3">
+<h3 id="what-the-executed-comparisons-show">What the executed comparisons show<a class="anchor" aria-label="anchor" href="#what-the-executed-comparisons-show"></a>
+</h3>
+<p>The <a href="https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/japanese-units" class="external-link">reproducible
+unit comparison</a> uses all 543 test sentences from UD Japanese
+GSD/GSDLUW r2.18. Their published SUW/LUW annotations have identical
+sentence IDs and original text. The <a href="https://github.com/UniversalDependencies/UD_Japanese-GSDLUW/blob/71fd68633ab8c3439a48db3f3718c9ed80be9c6c/README.md" class="external-link">upstream
+description</a> specifies manually annotated layers following BCCWJ
+conventions. These are news/blog sentences, not learner essays. The
+corpus is obtained separately under CC BY-SA 4.0; the R package bundles
+neither its text nor its annotations.</p>
+<table class="table">
+<thead><tr class="header">
+<th>All-token sentence summary</th>
+<th align="right">SUW</th>
+<th align="right">LUW</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Median N</td>
+<td align="right">21</td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td>Median TTR</td>
+<td align="right">0.9130</td>
+<td align="right">0.9259</td>
+</tr>
+<tr class="odd">
+<td>MATTR50 computable / all sentences</td>
+<td align="right">29 / 543</td>
+<td align="right">10 / 543</td>
+</tr>
+<tr class="even">
+<td>MTLD tail-only / computable</td>
+<td align="right">352 / 384</td>
+<td align="right">331 / 346</td>
+</tr>
+</tbody>
+</table>
+<p>All-token counting includes punctuation to isolate boundaries over
+the same covered characters; it is not a recommended lexical policy.
+Excluding UPOS PUNCT/SYM produces different coverage in 54/543 sentence
+pairs. The comparison records all cases and the 489-pair same-coverage
+subset separately. MATTR50 holds the window’s token count fixed, not its
+original-text span. Its paired all-token comparison has only ten
+eligible sentences, not 543. Sentences are never concatenated to
+manufacture eligible documents.</p>
+<p>The many tail-only MTLD values illustrate why a finite score is
+insufficient evidence of precision. Consult <a href="designing-comparisons.html#inspect-mtld-factor-support">factor
+support and length checks</a>. The advisory 50-token floor is not a
+validated Japanese reliability threshold.</p>
+<p>A separate check reuses saved Sudachi A/B/C analyses of 28 actual
+Japanese learner essays. Surface-form scores change in 24/28 essays
+between A and C:</p>
+<table class="table">
+<thead><tr class="header">
+<th>Metric</th>
+<th align="right">A median</th>
+<th align="right">C median</th>
+<th align="right">Paired Spearman rho</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>TTR</td>
+<td align="right">0.4316</td>
+<td align="right">0.4328</td>
+<td align="right">0.9907</td>
+</tr>
+<tr class="even">
+<td>MATTR50</td>
+<td align="right">0.7082</td>
+<td align="right">0.7081</td>
+<td align="right">0.9880</td>
+</tr>
+<tr class="odd">
+<td>MTLD</td>
+<td align="right">43.9420</td>
+<td align="right">43.6272</td>
+<td align="right">0.9496</td>
+</tr>
+</tbody>
+</table>
+<p>All 28 pairs are finite and retain the same original character
+coverage; none has a tail-only MTLD flag. These small-sample
+observations do not validate precision, proficiency discrimination or
+interchangeable score scales. <strong>Sudachi C is not relabeled NINJAL
+LUW.</strong> The public sentence comparison and the saved essay mode
+comparison answer different questions.</p>
+<p>For a methods section, report the actual source/version, unit, form,
+selection, window and MTLD definition. For example, the essay check
+above can be described as follows (replace these conditions with those
+actually used in your study):</p>
+<blockquote>
+<p>We compared surface-form lexical diversity in the same 28 essays
+using saved SudachiPy 0.6.11 / SudachiDict-core 20260428 annotations in
+modes A, B and C. Original text, including titles, was retained.
+Whitespace and auxiliary-symbol tokens were excluded; particles,
+auxiliaries and numbers were retained. MATTR used 50-token windows. MTLD
+used threshold .72, strict <code>&lt;</code>, no minimum factor length,
+linear tail credit and the mean of directional scores. We checked
+original-character coverage, paired missingness and MTLD factor support
+before comparing scores. These comparisons assessed sensitivity to the
+analysis mode, not proficiency or measurement precision.</p>
+</blockquote>
+</div>
+</div>
+<div class="section level2">
 <h2 id="japanese-file-workflow">Read files, review words and save the analysis<a class="anchor" aria-label="anchor" href="#japanese-file-workflow"></a>
 </h2>
 <p>Suppose the first line is a title and your question concerns
@@ -191,7 +359,7 @@ These are not UniDic results. Optional quanteda &gt;= 4.5.0 and a UTF-8
 R session are needed for KWIC review. No Python or external model is
 required for this walkthrough.</p>
 <p>To run the complete example at once:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"japanese-file-workflow.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">ja_file_record</span><span class="op">$</span><span class="va">metrics</span><span class="op">)</span>  <span class="co"># All retained body words</span></span>
 <span><span class="va">ja_file_record</span><span class="op">$</span><span class="va">counts</span>          <span class="co"># Reviewed target occurrences only</span></span>
@@ -202,7 +370,7 @@ annotations of its new text.</p>
 <div class="section level3">
 <h3 id="read-the-original-files-and-import-prepared-annotations">1. Read the original files and import prepared annotations<a class="anchor" aria-label="anchor" href="#read-the-original-files-and-import-prepared-annotations"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"text-file-input.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">ja_file_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"text-input"</span>, <span class="st">"japanese-workflow"</span>,</span>
@@ -272,7 +440,7 @@ explains explicit UTF-8/CP932 decoding in more detail.</p>
 <div class="section level3">
 <h3 id="select-the-body-without-rewriting-the-text">2. Select the body without rewriting the text<a class="anchor" aria-label="anchor" href="#select-the-body-without-rewriting-the-text"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># One segment and one contiguous body range per document in this small recipe.</span></span>
 <span><span class="co"># Empty original files have NA/NA bounds. Titles remain in the complete import.</span></span>
 <span><span class="va">ja_body_ranges</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="va">ja_document_ids</span>,</span>
@@ -295,7 +463,7 @@ Neither the complete import nor its original token indices are
 edited.</p>
 <details><summary>
 Show the body-range validation and selection code
-</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+</summary><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">select_japanese_example_body</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">imported</span>, <span class="va">ranges</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">s</span> <span class="op">&lt;-</span> <span class="va">imported</span><span class="op">$</span><span class="va">segments</span>; <span class="va">t</span> <span class="op">&lt;-</span> <span class="va">imported</span><span class="op">$</span><span class="va">tokens</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">ranges</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span> <span class="op">||</span></span>
@@ -328,7 +496,7 @@ Show the body-range validation and selection code
 <div class="section level3">
 <h3 id="inspect-kwic-and-record-contextual-decisions">3. Inspect KWIC and record contextual decisions<a class="anchor" aria-label="anchor" href="#inspect-kwic-and-record-contextual-decisions"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ja_file_candidates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"りんご"</span>, <span class="st">"リンゴ"</span>, <span class="st">"林檎"</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"はし"</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  candidate_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"apple"</span>, <span class="fl">3</span><span class="op">)</span>, <span class="st">"bridge"</span>, <span class="st">"chopsticks"</span>, <span class="st">"edge"</span><span class="op">)</span>,</span>
@@ -562,7 +730,7 @@ all-word lexical-identity measure would require an explicit identity
 policy and adequate coverage for the whole word population.</p>
 <details><summary>
 Show how the body measures and target tables are calculated
-</summary><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+</summary><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ja_file_words</span> <span class="op">&lt;-</span> <span class="va">ja_file_import</span><span class="op">$</span><span class="va">tokens</span><span class="op">[</span><span class="va">ja_file_selection</span><span class="op">$</span><span class="va">retained</span>, <span class="op">]</span></span>
 <span><span class="va">ja_file_sequences</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">ja_document_ids</span>, <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span></span>
 <span>  <span class="va">ja_file_words</span><span class="op">$</span><span class="va">surface</span><span class="op">[</span><span class="va">ja_file_words</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="va">id</span><span class="op">]</span><span class="op">)</span>, <span class="va">ja_document_ids</span><span class="op">)</span></span>
@@ -597,7 +765,7 @@ Show how the body measures and target tables are calculated
 <div class="section level3">
 <h3 id="save-enough-to-resume">5. Save enough to resume<a class="anchor" aria-label="anchor" href="#save-enough-to-resume"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ja_file_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"japanese-file-review-"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">ja_file_output</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">ja_file_record</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ja_file_output</span>, <span class="st">"analysis.rds"</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
@@ -608,7 +776,7 @@ Show how the body measures and target tables are calculated
 <p>The recipe uses a temporary directory to avoid overwriting study
 files. In your project, save the same complete
 <code>ja_file_record</code> to a chosen persistent path:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">ja_file_record</span>, <span class="st">"japanese-file-analysis.rds"</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"japanese-file-analysis.rds"</span><span class="op">)</span></span>
 <span><span class="va">saved</span><span class="op">$</span><span class="va">counts</span></span>
@@ -635,10 +803,10 @@ label. It returns ordinary data frames and keeps its inputs. It is an
 explicitly sourced example, not an exported function or a new
 analyzer.</p>
 <p>Continue from the file workflow above:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"japanese-document-profile.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># A declared, deliberately partial example map; other POS remain unmapped.</span></span>
 <span><span class="va">ja_pos_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"名詞"</span> <span class="op">=</span> <span class="st">"content"</span>, <span class="st">"動詞"</span> <span class="op">=</span> <span class="st">"content"</span>, <span class="st">"形容詞"</span> <span class="op">=</span> <span class="st">"content"</span>,</span>
 <span>  <span class="st">"形状詞"</span> <span class="op">=</span> <span class="st">"content"</span>, <span class="st">"副詞"</span> <span class="op">=</span> <span class="st">"content"</span>, <span class="st">"助詞"</span> <span class="op">=</span> <span class="st">"function"</span>, <span class="st">"助動詞"</span> <span class="op">=</span> <span class="st">"function"</span><span class="op">)</span></span>
@@ -860,7 +1028,7 @@ is not an educational kanji inventory. Half-width forms remain
 half-width, and emoji sequences can contain several codepoints in
 different categories.</p>
 <p>Inspect the three tables and the source-linked rows directly:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ja_profile</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"pos_missing_N"</span>, <span class="st">"origin_missing_N"</span>, <span class="st">"pos_unmapped_N"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;   document_id pos_missing_N origin_missing_N pos_unmapped_N</span></span>
 <span><span class="co">#&gt; 1    variants             0                0              0</span></span>
@@ -924,7 +1092,7 @@ POS/origin label or change these descriptions automatically. The profile
 keeps the full selection and input; the file-workflow record
 additionally keeps body ranges, decisions and the existing N/V/TTR
 results. Save them together:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ja_profile_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>profile <span class="op">=</span> <span class="va">ja_profile</span>, file_review <span class="op">=</span> <span class="va">ja_file_record</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">ja_profile_record</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ja_file_output</span>, <span class="st">"document-profile.rds"</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">name</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"documents"</span>, <span class="st">"characters"</span>, <span class="st">"features"</span><span class="op">)</span><span class="op">)</span></span>
@@ -935,7 +1103,7 @@ results. Save them together:</p>
 The CSVs are analysis/inspection tables; the full RDS retains the
 original sources and conditions. Recompute from the saved inputs and
 policy without rerunning a model:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">saved_profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ja_file_output</span>, <span class="st">"document-profile.rds"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">profile</span></span>
 <span><span class="va">replayed_profile</span> <span class="op">&lt;-</span> <span class="fu">japanese_document_profile</span><span class="op">(</span><span class="va">saved_profile</span><span class="op">$</span><span class="va">imported</span>, <span class="va">saved_profile</span><span class="op">$</span><span class="va">selection</span>,</span>
 <span>  <span class="va">saved_profile</span><span class="op">$</span><span class="va">policy</span><span class="op">$</span><span class="va">pos_groups</span>, <span class="va">saved_profile</span><span class="op">$</span><span class="va">policy</span><span class="op">$</span><span class="va">condition</span>,</span>
@@ -949,7 +1117,7 @@ anchors are checked. No API call, fee or additional dependency is needed
 for these profiles.</p>
 <p>To run both the file workflow and profiling example together in a
 fresh session:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"japanese-document-profile-demo.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">ja_profile</span><span class="op">$</span><span class="va">documents</span></span>
 <span><span class="va">ja_file_output</span>  <span class="co"># Temporary folder; choose a persistent output for your study.</span></span></code></pre></div>
@@ -966,10 +1134,10 @@ recipe connects the document profile above to the existing
 TUBELEX data or Japanese norms</strong>. Its zero and missing value are
 deliberate examples. No download, analyzer or API call is needed. Start
 with the complete file/profile example above.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"japanese-frequency-documents.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ja_frequency_keys</span> <span class="op">&lt;-</span> <span class="va">ja_profile</span><span class="op">$</span><span class="va">tokens</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"token_index"</span>, <span class="st">"start"</span>, <span class="st">"end"</span>, <span class="st">"surface"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="va">ja_frequency_keys</span><span class="op">$</span><span class="va">lookup_term</span> <span class="op">&lt;-</span> <span class="va">ja_frequency_keys</span><span class="op">$</span><span class="va">surface</span></span>
 <span><span class="va">ja_frequency_keys</span><span class="op">$</span><span class="va">key_reason</span> <span class="op">&lt;-</span> <span class="st">"Author-specified surface key for this teaching table"</span></span>
@@ -996,7 +1164,7 @@ table. Every original token, including exclusions and title words, has
 an anchored row. In your study, record the source and reason for each
 key. A lexical decision alone does not establish compatibility with a
 particular frequency table.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Fictional values, including one observed zero and one missing annotation.</span></span>
 <span><span class="va">ja_demo_norms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>word <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"林檎"</span>, <span class="st">"と"</span>, <span class="st">"を"</span>, <span class="st">"橋"</span>, <span class="st">"箸"</span>, <span class="st">"で"</span>, <span class="st">"渡る"</span>, <span class="st">"食べる"</span>, <span class="st">"見る"</span><span class="op">)</span>,</span>
 <span>  per_million <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1000</span>, <span class="fl">500</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">200</span>, <span class="fl">40</span>, <span class="fl">60</span>, <span class="fl">0</span><span class="op">)</span>,</span>
@@ -1090,7 +1258,7 @@ all 8 supplied keys match. <code>unlisted</code> has coverage zero.
 Documents with no retained tokens have <code>NA</code> coverage and
 means. The accounting identity is retained = matched + unmatched +
 unresolved.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">ja_frequency</span><span class="op">$</span><span class="va">norms</span><span class="op">$</span><span class="va">summary</span>, <span class="va">measure_id</span> <span class="op">==</span> <span class="st">"per_million"</span>,</span>
 <span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">document_id</span>, <span class="va">weighting</span>, <span class="va">estimate</span>, <span class="va">input_units</span>, <span class="va">observed_value_units</span>, <span class="va">missing_reason</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    document_id weighting estimate input_units observed_value_units</span></span>
@@ -1128,10 +1296,10 @@ Type coverage for unresolved lexical identities is not estimated.
 <code>$occurrences</code> retains source anchors, keys, reasons,
 statuses and each <code>value_</code> column, including excluded
 occurrences for inspection.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">plot_japanese_frequency_coverage</span><span class="op">(</span><span class="va">ja_frequency</span><span class="op">)</span></span></code></pre></div>
 <p><img src="japanese-annotations_files/figure-html/ja-frequency-coverage-plot-1.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Use monochrome = TRUE for black and white.</span></span></code></pre></div>
 <p>The points use the complete retained-token denominator. Rows without
 a point have no retained tokens; they are not plotted at zero. The
@@ -1140,7 +1308,7 @@ in your manuscript.</p>
 <div class="section level3">
 <h3 id="compare-selection-conditions-on-common-original-spans">Compare selection conditions on common original spans<a class="anchor" aria-label="anchor" href="#compare-selection-conditions-on-common-original-spans"></a>
 </h3>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># A second selection policy on unchanged text and unchanged lookup keys.</span></span>
 <span><span class="va">ja_content_selection</span> <span class="op">&lt;-</span> <span class="va">ja_profile</span><span class="op">$</span><span class="va">selection</span></span>
 <span><span class="va">ja_content_keep</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">ja_profile</span><span class="op">$</span><span class="va">tokens</span><span class="op">$</span><span class="va">pos_group</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">ja_profile</span><span class="op">$</span><span class="va">tokens</span><span class="op">$</span><span class="va">pos_group</span> <span class="op">==</span> <span class="st">"content"</span></span>
@@ -1242,7 +1410,7 @@ not establish a change in proficiency. The missing channel annotation
 also excludes <code>見る</code> from this all-measure common set,
 although its frequency itself is observed as zero. Choose your measure
 set before forming the intersection and report the retained counts.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ja_frequency_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>comparison <span class="op">=</span> <span class="va">ja_frequency_comparison</span>, review <span class="op">=</span> <span class="va">ja_profile_record</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">ja_frequency_record</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ja_file_output</span>, <span class="st">"frequency-analysis.rds"</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">ja_frequency</span><span class="op">$</span><span class="va">documents</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ja_file_output</span>, <span class="st">"frequency-documents.csv"</span><span class="op">)</span>,</span>
@@ -1257,7 +1425,7 @@ and both comparison scopes. CSV tables support inspection and analysis;
 they do not replace that record. Choose a persistent output folder for a
 study. Replay needs the saved reference, not a model, API key or a new
 download:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ja_frequency_saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ja_file_output</span>, <span class="st">"frequency-analysis.rds"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">ja_frequency_inputs</span> <span class="op">&lt;-</span> <span class="va">ja_frequency_saved</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">all</span></span>
 <span><span class="va">ja_frequency_replayed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">ja_frequency_inputs</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
@@ -1265,7 +1433,7 @@ download:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">ja_frequency_replayed</span>, <span class="va">ja_frequency_inputs</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu">common_japanese_frequency</span><span class="op">(</span><span class="va">ja_frequency_replayed</span><span class="op">)</span>, <span class="va">ja_frequency_saved</span><span class="op">$</span><span class="va">comparison</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Run the entire authored workflow in a fresh session with:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"japanese-frequency-demo.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">ja_frequency</span><span class="op">$</span><span class="va">documents</span></span>
 <span><span class="va">ja_file_output</span></span></code></pre></div>
@@ -1298,7 +1466,7 @@ does not download a dictionary.</p>
 original document IDs. The following strings are new examples, not
 sampled corpus text. The full-width letters and an invented string
 expose normalization and missing-feature decisions.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ja_segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"essay"</span>, <span class="st">"essay"</span>, <span class="st">"empty"</span><span class="op">)</span>,</span>
 <span>  segment_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s1"</span>, <span class="st">"s2"</span>, <span class="st">"s1"</span><span class="op">)</span>,</span>
 <span>  text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"国際連合で国際協力を学ぶ。"</span>, <span class="st">"ＡＩで学びました。 qzxv😀"</span>, <span class="st">""</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -1311,7 +1479,7 @@ the requested system dictionary is active, and restores the prior
 environment on exit. It does not edit the home configuration or request
 normalization or automatic sentence splitting. Use a path without spaces
 for this gibasa recipe.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">analyze_unidic</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">segments</span>, <span class="va">dic_dir</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">rc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/path.expand.html" class="external-link">path.expand</a></span><span class="op">(</span><span class="st">"~/.mecabrc"</span><span class="op">)</span></span>
 <span>  <span class="va">temporary_rc</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">rc</span><span class="op">)</span></span>
@@ -1340,7 +1508,7 @@ for this gibasa recipe.</p>
 <span>    surface <span class="op">=</span> <span class="va">raw</span><span class="op">$</span><span class="va">token</span>, raw_feature <span class="op">=</span> <span class="va">raw</span><span class="op">$</span><span class="va">feature</span><span class="op">)</span></span>
 <span>  <span class="va">features</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">expanded</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"doc_id"</span>, <span class="st">"sentence_id"</span>, <span class="st">"token_id"</span>, <span class="st">"token"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>tokens <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">tokens</span>, <span class="va">expanded</span><span class="op">[</span><span class="va">features</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>    configuration_sha256 <span class="op">=</span> <span class="fu">digest</span><span class="fu">::</span><span class="fu"><a href="https://eddelbuettel.github.io/digest/man/digest.html" class="external-link">digest</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">rc</span>, algo <span class="op">=</span> <span class="st">"sha256"</span><span class="op">)</span><span class="op">)</span></span>
+<span>    configuration_sha256 <span class="op">=</span> <span class="fu">digest</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/digest/man/digest.html" class="external-link">digest</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">rc</span>, algo <span class="op">=</span> <span class="st">"sha256"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="fu">analyze_unidic</span><span class="op">(</span><span class="va">ja_segments</span>, <span class="va">dic_dir</span><span class="op">)</span></span>
 <span><span class="va">ja_annotations</span> <span class="op">&lt;-</span> <span class="va">analysis</span><span class="op">$</span><span class="va">tokens</span></span>
@@ -1369,10 +1537,10 @@ commas and missing fields. gibasa does not expose MeCab’s unknown-node
 flag in these rows: a missing lemma is observable, but is not an
 independently verified unknown-word classification. Do not fabricate a
 definitive unknown flag from it.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dictionary_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sys.dic"</span>, <span class="st">"unk.dic"</span>, <span class="st">"char.bin"</span>, <span class="st">"matrix.bin"</span>, <span class="st">"dicrc"</span><span class="op">)</span></span>
 <span><span class="va">dictionary_hashes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">dic_dir</span>, <span class="va">dictionary_files</span><span class="op">)</span>,</span>
-<span>  <span class="kw">function</span><span class="op">(</span><span class="va">path</span><span class="op">)</span> <span class="fu">digest</span><span class="fu">::</span><span class="fu"><a href="https://eddelbuettel.github.io/digest/man/digest.html" class="external-link">digest</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">path</span>, algo <span class="op">=</span> <span class="st">"sha256"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">path</span><span class="op">)</span> <span class="fu">digest</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/digest/man/digest.html" class="external-link">digest</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">path</span>, algo <span class="op">=</span> <span class="st">"sha256"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">dictionary_files</span>, <span class="st">"_sha256"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">ja</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_import_annotations.html">lexdiv_import_annotations</a></span><span class="op">(</span><span class="va">ja_annotations</span>, <span class="va">ja_segments</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  language <span class="op">=</span> <span class="st">"ja"</span>, analyzer <span class="op">=</span> <span class="st">"gibasa/MeCab"</span>,</span>
@@ -1427,7 +1595,7 @@ tokens, retains particles and auxiliary verbs, and requires an observed
 substituting surface forms for missing bases. Change this selection if
 the research question calls for a different lexical population, and
 change the preprocessing label accordingly.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">t</span> <span class="op">&lt;-</span> <span class="va">ja</span><span class="op">$</span><span class="va">tokens</span></span>
 <span><span class="va">punctuation</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">t</span><span class="op">$</span><span class="va">POS1</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">t</span><span class="op">$</span><span class="va">POS1</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"補助記号"</span>, <span class="st">"空白"</span><span class="op">)</span></span>
 <span><span class="va">has_whitespace</span> <span class="op">&lt;-</span> <span class="fu">stringi</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stringi/man/stri_detect.html" class="external-link">stri_detect_regex</a></span><span class="op">(</span><span class="va">t</span><span class="op">$</span><span class="va">surface</span>, <span class="st">"\\p{White_Space}"</span><span class="op">)</span></span>
@@ -1461,7 +1629,7 @@ unavailable base leaves a gap, not a new adjacent pair. Do not renumber
 <code>lexdiv_as_quanteda(selected, ja$segments, term_col = "term")</code>
 preserves those gaps for concordances and other quanteda operations in a
 UTF-8 R session.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>imported <span class="op">=</span> <span class="va">ja</span>, selection <span class="op">=</span> <span class="va">selection</span>, metrics <span class="op">=</span> <span class="va">results</span>, ngrams <span class="op">=</span> <span class="va">grams</span><span class="op">)</span>,</span>
 <span>  <span class="st">"japanese-analysis.rds"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -1489,7 +1657,7 @@ text, boundaries and candidates are authored; it requires optional
 corpus, dictionary, Python or model. The IDs identify illustrative
 lexical items, not word families or a validated inventory of word
 senses.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"japanese-orthography.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">spelling</span> <span class="op">&lt;-</span> <span class="va">japanese_orthography_example</span></span>
 <span><span class="va">spelling</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>,</span>
@@ -1591,7 +1759,7 @@ proof of a misspelling.</p>
 columns; the example does not rewrite kana into kanji. Saving the whole
 object preserves the source, candidate inventory, decisions and reviewer
 reasons:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">spelling</span>, <span class="st">"japanese-orthography-review.rds"</span><span class="op">)</span></span>
 <span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"japanese-orthography-review.rds"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
@@ -1615,7 +1783,7 @@ produced the split alternative. This is a concrete integration case, not
 an estimate of analyzer accuracy on learner writing. The offline example
 supplies both annotations explicitly and requires neither that analyzer
 nor its dictionary.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">boundary</span> <span class="op">&lt;-</span> <span class="va">japanese_boundary_example</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">boundary</span><span class="op">$</span><span class="va">alignment</span><span class="op">$</span><span class="va">groups</span>, <span class="va">relation</span> <span class="op">!=</span> <span class="st">"exact"</span>,</span>
 <span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">start</span>, <span class="va">end</span>, <span class="va">pre</span>, <span class="va">keyword</span>, <span class="va">post</span>, <span class="va">predicted_n</span>, <span class="va">reference_n</span><span class="op">)</span><span class="op">)</span></span>
@@ -1691,7 +1859,7 @@ the existing annotation importer and stringi’s exact search; no new
 analyzer or exported API is introduced. The earlier
 <code><a href="../reference/lexdiv_ambiguity_review.html">lexdiv_ambiguity_review()</a></code> workflow continues to handle
 single-token lexical candidates.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"junimorph-spans.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"junimorph-spans-demo.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">span_demo</span> <span class="op">&lt;-</span> <span class="va">junimorph_spans_example</span></span>
@@ -1745,7 +1913,7 @@ supplies a three-column <code>jpn</code> table (lemma, form, feature
 bundle) under CC BY 4.0. Its filtered table and the pre-filtering
 hit-count file are different inputs. Obtain <code>jpn</code> separately;
 the package includes only the reader and authored examples.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu">read_junimorph</span><span class="op">(</span><span class="st">"local-resources/jpn"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  resource_id <span class="op">=</span> <span class="st">"J-UniMorph"</span>,</span>
 <span>  resource_version <span class="op">=</span> <span class="st">"jpn git blob 6b001fa9d33139bd9b85ffe70f74c1143ae9df24"</span>,</span>
@@ -1803,12 +1971,12 @@ its <strong>CC BY-NC-ND 4.0</strong> terms. They are not included in
 ldfreq. The following explicitly sourced reader needs only the local ZIP
 and metadata tables; optional <code>readxl</code> reads the
 workbooks.</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"ninjal-essays.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">data_dir</span> <span class="op">&lt;-</span> <span class="st">"ninjal-essay-data"</span></span>
-<span><span class="va">essays</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://readxl.tidyverse.org/reference/read_excel.html" class="external-link">read_excel</a></span><span class="op">(</span></span>
+<span><span class="va">essays</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readxl/man/read_excel.html" class="external-link">read_excel</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">data_dir</span>, <span class="st">"sakubun.xlsx"</span><span class="op">)</span>, col_types <span class="op">=</span> <span class="st">"text"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">writers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://readxl.tidyverse.org/reference/read_excel.html" class="external-link">read_excel</a></span><span class="op">(</span></span>
+<span><span class="va">writers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readxl/man/read_excel.html" class="external-link">read_excel</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">data_dir</span>, <span class="st">"shipitsusha.xlsx"</span><span class="op">)</span>, col_types <span class="op">=</span> <span class="st">"text"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Start with a small, explicitly selected subset of local files.</span></span>
@@ -1826,7 +1994,7 @@ workbooks.</p>
 <p>The UTF-8 default is a declaration, not an encoding guess. For a
 mixed archive, supply a named vector with each selected member’s
 inspected encoding:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">files</span> <span class="op">&lt;-</span> <span class="va">essays</span><span class="op">[[</span><span class="st">"日本語作文txt"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">encodings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"UTF-8"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span><span class="op">)</span>, <span class="va">files</span><span class="op">)</span></span>
 <span><span class="co"># A local list of member names verified as CP932, not a list of error words.</span></span>
@@ -1892,7 +2060,7 @@ in the gibasa section; do not pass the teaching reference above as
 TUBELEX. This example selects the whole source except auxiliary symbols
 and whitespace, while retaining missing-base tokens in the full
 denominator.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"japanese-frequency-documents.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"japanese-tubelex.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">t</span> <span class="op">&lt;-</span> <span class="va">ja</span><span class="op">$</span><span class="va">tokens</span></span>
