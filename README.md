@@ -396,7 +396,8 @@ Use [the vocabulary-audit guide](https://ryuya-dot-com.github.io/ldfreq/articles
 to inspect unmatched terms and surface-to-unit mappings before interpreting coverage.
 
 [From text to a report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html) extends this example
-to a reusable analysis table, an interpretation, saved results, and citations.
+to English case and Japanese POS-selection comparisons from local files,
+flat diagnostic tables, replayable saved results, methods text, figures and citations.
 
 ## Reference frequency needs its own tokenization
 

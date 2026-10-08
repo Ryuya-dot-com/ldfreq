@@ -4546,3 +4546,65 @@ No CRAN submission is authorized or performed.
 
 Follow-up: main run 37713809762 completed successfully in all 11 jobs. The saved
 `main-ci-final.json` closes the tracking item above; no rerun or cancellation.
+
+## 2026-10-08: Japanese unit sensitivity guide published
+
+- PR #35 final head `042f2ff8a473f85b349db7a344118db98724cea6`; merged main
+  `0f883ccce06cfe815134ab79dec546e724ce5d92`. Identical source tree
+  `3b3f248ed9c5b9373cbd09969e36ecddf8f1d093`.
+- Final PR run 37717144052: all 11 jobs successful. Current three OS releases
+  and R-devel each have 8,333 assertions and Status: OK, including all vignette
+  rebuilds. R4.1 job passed. C: 7,976 assertions, no failure, one existing
+  quanteda encoding warning and 29 conditional skips.
+- Paired UD input correspondence was checked independently in Python: 6,516
+  N/V records, 2,172 TTR values and 1,086 coverage decisions agree. A fresh
+  download with no private input reproduces all five public UD CSVs exactly.
+  No corpus/model is added to the R package; experiment artifacts are excluded
+  by the existing Rbuildignore and state the UD results' CC BY-SA attribution.
+- The original private sample roster/text matches every saved Sudachi input:
+  24 learner essays plus four Japanese-L1 essays. The initial all-learner wording
+  was corrected during PR review before main/site publication. Numerical outputs
+  are unchanged; previous N/V/TTR counts reproduce exactly. Initial run 37715908956
+  had already completed successfully before the correction push; no CI cancellation
+  or manual duplicate run occurred.
+- Pages commit `ecbeef208566cf9deff15d4af080dbd7d2ddab95`, run 37718729156:
+  successful. 129 HTML / 253 files checked; zero missing internal links or private
+  local paths. All 16 changed source files and all seven changed site files match
+  the checked local bytes after anonymous retrieval. The older 187 article output
+  lines remain intact; only the new authored comparison adds output.
+- Main run 37718654723 is separately in progress. A standard watcher saves its
+  final JSON in `reviews/ldfreq-japanese-units-20261008`. Acceptance uses the
+  completed same-tree PR checks and actual deployed contents, not a claim that
+  the new main run has already completed.
+- Core R code, exports, dependencies, numeric definitions, package version and
+  existing tags/releases are unchanged. Completion receipts stay local until
+  a subsequent substantive change; no receipt-only CI repush. No CRAN submission.
+
+## 2026-10-08 file-to-condition reporting examples
+
+The previous Japanese-unit main run 37718654723 completed successfully in all
+11 jobs; its final JSON is retained in the existing evidence directory. This
+closes its separate main tracking without rerunning any corpus calculations.
+
+The new report-guide examples run against installed 0.3.0.9002. They retain
+186 English and 30 Japanese diagnostic rows, method identities, source records,
+selection masks and exact input sequences, plus CSV/RDS/methods text. English
+case conditions retain identical N but have 14 versus 10 tail-only MTLD records
+among 30 finite scores. All Japanese MATTR50 values are unavailable; the three
+finite MTLD values are below the advisory token floor. Missing/unmapped POS
+withholds the complete-selection result even when a conditional score exists.
+
+Local validation: all ten new chunks executed; all three changed articles rebuilt.
+UTF-8 and C yield identical metric results and diagnostic tables. Both environments
+pass independent N/V/TTR checks, Japanese-only save/replay, missing/unmapped POS
+with finite conditional values, and rejection of a body boundary inside a token.
+The first C check exposed unmarked parsed POS strings: explicit encoding in
+read.csv, in addition to textConnection, resolves it. No package core change
+was needed. Public API audit retains 57 exports and all existing boundaries.
+
+Local site audit: 129 HTML / 253 files, zero missing internal links or private
+local paths. The article title changed; 58 otherwise unchanged pages receive
+only the corresponding generated navigation-label replacement, without
+rerunning their examples. Source, CI and deployed-byte identities will be
+recorded after normal PR publication. No new API, dependency, corpus, package
+version, release/tag or CRAN submission. Evidence: reviews/ldfreq-file-reports-20261008.

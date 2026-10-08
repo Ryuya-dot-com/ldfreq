@@ -1,8 +1,8 @@
 ---
-title: "From English text to a report"
+title: "From files to a diagnostic report"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{From English text to a report}
+  %\VignetteIndexEntry{From files to a diagnostic report}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -11,6 +11,326 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(ldfreq)
 ```
+
+## Compare analysis conditions from local files
+
+Start here to turn your own files into a table you can inspect, save and report.
+The two paths below work with ldfreq 0.3.0.9002, without new packages, downloads
+or an API key. English text is tokenized in R. Japanese text uses prepared
+annotations: importing a file does not perform Japanese morphological analysis.
+
+The question is **how a declared counting decision changes the same documents**.
+For English we preserve or lowercase spelling; for Japanese we retain all body
+words or only words with a declared content POS. These comparisons do not
+estimate writing ability or establish equivalence between the two languages.
+The English files are 30 authored teaching essays plus an empty file, not
+learner data. The five Japanese files are deliberately short authored examples
+that also expose missing annotations and unavailable scores.
+
+### Keep diagnostics beside each value
+
+Run this setup for either path. `diagnostic_rows()` is a small function defined
+in this guide, not a new package API. It extracts diagnostics already computed
+by the three requested metrics; it does not recalculate MTLD. The full result
+objects retain method parameters and schema identities in the saved record.
+
+```{r report-file-setup}
+reader <- new.env(parent = baseenv())
+sys.source(system.file("examples", "text-file-input.R",
+  package = "ldfreq", mustWork = TRUE), reader)
+settings <- list(metrics = c("ttr", "mattr", "mtld"),
+  window_length = 50, mtld_threshold = 0.72)
+calculate <- function(tokens) do.call(lexdiv_metrics_batch, c(list(tokens), settings))
+diagnostic_rows <- function(result) {
+  out <- as.data.frame(result)[c("document_id", "metric_id", "method_id",
+    "value", "status", "missing_reason", "N", "V", "below_quality_floor")]
+  fields <- c("forward_score", "reverse_score", "forward_complete_factors",
+    "reverse_complete_factors", "forward_tail_credit", "reverse_tail_credit")
+  for (field in fields) out[[field]] <- vapply(result$diagnostics, function(d) {
+    if (is.null(d[[field]])) NA_real_ else as.numeric(d[[field]])
+  }, numeric(1))
+  available <- out$metric_id == "mtld" & out$status == "ok"
+  out$mtld_tail_only <- ifelse(available,
+    pmin(out$forward_complete_factors, out$reverse_complete_factors) == 0, NA)
+  out$mtld_gap_percent <- ifelse(available,
+    100 * abs(out$forward_score - out$reverse_score) /
+      ((out$forward_score + out$reverse_score) / 2), NA_real_)
+  out
+}
+```
+
+`status` describes calculation availability; `below_quality_floor` is an
+advisory length screen. Neither establishes precision. `mtld_tail_only = TRUE`
+means no complete factor in at least one direction. The directional gap is
+order sensitivity, **not a standard error or confidence interval**; it can be
+zero when both scores depend entirely on their tails. Keep these flags rather
+than silently excluding documents. See the
+[factor-support explanation](designing-comparisons.html#inspect-mtld-factor-support)
+and its length-association example when checking your own study sample.
+
+### English: preserve or lowercase spelling {#compare-english-case-from-files}
+
+Replace `en_dir` with your TXT directory. Each file is one document, including
+its paragraph breaks. Filename stems are IDs here; supply your own mapping
+when that rule is unsuitable. No spelling correction, lemmatization, name
+removal or British/American spelling conversion is applied. Lowercasing can
+merge spellings such as `Rose` and `rose`; it does not resolve their meanings.
+
+```{r report-english-files}
+en_dir <- system.file("examples", "text-input", "texts",
+  package = "ldfreq", mustWork = TRUE)
+en_paths <- sort(list.files(en_dir, pattern = "[.]txt$", full.names = TRUE,
+  ignore.case = TRUE))
+stopifnot(length(en_paths) > 0L)
+en_ids <- tools::file_path_sans_ext(basename(en_paths))
+stopifnot(!anyDuplicated(en_ids), all(nzchar(en_ids)))
+en_files <- lapply(en_paths, reader$read_text_file, encoding = "UTF-8")
+en_texts <- setNames(vapply(en_files, `[[`, character(1), "text"), en_ids)
+en_sources <- do.call(rbind, lapply(en_files, `[[`, "source"))
+en_sources$document_id <- en_ids
+en_sources$source_file <- basename(en_paths)
+en_prepared <- lapply(c("preserve", "lower"), function(case) {
+  lexdiv_tokenize_batch(en_texts, tokenizer = "english",
+    normalization = "NFC", case = case, keep_numbers = FALSE)
+})
+names(en_prepared) <- c("preserve", "lower")
+en_inputs <- lapply(en_prepared, function(batch) lapply(batch, function(x) x$tokens$surface))
+en_runs <- lapply(en_inputs, calculate)
+en_table <- do.call(rbind, lapply(names(en_runs), function(condition) {
+  out <- diagnostic_rows(en_runs[[condition]])
+  out$condition <- condition
+  out
+}))
+rownames(en_table) <- NULL
+en_preview <- c(head(en_ids, 1), tail(en_ids, 1))
+knitr::kable(subset(en_table, document_id %in% en_preview,
+  c(document_id, condition, metric_id, N, V, value, status, missing_reason)),
+  digits = 3, row.names = FALSE)
+```
+
+Retain all rows, including `031`, whose empty input yields missing values.
+Compare conditions by ID and metric, never by an assumed row order. The table
+below counts availability separately for each condition and for paired values.
+It does not select documents on the basis of an observed score difference.
+
+```{r report-english-pairs}
+pair_fields <- c("document_id", "metric_id", "N", "value", "status", "mtld_tail_only")
+en_pairs <- merge(subset(en_table, condition == "preserve", pair_fields),
+  subset(en_table, condition == "lower", pair_fields),
+  by = c("document_id", "metric_id"), all = TRUE,
+  suffixes = c("_preserve", "_lower"))
+stopifnot(nrow(en_pairs) == length(en_ids) * length(settings$metrics))
+en_counts <- do.call(rbind, lapply(settings$metrics, function(metric) {
+  p <- subset(en_pairs, metric_id == metric)
+  a <- p$status_preserve == "ok" & is.finite(p$value_preserve)
+  b <- p$status_lower == "ok" & is.finite(p$value_lower)
+  data.frame(metric_id = metric, documents = nrow(p),
+    preserve_available = sum(a), lower_available = sum(b),
+    paired_available = sum(a & b), unpaired = sum(!(a & b)),
+    preserve_tail_only = if (metric == "mtld") sum(p$mtld_tail_only_preserve, na.rm = TRUE) else NA,
+    lower_tail_only = if (metric == "mtld") sum(p$mtld_tail_only_lower, na.rm = TRUE) else NA)
+}))
+knitr::kable(en_counts)
+```
+
+For these files N is unchanged, while lowercasing changes type identity. This
+is a sensitivity analysis of one counting decision, not a test of whether
+capitalization is correct. The tokenizer's positions refer to processed text;
+case conversion can change Unicode character length in other inputs. Do not
+reuse these positions as original-text annotation anchors. Both complete
+tokenizations, their exclusion records and original texts are saved below.
+
+### Japanese: all body words or content words {#compare-japanese-pos-from-files}
+
+This path is independent of the English path after the shared setup. It imports
+five TXT files and their authored annotation CSV. For your own texts, prepare
+complete annotations with your chosen analyzer and dictionary, and replace the
+declared body starts and provenance. The
+[Japanese file guide](japanese-annotations.html#japanese-file-workflow) explains
+source positions, title exclusion and review; the
+[analyzer recipe](japanese-annotations.html#use-gibasa-and-a-local-unidic-dictionary-in-r)
+provides a separate route for generating annotations. The authored example
+does not demonstrate analyzer accuracy.
+
+```{r report-japanese-files}
+ja_dir <- system.file("examples", "text-input", "japanese-workflow",
+  package = "ldfreq", mustWork = TRUE)
+ja_ids <- c("variants", "homophones", "unlisted", "no_targets", "empty")
+ja_files <- lapply(file.path(ja_dir, paste0(ja_ids, ".txt")),
+  reader$read_text_file, encoding = "UTF-8")
+ja_texts <- setNames(vapply(ja_files, `[[`, character(1), "text"), ja_ids)
+ja_sources <- do.call(rbind, lapply(ja_files, `[[`, "source"))
+ja_sources$document_id <- ja_ids
+ja_sources$source_file <- paste0(ja_ids, ".txt")
+ja_csv <- reader$read_text_file(file.path(ja_dir, "annotations.csv"))
+ja_connection <- textConnection(ja_csv$text, encoding = "UTF-8")
+ja_annotations <- read.csv(ja_connection, colClasses = "character",
+  na.strings = "<MISSING>", check.names = FALSE, encoding = "UTF-8")
+close(ja_connection)
+ja_annotations$token_index <- as.numeric(ja_annotations$token_index)
+ja_import <- lexdiv_import_annotations(ja_annotations,
+  data.frame(document_id = ja_ids, segment_id = "s1", text = unname(ja_texts)),
+  list(language = "ja", analyzer = "authored", analyzer_version = "2",
+    dictionary = "none", dictionary_version = "not-applicable",
+    unit = "authored-file-workflow", normalization = "none"))
+ja_tokens <- ja_import$tokens
+```
+
+Read the CSV through an explicitly UTF-8 connection and mark the parsed strings
+as UTF-8 too, including on C/POSIX locales. Its literal `<MISSING>` marker denotes unavailable annotations; the
+original CSV text and its hash are retained. Next declare the selection policy.
+
+```{r report-japanese-selection}
+# One complete segment per document; the body extends to its end.
+ja_body_start <- setNames(c(5L, 4L, 1L, 1L, NA_integer_), ja_ids)
+start <- unname(ja_body_start[ja_tokens$document_id])
+stopifnot(!anyNA(start), !any(ja_tokens$start < start & ja_tokens$end >= start))
+ja_body <- ja_tokens$start >= start & ja_tokens$surface != "\u3002"
+# This teaching inventory declares nouns and verbs as content; particles as function.
+ja_groups <- setNames(c("content", "content", "function"),
+  c("\u540d\u8a5e", "\u52d5\u8a5e", "\u52a9\u8a5e"))
+ja_group <- unname(ja_groups[ja_tokens$POS1])
+ja_unknown <- ja_body & is.na(ja_group)
+ja_selections <- list(all_body = ja_body,
+  content = ja_body & !is.na(ja_group) & ja_group == "content")
+ja_inputs <- lapply(ja_selections, function(keep) setNames(lapply(ja_ids, function(id) {
+  ja_tokens$surface[keep & ja_tokens$document_id == id]
+}), ja_ids))
+```
+
+The inputs stay named by document ID, including zero-token selections. Build
+the diagnostic table without dropping those documents:
+
+```{r report-japanese-metrics}
+ja_runs <- lapply(ja_inputs, calculate)
+ja_table <- do.call(rbind, lapply(names(ja_runs), function(condition) {
+  out <- diagnostic_rows(ja_runs[[condition]])
+  out$condition <- condition
+  out$eligible_body_N <- vapply(out$document_id, function(id)
+    sum(ja_body & ja_tokens$document_id == id), integer(1))
+  out$unknown_selection_N <- vapply(out$document_id, function(id)
+    if (condition == "content") sum(ja_unknown & ja_tokens$document_id == id) else 0L,
+    integer(1))
+  out$known_excluded_N <- out$eligible_body_N - out$N - out$unknown_selection_N
+  out$selection_complete <- out$unknown_selection_N == 0L
+  out$reportable_value <- ifelse(out$selection_complete, out$value, NA_real_)
+  out
+}))
+rownames(ja_table) <- NULL
+knitr::kable(subset(ja_table, metric_id == "ttr", c(document_id, condition,
+  eligible_body_N, N, unknown_selection_N, known_excluded_N, value, reportable_value)),
+  digits = 3, row.names = FALSE)
+```
+
+The original titles and punctuation stay in `ja_import`. Here only the declared
+body is analyzed, excluding literal `。`; other corpora require their own
+explicit punctuation policy. The small POS map covers this example, not the
+full UniDic inventory. Extend it deliberately for your analyzer: missing and
+unmapped POS are **unknown selections**, not automatically function words.
+All-body analysis does not require POS; content selection does. The invented
+word in `unlisted` therefore stays in all-body TTR but cannot be assigned to
+the content condition. The accounting identity is
+`eligible_body_N = N + unknown_selection_N + known_excluded_N`.
+
+`value` is the calculation on known selected tokens. `reportable_value` withholds
+it when any eligible token has unknown membership; `status` still describes
+the calculation, not selection completeness. Even a nonmissing
+`reportable_value` does not establish measurement precision. Keep both columns:
+this prevents an incomplete content-word sample from appearing fully observed.
+`no_targets` contains only an excluded full stop, whereas `empty` has no source
+tokens; the imported source retains that distinction.
+
+```{r report-japanese-availability}
+knitr::kable(as.data.frame(with(ja_table, table(condition, metric_id, status))))
+```
+
+MATTR50 is unavailable for every file. MTLD nevertheless returns values for
+two all-body selections and one content selection; all three fall below its
+advisory length floor. A computable value does not make these short samples
+suitable for a substantive MTLD comparison. They illustrate accounting and
+missingness, not recommended lengths for lexical analysis.
+Do not shrink the common window or concatenate independent documents to create
+scores. Content-word selection also removes intervening tokens: a window of
+50 content words has a different original-text span from 50 all-body words.
+Retain the selected source occurrences rather than claiming equal coverage.
+For longer Japanese texts, see the executed
+[word-unit comparisons](japanese-annotations.html#what-the-executed-comparisons-show).
+
+### Save a complete record and a flat table
+
+Run the appropriate record assignment after its language path. It stores the
+original input, exact selected sequences, complete results, diagnostics and
+settings. The methods text states computational choices; replace the teaching
+sample description with your actual sampling, writer/task structure, analyzer
+and dictionary information. Do not infer these from filenames or scores.
+
+```{r report-english-record}
+en_record <- list(texts = en_texts, sources = en_sources, prepared = en_prepared,
+  inputs = en_inputs, results = en_runs, diagnostics = en_table, paired = en_pairs,
+  counts = en_counts, settings = settings, session = sessionInfo(),
+  methods = paste(length(en_texts), "English input files were analyzed.",
+    "Each file was one document. English tokenization used NFC, excluded numbers,",
+    "URLs and emails, and retained contractions and hyphenated words.",
+    "We compared case-preserved and lowercased surface forms without lemmatization",
+    "or spelling correction, retaining all documents and diagnostic flags."))
+```
+
+```{r report-japanese-record}
+ja_record <- list(texts = ja_texts, sources = ja_sources, annotation_source = ja_csv,
+  imported = ja_import, body_start = ja_body_start, pos_groups = ja_groups,
+  selections = ja_selections, unknown_selection = ja_unknown,
+  inputs = ja_inputs, results = ja_runs, diagnostics = ja_table,
+  settings = settings, session = sessionInfo(),
+  methods = paste(length(ja_texts), "Japanese input files were analyzed with prepared",
+    "annotations, analyzer authored version 2, no dictionary or normalization.",
+    "We excluded titles using declared original-codepoint body starts and removed",
+    "literal full stops. We compared all retained surface words with nouns and",
+    "verbs in an explicit POS map; particles were excluded from the latter.",
+    "Missing or unmapped POS remained unknown. Content results were withheld",
+    "when selection was incomplete. No form was corrected or lemmatized."))
+```
+
+Set `record <- en_record` or `record <- ja_record`. This last block works for
+either language. For your study, replace the temporary directory with a
+persistent project directory, for example `output_dir <- "results/english"`.
+Files in that directory are overwritten on a repeat run; choose separate
+directories for different analyses.
+
+```{r report-file-save}
+record <- en_record
+output_dir <- tempfile("ldfreq-condition-report-")
+dir.create(output_dir, recursive = TRUE)
+mtld_method <- unique(subset(record$diagnostics, metric_id == "mtld")$method_id)
+stopifnot(identical(mtld_method, "mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1"))
+record$methods <- c(record$methods, sprintf(paste(
+  "Calculations used ldfreq %s: full-document TTR, MATTR with a common window of %d,",
+  "and MTLD method %s, threshold %g.",
+  "MTLD used strict <, no minimum factor length, final-token closure checks,",
+  "linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions.",
+  "We retained unavailable results and reasons, the advisory length flag, complete",
+  "factor counts and directional gaps. Gaps describe order sensitivity, not precision."),
+  as.character(packageVersion("ldfreq")), record$settings$window_length,
+  mtld_method, record$settings$mtld_threshold))
+saveRDS(record, file.path(output_dir, "analysis.rds"), version = 2)
+write.csv(record$diagnostics, file.path(output_dir, "diagnostics.csv"),
+  row.names = FALSE, na = "<MISSING>", fileEncoding = "UTF-8")
+writeLines(enc2utf8(record$methods), file.path(output_dir, "methods.txt"), useBytes = TRUE)
+restored <- readRDS(file.path(output_dir, "analysis.rds"))
+stopifnot(identical(restored, record))
+replayed <- lapply(restored$inputs, function(tokens)
+  do.call(lexdiv_metrics_batch, c(list(tokens), restored$settings)))
+stopifnot(identical(replayed, restored$results))
+cat(record$methods, sep = "\n\n")
+```
+
+The CSV is a flat inspection table; **the RDS is the complete analysis record**.
+It contains original text and selected words, so keep it under the same access
+rules as the input. Replay here verifies calculations under the installed
+software; it does not independently validate annotations or estimates.
+Use a persistent software environment and keep the original files for later
+reanalysis. For a text CSV instead of separate files, use the
+[ID-preserving CSV input recipe](english-tokenization.html#alternatively-read-a-csv-containing-the-texts).
+The remaining sections explain reference coverage, figures and citations.
 
 ## Question and unit of analysis
 
