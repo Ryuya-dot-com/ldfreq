@@ -1,7 +1,7 @@
 {
   "package_version": "0.3.0.9001",
   "R": "R version 4.6.1 (2026-06-24)",
-  "stringi": "1.8.7",
+  "stringi": "1.8.9",
   "threshold": 0.72,
   "legacy_method": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
   "current_method": "mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1",
@@ -9,5 +9,14 @@
   "preprocessing": "English tokenizer, NFC, lower case, surface tokens, numbers excluded",
   "paired_rule": "Both scores finite; missing values retained in document table; no imputation",
   "ranks": "Average ties; Spearman on the paired documents",
+  "factor_screen": "Complete factors in both directions; strict < 0.72; N < 10 classified separately; no short factors guarantees no min10 effect",
+  "screen_checks": {
+    "seed": 20261008,
+    "inputs": 1500,
+    "lengths": "Uniform integers 10:300",
+    "vocabulary_size": "Uniform integers 1:100",
+    "sampling": "IID uniform tokens with replacement; Mersenne-Twister/Inversion/Rejection",
+    "scope": "Independent deterministic check, not a reproduction of another random sample or a prevalence estimate"
+  },
   "scope": "Descriptive migration sensitivity; not population validity or CLAN comparison"
 }

@@ -4377,3 +4377,80 @@ unchanged source members match the checkout byte-for-byte; DESCRIPTION differs
 only by normal R build formatting and generated metadata. The comparison runner,
 input hashes and CSV/JSON results are public under `experiments/mtld-migration`;
 complete local RDS is retained in the evidence directory.
+
+
+## Published C-locale correction: PR #32
+
+Merged main is `7d3ae8dd29653fc64e8925567a78858605947f86`; its tree
+`4d3e7cf46f976e45c45efb2967190d2c4e3d2e4f` exactly matches tested head
+`a2f6afe8bd1773b70f21f3a8a758dd180f5fd684`. PR run 37658859042 passed all
+11 jobs, including 8,286 assertions and full vignette rebuilding in current
+macOS/Windows/Linux and R-devel. R4.1 passed 8,211 with eight optional-dependency
+skips/two existing NOTEs; C passed 7,929 with one quanteda warning/29 explicit skips.
+Both required gates passed; release-candidate classification stays development.
+
+Tag `v0.3.0.9001` targets main and its prerelease contains the source archive
+and checksum. SHA-256: `69800ac0669e118b94d147529fe80cc166e41d8ebabcf8d5ec3169631ee26b99`.
+The old annotated tag `v0.3.0-dev.1` / object `07ef72baed22fa9ba8e99ad208d2b23b9068e242`
+still points to `55fedb18a1f7b01bd792cc7d699fa64b83bc42b2`. No tag was rewritten.
+Actual pak installation of the new public tag into an isolated library succeeded.
+In C LC_CTYPE, installed MTLD/legacy behavior, the 31-document saved result,
+TUBELEX word bytes/counts, installed version and citation were verified. A separate
+session matched all document IDs and 30 finite scores/one missing result to the
+stored comparison CSV, using the newly installed stringi 1.8.9.
+
+Pages `c260a5035936300bffa9c6e2f3ff49956b72810c`, run 37663109653, succeeded.
+All changed source files (32), changed site files (79) and the two release assets
+were fetched without authentication and matched the verified local bytes. There
+are 129 HTML pages / 253 site files, no missing local links or leaked private paths.
+No source, site or numerical rebuild is needed for the final internal receipt.
+
+Main run 37662826699 was triggered normally. Its C, current three OS, R4.1,
+PDF and both builder jobs succeeded. R-devel preparation succeeded from a cold
+cache and saved it; successor job 112942805743 remains in R setup at this record.
+The full main run is not yet reported as successful. PR's complete identical-tree
+evidence is retained separately. No workflow cancellation, bypass or timeout
+increase is used. The local standard gh watcher records the eventual result in
+`reviews/ldfreq-locale-migration-20261008/main-watch.log`.
+
+Outstanding research/environment limits remain the Windows R4.1/CP932 check,
+empirical low-score learner effects, CLAN equivalence and DOI preservation;
+they are not silently treated as completed. No CRAN submission occurred.
+
+Acceptance uses the completed identical-tree PR evidence and public installation/byte
+checks. The pending main R installation does not invalidate those completed checks;
+it is also not called a successful main run. Public release notes disclose this
+checkpoint explicitly. The existing watcher continues to collect the normal run's
+eventual status; no new numeric experiment, build, CI retry or cancellation is started.
+
+
+## MTLD factor-screen follow-up (2026-10-08)
+
+Main run 37662826699 eventually ended cancelled: R-devel timed out in
+`setup-r`, before dependencies or package checks. Nine jobs passed; the aggregate
+gate failed. This updates the pending checkpoint above, without replacing the
+complete same-tree PR #32 evidence with a claim of main success. No manual
+cancellation, retry or timeout extension was made.
+
+The new migration work changes tutorial/experiment code and explanation only.
+Evidence: `reviews/ldfreq-mtld-factor-screen-20261008/`. The published factor
+helper was checked on seven boundaries and 1,500 seeded synthetic inputs.
+The sufficient condition preserved exact values, statuses and missing reasons.
+Authored data reproduce the shortest factor 14; 22 essays with complete factors
+have median minimum 39, while eight absent minima would produce a 30-essay
+median of 45 if represented by Inf. Saved ICNALE original surface tokens were
+reused (140 essays/31,902 occurrences): 15/136 L2 and 1/4 ENS actually changed.
+No corpus text, IDs, individual output or ratings enter the public repository.
+The local runner is `analysis/icnale-gra/mtld-migration.R`; public aggregate
+provenance records the private input hashes. Package code, metric contracts,
+57 exports, data, licenses and version stay unchanged. The fixed release tag
+remains immutable; no new release or CRAN submission is needed for this update.
+
+Both changed guides executed successfully against the fixed v0.3.0.9001
+installation. All 129 HTML pages pass local link/anchor and private-path checks;
+only the two article HTML/Markdown pairs and NEWS HTML/Markdown change. A
+network-restricted NEWS lookup failed after the article builds; only that NEWS
+step was resumed with network access. Completed article calculations were reused.
+The 30 prepared token streams are identical to the previous migration RDS.
+No numerical package or external-tool suite was repeated for this documentation
+change. CI and public source/site verification follow the normal protected flow.

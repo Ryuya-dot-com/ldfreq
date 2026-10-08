@@ -396,6 +396,29 @@ parameters, document counts, exclusions, task/writer structure, and the reason
 for the window choice. Report effect sizes and uncertainty using the study's
 sampling units; these descriptive functions do not choose an inferential model.
 
+For **MTLD**, also state the threshold and **comparison operator (`<` or `<=`)**,
+the minimum complete-factor length (none or the legacy ten tokens), whether the
+last token is checked for closure, the residual-tail rule, and how forward and
+reverse scores are combined. These choices are not identified by the name
+"MTLD" alone. For the current default, a methods statement could read:
+
+> We calculated MTLD with ldfreq [installed package version], method
+> `mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1`, using threshold 0.72.
+> A factor closed when its running TTR was strictly less than 0.72 (`<`, not
+> `<=`), with no minimum factor length and with the final token included in
+> closure checks. The residual factor contributed `(1 - TTR) / (1 - 0.72)`;
+> we averaged the forward and reverse MTLD scores arithmetically.
+
+Replace the version placeholder with `as.character(packageVersion("ldfreq"))`
+and describe the actual tokenization and exclusions. If using the legacy
+variant, report its `method_id` and ten-token minimum instead. For migration
+comparisons, record both definitions' operators even when they are the same.
+The [factor screen](designing-comparisons.html#identify-where-the-min10-restriction-can-matter)
+identifies where the minimum-length rule can matter. Changing the operator is
+a separate comparison: in teaching essay `024`, `<` gives 86.1956 and `<=`
+gives 64.3163 with every other setting fixed. Report the reference value when
+expressing this change as a percentage.
+
 ## What to cite
 
 Use `citation("ldfreq")` for the software. Cite the resources and methods
