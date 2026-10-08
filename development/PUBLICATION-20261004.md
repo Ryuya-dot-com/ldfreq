@@ -4890,3 +4890,49 @@ API audit (57 exports) and note policy passed. Only the changed article, home,
 NEWS, search and Markdown were rebuilt. Normal PR CI and actual delivery follow.
 This sample does not validate missing-data/repeated-writer scenarios (covered
 by existing authored checks), psychometric validity or novice usability.
+
+### Publication completion for PR #40
+
+- Main `280eebf822ec32208cb903bb193048500d212422` and checked final PR head
+  `f584a8a375255ddabab7e8bf181d7e94c871a702` have the same tree
+  `80b3d19686b9431572abd470a287f53e6b82a2e4`. Final run 37741680143 passed
+  all 11 jobs, including current Linux/macOS/Windows, R4.1, R-devel, C and PDF.
+- Initial run 37740352894 also passed all 11 jobs. After its completion, two
+  repository-only READMEs were corrected to distinguish saved corpus-derived
+  tokens from the complete verbatim essays retained in answer.csv. No running
+  CI was cancelled. Code, numeric files and site outputs were unchanged;
+  successful local calculations/builds were not repeated for this correction.
+- Pages commit `ed7257d583ce1f3d2158211993b100e3c73732ca`, run 37743148684,
+  succeeded. Eleven changed source files and eight site files were fetched
+  anonymously and matched the validated bytes. The site has 129 HTML pages,
+  253 files, no missing internal links and no private paths.
+- Main run 37743108436 is automatically running and has a watcher saving its
+  final JSON/log in reviews/ldfreq-pelic-report-20261008. Acceptance uses the
+  successful same-tree PR and actual delivery, without claiming a completed
+  main run. The version, tag and release remain unchanged; no CRAN submission.
+  This completion receipt stays local until the next substantive change.
+
+
+## 2026-10-08: MTLD diagnostics through the existing widening API
+
+Scope: approved optional `lexdiv_widen(mtld_diagnostics = TRUE)` refinement,
+version 0.3.0.9004. Stored core schemas, formulas, defaults, dependencies and
+57 exports remain unchanged. No CRAN submission. Source build, fresh install,
+help/guide publication and normal protected PR/main checks are the completion path.
+UTF-8 and C targeted checks each pass 562 assertions without warning, failure or
+skip. The original 9003 default/value-only wide tables and compact displays are
+identical for 264 saved English/Japanese/PELIC rows. Scalar diagnostics, source
+record identity, CSV and full-RDS replay are checked in both locales. No corpus
+re-tokenization or metric re-estimation was needed. Initial test-only corrections
+used the existing `threshold` profile parameter and compared retained columns
+without assuming base subsetting retains custom attributes.
+Evidence: `reviews/ldfreq-mtld-wide-20261008`.
+
+Archive: all 22 vignettes built. Final namespace qualification (`stats::setNames`)
+was applied using a standard staging rebuild with completed vignette artifacts;
+`R CMD build --no-build-vignettes` avoided repeating their computations. All 341
+shared source files match the archive byte-for-byte; DESCRIPTION matches after
+standard dependency-line wrapping. A fresh archive install passes 127 display/
+widen assertions and the 264-row saved-result replay. Version/citation and
+`codetools::checkUsagePackage` pass. The initial usage-check invocation named the
+wrong namespace (`tools`); only that check was corrected, not the successful tests.

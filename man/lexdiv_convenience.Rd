@@ -26,7 +26,8 @@ lexdiv_widen(
     "value", "status", "missing_reason", "method_id",
     "below_quality_floor", "metric_contract_id", "metric_contract_version",
     "requested_parameters", "effective_parameters", "N", "V"
-  )
+  ),
+  mtld_diagnostics = FALSE
 )
 
 \method{print}{lexdiv_wide_results}(x, ...)
@@ -117,6 +118,9 @@ lexdiv_widen(
   \item{names_from}{The column supplying wide field names. The default is
   \code{request_id} for profiles and \code{metric_id} otherwise.}
   \item{values_from}{One or more result columns to widen.}
+  \item{mtld_diagnostics}{One \code{TRUE} or \code{FALSE}. Append scalar
+  diagnostics for core sequential bidirectional MTLD, including saved legacy
+  min10 results. The default \code{FALSE} retains the existing output.}
   \item{metric_id}{One exact metric ID to plot. It can be omitted only when the
   result contains one metric.}
   \item{request_id}{An optional profile request ID to select.}
@@ -153,6 +157,28 @@ With one
 request. With multiple fields they use \code{ID__field}. Duplicate output
 cells are rejected rather than silently aggregated.
 
+With \code{mtld_diagnostics = TRUE}, eight scalar columns are appended for each
+supported MTLD specification only: \code{ID__forward_score},
+\code{ID__reverse_score}, \code{ID__forward_complete_factors},
+\code{ID__reverse_complete_factors}, \code{ID__forward_tail_credit},
+\code{ID__reverse_tail_credit}, \code{ID__tail_only} and \code{ID__gap_pct}.
+Ordinary column names do not change, including when \code{values_from = "value"}.
+The first six fields copy existing diagnostics; absent or nonscalar/nonfinite
+numeric fields become \code{NA}. Recorded zero counts remain zero.
+The last two fields use the same calculation as the compact print method:
+\code{tail_only} indicates zero complete factors in at least one direction;
+\code{gap_pct} is \code{100 * abs(forward_score - reverse_score) /
+mean(c(forward_score, reverse_score))}. Both require finite directional scores
+and complete-factor counts; a nonpositive mean leaves the gap missing.
+The gap describes order sensitivity, not a standard error or confidence
+interval. It can be zero when both directions depend entirely on their tails.
+Missing diagnostics are not recomputed, and no rows are removed.
+These fields support the core no-minimum and legacy min10 linear-tail methods;
+they do not reinterpret diagnostics from other MTLD variants. Zero-row inputs
+retain only the requested ID columns. Keep the original long result in RDS to
+preserve all diagnostics and provenance; selected scalar columns can be saved
+as CSV for analysis.
+
 Metric plots require a single specification, including when all rows share
 the same metric ID. Select a request or subset the input by specification.
 Their invisible return contains \code{label} followed by the complete selected
@@ -185,6 +211,15 @@ tidy_tokens <- data.frame(
 documents <- lexdiv_as_documents(tidy_tokens)
 long <- lexdiv_metrics_batch(documents, metrics = c("ttr", "maas"))
 lexdiv_widen(long, values_from = "value")
+
+# A short constructed example exposes support; it is not a reliability example.
+supported <- lexdiv_metrics_batch(list(
+  one_tail = c(letters[1:8], "a", "a"), empty = character()
+), metrics = "mtld")
+wide <- lexdiv_widen(supported, values_from = c("value", "status", "N"),
+  mtld_diagnostics = TRUE)
+wide[c("document_id", "mtld__value", "mtld__status",
+  "mtld__tail_only", "mtld__gap_pct")]
 
 plot(long, metric_id = "ttr")
 plot(long, metric_id = "ttr", monochrome = TRUE)
