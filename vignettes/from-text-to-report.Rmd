@@ -608,6 +608,58 @@ and reserve `<MISSING>` for missing values. The methods text above describes
 this table step; combine it with your actual sampling and calculation methods.
 This executable example has not been tested for usability with novice users.
 
+### Apply the same report steps to real learner writing {#pelic-study-report}
+
+The [PELIC reporting example](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/study-report)
+applies these same three helper functions to saved results for **16 essays by
+16 actual writers**, all on one prompt and at one recorded course level.
+It verifies response, writer, prompt and course IDs against the original
+metadata and preserves all 48 metric rows. It reuses the
+[earlier PELIC analysis](designing-comparisons.html#a-public-learner-corpus-example);
+it does not collect a second sample or recalculate its metrics.
+
+| Metric | Documents / writers | Reported | Mean | Sample SD | Median |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| TTR | 16 / 16 | 16 | 0.5552 | 0.0664 | 0.5540 |
+| MATTR50 | 16 / 16 | 16 | 0.7347 | 0.0580 | 0.7429 |
+| MTLD | 16 / 16 | 16 | 54.2450 | 15.4654 | 51.3867 |
+
+There are no unavailable or withheld values in this sample. Length ranges
+from 70 to 314 selected tokens. No MTLD direction is tail-only; the median
+forward/reverse gap is 8.54%, with a maximum of 47.08%. Retaining those gaps
+beside values does not turn them into confidence intervals. Course level is
+study context, not a validated ability measure; this one-prompt example does
+not support group or proficiency comparisons.
+
+The repository example explains how to use an existing local PELIC cache,
+create the report, and replay it in a fresh R session. Its generated methods
+text distinguishes the software used for the saved calculations (0.3.0.9002)
+from that used for reporting (0.3.0.9003). Only aggregate tables and methods
+are published; original text, tokens and document-level output remain local.
+Installation and vignette building never download the corpus.
+
+After creating the local report, inspect it with:
+
+```{r report-pelic-inspect, eval=FALSE}
+pelic <- readRDS("/path/to/local-report/study.rds")
+pelic$study$summary[c("metric_id", "n_documents", "n_writers_known",
+  "n_reported", "n_unavailable", "n_withheld", "mean", "sd", "median")]
+pelic$study$diagnostic_summary
+cat(pelic$study$methods, sep = "\n\n")
+flat <- read.csv("/path/to/local-report/document-results.csv",
+  colClasses = vapply(pelic$study$table, class, character(1)),
+  na.strings = "<MISSING>", encoding = "UTF-8")
+stopifnot(isTRUE(all.equal(flat, pelic$study$table, tolerance = 1e-14)))
+```
+
+Explicit column classes preserve IDs and all-missing character columns such
+as `missing_reason`; automatic CSV type inference can change those columns
+to logical. For your own data, replace the input and metadata in the earlier
+file paths, rather than substituting texts into the sample-specific PELIC
+verification script. The missing/withheld and repeated-writer cases remain
+illustrated by the authored examples above. Real-data integration and novice
+usability are separate questions; the latter has not yet been evaluated.
+
 ## Question and unit of analysis
 
 If your texts are in TXT files or a CSV, begin with the executable

@@ -78,3 +78,8 @@ used 136 actual L2 originals and four ENS texts. That was an empirical
 migration check with local, non-redistributable data; it did not supply a
 public raw-data reproduction or establish psychometric validity. PELIC
 addresses the public reproduction gap without distributing another corpus.
+
+The [study-report continuation](../study-report/README.md) reuses this saved
+analysis to join original writer/task metadata, produce descriptive tables
+and methods text, and replay them in a fresh R session. It adds no new sample
+and does not repeat the metric calculations or download.

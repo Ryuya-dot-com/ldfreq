@@ -4825,3 +4825,68 @@ and value tables with short column labels. Final site audit: 129 HTML / 253 file
 no missing internal links or private paths, eight changed files. Normal PR CI
 and anonymous delivery checks follow. No inference, novice-user validation,
 new resource licence decision, package release or CRAN submission is claimed.
+
+### Publication completion for PR #39
+
+- Main: `25d5ccf3d1e773e3468699aa925c0141de76f912`; checked PR head
+  `36204f09e136507733cbc07cfd0982a3ea9b9411`. Both have tree
+  `bb9865067ad313e1c64d3d04039f0ac9e0cbcb15`.
+- PR run 37736025592 passed all 11 jobs. Current Linux/macOS/Windows and
+  R-devel each passed 8,399 assertions with no failures/warnings/skips,
+  Status: OK including vignette rebuilding. R4.1 succeeded. C locale passed
+  7,976 assertions, zero failures, one existing warning and 32 conditional
+  skips. Separate guide-local UTF-8/C checks cover both language paths; no
+  Windows R4.1/CP932 guarantee is inferred.
+- Pages `868d11ace537ef321d694fce37c95464f899cf35`, run 37737481252,
+  succeeded. All six changed source files and eight changed site files were
+  anonymously retrieved and matched the validated files byte for byte.
+  Evidence: reviews/ldfreq-study-report-20261008. No new release/tag or version.
+- Main run 37737355043 was automatically triggered and is separately in
+  progress. Its standard watcher saves final JSON/log in the same evidence
+  directory. Acceptance uses the completed same-tree PR and actual delivery,
+  without asserting completed main checks. Completion receipts remain local
+  until a substantive subsequent change; no receipt-only push, cancellation
+  or repeated successful corpus computation. CRAN submission remains excluded.
+- The new work verifies metadata pairing, denominators, descriptive arithmetic
+  and replay. Authored examples and fictional writer IDs do not establish
+  human reliability, population effects or novice usability.
+
+## 2026-10-08 saved PELIC study reporting: local acceptance
+
+The user approved applying the diagnostic reporting workflow to the existing
+real learner sample. The prior main run 37737355043 has now completed with all
+11 jobs successful (saved final JSON); its tracking is closed. No successful
+corpus calculation or CI was repeated for that receipt.
+
+Evidence: reviews/ldfreq-pelic-report-20261008. The repository-only pelic.R
+uses three unchanged guide helpers and the saved learner-length analysis.
+It verifies source CSV SHA-256 identities and response/writer/task/course
+metadata, retains all original objects and values, and publishes only three
+aggregate/methods files. Text, tokens and document-level output remain local.
+No corpus acquisition, new sample, tokenization, metric recalculation, NJ8
+lookup, inference, API, dependency, version/tag or CRAN submission was added.
+
+All 16 documents by 16 writers produce 48 rows and three descriptive groups.
+They share prompt 3042 and course level 3; every requested value is available,
+none withheld. Means/sample SDs/medians were checked directly against the
+original saved values. N is 70–314, with no tail-only MTLD direction; median
+directional gap 8.540617%, maximum 47.080979%. Existing factor diagnostics are
+unchanged. The methods text distinguishes calculation package 0.3.0.9002 from
+reporting package 0.3.0.9003 and describes the actual selection/parameters.
+
+Initial CSV round-trip checking exposed automatic conversion of an all-missing
+character missing_reason column to logical. Using the full stored column types
+preserves that column and character IDs. Initial C-locale metadata reading with
+fileEncoding attempted native conversion and truncated the source CSV at
+non-ASCII text. Marking the original bytes as UTF-8 with encoding, while
+selecting only metadata columns, fixed that read. The final UTF-8/C study tables,
+summaries, methods and original objects agree exactly; the revised script has
+no read warnings. These are recipe corrections, not metric changes.
+
+A fresh R process re-extracts saved diagnostics, rebuilds the join/summaries and
+verifies CSV/methods; full RDS matches the original record. The actual new guide
+inspection chunk and three published files also match the saved outputs.
+API audit (57 exports) and note policy passed. Only the changed article, home,
+NEWS, search and Markdown were rebuilt. Normal PR CI and actual delivery follow.
+This sample does not validate missing-data/repeated-writer scenarios (covered
+by existing authored checks), psychometric validity or novice usability.

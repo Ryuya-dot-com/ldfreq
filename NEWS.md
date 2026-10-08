@@ -1,5 +1,10 @@
 # ldfreq 0.3.0.9003 (development)
 
+- Apply the study-report workflow to saved PELIC results: verify original
+  document/writer/task metadata, retain metric values and MTLD diagnostics,
+  publish descriptive aggregates and actual methods text, and replay the report
+  in a fresh R session. Explicit CSV column types preserve all-missing character
+  columns. No new API, metric calculation, corpus bundle or automatic download.
 - Extend the reporting guide with checked document-to-study metadata joins,
   parameter-specific descriptive statistics, known-writer and document counts,
   separate unavailable/incomplete/withheld states, optional same-token NJ8

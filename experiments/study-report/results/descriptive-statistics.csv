@@ -1,0 +1,4 @@
+"corpus","task","course_level","condition","metric_id","method_id","window_length","mtld_threshold","n_documents","n_writers_known","n_unknown_writer_documents","n_calculated","n_reported","n_unavailable","n_withheld","n_selection_incomplete","n_reported_writers_known","n_reported_unknown_writer_documents","n_tail_only_reported","n_below_floor_reported","mean","sd","median"
+"PELIC v1.0","3042","3","lower","ttr","ttr_v_over_n_v1",<MISSING>,<MISSING>,16,16,0,16,16,0,0,0,16,0,<MISSING>,0,0.555191530450133,0.0663749503576848,0.55396110056926
+"PELIC v1.0","3042","3","lower","mattr","mattr_sliding_step1_v1",50,<MISSING>,16,16,0,16,16,0,0,0,16,0,<MISSING>,0,0.734711584423913,0.0579922524761947,0.742903225806452
+"PELIC v1.0","3042","3","lower","mtld","mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1",<MISSING>,0.72,16,16,0,16,16,0,0,0,16,0,0,0,54.2450017872824,15.4654275266782,51.3867430053327
