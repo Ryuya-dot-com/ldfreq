@@ -1,0 +1,4 @@
+"policy","metric","left","right","total","finite_pairs","missing_pairs","changed_pairs","spearman","median_absolute_change"
+"saved_Sudachi_surface","mattr","A","C",28,28,0,24,0.987958401751505,0.00151492007576132
+"saved_Sudachi_surface","mtld","A","C",28,28,0,24,0.949644225506294,1.25808171138169
+"saved_Sudachi_surface","ttr","A","C",28,28,0,24,0.990695128626163,0.00280210336708733

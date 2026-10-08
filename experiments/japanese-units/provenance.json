@@ -1,0 +1,76 @@
+{
+  "sources": [
+    {
+      "unit": "SUW",
+      "repository": "UD_Japanese-GSD",
+      "commit": "33e7310b58308e85fd2b33a2fc3ef3e434f821c7",
+      "file": "ja_gsd-ud-test.conllu",
+      "sha256": "5f50ee6ed45c7ebda3787e593eaf5e9a225f25e53f6b4b32df778031862c843f"
+    },
+    {
+      "unit": "LUW",
+      "repository": "UD_Japanese-GSDLUW",
+      "commit": "71fd68633ab8c3439a48db3f3718c9ed80be9c6c",
+      "file": "ja_gsdluw-ud-test.conllu",
+      "sha256": "ece9979804365bac228003e859d976e48634f2f9b71dc771a2f07079e8e65659"
+    }
+  ],
+  "release": "UD r2.18",
+  "split": "entire test split",
+  "language": "ja",
+  "form": "surface; no case or Unicode normalization",
+  "window_length": 50,
+  "mtld": "threshold .72; strict <; no minimum; linear tail; direction mean",
+  "package": "0.3.0.9002",
+  "R": "4.6.1",
+  "license": "UD inputs CC BY-SA 4.0; no corpus texts or annotation tables redistributed",
+  "private": {
+    "input_sha256": "77c5814bb503b6f5c5fcef7812921522cc5141e3e45b1a7cb99560dc02b4f9bf",
+    "documents": 28,
+    "same_coverage_A_C": 28,
+    "annotations": {
+      "A": {
+        "language": "ja",
+        "analyzer": "SudachiPy",
+        "analyzer_version": "0.6.11",
+        "dictionary": "SudachiDict-core",
+        "dictionary_version": "20260428",
+        "unit": "Sudachi-SplitMode-A",
+        "normalization": "original text/surface unchanged; internal default Sudachi plugins active",
+        "system.dic_sha256": "6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e",
+        "sudachi.json_sha256": "5ef3d0c95ab6f9261ec75411947d90a837ac56556b3e242fb6351b1417582395",
+        "char.def_sha256": "b549ec56ad67359f535c80b7efa150538af2a78b7609d0d6bae796dd89f4f29d",
+        "rewrite.def_sha256": "a62bb6af22136331225d05fbcf95b97939e3f236feeda2240ed59641a0470d1c",
+        "unk.def_sha256": "4e8c4c15e18af6a9fc5d636e3dc73fde55d50941b93a6c8835d4653d3f54ba79"
+      },
+      "B": {
+        "language": "ja",
+        "analyzer": "SudachiPy",
+        "analyzer_version": "0.6.11",
+        "dictionary": "SudachiDict-core",
+        "dictionary_version": "20260428",
+        "unit": "Sudachi-SplitMode-B",
+        "normalization": "original text/surface unchanged; internal default Sudachi plugins active",
+        "system.dic_sha256": "6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e",
+        "sudachi.json_sha256": "5ef3d0c95ab6f9261ec75411947d90a837ac56556b3e242fb6351b1417582395",
+        "char.def_sha256": "b549ec56ad67359f535c80b7efa150538af2a78b7609d0d6bae796dd89f4f29d",
+        "rewrite.def_sha256": "a62bb6af22136331225d05fbcf95b97939e3f236feeda2240ed59641a0470d1c",
+        "unk.def_sha256": "4e8c4c15e18af6a9fc5d636e3dc73fde55d50941b93a6c8835d4653d3f54ba79"
+      },
+      "C": {
+        "language": "ja",
+        "analyzer": "SudachiPy",
+        "analyzer_version": "0.6.11",
+        "dictionary": "SudachiDict-core",
+        "dictionary_version": "20260428",
+        "unit": "Sudachi-SplitMode-C",
+        "normalization": "original text/surface unchanged; internal default Sudachi plugins active",
+        "system.dic_sha256": "6c1d5adc8a2389875713056e7b39bbcd0073d6122ffd509866e1d3a196f8608e",
+        "sudachi.json_sha256": "5ef3d0c95ab6f9261ec75411947d90a837ac56556b3e242fb6351b1417582395",
+        "char.def_sha256": "b549ec56ad67359f535c80b7efa150538af2a78b7609d0d6bae796dd89f4f29d",
+        "rewrite.def_sha256": "a62bb6af22136331225d05fbcf95b97939e3f236feeda2240ed59641a0470d1c",
+        "unk.def_sha256": "4e8c4c15e18af6a9fc5d636e3dc73fde55d50941b93a6c8835d4653d3f54ba79"
+      }
+    }
+  }
+}

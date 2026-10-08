@@ -1,0 +1,13 @@
+"policy","metric","left","right","total","finite_pairs","missing_pairs","changed_pairs","spearman","median_absolute_change"
+"all_tokens","mattr","SUW","LUW",543,10,533,10,0.272727272727273,0.0192992424242425
+"all_tokens_same_coverage","mattr","SUW","LUW",543,10,533,10,0.272727272727273,0.0192992424242425
+"exclude_PUNCT_SYM","mattr","SUW","LUW",543,4,539,4,0.8,0.0075613405365007
+"exclude_PUNCT_SYM_same_coverage","mattr","SUW","LUW",489,3,486,3,0.5,0.00756957328385899
+"all_tokens","mtld","SUW","LUW",543,346,197,334,0.70197589324119,12.4507744517926
+"all_tokens_same_coverage","mtld","SUW","LUW",543,346,197,334,0.70197589324119,12.4507744517926
+"exclude_PUNCT_SYM","mtld","SUW","LUW",543,327,216,317,0.695603669874145,11.6106666666667
+"exclude_PUNCT_SYM_same_coverage","mtld","SUW","LUW",489,293,196,283,0.69885797751494,11.34
+"all_tokens","ttr","SUW","LUW",543,543,0,370,0.904692842313498,0.0135338345864661
+"all_tokens_same_coverage","ttr","SUW","LUW",543,543,0,370,0.904692842313498,0.0135338345864661
+"exclude_PUNCT_SYM","ttr","SUW","LUW",543,543,0,356,0.884885761565541,0.0144230769230769
+"exclude_PUNCT_SYM_same_coverage","ttr","SUW","LUW",489,489,0,317,0.878085701505983,0.0139860139860141

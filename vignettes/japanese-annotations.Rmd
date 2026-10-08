@@ -106,6 +106,113 @@ verify the example's arithmetic; a seven-token text cannot establish the
 reliability of a diversity measure. Choose length-appropriate measures and
 report non-computable requests rather than changing their parameters silently.
 
+## Compare word units on the same original text {#compare-japanese-word-units}
+
+A different word unit changes the denominator as well as the vocabulary being
+counted. Keep the original documents fixed, import both complete annotations,
+and compare their source spans before calculating scores. Here is a second,
+coarser **authored** annotation of the same teaching text; neither annotation
+is presented as an official short-unit or long-unit analysis.
+
+```{r ja-unit-comparison}
+coarse_rows <- data.frame(document_id = "essay", segment_id = "s1",
+  token_index = 1:6,
+  surface = c("国際連合", "で", "国際協力", "を", "学ぶ", "。"))
+coarse <- lexdiv_import_annotations(coarse_rows, segments, list(
+  language = "ja", analyzer = "authored", analyzer_version = "1",
+  dictionary = "none", dictionary_version = "not-applicable",
+  unit = "authored-coarse", normalization = "none"
+))
+unit_alignment <- lexdiv_align_annotations(imported, coarse)
+unit_alignment$groups[c("keyword", "relation", "predicted_n", "reference_n")]
+
+count_units <- function(x) {
+  t <- x$tokens
+  retained <- t$surface != "。"  # This teaching example's explicit selection.
+  tokens <- setNames(lapply(x$documents$document_id, function(id) {
+    t$surface[t$document_id == id & retained]
+  }), x$documents$document_id)
+  lexdiv_metrics_batch(tokens, metrics = "ttr")
+}
+count_units(imported)
+count_units(coarse)
+```
+
+The same sentence now has five retained tokens and five types, versus seven
+tokens and six types before. TTR rises from 6/7 to 1 without a change in the
+writer's text. The empty document stays missing in both conditions. Span
+alignment identifies the merges; it does not decide which analysis is best.
+
+In real data, check the **covered original characters after selection**, too.
+A punctuation token in a fine analysis may be inside a retained compound in
+a coarser analysis. Applying `!upos %in% c("PUNCT", "SYM")` to both tables can
+therefore select different material. Do not remove that internal punctuation
+by rewriting a token silently. Retain the discrepancy or justify a shared
+source-span selection for the research question.
+
+### What the executed comparisons show
+
+The [reproducible unit comparison](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/japanese-units)
+uses all 543 test sentences from UD Japanese GSD/GSDLUW r2.18. Their published
+SUW/LUW annotations have identical sentence IDs and original text. The
+[upstream description](https://github.com/UniversalDependencies/UD_Japanese-GSDLUW/blob/71fd68633ab8c3439a48db3f3718c9ed80be9c6c/README.md)
+specifies manually annotated layers following BCCWJ conventions. These are
+news/blog sentences, not learner essays. The corpus is obtained separately
+under CC BY-SA 4.0; the R package bundles neither its text nor its annotations.
+
+| All-token sentence summary | SUW | LUW |
+| --- | ---: | ---: |
+| Median N | 21 | 17 |
+| Median TTR | 0.9130 | 0.9259 |
+| MATTR50 computable / all sentences | 29 / 543 | 10 / 543 |
+| MTLD tail-only / computable | 352 / 384 | 331 / 346 |
+
+All-token counting includes punctuation to isolate boundaries over the same
+covered characters; it is not a recommended lexical policy. Excluding UPOS
+PUNCT/SYM produces different coverage in 54/543 sentence pairs. The comparison
+records all cases and the 489-pair same-coverage subset separately. MATTR50
+holds the window's token count fixed, not its original-text span. Its paired
+all-token comparison has only ten eligible sentences, not 543. Sentences are
+never concatenated to manufacture eligible documents.
+
+The many tail-only MTLD values illustrate why a finite score is insufficient
+evidence of precision. Consult [factor support and length checks](designing-comparisons.html#inspect-mtld-factor-support).
+The advisory 50-token floor is not a validated Japanese reliability threshold.
+
+A separate check reuses saved Sudachi A/B/C analyses of 28 Japanese essays:
+**24 learner essays and four Japanese-L1 essays**. The same task was sampled
+deterministically, with four writers per reported L1 across seven groups;
+see the reproduction record for selection details. Surface-form scores change
+in 24/28 essays between A and C:
+
+| Metric | A median | C median | Paired Spearman rho |
+| --- | ---: | ---: | ---: |
+| TTR | 0.4316 | 0.4328 | 0.9907 |
+| MATTR50 | 0.7082 | 0.7081 | 0.9880 |
+| MTLD | 43.9420 | 43.6272 | 0.9496 |
+
+All 28 pairs are finite and retain the same original character coverage; none
+has a tail-only MTLD flag. These small-sample observations do not validate
+precision, proficiency discrimination or interchangeable score scales, and
+are not an L2-only estimate.
+**Sudachi C is not relabeled NINJAL LUW.** The public sentence comparison and
+the saved essay mode comparison answer different questions.
+
+For a methods section, report the actual source/version, unit, form, selection,
+window and MTLD definition. For example, the essay check above can be described
+as follows (replace these conditions with those actually used in your study):
+
+> We compared surface-form lexical diversity in the same 28 essays (24 learner
+> essays and four Japanese-L1 essays) using saved SudachiPy 0.6.11 /
+> SudachiDict-core 20260428 annotations in modes A, B and C.
+> Original text, including titles, was retained. Whitespace and auxiliary-symbol
+> tokens were excluded; particles, auxiliaries and numbers were retained.
+> MATTR used 50-token windows. MTLD used threshold .72, strict `<`, no minimum
+> factor length, linear tail credit and the mean of directional scores. We
+> checked original-character coverage, paired missingness and MTLD factor
+> support before comparing scores. These comparisons assessed sensitivity to
+> the analysis mode, not proficiency or measurement precision.
+
 ## Read files, review words and save the analysis {#japanese-file-workflow}
 
 Suppose the first line is a title and your question concerns vocabulary in the

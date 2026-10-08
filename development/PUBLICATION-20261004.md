@@ -4513,3 +4513,36 @@ is retained in the previous evidence directory. No rerun or cancellation was
 needed. For the present change, site build, normal protected PR CI, fixed
 prerelease and anonymous publication checks are subsequent acceptance steps.
 No CRAN submission is authorized or performed.
+
+
+## 2026-10-08: factor-support correction publication complete
+
+- PR #34: `e8481fd4badd0ee025eb87c0884cc18b7bf132b3`; merged main
+  `78652453a826b23338ac491d488e26c5834802e4`; identical source tree
+  `4e22aa87722c08c60ea2bcd2fcc876613efa2d40`.
+- PR run 37712747252: all 11 jobs successful. macOS/Windows/Linux release and
+  R-devel each report 8,333 assertions and Status: OK including vignette rebuilds.
+  R4.1 job passed. C: 7,976 assertions, zero failures, one existing quanteda
+  encoding warning and 29 conditional skips. Required release classification passed.
+- Annotated tag `v0.3.0.9002` points to that main. Prerelease includes the verified
+  22-vignette archive and SHA256SUMS. Anonymous downloads match both local files.
+  Archive identity: 339 source files match byte for byte; DESCRIPTION differs
+  only in normal R build formatting and four standard generated metadata fields.
+- Actual pak installation of the public tag in `github-library` resolves main
+  `7865245`. Fresh C session confirms version/citation, a 100-token tail-only
+  MTLD example (140; floor passed; warning flag true; gap zero), unchanged return
+  object/schema, and TUBELEX ASCII profile status ok. Saved earlier 30-essay RDS
+  also prints correctly without changes to its values or serialization.
+- Pages commit `5c84e3a689b365fd2f19672fa7adea94b8d13884`, run 37713942901:
+  success. 129 HTML pages / 253 site files checked, no missing internal link or
+  private local path. All 29 changed public source files and all 80 changed
+  site files match verified local bytes after anonymous retrieval.
+- Main run 37713809762 is separately in progress. Its watcher retains final
+  output and `main-ci-final.json`; completed same-tree PR evidence supports the
+  release. No claim of a completed main run is made at this checkpoint.
+- Receipts are appended locally after anonymous checks, without a documentation-
+  only repush that would duplicate numerical CI. No tag rewrite, skipped check,
+  cancellation, extra paid API call, corpus redistribution or CRAN submission.
+
+Follow-up: main run 37713809762 completed successfully in all 11 jobs. The saved
+`main-ci-final.json` closes the tracking item above; no rerun or cancellation.
