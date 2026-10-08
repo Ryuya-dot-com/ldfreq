@@ -353,13 +353,13 @@ unlink(path)
 
 The saved object includes source annotations, phrase components,
 resource declarations, exclusions, settings, input hash and package
-versions. A review table can use `phrase_id`, `document_id`,
-`segment_id`, `from` and `to` together with that input hash. Record
-literal/idiomatic or other functional judgments separately, with
-reviewer, criteria and unresolved cases. Phrase matches do not establish
-collocational strength, formulaicity, proficiency, or a learner’s
-knowledge. The current single-token ambiguity API does not accept these
-phrase rows; this example does not create a phrase-sense classifier.
+versions. The next section adds a checked worksheet for
+occurrence-specific decisions. Record literal/idiomatic or other
+functional judgments separately, with reviewer, criteria and unresolved
+cases. Phrase matches do not establish collocational strength,
+formulaicity, proficiency, or a learner’s knowledge. The current
+single-token ambiguity API does not accept these phrase rows; this
+example does not create a phrase-sense classifier.
 
 This helper is intended for inspectable, modest lists: it calls quanteda
 once per ID and retains source text plus every document-by-ID count,
@@ -371,6 +371,239 @@ patterns](https://quanteda.io/reference/phrase.html) and
 [KWIC](https://quanteda.io/reference/kwic.html) perform the search. The
 addition here is the reproducible connection to source spans,
 exclusions, overlap-aware denominators and subsequent human inspection.
+
+## Review phrase matches and return decisions to document counts
+
+A match for `take off` can describe a departing plane or removing a
+coat. Whether it belongs in an analysis depends on the declared question
+and its context. Similarly, the authored Japanese examples distinguish
+hindering a plan from physically pulling a doll’s leg. The search finds
+both; it does not make that contextual judgment.
+
+From development version **0.3.0.9003**, the explicitly sourced
+`phrase_list_review()` helper connects the existing phrase search to a
+complete decision worksheet. It is not an exported package API. Install
+that version or later using the [installation
+instructions](https://ryuya-dot-com.github.io/ldfreq/#installation), and
+use optional quanteda \>= 4.5.0 in a UTF-8 R session. The standalone
+example runs offline, without a corpus, model or API key:
+
+``` r
+source(system.file("examples", "phrase-review-demo.R",
+  package = "ldfreq", mustWork = TRUE), local = TRUE)
+phrase_after$documents
+phrase_after$counts
+```
+
+All texts, phrase entries and decisions are authored teaching material,
+not learner observations, an established phrase inventory or an
+independent human reference. Six document IDs include complete
+English/Japanese reviews, pending reviews, a nonempty no-match document
+and an empty document.
+
+| document_id | segment_id | phrase_id | keyword | segment_text |
+|:---|:---|:---|:---|:---|
+| en | s1 | departure | take off | The plane will take off soon. |
+| en | s2 | departure | take off | Please take off your coat. |
+| en_pending | s1 | departure | take off | Later they take off. |
+| en_pending | s2 | departure | take off | The crew will take off at noon. |
+| en | s1 | departure_long | will take off | The plane will take off soon. |
+| en_pending | s2 | departure_long | will take off | The crew will take off at noon. |
+| ja | s1 | hindrance | 足を引っ張った | 彼の失言が計画の足を引っ張った。 |
+| ja | s2 | hindrance | 足を引っ張った | 子供が人形の足を引っ張った。 |
+| ja_pending | s1 | hindrance | 足を引っ張った | 彼は足を引っ張った。 |
+| ja_pending | s2 | hindrance | 足を引っ張った | 会議でまた足を引っ張った。 |
+
+The declared criterion accepts the English departure interpretation and
+the Japanese hindrance interpretation. A longer `will take off` entry
+deliberately overlaps `take off`, so both entries remain inspectable.
+The Japanese entry uses the supplied authored components
+`足 / を / 引っ張っ / た`; other tokenizations require correspondingly
+specified entries. No automatic lemmatization, alternative-form
+expansion or discontinuous search is implied.
+
+For your own unchanged search result, start with:
+
+``` r
+source(system.file("examples", "phrase-list-kwic.R",
+  package = "ldfreq", mustWork = TRUE), local = TRUE)
+before <- phrase_list_review(my_search,
+  criterion = "Write the study's interpretation and inclusion rule here.")
+```
+
+### Export context separately from the editable worksheet
+
+``` r
+phrase_review_dir <- tempfile("ldfreq-phrase-review-")
+dir.create(phrase_review_dir)
+saveRDS(phrase_before, file.path(phrase_review_dir, "review-before.rds"), version = 2)
+write.csv(phrase_before$occurrences, file.path(phrase_review_dir, "context.csv"),
+  row.names = FALSE, na = "<MISSING>", fileEncoding = "UTF-8")
+write.csv(phrase_before$worksheet, file.path(phrase_review_dir, "decisions.csv"),
+  row.names = FALSE, na = "<MISSING>", fileEncoding = "UTF-8")
+```
+
+`context.csv` is for reading the KWIC and complete original segment.
+`decisions.csv` is the editable worksheet. It has one row per **phrase
+ID and source occurrence**, including nested spans and identical forms
+listed under different IDs. Edit only `status`, `reviewer` and `reason`;
+keep all other cells and every row, although you may reorder rows. Read
+all columns as character when importing the CSV so IDs and coordinates
+survive unchanged.
+
+| Status | Meaning and required fields |
+|----|----|
+| `accepted` | The occurrence meets the declared criterion; supply reviewer and reason |
+| `rejected` | The match is outside that criterion; supply reviewer and reason. This does not label the writer’s expression incorrect |
+| `unresolved` | It was examined but the interpretation remains unsettled; supply reviewer and reason |
+| `unreviewed` | No decision has been submitted; leave reviewer and reason missing |
+
+Here `<MISSING>` is the CSV missing-value marker. Do not use that
+literal string as a reviewer name or reason. To resume an existing
+review, export its latest `$worksheet`; starting again from the initial
+blank worksheet replaces the earlier decisions. Save each stage or rater
+separately when that history matters.
+
+The following edits encode the teaching interpretations and deliberately
+leave some rows unresolved or unreviewed. They are not automated
+semantic analysis.
+
+``` r
+# Illustrative edits to the worksheet; in a study inspect context and edit the CSV.
+phrase_sheet <- phrase_before$worksheet
+complete_docs <- phrase_sheet$document_id %in% c("en", "ja")
+phrase_sheet$status[complete_docs & phrase_sheet$segment_id == "s1"] <- "accepted"
+phrase_sheet$status[complete_docs & phrase_sheet$segment_id == "s2"] <- "rejected"
+pending_docs <- phrase_sheet$document_id %in% c("en_pending", "ja_pending")
+phrase_sheet$status[pending_docs & phrase_sheet$segment_id == "s1"] <- "unresolved"
+submitted <- phrase_sheet$status != "unreviewed"
+phrase_sheet$reviewer[submitted] <- "authored-demo-reviewer"
+reasons <- c(accepted = "Authored context supplies the declared target interpretation.",
+  rejected = "Removing a coat or physically pulling a doll's leg is outside the criterion.",
+  unresolved = "The short authored context does not settle the interpretation.")
+phrase_sheet$reason[submitted] <- unname(reasons[phrase_sheet$status[submitted]])
+# Reordering must never move a decision to another source occurrence.
+phrase_sheet <- phrase_sheet[rev(seq_len(nrow(phrase_sheet))), ]
+write.csv(phrase_sheet, file.path(phrase_review_dir, "decisions-edited.csv"),
+  row.names = FALSE, na = "<MISSING>", fileEncoding = "UTF-8")
+```
+
+### Reapply by identity, then inspect counts and coverage
+
+``` r
+phrase_reader <- new.env(parent = baseenv())
+sys.source(system.file("examples", "text-file-input.R", package = "ldfreq",
+  mustWork = TRUE), phrase_reader)
+phrase_csv <- phrase_reader$read_text_file(
+  file.path(phrase_review_dir, "decisions-edited.csv"), encoding = "UTF-8")
+phrase_connection <- textConnection(phrase_csv$text, encoding = "UTF-8")
+phrase_sheet_read <- read.csv(phrase_connection, colClasses = "character",
+  check.names = FALSE, na.strings = "<MISSING>", encoding = "UTF-8")
+close(phrase_connection)
+phrase_saved <- readRDS(file.path(phrase_review_dir, "review-before.rds"))
+phrase_after <- phrase_list_review(phrase_saved$source, phrase_saved$criterion,
+  worksheet = phrase_sheet_read)
+phrase_after$documents[c("document_id", "occurrences", "accepted", "rejected",
+  "unresolved", "unreviewed", "review_complete")]
+#>   document_id occurrences accepted rejected unresolved unreviewed
+#> 1          en           3        2        1          0          0
+#> 2  en_pending           3        0        0          1          2
+#> 3          ja           2        1        1          0          0
+#> 4  ja_pending           2        0        0          1          1
+#> 5    no_match           0        0        0          0          0
+#> 6       empty           0        0        0          0          0
+#>   review_complete
+#> 1            TRUE
+#> 2           FALSE
+#> 3            TRUE
+#> 4           FALSE
+#> 5            TRUE
+#> 6            TRUE
+phrase_after$documents[c("document_id", "retained_tokens", "covered_tokens",
+  "accepted_covered_tokens", "accepted_coverage", "reportable_accepted_coverage")]
+#>   document_id retained_tokens covered_tokens accepted_covered_tokens
+#> 1          en              11              5                       3
+#> 2  en_pending              11              5                       0
+#> 3          ja              18              8                       4
+#> 4  ja_pending              13              8                       0
+#> 5    no_match               5              0                       0
+#> 6       empty               0              0                       0
+#>   accepted_coverage reportable_accepted_coverage
+#> 1         0.2727273                    0.2727273
+#> 2         0.0000000                           NA
+#> 3         0.2222222                    0.2222222
+#> 4         0.0000000                           NA
+#> 5         0.0000000                    0.0000000
+#> 6                NA                           NA
+```
+
+The helper replays the original search before applying the worksheet. It
+checks the full row set, source anchors, review fingerprint and required
+decision fields. A removed/duplicated row, edited fixed cell or partly
+filled unreviewed row fails. Changed source, phrase entries, resource
+declaration, search settings **including the context window**, or
+criterion require a new worksheet. Do not replace IDs to force old
+decisions onto changed material.
+
+Each document and document-by-phrase cell satisfies
+`occurrences = accepted + rejected + unresolved + unreviewed`.
+`covered_tokens` describes all exact matches; `accepted_covered_tokens`
+describes only the **union** of accepted spans. The English complete
+review accepts two nested occurrences of lengths three and two, but
+their union is three tokens, so accepted coverage is `3/11`, not `5/11`.
+The Japanese complete review gives `4/18`. These authored ratios are not
+a language or ability comparison.
+
+`accepted_coverage` retains the coverage of decisions accepted so far.
+`reportable_accepted_coverage` is missing whenever a document still has
+an unresolved or unreviewed match. A zero in the former column for a
+pending review is therefore not reported as an observed absence of
+relevant uses. The no-match document has zero coverage; the empty
+document has missing coverage because its denominator is zero.
+
+`review_complete` means that every **matched entry** has an
+accepted/rejected decision. It does not establish that the inventory is
+exhaustive, that the annotations are correct, or that the decisions are
+reliable. Different list entries at the same span retain separate
+decisions; union coverage prevents double counting but does not
+adjudicate inconsistent judgments. Original tokens remain unchanged:
+this workflow does not compound accepted expressions into single words
+or alter TTR, MATTR or MTLD.
+
+### Save the complete review and reproduce its tables
+
+``` r
+phrase_record <- list(before = phrase_saved, after = phrase_after,
+  worksheet_input = phrase_csv, session = sessionInfo())
+saveRDS(phrase_record, file.path(phrase_review_dir, "analysis.rds"), version = 2)
+write.csv(phrase_after$documents, file.path(phrase_review_dir, "document-results.csv"),
+  row.names = FALSE, na = "<MISSING>", fileEncoding = "UTF-8")
+write.csv(phrase_after$counts, file.path(phrase_review_dir, "phrase-counts.csv"),
+  row.names = FALSE, na = "<MISSING>", fileEncoding = "UTF-8")
+phrase_restored <- readRDS(file.path(phrase_review_dir, "analysis.rds"))
+stopifnot(identical(phrase_restored, phrase_record), identical(
+  phrase_list_review(phrase_restored$after$source, phrase_restored$after$criterion,
+    worksheet = phrase_restored$after$worksheet), phrase_restored$after))
+```
+
+The temporary directory makes the example runnable. For a study, use a
+persistent project directory and separate files for successive review
+stages; writing the same filename overwrites it. The RDS retains
+original text, search settings, the declared criterion, every judgment
+and the imported CSV record. The two result CSVs are flat tables for
+later analysis. Reproduction uses the same software versions; retain the
+original files and saved environment. These records contain source text
+and the phrase inventory, so their sharing conditions follow those
+materials.
+
+A methods description should identify the phrase inventory/version,
+analyzer and word unit, case/normalization policy, segment boundaries,
+exclusions, context and decision criterion, reviewers and handling of
+disagreements. Report accepted/rejected/unresolved/unreviewed counts and
+the retained-token denominator. State that overlapping accepted spans
+contribute their union to coverage, and report how many documents remain
+incomplete. Search and worksheet checks verify correspondence, not
+inter-rater agreement or psycholinguistic validity.
 
 ## Connect to the existing ldfreq reference workflow
 

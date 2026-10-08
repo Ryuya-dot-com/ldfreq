@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -161,19 +161,20 @@
 <p>KH Coder is an optional companion, not a prerequisite for ldfreq. Its current <a href="https://khcoder.net/dl3.html" class="external-link">official distributions</a> include paid editions and a restricted free Windows edition; the <a href="https://khcoder.net/mac_com.html" class="external-link">Mac distribution</a> is paid and requires Apple Silicon. These distribution conditions are distinct from the older public source release. The ldfreq workflow does not require a KH Coder purchase.</p>
 <p>N-gram extraction is also established functionality in <a href="https://quanteda.io/reference/tokens_ngrams.html" class="external-link">quanteda</a>, and <a href="https://www.linguisticanalysistools.org/taales.html" class="external-link">TAALES</a> provides word and phrase measures with coverage diagnostics. In ldfreq, the emphasis is a shared R workflow retaining document/segment locations, reference definitions, eligible-window denominators and missingness alongside other lexical measures. The current n-gram functions provide frequencies, not MI/t-score or a validated phraseological-sophistication score.</p>
 <p>Phrase-list profiling and source-text overlap also have existing tools. Masaki Eguchi’s <a href="https://github.com/egumasa/Multi-Word-Units-Profiler" class="external-link">Multi-Word Units Profiler</a> highlights expressions from published phrase lists, while <a href="https://github.com/egumasa/cx-overlaps" class="external-link">cx-overlaps</a>, his extension of Philip Tillman’s fluencysimilarity, compares unigram/trigram use across performances or against a source. Phrase matching, overlap and cosine similarity are not new contributions of ldfreq. Its focus is connecting analysis units and source locations to reference-resource definitions, human decisions and missingness in an R workflow. An <a href="https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.html#match-your-phrase-list-and-inspect-its-coverage">installed phrase-list example</a> uses quanteda for exact sequences of two or more supplied tokens, including long expressions, and returns original-text KWIC and overlap-aware document coverage. It is an explicitly sourced helper, not an exported API or a phrase-sense/discourse-function classifier. Phrase lists are supplied by the caller and are not bundled.</p>
+<p>The <a href="https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.html#review-phrase-matches">phrase-review walkthrough</a> adds accepted/rejected/unresolved/unreviewed decisions, a checked CSV worksheet and document-by-phrase counts. It distinguishes coverage of accepted spans from a complete review, retains overlap without double counting tokens, and saves the complete source-linked record. It does not change the original word tokens or infer whether an expression is idiomatic.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Version 0.3.0.9002 is a development prerelease and has not been released on CRAN. The fixed tag below preserves this measurement-contract migration. It requires R 4.1.0 or later. Install the tested snapshot used by this documentation:</p>
+<p>Version 0.3.0.9003 is a development prerelease and has not been released on CRAN. The fixed tag below identifies the tested code and installed examples. It requires R 4.1.0 or later. Install the tested snapshot used by this documentation:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run install.packages("pak") first if pak is not installed.</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@v0.3.0.9002"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@v0.3.0.9003"</span><span class="op">)</span></span></code></pre></div>
 <p>Pinning the revision fixes the implementation, even when development snapshots share the same version number. The package’s required dependencies are <code>digest</code> and <code>stringi</code>; additional tools are optional for their documented workflows. For example, candidate-review examples use <code>quanteda</code>.</p>
 <p>If you have a built source archive, install it locally:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install digest and stringi first if they are not already available.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ldfreq_0.3.0.9002.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ldfreq_0.3.0.9003.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
 <p>The built archive includes rendered guides. A GitHub source installation may omit them; the online guides remain available.</p>
 </div>
 <div class="section level2">

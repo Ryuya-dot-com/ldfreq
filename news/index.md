@@ -1,5 +1,18 @@
 # Changelog
 
+## ldfreq 0.3.0.9003 (development)
+
+- Connect exact phrase-list matches to contextual acceptance review in
+  an explicitly sourced example. Keep accepted, rejected, unresolved and
+  unreviewed occurrences, complete source-bound CSV worksheets and
+  document-by-phrase counts. Accepted coverage uses the union of
+  original token slots; incomplete reviews retain observed counts but
+  withhold a complete-review coverage value.
+- Add an authored English/Japanese workflow with CSV editing, checked
+  reapplication and complete RDS replay. Original tokens, lexical
+  metrics, public exports and dependencies are unchanged. This is not an
+  automatic idiom or proficiency score.
+
 ## ldfreq 0.3.0.9002 (development)
 
 - Extend the report guide with executable English and Japanese file
