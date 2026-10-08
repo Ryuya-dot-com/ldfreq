@@ -262,8 +262,14 @@ previous min10 calculation remains explicitly available through
 it is not silently relabelled. The [executed external
 comparisons](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/external-metrics)
 record identical inputs, tool versions, outputs and reasons for
-differences. `expected_ttr_d` is experimental: accurate computation of
-this estimator does not establish equivalence to CLAN vocd-D.
+differences. The [raw-text
+comparison](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/raw-text-comparison)
+additionally records eight preprocessing configurations, actual scoring
+tokens and native/common-formula scores. It distinguishes TAALED’s
+space-split fallback from pinned Pylats surface, lemma/POS and explicit
+content-word configurations. `expected_ttr_d` is experimental: accurate
+computation of this estimator does not establish equivalence to CLAN
+vocd-D.
 [`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
 reports each method’s classification. Default computations and presets
 exclude it; request `metrics = "expected_ttr_d"` to compute it
@@ -281,6 +287,24 @@ value of 1 merely checks for non-empty input. MATTR’s fixed 50-token
 floor does not validate every possible window size: consult
 [`lexdiv_length_evidence()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_length_evidence.md)
 and report the chosen window and available text length separately.
+
+For MTLD, also inspect factor support. From development version
+0.3.0.9002, the compact display flags `mtld_tail_only` when either
+direction has no complete factors and shows `mtld_gap_pct`, the absolute
+directional difference as a percentage of their mean. `status = "ok"`
+means computable. Passing the advisory 50-token floor does not establish
+precision, and a zero directional gap can occur when **both** directions
+depend entirely on their fractional tails. The gap describes order
+sensitivity, not a confidence interval. The [factor-support
+example](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html#inspect-mtld-factor-support)
+extracts the underlying counts and scores into an ordinary table,
+including when using an earlier package version. The 50-token MTLD
+screen is inherited guidance, not a validated reliability cutoff for the
+present definition. For your own sample, the same guide supplies a
+token-count correlation recipe and an [executed PELIC learner-text
+example](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/learner-length).
+These are descriptive checks, not evidence of length invariance or a
+validated novice-user workflow.
 
 KH Coder already uses R and documents [exporting plotting commands as R
 Source](https://khcoder.net/scr_r.html). R integration, Japanese support
@@ -334,14 +358,14 @@ lists are supplied by the caller and are not bundled.
 
 ## Installation
 
-Version 0.3.0.9001 is a development prerelease and has not been released
+Version 0.3.0.9002 is a development prerelease and has not been released
 on CRAN. The fixed tag below preserves this measurement-contract
 migration. It requires R 4.1.0 or later. Install the tested snapshot
 used by this documentation:
 
 ``` r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9001")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9002")
 ```
 
 Pinning the revision fixes the implementation, even when development
@@ -354,7 +378,7 @@ If you have a built source archive, install it locally:
 
 ``` r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9001.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9002.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation

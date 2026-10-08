@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1482,6 +1482,18 @@ stated formula, sequential factorization, and aggregation. Exact
 end-to-end comparison still requires the same token sequence and a
 separately version-pinned TAALED run; preprocessing, short-input, and
 missing-value policies must be compared independently.</p>
+<p>The <a href="https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/raw-text-comparison" class="external-link">executed
+raw-text audit</a> now supplies that separate comparison for four
+authored inputs and eight explicit configurations of ldfreq, koRpus,
+quanteda and TAALED/Pylats. It retains scoring tokens and distinguishes
+native scores from scores using one common formula. For a contraction
+example, ldfreq English/lower retains 34 tokens, koRpus 46, and TAALED
+with Pylats lemma/POS settings 41; the lexical units differ as well.
+TAALED’s space-split fallback and Pylats configurations are recorded
+separately. A content-word alternative is explicitly configured, not
+described as a universal TAALED default. These examples identify
+pipeline differences, not a conversion factor for scores from published
+studies.</p>
 </div>
 <div class="section level2">
 <h2 id="frequency-is-relative-to-a-corpus">Frequency is relative to a corpus<a class="anchor" aria-label="anchor" href="#frequency-is-relative-to-a-corpus"></a>

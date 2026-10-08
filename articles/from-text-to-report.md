@@ -477,6 +477,31 @@ current default, a methods statement could read:
 > `(1 - TTR) / (1 - 0.72)`; we averaged the forward and reverse MTLD
 > scores arithmetically.
 
+Report diagnostic results separately from these calculation settings,
+for example:
+
+> Of \[number\] computable texts, \[number\] had no complete factor in
+> at least one direction. We retained these values with a tail-only
+> flag. The median absolute forward/reverse difference divided by their
+> mean was \[percent\]%, a descriptive measure of order sensitivity, not
+> an estimate of precision. We examined associations with token count
+> within \[task/population strata\].
+
+Fill these placeholders from your own results; the [factor-support and
+length
+checks](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html#inspect-mtld-factor-support)
+provide executable code. State any prespecified exclusion rule and its
+effect on document counts instead of silently removing flagged texts.
+
+The version numbers have separate jobs: `packageVersion("ldfreq")`
+identifies the software release; `contract_version` identifies the
+metric definitions; `batch_schema_version` identifies the layout of a
+batch result. They are not three interchangeable software versions. Use
+the package version, exact method and settings in the methods section;
+retain contract/schema metadata in the saved RDS for reanalysis. The
+examples are checked as software examples; their usability has not been
+established in a study of novice users.
+
 Replace the version placeholder with
 `as.character(packageVersion("ldfreq"))` and describe the actual
 tokenization and exclusions. If using the legacy variant, report its

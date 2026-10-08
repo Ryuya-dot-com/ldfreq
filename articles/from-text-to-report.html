@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -590,6 +590,29 @@ factor length and with the final token included in closure checks. The
 residual factor contributed <code>(1 - TTR) / (1 - 0.72)</code>; we
 averaged the forward and reverse MTLD scores arithmetically.</p>
 </blockquote>
+<p>Report diagnostic results separately from these calculation settings,
+for example:</p>
+<blockquote>
+<p>Of [number] computable texts, [number] had no complete factor in at
+least one direction. We retained these values with a tail-only flag. The
+median absolute forward/reverse difference divided by their mean was
+[percent]%, a descriptive measure of order sensitivity, not an estimate
+of precision. We examined associations with token count within
+[task/population strata].</p>
+</blockquote>
+<p>Fill these placeholders from your own results; the <a href="designing-comparisons.html#inspect-mtld-factor-support">factor-support
+and length checks</a> provide executable code. State any prespecified
+exclusion rule and its effect on document counts instead of silently
+removing flagged texts.</p>
+<p>The version numbers have separate jobs:
+<code>packageVersion("ldfreq")</code> identifies the software release;
+<code>contract_version</code> identifies the metric definitions;
+<code>batch_schema_version</code> identifies the layout of a batch
+result. They are not three interchangeable software versions. Use the
+package version, exact method and settings in the methods section;
+retain contract/schema metadata in the saved RDS for reanalysis. The
+examples are checked as software examples; their usability has not been
+established in a study of novice users.</p>
 <p>Replace the version placeholder with
 <code>as.character(packageVersion("ldfreq"))</code> and describe the
 actual tokenization and exclusions. If using the legacy variant, report

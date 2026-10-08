@@ -10,10 +10,11 @@ common window size before comparing groups. A result about local
 surface-form variety is not automatically a result about vocabulary
 knowledge, proficiency, or writing quality.
 
-The examples below are synthetic. They isolate effects of length, order,
-and window size so that we can explain what the calculations answer.
-They cannot establish a population effect or the validity of a chosen
-window for a task.
+The runnable examples below use synthetic sequences and authored
+teaching essays to isolate effects of length, order and window size. A
+separate executed PELIC example uses actual learner writing. Neither the
+teaching examples nor that small observational sample establish a
+population effect or validate a window for every task.
 
 ## Native-speaker corpora are also analysis targets
 
@@ -244,6 +245,224 @@ count, missing cases, ranks and numerical changes for your own sample
 before combining old and new results. Correlation alone can conceal a
 systematic shift in values. With fewer than two finite pairs or constant
 scores, rank correlation is not defined.
+
+### Inspect MTLD factor support
+
+`status = "ok"` means that the formula is computable. The 50-token
+advisory screen does not mean that the text contains a complete MTLD
+factor. In a direction with no complete factors, the value is
+`N / tail_credit`: an extrapolation from the fractional tail alone. It
+can exceed the observed text length. There is no requirement that MTLD
+be bounded by `N`.
+
+Use this ordinary R helper with current MTLD or its sequential legacy
+min10 results. It reads the existing diagnostics, so it also works with
+saved results from earlier versions. Other MTLD variants have different
+diagnostics.
+
+``` r
+mtld_support_table <- function(x) {
+  fields <- c("forward_score", "reverse_score", "forward_complete_factors",
+    "reverse_complete_factors", "forward_tail_credit", "reverse_tail_credit")
+  stopifnot(nrow(x) > 0L, all(vapply(x$diagnostics,
+    function(d) all(fields %in% names(d)), logical(1))))
+  d <- do.call(rbind, lapply(x$diagnostics, function(z) as.data.frame(z[fields])))
+  out <- cbind(as.data.frame(x)[intersect(
+    c("document_id", "method_id", "value", "status", "N"), names(x))], d)
+  out$tail_only <- ifelse(x$status == "ok",
+    pmin(d$forward_complete_factors, d$reverse_complete_factors) == 0, NA)
+  out$direction_gap_percent <- ifelse(x$status == "ok",
+    100 * abs(d$forward_score - d$reverse_score) /
+      ((d$forward_score + d$reverse_score) / 2), NA_real_)
+  out$score_exceeds_N <- ifelse(x$status == "ok", x$value > x$N, NA)
+  out
+}
+support <- mtld_support_table(current)
+support[c("document_id", "N", "value", "forward_complete_factors",
+  "reverse_complete_factors", "tail_only", "direction_gap_percent")]
+#>    document_id   N     value forward_complete_factors reverse_complete_factors
+#> 1          001 107 133.57167                        0                        0
+#> 2          002 129 103.88318                        1                        1
+#> 3          003 147  54.66044                        2                        2
+#> 4          004 117 123.64258                        0                        0
+#> 5          005 138  89.97273                        1                        1
+#> 6          006 108 120.96000                        0                        0
+#> 7          007 127  75.46677                        1                        1
+#> 8          008 149  48.75861                        2                        3
+#> 9          009 117 117.00000                        1                        1
+#> 10         010 137  59.40803                        2                        2
+#> 11         011 108 163.29600                        0                        0
+#> 12         012 128  72.79462                        1                        1
+#> 13         013 147  56.02444                        2                        2
+#> 14         014 119 141.61000                        0                        0
+#> 15         015 137  78.68859                        1                        1
+#> 16         016 107 107.00000                        1                        1
+#> 17         017 128 114.25397                        0                        1
+#> 18         018 148  53.68868                        2                        2
+#> 19         019 118 118.07152                        1                        0
+#> 20         020 140  69.04465                        1                        2
+#> 21         021 108 125.61231                        0                        0
+#> 22         022 128  80.02695                        1                        1
+#> 23         023 149  58.90084                        2                        2
+#> 24         024 119  86.19561                        1                        1
+#> 25         025 138  65.67068                        1                        2
+#> 26         026 110 130.30769                        0                        0
+#> 27         027 128  76.37374                        1                        1
+#> 28         028 148  54.13347                        2                        2
+#> 29         029 119 165.21167                        0                        0
+#> 30         030 139  51.65766                        2                        2
+#> 31         031   0        NA                       NA                       NA
+#>    tail_only direction_gap_percent
+#> 1       TRUE             0.0000000
+#> 2      FALSE            48.3558994
+#> 3      FALSE             5.9018653
+#> 4       TRUE             0.0000000
+#> 5      FALSE             9.9900100
+#> 6       TRUE             0.0000000
+#> 7      FALSE             5.5081245
+#> 8      FALSE            30.6882591
+#> 9      FALSE             0.0000000
+#> 10     FALSE            30.6085704
+#> 11      TRUE             0.0000000
+#> 12     FALSE            13.2198628
+#> 13     FALSE             7.8127839
+#> 14      TRUE             0.0000000
+#> 15     FALSE            12.1892871
+#> 16     FALSE             0.0000000
+#> 17      TRUE            43.3451725
+#> 18     FALSE             8.7547406
+#> 19      TRUE             0.1211387
+#> 20     FALSE            44.6082118
+#> 21      TRUE             0.0000000
+#> 22     FALSE            14.3172409
+#> 23     FALSE             1.5513497
+#> 24     FALSE            25.7299798
+#> 25     FALSE            42.5711165
+#> 26      TRUE             0.0000000
+#> 27     FALSE            10.1214575
+#> 28     FALSE             1.4513788
+#> 29      TRUE             0.0000000
+#> 30     FALSE             7.3637703
+#> 31        NA                    NA
+```
+
+Among the 30 nonempty authored texts, ten have no complete factor in at
+least one direction, including eight with none in either direction; 22
+have at most one in at least one direction. Nine scores exceed `N`. The
+median directional gap is 6.63%, with a maximum of 48.36%, using the
+mean of directional scores as the denominator. The four highest scores
+depend entirely on the tail in both directions. These counts describe
+the examples, not a learner population.
+
+From development version 0.3.0.9002, printing results shows
+`mtld_tail_only` and `mtld_gap_pct` automatically where these
+diagnostics are available. These are derived display columns; the saved
+result schema and values are unchanged. The table above retains the
+numeric components for analysis or export.
+
+**The gap measures order sensitivity, not uncertainty.** When both
+directions have zero complete factors, both tails have the same
+full-text TTR, hence the same score and a gap of zero. That is not
+evidence of precision. A complete factor count is useful diagnostic
+information, but there is no validated universal count cutoff here for
+reliable measurement. Retain flags, report their prevalence and justify
+any exclusions through the study design.
+
+Why retain 50 tokens?
+[`lexdiv_length_evidence()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_length_evidence.md)
+records a 50-token result for MTLD Original in Zenker and Kyle’s (2021)
+ICNALE study and 50-token guidance in TAALED 0.32. It also records
+Koizumi’s (2012) context-specific 100-token recommendation for spoken L2
+English. The implementations, tasks and samples differ; the registry
+does **not** establish equivalence with this package’s current
+no-minimum definition. Thus 50 is retained as advisory length guidance,
+not adopted as an empirically validated precision threshold for this
+implementation. Length, factor support, task and sampling design all
+need attention; one cannot replace them with a single pass/fail
+criterion.
+
+### Check association with text length in your sample
+
+This recipe reports Pearson and Spearman correlations with the
+**analyzed** token count, with one common setting per metric. Replace
+`tokens` with your own prepared documents. Keep non-computable values
+missing and report their count rather than treating them as zero.
+
+``` r
+length_associations <- function(results) {
+  do.call(rbind, lapply(split(as.data.frame(results), results$metric_id), function(x) {
+    stopifnot(!anyDuplicated(x$document_id)) # one setting per document/metric
+    ok <- x$status == "ok" & is.finite(x$N) & is.finite(x$value)
+    n <- x$N[ok]
+    value <- x$value[ok]
+    estimable <- length(n) >= 3L && length(unique(n)) > 1L &&
+      length(unique(value)) > 1L
+    data.frame(metric_id = x$metric_id[[1]], paired = sum(ok),
+      excluded = sum(!ok), N_min = if (length(n)) min(n) else NA,
+      N_max = if (length(n)) max(n) else NA,
+      pearson = if (estimable) cor(n, value) else NA_real_,
+      spearman = if (estimable) cor(n, value, method = "spearman") else NA_real_)
+  }))
+}
+length_results <- lexdiv_metrics_batch(tokens,
+  metrics = c("ttr", "mattr", "mtld"), window_length = 50)
+length_associations(length_results)
+#>       metric_id paired excluded N_min N_max    pearson   spearman
+#> mattr     mattr     30        1   107   149 -0.9195612 -0.9113254
+#> mtld       mtld     30        1   107   149 -0.8552701 -0.8689381
+#> ttr         ttr     30        1   107   149 -0.8835006 -0.8470752
+```
+
+These are descriptive associations, not a test of length independence.
+Across documents, length can co-vary with proficiency, topic and task.
+Inspect the actual `N` range and repeat the table within relevant
+strata; do not conclude length invariance from a small correlation or
+automatically regress length out of every metric. Repeated writers
+require an appropriate sampling model for inference, so this recipe does
+not attach independent-observation p-values. A complementary
+within-document check uses fixed contiguous segment lengths under the
+same tokenization and metric settings. It asks a different question and
+overlapping segments are not independent texts. Bestgen’s
+[methodological review](https://arxiv.org/abs/2307.04626) distinguishes
+the text length problem from sensitivity to the metric’s own length
+parameter.
+
+### A public learner-corpus example
+
+An [executed PELIC v1.0
+example](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/learner-length)
+applies these checks to 16 original essays by 16 writers answering the
+same prompt, all in recorded course level 3. The prompt was selected for
+the largest number of distinct writers among original writing-class
+essay responses, with numeric-ID tie breaking, before examining scores.
+English tokenization uses lowercase surface forms, NFC, and excludes
+numbers; spelling and grammatical forms remain unchanged. Analyzed
+lengths range from 70 to 314.
+
+| Metric | Pearson with N | Spearman with N | Paired / excluded |
+|----|---:|---:|---:|
+| TTR | -0.6500 | -0.6814 | 16 / 0 |
+| MATTR, common window 50 | 0.4173 | 0.4294 | 16 / 0 |
+| MTLD, strict \< 0.72, no minimum | 0.3834 | 0.2500 | 16 / 0 |
+
+Every direction has at least one complete MTLD factor in this sample.
+The directional gap has median 8.54% and maximum 47.08%. These
+observations do not validate reliability or identify the best metric.
+Even within a prompt, writers and content can differ with length. A
+fixed-document prefix example is also provided; only three texts reach
+200 tokens, so it is a computational demonstration, not evidence of
+population stability.
+
+The [corpus](https://doi.org/10.5281/zenodo.3991977) is credited to
+Juffs, Han and Naismith (2020). The pinned upstream README states CC
+BY-NC-ND 4.0, while Zenodo v1.0 metadata states CC BY-ND 4.0; the
+example follows the upstream noncommercial condition. Corpus texts and
+transformed token sequences are not bundled. Reproduction explicitly
+downloads the hash-verified source into a local cache (about 182 MB);
+package installation and vignette builds do not download it. The public
+repository contains the code, settings and aggregate tables. Existing
+ICNALE GRA V2.1 results below remain a separate local-data migration
+comparison.
 
 ### Identify where the min10 restriction can matter
 

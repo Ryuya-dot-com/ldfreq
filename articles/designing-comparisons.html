@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,10 +81,11 @@ participants. Fix the task, population, lexical unit, preprocessing, and
 common window size before comparing groups. A result about local
 surface-form variety is not automatically a result about vocabulary
 knowledge, proficiency, or writing quality.</p>
-<p>The examples below are synthetic. They isolate effects of length,
-order, and window size so that we can explain what the calculations
-answer. They cannot establish a population effect or the validity of a
-chosen window for a task.</p>
+<p>The runnable examples below use synthetic sequences and authored
+teaching essays to isolate effects of length, order and window size. A
+separate executed PELIC example uses actual learner writing. Neither the
+teaching examples nor that small observational sample establish a
+population effect or validate a window for every task.</p>
 </div>
 <div class="section level2">
 <h2 id="native-speaker-corpora-are-also-analysis-targets">Native-speaker corpora are also analysis targets<a class="anchor" aria-label="anchor" href="#native-speaker-corpora-are-also-analysis-targets"></a>
@@ -326,6 +327,236 @@ systematic shift in values. With fewer than two finite pairs or constant
 scores, rank correlation is not defined.</p>
 </div>
 <div class="section level3">
+<h3 id="inspect-mtld-factor-support">Inspect MTLD factor support<a class="anchor" aria-label="anchor" href="#inspect-mtld-factor-support"></a>
+</h3>
+<p><code>status = "ok"</code> means that the formula is computable. The
+50-token advisory screen does not mean that the text contains a complete
+MTLD factor. In a direction with no complete factors, the value is
+<code>N / tail_credit</code>: an extrapolation from the fractional tail
+alone. It can exceed the observed text length. There is no requirement
+that MTLD be bounded by <code>N</code>.</p>
+<p>Use this ordinary R helper with current MTLD or its sequential legacy
+min10 results. It reads the existing diagnostics, so it also works with
+saved results from earlier versions. Other MTLD variants have different
+diagnostics.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mtld_support_table</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">fields</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"forward_score"</span>, <span class="st">"reverse_score"</span>, <span class="st">"forward_complete_factors"</span>,</span>
+<span>    <span class="st">"reverse_complete_factors"</span>, <span class="st">"forward_tail_credit"</span>, <span class="st">"reverse_tail_credit"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0L</span>, <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">diagnostics</span>,</span>
+<span>    <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">fields</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">diagnostics</span>, <span class="kw">function</span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">z</span><span class="op">[</span><span class="va">fields</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">intersect</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"method_id"</span>, <span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"N"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>, <span class="va">d</span><span class="op">)</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">tail_only</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="st">"ok"</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmin</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">forward_complete_factors</span>, <span class="va">d</span><span class="op">$</span><span class="va">reverse_complete_factors</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">direction_gap_percent</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="st">"ok"</span>,</span>
+<span>    <span class="fl">100</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">forward_score</span> <span class="op">-</span> <span class="va">d</span><span class="op">$</span><span class="va">reverse_score</span><span class="op">)</span> <span class="op">/</span></span>
+<span>      <span class="op">(</span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">forward_score</span> <span class="op">+</span> <span class="va">d</span><span class="op">$</span><span class="va">reverse_score</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span>, <span class="cn">NA_real_</span><span class="op">)</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">score_exceeds_N</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="st">"ok"</span>, <span class="va">x</span><span class="op">$</span><span class="va">value</span> <span class="op">&gt;</span> <span class="va">x</span><span class="op">$</span><span class="va">N</span>, <span class="cn">NA</span><span class="op">)</span></span>
+<span>  <span class="va">out</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">support</span> <span class="op">&lt;-</span> <span class="fu">mtld_support_table</span><span class="op">(</span><span class="va">current</span><span class="op">)</span></span>
+<span><span class="va">support</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"N"</span>, <span class="st">"value"</span>, <span class="st">"forward_complete_factors"</span>,</span>
+<span>  <span class="st">"reverse_complete_factors"</span>, <span class="st">"tail_only"</span>, <span class="st">"direction_gap_percent"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;    document_id   N     value forward_complete_factors reverse_complete_factors</span></span>
+<span><span class="co">#&gt; 1          001 107 133.57167                        0                        0</span></span>
+<span><span class="co">#&gt; 2          002 129 103.88318                        1                        1</span></span>
+<span><span class="co">#&gt; 3          003 147  54.66044                        2                        2</span></span>
+<span><span class="co">#&gt; 4          004 117 123.64258                        0                        0</span></span>
+<span><span class="co">#&gt; 5          005 138  89.97273                        1                        1</span></span>
+<span><span class="co">#&gt; 6          006 108 120.96000                        0                        0</span></span>
+<span><span class="co">#&gt; 7          007 127  75.46677                        1                        1</span></span>
+<span><span class="co">#&gt; 8          008 149  48.75861                        2                        3</span></span>
+<span><span class="co">#&gt; 9          009 117 117.00000                        1                        1</span></span>
+<span><span class="co">#&gt; 10         010 137  59.40803                        2                        2</span></span>
+<span><span class="co">#&gt; 11         011 108 163.29600                        0                        0</span></span>
+<span><span class="co">#&gt; 12         012 128  72.79462                        1                        1</span></span>
+<span><span class="co">#&gt; 13         013 147  56.02444                        2                        2</span></span>
+<span><span class="co">#&gt; 14         014 119 141.61000                        0                        0</span></span>
+<span><span class="co">#&gt; 15         015 137  78.68859                        1                        1</span></span>
+<span><span class="co">#&gt; 16         016 107 107.00000                        1                        1</span></span>
+<span><span class="co">#&gt; 17         017 128 114.25397                        0                        1</span></span>
+<span><span class="co">#&gt; 18         018 148  53.68868                        2                        2</span></span>
+<span><span class="co">#&gt; 19         019 118 118.07152                        1                        0</span></span>
+<span><span class="co">#&gt; 20         020 140  69.04465                        1                        2</span></span>
+<span><span class="co">#&gt; 21         021 108 125.61231                        0                        0</span></span>
+<span><span class="co">#&gt; 22         022 128  80.02695                        1                        1</span></span>
+<span><span class="co">#&gt; 23         023 149  58.90084                        2                        2</span></span>
+<span><span class="co">#&gt; 24         024 119  86.19561                        1                        1</span></span>
+<span><span class="co">#&gt; 25         025 138  65.67068                        1                        2</span></span>
+<span><span class="co">#&gt; 26         026 110 130.30769                        0                        0</span></span>
+<span><span class="co">#&gt; 27         027 128  76.37374                        1                        1</span></span>
+<span><span class="co">#&gt; 28         028 148  54.13347                        2                        2</span></span>
+<span><span class="co">#&gt; 29         029 119 165.21167                        0                        0</span></span>
+<span><span class="co">#&gt; 30         030 139  51.65766                        2                        2</span></span>
+<span><span class="co">#&gt; 31         031   0        NA                       NA                       NA</span></span>
+<span><span class="co">#&gt;    tail_only direction_gap_percent</span></span>
+<span><span class="co">#&gt; 1       TRUE             0.0000000</span></span>
+<span><span class="co">#&gt; 2      FALSE            48.3558994</span></span>
+<span><span class="co">#&gt; 3      FALSE             5.9018653</span></span>
+<span><span class="co">#&gt; 4       TRUE             0.0000000</span></span>
+<span><span class="co">#&gt; 5      FALSE             9.9900100</span></span>
+<span><span class="co">#&gt; 6       TRUE             0.0000000</span></span>
+<span><span class="co">#&gt; 7      FALSE             5.5081245</span></span>
+<span><span class="co">#&gt; 8      FALSE            30.6882591</span></span>
+<span><span class="co">#&gt; 9      FALSE             0.0000000</span></span>
+<span><span class="co">#&gt; 10     FALSE            30.6085704</span></span>
+<span><span class="co">#&gt; 11      TRUE             0.0000000</span></span>
+<span><span class="co">#&gt; 12     FALSE            13.2198628</span></span>
+<span><span class="co">#&gt; 13     FALSE             7.8127839</span></span>
+<span><span class="co">#&gt; 14      TRUE             0.0000000</span></span>
+<span><span class="co">#&gt; 15     FALSE            12.1892871</span></span>
+<span><span class="co">#&gt; 16     FALSE             0.0000000</span></span>
+<span><span class="co">#&gt; 17      TRUE            43.3451725</span></span>
+<span><span class="co">#&gt; 18     FALSE             8.7547406</span></span>
+<span><span class="co">#&gt; 19      TRUE             0.1211387</span></span>
+<span><span class="co">#&gt; 20     FALSE            44.6082118</span></span>
+<span><span class="co">#&gt; 21      TRUE             0.0000000</span></span>
+<span><span class="co">#&gt; 22     FALSE            14.3172409</span></span>
+<span><span class="co">#&gt; 23     FALSE             1.5513497</span></span>
+<span><span class="co">#&gt; 24     FALSE            25.7299798</span></span>
+<span><span class="co">#&gt; 25     FALSE            42.5711165</span></span>
+<span><span class="co">#&gt; 26      TRUE             0.0000000</span></span>
+<span><span class="co">#&gt; 27     FALSE            10.1214575</span></span>
+<span><span class="co">#&gt; 28     FALSE             1.4513788</span></span>
+<span><span class="co">#&gt; 29      TRUE             0.0000000</span></span>
+<span><span class="co">#&gt; 30     FALSE             7.3637703</span></span>
+<span><span class="co">#&gt; 31        NA                    NA</span></span></code></pre></div>
+<p>Among the 30 nonempty authored texts, ten have no complete factor in
+at least one direction, including eight with none in either direction;
+22 have at most one in at least one direction. Nine scores exceed
+<code>N</code>. The median directional gap is 6.63%, with a maximum of
+48.36%, using the mean of directional scores as the denominator. The
+four highest scores depend entirely on the tail in both directions.
+These counts describe the examples, not a learner population.</p>
+<p>From development version 0.3.0.9002, printing results shows
+<code>mtld_tail_only</code> and <code>mtld_gap_pct</code> automatically
+where these diagnostics are available. These are derived display
+columns; the saved result schema and values are unchanged. The table
+above retains the numeric components for analysis or export.</p>
+<p><strong>The gap measures order sensitivity, not uncertainty.</strong>
+When both directions have zero complete factors, both tails have the
+same full-text TTR, hence the same score and a gap of zero. That is not
+evidence of precision. A complete factor count is useful diagnostic
+information, but there is no validated universal count cutoff here for
+reliable measurement. Retain flags, report their prevalence and justify
+any exclusions through the study design.</p>
+<p>Why retain 50 tokens? <code><a href="../reference/lexdiv_length_evidence.html">lexdiv_length_evidence()</a></code> records a
+50-token result for MTLD Original in Zenker and Kyle’s (2021) ICNALE
+study and 50-token guidance in TAALED 0.32. It also records Koizumi’s
+(2012) context-specific 100-token recommendation for spoken L2 English.
+The implementations, tasks and samples differ; the registry does
+<strong>not</strong> establish equivalence with this package’s current
+no-minimum definition. Thus 50 is retained as advisory length guidance,
+not adopted as an empirically validated precision threshold for this
+implementation. Length, factor support, task and sampling design all
+need attention; one cannot replace them with a single pass/fail
+criterion.</p>
+</div>
+<div class="section level3">
+<h3 id="check-association-with-text-length-in-your-sample">Check association with text length in your sample<a class="anchor" aria-label="anchor" href="#check-association-with-text-length-in-your-sample"></a>
+</h3>
+<p>This recipe reports Pearson and Spearman correlations with the
+<strong>analyzed</strong> token count, with one common setting per
+metric. Replace <code>tokens</code> with your own prepared documents.
+Keep non-computable values missing and report their count rather than
+treating them as zero.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">length_associations</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">results</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span>, <span class="va">results</span><span class="op">$</span><span class="va">metric_id</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span><span class="op">)</span> <span class="co"># one setting per document/metric</span></span>
+<span>    <span class="va">ok</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="st">"ok"</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">N</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">value</span><span class="op">)</span></span>
+<span>    <span class="va">n</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">$</span><span class="va">N</span><span class="op">[</span><span class="va">ok</span><span class="op">]</span></span>
+<span>    <span class="va">value</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">$</span><span class="va">value</span><span class="op">[</span><span class="va">ok</span><span class="op">]</span></span>
+<span>    <span class="va">estimable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">3L</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1L</span> <span class="op">&amp;&amp;</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1L</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>metric_id <span class="op">=</span> <span class="va">x</span><span class="op">$</span><span class="va">metric_id</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, paired <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">ok</span><span class="op">)</span>,</span>
+<span>      excluded <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="va">ok</span><span class="op">)</span>, N_min <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="kw">else</span> <span class="cn">NA</span>,</span>
+<span>      N_max <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="kw">else</span> <span class="cn">NA</span>,</span>
+<span>      pearson <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">estimable</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">n</span>, <span class="va">value</span><span class="op">)</span> <span class="kw">else</span> <span class="cn">NA_real_</span>,</span>
+<span>      spearman <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">estimable</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">n</span>, <span class="va">value</span>, method <span class="op">=</span> <span class="st">"spearman"</span><span class="op">)</span> <span class="kw">else</span> <span class="cn">NA_real_</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">length_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span><span class="va">tokens</span>,</span>
+<span>  metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"mattr"</span>, <span class="st">"mtld"</span><span class="op">)</span>, window_length <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
+<span><span class="fu">length_associations</span><span class="op">(</span><span class="va">length_results</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       metric_id paired excluded N_min N_max    pearson   spearman</span></span>
+<span><span class="co">#&gt; mattr     mattr     30        1   107   149 -0.9195612 -0.9113254</span></span>
+<span><span class="co">#&gt; mtld       mtld     30        1   107   149 -0.8552701 -0.8689381</span></span>
+<span><span class="co">#&gt; ttr         ttr     30        1   107   149 -0.8835006 -0.8470752</span></span></code></pre></div>
+<p>These are descriptive associations, not a test of length
+independence. Across documents, length can co-vary with proficiency,
+topic and task. Inspect the actual <code>N</code> range and repeat the
+table within relevant strata; do not conclude length invariance from a
+small correlation or automatically regress length out of every metric.
+Repeated writers require an appropriate sampling model for inference, so
+this recipe does not attach independent-observation p-values. A
+complementary within-document check uses fixed contiguous segment
+lengths under the same tokenization and metric settings. It asks a
+different question and overlapping segments are not independent texts.
+Bestgen’s <a href="https://arxiv.org/abs/2307.04626" class="external-link">methodological
+review</a> distinguishes the text length problem from sensitivity to the
+metric’s own length parameter.</p>
+</div>
+<div class="section level3">
+<h3 id="a-public-learner-corpus-example">A public learner-corpus example<a class="anchor" aria-label="anchor" href="#a-public-learner-corpus-example"></a>
+</h3>
+<p>An <a href="https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/learner-length" class="external-link">executed
+PELIC v1.0 example</a> applies these checks to 16 original essays by 16
+writers answering the same prompt, all in recorded course level 3. The
+prompt was selected for the largest number of distinct writers among
+original writing-class essay responses, with numeric-ID tie breaking,
+before examining scores. English tokenization uses lowercase surface
+forms, NFC, and excludes numbers; spelling and grammatical forms remain
+unchanged. Analyzed lengths range from 70 to 314.</p>
+<table class="table">
+<thead><tr class="header">
+<th>Metric</th>
+<th align="right">Pearson with N</th>
+<th align="right">Spearman with N</th>
+<th align="right">Paired / excluded</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>TTR</td>
+<td align="right">-0.6500</td>
+<td align="right">-0.6814</td>
+<td align="right">16 / 0</td>
+</tr>
+<tr class="even">
+<td>MATTR, common window 50</td>
+<td align="right">0.4173</td>
+<td align="right">0.4294</td>
+<td align="right">16 / 0</td>
+</tr>
+<tr class="odd">
+<td>MTLD, strict &lt; 0.72, no minimum</td>
+<td align="right">0.3834</td>
+<td align="right">0.2500</td>
+<td align="right">16 / 0</td>
+</tr>
+</tbody>
+</table>
+<p>Every direction has at least one complete MTLD factor in this sample.
+The directional gap has median 8.54% and maximum 47.08%. These
+observations do not validate reliability or identify the best metric.
+Even within a prompt, writers and content can differ with length. A
+fixed-document prefix example is also provided; only three texts reach
+200 tokens, so it is a computational demonstration, not evidence of
+population stability.</p>
+<p>The <a href="https://doi.org/10.5281/zenodo.3991977" class="external-link">corpus</a> is
+credited to Juffs, Han and Naismith (2020). The pinned upstream README
+states CC BY-NC-ND 4.0, while Zenodo v1.0 metadata states CC BY-ND 4.0;
+the example follows the upstream noncommercial condition. Corpus texts
+and transformed token sequences are not bundled. Reproduction explicitly
+downloads the hash-verified source into a local cache (about 182 MB);
+package installation and vignette builds do not download it. The public
+repository contains the code, settings and aggregate tables. Existing
+ICNALE GRA V2.1 results below remain a separate local-data migration
+comparison.</p>
+</div>
+<div class="section level3">
 <h3 id="identify-where-the-min10-restriction-can-matter">Identify where the min10 restriction can matter<a class="anchor" aria-label="anchor" href="#identify-where-the-min10-restriction-can-matter"></a>
 </h3>
 <p>For an input of at least ten tokens, if <strong>neither direction has
@@ -340,7 +571,7 @@ segmentation without changing the final directional mean.</p>
 used for MTLD. Use the same threshold as in the metric calculation. It
 is tutorial code; it does not add fields to package results or change
 the MTLD definition.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mtld_factor_screen</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">threshold</span> <span class="op">=</span> <span class="fl">0.72</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">is.character</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="va">threshold</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">threshold</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1L</span>,</span>
@@ -374,7 +605,7 @@ that direction has no complete factor. Fewer than ten tokens are
 classified separately because the legacy method cannot return a score. A
 screen classification does not replace the metric’s status or establish
 that a text is long enough for a study’s purposes.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">factor_screen</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">tokens</span>, <span class="va">mtld_factor_screen</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">factor_screen</span><span class="op">$</span><span class="va">document_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">tokens</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">factor_screen</span><span class="op">$</span><span class="va">screen</span><span class="op">)</span></span>
@@ -449,7 +680,7 @@ YouTube subtitles, use TUBELEX as a separate corpus-relative measure.
 Its Treebank segmentation is not supplied by the general Unicode
 tokenizer in this package. Prepare and record a compatible external
 pipeline; these hand-prepared terms illustrate only one sentence.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"I"</span>, <span class="st">"do"</span>, <span class="st">"n't"</span>, <span class="st">"think"</span>, <span class="st">"it"</span>, <span class="st">"'s"</span>, <span class="st">"a"</span>, <span class="st">"book"</span><span class="op">)</span></span>
 <span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="va">terms</span><span class="op">)</span></span>
 <span><span class="va">frequency</span><span class="op">$</span><span class="va">summary</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weighting"</span>, <span class="st">"coverage"</span>, <span class="st">"mean_zipf"</span><span class="op">)</span><span class="op">]</span></span>
