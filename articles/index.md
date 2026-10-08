@@ -2,7 +2,7 @@
 
 ### Start here
 
-- [From English text to a
+- [From files to a diagnostic
   report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.md):
 - [Getting started with
   ldfreq](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.md):

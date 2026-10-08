@@ -406,6 +406,13 @@ or proficiency data. Reading Japanese text uses the same input steps;
 its subsequent annotation is a [separate
 workflow](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.md).
 
+For a complete condition comparison, the [file-to-report
+example](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#compare-english-case-from-files)
+uses these same files to compare preserved case with lowercase. It
+retains MTLD factor support, unavailable results and paired document
+counts, and saves both a flat diagnostic table and a replayable record
+with methods text.
+
 The small `read_text_file()` helper below is an **explicitly sourced
 example**, not an exported ldfreq function. It uses base R for reading
 and the existing digest dependency for hashes. It preserves paragraph

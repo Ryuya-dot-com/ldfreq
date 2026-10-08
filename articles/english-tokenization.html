@@ -33,7 +33,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/from-text-to-report.html">From English text to a report</a></li>
+<li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/word-families-and-affixes.html">Word families, roots, and affixes: from texts to interpretable profiles</a></li>
@@ -573,6 +573,11 @@ Shared topic passages and different amounts of repetition illustrate
 variation in vocabulary diversity; they are not independent learner
 observations or proficiency data. Reading Japanese text uses the same
 input steps; its subsequent annotation is a <a href="japanese-annotations.html">separate workflow</a>.</p>
+<p>For a complete condition comparison, the <a href="from-text-to-report.html#compare-english-case-from-files">file-to-report
+example</a> uses these same files to compare preserved case with
+lowercase. It retains MTLD factor support, unavailable results and
+paired document counts, and saves both a flat diagnostic table and a
+replayable record with methods text.</p>
 <p>The small <code>read_text_file()</code> helper below is an
 <strong>explicitly sourced example</strong>, not an exported ldfreq
 function. It uses base R for reading and the existing digest dependency

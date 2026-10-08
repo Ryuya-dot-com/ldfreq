@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>From English text to a report • ldfreq</title>
+<title>From files to a diagnostic report • ldfreq</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="From English text to a report">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="From files to a diagnostic report">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -33,7 +33,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/from-text-to-report.html">From English text to a report</a></li>
+<li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/word-families-and-affixes.html">Word families, roots, and affixes: from texts to interpretable profiles</a></li>
@@ -62,7 +62,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>From English text to a report</h1>
+      <h1>From files to a diagnostic report</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/vignettes/from-text-to-report.Rmd" class="external-link"><code>vignettes/from-text-to-report.Rmd</code></a></small>
@@ -71,6 +71,726 @@
 
     
     
+<div class="section level2">
+<h2 id="compare-analysis-conditions-from-local-files">Compare analysis conditions from local files<a class="anchor" aria-label="anchor" href="#compare-analysis-conditions-from-local-files"></a>
+</h2>
+<p>Start here to turn your own files into a table you can inspect, save
+and report. The two paths below work with ldfreq 0.3.0.9002, without new
+packages, downloads or an API key. English text is tokenized in R.
+Japanese text uses prepared annotations: importing a file does not
+perform Japanese morphological analysis.</p>
+<p>The question is <strong>how a declared counting decision changes the
+same documents</strong>. For English we preserve or lowercase spelling;
+for Japanese we retain all body words or only words with a declared
+content POS. These comparisons do not estimate writing ability or
+establish equivalence between the two languages. The English files are
+30 authored teaching essays plus an empty file, not learner data. The
+five Japanese files are deliberately short authored examples that also
+expose missing annotations and unavailable scores.</p>
+<div class="section level3">
+<h3 id="keep-diagnostics-beside-each-value">Keep diagnostics beside each value<a class="anchor" aria-label="anchor" href="#keep-diagnostics-beside-each-value"></a>
+</h3>
+<p>Run this setup for either path. <code>diagnostic_rows()</code> is a
+small function defined in this guide, not a new package API. It extracts
+diagnostics already computed by the three requested metrics; it does not
+recalculate MTLD. The full result objects retain method parameters and
+schema identities in the saved record.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">reader</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"text-file-input.R"</span>,</span>
+<span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">reader</span><span class="op">)</span></span>
+<span><span class="va">settings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"mattr"</span>, <span class="st">"mtld"</span><span class="op">)</span>,</span>
+<span>  window_length <span class="op">=</span> <span class="fl">50</span>, mtld_threshold <span class="op">=</span> <span class="fl">0.72</span><span class="op">)</span></span>
+<span><span class="va">calculate</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">tokens</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">lexdiv_metrics_batch</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">tokens</span><span class="op">)</span>, <span class="va">settings</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">diagnostic_rows</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"metric_id"</span>, <span class="st">"method_id"</span>,</span>
+<span>    <span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"missing_reason"</span>, <span class="st">"N"</span>, <span class="st">"V"</span>, <span class="st">"below_quality_floor"</span><span class="op">)</span><span class="op">]</span></span>
+<span>  <span class="va">fields</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"forward_score"</span>, <span class="st">"reverse_score"</span>, <span class="st">"forward_complete_factors"</span>,</span>
+<span>    <span class="st">"reverse_complete_factors"</span>, <span class="st">"forward_tail_credit"</span>, <span class="st">"reverse_tail_credit"</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">field</span> <span class="kw">in</span> <span class="va">fields</span><span class="op">)</span> <span class="va">out</span><span class="op">[[</span><span class="va">field</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">diagnostics</span>, <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">d</span><span class="op">[[</span><span class="va">field</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="cn">NA_real_</span> <span class="kw">else</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">d</span><span class="op">[[</span><span class="va">field</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">}</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">available</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">metric_id</span> <span class="op">==</span> <span class="st">"mtld"</span> <span class="op">&amp;</span> <span class="va">out</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="st">"ok"</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">mtld_tail_only</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">available</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmin</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">forward_complete_factors</span>, <span class="va">out</span><span class="op">$</span><span class="va">reverse_complete_factors</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">mtld_gap_percent</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">available</span>,</span>
+<span>    <span class="fl">100</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">forward_score</span> <span class="op">-</span> <span class="va">out</span><span class="op">$</span><span class="va">reverse_score</span><span class="op">)</span> <span class="op">/</span></span>
+<span>      <span class="op">(</span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">forward_score</span> <span class="op">+</span> <span class="va">out</span><span class="op">$</span><span class="va">reverse_score</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span>, <span class="cn">NA_real_</span><span class="op">)</span></span>
+<span>  <span class="va">out</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p><code>status</code> describes calculation availability;
+<code>below_quality_floor</code> is an advisory length screen. Neither
+establishes precision. <code>mtld_tail_only = TRUE</code> means no
+complete factor in at least one direction. The directional gap is order
+sensitivity, <strong>not a standard error or confidence
+interval</strong>; it can be zero when both scores depend entirely on
+their tails. Keep these flags rather than silently excluding documents.
+See the <a href="designing-comparisons.html#inspect-mtld-factor-support">factor-support
+explanation</a> and its length-association example when checking your
+own study sample.</p>
+</div>
+<div class="section level3">
+<h3 id="compare-english-case-from-files">English: preserve or lowercase spelling<a class="anchor" aria-label="anchor" href="#compare-english-case-from-files"></a>
+</h3>
+<p>Replace <code>en_dir</code> with your TXT directory. Each file is one
+document, including its paragraph breaks. Filename stems are IDs here;
+supply your own mapping when that rule is unsuitable. No spelling
+correction, lemmatization, name removal or British/American spelling
+conversion is applied. Lowercasing can merge spellings such as
+<code>Rose</code> and <code>rose</code>; it does not resolve their
+meanings.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">en_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"text-input"</span>, <span class="st">"texts"</span>,</span>
+<span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">en_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">en_dir</span>, pattern <span class="op">=</span> <span class="st">"[.]txt$"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  ignore.case <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">en_paths</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0L</span><span class="op">)</span></span>
+<span><span class="va">en_ids</span> <span class="op">&lt;-</span> <span class="fu">tools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_path_sans_ext</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">en_paths</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">en_ids</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="va">en_ids</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">en_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">en_paths</span>, <span class="va">reader</span><span class="op">$</span><span class="va">read_text_file</span>, encoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="va">en_texts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">en_files</span>, <span class="va">`[[`</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, <span class="st">"text"</span><span class="op">)</span>, <span class="va">en_ids</span><span class="op">)</span></span>
+<span><span class="va">en_sources</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">en_files</span>, <span class="va">`[[`</span>, <span class="st">"source"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">en_sources</span><span class="op">$</span><span class="va">document_id</span> <span class="op">&lt;-</span> <span class="va">en_ids</span></span>
+<span><span class="va">en_sources</span><span class="op">$</span><span class="va">source_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">en_paths</span><span class="op">)</span></span>
+<span><span class="va">en_prepared</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"preserve"</span>, <span class="st">"lower"</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">case</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_tokenize_batch</a></span><span class="op">(</span><span class="va">en_texts</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>,</span>
+<span>    normalization <span class="op">=</span> <span class="st">"NFC"</span>, case <span class="op">=</span> <span class="va">case</span>, keep_numbers <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">en_prepared</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"preserve"</span>, <span class="st">"lower"</span><span class="op">)</span></span>
+<span><span class="va">en_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">en_prepared</span>, <span class="kw">function</span><span class="op">(</span><span class="va">batch</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">batch</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">$</span><span class="va">tokens</span><span class="op">$</span><span class="va">surface</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">en_runs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">en_inputs</span>, <span class="va">calculate</span><span class="op">)</span></span>
+<span><span class="va">en_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">en_runs</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">condition</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">diagnostic_rows</span><span class="op">(</span><span class="va">en_runs</span><span class="op">[[</span><span class="va">condition</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">condition</span> <span class="op">&lt;-</span> <span class="va">condition</span></span>
+<span>  <span class="va">out</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">en_table</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span><span class="va">en_preview</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">en_ids</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">en_ids</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">en_table</span>, <span class="va">document_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">en_preview</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">document_id</span>, <span class="va">condition</span>, <span class="va">metric_id</span>, <span class="va">N</span>, <span class="va">V</span>, <span class="va">value</span>, <span class="va">status</span>, <span class="va">missing_reason</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  digits <span class="op">=</span> <span class="fl">3</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="17%">
+<col width="14%">
+<col width="14%">
+<col width="5%">
+<col width="4%">
+<col width="11%">
+<col width="11%">
+<col width="21%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">document_id</th>
+<th align="left">condition</th>
+<th align="left">metric_id</th>
+<th align="right">N</th>
+<th align="right">V</th>
+<th align="right">value</th>
+<th align="left">status</th>
+<th align="left">missing_reason</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">001</td>
+<td align="left">preserve</td>
+<td align="left">ttr</td>
+<td align="right">107</td>
+<td align="right">86</td>
+<td align="right">0.804</td>
+<td align="left">ok</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">001</td>
+<td align="left">preserve</td>
+<td align="left">mattr</td>
+<td align="right">107</td>
+<td align="right">86</td>
+<td align="right">0.856</td>
+<td align="left">ok</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">001</td>
+<td align="left">preserve</td>
+<td align="left">mtld</td>
+<td align="right">107</td>
+<td align="right">86</td>
+<td align="right">152.653</td>
+<td align="left">ok</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">031</td>
+<td align="left">preserve</td>
+<td align="left">ttr</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="left">missing</td>
+<td align="left">empty_input</td>
+</tr>
+<tr class="odd">
+<td align="left">031</td>
+<td align="left">preserve</td>
+<td align="left">mattr</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="left">missing</td>
+<td align="left">empty_input</td>
+</tr>
+<tr class="even">
+<td align="left">031</td>
+<td align="left">preserve</td>
+<td align="left">mtld</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="left">missing</td>
+<td align="left">empty_input</td>
+</tr>
+<tr class="odd">
+<td align="left">001</td>
+<td align="left">lower</td>
+<td align="left">ttr</td>
+<td align="right">107</td>
+<td align="right">83</td>
+<td align="right">0.776</td>
+<td align="left">ok</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">001</td>
+<td align="left">lower</td>
+<td align="left">mattr</td>
+<td align="right">107</td>
+<td align="right">83</td>
+<td align="right">0.829</td>
+<td align="left">ok</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">001</td>
+<td align="left">lower</td>
+<td align="left">mtld</td>
+<td align="right">107</td>
+<td align="right">83</td>
+<td align="right">133.572</td>
+<td align="left">ok</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">031</td>
+<td align="left">lower</td>
+<td align="left">ttr</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="left">missing</td>
+<td align="left">empty_input</td>
+</tr>
+<tr class="odd">
+<td align="left">031</td>
+<td align="left">lower</td>
+<td align="left">mattr</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="left">missing</td>
+<td align="left">empty_input</td>
+</tr>
+<tr class="even">
+<td align="left">031</td>
+<td align="left">lower</td>
+<td align="left">mtld</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="left">missing</td>
+<td align="left">empty_input</td>
+</tr>
+</tbody>
+</table>
+<p>Retain all rows, including <code>031</code>, whose empty input yields
+missing values. Compare conditions by ID and metric, never by an assumed
+row order. The table below counts availability separately for each
+condition and for paired values. It does not select documents on the
+basis of an observed score difference.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pair_fields</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"metric_id"</span>, <span class="st">"N"</span>, <span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"mtld_tail_only"</span><span class="op">)</span></span>
+<span><span class="va">en_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">en_table</span>, <span class="va">condition</span> <span class="op">==</span> <span class="st">"preserve"</span>, <span class="va">pair_fields</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">en_table</span>, <span class="va">condition</span> <span class="op">==</span> <span class="st">"lower"</span>, <span class="va">pair_fields</span><span class="op">)</span>,</span>
+<span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"metric_id"</span><span class="op">)</span>, all <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  suffixes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"_preserve"</span>, <span class="st">"_lower"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">en_pairs</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">en_ids</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">settings</span><span class="op">$</span><span class="va">metrics</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">en_counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">settings</span><span class="op">$</span><span class="va">metrics</span>, <span class="kw">function</span><span class="op">(</span><span class="va">metric</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">en_pairs</span>, <span class="va">metric_id</span> <span class="op">==</span> <span class="va">metric</span><span class="op">)</span></span>
+<span>  <span class="va">a</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">$</span><span class="va">status_preserve</span> <span class="op">==</span> <span class="st">"ok"</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">value_preserve</span><span class="op">)</span></span>
+<span>  <span class="va">b</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">$</span><span class="va">status_lower</span> <span class="op">==</span> <span class="st">"ok"</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">value_lower</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>metric_id <span class="op">=</span> <span class="va">metric</span>, documents <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span>,</span>
+<span>    preserve_available <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span>, lower_available <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span>,</span>
+<span>    paired_available <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">a</span> <span class="op">&amp;</span> <span class="va">b</span><span class="op">)</span>, unpaired <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="op">(</span><span class="va">a</span> <span class="op">&amp;</span> <span class="va">b</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    preserve_tail_only <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">metric</span> <span class="op">==</span> <span class="st">"mtld"</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">mtld_tail_only_preserve</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="kw">else</span> <span class="cn">NA</span>,</span>
+<span>    lower_tail_only <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">metric</span> <span class="op">==</span> <span class="st">"mtld"</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">mtld_tail_only_lower</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="kw">else</span> <span class="cn">NA</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">en_counts</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="8%">
+<col width="8%">
+<col width="16%">
+<col width="13%">
+<col width="14%">
+<col width="7%">
+<col width="16%">
+<col width="13%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">metric_id</th>
+<th align="right">documents</th>
+<th align="right">preserve_available</th>
+<th align="right">lower_available</th>
+<th align="right">paired_available</th>
+<th align="right">unpaired</th>
+<th align="right">preserve_tail_only</th>
+<th align="right">lower_tail_only</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">ttr</td>
+<td align="right">31</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td align="right">1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">mattr</td>
+<td align="right">31</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td align="right">1</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">mtld</td>
+<td align="right">31</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td align="right">1</td>
+<td align="right">14</td>
+<td align="right">10</td>
+</tr>
+</tbody>
+</table>
+<p>For these files N is unchanged, while lowercasing changes type
+identity. This is a sensitivity analysis of one counting decision, not a
+test of whether capitalization is correct. The tokenizer’s positions
+refer to processed text; case conversion can change Unicode character
+length in other inputs. Do not reuse these positions as original-text
+annotation anchors. Both complete tokenizations, their exclusion records
+and original texts are saved below.</p>
+</div>
+<div class="section level3">
+<h3 id="compare-japanese-pos-from-files">Japanese: all body words or content words<a class="anchor" aria-label="anchor" href="#compare-japanese-pos-from-files"></a>
+</h3>
+<p>This path is independent of the English path after the shared setup.
+It imports five TXT files and their authored annotation CSV. For your
+own texts, prepare complete annotations with your chosen analyzer and
+dictionary, and replace the declared body starts and provenance. The <a href="japanese-annotations.html#japanese-file-workflow">Japanese file
+guide</a> explains source positions, title exclusion and review; the <a href="japanese-annotations.html#use-gibasa-and-a-local-unidic-dictionary-in-r">analyzer
+recipe</a> provides a separate route for generating annotations. The
+authored example does not demonstrate analyzer accuracy.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ja_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"text-input"</span>, <span class="st">"japanese-workflow"</span>,</span>
+<span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">ja_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"variants"</span>, <span class="st">"homophones"</span>, <span class="st">"unlisted"</span>, <span class="st">"no_targets"</span>, <span class="st">"empty"</span><span class="op">)</span></span>
+<span><span class="va">ja_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ja_dir</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">ja_ids</span>, <span class="st">".txt"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="va">reader</span><span class="op">$</span><span class="va">read_text_file</span>, encoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="va">ja_texts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">ja_files</span>, <span class="va">`[[`</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, <span class="st">"text"</span><span class="op">)</span>, <span class="va">ja_ids</span><span class="op">)</span></span>
+<span><span class="va">ja_sources</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">ja_files</span>, <span class="va">`[[`</span>, <span class="st">"source"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ja_sources</span><span class="op">$</span><span class="va">document_id</span> <span class="op">&lt;-</span> <span class="va">ja_ids</span></span>
+<span><span class="va">ja_sources</span><span class="op">$</span><span class="va">source_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">ja_ids</span>, <span class="st">".txt"</span><span class="op">)</span></span>
+<span><span class="va">ja_csv</span> <span class="op">&lt;-</span> <span class="va">reader</span><span class="op">$</span><span class="fu">read_text_file</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">ja_dir</span>, <span class="st">"annotations.csv"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ja_connection</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/textconnections.html" class="external-link">textConnection</a></span><span class="op">(</span><span class="va">ja_csv</span><span class="op">$</span><span class="va">text</span>, encoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="va">ja_annotations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">ja_connection</span>, colClasses <span class="op">=</span> <span class="st">"character"</span>,</span>
+<span>  na.strings <span class="op">=</span> <span class="st">"&lt;MISSING&gt;"</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span>, encoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">close</a></span><span class="op">(</span><span class="va">ja_connection</span><span class="op">)</span></span>
+<span><span class="va">ja_annotations</span><span class="op">$</span><span class="va">token_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">ja_annotations</span><span class="op">$</span><span class="va">token_index</span><span class="op">)</span></span>
+<span><span class="va">ja_import</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_import_annotations.html">lexdiv_import_annotations</a></span><span class="op">(</span><span class="va">ja_annotations</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="va">ja_ids</span>, segment_id <span class="op">=</span> <span class="st">"s1"</span>, text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">ja_texts</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>language <span class="op">=</span> <span class="st">"ja"</span>, analyzer <span class="op">=</span> <span class="st">"authored"</span>, analyzer_version <span class="op">=</span> <span class="st">"2"</span>,</span>
+<span>    dictionary <span class="op">=</span> <span class="st">"none"</span>, dictionary_version <span class="op">=</span> <span class="st">"not-applicable"</span>,</span>
+<span>    unit <span class="op">=</span> <span class="st">"authored-file-workflow"</span>, normalization <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ja_tokens</span> <span class="op">&lt;-</span> <span class="va">ja_import</span><span class="op">$</span><span class="va">tokens</span></span></code></pre></div>
+<p>Read the CSV through an explicitly UTF-8 connection and mark the
+parsed strings as UTF-8 too, including on C/POSIX locales. Its literal
+<code>&lt;MISSING&gt;</code> marker denotes unavailable annotations; the
+original CSV text and its hash are retained. Next declare the selection
+policy.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># One complete segment per document; the body extends to its end.</span></span>
+<span><span class="va">ja_body_start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5L</span>, <span class="fl">4L</span>, <span class="fl">1L</span>, <span class="fl">1L</span>, <span class="cn">NA_integer_</span><span class="op">)</span>, <span class="va">ja_ids</span><span class="op">)</span></span>
+<span><span class="va">start</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">ja_body_start</span><span class="op">[</span><span class="va">ja_tokens</span><span class="op">$</span><span class="va">document_id</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">start</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">ja_tokens</span><span class="op">$</span><span class="va">start</span> <span class="op">&lt;</span> <span class="va">start</span> <span class="op">&amp;</span> <span class="va">ja_tokens</span><span class="op">$</span><span class="va">end</span> <span class="op">&gt;=</span> <span class="va">start</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ja_body</span> <span class="op">&lt;-</span> <span class="va">ja_tokens</span><span class="op">$</span><span class="va">start</span> <span class="op">&gt;=</span> <span class="va">start</span> <span class="op">&amp;</span> <span class="va">ja_tokens</span><span class="op">$</span><span class="va">surface</span> <span class="op">!=</span> <span class="st">"\u3002"</span></span>
+<span><span class="co"># This teaching inventory declares nouns and verbs as content; particles as function.</span></span>
+<span><span class="va">ja_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"content"</span>, <span class="st">"content"</span>, <span class="st">"function"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"\u540d\u8a5e"</span>, <span class="st">"\u52d5\u8a5e"</span>, <span class="st">"\u52a9\u8a5e"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ja_group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">ja_groups</span><span class="op">[</span><span class="va">ja_tokens</span><span class="op">$</span><span class="va">POS1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">ja_unknown</span> <span class="op">&lt;-</span> <span class="va">ja_body</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">ja_group</span><span class="op">)</span></span>
+<span><span class="va">ja_selections</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>all_body <span class="op">=</span> <span class="va">ja_body</span>,</span>
+<span>  content <span class="op">=</span> <span class="va">ja_body</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">ja_group</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">ja_group</span> <span class="op">==</span> <span class="st">"content"</span><span class="op">)</span></span>
+<span><span class="va">ja_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">ja_selections</span>, <span class="kw">function</span><span class="op">(</span><span class="va">keep</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">ja_ids</span>, <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">ja_tokens</span><span class="op">$</span><span class="va">surface</span><span class="op">[</span><span class="va">keep</span> <span class="op">&amp;</span> <span class="va">ja_tokens</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="va">id</span><span class="op">]</span></span>
+<span><span class="op">}</span><span class="op">)</span>, <span class="va">ja_ids</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The inputs stay named by document ID, including zero-token
+selections. Build the diagnostic table without dropping those
+documents:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ja_runs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">ja_inputs</span>, <span class="va">calculate</span><span class="op">)</span></span>
+<span><span class="va">ja_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">ja_runs</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">condition</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">diagnostic_rows</span><span class="op">(</span><span class="va">ja_runs</span><span class="op">[[</span><span class="va">condition</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">condition</span> <span class="op">&lt;-</span> <span class="va">condition</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">eligible_body_N</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">document_id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">ja_body</span> <span class="op">&amp;</span> <span class="va">ja_tokens</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="va">id</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">unknown_selection_N</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">document_id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="va">condition</span> <span class="op">==</span> <span class="st">"content"</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">ja_unknown</span> <span class="op">&amp;</span> <span class="va">ja_tokens</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="va">id</span><span class="op">)</span> <span class="kw">else</span> <span class="fl">0L</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">known_excluded_N</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">eligible_body_N</span> <span class="op">-</span> <span class="va">out</span><span class="op">$</span><span class="va">N</span> <span class="op">-</span> <span class="va">out</span><span class="op">$</span><span class="va">unknown_selection_N</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">selection_complete</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">$</span><span class="va">unknown_selection_N</span> <span class="op">==</span> <span class="fl">0L</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">reportable_value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">selection_complete</span>, <span class="va">out</span><span class="op">$</span><span class="va">value</span>, <span class="cn">NA_real_</span><span class="op">)</span></span>
+<span>  <span class="va">out</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">ja_table</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">ja_table</span>, <span class="va">metric_id</span> <span class="op">==</span> <span class="st">"ttr"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">document_id</span>, <span class="va">condition</span>,</span>
+<span>  <span class="va">eligible_body_N</span>, <span class="va">N</span>, <span class="va">unknown_selection_N</span>, <span class="va">known_excluded_N</span>, <span class="va">value</span>, <span class="va">reportable_value</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  digits <span class="op">=</span> <span class="fl">3</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="11%">
+<col width="9%">
+<col width="15%">
+<col width="2%">
+<col width="19%">
+<col width="16%">
+<col width="5%">
+<col width="16%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">document_id</th>
+<th align="left">condition</th>
+<th align="right">eligible_body_N</th>
+<th align="right">N</th>
+<th align="right">unknown_selection_N</th>
+<th align="right">known_excluded_N</th>
+<th align="right">value</th>
+<th align="right">reportable_value</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">variants</td>
+<td align="left">all_body</td>
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.800</td>
+<td align="right">0.800</td>
+</tr>
+<tr class="even">
+<td align="left">homophones</td>
+<td align="left">all_body</td>
+<td align="right">9</td>
+<td align="right">9</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.667</td>
+<td align="right">0.667</td>
+</tr>
+<tr class="odd">
+<td align="left">unlisted</td>
+<td align="left">all_body</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1.000</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="even">
+<td align="left">no_targets</td>
+<td align="left">all_body</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">empty</td>
+<td align="left">all_body</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">variants</td>
+<td align="left">content</td>
+<td align="right">5</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">1.000</td>
+<td align="right">1.000</td>
+</tr>
+<tr class="odd">
+<td align="left">homophones</td>
+<td align="left">content</td>
+<td align="right">9</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0.667</td>
+<td align="right">0.667</td>
+</tr>
+<tr class="even">
+<td align="left">unlisted</td>
+<td align="left">content</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">no_targets</td>
+<td align="left">content</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">empty</td>
+<td align="left">content</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<p>The original titles and punctuation stay in <code>ja_import</code>.
+Here only the declared body is analyzed, excluding literal
+<code>。</code>; other corpora require their own explicit punctuation
+policy. The small POS map covers this example, not the full UniDic
+inventory. Extend it deliberately for your analyzer: missing and
+unmapped POS are <strong>unknown selections</strong>, not automatically
+function words. All-body analysis does not require POS; content
+selection does. The invented word in <code>unlisted</code> therefore
+stays in all-body TTR but cannot be assigned to the content condition.
+The accounting identity is
+<code>eligible_body_N = N + unknown_selection_N + known_excluded_N</code>.</p>
+<p><code>value</code> is the calculation on known selected tokens.
+<code>reportable_value</code> withholds it when any eligible token has
+unknown membership; <code>status</code> still describes the calculation,
+not selection completeness. Even a nonmissing
+<code>reportable_value</code> does not establish measurement precision.
+Keep both columns: this prevents an incomplete content-word sample from
+appearing fully observed. <code>no_targets</code> contains only an
+excluded full stop, whereas <code>empty</code> has no source tokens; the
+imported source retains that distinction.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">ja_table</span>, <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">condition</span>, <span class="va">metric_id</span>, <span class="va">status</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left">condition</th>
+<th align="left">metric_id</th>
+<th align="left">status</th>
+<th align="right">Freq</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">all_body</td>
+<td align="left">mattr</td>
+<td align="left">missing</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">content</td>
+<td align="left">mattr</td>
+<td align="left">missing</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">all_body</td>
+<td align="left">mtld</td>
+<td align="left">missing</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">content</td>
+<td align="left">mtld</td>
+<td align="left">missing</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">all_body</td>
+<td align="left">ttr</td>
+<td align="left">missing</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">content</td>
+<td align="left">ttr</td>
+<td align="left">missing</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">all_body</td>
+<td align="left">mattr</td>
+<td align="left">ok</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">content</td>
+<td align="left">mattr</td>
+<td align="left">ok</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">all_body</td>
+<td align="left">mtld</td>
+<td align="left">ok</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">content</td>
+<td align="left">mtld</td>
+<td align="left">ok</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">all_body</td>
+<td align="left">ttr</td>
+<td align="left">ok</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">content</td>
+<td align="left">ttr</td>
+<td align="left">ok</td>
+<td align="right">2</td>
+</tr>
+</tbody>
+</table>
+<p>MATTR50 is unavailable for every file. MTLD nevertheless returns
+values for two all-body selections and one content selection; all three
+fall below its advisory length floor. A computable value does not make
+these short samples suitable for a substantive MTLD comparison. They
+illustrate accounting and missingness, not recommended lengths for
+lexical analysis. Do not shrink the common window or concatenate
+independent documents to create scores. Content-word selection also
+removes intervening tokens: a window of 50 content words has a different
+original-text span from 50 all-body words. Retain the selected source
+occurrences rather than claiming equal coverage. For longer Japanese
+texts, see the executed <a href="japanese-annotations.html#what-the-executed-comparisons-show">word-unit
+comparisons</a>.</p>
+</div>
+<div class="section level3">
+<h3 id="save-a-complete-record-and-a-flat-table">Save a complete record and a flat table<a class="anchor" aria-label="anchor" href="#save-a-complete-record-and-a-flat-table"></a>
+</h3>
+<p>Run the appropriate record assignment after its language path. It
+stores the original input, exact selected sequences, complete results,
+diagnostics and settings. The methods text states computational choices;
+replace the teaching sample description with your actual sampling,
+writer/task structure, analyzer and dictionary information. Do not infer
+these from filenames or scores.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">en_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>texts <span class="op">=</span> <span class="va">en_texts</span>, sources <span class="op">=</span> <span class="va">en_sources</span>, prepared <span class="op">=</span> <span class="va">en_prepared</span>,</span>
+<span>  inputs <span class="op">=</span> <span class="va">en_inputs</span>, results <span class="op">=</span> <span class="va">en_runs</span>, diagnostics <span class="op">=</span> <span class="va">en_table</span>, paired <span class="op">=</span> <span class="va">en_pairs</span>,</span>
+<span>  counts <span class="op">=</span> <span class="va">en_counts</span>, settings <span class="op">=</span> <span class="va">settings</span>, session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  methods <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">en_texts</span><span class="op">)</span>, <span class="st">"English input files were analyzed."</span>,</span>
+<span>    <span class="st">"Each file was one document. English tokenization used NFC, excluded numbers,"</span>,</span>
+<span>    <span class="st">"URLs and emails, and retained contractions and hyphenated words."</span>,</span>
+<span>    <span class="st">"We compared case-preserved and lowercased surface forms without lemmatization"</span>,</span>
+<span>    <span class="st">"or spelling correction, retaining all documents and diagnostic flags."</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ja_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>texts <span class="op">=</span> <span class="va">ja_texts</span>, sources <span class="op">=</span> <span class="va">ja_sources</span>, annotation_source <span class="op">=</span> <span class="va">ja_csv</span>,</span>
+<span>  imported <span class="op">=</span> <span class="va">ja_import</span>, body_start <span class="op">=</span> <span class="va">ja_body_start</span>, pos_groups <span class="op">=</span> <span class="va">ja_groups</span>,</span>
+<span>  selections <span class="op">=</span> <span class="va">ja_selections</span>, unknown_selection <span class="op">=</span> <span class="va">ja_unknown</span>,</span>
+<span>  inputs <span class="op">=</span> <span class="va">ja_inputs</span>, results <span class="op">=</span> <span class="va">ja_runs</span>, diagnostics <span class="op">=</span> <span class="va">ja_table</span>,</span>
+<span>  settings <span class="op">=</span> <span class="va">settings</span>, session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  methods <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">ja_texts</span><span class="op">)</span>, <span class="st">"Japanese input files were analyzed with prepared"</span>,</span>
+<span>    <span class="st">"annotations, analyzer authored version 2, no dictionary or normalization."</span>,</span>
+<span>    <span class="st">"We excluded titles using declared original-codepoint body starts and removed"</span>,</span>
+<span>    <span class="st">"literal full stops. We compared all retained surface words with nouns and"</span>,</span>
+<span>    <span class="st">"verbs in an explicit POS map; particles were excluded from the latter."</span>,</span>
+<span>    <span class="st">"Missing or unmapped POS remained unknown. Content results were withheld"</span>,</span>
+<span>    <span class="st">"when selection was incomplete. No form was corrected or lemmatized."</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Set <code>record &lt;- en_record</code> or
+<code>record &lt;- ja_record</code>. This last block works for either
+language. For your study, replace the temporary directory with a
+persistent project directory, for example
+<code>output_dir &lt;- "results/english"</code>. Files in that directory
+are overwritten on a repeat run; choose separate directories for
+different analyses.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">record</span> <span class="op">&lt;-</span> <span class="va">en_record</span></span>
+<span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"ldfreq-condition-report-"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">output_dir</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">mtld_method</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">diagnostics</span>, <span class="va">metric_id</span> <span class="op">==</span> <span class="st">"mtld"</span><span class="op">)</span><span class="op">$</span><span class="va">method_id</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">mtld_method</span>, <span class="st">"mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">record</span><span class="op">$</span><span class="va">methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">methods</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span>
+<span>  <span class="st">"Calculations used ldfreq %s: full-document TTR, MATTR with a common window of %d,"</span>,</span>
+<span>  <span class="st">"and MTLD method %s, threshold %g."</span>,</span>
+<span>  <span class="st">"MTLD used strict &lt;, no minimum factor length, final-token closure checks,"</span>,</span>
+<span>  <span class="st">"linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions."</span>,</span>
+<span>  <span class="st">"We retained unavailable results and reasons, the advisory length flag, complete"</span>,</span>
+<span>  <span class="st">"factor counts and directional gaps. Gaps describe order sensitivity, not precision."</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span>, <span class="va">record</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">window_length</span>,</span>
+<span>  <span class="va">mtld_method</span>, <span class="va">record</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">mtld_threshold</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">record</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"analysis.rds"</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">diagnostics</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"diagnostics.csv"</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>, na <span class="op">=</span> <span class="st">"&lt;MISSING&gt;"</span>, fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/writeLines.html" class="external-link">writeLines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Encoding.html" class="external-link">enc2utf8</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">methods</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"methods.txt"</span><span class="op">)</span>, useBytes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"analysis.rds"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">restored</span>, <span class="va">record</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">replayed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">inputs</span>, <span class="kw">function</span><span class="op">(</span><span class="va">tokens</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">lexdiv_metrics_batch</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">tokens</span><span class="op">)</span>, <span class="va">restored</span><span class="op">$</span><span class="va">settings</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">replayed</span>, <span class="va">restored</span><span class="op">$</span><span class="va">results</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">methods</span>, sep <span class="op">=</span> <span class="st">"\n\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Calculations used ldfreq 0.3.0.9002: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict &lt;, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.</span></span></code></pre></div>
+<p>The CSV is a flat inspection table; <strong>the RDS is the complete
+analysis record</strong>. It contains original text and selected words,
+so keep it under the same access rules as the input. Replay here
+verifies calculations under the installed software; it does not
+independently validate annotations or estimates. Use a persistent
+software environment and keep the original files for later reanalysis.
+For a text CSV instead of separate files, use the <a href="english-tokenization.html#alternatively-read-a-csv-containing-the-texts">ID-preserving
+CSV input recipe</a>. The remaining sections explain reference coverage,
+figures and citations.</p>
+</div>
+</div>
 <div class="section level2">
 <h2 id="question-and-unit-of-analysis">Question and unit of analysis<a class="anchor" aria-label="anchor" href="#question-and-unit-of-analysis"></a>
 </h2>
@@ -89,7 +809,7 @@ The small window makes the example executable; it is not a recommended
 universal window. In a study, justify the common window from the task
 and document-length distribution before comparing results. Keep writer
 and task IDs with document IDs in the study’s own table.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">texts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  first <span class="op">=</span> <span class="st">"The student reads a book and discusses the book with a friend."</span>,</span>
 <span>  second <span class="op">=</span> <span class="st">"The student explores a story and shares several ideas with a friend."</span></span>
@@ -168,7 +888,7 @@ lemma-based research, explicitly annotate every document with the same
 lemma procedure, report its coverage, and select
 <code>unit = "lemma"</code>. Do not switch units only for documents with
 poor matching.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">levels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nj8_profile.html">nj8_profile_batch</a></span><span class="op">(</span><span class="va">prepared</span>, unit <span class="op">=</span> <span class="st">"surface"</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">levels</span><span class="op">$</span><span class="va">coverage</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"document_id"</span>, <span class="st">"eligible_tokens"</span>, <span class="st">"matched_tokens"</span>, <span class="st">"token_coverage"</span>, <span class="st">"type_coverage"</span></span>
@@ -205,7 +925,7 @@ poor matching.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">levels</span><span class="op">$</span><span class="va">lookup</span><span class="op">[</span><span class="op">!</span><span class="va">levels</span><span class="op">$</span><span class="va">lookup</span><span class="op">$</span><span class="va">matched</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"term"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;    document_id      term</span></span>
 <span><span class="co">#&gt; 3        first     reads</span></span>
@@ -224,7 +944,7 @@ NJ8.</p>
 <p>For each document, the cumulative Level 8 token proportion equals its
 total token coverage. Lower cumulative levels describe the fraction
 found at or below that level, not a learner’s vocabulary knowledge.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">level8</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">levels</span><span class="op">$</span><span class="va">summary</span>, <span class="va">weighting</span> <span class="op">==</span> <span class="st">"token"</span> <span class="op">&amp;</span> <span class="va">level</span> <span class="op">==</span> <span class="fl">8</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span></span>
 <span>  <span class="va">level8</span><span class="op">$</span><span class="va">cumulative_proportion</span>, <span class="va">levels</span><span class="op">$</span><span class="va">coverage</span><span class="op">$</span><span class="va">token_coverage</span></span>
@@ -239,7 +959,7 @@ found at or below that level, not a learner’s vocabulary knowledge.</p>
 parameters, and counts. Its checks prevent different MATTR windows from
 entering one metric column as if they were the same specification.
 Coverage is then joined by explicit IDs, preserving document order.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">metrics</span><span class="op">)</span></span>
 <span><span class="va">coverage</span> <span class="op">&lt;-</span> <span class="va">levels</span><span class="op">$</span><span class="va">coverage</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">levels</span><span class="op">$</span><span class="va">coverage</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">coverage</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span><span class="op">)</span></span>
@@ -275,7 +995,7 @@ Coverage is then joined by explicit IDs, preserving document order.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">metrics</span>, metric_id <span class="op">=</span> <span class="st">"mattr"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="from-text-to-report_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="700"></p>
 <p>Report differences in the selected metric and differences in coverage
@@ -318,7 +1038,7 @@ follow the target journal’s file-format and resolution requirements. The
 particular short-label example, and restores the previous settings
 afterwards. Longer document labels need more room, a larger figure, or a
 custom horizontal dot plot rather than smaller text.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draw_mattr</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">monochrome</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">old</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.2</span>, <span class="fl">4.5</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">old</span><span class="op">)</span><span class="op">)</span></span>
@@ -395,7 +1115,7 @@ sizes illustrate a comparison, not universal recommended settings.</p>
 <div class="section level3">
 <h3 id="prepare-the-text-and-analysis">Prepare the text and analysis<a class="anchor" aria-label="anchor" href="#prepare-the-text-and-analysis"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">trajectory_text</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span>
@@ -459,7 +1179,7 @@ example, not exported by ldfreq.</p>
 <div class="section level3">
 <h3 id="draw-the-overlapping-trajectories">Draw the overlapping trajectories<a class="anchor" aria-label="anchor" href="#draw-the-overlapping-trajectories"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draw_trajectory</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">monochrome</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">old</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.2</span>, <span class="fl">4.3</span>, <span class="fl">2.2</span>, <span class="fl">0.8</span><span class="op">)</span>, mgp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.65</span>, <span class="fl">0.65</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>             tcl <span class="op">=</span> <span class="op">-</span><span class="fl">0.25</span>, family <span class="op">=</span> <span class="st">"sans"</span>, las <span class="op">=</span> <span class="fl">1</span>, bty <span class="op">=</span> <span class="st">"l"</span><span class="op">)</span></span>
@@ -512,7 +1232,7 @@ current working directory (<code><a href="https://rdrr.io/r/base/getwd.html" cla
 replaced if they already exist. Use the PNG for sharing and inspect the
 PDF at its intended publication size. Place any figure title and
 explanatory note outside the image.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png</a></span><span class="op">(</span><span class="st">"ldfreq-trajectory.png"</span>, width <span class="op">=</span> <span class="fl">6.5</span>, height <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>    units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">300</span>, pointsize <span class="op">=</span> <span class="fl">11</span>, bg <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></span>
 <span><span class="fu">draw_trajectory</span><span class="op">(</span><span class="op">)</span></span>
@@ -540,7 +1260,7 @@ scores. The following round trip keeps list-columns and resource
 identity intact. The saved object contains the input terms; handle it
 under the study’s data access rules. It is not intended for automatic
 public sharing.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  prepared <span class="op">=</span> <span class="va">prepared</span>, diversity <span class="op">=</span> <span class="va">diversity</span>, metrics <span class="op">=</span> <span class="va">metrics</span>, levels <span class="op">=</span> <span class="va">levels</span>,</span>
 <span>  analysis <span class="op">=</span> <span class="va">analysis</span>, session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>

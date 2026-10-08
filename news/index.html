@@ -18,7 +18,7 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/from-text-to-report.html">From English text to a report</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/word-families-and-affixes.html">Word families, roots, and affixes: from texts to interpretable profiles</a></li>
@@ -44,7 +44,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0.9002" id="ldfreq-0309002-development">ldfreq 0.3.0.9002 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-0309002-development"></a></h2>
-<ul><li>Document Japanese unit sensitivity using paired public SUW/LUW annotations and saved Sudachi modes for 24 learner and four Japanese-L1 essays. Explain how POS filtering can change original-character coverage, and retain paired eligibility and MTLD factor support. Add a runnable authored comparison and repository-only reproduction scripts; no new package APIs, dependencies or bundled corpus data.</li>
+<ul><li>Extend the report guide with executable English and Japanese file workflows: compare case or POS selection, retain unavailable results and MTLD support, distinguish unknown selection from exclusion, and save diagnostic CSV, full RDS and methods text. These guide-local recipes run with 0.3.0.9002; no API, dependency, formula or installed data changes.</li>
+<li>Document Japanese unit sensitivity using paired public SUW/LUW annotations and saved Sudachi modes for 24 learner and four Japanese-L1 essays. Explain how POS filtering can change original-character coverage, and retain paired eligibility and MTLD factor support. Add a runnable authored comparison and repository-only reproduction scripts; no new package APIs, dependencies or bundled corpus data.</li>
 <li>Expose tail-only sequential MTLD estimation and forward/reverse disagreement in all compact metric result displays, including saved older results. Values, statuses, stored schemas and public function signatures remain unchanged.</li>
 <li>Explain the advisory 50-token floor and the limits of factor counts and directional disagreement. A zero gap can accompany entirely tail-based estimation; it is not a precision estimate. Add ordinary-table extraction, sample length associations and a copyable diagnostic reporting example.</li>
 <li>Add executed raw-text comparisons for eight pinned preprocessing configurations and a reproducible PELIC learner-writing example with local downloads and published aggregates. No corpus texts or new dependencies are bundled.</li>
