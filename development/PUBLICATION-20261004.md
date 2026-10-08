@@ -4936,3 +4936,48 @@ standard dependency-line wrapping. A fresh archive install passes 127 display/
 widen assertions and the 264-row saved-result replay. Version/citation and
 `codetools::checkUsagePackage` pass. The initial usage-check invocation named the
 wrong namespace (`tools`); only that check was corrected, not the successful tests.
+
+公開完了：PR #41をmain `ed4600720f35338764a3400c68525526fa37d502`へ統合。
+PR head `8921cd816b339b012087d90559f13d291aabbe49`とtree
+`f7a299882fbcd98c5234579eaa1dddc2907dc627`が一致。run 37746167337は全11ジョブ成功。
+Linux releaseは8,479 assertions・失敗／警告／skipなし、ビネット再構築込みStatus: OK。
+Cは8,056成功・失敗0、既存quanteda encoding警告1・32 skips。新規の重点テストは両localeで
+562成功・警告／skipなし。R4.1・R-devel・macOS・Windowsも必要なジョブは成功。
+固定tag v0.3.0.9004と22ビネット入りarchive／SHA-256をGitHub prereleaseへ公開。
+実pak導入でmain SHA・版／引用・新API・264行の旧版互換と保存再現を確認した。
+Pages `b5eac66b84e72d5ff43a4843cb65297af80e0742` / run 37747873812成功。
+匿名取得はソース13件・サイト79件・release添付2件の全bytes一致。
+証拠はreviews/ldfreq-mtld-wide-20261008。main run 37747691440は自動起動を別途追跡中。
+同一treeの成功済みPRと公開実体を受入れ証拠とし、main一括成功とは称さない。
+watcherが最終JSON/logを保存する。完了記録だけのpush・検証の再起動／取消はしない。
+CRAN非投稿。方向差の精度指標化・人手ユーザビリティ・Windows R4.1/CP932は検証していない。
+
+
+## 2026-10-08: Preserve explicit study metadata in text-batch analysis
+
+Scope: `lexdiv_metrics_text_batch(..., metadata = study)` adds an optional
+separate ID-aligned table; no default/core/preprocessing change, new export,
+dependency or CRAN submission. Version 0.3.0.9005 identifies the installed change.
+The prepared input remains `lexdiv_tokenization`; imported Japanese annotation
+tables are a separate workflow, not silently accepted by this refinement.
+Initial test fixtures were corrected to follow existing empty-lemma/UPOS rules
+and the numeric N type. New metadata tests then pass 43 assertions.
+Targeted UTF-8: 541 passes, no failures/warnings/skips. C: 540 passes, no failures
+or warnings, one existing nonrepresentable-path skip. Reused 31 prepared authored
+texts retain all 93 stored metric values/diagnostics; baseline 9004 default
+results and the original three components remain identical. Roster alignment,
+input immutability, CSV and full-RDS replay pass in both locales. These are
+workflow checks, not independent usability or study-label validation.
+Previous main CI 37747691440 is now confirmed complete, all 11 jobs successful.
+Evidence: `reviews/ldfreq-batch-metadata-20261008`.
+
+Archive verification: all 342 common source files match byte-for-byte and all
+22 guides are included. DESCRIPTION, version/citation and package usage checks
+pass; the fresh install passes 43 new assertions and the 31-document replay.
+The first offline-smoke command omitted `library(ldfreq)` and stopped before
+its first function call; the invocation was corrected, without repeating other
+successful checks. No package code correction was required.
+
+The corrected installed offline smoke script completes successfully. Site build:
+129 HTML pages / 253 files, no missing internal links or private paths; 79 files
+changed. API help, file-input/report guides, NEWS, search and Markdown agree.

@@ -259,7 +259,9 @@ universal exclusion policy.
 ## Analyze an ID/text table
 
 Use one row per document, with explicit unique IDs and character text. Other
-columns, such as writer or task, stay in the study table for a later join by ID.
+columns, such as writer or task, are not selected automatically. From 0.3.0.9005,
+pass them explicitly with `metadata` to keep a checked study table in the result;
+see the [file example](#retain-study-metadata) below.
 Empty text is a valid zero-token document. `NA` text is an error naming the
 document; decide whether it denotes missing data before analysis rather than
 silently replacing it with an empty string.
@@ -429,7 +431,7 @@ choose a marker that is not an actual response. `""` denotes an empty response,
 not an unavailable response. ldfreq rejects `NA` text and names the document;
 resolve its meaning in your study record instead of replacing it with `""`.
 
-### Analyze, attach metadata and inspect the result
+### Analyze, retain metadata and inspect the result {#retain-study-metadata}
 
 Use `file_documents` below, or substitute `csv_documents`. Normalization and
 case conversion happen here as declared analysis choices, after file reading.
@@ -437,39 +439,53 @@ The 50-token window is common to all documents. The 30 nonempty teaching texts
 are 107–149 tokens long and can all use that window. For a research corpus,
 justify the window for your task and length distribution; keep it common across
 comparable texts rather than shrinking it for short documents.
+The `metadata` argument below requires **ldfreq 0.3.0.9005 or later**.
 
 ```{r file-input-analysis}
 file_tokens <- lexdiv_tokenize_batch(file_documents,
   id_col = "document_id", text_col = "text", tokenizer = "english",
   normalization = "NFC", case = "lower")
+metadata_input <- input_helpers$read_text_file(file.path(input_dir, "metadata.csv"))
+metadata_connection <- textConnection(metadata_input$text, encoding = "UTF-8")
+file_metadata <- read.csv(metadata_connection, encoding = "UTF-8",
+  colClasses = "character", na.strings = "<MISSING>", check.names = FALSE)
+close(metadata_connection)
 file_analysis <- lexdiv_metrics_text_batch(file_tokens,
-  metrics = c("ttr", "mattr"), window_length = 50)
+  metrics = c("ttr", "mattr"), window_length = 50, metadata = file_metadata)
 file_results <- file_analysis$results[c("document_id", "metric_id", "N", "V", "value",
   "status", "missing_reason")]
 # Preview three nonempty documents and the empty document; retain all result rows.
 rbind(head(file_results, 6), subset(file_results, document_id == "031"))
 with(file_results, table(metric_id, status))
 
-metadata_input <- input_helpers$read_text_file(file.path(input_dir, "metadata.csv"))
-file_metadata <- read.csv(text = metadata_input$text,
-  colClasses = "character", na.strings = "<MISSING>", check.names = FALSE)
-stopifnot(!anyNA(file_metadata$document_id), !anyDuplicated(file_metadata$document_id),
-  setequal(file_metadata$document_id, file_documents$document_id))
 file_report <- lexdiv_widen(file_analysis$results)
-metadata_row <- match(file_report$document_id, file_metadata$document_id)
-stopifnot(identical(file_report$document_id, file_metadata$document_id[metadata_row]))
-file_report[c("writer_id", "task")] <- file_metadata[metadata_row, c("writer_id", "task")]
+metadata_row <- match(file_report$document_id, file_analysis$metadata$document_id)
+stopifnot(identical(file_report$document_id, file_analysis$metadata$document_id[metadata_row]))
+study_fields <- c("writer_id", "task")
+stopifnot(!any(study_fields %in% names(file_report)))
+file_report[study_fields] <- file_analysis$metadata[metadata_row, study_fields]
 file_report[c(1:3, nrow(file_report)),
   c("document_id", "writer_id", "task", "ttr__value", "mattr__value")]
 ```
 
-Metadata are deliberately in a different order: join by ID, never by row
-number. This example requires metadata for exactly the selected documents;
-subset a larger study table explicitly and inspect unmatched IDs. Several
+Metadata are deliberately in a different order. The API matches them by ID and
+returns them in document order in `file_analysis$metadata`, including the empty
+document. Missing, duplicate or extra document IDs cause an error; subset a larger
+study table explicitly before analysis. The same `metadata` argument works with
+raw ID/text tables or named raw texts. Its ID column is always `document_id`,
+even if `id_col` names a different column in the raw input. Other study columns
+retain their values and types; list and matrix columns are rejected. Several
 documents may share a writer ID. Here all writer/task IDs are fictional and the
 texts share authored passages; they cannot support population inference.
 Document `031` stays in the report with unavailable
 metrics and their reasons. It is not a zero-diversity essay.
+
+The metric table and token audit remain separate from metadata. The explicit
+join above checks for column-name collisions and makes a report without
+overwriting a score. Unknown writers or tasks remain `NA`; no labels are
+inferred from text. With `metadata = NULL` (the default), the original
+three-component result and calculations are unchanged. Save the complete object
+to retain the typed metadata table together with the analysis.
 
 ```{r file-input-plot, fig.width=8, fig.height=4}
 plot(file_analysis, metric_id = "mattr", xlab = "Document", las = 2)

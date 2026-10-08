@@ -21,7 +21,7 @@ lexdiv_metrics_text_batch(
   documents, id_col = "document_id", text_col = "text",
   unit = "surface", word_inclusion = "all",
   normalization = "NFC", case = "preserve", keep_numbers = FALSE,
-  tokenizer = "unicode", ...
+  tokenizer = "unicode", ..., metadata = NULL
 )
 
 \method{print}{lexdiv_text_batch_results}(x, ...)
@@ -35,8 +35,15 @@ The metric function also accepts a plain named list of
 mixed lists are not accepted. Empty texts are valid; missing texts are errors
 identifying the document. An empty named vector/list or zero-row table is valid.}
 \item{id_col,text_col}{Names of the selected ID and text columns. Other columns
-are ignored; join study metadata by document ID afterwards. These arguments
+are ignored unless explicitly supplied through \code{metadata}; these arguments
 cannot be supplied for a prepared-tokenization list.}
+\item{metadata}{Optional data frame with one row for every input document,
+including empty documents. Specify by name. It must contain a unique plain
+character \code{document_id} column, even when the raw text uses a different
+\code{id_col}. Other columns must be atomic vectors, including factors or dates;
+list, matrix and nested data-frame columns are rejected. Missing study values
+such as an unknown writer are allowed. The default \code{NULL} retains the
+existing three-component return value.}
 \item{normalization,case,keep_numbers,tokenizer}{Settings passed to
 \code{\link{lexdiv_tokenize}} for raw input. All raw texts share these settings.
 The default \code{"unicode"} rules preserve existing behavior; explicitly use
@@ -76,6 +83,27 @@ annotate the tokens before scoring or reuse them with a reference vocabulary.
 Its output is a named list: \code{prepared$essay_a$tokens} shows one document.
 Do not supply tokenization settings again when scoring that prepared list.
 
+To retain writer, task, group or occasion information with an analysis, supply
+\code{metadata} to \code{lexdiv_metrics_text_batch()}. It accepts the same
+metadata table for named raw texts, raw ID/text tables and prepared tokenization
+lists. Rows are matched by document ID and reordered to the input order;
+\code{document_id} becomes the first column and row names are reset.
+Missing, extra or duplicate document IDs are errors. Select the intended roster
+explicitly when a study table covers a larger corpus. Writer IDs may repeat
+across documents; document IDs must not. Column names must be unique and nonempty.
+UTF-8 ID markers are canonicalized as in the batch input, without Unicode
+normalization. Study-column values and types are preserved.
+
+Metadata are returned separately, not inserted into metric or token rows.
+Thus a study column named \code{value} cannot overwrite a metric value.
+Join selected fields by \code{document_id} for analysis, checking for column-name
+collisions; save the whole object as RDS to retain the typed table and audits.
+This roster check does not verify the truth of study labels, establish independent
+observations or fit a repeated-measures model. No labels are inferred from text.
+The separate tables returned by \code{lexdiv_import_annotations()} are not
+\code{lexdiv_tokenization} objects; use the existing ID-based reporting workflow
+for that input path rather than passing the imported object to this function.
+
 Plot defaults use a sans serif font, horizontal tick labels and an open frame.
 Override these with \code{family}, \code{las} or \code{bty} in the plot
 method's \code{...}. Cosmetic graphics parameters are restored after drawing.
@@ -103,7 +131,7 @@ file input and segmentation examples.
 \code{lexdiv_tokenization} objects, with their token tables and provenance.
 
 \code{lexdiv_metrics_text_batch()} returns a \code{lexdiv_text_batch_results}
-list with three components:
+list with three default components and optional study metadata:
 \describe{
   \item{results}{A long \code{lexdiv_batch_results} data frame with
   \code{document_id} and every core metric result column.}
@@ -111,6 +139,8 @@ list with three components:
   \code{document_id} column. Zero-token documents have no token rows.}
   \item{preprocessing}{An input-ordered named list containing every document's
   complete preprocessing record, including zero-token documents.}
+  \item{metadata}{Present only when \code{metadata} is non-\code{NULL}. A data
+  frame ordered by input document ID, with one row per document.}
 }
 \code{print()} returns the input invisibly. \code{plot()} returns the plotted
 metric rows invisibly, with the same selection rules as
@@ -152,6 +182,16 @@ prepared$essay_a$tokens
 # recommendation.
 lexdiv_metrics_text_batch(prepared, metrics = "mattr", window_length = 4)$results
 nj8_profile_batch(prepared, unit = "surface")$coverage
+
+# 5. Keep study information with the same analysis, matched by ID.
+# Labels are fictional; the empty response has an unknown writer.
+study <- data.frame(document_id = c("empty", "essay_b", "essay_a"),
+  writer_id = c(NA_character_, "writer_1", "writer_1"),
+  occasion = c(1L, 2L, 1L))
+with_study <- lexdiv_metrics_text_batch(prepared, metrics = "ttr", metadata = study)
+with_study$metadata
+stopifnot(identical(with_study$results,
+  lexdiv_metrics_text_batch(prepared, metrics = "ttr")$results))
 }
 \seealso{\code{\link{lexdiv_metrics_text}}, \code{\link{lexdiv_convenience}},
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files}{Read your own TXT or CSV files},

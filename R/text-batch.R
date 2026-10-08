@@ -34,6 +34,38 @@
   stats::setNames(as.list(texts), ids)
 }
 
+# Keep document-level information separate from metric and token-level fields.
+.lextext_metadata <- function(metadata, ids) {
+  if (is.null(metadata)) return(NULL)
+  if (!is.data.frame(metadata)) {
+    stop("metadata must be NULL or a data frame with a document_id column.", call. = FALSE)
+  }
+  metadata <- as.data.frame(metadata)
+  columns <- .lex_batch_column_names(names(metadata))
+  if (any(!nzchar(columns)) || anyDuplicated(columns) || !"document_id" %in% columns) {
+    stop("metadata must have unique, non-empty column names including document_id.", call. = FALSE)
+  }
+  names(metadata) <- columns
+  metadata$document_id <- .lex_batch_validate_ids(metadata$document_id, nrow(metadata))
+  if (!all(vapply(metadata, function(column) {
+    is.atomic(column) && is.null(dim(column))
+  }, logical(1)))) {
+    stop("metadata columns must contain one atomic value per document, not lists or matrices.",
+      call. = FALSE)
+  }
+  missing_ids <- setdiff(ids, metadata$document_id)
+  extra_ids <- setdiff(metadata$document_id, ids)
+  if (length(missing_ids) || length(extra_ids)) {
+    stop(sprintf(
+      "metadata must match the input documents exactly: %d missing ID(s), %d extra ID(s).",
+      length(missing_ids), length(extra_ids)), call. = FALSE)
+  }
+  metadata <- metadata[match(ids, metadata$document_id),
+    c("document_id", setdiff(columns, "document_id")), drop = FALSE]
+  row.names(metadata) <- NULL
+  metadata
+}
+
 #' Tokenize multiple raw texts with explicit document IDs
 #'
 #' The tokenizer and settings are shared across documents. Missing text is an
@@ -65,15 +97,19 @@ lexdiv_tokenize_batch <- function(
 #' @inheritParams lexdiv_tokenize_batch
 #' @inheritParams lexdiv_metrics_text
 #' @param ... Metric requests forwarded to [lexdiv_metrics_text()].
+#' @param metadata Optional data frame with a unique plain character
+#'   `document_id` for every input document and atomic study-information columns.
+#'   Rows are matched by ID and retained separately in `$metadata`. Specify by name.
 #' @return A `lexdiv_text_batch_results` list containing `results`, `token_audit`,
 #'   and a named `preprocessing` list. Zero-token documents retain metric rows
-#'   and preprocessing but contribute no token-audit rows.
+#'   and preprocessing but contribute no token-audit rows. When supplied,
+#'   `metadata` is a fourth component ordered by input document ID.
 #' @export
 lexdiv_metrics_text_batch <- function(
     documents, id_col = "document_id", text_col = "text",
     unit = "surface", word_inclusion = "all",
     normalization = "NFC", case = "preserve", keep_numbers = FALSE,
-    tokenizer = "unicode", ...) {
+    tokenizer = "unicode", ..., metadata = NULL) {
   supplied <- c(normalization = !missing(normalization), case = !missing(case),
     keep_numbers = !missing(keep_numbers), tokenizer = !missing(tokenizer))
   if (is.list(documents) && !is.data.frame(documents)) {
@@ -97,6 +133,7 @@ lexdiv_metrics_text_batch <- function(
     prepared <- lexdiv_tokenize_batch(documents, id_col, text_col,
       normalization, case, keep_numbers, tokenizer)
   }
+  metadata <- .lextext_metadata(metadata, names(prepared))
   unit <- .lexprep_scalar_choice(unit, c("surface", "lemma", "flemma"), "unit")
   word_inclusion <- .lexprep_scalar_choice(word_inclusion, c("all", "content"), "word_inclusion")
   prototype <- lexdiv_metrics_batch(stats::setNames(list(), character()), ...)
@@ -125,9 +162,11 @@ lexdiv_metrics_text_batch <- function(
   }
   row.names(results) <- NULL
   row.names(token_audit) <- NULL
-  structure(list(results = results, token_audit = token_audit,
+  output <- structure(list(results = results, token_audit = token_audit,
     preprocessing = stats::setNames(lapply(pieces, `[[`, "preprocessing"), names(prepared))),
     class = "lexdiv_text_batch_results")
+  if (!is.null(metadata)) output$metadata <- metadata
+  output
 }
 
 #' @export
@@ -135,6 +174,10 @@ print.lexdiv_text_batch_results <- function(x, ...) {
   cat(sprintf("<lexdiv_text_batch_results: %d documents; %d audited tokens>\n",
     length(x$preprocessing), nrow(x$token_audit)))
   print(x$results, ...)
+  if (!is.null(x$metadata)) {
+    cat(sprintf("Metadata: %d documents; %d study fields in $metadata.\n",
+      nrow(x$metadata), ncol(x$metadata) - 1L))
+  }
   invisible(x)
 }
 

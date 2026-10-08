@@ -1,3 +1,16 @@
+# ldfreq 0.3.0.9005 (development)
+
+- Add the optional named `metadata` argument to `lexdiv_metrics_text_batch()`.
+  Retain study information in a separate `$metadata` table, matched to every
+  document by unique character ID and reordered to input order. Reject missing,
+  duplicate or extra IDs and list/matrix columns; retain empty documents,
+  unknown study values and column types. Default output, core calculations,
+  token audits and preprocessing records are unchanged.
+- Connect the file-input guide and API examples to metadata retention and full
+  RDS saving, with explicit report joins that check for column-name collisions.
+  Prepared `lexdiv_tokenization` lists remain distinct from imported Japanese
+  annotation tables. No new export, dependency or automatic study labels.
+
 # ldfreq 0.3.0.9004 (development)
 
 - Add optional `mtld_diagnostics = TRUE` to `lexdiv_widen()`: extract the
