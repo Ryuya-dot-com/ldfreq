@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,10 +75,10 @@
 <h2 id="compare-analysis-conditions-from-local-files">Compare analysis conditions from local files<a class="anchor" aria-label="anchor" href="#compare-analysis-conditions-from-local-files"></a>
 </h2>
 <p>Start here to turn your own files into a table you can inspect, save
-and report. The two paths below work with ldfreq 0.3.0.9002, without new
-packages, downloads or an API key. English text is tokenized in R.
-Japanese text uses prepared annotations: importing a file does not
-perform Japanese morphological analysis.</p>
+and report. The two core file-analysis paths work with ldfreq
+0.3.0.9002, without new packages, downloads or an API key. English text
+is tokenized in R. Japanese text uses prepared annotations: importing a
+file does not perform Japanese morphological analysis.</p>
 <p>The question is <strong>how a declared counting decision changes the
 same documents</strong>. For English we preserve or lowercase spelling;
 for Japanese we retain all body words or only words with a declared
@@ -779,7 +779,7 @@ different analyses.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">methods</span>, sep <span class="op">=</span> <span class="st">"\n\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Calculations used ldfreq 0.3.0.9003: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict &lt;, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.</span></span></code></pre></div>
+<span><span class="co">#&gt; Calculations used ldfreq 0.3.0.9004: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict &lt;, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.</span></span></code></pre></div>
 <p>The CSV is a flat inspection table; <strong>the RDS is the complete
 analysis record</strong>. It contains original text and selected words,
 so keep it under the same access rules as the input. Replay here
@@ -1576,11 +1576,111 @@ found at or below that level, not a learner’s vocabulary knowledge.</p>
 <div class="section level2">
 <h2 id="produce-an-analysis-table-and-inspect-it">Produce an analysis table and inspect it<a class="anchor" aria-label="anchor" href="#produce-an-analysis-table-and-inspect-it"></a>
 </h2>
+<div class="section level3">
+<h3 id="wide-mtld-diagnostics">Extract MTLD diagnostics into ordinary columns<a class="anchor" aria-label="anchor" href="#wide-mtld-diagnostics"></a>
+</h3>
+<p>With <strong>ldfreq 0.3.0.9004 or later</strong>, the English results
+already calculated above can be widened with their MTLD diagnostics. No
+tokenization or metric calculation is repeated. This is convenient for
+spreadsheets or statistical models that expect one scalar per cell. The
+guide’s earlier <code>diagnostic_rows()</code> helper remains useful for
+long tables and older installations.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">en_wide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">en_runs</span><span class="op">$</span><span class="va">lower</span>,</span>
+<span>  values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"missing_reason"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
+<span>  mtld_diagnostics <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">inspect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"mtld__value"</span>, <span class="st">"mtld__status"</span>,</span>
+<span>  <span class="st">"mtld__forward_complete_factors"</span>, <span class="st">"mtld__reverse_complete_factors"</span>,</span>
+<span>  <span class="st">"mtld__tail_only"</span>, <span class="st">"mtld__gap_pct"</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">en_wide</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">en_wide</span><span class="op">)</span><span class="op">)</span>, <span class="va">inspect</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="9%">
+<col width="9%">
+<col width="10%">
+<col width="24%">
+<col width="24%">
+<col width="12%">
+<col width="10%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">document_id</th>
+<th align="right">mtld__value</th>
+<th align="left">mtld__status</th>
+<th align="right">mtld__forward_complete_factors</th>
+<th align="right">mtld__reverse_complete_factors</th>
+<th align="left">mtld__tail_only</th>
+<th align="right">mtld__gap_pct</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">001</td>
+<td align="right">133.57</td>
+<td align="left">ok</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left">002</td>
+<td align="right">103.88</td>
+<td align="left">ok</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="left">FALSE</td>
+<td align="right">48.36</td>
+</tr>
+<tr class="odd">
+<td align="left">031</td>
+<td align="right">NA</td>
+<td align="left">missing</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<p>Use <code>mtld__tail_only</code> to find computable estimates with
+zero complete factors in at least one direction.
+<code>mtld__gap_pct</code> is the absolute forward/reverse score
+difference divided by their mean, multiplied by 100. It describes
+sensitivity to order, <strong>not precision or a confidence
+interval</strong>. A zero gap can coexist with tail-only estimation in
+both directions. The empty document remains present; unavailable fields
+are <code>NA</code>, not zero. Recorded zero factor counts are retained
+even when a score cannot be computed; the derived flag and gap require
+finite scores and counts in both directions.</p>
+<p>The table also contains <code>mtld__forward_score</code>,
+<code>mtld__reverse_score</code>, <code>mtld__forward_tail_credit</code>
+and <code>mtld__reverse_tail_credit</code>. Each profile request gets
+its own prefix; other metrics do not receive irrelevant MTLD columns.
+Saved core min10 results are read under their original method identity,
+without being converted to the current definition. Absent diagnostic
+fields remain <code>NA</code>.</p>
+<p>Select scalar fields for CSV, and keep the complete original result
+in RDS:</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">en_wide</span>, <span class="st">"english-analysis.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>, na <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>original <span class="op">=</span> <span class="va">en_runs</span><span class="op">$</span><span class="va">lower</span>, wide <span class="op">=</span> <span class="va">en_wide</span><span class="op">)</span>, <span class="st">"english-analysis.rds"</span><span class="op">)</span></span>
+<span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"english-analysis.rds"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">wide</span>, <span class="va">en_wide</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>With the default <code>values_from</code>, parameter list columns are
+retained for provenance; use RDS for that complete table. Adding
+<code>mtld_diagnostics = TRUE</code> preserves all ordinary column names
+and values. Without it, output is unchanged. These columns help inspect
+support; they do not establish an automatic exclusion rule.</p>
+</div>
+<div class="section level3">
+<h3 id="join-vocabulary-coverage-by-document-id">Join vocabulary coverage by document ID<a class="anchor" aria-label="anchor" href="#join-vocabulary-coverage-by-document-id"></a>
+</h3>
 <p><code><a href="../reference/lexdiv_convenience.html">lexdiv_widen()</a></code> retains each metric’s definition,
 parameters, and counts. Its checks prevent different MATTR windows from
 entering one metric column as if they were the same specification.
 Coverage is then joined by explicit IDs, preserving document order.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">metrics</span><span class="op">)</span></span>
 <span><span class="va">coverage</span> <span class="op">&lt;-</span> <span class="va">levels</span><span class="op">$</span><span class="va">coverage</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">levels</span><span class="op">$</span><span class="va">coverage</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">coverage</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span><span class="op">)</span></span>
@@ -1616,7 +1716,7 @@ Coverage is then joined by explicit IDs, preserving document order.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">metrics</span>, metric_id <span class="op">=</span> <span class="st">"mattr"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="from-text-to-report_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="700"></p>
 <p>Report differences in the selected metric and differences in coverage
@@ -1634,6 +1734,7 @@ selected above.</p>
 worksheet</a>. It keeps source context, unsubmitted cases, explicit
 unresolved judgments and document-level review counts separate from
 lexical-diversity scores.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="prepare-the-figure-at-its-publication-size">Prepare the figure at its publication size<a class="anchor" aria-label="anchor" href="#prepare-the-figure-at-its-publication-size"></a>
@@ -1659,7 +1760,7 @@ follow the target journal’s file-format and resolution requirements. The
 particular short-label example, and restores the previous settings
 afterwards. Longer document labels need more room, a larger figure, or a
 custom horizontal dot plot rather than smaller text.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draw_mattr</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">monochrome</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">old</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.2</span>, <span class="fl">4.5</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">old</span><span class="op">)</span><span class="op">)</span></span>
@@ -1736,7 +1837,7 @@ sizes illustrate a comparison, not universal recommended settings.</p>
 <div class="section level3">
 <h3 id="prepare-the-text-and-analysis">Prepare the text and analysis<a class="anchor" aria-label="anchor" href="#prepare-the-text-and-analysis"></a>
 </h3>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">trajectory_text</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span>
@@ -1800,7 +1901,7 @@ example, not exported by ldfreq.</p>
 <div class="section level3">
 <h3 id="draw-the-overlapping-trajectories">Draw the overlapping trajectories<a class="anchor" aria-label="anchor" href="#draw-the-overlapping-trajectories"></a>
 </h3>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">draw_trajectory</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">monochrome</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">old</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.2</span>, <span class="fl">4.3</span>, <span class="fl">2.2</span>, <span class="fl">0.8</span><span class="op">)</span>, mgp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.65</span>, <span class="fl">0.65</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>             tcl <span class="op">=</span> <span class="op">-</span><span class="fl">0.25</span>, family <span class="op">=</span> <span class="st">"sans"</span>, las <span class="op">=</span> <span class="fl">1</span>, bty <span class="op">=</span> <span class="st">"l"</span><span class="op">)</span></span>
@@ -1853,7 +1954,7 @@ current working directory (<code><a href="https://rdrr.io/r/base/getwd.html" cla
 replaced if they already exist. Use the PNG for sharing and inspect the
 PDF at its intended publication size. Place any figure title and
 explanatory note outside the image.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png</a></span><span class="op">(</span><span class="st">"ldfreq-trajectory.png"</span>, width <span class="op">=</span> <span class="fl">6.5</span>, height <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>    units <span class="op">=</span> <span class="st">"in"</span>, res <span class="op">=</span> <span class="fl">300</span>, pointsize <span class="op">=</span> <span class="fl">11</span>, bg <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></span>
 <span><span class="fu">draw_trajectory</span><span class="op">(</span><span class="op">)</span></span>
@@ -1881,7 +1982,7 @@ scores. The following round trip keeps list-columns and resource
 identity intact. The saved object contains the input terms; handle it
 under the study’s data access rules. It is not intended for automatic
 public sharing.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  prepared <span class="op">=</span> <span class="va">prepared</span>, diversity <span class="op">=</span> <span class="va">diversity</span>, metrics <span class="op">=</span> <span class="va">metrics</span>, levels <span class="op">=</span> <span class="va">levels</span>,</span>
 <span>  analysis <span class="op">=</span> <span class="va">analysis</span>, session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>

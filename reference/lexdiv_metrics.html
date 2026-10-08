@@ -15,7 +15,7 @@ parameters, and diagnostics are returned beside each value."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -226,7 +226,9 @@ derived from existing <code>diagnostics</code>: <code>mtld_tail_only</code> is t
 either direction has zero complete factors, and <code>mtld_gap_pct</code> is
 <code>100 * abs(forward_score - reverse_score) / mean(c(forward_score,
 reverse_score))</code>. These are display columns, not additional stored result
-fields. A tail-only direction extrapolates from its fractional tail; a zero
+fields. Use <code><a href="lexdiv_convenience.html">lexdiv_widen</a>(x, mtld_diagnostics = TRUE)</code> to extract
+them with the directional scores, factor counts and tail credits into ordinary
+columns. A tail-only direction extrapolates from its fractional tail; a zero
 gap is possible when both directions have no complete factors. The gap
 describes order sensitivity, not standard error, reliability or a confidence
 interval. The 50-token MTLD floor is a retained advisory length screen, not a

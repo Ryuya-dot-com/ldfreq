@@ -3,9 +3,9 @@
 ## Compare analysis conditions from local files
 
 Start here to turn your own files into a table you can inspect, save and
-report. The two paths below work with ldfreq 0.3.0.9002, without new
-packages, downloads or an API key. English text is tokenized in R.
-Japanese text uses prepared annotations: importing a file does not
+report. The two core file-analysis paths work with ldfreq 0.3.0.9002,
+without new packages, downloads or an API key. English text is tokenized
+in R. Japanese text uses prepared annotations: importing a file does not
 perform Japanese morphological analysis.
 
 The question is **how a declared counting decision changes the same
@@ -374,7 +374,7 @@ stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 #> 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.
 #> 
-#> Calculations used ldfreq 0.3.0.9003: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
+#> Calculations used ldfreq 0.3.0.9004: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
 ```
 
 The CSV is a flat inspection table; **the RDS is the complete analysis
@@ -873,6 +873,67 @@ plot(nj8_profile(prepared[[1]], unit = "surface"), weighting = "token")
 ![](from-text-to-report_files/figure-html/unnamed-chunk-4-1.png)
 
 ## Produce an analysis table and inspect it
+
+### Extract MTLD diagnostics into ordinary columns
+
+With **ldfreq 0.3.0.9004 or later**, the English results already
+calculated above can be widened with their MTLD diagnostics. No
+tokenization or metric calculation is repeated. This is convenient for
+spreadsheets or statistical models that expect one scalar per cell. The
+guide’s earlier `diagnostic_rows()` helper remains useful for long
+tables and older installations.
+
+``` r
+en_wide <- lexdiv_widen(en_runs$lower,
+  values_from = c("value", "status", "missing_reason", "N"),
+  mtld_diagnostics = TRUE)
+inspect <- c("document_id", "mtld__value", "mtld__status",
+  "mtld__forward_complete_factors", "mtld__reverse_complete_factors",
+  "mtld__tail_only", "mtld__gap_pct")
+knitr::kable(en_wide[c(1, 2, nrow(en_wide)), inspect], digits = 2,
+  row.names = FALSE)
+```
+
+| document_id | mtld\_\_value | mtld\_\_status | mtld\_\_forward_complete_factors | mtld\_\_reverse_complete_factors | mtld\_\_tail_only | mtld\_\_gap_pct |
+|:---|---:|:---|---:|---:|:---|---:|
+| 001 | 133.57 | ok | 0 | 0 | TRUE | 0.00 |
+| 002 | 103.88 | ok | 1 | 1 | FALSE | 48.36 |
+| 031 | NA | missing | NA | NA | NA | NA |
+
+Use `mtld__tail_only` to find computable estimates with zero complete
+factors in at least one direction. `mtld__gap_pct` is the absolute
+forward/reverse score difference divided by their mean, multiplied by
+100. It describes sensitivity to order, **not precision or a confidence
+interval**. A zero gap can coexist with tail-only estimation in both
+directions. The empty document remains present; unavailable fields are
+`NA`, not zero. Recorded zero factor counts are retained even when a
+score cannot be computed; the derived flag and gap require finite scores
+and counts in both directions.
+
+The table also contains `mtld__forward_score`, `mtld__reverse_score`,
+`mtld__forward_tail_credit` and `mtld__reverse_tail_credit`. Each
+profile request gets its own prefix; other metrics do not receive
+irrelevant MTLD columns. Saved core min10 results are read under their
+original method identity, without being converted to the current
+definition. Absent diagnostic fields remain `NA`.
+
+Select scalar fields for CSV, and keep the complete original result in
+RDS:
+
+``` r
+write.csv(en_wide, "english-analysis.csv", row.names = FALSE, na = "")
+saveRDS(list(original = en_runs$lower, wide = en_wide), "english-analysis.rds")
+restored <- readRDS("english-analysis.rds")
+stopifnot(identical(restored$wide, en_wide))
+```
+
+With the default `values_from`, parameter list columns are retained for
+provenance; use RDS for that complete table. Adding
+`mtld_diagnostics = TRUE` preserves all ordinary column names and
+values. Without it, output is unchanged. These columns help inspect
+support; they do not establish an automatic exclusion rule.
+
+### Join vocabulary coverage by document ID
 
 [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
 retains each metric’s definition, parameters, and counts. Its checks

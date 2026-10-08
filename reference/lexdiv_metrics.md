@@ -196,14 +196,16 @@ For sequential bidirectional MTLD, the compact display adds two columns
 derived from existing `diagnostics`: `mtld_tail_only` is true when
 either direction has zero complete factors, and `mtld_gap_pct` is
 `100 * abs(forward_score - reverse_score) / mean(c(forward_score, reverse_score))`.
-These are display columns, not additional stored result fields. A
-tail-only direction extrapolates from its fractional tail; a zero gap is
-possible when both directions have no complete factors. The gap
-describes order sensitivity, not standard error, reliability or a
-confidence interval. The 50-token MTLD floor is a retained advisory
-length screen, not a validated cutoff for the current no-minimum
-definition. The study-specific 50/100-token evidence and
-method-equivalence limits are recorded by
+These are display columns, not additional stored result fields. Use
+[`lexdiv_widen`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)`(x, mtld_diagnostics = TRUE)`
+to extract them with the directional scores, factor counts and tail
+credits into ordinary columns. A tail-only direction extrapolates from
+its fractional tail; a zero gap is possible when both directions have no
+complete factors. The gap describes order sensitivity, not standard
+error, reliability or a confidence interval. The 50-token MTLD floor is
+a retained advisory length screen, not a validated cutoff for the
+current no-minimum definition. The study-specific 50/100-token evidence
+and method-equivalence limits are recorded by
 [`lexdiv_length_evidence()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_length_evidence.md).
 Neither passing the length screen nor having complete factors
 establishes precision. See the designing-comparisons guide for a numeric

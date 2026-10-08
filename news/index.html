@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,11 @@
       <small>Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0.9004" id="ldfreq-0309004-development">ldfreq 0.3.0.9004 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-0309004-development"></a></h2>
+<ul><li>Add optional <code>mtld_diagnostics = TRUE</code> to <code><a href="../reference/lexdiv_convenience.html">lexdiv_widen()</a></code>: extract the existing core MTLD directional scores, complete-factor counts and tail credits, plus tail-only and directional-gap columns shared with compact printing. Defaults, metric values and stored result schemas are unchanged. Saved legacy min10 results retain their method identity; unavailable diagnostics stay missing and recorded zero counts stay zero. Request/specification and name-collision checks remain in force. No new export, dependency or automatic exclusion.</li>
+<li>Show compact scalar tables and CSV/full-RDS use in the API help and report guide.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0.9003" id="ldfreq-0309003-development">ldfreq 0.3.0.9003 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-0309003-development"></a></h2>
 <ul><li>Apply the study-report workflow to saved PELIC results: verify original document/writer/task metadata, retain metric values and MTLD diagnostics, publish descriptive aggregates and actual methods text, and replay the report in a fresh R session. Explicit CSV column types preserve all-missing character columns. No new API, metric calculation, corpus bundle or automatic download.</li>

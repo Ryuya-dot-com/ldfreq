@@ -1,5 +1,19 @@
 # Changelog
 
+## ldfreq 0.3.0.9004 (development)
+
+- Add optional `mtld_diagnostics = TRUE` to
+  [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md):
+  extract the existing core MTLD directional scores, complete-factor
+  counts and tail credits, plus tail-only and directional-gap columns
+  shared with compact printing. Defaults, metric values and stored
+  result schemas are unchanged. Saved legacy min10 results retain their
+  method identity; unavailable diagnostics stay missing and recorded
+  zero counts stay zero. Request/specification and name-collision checks
+  remain in force. No new export, dependency or automatic exclusion.
+- Show compact scalar tables and CSV/full-RDS use in the API help and
+  report guide.
+
 ## ldfreq 0.3.0.9003 (development)
 
 - Apply the study-report workflow to saved PELIC results: verify
