@@ -399,14 +399,14 @@ code runs on 0.3.0.9003.
 
 ## Installation
 
-Version 0.3.0.9004 is a development prerelease and has not been released
+Version 0.3.0.9005 is a development prerelease and has not been released
 on CRAN. The fixed tag below identifies the tested code and installed
 examples. It requires R 4.1.0 or later. Install the tested snapshot used
 by this documentation:
 
 ``` r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9004")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9005")
 ```
 
 Pinning the revision fixes the implementation, even when development
@@ -419,7 +419,7 @@ If you have a built source archive, install it locally:
 
 ``` r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9004.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9005.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation
@@ -442,6 +442,11 @@ For TXT files, folders or ID/text CSV files, start with the [executable
 file-input
 tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
 It includes sample files, metadata joins and complete analysis saving.
+From 0.3.0.9005, `lexdiv_metrics_text_batch(..., metadata = study)`
+retains writer/task/occasion information in `$metadata`, matched by
+`document_id`. Missing, duplicate or extra document IDs are rejected;
+metric and token tables remain unchanged. See the [metadata
+example](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#retain-study-metadata).
 
 ``` r
 library(ldfreq)

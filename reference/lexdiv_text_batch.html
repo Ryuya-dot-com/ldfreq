@@ -11,7 +11,7 @@ preprocessing. These functions do not guess IDs or merge documents."></head><bod
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,7 @@ preprocessing. These functions do not guess IDs or merge documents.</p>
 <span>  <span class="va">documents</span>, id_col <span class="op">=</span> <span class="st">"document_id"</span>, text_col <span class="op">=</span> <span class="st">"text"</span>,</span>
 <span>  unit <span class="op">=</span> <span class="st">"surface"</span>, word_inclusion <span class="op">=</span> <span class="st">"all"</span>,</span>
 <span>  normalization <span class="op">=</span> <span class="st">"NFC"</span>, case <span class="op">=</span> <span class="st">"preserve"</span>, keep_numbers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  tokenizer <span class="op">=</span> <span class="st">"unicode"</span>, <span class="va">...</span></span>
+<span>  tokenizer <span class="op">=</span> <span class="st">"unicode"</span>, <span class="va">...</span>, metadata <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'lexdiv_text_batch_results'</span></span>
@@ -88,8 +88,17 @@ identifying the document. An empty named vector/list or zero-row table is valid.
 
 <dt id="arg-id-col-text-col">id_col,text_col<a class="anchor" aria-label="anchor" href="#arg-id-col-text-col"></a></dt>
 <dd><p>Names of the selected ID and text columns. Other columns
-are ignored; join study metadata by document ID afterwards. These arguments
+are ignored unless explicitly supplied through <code>metadata</code>; these arguments
 cannot be supplied for a prepared-tokenization list.</p></dd>
+
+<dt id="arg-metadata">metadata<a class="anchor" aria-label="anchor" href="#arg-metadata"></a></dt>
+<dd><p>Optional data frame with one row for every input document,
+including empty documents. Specify by name. It must contain a unique plain
+character <code>document_id</code> column, even when the raw text uses a different
+<code>id_col</code>. Other columns must be atomic vectors, including factors or dates;
+list, matrix and nested data-frame columns are rejected. Missing study values
+such as an unknown writer are allowed. The default <code>NULL</code> retains the
+existing three-component return value.</p></dd>
 
 <dt id="arg-normalization-case-keep-numbers-tokenizer">normalization,case,keep_numbers,tokenizer<a class="anchor" aria-label="anchor" href="#arg-normalization-case-keep-numbers-tokenizer"></a></dt>
 <dd><p>Settings passed to
@@ -138,6 +147,25 @@ table alone does not retain the token audit and preprocessing records.</p>
 annotate the tokens before scoring or reuse them with a reference vocabulary.
 Its output is a named list: <code>prepared$essay_a$tokens</code> shows one document.
 Do not supply tokenization settings again when scoring that prepared list.</p>
+<p>To retain writer, task, group or occasion information with an analysis, supply
+<code>metadata</code> to <code>lexdiv_metrics_text_batch()</code>. It accepts the same
+metadata table for named raw texts, raw ID/text tables and prepared tokenization
+lists. Rows are matched by document ID and reordered to the input order;
+<code>document_id</code> becomes the first column and row names are reset.
+Missing, extra or duplicate document IDs are errors. Select the intended roster
+explicitly when a study table covers a larger corpus. Writer IDs may repeat
+across documents; document IDs must not. Column names must be unique and nonempty.
+UTF-8 ID markers are canonicalized as in the batch input, without Unicode
+normalization. Study-column values and types are preserved.</p>
+<p>Metadata are returned separately, not inserted into metric or token rows.
+Thus a study column named <code>value</code> cannot overwrite a metric value.
+Join selected fields by <code>document_id</code> for analysis, checking for column-name
+collisions; save the whole object as RDS to retain the typed table and audits.
+This roster check does not verify the truth of study labels, establish independent
+observations or fit a repeated-measures model. No labels are inferred from text.
+The separate tables returned by <code><a href="lexdiv_import_annotations.html">lexdiv_import_annotations()</a></code> are not
+<code>lexdiv_tokenization</code> objects; use the existing ID-based reporting workflow
+for that input path rather than passing the imported object to this function.</p>
 <p>Plot defaults use a sans serif font, horizontal tick labels and an open frame.
 Override these with <code>family</code>, <code>las</code> or <code>bty</code> in the plot
 method's <code>...</code>. Cosmetic graphics parameters are restored after drawing.</p>
@@ -162,7 +190,7 @@ file input and segmentation examples.</p>
     <p><code>lexdiv_tokenize_batch()</code> returns an input-ordered named list of complete
 <code>lexdiv_tokenization</code> objects, with their token tables and provenance.</p>
 <p><code>lexdiv_metrics_text_batch()</code> returns a <code>lexdiv_text_batch_results</code>
-list with three components:</p><dl><dt>results</dt>
+list with three default components and optional study metadata:</p><dl><dt>results</dt>
 <dd><p>A long <code>lexdiv_batch_results</code> data frame with
   <code>document_id</code> and every core metric result column.</p></dd>
 
@@ -173,6 +201,10 @@ list with three components:</p><dl><dt>results</dt>
   <dt>preprocessing</dt>
 <dd><p>An input-ordered named list containing every document's
   complete preprocessing record, including zero-token documents.</p></dd>
+
+  <dt>metadata</dt>
+<dd><p>Present only when <code>metadata</code> is non-<code>NULL</code>. A data
+  frame ordered by input document ID, with one row per document.</p></dd>
 
 
 </dl><p><code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> returns the input invisibly. <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> returns the plotted
@@ -297,6 +329,20 @@ create a metric table; save the complete object to retain its audits.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1              2           0.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2              1           0.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3              0            NA</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 5. Keep study information with the same analysis, matched by ID.</span></span></span>
+<span class="r-in"><span><span class="co"># Labels are fictional; the empty response has an unknown writer.</span></span></span>
+<span class="r-in"><span><span class="va">study</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"empty"</span>, <span class="st">"essay_b"</span>, <span class="st">"essay_a"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  writer_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA_character_</span>, <span class="st">"writer_1"</span>, <span class="st">"writer_1"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  occasion <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">2L</span>, <span class="fl">1L</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">with_study</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_text_batch</span><span class="op">(</span><span class="va">prepared</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span>, metadata <span class="op">=</span> <span class="va">study</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">with_study</span><span class="op">$</span><span class="va">metadata</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id writer_id occasion</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a  writer_1        1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     essay_b  writer_1        2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       empty      &lt;NA&gt;        1</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">with_study</span><span class="op">$</span><span class="va">results</span>,</span></span>
+<span class="r-in"><span>  <span class="fu">lexdiv_metrics_text_batch</span><span class="op">(</span><span class="va">prepared</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span><span class="op">$</span><span class="va">results</span><span class="op">)</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

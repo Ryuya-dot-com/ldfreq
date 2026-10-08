@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -504,11 +504,13 @@ validity or a preferred universal exclusion policy.</p>
 <h2 id="analyze-an-idtext-table">Analyze an ID/text table<a class="anchor" aria-label="anchor" href="#analyze-an-idtext-table"></a>
 </h2>
 <p>Use one row per document, with explicit unique IDs and character
-text. Other columns, such as writer or task, stay in the study table for
-a later join by ID. Empty text is a valid zero-token document.
-<code>NA</code> text is an error naming the document; decide whether it
-denotes missing data before analysis rather than silently replacing it
-with an empty string.</p>
+text. Other columns, such as writer or task, are not selected
+automatically. From 0.3.0.9005, pass them explicitly with
+<code>metadata</code> to keep a checked study table in the result; see
+the <a href="#retain-study-metadata">file example</a> below. Empty text
+is a valid zero-token document. <code>NA</code> text is an error naming
+the document; decide whether it denotes missing data before analysis
+rather than silently replacing it with an empty string.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">essays</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  essay_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"essay_02"</span>, <span class="st">"essay_01"</span>, <span class="st">"empty"</span><span class="op">)</span>,</span>
@@ -731,7 +733,7 @@ denotes an empty response, not an unavailable response. ldfreq rejects
 study record instead of replacing it with <code>""</code>.</p>
 </div>
 <div class="section level3">
-<h3 id="analyze-attach-metadata-and-inspect-the-result">Analyze, attach metadata and inspect the result<a class="anchor" aria-label="anchor" href="#analyze-attach-metadata-and-inspect-the-result"></a>
+<h3 id="retain-study-metadata">Analyze, retain metadata and inspect the result<a class="anchor" aria-label="anchor" href="#retain-study-metadata"></a>
 </h3>
 <p>Use <code>file_documents</code> below, or substitute
 <code>csv_documents</code>. Normalization and case conversion happen
@@ -739,14 +741,20 @@ here as declared analysis choices, after file reading. The 50-token
 window is common to all documents. The 30 nonempty teaching texts are
 107–149 tokens long and can all use that window. For a research corpus,
 justify the window for your task and length distribution; keep it common
-across comparable texts rather than shrinking it for short
-documents.</p>
+across comparable texts rather than shrinking it for short documents.
+The <code>metadata</code> argument below requires <strong>ldfreq
+0.3.0.9005 or later</strong>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">file_tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_tokenize_batch</a></span><span class="op">(</span><span class="va">file_documents</span>,</span>
 <span>  id_col <span class="op">=</span> <span class="st">"document_id"</span>, text_col <span class="op">=</span> <span class="st">"text"</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>,</span>
 <span>  normalization <span class="op">=</span> <span class="st">"NFC"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span>
+<span><span class="va">metadata_input</span> <span class="op">&lt;-</span> <span class="va">input_helpers</span><span class="op">$</span><span class="fu">read_text_file</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">input_dir</span>, <span class="st">"metadata.csv"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">metadata_connection</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/textconnections.html" class="external-link">textConnection</a></span><span class="op">(</span><span class="va">metadata_input</span><span class="op">$</span><span class="va">text</span>, encoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="va">file_metadata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">metadata_connection</span>, encoding <span class="op">=</span> <span class="st">"UTF-8"</span>,</span>
+<span>  colClasses <span class="op">=</span> <span class="st">"character"</span>, na.strings <span class="op">=</span> <span class="st">"&lt;MISSING&gt;"</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">close</a></span><span class="op">(</span><span class="va">metadata_connection</span><span class="op">)</span></span>
 <span><span class="va">file_analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch</a></span><span class="op">(</span><span class="va">file_tokens</span>,</span>
-<span>  metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"mattr"</span><span class="op">)</span>, window_length <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
+<span>  metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"mattr"</span><span class="op">)</span>, window_length <span class="op">=</span> <span class="fl">50</span>, metadata <span class="op">=</span> <span class="va">file_metadata</span><span class="op">)</span></span>
 <span><span class="va">file_results</span> <span class="op">&lt;-</span> <span class="va">file_analysis</span><span class="op">$</span><span class="va">results</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"metric_id"</span>, <span class="st">"N"</span>, <span class="st">"V"</span>, <span class="st">"value"</span>,</span>
 <span>  <span class="st">"status"</span>, <span class="st">"missing_reason"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co"># Preview three nonempty documents and the empty document; retain all result rows.</span></span>
@@ -767,15 +775,12 @@ documents.</p>
 <span><span class="co">#&gt;     mattr       1 30</span></span>
 <span><span class="co">#&gt;     ttr         1 30</span></span>
 <span></span>
-<span><span class="va">metadata_input</span> <span class="op">&lt;-</span> <span class="va">input_helpers</span><span class="op">$</span><span class="fu">read_text_file</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">input_dir</span>, <span class="st">"metadata.csv"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">file_metadata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span>text <span class="op">=</span> <span class="va">metadata_input</span><span class="op">$</span><span class="va">text</span>,</span>
-<span>  colClasses <span class="op">=</span> <span class="st">"character"</span>, na.strings <span class="op">=</span> <span class="st">"&lt;MISSING&gt;"</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">file_metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">file_metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setequal</a></span><span class="op">(</span><span class="va">file_metadata</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">file_documents</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">file_report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">file_analysis</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span>
-<span><span class="va">metadata_row</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">file_report</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">file_metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">file_report</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">file_metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">[</span><span class="va">metadata_row</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">file_report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"writer_id"</span>, <span class="st">"task"</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">file_metadata</span><span class="op">[</span><span class="va">metadata_row</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"writer_id"</span>, <span class="st">"task"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">metadata_row</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">file_report</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">file_analysis</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">file_report</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">file_analysis</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">[</span><span class="va">metadata_row</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">study_fields</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"writer_id"</span>, <span class="st">"task"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">study_fields</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">file_report</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">file_report</span><span class="op">[</span><span class="va">study_fields</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">file_analysis</span><span class="op">$</span><span class="va">metadata</span><span class="op">[</span><span class="va">metadata_row</span>, <span class="va">study_fields</span><span class="op">]</span></span>
 <span><span class="va">file_report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">file_report</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"writer_id"</span>, <span class="st">"task"</span>, <span class="st">"ttr__value"</span>, <span class="st">"mattr__value"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt; &lt;lexdiv_wide_results: 4 rows; 5 columns&gt;</span></span>
@@ -784,14 +789,27 @@ documents.</p>
 <span><span class="co">#&gt; 2          002 example_writer_02 authored-description  0.7131783    0.7905000</span></span>
 <span><span class="co">#&gt; 3          003 example_writer_03 authored-description  0.5918367    0.6665306</span></span>
 <span><span class="co">#&gt; 31         031 example_writer_01 authored-description         NA           NA</span></span></code></pre></div>
-<p>Metadata are deliberately in a different order: join by ID, never by
-row number. This example requires metadata for exactly the selected
-documents; subset a larger study table explicitly and inspect unmatched
-IDs. Several documents may share a writer ID. Here all writer/task IDs
-are fictional and the texts share authored passages; they cannot support
-population inference. Document <code>031</code> stays in the report with
+<p>Metadata are deliberately in a different order. The API matches them
+by ID and returns them in document order in
+<code>file_analysis$metadata</code>, including the empty document.
+Missing, duplicate or extra document IDs cause an error; subset a larger
+study table explicitly before analysis. The same <code>metadata</code>
+argument works with raw ID/text tables or named raw texts. Its ID column
+is always <code>document_id</code>, even if <code>id_col</code> names a
+different column in the raw input. Other study columns retain their
+values and types; list and matrix columns are rejected. Several
+documents may share a writer ID. Here all writer/task IDs are fictional
+and the texts share authored passages; they cannot support population
+inference. Document <code>031</code> stays in the report with
 unavailable metrics and their reasons. It is not a zero-diversity
 essay.</p>
+<p>The metric table and token audit remain separate from metadata. The
+explicit join above checks for column-name collisions and makes a report
+without overwriting a score. Unknown writers or tasks remain
+<code>NA</code>; no labels are inferred from text. With
+<code>metadata = NULL</code> (the default), the original three-component
+result and calculations are unchanged. Save the complete object to
+retain the typed metadata table together with the analysis.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">file_analysis</span>, metric_id <span class="op">=</span> <span class="st">"mattr"</span>, xlab <span class="op">=</span> <span class="st">"Document"</span>, las <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="english-tokenization_files/figure-html/file-input-plot-1.png" class="r-plt" alt="" width="768"></p>

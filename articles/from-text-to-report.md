@@ -374,7 +374,7 @@ stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 #> 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.
 #> 
-#> Calculations used ldfreq 0.3.0.9004: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
+#> Calculations used ldfreq 0.3.0.9005: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
 ```
 
 The CSV is a flat inspection table; **the RDS is the complete analysis
@@ -406,6 +406,15 @@ participant or source-author IDs when their role is explicitly declared.
 Unknown writers or tasks remain `NA`, rather than being invented from
 filenames. Keep task, group, time and corpus information in separate
 columns when the study needs them.
+
+If an analysis was created with
+`lexdiv_metrics_text_batch(..., metadata = study)`, its `$metadata`
+component already contains the ID-checked, input-ordered study table.
+Use that table below; see the [metadata input
+example](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#retain-study-metadata)
+(0.3.0.9005 or later). The Japanese imported-token path above has a
+different input format and continues to use the explicit join shown
+here.
 
 ``` r
 join_study_metadata <- function(rows, metadata) {

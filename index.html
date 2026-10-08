@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9005</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -169,22 +169,22 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Version 0.3.0.9004 is a development prerelease and has not been released on CRAN. The fixed tag below identifies the tested code and installed examples. It requires R 4.1.0 or later. Install the tested snapshot used by this documentation:</p>
+<p>Version 0.3.0.9005 is a development prerelease and has not been released on CRAN. The fixed tag below identifies the tested code and installed examples. It requires R 4.1.0 or later. Install the tested snapshot used by this documentation:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run install.packages("pak") first if pak is not installed.</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@v0.3.0.9004"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@v0.3.0.9005"</span><span class="op">)</span></span></code></pre></div>
 <p>Pinning the revision fixes the implementation, even when development snapshots share the same version number. The package’s required dependencies are <code>digest</code> and <code>stringi</code>; additional tools are optional for their documented workflows. For example, candidate-review examples use <code>quanteda</code>.</p>
 <p>If you have a built source archive, install it locally:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install digest and stringi first if they are not already available.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ldfreq_0.3.0.9004.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ldfreq_0.3.0.9005.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
 <p>The built archive includes rendered guides. A GitHub source installation may omit them; the online guides remain available.</p>
 </div>
 <div class="section level2">
 <h2 id="a-first-analysis">A first analysis<a class="anchor" aria-label="anchor" href="#a-first-analysis"></a>
 </h2>
 <p>After <code><a href="https://ryuya-dot-com.github.io/ldfreq/">library(ldfreq)</a></code>, open <code><a href="reference/ldfreq-package.html">?ldfreq</a></code> for a short first analysis and an input map. <code><a href="reference/lexdiv_preprocessing.html">?lexdiv_metrics_text</a></code> explains the counted words and scores; <code><a href="reference/lexdiv_family_profile.html">?lexdiv_family_profile</a></code> contains a complete Nation word-family example. Run <code>example("lexdiv_metrics_text", package = "ldfreq")</code> to execute the text examples. These help pages include expected values and explain missing results.</p>
-<p>For TXT files, folders or ID/text CSV files, start with the <a href="https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files">executable file-input tutorial</a>. It includes sample files, metadata joins and complete analysis saving.</p>
+<p>For TXT files, folders or ID/text CSV files, start with the <a href="https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files">executable file-input tutorial</a>. It includes sample files, metadata joins and complete analysis saving. From 0.3.0.9005, <code>lexdiv_metrics_text_batch(..., metadata = study)</code> retains writer/task/occasion information in <code>$metadata</code>, matched by <code>document_id</code>. Missing, duplicate or extra document IDs are rejected; metric and token tables remain unchanged. See the <a href="https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#retain-study-metadata">metadata example</a>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
 <span></span>
