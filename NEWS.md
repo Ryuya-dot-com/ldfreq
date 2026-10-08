@@ -1,5 +1,10 @@
 # ldfreq 0.3.0.9002 (development)
 
+- Extend the report guide with executable English and Japanese file workflows:
+  compare case or POS selection, retain unavailable results and MTLD support,
+  distinguish unknown selection from exclusion, and save diagnostic CSV, full
+  RDS and methods text. These guide-local recipes run with 0.3.0.9002; no API,
+  dependency, formula or installed data changes.
 - Document Japanese unit sensitivity using paired public SUW/LUW annotations
   and saved Sudachi modes for 24 learner and four Japanese-L1 essays. Explain how POS filtering can change
   original-character coverage, and retain paired eligibility and MTLD factor

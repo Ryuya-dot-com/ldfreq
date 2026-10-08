@@ -46,6 +46,11 @@ the decisions without installing an analyzer. Then use the
 [gibasa recipe](#use-gibasa-and-a-local-unidic-dictionary-in-r) to supply your own
 annotations. File reading and morphological analysis are separate steps.
 
+For a smaller comparison without the optional review dependency, use
+[all-body versus content-word selection](from-text-to-report.html#compare-japanese-pos-from-files).
+It reads the same authored files, preserves unknown POS membership, exposes
+calculation diagnostics, and saves a complete record and methods text.
+
 ## An offline example
 
 The package's token-table importer supports R >= 4.1. The optional
