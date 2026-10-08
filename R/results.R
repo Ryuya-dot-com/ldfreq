@@ -301,30 +301,44 @@
   output
 }
 
-# Print-only diagnostics keep stored records and earlier RDS files compatible.
+# Derive table/display fields without modifying stored records or old RDS files.
+.lex_mtld_diagnostic_table <- function(diagnostics) {
+  fields <- c("forward_score", "reverse_score",
+              "forward_complete_factors", "reverse_complete_factors",
+              "forward_tail_credit", "reverse_tail_credit")
+  output <- as.data.frame(stats::setNames(
+    rep(list(rep(NA_real_, length(diagnostics))), length(fields)), fields))
+  for (i in seq_along(diagnostics)) {
+    d <- diagnostics[[i]]
+    if (!is.list(d)) next
+    for (field in intersect(fields, names(d))) {
+      value <- d[[field]]
+      if (is.numeric(value) && length(value) == 1L && is.finite(value)) {
+        output[[field]][[i]] <- value
+      }
+    }
+  }
+  eligible <- stats::complete.cases(output[fields[1:4]])
+  output$tail_only <- rep(NA, nrow(output))
+  output$gap_pct <- rep(NA_real_, nrow(output))
+  for (i in which(eligible)) {
+    output$tail_only[[i]] <- min(output$forward_complete_factors[[i]],
+                                output$reverse_complete_factors[[i]]) == 0
+    mean_score <- mean(c(output$forward_score[[i]], output$reverse_score[[i]]))
+    output$gap_pct[[i]] <- if (mean_score > 0) {
+      100 * abs(output$forward_score[[i]] - output$reverse_score[[i]]) / mean_score
+    } else NA_real_
+  }
+  output
+}
+
 .print_lexdiv_table <- function(x, visible, ...) {
   display <- as.data.frame(x[visible])
   if ("diagnostics" %in% names(x)) {
-    fields <- c("forward_score", "reverse_score",
-                "forward_complete_factors", "reverse_complete_factors")
-    eligible <- vapply(x$diagnostics, function(d) {
-      is.list(d) && all(fields %in% names(d)) &&
-        all(vapply(d[fields], function(z) {
-          is.numeric(z) && length(z) == 1L && is.finite(z)
-        }, logical(1L)))
-    }, logical(1L))
-    if (any(eligible)) {
-      display$mtld_tail_only <- rep(NA, nrow(x))
-      display$mtld_gap_pct <- rep(NA_real_, nrow(x))
-      for (i in which(eligible)) {
-        d <- x$diagnostics[[i]]
-        display$mtld_tail_only[[i]] <-
-          min(d$forward_complete_factors, d$reverse_complete_factors) == 0
-        mean_score <- mean(c(d$forward_score, d$reverse_score))
-        display$mtld_gap_pct[[i]] <- if (mean_score > 0) {
-          100 * abs(d$forward_score - d$reverse_score) / mean_score
-        } else NA_real_
-      }
+    diagnostics <- .lex_mtld_diagnostic_table(x$diagnostics)
+    if (any(!is.na(diagnostics$tail_only))) {
+      display$mtld_tail_only <- diagnostics$tail_only
+      display$mtld_gap_pct <- diagnostics$gap_pct
     }
   }
   print.data.frame(display, ...)

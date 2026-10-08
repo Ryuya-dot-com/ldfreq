@@ -258,6 +258,12 @@ and an [executed PELIC learner-text example](https://github.com/Ryuya-dot-com/ld
 These are descriptive checks, not evidence of length invariance or a validated
 novice-user workflow.
 
+From 0.3.0.9004, use `lexdiv_widen(result, mtld_diagnostics = TRUE)` to
+extract directional scores, complete-factor counts, tail credits,
+`mtld__tail_only` and `mtld__gap_pct` as ordinary columns. The
+[wide-table walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#wide-mtld-diagnostics)
+shows how to select a compact analysis table while retaining the full record.
+
 KH Coder already uses R and documents
 [exporting plotting commands as R Source](https://khcoder.net/scr_r.html).
 R integration, Japanese support and returning to source context therefore do
@@ -317,14 +323,14 @@ decisions and document profiles. Its guide-local code runs on 0.3.0.9003.
 
 ## Installation
 
-Version 0.3.0.9003 is a development prerelease and has not been released on CRAN.
+Version 0.3.0.9004 is a development prerelease and has not been released on CRAN.
 The fixed tag below identifies the tested code and installed examples.
 It requires R 4.1.0 or later. Install the tested snapshot used by this
 documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9003")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9004")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
@@ -336,7 +342,7 @@ If you have a built source archive, install it locally:
 
 ```r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9003.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9004.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation may

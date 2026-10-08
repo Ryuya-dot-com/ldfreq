@@ -154,7 +154,9 @@ derived from existing \code{diagnostics}: \code{mtld_tail_only} is true when
 either direction has zero complete factors, and \code{mtld_gap_pct} is
 \code{100 * abs(forward_score - reverse_score) / mean(c(forward_score,
 reverse_score))}. These are display columns, not additional stored result
-fields. A tail-only direction extrapolates from its fractional tail; a zero
+fields. Use \code{\link{lexdiv_widen}(x, mtld_diagnostics = TRUE)} to extract
+them with the directional scores, factor counts and tail credits into ordinary
+columns. A tail-only direction extrapolates from its fractional tail; a zero
 gap is possible when both directions have no complete factors. The gap
 describes order sensitivity, not standard error, reliability or a confidence
 interval. The 50-token MTLD floor is a retained advisory length screen, not a

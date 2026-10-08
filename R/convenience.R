@@ -175,6 +175,9 @@ lexdiv_as_documents <- function(
 #'   use the metric/request IDs directly. With several, names have the form
 #'   `ID__field`. Defaults retain values, status, method, contract, requested and
 #'   effective parameters, quality-floor flags, and token/type counts.
+#' @param mtld_diagnostics One `TRUE` or `FALSE`. Append scalar diagnostics for
+#'   core sequential bidirectional MTLD, including saved legacy min10 results.
+#'   Defaults to `FALSE`; stored results and metric values are unchanged.
 #'
 #' @return A `lexdiv_wide_results` data frame.
 #' @export
@@ -186,10 +189,12 @@ lexdiv_widen <- function(
       "value", "status", "missing_reason", "method_id",
       "below_quality_floor", "metric_contract_id", "metric_contract_version",
       "requested_parameters", "effective_parameters", "N", "V"
-    )) {
+    ),
+    mtld_diagnostics = FALSE) {
   if (!is.data.frame(x)) {
     stop("x must be a lexical-diversity result data frame.", call. = FALSE)
   }
+  mtld_diagnostics <- .lexprep_scalar_flag(mtld_diagnostics, "mtld_diagnostics")
   if (is.null(id_cols)) {
     id_cols <- if ("document_id" %in% names(x)) "document_id" else character()
   }
@@ -270,6 +275,29 @@ lexdiv_widen <- function(
         output[[column_name]] <- column
       }
     }
+  }
+  if (mtld_diagnostics) {
+    supported <- x$method_id %in% c(
+      "mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1",
+      "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1"
+    )
+    diagnostics <- .lex_mtld_diagnostic_table(
+      if ("diagnostics" %in% names(x)) x$diagnostics else vector("list", nrow(x)))
+    for (wide_id in unique(wide_ids[supported])) {
+      selected_rows <- which(wide_ids == wide_id)
+      for (field in names(diagnostics)) {
+        column_name <- paste0(wide_id, "__", field)
+        if (column_name %in% c(id_cols, output_names)) {
+          stop("The requested wide-column names collide.", call. = FALSE)
+        }
+        output_names <- c(output_names, column_name)
+        source <- diagnostics[[field]]
+        column <- source[rep.int(NA_integer_, nrow(output))]
+        column[group_index[selected_rows]] <- source[selected_rows]
+        output[[column_name]] <- column
+      }
+    }
+    attr(output, "mtld_diagnostics") <- TRUE
   }
   if (anyDuplicated(c(id_cols, output_names))) {
     stop("The requested wide-column names collide.", call. = FALSE)

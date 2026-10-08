@@ -11,6 +11,13 @@ rendered by pkgdown.
 
 ## Decisions
 
+- The 0.3.0.9004 `lexdiv_widen(mtld_diagnostics = TRUE)` refinement appends
+  eight scalar fields for recognized core sequential MTLD specifications only.
+  It reads saved diagnostics and shares derived flags with printing; it never
+  recalculates metrics or changes long-result schemas, exports or dependencies.
+  Default output remains identical, unavailable fields remain NA, and columns
+  from different specifications or colliding names cannot overwrite each other.
+
 - The 0.3.0.9003 phrase-list review is an explicitly sourced example, not an
   export or an extension of the single-token ambiguity API. It reuses the exact
   phrase search and the existing full-worksheet validation pattern. Decisions
