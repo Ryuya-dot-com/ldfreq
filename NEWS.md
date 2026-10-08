@@ -1,7 +1,7 @@
 # ldfreq 0.3.0.9002 (development)
 
 - Document Japanese unit sensitivity using paired public SUW/LUW annotations
-  and saved learner-essay Sudachi modes. Explain how POS filtering can change
+  and saved Sudachi modes for 24 learner and four Japanese-L1 essays. Explain how POS filtering can change
   original-character coverage, and retain paired eligibility and MTLD factor
   support. Add a runnable authored comparison and repository-only reproduction
   scripts; no new package APIs, dependencies or bundled corpus data.

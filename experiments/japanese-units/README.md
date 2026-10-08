@@ -2,7 +2,7 @@
 
 Two questions require different evidence. How does a published short/long-unit
 annotation change counts for the same Japanese sentence? Separately, how much
-do scores change across an analyzer's modes on actual learner essays? Neither
+do scores change across an analyzer's modes on actual Japanese essays? Neither
 question establishes which unit best measures proficiency or score precision.
 
 ## Paired public annotations
@@ -61,10 +61,15 @@ to expose short-input limitations, not to recommend sentence MTLD. We never
 join unrelated sentences to reach a token threshold. The 50-token advisory
 floor has not been validated as a Japanese precision threshold.
 
-## Separate learner-essay check: saved Sudachi modes
+## Separate essay check: saved Sudachi modes
 
-The optional fourth argument reuses the already saved **28 NINJAL learner
-essays** from the [backend pilot](../japanese-backends/README.md). It does not
+The optional fourth argument reuses the already saved **28 NINJAL essays:
+24 learner essays and four Japanese-L1 essays**, from the
+[backend pilot](../japanese-backends/README.md). The diagnostic selection used
+task 01 and the first four sorted document IDs per reported L1: Chinese,
+Korean, English, Finnish, Sinhala, German and Japanese. They are 28 distinct
+writers. The saved original metadata and text were matched to all 28 Sudachi
+inputs before publication. This mixed sample is not an L2-only estimate. It does not
 download or redistribute that corpus. The original spans, including titles,
 are unchanged; POS1 whitespace/auxiliary symbols are excluded, while particles,
 auxiliaries and numbers are retained. This uses surface forms, not normalized
