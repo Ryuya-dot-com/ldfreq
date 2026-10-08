@@ -11,6 +11,14 @@ rendered by pkgdown.
 
 ## Decisions
 
+- The 0.3.0.9003 phrase-list review is an explicitly sourced example, not an
+  export or an extension of the single-token ambiguity API. It reuses the exact
+  phrase search and the existing full-worksheet validation pattern. Decisions
+  apply to source-bound occurrences under one declared criterion. Per-document
+  and per-phrase state counts retain zeros; accepted-token union coverage is
+  separate from candidate coverage and incomplete-review reporting. Original
+  tokenization, lexical-diversity calculations and all 57 exports are unchanged.
+
 - The 2026-10-07 core review freezes new feature exports. `lexdiv_methods()`
   adds a `stability` metadata column and marks expected-TTR D experimental;
   the coordinated core-contract 0.2.0 migration excludes it from defaults and

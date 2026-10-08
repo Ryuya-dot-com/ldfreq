@@ -99,3 +99,128 @@ test_that("modified source and ambiguous phrase specifications fail before analy
   expect_error(e$phrase_list_kwic(e$annotations, e$phrases, e$resource, keep = TRUE), "keep")
   expect_error(e$phrase_list_kwic(e$annotations, e$phrases, e$resource, window = 0.5), "window")
 })
+
+phrase_review_example <- function() {
+  skip_if_not_installed("quanteda", "4.5.0")
+  skip_if_not(isTRUE(l10n_info()[["UTF-8"]]))
+  env <- new.env(parent = globalenv())
+  invisible(capture.output(sys.source(system.file("examples", "phrase-review-demo.R",
+    package = "ldfreq", mustWork = TRUE), envir = env)))
+  env
+}
+
+test_that("phrase decisions retain states, empty documents and overlap-aware coverage", {
+  e <- phrase_review_example(); x <- e$phrase_after; d <- x$documents
+  expect_identical(d$document_id, c("en", "en_pending", "ja", "ja_pending", "no_match", "empty"))
+  expect_equal(d$retained_tokens, c(11, 11, 18, 13, 5, 0))
+  expect_equal(d$occurrences, c(3, 3, 2, 2, 0, 0))
+  expect_equal(d$accepted, c(2, 0, 1, 0, 0, 0))
+  expect_equal(d$rejected, c(1, 0, 1, 0, 0, 0))
+  expect_equal(d$unresolved, c(0, 1, 0, 1, 0, 0))
+  expect_equal(d$unreviewed, c(0, 2, 0, 1, 0, 0))
+  expect_equal(d$covered_tokens, c(5, 5, 8, 8, 0, 0))
+  expect_equal(d$accepted_covered_tokens, c(3, 0, 4, 0, 0, 0))
+  expect_equal(d$accepted_coverage, c(3/11, 0, 4/18, 0, 0, NA))
+  expect_equal(d$reportable_accepted_coverage, c(3/11, NA, 4/18, NA, 0, NA))
+  expect_identical(d$review_complete, c(TRUE, FALSE, TRUE, FALSE, TRUE, TRUE))
+  states <- c("accepted", "rejected", "unresolved", "unreviewed")
+  expect_equal(rowSums(d[states]), d$occurrences)
+  expect_equal(rowSums(x$counts[states]), x$counts$occurrences)
+  expect_equal(nrow(x$counts), 24L)
+  expect_true(all(x$counts$occurrences[x$counts$phrase_id == "absent"] == 0L))
+  expect_identical(x$source, e$phrase_search)
+  expect_identical(x$source$source, e$phrase_annotations)
+  expect_identical(stringi::stri_sub(x$occurrences$segment_text,
+    x$occurrences$start, x$occurrences$end), x$occurrences$keyword)
+  expect_identical(x$worksheet$occurrence_id, e$phrase_before$worksheet$occurrence_id)
+  expect_true(all(vapply(x$worksheet, is.character, logical(1))))
+  expect_identical(e$phrase_record, e$phrase_restored)
+  # Fixed hand-counts also check that all accepted nested lengths (3 + 2)
+  # do not inflate the English union (3), nor change the token denominator (11).
+  en <- subset(x$occurrences, document_id == "en" & status == "accepted")
+  expect_equal(sum(en$to - en$from + 1L), 5L)
+  expect_equal(d$accepted_covered_tokens[1], 3L)
+  all_unreviewed <- e$phrase_before$documents
+  expect_true(all(is.na(all_unreviewed$reportable_accepted_coverage[1:4])))
+})
+
+test_that("phrase worksheets refuse changed anchors, stale criteria and partial decisions", {
+  e <- phrase_review_example(); w <- e$phrase_after$worksheet
+  apply <- function(sheet = w, criterion = e$phrase_criterion, result = e$phrase_search)
+    e$phrase_list_review(result, criterion, worksheet = sheet)
+  for (field in setdiff(names(w), c("status", "reviewer", "reason"))) {
+    edited <- w; edited[[field]][1] <- paste0(edited[[field]][1], "changed")
+    expect_error(apply(edited), if (field == "occurrence_id") "every original" else "fixed worksheet")
+  }
+  expect_error(apply(w[-1, ]), "every original")
+  expect_error(apply(rbind(w, w[1, ])), "every original")
+  edited <- w; edited$from <- as.numeric(edited$from)
+  expect_error(apply(edited), "as character")
+  expect_error(apply(criterion = "Changed interpretation criterion."), "fixed worksheet")
+  expect_error(apply(criterion = " "), "criterion")
+  edited <- w; edited$status[1] <- "selected"
+  expect_error(apply(edited), "Status must")
+  edited$status[1] <- NA_character_
+  expect_error(apply(edited), "Status must")
+  for (field in c("reviewer", "reason")) {
+    edited <- w; edited[[field]][which(edited$status == "unresolved")[1]] <- "  "
+    expect_error(apply(edited), "reviewer and reason")
+    edited <- w; edited[[field]][which(edited$status == "unreviewed")[1]] <- "partly filled"
+    expect_error(apply(edited), "partly filled")
+  }
+  changed <- e$phrase_search; changed$occurrences$keyword[1] <- "changed"
+  expect_error(apply(result = changed), "search result changed")
+  changed <- e$phrase_search; changed$documents$retained_tokens[1] <- 999L
+  expect_error(apply(result = changed), "search result changed")
+  changed <- e$phrase_search; changed$provenance$input_sha256 <- "changed"
+  expect_error(apply(result = changed), "search result changed")
+  resource <- e$phrase_resource; resource$resource_version <- "2"
+  changed <- e$phrase_list_kwic(e$phrase_annotations, e$review_phrases, resource,
+    e$phrase_keep, window = 3L)
+  expect_error(apply(result = changed), "fixed worksheet")
+  phrases <- e$review_phrases; phrases$absent <- c("still", "absent")
+  changed <- e$phrase_list_kwic(e$phrase_annotations, phrases, e$phrase_resource,
+    e$phrase_keep, window = 3L)
+  expect_error(apply(result = changed), "fixed worksheet")
+  keep <- e$phrase_keep; keep[1] <- FALSE
+  changed <- e$phrase_list_kwic(e$phrase_annotations, e$review_phrases, e$phrase_resource,
+    keep, window = 3L)
+  expect_error(apply(result = changed), "fixed worksheet")
+  # A valid source edit outside the phrase preserves its span but invalidates review.
+  tokens <- e$phrase_tokens; tokens$surface[1] <- "Our"
+  segments <- e$phrase_segments; segments$text[1] <- sub("^The", "Our", segments$text[1])
+  annotations <- lexdiv_import_annotations(tokens, segments,
+    e$phrase_annotations$provenance$annotation)
+  changed <- e$phrase_list_kwic(annotations, e$review_phrases, e$phrase_resource,
+    e$phrase_keep, window = 3L)
+  expect_identical(changed$occurrences$start, e$phrase_search$occurrences$start)
+  expect_identical(changed$occurrences$keyword, e$phrase_search$occurrences$keyword)
+  expect_error(apply(result = changed), "fixed worksheet")
+})
+
+test_that("reviewing absent matches and duplicate phrase IDs preserves the search population", {
+  e <- phrase_example()
+  result <- e$phrase_list_kwic(e$annotations, e$phrases["absent"], e$resource, e$keep)
+  reviewed <- e$phrase_list_review(result, "Retain listed occurrences.")
+  expect_equal(nrow(reviewed$worksheet), 0L)
+  expect_identical(reviewed$documents$review_complete, rep(TRUE, 3))
+  expect_equal(reviewed$documents$reportable_accepted_coverage, c(0, 0, NA))
+  expect_identical(e$phrase_list_review(result, reviewed$criterion, reviewed$worksheet), reviewed)
+  excluded <- e$phrase_list_kwic(e$annotations, e$phrases, e$resource,
+    rep(FALSE, nrow(e$annotations$tokens)))
+  reviewed <- e$phrase_list_review(excluded, "Retain listed occurrences.")
+  expect_true(all(reviewed$documents$review_complete))
+  expect_true(all(is.na(reviewed$documents$reportable_accepted_coverage)))
+  # Duplicated spellings under distinct list IDs have distinct decisions.
+  phrases <- list(first = c("in", "the", "end"), second = c("in", "the", "end"))
+  result <- e$phrase_list_kwic(e$annotations, phrases, e$resource, e$keep)
+  before <- e$phrase_list_review(result, "Accept both listed IDs.")
+  sheet <- before$worksheet
+  expect_equal(nrow(sheet), 2L) # The deleted 'very' still blocks a third/fourth hit.
+  expect_equal(length(unique(sheet$occurrence_id)), 2L)
+  sheet$status <- "accepted"; sheet$reviewer <- "demo"; sheet$reason <- "Both IDs in scope."
+  after <- e$phrase_list_review(result, before$criterion, sheet)
+  expect_equal(after$documents$accepted, c(2, 0, 0))
+  expect_equal(after$documents$accepted_covered_tokens, c(3, 0, 0))
+  expect_equal(after$documents$reportable_accepted_coverage, c(3/12, 0, NA))
+})

@@ -293,16 +293,23 @@ coverage. It is an explicitly sourced helper, not an exported API or a
 phrase-sense/discourse-function classifier. Phrase lists are supplied by the
 caller and are not bundled.
 
+The [phrase-review walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.html#review-phrase-matches)
+adds accepted/rejected/unresolved/unreviewed decisions, a checked CSV worksheet
+and document-by-phrase counts. It distinguishes coverage of accepted spans
+from a complete review, retains overlap without double counting tokens, and
+saves the complete source-linked record. It does not change the original
+word tokens or infer whether an expression is idiomatic.
+
 ## Installation
 
-Version 0.3.0.9002 is a development prerelease and has not been released on CRAN.
-The fixed tag below preserves this measurement-contract migration.
+Version 0.3.0.9003 is a development prerelease and has not been released on CRAN.
+The fixed tag below identifies the tested code and installed examples.
 It requires R 4.1.0 or later. Install the tested snapshot used by this
 documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9002")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9003")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
@@ -314,7 +321,7 @@ If you have a built source archive, install it locally:
 
 ```r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9002.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9003.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation may
