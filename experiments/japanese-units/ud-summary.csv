@@ -1,0 +1,13 @@
+"policy","condition","metric","documents","finite","missing","N_min","N_median","N_max","V_median","median","below_floor","tail_only"
+"all_tokens","LUW","mattr",543,10,533,2,17,108,16,0.758,533,NA
+"exclude_PUNCT_SYM","LUW","mattr",543,4,539,1,15,98,14,0.786626016260163,539,NA
+"all_tokens","SUW","mattr",543,29,514,2,21,136,19,0.737931034482759,514,NA
+"exclude_PUNCT_SYM","SUW","mattr",543,21,522,1,19,126,17,0.738333333333333,522,NA
+"all_tokens","LUW","mtld",543,346,197,2,17,108,16,50.54,533,331
+"exclude_PUNCT_SYM","LUW","mtld",543,327,216,1,15,98,14,47.32,539,315
+"all_tokens","SUW","mtld",543,384,159,2,21,136,19,56.7622222222222,514,352
+"exclude_PUNCT_SYM","SUW","mtld",543,370,173,1,19,126,17,53.38,522,341
+"all_tokens","LUW","ttr",543,543,0,2,17,108,16,0.925925925925926,0,NA
+"exclude_PUNCT_SYM","LUW","ttr",543,543,0,1,15,98,14,0.933333333333333,0,NA
+"all_tokens","SUW","ttr",543,543,0,2,21,136,19,0.91304347826087,0,NA
+"exclude_PUNCT_SYM","SUW","ttr",543,543,0,1,19,126,17,0.916666666666667,0,NA

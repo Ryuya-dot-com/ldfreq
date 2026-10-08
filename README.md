@@ -171,6 +171,9 @@ POS groups, retaining exclusions, missing labels, denominators and saved inputs.
 A Japanese dictionary is optional and separately
 obtained; the package does not bundle one or establish cross-language score
 equivalence. The Unicode tokenizer alone is not a Japanese word segmenter.
+The [word-unit comparison](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#compare-japanese-word-units)
+shows how segmentation and punctuation selection affect counts, paired score
+comparisons and short-text eligibility, using separately obtained annotations.
 
 For experimental stimuli, the [Japanese norms guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.html)
 shows how to attach separately obtained AoA or BOI ratings while retaining item

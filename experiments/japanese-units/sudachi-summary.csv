@@ -1,0 +1,10 @@
+"policy","condition","metric","documents","finite","missing","N_min","N_median","N_max","V_median","median","below_floor","tail_only"
+"saved_Sudachi_surface","A","mattr",28,28,0,147,333.5,619,137.5,0.70819967627393,0,NA
+"saved_Sudachi_surface","B","mattr",28,28,0,147,323.5,609,136.5,0.706082580645161,0,NA
+"saved_Sudachi_surface","C","mattr",28,28,0,147,323,609,136,0.708105899886035,0,NA
+"saved_Sudachi_surface","A","mtld",28,28,0,147,333.5,619,137.5,43.9420388343488,0,0
+"saved_Sudachi_surface","B","mtld",28,28,0,147,323.5,609,136.5,43.2879933328458,0,0
+"saved_Sudachi_surface","C","mtld",28,28,0,147,323,609,136,43.6272366047487,0,0
+"saved_Sudachi_surface","A","ttr",28,28,0,147,333.5,619,137.5,0.431582446808511,0,NA
+"saved_Sudachi_surface","B","ttr",28,28,0,147,323.5,609,136.5,0.432966377914862,0,NA
+"saved_Sudachi_surface","C","ttr",28,28,0,147,323,609,136,0.432816636822042,0,NA
