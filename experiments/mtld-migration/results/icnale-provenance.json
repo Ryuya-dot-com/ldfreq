@@ -1,0 +1,14 @@
+{
+  "corpus": "ICNALE GRA V2.1, 140 original essays",
+  "sample": "136 L2 essays (31 A2_0, 32 B1_1, 33 B1_2, 40 B2_0) and 4 ENS; one writing task",
+  "preparation": "Retained English tokenizer 0.1.0; NFC; lowercase surface tokens; numbers excluded; no correction or lemma substitution",
+  "source_audit_sha256": "989b2ed9d13e25f4479628bdf67187a236b553e94e99f3d7c93d2e2d39aad92d",
+  "metadata_sha256": "ed191e4cf6ba5f223ca6872c5f9d7f15728696962c2ecb3b28fab1936cf4b09b",
+  "package_version": "0.3.0.9001",
+  "threshold": 0.72,
+  "operator": "<",
+  "legacy_method": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+  "current_method": "mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1",
+  "comparison_tolerance": 1e-12,
+  "scope": "Observed sample sensitivity, not population prevalence, score validity or an independent annotation evaluation"
+}

@@ -205,19 +205,115 @@ data.frame(paired = sum(paired), excluded = sum(!paired),
 
 All 30 paired scores agree (Spearman = 1; mean absolute change = 0); the empty
 document remains missing. These texts have 107--149 tokens and MTLD values
-48.76--165.21. They do not estimate the effect on low-scoring learner essays.
+48.76--165.21. The agreement has a structural explanation, which the factor
+screen below makes visible. These authored texts do not estimate the effect
+on low-scoring learner essays.
 Report the paired count, missing cases, ranks and numerical changes for your
 own sample before combining old and new results. Correlation alone can conceal
 a systematic shift in values. With fewer than two finite pairs or constant
 scores, rank correlation is not defined.
 
+### Identify where the min10 restriction can matter
+
+For an input of at least ten tokens, if **neither direction has a complete
+factor shorter than ten tokens** under the current definition, the old min10
+restriction never blocks a closure. Both scans therefore start each next factor
+at the same token, leave the same residual tail, and return the same score (or
+the same `no_factor` missing result). This is a sufficient condition for
+agreement, not a necessary one: a short factor can change the segmentation
+without changing the final directional mean.
+
+This small analysis helper inspects the same ordered token vector used for MTLD.
+Use the same threshold as in the metric calculation. It is tutorial code; it
+does not add fields to package results or change the MTLD definition.
+
+```{r mtld-factor-screen}
+mtld_factor_screen <- function(x, threshold = 0.72) {
+  stopifnot(is.character(x), !anyNA(x), all(nzchar(x)),
+    is.numeric(threshold), length(threshold) == 1L,
+    is.finite(threshold), threshold > 0, threshold < 1)
+  scan <- function(x) {
+    start <- 1L
+    complete <- integer()
+    for (i in seq_along(x)) {
+      n <- i - start + 1L
+      if (length(unique(x[start:i])) / n < threshold) {
+        complete <- c(complete, n)
+        start <- i + 1L
+      }
+    }
+    c(minimum = if (length(complete)) min(complete) else NA_integer_,
+      short = sum(complete < 10L))
+  }
+  forward <- scan(x)
+  reverse <- scan(rev(x))
+  data.frame(N = length(x), forward_min = unname(forward["minimum"]),
+    reverse_min = unname(reverse["minimum"]),
+    forward_short = unname(forward["short"]),
+    reverse_short = unname(reverse["short"]),
+    screen = if (length(x) < 10L) "legacy_ineligible" else if
+      (forward["short"] + reverse["short"] == 0L) "no_min10_effect" else
+      "possible_min10_effect")
+}
+```
+
+The minima count **complete factors only**; an unfinished tail is not a short
+complete factor. `NA` means that direction has no complete factor. Fewer than
+ten tokens are classified separately because the legacy method cannot return a
+score. A screen classification does not replace the metric's status or establish
+that a text is long enough for a study's purposes.
+
+```{r}
+factor_screen <- do.call(rbind, lapply(tokens, mtld_factor_screen))
+factor_screen$document_id <- names(tokens)
+table(factor_screen$screen)
+shortest <- pmin(factor_screen$forward_min, factor_screen$reverse_min,
+  na.rm = TRUE)
+data.frame(shortest_complete_factor = min(shortest, na.rm = TRUE),
+  documents_with_complete_factors = sum(!is.na(shortest)),
+  median_document_minimum = median(shortest, na.rm = TRUE))
+```
+
+All 30 essays are `no_min10_effect`: the shortest complete factor in either
+direction is 14 tokens. Among the 22 essays with at least one complete factor,
+the median document minimum is 39 tokens. The other eight have only residual
+factors in both directions. Assigning `Inf` to those eight and taking the median
+over all 30 would give 45; this example leaves their absent minima as `NA` and
+states the 22-document denominator. Thus the observed
+agreement is guaranteed by their factor lengths, not evidence that the two
+definitions are interchangeable. The empty document is `legacy_ineligible`.
+
+For your own corpus, retain this table alongside the scores. Only rows marked
+`possible_min10_effect` need the legacy calculation to determine a numerical
+change, provided the token stream and all other settings are unchanged. Report
+the potentially affected count separately from the actually changed count;
+also report ineligible and missing cases. For example,
+`subset(factor_screen, screen == "possible_min10_effect")` selects the documents
+to inspect. With no complete factors, the document minimum remains `NA`;
+do not substitute zero or infer a low MTLD score from it.
+
+In a local check of the saved original ICNALE GRA V2.1 token streams, the same
+screen and actual old/new scores were compared separately for learners and
+English native speakers. Aggregate results and the reproduction procedure are
+in the [migration record](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/mtld-migration).
+The corpus texts and individual results are not distributed.
+Of the 136 learner essays, 15 (11.03%) had a short factor and all 15 changed;
+the remaining 121 were guaranteed unchanged. The A2 subset had 2 changes in 31
+essays (6.45%). One of the four ENS essays also changed. These are descriptive
+results for the retained sample and preparation, not population rates or
+evidence that the restriction affects only beginners.
+
 Both methods above use strict `<`. Changing only the comparison to `<=` is a
 different sensitivity analysis: for teaching essay `024`, a transparent
-no-minimum reference gives 86.1956 with `<` and 64.3163 with `<=`. The
+no-minimum reference gives 86.1956 with `<` and 64.3163 with `<=`: a 25.38%
+decrease relative to the strict value (equivalently, strict is 34.02% higher
+relative to the inclusive value). The
 [executed migration record](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/mtld-migration)
 preserves the document-level outputs, operator-only reference and exact input
 hashes. The boundary effect depends on the token sequence, so there is no
 universal percentage adjustment.
+Include the operator in your methods statement; see the
+[reporting guide](from-text-to-report.html#save-enough-to-reproduce-and-report-the-analysis).
 
 Expected-TTR D is experimental and excluded from defaults. Near-all-unique
 texts yield large estimates because the target curve approaches one. The

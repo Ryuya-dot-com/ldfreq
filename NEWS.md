@@ -1,5 +1,12 @@
 # ldfreq 0.3.0.9001 (development)
 
+- Extend the MTLD migration tutorial with a complete-factor screen: no factor
+  shorter than ten in either direction guarantees that min10 has no effect
+  when the legacy formula is eligible. Distinguish potential from actual score
+  changes and explain absent factors. Add aggregate sensitivity results for
+  136 local ICNALE GRA V2.1 learner essays (15 changed) and four ENS essays.
+  Include the threshold operator explicitly in the reporting guide's MTLD
+  methods example. Package methods and result schemas are unchanged.
 - Decode the bundled TUBELEX CSV through an explicitly UTF-8 text connection.
   ASCII and accented queries now work under C/POSIX locales. Schema-failure
   printing shows the failed checks, current LC_CTYPE and an encoding hint.
