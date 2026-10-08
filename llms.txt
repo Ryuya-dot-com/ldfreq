@@ -74,7 +74,12 @@ connects document results to writer/task metadata, retains unavailable
 and withheld values, and reports document-weighted descriptive
 statistics with their contributing document/writer counts. It uses the
 existing installation and saves both flat CSV tables and the complete
-analysis record.
+analysis record. An [executed PELIC
+example](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#pelic-study-report)
+connects saved results for 16 real learner essays to original
+writer/task metadata, diagnostic summaries, methods text and
+fresh-session report replay. Corpus texts are not bundled or downloaded
+during installation.
 
 The Japanese workflow also connects [source-linked frequency
 profiles](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#connect-document-selections-to-reference-frequency)
