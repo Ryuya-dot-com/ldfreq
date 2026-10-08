@@ -44,7 +44,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0.9001" id="ldfreq-0309001-development">ldfreq 0.3.0.9001 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-0309001-development"></a></h2>
-<ul><li>Decode the bundled TUBELEX CSV through an explicitly UTF-8 text connection. ASCII and accented queries now work under C/POSIX locales. Schema-failure printing shows the failed checks, current LC_CTYPE and an encoding hint.</li>
+<ul><li>Extend the MTLD migration tutorial with a complete-factor screen: no factor shorter than ten in either direction guarantees that min10 has no effect when the legacy formula is eligible. Distinguish potential from actual score changes and explain absent factors. Add aggregate sensitivity results for 136 local ICNALE GRA V2.1 learner essays (15 changed) and four ENS essays. Include the threshold operator explicitly in the reporting guide’s MTLD methods example. Package methods and result schemas are unchanged.</li>
+<li>Decode the bundled TUBELEX CSV through an explicitly UTF-8 text connection. ASCII and accented queries now work under C/POSIX locales. Schema-failure printing shows the failed checks, current LC_CTYPE and an encoding hint.</li>
 <li>Remove MorphyNet’s initial UTF-8 BOM explicitly, retaining the original byte hash and the documented delimiter policy in non-UTF-8 locales (reader 0.1.1). Make the NINJAL recipe’s metadata keys and Unicode test fixtures locale-neutral.</li>
 <li>Add a C-locale installed-package CI job. Prepare and cache R-devel dependencies in a separate job; retain full checks and all vignette rebuilds within the existing per-job limits.</li>
 <li>Use a fourth-component development version in DESCRIPTION and derive the citation’s version from installed metadata. The earlier v0.3.0-dev.1 snapshot remains unchanged; later formal versions must sort after development versions.</li>

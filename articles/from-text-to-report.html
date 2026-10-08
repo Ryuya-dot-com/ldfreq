@@ -574,6 +574,33 @@ information.</p>
 task/writer structure, and the reason for the window choice. Report
 effect sizes and uncertainty using the study’s sampling units; these
 descriptive functions do not choose an inferential model.</p>
+<p>For <strong>MTLD</strong>, also state the threshold and
+<strong>comparison operator (<code>&lt;</code> or
+<code>&lt;=</code>)</strong>, the minimum complete-factor length (none
+or the legacy ten tokens), whether the last token is checked for
+closure, the residual-tail rule, and how forward and reverse scores are
+combined. These choices are not identified by the name “MTLD” alone. For
+the current default, a methods statement could read:</p>
+<blockquote>
+<p>We calculated MTLD with ldfreq [installed package version], method
+<code>mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1</code>, using
+threshold 0.72. A factor closed when its running TTR was strictly less
+than 0.72 (<code>&lt;</code>, not <code>&lt;=</code>), with no minimum
+factor length and with the final token included in closure checks. The
+residual factor contributed <code>(1 - TTR) / (1 - 0.72)</code>; we
+averaged the forward and reverse MTLD scores arithmetically.</p>
+</blockquote>
+<p>Replace the version placeholder with
+<code>as.character(packageVersion("ldfreq"))</code> and describe the
+actual tokenization and exclusions. If using the legacy variant, report
+its <code>method_id</code> and ten-token minimum instead. For migration
+comparisons, record both definitions’ operators even when they are the
+same. The <a href="designing-comparisons.html#identify-where-the-min10-restriction-can-matter">factor
+screen</a> identifies where the minimum-length rule can matter. Changing
+the operator is a separate comparison: in teaching essay
+<code>024</code>, <code>&lt;</code> gives 86.1956 and <code>&lt;=</code>
+gives 64.3163 with every other setting fixed. Report the reference value
+when expressing this change as a percentage.</p>
 </div>
 <div class="section level2">
 <h2 id="what-to-cite">What to cite<a class="anchor" aria-label="anchor" href="#what-to-cite"></a>

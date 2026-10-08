@@ -317,20 +317,122 @@ check a study’s documents.</p>
 <span><span class="co">#&gt; 1     30        1        1                    0</span></span></code></pre></div>
 <p>All 30 paired scores agree (Spearman = 1; mean absolute change = 0);
 the empty document remains missing. These texts have 107–149 tokens and
-MTLD values 48.76–165.21. They do not estimate the effect on low-scoring
-learner essays. Report the paired count, missing cases, ranks and
-numerical changes for your own sample before combining old and new
-results. Correlation alone can conceal a systematic shift in values.
-With fewer than two finite pairs or constant scores, rank correlation is
-not defined.</p>
+MTLD values 48.76–165.21. The agreement has a structural explanation,
+which the factor screen below makes visible. These authored texts do not
+estimate the effect on low-scoring learner essays. Report the paired
+count, missing cases, ranks and numerical changes for your own sample
+before combining old and new results. Correlation alone can conceal a
+systematic shift in values. With fewer than two finite pairs or constant
+scores, rank correlation is not defined.</p>
+</div>
+<div class="section level3">
+<h3 id="identify-where-the-min10-restriction-can-matter">Identify where the min10 restriction can matter<a class="anchor" aria-label="anchor" href="#identify-where-the-min10-restriction-can-matter"></a>
+</h3>
+<p>For an input of at least ten tokens, if <strong>neither direction has
+a complete factor shorter than ten tokens</strong> under the current
+definition, the old min10 restriction never blocks a closure. Both scans
+therefore start each next factor at the same token, leave the same
+residual tail, and return the same score (or the same
+<code>no_factor</code> missing result). This is a sufficient condition
+for agreement, not a necessary one: a short factor can change the
+segmentation without changing the final directional mean.</p>
+<p>This small analysis helper inspects the same ordered token vector
+used for MTLD. Use the same threshold as in the metric calculation. It
+is tutorial code; it does not add fields to package results or change
+the MTLD definition.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mtld_factor_screen</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">threshold</span> <span class="op">=</span> <span class="fl">0.72</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">is.character</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="va">threshold</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">threshold</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1L</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">threshold</span><span class="op">)</span>, <span class="va">threshold</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="va">threshold</span> <span class="op">&lt;</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="va">scan</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">start</span> <span class="op">&lt;-</span> <span class="fl">1L</span></span>
+<span>    <span class="va">complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">n</span> <span class="op">&lt;-</span> <span class="va">i</span> <span class="op">-</span> <span class="va">start</span> <span class="op">+</span> <span class="fl">1L</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">start</span><span class="op">:</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="va">n</span> <span class="op">&lt;</span> <span class="va">threshold</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="va">complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">complete</span>, <span class="va">n</span><span class="op">)</span></span>
+<span>        <span class="va">start</span> <span class="op">&lt;-</span> <span class="va">i</span> <span class="op">+</span> <span class="fl">1L</span></span>
+<span>      <span class="op">}</span></span>
+<span>    <span class="op">}</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>minimum <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">complete</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">complete</span><span class="op">)</span> <span class="kw">else</span> <span class="cn">NA_integer_</span>,</span>
+<span>      short <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">complete</span> <span class="op">&lt;</span> <span class="fl">10L</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">forward</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/scan.html" class="external-link">scan</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="va">reverse</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/scan.html" class="external-link">scan</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, forward_min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">forward</span><span class="op">[</span><span class="st">"minimum"</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>    reverse_min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">reverse</span><span class="op">[</span><span class="st">"minimum"</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>    forward_short <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">forward</span><span class="op">[</span><span class="st">"short"</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>    reverse_short <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">reverse</span><span class="op">[</span><span class="st">"short"</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>    screen <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">10L</span><span class="op">)</span> <span class="st">"legacy_ineligible"</span> <span class="kw">else</span> <span class="kw">if</span></span>
+<span>      <span class="op">(</span><span class="va">forward</span><span class="op">[</span><span class="st">"short"</span><span class="op">]</span> <span class="op">+</span> <span class="va">reverse</span><span class="op">[</span><span class="st">"short"</span><span class="op">]</span> <span class="op">==</span> <span class="fl">0L</span><span class="op">)</span> <span class="st">"no_min10_effect"</span> <span class="kw">else</span></span>
+<span>      <span class="st">"possible_min10_effect"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The minima count <strong>complete factors only</strong>; an
+unfinished tail is not a short complete factor. <code>NA</code> means
+that direction has no complete factor. Fewer than ten tokens are
+classified separately because the legacy method cannot return a score. A
+screen classification does not replace the metric’s status or establish
+that a text is long enough for a study’s purposes.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">factor_screen</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">tokens</span>, <span class="va">mtld_factor_screen</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">factor_screen</span><span class="op">$</span><span class="va">document_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">tokens</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">factor_screen</span><span class="op">$</span><span class="va">screen</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; legacy_ineligible   no_min10_effect </span></span>
+<span><span class="co">#&gt;                 1                30</span></span>
+<span><span class="va">shortest</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmin</a></span><span class="op">(</span><span class="va">factor_screen</span><span class="op">$</span><span class="va">forward_min</span>, <span class="va">factor_screen</span><span class="op">$</span><span class="va">reverse_min</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>shortest_complete_factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">shortest</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  documents_with_complete_factors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">shortest</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  median_document_minimum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">shortest</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   shortest_complete_factor documents_with_complete_factors</span></span>
+<span><span class="co">#&gt; 1                       14                              22</span></span>
+<span><span class="co">#&gt;   median_document_minimum</span></span>
+<span><span class="co">#&gt; 1                      39</span></span></code></pre></div>
+<p>All 30 essays are <code>no_min10_effect</code>: the shortest complete
+factor in either direction is 14 tokens. Among the 22 essays with at
+least one complete factor, the median document minimum is 39 tokens. The
+other eight have only residual factors in both directions. Assigning
+<code>Inf</code> to those eight and taking the median over all 30 would
+give 45; this example leaves their absent minima as <code>NA</code> and
+states the 22-document denominator. Thus the observed agreement is
+guaranteed by their factor lengths, not evidence that the two
+definitions are interchangeable. The empty document is
+<code>legacy_ineligible</code>.</p>
+<p>For your own corpus, retain this table alongside the scores. Only
+rows marked <code>possible_min10_effect</code> need the legacy
+calculation to determine a numerical change, provided the token stream
+and all other settings are unchanged. Report the potentially affected
+count separately from the actually changed count; also report ineligible
+and missing cases. For example,
+<code>subset(factor_screen, screen == "possible_min10_effect")</code>
+selects the documents to inspect. With no complete factors, the document
+minimum remains <code>NA</code>; do not substitute zero or infer a low
+MTLD score from it.</p>
+<p>In a local check of the saved original ICNALE GRA V2.1 token streams,
+the same screen and actual old/new scores were compared separately for
+learners and English native speakers. Aggregate results and the
+reproduction procedure are in the <a href="https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/mtld-migration" class="external-link">migration
+record</a>. The corpus texts and individual results are not distributed.
+Of the 136 learner essays, 15 (11.03%) had a short factor and all 15
+changed; the remaining 121 were guaranteed unchanged. The A2 subset had
+2 changes in 31 essays (6.45%). One of the four ENS essays also changed.
+These are descriptive results for the retained sample and preparation,
+not population rates or evidence that the restriction affects only
+beginners.</p>
 <p>Both methods above use strict <code>&lt;</code>. Changing only the
 comparison to <code>&lt;=</code> is a different sensitivity analysis:
 for teaching essay <code>024</code>, a transparent no-minimum reference
 gives 86.1956 with <code>&lt;</code> and 64.3163 with
-<code>&lt;=</code>. The <a href="https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/mtld-migration" class="external-link">executed
+<code>&lt;=</code>: a 25.38% decrease relative to the strict value
+(equivalently, strict is 34.02% higher relative to the inclusive value).
+The <a href="https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/mtld-migration" class="external-link">executed
 migration record</a> preserves the document-level outputs, operator-only
 reference and exact input hashes. The boundary effect depends on the
-token sequence, so there is no universal percentage adjustment.</p>
+token sequence, so there is no universal percentage adjustment. Include
+the operator in your methods statement; see the <a href="from-text-to-report.html#save-enough-to-reproduce-and-report-the-analysis">reporting
+guide</a>.</p>
 <p>Expected-TTR D is experimental and excluded from defaults.
 Near-all-unique texts yield large estimates because the target curve
 approaches one. The numerical correction in package 0.2.0 does not
@@ -347,7 +449,7 @@ YouTube subtitles, use TUBELEX as a separate corpus-relative measure.
 Its Treebank segmentation is not supplied by the general Unicode
 tokenizer in this package. Prepare and record a compatible external
 pipeline; these hand-prepared terms illustrate only one sentence.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"I"</span>, <span class="st">"do"</span>, <span class="st">"n't"</span>, <span class="st">"think"</span>, <span class="st">"it"</span>, <span class="st">"'s"</span>, <span class="st">"a"</span>, <span class="st">"book"</span><span class="op">)</span></span>
 <span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="va">terms</span><span class="op">)</span></span>
 <span><span class="va">frequency</span><span class="op">$</span><span class="va">summary</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weighting"</span>, <span class="st">"coverage"</span>, <span class="st">"mean_zipf"</span><span class="op">)</span><span class="op">]</span></span>
