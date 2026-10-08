@@ -473,6 +473,6 @@ print.lexdiv_variant_results <- function(x, ...) {
     ),
     names(x)
   )
-  print.data.frame(x[visible], ...)
+  .print_lexdiv_table(x, visible, ...)
   invisible(x)
 }

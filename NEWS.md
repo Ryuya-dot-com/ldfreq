@@ -1,3 +1,16 @@
+# ldfreq 0.3.0.9002 (development)
+
+- Expose tail-only sequential MTLD estimation and forward/reverse disagreement
+  in all compact metric result displays, including saved older results. Values,
+  statuses, stored schemas and public function signatures remain unchanged.
+- Explain the advisory 50-token floor and the limits of factor counts and
+  directional disagreement. A zero gap can accompany entirely tail-based
+  estimation; it is not a precision estimate. Add ordinary-table extraction,
+  sample length associations and a copyable diagnostic reporting example.
+- Add executed raw-text comparisons for eight pinned preprocessing configurations
+  and a reproducible PELIC learner-writing example with local downloads and
+  published aggregates. No corpus texts or new dependencies are bundled.
+
 # ldfreq 0.3.0.9001 (development)
 
 - Extend the MTLD migration tutorial with a complete-factor screen: no factor

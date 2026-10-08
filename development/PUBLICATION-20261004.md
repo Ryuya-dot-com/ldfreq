@@ -4454,3 +4454,62 @@ step was resumed with network access. Completed article calculations were reused
 The 30 prepared token streams are identical to the previous migration RDS.
 No numerical package or external-tool suite was repeated for this documentation
 change. CI and public source/site verification follow the normal protected flow.
+
+
+### Published factor-screen update: PR #33
+
+Main `81b63d7affe49db9e0066c0cb557a03fbb5c0731` and PR head `939026f` share
+tree `d028ad35a1c3a8a8fc8f5071c490803a3d244b01`. PR run 37707695156 passed
+all 11 jobs. Current three OS and R-devel each passed 8,286 assertions and
+vignette rebuilding with Status: OK; R4.1 also passed. C passed 7,929 with
+zero failures, one existing encoding warning and 29 explicit skips. Its R
+setup took 13m40s and dependency setup 8m44s; installation/tests then finished
+in 2m13s. No job was cancelled or retried and no timeout was extended.
+
+Pages commit `bf3998deb0661458bd060834ed6a475ebc3292df`, run 37710007641,
+succeeded. Anonymous retrieval matches all 14 changed source files and all six
+changed site files byte-for-byte. Source and site release identities, full
+CI logs and verification JSON are retained in the evidence directory. The
+prior release note's pending CI checkpoint was updated with its verified final
+setup timeout; its tag/archive were not modified, and the note was read back.
+
+Main run 37709966063 is normally triggered and still in progress at this
+checkpoint; its standard watcher continues in `main-watch.log`. Acceptance
+uses the complete same-tree PR checks plus deployed-content verification, not
+a claim that the separate main run has already passed. Completion receipts
+are local-only updates, avoiding a new source/site build or duplicate CI for
+receipt text. API, formulas, datasets/licenses and fixed tags are unchanged.
+
+
+## 2026-10-08: MTLD factor support and raw-text/learner examples (local checks)
+
+Current correction: 0.3.0.9002, same 57 exports, unchanged numerical methods and
+stored result schemas. All five direct metric printers derive tail-only flags
+and directional gaps from existing diagnostics; old saved objects are supported.
+A shared helper prevents the batch/profile/legacy display paths from diverging.
+The gap is descriptive order sensitivity, not an uncertainty estimate.
+
+Local evidence: `reviews/ldfreq-mtld-support-20261008/` in the workspace.
+Focused API/batch/profile/variant/display tests passed 455 assertions without
+failures, errors, skips or warnings. The new installed display tests passed all
+47 assertions under LANG=C / LC_ALL=C. R CMD build rebuilt all 22 vignettes;
+installation of its archive succeeded. The archive has 443 members and excludes
+experiments/development and corpus caches. SHA-256:
+`7af26848172092aa59c61f3fc1c8c8cc5cff960414693741aa0ee8377b78e9d7`.
+
+The raw-text runners executed four authored inputs in eight configurations.
+Native TTR matches scoring-token TTR in all 32 records. Source/model versions,
+inputs, tokens and native/common MTLD outputs are frozen under
+`experiments/raw-text-comparison/results/`. No upstream code, data or model is
+redistributed. PELIC v1.0 is retrieved only into a local cache; selected writing
+prompt 3042 has 16 unique writers, course level 3, analyzed N=70–314. The public
+learner-length record retains aggregate correlations, factor support and a
+fixed-three-document prefix demonstration, with input hashes and selection
+rules. Original and transformed corpus text is not included in the repository.
+These are executed examples, not psychometric or novice-usability validation.
+
+Previous main CI 37709966063 completed all 11 jobs successfully; its final JSON
+is retained in the previous evidence directory. No rerun or cancellation was
+needed. For the present change, site build, normal protected PR CI, fixed
+prerelease and anonymous publication checks are subsequent acceptance steps.
+No CRAN submission is authorized or performed.

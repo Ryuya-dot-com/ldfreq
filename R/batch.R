@@ -244,6 +244,6 @@ print.lexdiv_batch_results <- function(x, ...) {
     ),
     names(x)
   )
-  print.data.frame(x[visible_names], ...)
+  .print_lexdiv_table(x, visible_names, ...)
   invisible(x)
 }

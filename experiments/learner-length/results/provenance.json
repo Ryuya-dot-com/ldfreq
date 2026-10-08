@@ -1,0 +1,41 @@
+{
+  "corpus": "PELIC v1.0",
+  "commit": "853e9e545cc7a78a70839c68e8ed293cc7ed9c2c",
+  "doi": "10.5281/zenodo.3991977",
+  "input_sha256": {
+    "answer": "8fc5b9dc8148f0330231d67efc2f855a6ee520aeabe2be4afdb442b3ce6e6f82",
+    "course": "d6b710cd284126383f96dd9fccc088ba3dcb28b5e80349cde531d565254c22c2",
+    "question": "0b789694740ffae6620bb3f3e65d3ed18dcde3278fa1de5d821fbcaf5873e5cf"
+  },
+  "license": "CC BY-NC-ND 4.0 in upstream README; Zenodo metadata says CC BY-ND 4.0",
+  "policy": "Follow upstream noncommercial condition; no texts or token sequences redistributed",
+  "selection": "version 1; writing class w; essay type 4; most unique writers per prompt; ties lowest numeric question_id; first numeric answer_id per writer",
+  "question_id": "3042",
+  "levels": {
+    "3": 16
+  },
+  "tokenizer": {
+    "contract_id": "ldfreq-preprocessing",
+    "contract_version": "0.4.0",
+    "tokenizer_id": "ldfreq-english-word-tokenizer",
+    "tokenizer_version": "0.1.0"
+  },
+  "parameters": {
+    "metrics": [
+      "ttr",
+      "mattr",
+      "mtld"
+    ],
+    "window_length": 50,
+    "threshold": 0.72,
+    "operator": "<",
+    "case": "lower",
+    "normalization": "NFC",
+    "unit": "surface",
+    "tokenizer": "english",
+    "keep_numbers": false
+  },
+  "package": "0.3.0.9002",
+  "R": "4.6.1",
+  "source_sha256": "74e78ff083d88681eb5f85329897bf07cf57ad344558817b8c12358d2018400e"
+}

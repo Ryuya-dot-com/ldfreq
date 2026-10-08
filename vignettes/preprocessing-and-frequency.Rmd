@@ -969,6 +969,17 @@ still requires the same token sequence and a separately version-pinned TAALED
 run; preprocessing, short-input, and missing-value policies must be compared
 independently.
 
+The [executed raw-text audit](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/raw-text-comparison)
+now supplies that separate comparison for four authored inputs and eight
+explicit configurations of ldfreq, koRpus, quanteda and TAALED/Pylats. It
+retains scoring tokens and distinguishes native scores from scores using one
+common formula. For a contraction example, ldfreq English/lower retains 34
+tokens, koRpus 46, and TAALED with Pylats lemma/POS settings 41; the lexical
+units differ as well. TAALED's space-split fallback and Pylats configurations
+are recorded separately. A content-word alternative is explicitly configured,
+not described as a universal TAALED default. These examples identify pipeline
+differences, not a conversion factor for scores from published studies.
+
 ## Frequency is relative to a corpus
 
 Bottini and Le Foll (2025, <https://doi.org/10.1075/ijlcr.23029.bot>) show that
