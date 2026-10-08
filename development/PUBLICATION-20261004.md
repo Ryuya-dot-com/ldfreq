@@ -4666,3 +4666,85 @@ guides. Full pkgdown build succeeded: 129 HTML / 253 files, zero missing local
 links or private local paths; 78 site files changed. API and minimum-R note
 policy audits passed. Protected PR checks, fixed development tag/prerelease
 and actual public-byte verification follow; CRAN submission remains excluded.
+
+### Publication completion for PR #37
+
+- Main: `6b4bbe92899f58e55f223f20e70034f1d1615334`; checked PR head
+  `b0a9db045ec8d5d80d72c61e141d33aa14bcb4ac`. Both have source tree
+  `18364fc7b5d3133fdd51394799f49c42589edbee`.
+- PR run 37726626468 passed all 11 jobs. Current macOS, Windows, Linux and
+  R-devel each passed 8,399 assertions, no failures/warnings/skips, Status: OK,
+  including full vignette rebuilding. The R4.1 job succeeded. C locale passed
+  7,976 assertions with no failures, one existing quanteda encoding warning and
+  32 conditional skips. The new phrase-review example requires UTF-8 and is
+  not a C/CP932 validation. The watch client had one network timeout; only
+  monitoring was resumed, without cancelling or rerunning CI.
+- Fixed annotated tag `v0.3.0.9003` points to the merged main. GitHub prerelease
+  includes the previously validated archive and SHA256SUMS.txt; both anonymously
+  downloaded assets match local bytes and GitHub's asset digests exactly.
+  Actual pak installation from the tag into a separate library succeeded.
+  Its RemoteSha, version/citation, installed helper/demo bytes, authored English/
+  Japanese results, complete CSV application and saved RDS replay were checked.
+- Pages `3fe528ef965c4d0086ec2da5fcc90ce3c0584962`, run 37727715167,
+  succeeded. Anonymous delivery of all 11 changed source files and all 78 changed
+  site files matches the locally validated bytes exactly. Local site audit:
+  129 HTML / 253 files, zero missing internal links or private local paths.
+- Main run 37727604102 is separately in progress. Its standard watcher records
+  the final JSON/log in reviews/ldfreq-phrase-review-20261008. Acceptance uses
+  completed same-tree PR checks and actual publication, not a claim that the
+  main rerun is complete. Completion receipts remain local until a substantive
+  subsequent change; no receipt-only repush. No CRAN submission.
+- These checks establish source correspondence, counting and replay, not
+  independent rater reliability, psycholinguistic validity or novice usability.
+  Public exports, core formulas, metric schemas, dependencies and bundled data
+  remain unchanged; earlier fixed tags/releases were retained.
+
+Follow-up on 2026-10-08: the saved final JSON confirms main run 37727604102
+completed successfully in all 11 jobs on the same merged SHA. This closes the
+separate main tracking recorded as pending at publication. No rerun or
+receipt-only push was needed.
+
+## 2026-10-08 literature-grounded phrase agreement: local acceptance
+
+Scope: a guide-local recipe on the existing 0.3.0.9003 installation, with no
+new public exports, dependencies, core metric definitions, installed helpers
+or tag/release. The annotation literature informs the coding unit, two-rater
+nominal model, separate marginal counts, independent pre-discussion decisions
+and limits of agreement as validity evidence. The handling of unresolved and
+unreviewed states is explicitly this workflow's conditional-analysis policy,
+not a universal rule attributed to a paper.
+
+Read the relevant sections of Carletta (1996), pp. 250--253;
+Di Eugenio and Glass (2004), pp. 96--100; and Artstein and Poesio (2008),
+sections 2.1--2.4 and Tables 1--2. Links are in the guide. Zotero title/creator
+searches for agreement, reliability, kappa and Artstein did not locate these
+direct method references; official public originals supply the actual basis.
+No library writes or private corpus uploads were made.
+
+Evidence: reviews/ldfreq-phrase-agreement-20261008. Six guide chunks, including
+the optional irr path, execute on the GitHub-installed 0.3.0.9003. Hand-checked
+counts retain all ten occurrences: four jointly decisive, three agreements,
+one disagreement and six incomplete cases; seven queue entries and 18 document
+profile rows. Nine rejection cases, reordered worksheets, empty/no-paired
+and constant-label cases, unchanged original tokens and complete RDS/optional
+kappa replay pass. The public API audit retains 57 exports.
+
+The external irr 0.85 engine reproduces five published count tables against
+independent exact fraction arithmetic. Artstein/Poesio Table 1 gives 8/23.
+Di Eugenio/Glass Examples 3--6 give -1/19, 4/5, 2/7 and 4/11. The printed
+kappa values in Examples 3, 5 and 6 disagree with their displayed counts;
+Example 5's printed expected agreement is also inconsistent (0.52 versus
+0.51 from the margins). The actual PDF table was visually inspected. Initial
+assertions using reported values failed; the expected values were corrected
+from the counts, without changing the coefficient engine. The public guide
+and coefficient-audit.csv distinguish this from algorithm disagreement.
+
+Independent human agreement, inventory recall, novice usability and uncertainty
+estimation remain separate research tasks. CRAN submission is excluded.
+
+The entire changed article, home and NEWS rendered without warnings. The
+initial site audit detected stale Markdown from the previous publication;
+only the standard HTML-to-Markdown step was then run, without rerunning the
+successful guide calculations. Final audit: 129 HTML / 253 files, zero missing
+internal links or private paths, eight changed publication files. Normal PR
+checks and anonymous delivery verification follow. Minimum-R note policy passes.
