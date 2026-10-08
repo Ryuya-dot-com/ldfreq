@@ -1,5 +1,10 @@
 # ldfreq 0.3.0.9003 (development)
 
+- Extend the phrase-review guide with literature-grounded comparison of two
+  raters, explicit paired-decision denominators, open-case KWIC, separately
+  recorded discussion and original document profiles. An optional `irr`
+  recipe names unweighted Cohen kappa and is checked against published count
+  tables. Guide-local code runs on 0.3.0.9003; no new export or dependency.
 - Connect exact phrase-list matches to contextual acceptance review in an
   explicitly sourced example. Keep accepted, rejected, unresolved and unreviewed
   occurrences, complete source-bound CSV worksheets and document-by-phrase counts.

@@ -300,6 +300,11 @@ from a complete review, retains overlap without double counting tokens, and
 saves the complete source-linked record. It does not change the original
 word tokens or infer whether an expression is idiomatic.
 
+The [two-rater comparison](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.html#phrase-agreement)
+keeps open cases, paired-decision denominators and category counts visible,
+connects optionally to `irr` for Cohen kappa, and preserves separate discussion
+decisions and document profiles. Its guide-local code runs on 0.3.0.9003.
+
 ## Installation
 
 Version 0.3.0.9003 is a development prerelease and has not been released on CRAN.
