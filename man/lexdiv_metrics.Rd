@@ -149,6 +149,21 @@ otherwise computable value. Unicode encoding-marker canonicalization is not
 Unicode normalization: canonically equivalent but scalar-distinct strings
 remain distinct types.
 
+For sequential bidirectional MTLD, the compact display adds two columns
+derived from existing \code{diagnostics}: \code{mtld_tail_only} is true when
+either direction has zero complete factors, and \code{mtld_gap_pct} is
+\code{100 * abs(forward_score - reverse_score) / mean(c(forward_score,
+reverse_score))}. These are display columns, not additional stored result
+fields. A tail-only direction extrapolates from its fractional tail; a zero
+gap is possible when both directions have no complete factors. The gap
+describes order sensitivity, not standard error, reliability or a confidence
+interval. The 50-token MTLD floor is a retained advisory length screen, not a
+validated cutoff for the current no-minimum definition. The study-specific
+50/100-token evidence and method-equivalence limits are recorded by
+\code{lexdiv_length_evidence()}. Neither passing the length screen nor having
+complete factors establishes precision. See the designing-comparisons guide
+for a numeric table of counts, tails and directional scores.
+
 Within the same exact method and design, Maas a-squared and Yule's K
 conventionally decrease as repetition decreases; the other ten supported methods
 conventionally increase with observed lexical variety or lower repetition.

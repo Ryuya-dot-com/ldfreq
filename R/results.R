@@ -301,6 +301,44 @@
   output
 }
 
+# Print-only diagnostics keep stored records and earlier RDS files compatible.
+.print_lexdiv_table <- function(x, visible, ...) {
+  display <- as.data.frame(x[visible])
+  if ("diagnostics" %in% names(x)) {
+    fields <- c("forward_score", "reverse_score",
+                "forward_complete_factors", "reverse_complete_factors")
+    eligible <- vapply(x$diagnostics, function(d) {
+      is.list(d) && all(fields %in% names(d)) &&
+        all(vapply(d[fields], function(z) {
+          is.numeric(z) && length(z) == 1L && is.finite(z)
+        }, logical(1L)))
+    }, logical(1L))
+    if (any(eligible)) {
+      display$mtld_tail_only <- rep(NA, nrow(x))
+      display$mtld_gap_pct <- rep(NA_real_, nrow(x))
+      for (i in which(eligible)) {
+        d <- x$diagnostics[[i]]
+        display$mtld_tail_only[[i]] <-
+          min(d$forward_complete_factors, d$reverse_complete_factors) == 0
+        mean_score <- mean(c(d$forward_score, d$reverse_score))
+        display$mtld_gap_pct[[i]] <- if (mean_score > 0) {
+          100 * abs(d$forward_score - d$reverse_score) / mean_score
+        } else NA_real_
+      }
+    }
+  }
+  print.data.frame(display, ...)
+  if ("mtld_tail_only" %in% names(display)) {
+    cat("MTLD gap (%): absolute forward/reverse difference / their mean; not a precision estimate.\n")
+    if (any(display$mtld_tail_only, na.rm = TRUE)) {
+      cat("Attention: mtld_tail_only = TRUE means no complete factor in at least one direction.\n",
+          "That direction is estimated from the fractional tail alone; status 'ok' means computable.\n",
+          sep = "")
+    }
+  }
+  invisible(x)
+}
+
 #' @export
 print.lexdiv_results <- function(x, ...) {
   contract_version <- attr(x, "contract_version", exact = TRUE)
@@ -320,6 +358,6 @@ print.lexdiv_results <- function(x, ...) {
     ),
     names(x)
   )
-  print.data.frame(x[visible_names], ...)
+  .print_lexdiv_table(x, visible_names, ...)
   invisible(x)
 }

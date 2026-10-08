@@ -1,0 +1,813 @@
+{
+  "R": "4.6.1",
+  "versions": {
+    "ldfreq": "0.3.0.9002",
+    "koRpus": "0.13.9",
+    "quanteda": "4.5.0",
+    "quanteda.textstats": "0.97.2",
+    "stringi": "1.8.9"
+  },
+  "inputs_sha256": "d0f4e849b1bd49a629fd233ad264d528b57d7faed388ffd754e7520ee4fa501d",
+  "results": [
+    {
+      "case": "contractions",
+      "pipeline": "ldfreq_default",
+      "tokens": ["Don't", "stop", "because", "I", "don't", "know", "I", "can't", "say", "that", "she", "won't", "try", "She's", "ready", "isn't", "she", "Don't", "stop", "because", "I", "don’t", "know", "I", "can’t", "say", "that", "she", "won’t", "try", "She’s", "ready", "isn’t", "she"],
+      "native_ttr": 0.588235294117647,
+      "native_mtld": 25.0892933163048,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.588235294117647,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 34,
+          "V": 20
+        },
+        {
+          "metric_id": "mtld",
+          "value": 25.0892933163048,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 34,
+          "V": 20
+        }
+      ]
+    },
+    {
+      "case": "contractions",
+      "pipeline": "ldfreq_english_lower",
+      "tokens": ["don't", "stop", "because", "i", "don't", "know", "i", "can't", "say", "that", "she", "won't", "try", "she's", "ready", "isn't", "she", "don't", "stop", "because", "i", "don't", "know", "i", "can't", "say", "that", "she", "won't", "try", "she's", "ready", "isn't", "she"],
+      "native_ttr": 0.411764705882353,
+      "native_mtld": 18.029114480334,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.411764705882353,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 34,
+          "V": 14
+        },
+        {
+          "metric_id": "mtld",
+          "value": 18.029114480334,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 34,
+          "V": 14
+        }
+      ]
+    },
+    {
+      "case": "contractions",
+      "pipeline": "koRpus_tokenize_lexdiv",
+      "tokens": ["don", "t", "stop", "because", "i", "don", "t", "know", "i", "can", "t", "say", "that", "she", "won", "t", "try", "she", "s", "ready", "isn", "t", "she", "don", "t", "stop", "because", "i", "don", "t", "know", "i", "can", "t", "say", "that", "she", "won", "t", "try", "she", "s", "ready", "isn", "t", "she"],
+      "native_ttr": 0.326086956521739,
+      "native_mtld": 13.4370026525199,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.326086956521739,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 46,
+          "V": 15
+        },
+        {
+          "metric_id": "mtld",
+          "value": 13.4370026525199,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 46,
+          "V": 15
+        }
+      ]
+    },
+    {
+      "case": "contractions",
+      "pipeline": "quanteda_tokens_textstat",
+      "tokens": ["don't", "stop", "because", "i", "don't", "know", "i", "can't", "say", "that", "she", "won't", "try", "she's", "ready", "isn't", "she", "don't", "stop", "because", "i", "don’t", "know", "i", "can’t", "say", "that", "she", "won’t", "try", "she’s", "ready", "isn’t", "she"],
+      "native_ttr": 0.558823529411765,
+      "native_mtld": null,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.558823529411765,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 34,
+          "V": 19
+        },
+        {
+          "metric_id": "mtld",
+          "value": 17.4811320754717,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 34,
+          "V": 19
+        }
+      ]
+    },
+    {
+      "case": "case_punctuation",
+      "pipeline": "ldfreq_default",
+      "tokens": ["CAT", "cat", "Cat", "cats", "CATS", "A", "well-known", "cat", "visits", "New", "York", "in", "The", "cats", "cost", "they", "cost", "dollars", "CAT", "cat", "Cat", "cats", "CATS", "A", "well-known", "cat", "visits", "New", "York", "in"],
+      "native_ttr": 0.5,
+      "native_mtld": 25.7386363636364,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.5,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 30,
+          "V": 15
+        },
+        {
+          "metric_id": "mtld",
+          "value": 25.7386363636364,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 30,
+          "V": 15
+        }
+      ]
+    },
+    {
+      "case": "case_punctuation",
+      "pipeline": "ldfreq_english_lower",
+      "tokens": ["cat", "cat", "cat", "cats", "cats", "a", "well-known", "cat", "visits", "new", "york", "in", "the", "cats", "cost", "they", "cost", "dollars", "cat", "cat", "cat", "cats", "cats", "a", "well-known", "cat", "visits", "new", "york", "in"],
+      "native_ttr": 0.4,
+      "native_mtld": 12.5,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.4,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 30,
+          "V": 12
+        },
+        {
+          "metric_id": "mtld",
+          "value": 12.5,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 30,
+          "V": 12
+        }
+      ]
+    },
+    {
+      "case": "case_punctuation",
+      "pipeline": "koRpus_tokenize_lexdiv",
+      "tokens": ["cat", "cat", "cat", "cats", "cats", "a", "well-known", "cat", "visits", "new", "york", "in", "2024", "the", "cats", "cost", "$", "42", "they", "cost", "42", "dollars", "cat", "cat", "cat", "cats", "cats", "a", "well-known", "cat", "visits", "new", "york", "in", "2024"],
+      "native_ttr": 0.428571428571429,
+      "native_mtld": 11.6666666666667,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.428571428571429,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 35,
+          "V": 15
+        },
+        {
+          "metric_id": "mtld",
+          "value": 11.6666666666667,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 35,
+          "V": 15
+        }
+      ]
+    },
+    {
+      "case": "case_punctuation",
+      "pipeline": "quanteda_tokens_textstat",
+      "tokens": ["cat", "cat", "cat", "cats", "cats", "a", "well-known", "cat", "visits", "new", "york", "in", "the", "cats", "cost", "they", "cost", "dollars", "cat", "cat", "cat", "cats", "cats", "a", "well-known", "cat", "visits", "new", "york", "in"],
+      "native_ttr": 0.4,
+      "native_mtld": null,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.4,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 30,
+          "V": 12
+        },
+        {
+          "metric_id": "mtld",
+          "value": 12.5,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 30,
+          "V": 12
+        }
+      ]
+    },
+    {
+      "case": "lemma_pos",
+      "pipeline": "ldfreq_default",
+      "tokens": ["I", "use", "a", "record", "to", "record", "results", "Students", "study", "the", "studies", "and", "studied", "the", "result", "She", "runs", "and", "he", "is", "running", "I", "use", "a", "record", "to", "record", "results", "Students", "study", "the", "studies", "and", "studied", "the", "result", "She", "runs", "and", "he", "is", "running"],
+      "native_ttr": 0.428571428571429,
+      "native_mtld": 29.037037037037,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.428571428571429,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 18
+        },
+        {
+          "metric_id": "mtld",
+          "value": 29.037037037037,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 18
+        }
+      ]
+    },
+    {
+      "case": "lemma_pos",
+      "pipeline": "ldfreq_english_lower",
+      "tokens": ["i", "use", "a", "record", "to", "record", "results", "students", "study", "the", "studies", "and", "studied", "the", "result", "she", "runs", "and", "he", "is", "running", "i", "use", "a", "record", "to", "record", "results", "students", "study", "the", "studies", "and", "studied", "the", "result", "she", "runs", "and", "he", "is", "running"],
+      "native_ttr": 0.428571428571429,
+      "native_mtld": 29.037037037037,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.428571428571429,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 18
+        },
+        {
+          "metric_id": "mtld",
+          "value": 29.037037037037,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 18
+        }
+      ]
+    },
+    {
+      "case": "lemma_pos",
+      "pipeline": "koRpus_tokenize_lexdiv",
+      "tokens": ["i", "use", "a", "record", "to", "record", "results", "students", "study", "the", "studies", "and", "studied", "the", "result", "she", "runs", "and", "he", "is", "running", "i", "use", "a", "record", "to", "record", "results", "students", "study", "the", "studies", "and", "studied", "the", "result", "she", "runs", "and", "he", "is", "running"],
+      "native_ttr": 0.428571428571429,
+      "native_mtld": 29.037037037037,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.428571428571429,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 18
+        },
+        {
+          "metric_id": "mtld",
+          "value": 29.037037037037,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 18
+        }
+      ]
+    },
+    {
+      "case": "lemma_pos",
+      "pipeline": "quanteda_tokens_textstat",
+      "tokens": ["i", "use", "a", "record", "to", "record", "results", "students", "study", "the", "studies", "and", "studied", "the", "result", "she", "runs", "and", "he", "is", "running", "i", "use", "a", "record", "to", "record", "results", "students", "study", "the", "studies", "and", "studied", "the", "result", "she", "runs", "and", "he", "is", "running"],
+      "native_ttr": 0.428571428571429,
+      "native_mtld": null,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.428571428571429,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 18
+        },
+        {
+          "metric_id": "mtld",
+          "value": 29.037037037037,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 18
+        }
+      ]
+    },
+    {
+      "case": "learner_forms",
+      "pipeline": "ldfreq_default",
+      "tokens": ["I", "goed", "to", "school", "becuase", "my", "freind", "likes", "the", "school", "The", "students", "was", "happy", "and", "I", "was", "happy", "too", "I", "go", "to", "school", "because", "my", "friend", "likes", "the", "school", "The", "students", "were", "happy", "and", "I", "was", "happy", "too"],
+      "native_ttr": 0.5,
+      "native_mtld": 30.6923076923077,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.5,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 38,
+          "V": 19
+        },
+        {
+          "metric_id": "mtld",
+          "value": 30.6923076923077,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 38,
+          "V": 19
+        }
+      ]
+    },
+    {
+      "case": "learner_forms",
+      "pipeline": "ldfreq_english_lower",
+      "tokens": ["i", "goed", "to", "school", "becuase", "my", "freind", "likes", "the", "school", "the", "students", "was", "happy", "and", "i", "was", "happy", "too", "i", "go", "to", "school", "because", "my", "friend", "likes", "the", "school", "the", "students", "were", "happy", "and", "i", "was", "happy", "too"],
+      "native_ttr": 0.473684210526316,
+      "native_mtld": 22.234648674436,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.473684210526316,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 38,
+          "V": 18
+        },
+        {
+          "metric_id": "mtld",
+          "value": 22.234648674436,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 38,
+          "V": 18
+        }
+      ]
+    },
+    {
+      "case": "learner_forms",
+      "pipeline": "koRpus_tokenize_lexdiv",
+      "tokens": ["i", "goed", "to", "school", "becuase", "my", "freind", "likes", "the", "school", "the", "students", "was", "happy", "and", "i", "was", "happy", "too", "i", "go", "to", "school", "because", "my", "friend", "likes", "the", "school", "the", "students", "were", "happy", "and", "i", "was", "happy", "too"],
+      "native_ttr": 0.473684210526316,
+      "native_mtld": 22.234648674436,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.473684210526316,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 38,
+          "V": 18
+        },
+        {
+          "metric_id": "mtld",
+          "value": 22.234648674436,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 38,
+          "V": 18
+        }
+      ]
+    },
+    {
+      "case": "learner_forms",
+      "pipeline": "quanteda_tokens_textstat",
+      "tokens": ["i", "goed", "to", "school", "becuase", "my", "freind", "likes", "the", "school", "the", "students", "was", "happy", "and", "i", "was", "happy", "too", "i", "go", "to", "school", "because", "my", "friend", "likes", "the", "school", "the", "students", "were", "happy", "and", "i", "was", "happy", "too"],
+      "native_ttr": 0.473684210526316,
+      "native_mtld": null,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.473684210526316,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 38,
+          "V": 18
+        },
+        {
+          "metric_id": "mtld",
+          "value": 22.234648674436,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 38,
+          "V": 18
+        }
+      ]
+    },
+    {
+      "case": "contractions",
+      "pipeline": "taaled_fallback",
+      "tokens": ["don't", "stop", "because", "i", "don't", "know.", "i", "can't", "say", "that", "she", "won't", "try.", "she's", "ready,", "isn't", "she?", "don't", "stop", "because", "i", "don’t", "know.", "i", "can’t", "say", "that", "she", "won’t", "try.", "she’s", "ready,", "isn’t", "she?"],
+      "native_ttr": 0.588235294117647,
+      "native_mtld": 27.6567164179105,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.588235294117647,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 34,
+          "V": 20
+        },
+        {
+          "metric_id": "mtld",
+          "value": 19.4836394948335,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 34,
+          "V": 20
+        }
+      ]
+    },
+    {
+      "case": "case_punctuation",
+      "pipeline": "taaled_fallback",
+      "tokens": ["cat", "cat", "cat", "cats,", "cats!", "a", "well-known", "cat", "visits", "new", "york", "in", "2024.", "the", "cats", "cost", "$42;", "they", "cost", "42", "dollars.", "cat", "cat", "cat", "cats,", "cats!", "a", "well-known", "cat", "visits", "new", "york", "in", "2024."],
+      "native_ttr": 0.5,
+      "native_mtld": 16.533427163969,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.5,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 34,
+          "V": 17
+        },
+        {
+          "metric_id": "mtld",
+          "value": 17,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 34,
+          "V": 17
+        }
+      ]
+    },
+    {
+      "case": "lemma_pos",
+      "pipeline": "taaled_fallback",
+      "tokens": ["i", "use", "a", "record", "to", "record", "results.", "students", "study", "the", "studies", "and", "studied", "the", "result.", "she", "runs", "and", "he", "is", "running.", "i", "use", "a", "record", "to", "record", "results.", "students", "study", "the", "studies", "and", "studied", "the", "result.", "she", "runs", "and", "he", "is", "running."],
+      "native_ttr": 0.428571428571429,
+      "native_mtld": 29.037037037037,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.428571428571429,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 18
+        },
+        {
+          "metric_id": "mtld",
+          "value": 29.037037037037,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 18
+        }
+      ]
+    },
+    {
+      "case": "learner_forms",
+      "pipeline": "taaled_fallback",
+      "tokens": ["i", "goed", "to", "school", "becuase", "my", "freind", "likes", "the", "school.", "the", "students", "was", "happy", "and", "i", "was", "happy", "too.", "i", "go", "to", "school", "because", "my", "friend", "likes", "the", "school.", "the", "students", "were", "happy", "and", "i", "was", "happy", "too."],
+      "native_ttr": 0.5,
+      "native_mtld": 28.2171215880893,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.5,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 38,
+          "V": 19
+        },
+        {
+          "metric_id": "mtld",
+          "value": 28.2171215880893,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 38,
+          "V": 19
+        }
+      ]
+    },
+    {
+      "case": "contractions",
+      "pipeline": "taaled_pylats_surface",
+      "tokens": ["do", "n't", "stop", "because", "i", "do", "n't", "know", "i", "ca", "n't", "say", "that", "she", "wo", "n't", "try", "she", "'s", "ready", "is", "n't", "she", "do", "n't", "stop", "because", "i", "do", "n’t", "know", "i", "ca", "n’t", "say", "that", "she", "wo", "n’t", "try", "she", "’s", "ready", "is", "n’t", "she"],
+      "native_ttr": 0.369565217391304,
+      "native_mtld": 15.2410268059973,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.369565217391304,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 46,
+          "V": 17
+        },
+        {
+          "metric_id": "mtld",
+          "value": 15.4773252331651,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 46,
+          "V": 17
+        }
+      ]
+    },
+    {
+      "case": "contractions",
+      "pipeline": "taaled_pylats_ld",
+      "tokens": ["do_AUX", "not_PART", "stop_VERB", "because_SCONJ", "i_PRON", "do_AUX", "not_PART", "know_VERB", "i_PRON", "can_AUX", "not_PART", "say_VERB", "that_SCONJ", "she_PRON", "will_AUX", "not_PART", "try_VERB", "she_PRON", "be_AUX", "ready_ADJ", "be_AUX", "not_PART", "she_PRON", "do_AUX", "not_PART", "stop_VERB", "because_SCONJ", "i_PRON", "do_AUX", "know_VERB", "i_PRON", "can_AUX", "say_VERB", "that_SCONJ", "she_PRON", "will_AUX", "try_VERB", "she_PRON", "ready_ADJ", "be_AUX", "she_PRON"],
+      "native_ttr": 0.341463414634146,
+      "native_mtld": 17.2231457800512,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.341463414634146,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 41,
+          "V": 14
+        },
+        {
+          "metric_id": "mtld",
+          "value": 14.1714015151515,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 41,
+          "V": 14
+        }
+      ]
+    },
+    {
+      "case": "contractions",
+      "pipeline": "taaled_pylats_content",
+      "tokens": ["stop_VERB", "know_VERB", "say_VERB", "try_VERB", "ready_ADJ", "stop_VERB", "know_VERB", "say_VERB", "try_VERB", "ready_ADJ"],
+      "native_ttr": 0.5,
+      "native_mtld": 5.6,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.5,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 10,
+          "V": 5
+        },
+        {
+          "metric_id": "mtld",
+          "value": 10,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 10,
+          "V": 5
+        }
+      ]
+    },
+    {
+      "case": "case_punctuation",
+      "pipeline": "taaled_pylats_surface",
+      "tokens": ["cat", "cat", "cat", "cats", "cats", "a", "well", "known", "cat", "visits", "new", "york", "in", "the", "cats", "cost", "$", "they", "cost", "dollars", "cat", "cat", "cat", "cats", "cats", "a", "well", "known", "cat", "visits", "new", "york", "in"],
+      "native_ttr": 0.424242424242424,
+      "native_mtld": 16.2155172413793,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.424242424242424,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 33,
+          "V": 14
+        },
+        {
+          "metric_id": "mtld",
+          "value": 13.75,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 33,
+          "V": 14
+        }
+      ]
+    },
+    {
+      "case": "case_punctuation",
+      "pipeline": "taaled_pylats_ld",
+      "tokens": ["cat_PROPN", "cat_NOUN", "cat_PROPN", "cat_NOUN", "cat_NOUN", "a_DET", "well_ADV", "know_VERB", "cat_NOUN", "visit_VERB", "new_PROPN", "york_PROPN", "in_ADP", "the_DET", "cat_NOUN", "cost_VERB", "$_SYM", "they_PRON", "cost_VERB", "dollar_NOUN", "cat_PROPN", "cat_NOUN", "cat_PROPN", "cat_NOUN", "cat_NOUN", "a_DET", "well_ADV", "know_VERB", "cat_NOUN", "visit_VERB", "new_PROPN", "york_PROPN", "in_ADP"],
+      "native_ttr": 0.424242424242424,
+      "native_mtld": 14.8496232016442,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.424242424242424,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 33,
+          "V": 14
+        },
+        {
+          "metric_id": "mtld",
+          "value": 13.75,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 33,
+          "V": 14
+        }
+      ]
+    },
+    {
+      "case": "case_punctuation",
+      "pipeline": "taaled_pylats_content",
+      "tokens": ["cat_PROPN", "cat_NOUN", "cat_PROPN", "cat_NOUN", "cat_NOUN", "well_ADV", "know_VERB", "cat_NOUN", "visit_VERB", "new_PROPN", "york_PROPN", "cat_NOUN", "cost_VERB", "cost_VERB", "dollar_NOUN", "cat_PROPN", "cat_NOUN", "cat_PROPN", "cat_NOUN", "cat_NOUN", "well_ADV", "know_VERB", "cat_NOUN", "visit_VERB", "new_PROPN", "york_PROPN"],
+      "native_ttr": 0.346153846153846,
+      "native_mtld": 10.5746268656716,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.346153846153846,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 26,
+          "V": 9
+        },
+        {
+          "metric_id": "mtld",
+          "value": 7.58333333333333,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 26,
+          "V": 9
+        }
+      ]
+    },
+    {
+      "case": "lemma_pos",
+      "pipeline": "taaled_pylats_surface",
+      "tokens": ["i", "use", "a", "record", "to", "record", "results", "students", "study", "the", "studies", "and", "studied", "the", "result", "she", "runs", "and", "he", "is", "running", "i", "use", "a", "record", "to", "record", "results", "students", "study", "the", "studies", "and", "studied", "the", "result", "she", "runs", "and", "he", "is", "running"],
+      "native_ttr": 0.428571428571429,
+      "native_mtld": 29.037037037037,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.428571428571429,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 18
+        },
+        {
+          "metric_id": "mtld",
+          "value": 29.037037037037,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 18
+        }
+      ]
+    },
+    {
+      "case": "lemma_pos",
+      "pipeline": "taaled_pylats_ld",
+      "tokens": ["i_PRON", "use_VERB", "a_DET", "record_NOUN", "to_PART", "record_NOUN", "result_NOUN", "student_NOUN", "study_VERB", "the_DET", "study_NOUN", "and_CCONJ", "study_VERB", "the_DET", "result_NOUN", "she_PRON", "run_VERB", "and_CCONJ", "he_PRON", "be_AUX", "run_VERB", "i_PRON", "use_VERB", "a_DET", "record_NOUN", "to_PART", "record_NOUN", "result_NOUN", "student_NOUN", "study_VERB", "the_DET", "study_NOUN", "and_CCONJ", "study_VERB", "the_DET", "result_NOUN", "she_PRON", "run_VERB", "and_CCONJ", "he_PRON", "be_AUX", "run_VERB"],
+      "native_ttr": 0.357142857142857,
+      "native_mtld": 18.9778809997788,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.357142857142857,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 15
+        },
+        {
+          "metric_id": "mtld",
+          "value": 19.0839416058394,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 42,
+          "V": 15
+        }
+      ]
+    },
+    {
+      "case": "lemma_pos",
+      "pipeline": "taaled_pylats_content",
+      "tokens": ["use_VERB", "record_NOUN", "record_NOUN", "result_NOUN", "student_NOUN", "study_VERB", "study_NOUN", "study_VERB", "result_NOUN", "run_VERB", "run_VERB", "use_VERB", "record_NOUN", "record_NOUN", "result_NOUN", "student_NOUN", "study_VERB", "study_NOUN", "study_VERB", "result_NOUN", "run_VERB", "run_VERB"],
+      "native_ttr": 0.318181818181818,
+      "native_mtld": 8.40566037735849,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.318181818181818,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 22,
+          "V": 7
+        },
+        {
+          "metric_id": "mtld",
+          "value": 3.66666666666667,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 22,
+          "V": 7
+        }
+      ]
+    },
+    {
+      "case": "learner_forms",
+      "pipeline": "taaled_pylats_surface",
+      "tokens": ["i", "goed", "to", "school", "my", "freind", "likes", "the", "school", "the", "students", "was", "happy", "and", "i", "was", "happy", "too", "i", "go", "to", "school", "because", "my", "friend", "likes", "the", "school", "the", "students", "were", "happy", "and", "i", "was", "happy", "too"],
+      "native_ttr": 0.459459459459459,
+      "native_mtld": 19.5471698113208,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.459459459459459,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 37,
+          "V": 17
+        },
+        {
+          "metric_id": "mtld",
+          "value": 19.5471698113208,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 37,
+          "V": 17
+        }
+      ]
+    },
+    {
+      "case": "learner_forms",
+      "pipeline": "taaled_pylats_ld",
+      "tokens": ["i_PRON", "to_ADP", "school_NOUN", "my_PRON", "like_VERB", "the_DET", "school_NOUN", "the_DET", "student_NOUN", "be_AUX", "happy_ADJ", "and_CCONJ", "i_PRON", "be_AUX", "happy_ADJ", "too_ADV", "i_PRON", "go_VERB", "to_ADP", "school_NOUN", "because_SCONJ", "my_PRON", "friend_NOUN", "like_VERB", "the_DET", "school_NOUN", "the_DET", "student_NOUN", "be_AUX", "happy_ADJ", "and_CCONJ", "i_PRON", "be_AUX", "happy_ADJ", "too_ADV"],
+      "native_ttr": 0.4,
+      "native_mtld": 17.5,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.4,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 35,
+          "V": 14
+        },
+        {
+          "metric_id": "mtld",
+          "value": 14.5833333333333,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 35,
+          "V": 14
+        }
+      ]
+    },
+    {
+      "case": "learner_forms",
+      "pipeline": "taaled_pylats_content",
+      "tokens": ["school_NOUN", "like_VERB", "school_NOUN", "student_NOUN", "happy_ADJ", "happy_ADJ", "too_ADV", "go_VERB", "school_NOUN", "friend_NOUN", "like_VERB", "school_NOUN", "student_NOUN", "happy_ADJ", "happy_ADJ", "too_ADV"],
+      "native_ttr": 0.4375,
+      "native_mtld": 8.66709928617781,
+      "common": [
+        {
+          "metric_id": "ttr",
+          "value": 0.4375,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 16,
+          "V": 7
+        },
+        {
+          "metric_id": "mtld",
+          "value": 5.33333333333333,
+          "status": "ok",
+          "missing_reason": null,
+          "N": 16,
+          "V": 7
+        }
+      ]
+    }
+  ]
+}
