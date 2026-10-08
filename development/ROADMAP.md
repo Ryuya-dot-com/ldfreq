@@ -1,10 +1,35 @@
 # ldfreq：研究根拠・利用手順・検証を結ぶロードマップ
 
-更新日：2026-10-08。現行対象は0.3.0.9004の開発版。冒頭の是正・公開記録が現在地であり、以下の0.2.0時点の記録は履歴。
+更新日：2026-10-08。現行対象は0.3.0.9005の開発版。冒頭の是正・公開記録が現在地であり、以下の0.2.0時点の記録は履歴。
 
 以前の進捗：日本語実作文4件で本文範囲・分割案・語彙判断と文書表の対応を限定確認した。ファイル入力教材の公開、判断表のCSV編集・再適用、英作文4出現の試行も完了。以下の実装・公開確認は2026-10-06時点：5資源の配布一覧・3 OSの導入整合、140作文の語族比較、日本語作文1,777件の読込を確認。J-UniMorphの複数token範囲を28実作文で照合。英語140作文の同じ31,902出現へMorphoLex／MorphyNetを接続し、語族所属・資源候補・出現判断を分離。Public化・保護付きmain統合・gh-pages公開を完了。対象：Rパッケージ0.2.0の開発checkout。採用revision・CI・匿名取得の証拠は下記とPUBLICATION-20261004.mdを参照。
 
 ## 現在の優先順位と統合計画
+
+2026-10-08（文書IDで照合する研究情報の保持）：継続指示に基づく次の既存API精緻化。
+目的・優先5に沿い、lexdiv_metrics_text_batchの任意metadata引数から著者／課題／時点等を
+別componentとして保持する。完全な文書ID対応を検査し、入力順へ整列。未指定の返り値、
+原文／token監査／前処理／指標値／core契約、57 exports・22ガイド・依存は維持する。
+同じ入力に余分な列があるだけでは自動採用しない。非空一意文字ID、同じroster、scalar列、
+欠測研究値・重複著者・空文書、保存型・CSV/RDSと旧版既定出力を確認する。
+text-batchが受け取るlexdiv_tokenizationと、日本語importerのtoken表は別経路であり、
+後者まで自動対応するとした初期見通しを採用しない。既存の明示ID結合を使う境界を記す。
+導入変更を9005で識別し、help・既存ファイル教材・通常PR/main・固定開発版・Pagesまで確認。
+新しい統計手法・n-gram・汎用metadata結合APIやCRAN投稿はこの作業に追加しない。
+前回main 37747691440は保存済み最終JSONで全11ジョブ成功。再実行せず追跡完了。
+初回テストで空のlemma入力への必要な注釈、不要なUPOS backend指定、Nのdouble型を
+既存契約に合わせて修正した。metadata実装の変更ではない。重点43 assertions成功。
+重点範囲はUTF-8 541成功、C 540成功・既存非ASCIIパス1 skip、いずれも失敗・警告なし。
+保存済み31作例の93行で9004の既定envelopeが完全一致し、metadata付きの既存3component、
+値・診断・原input不変、31行のID整列、CSV／完全RDS往復を両localeで照合した。
+英語ファイル教材は研究情報の読込→引数→明示report結合→保存へ更新。API監査57 exports、
+note policy、Rd構文・diff検査は成功。22ビネット入りarchiveは342ソースfileのbytesが一致。
+新規導入後も43 assertions、31文書の既定互換・metadata・保存確認、版／引用とusage検査が成功。
+offline-smokeの初回呼出しはlibrary(ldfreq)が抜けた検証コマンドの誤りで、最初の関数呼出し時に
+停止した。読み込みを明示してその工程のみ再開し、成功した。
+全サイト129 HTML・253ファイルを構築。内部リンク欠落0、私的パスなし、配信差分79ファイル。
+help／ファイル教材／報告ガイド／NEWS／検索・Markdownの一致を確認し通常PRへ進む。
+
 
 2026-10-08（MTLD診断の既存APIへの接続）：承認済みの次の作業単位。
 lexdiv_widenに任意のmtld_diagnostics引数を加え、保存済み6診断と表示の2派生列を
@@ -14,7 +39,7 @@ lexdiv_widenに任意のmtld_diagnostics引数を加え、保存済み6診断と
 インストールされるAPIを区別するため9004へ進め、既存タグは保持。help・NEWS・報告ガイド、
 配布archive・固定開発版・通常PR/main/Pagesの一致を完了条件とする。CRAN投稿はしない。
 metadata取込API・n-gram関連度・新規統計指標はこの作業に追加しない。
-前回main 37743108436は引き続き通常起動を追跡し、今回の検証として使い回さない。
+前回main 37743108436は全11ジョブ成功の最終JSONを確認し追跡完了。今回の検証として使い回さない。
 重点検証：UTF-8／Cそれぞれ562 assertions成功、失敗・警告・skipなし。
 英語186行・日本語30行・PELIC48行の保存済み264行で、9003の既定wide／value-only／
 print出力との完全一致を確認。追加診断・元record不変・CSV／完全RDS往復を両ロケールで照合。
@@ -25,6 +50,22 @@ API監査57 exportsとnote policyも成功。22ビネットを含むarchiveを�
 導入後の127 assertionsと264行の保存結果確認も成功。codetoolsの使用検査は問題なし。
 初回検査コマンドがtools::checkUsagePackageを参照した誤りはcodetoolsへ修正し、成功済み
 テストは再実行しなかった。公開サイト・ヘルプを9004で構築し通常PRへ進む。
+
+公開完了：PR #41をmain `ed4600720f35338764a3400c68525526fa37d502`へ統合。
+PR head `8921cd816b339b012087d90559f13d291aabbe49`とtree
+`f7a299882fbcd98c5234579eaa1dddc2907dc627`が一致。run 37746167337は全11ジョブ成功。
+Linux releaseは8,479 assertions・失敗／警告／skipなし、ビネット再構築込みStatus: OK。
+Cは8,056成功・失敗0、既存quanteda encoding警告1・32 skips。新規の重点テストは両localeで
+562成功・警告／skipなし。R4.1・R-devel・macOS・Windowsも必要なジョブは成功。
+固定tag v0.3.0.9004と22ビネット入りarchive／SHA-256をGitHub prereleaseへ公開。
+実pak導入でmain SHA・版／引用・新API・264行の旧版互換と保存再現を確認した。
+Pages `b5eac66b84e72d5ff43a4843cb65297af80e0742` / run 37747873812成功。
+匿名取得はソース13件・サイト79件・release添付2件の全bytes一致。
+証拠はreviews/ldfreq-mtld-wide-20261008。main run 37747691440は自動起動を別途追跡中。
+同一treeの成功済みPRと公開実体を受入れ証拠とし、main一括成功とは称さない。
+watcherが最終JSON/logを保存する。完了記録だけのpush・検証の再起動／取消はしない。
+CRAN非投稿。方向差の精度指標化・人手ユーザビリティ・Windows R4.1/CP932は検証していない。
+
 
 
 2026-10-08（保存済みPELICを研究報告へ接続）：ユーザーが承認した次の作業単位。

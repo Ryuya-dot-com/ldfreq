@@ -11,6 +11,14 @@ rendered by pkgdown.
 
 ## Decisions
 
+- The 0.3.0.9005 text-batch `metadata` argument preserves explicit document-level
+  information in an optional separate component. It uses the same document-ID
+  validation as the batch input and checks the exact roster. No automatic
+  extraction from raw-input extra columns, inference of study labels, insertion
+  into core/token rows or new export is introduced. `NULL` keeps the existing
+  three-component return and preprocessing/core contracts; imported annotation
+  tables retain their separate workflow. Full RDS preserves column types.
+
 - The 0.3.0.9004 `lexdiv_widen(mtld_diagnostics = TRUE)` refinement appends
   eight scalar fields for recognized core sequential MTLD specifications only.
   It reads saved diagnostics and shares derived flags with printing; it never

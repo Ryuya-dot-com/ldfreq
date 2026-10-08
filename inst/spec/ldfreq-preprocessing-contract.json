@@ -244,6 +244,8 @@
         "token_audit",
         "preprocessing"
       ],
+      "metrics_optional_return_components": ["metadata"],
+      "metadata": "explicit-named-argument; exact-unique-character-document_id-roster; input-order; separate-atomic-column-table; missing-study-values-retained; NULL-preserves-default-components",
       "metric_table": "unchanged-core-and-batch-result-schemas",
       "token_audit": "document_id-prepended-to-single-text-token-audit; empty-documents-have-no-token-rows",
       "preprocessing": "input-ordered-named-list-of-complete-single-text-preprocessing-records"

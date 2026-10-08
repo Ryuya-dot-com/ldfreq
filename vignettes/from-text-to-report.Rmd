@@ -349,6 +349,13 @@ source-author IDs when their role is explicitly declared. Unknown writers or
 tasks remain `NA`, rather than being invented from filenames. Keep task, group,
 time and corpus information in separate columns when the study needs them.
 
+If an analysis was created with `lexdiv_metrics_text_batch(..., metadata = study)`,
+its `$metadata` component already contains the ID-checked, input-ordered study
+table. Use that table below; see the
+[metadata input example](english-tokenization.html#retain-study-metadata)
+(0.3.0.9005 or later). The Japanese imported-token path above has a different
+input format and continues to use the explicit join shown here.
+
 ```{r report-study-join-function}
 join_study_metadata <- function(rows, metadata) {
   if (!is.data.frame(rows) || !is.data.frame(metadata) ||

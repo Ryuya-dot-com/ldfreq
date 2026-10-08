@@ -260,7 +260,12 @@ stopifnot(
 english_texts <- data.frame(document_id = c("essay", "empty"),
   text = c("The cat can't read. 3.14 https://example.org", ""))
 english_tokens <- lexdiv_tokenize_batch(english_texts, tokenizer = "english", case = "lower")
-english_batch <- lexdiv_metrics_text_batch(english_tokens, metrics = "ttr")
+english_study <- data.frame(document_id = c("empty", "essay"),
+  writer_id = c(NA_character_, "authored-example"))
+english_batch <- lexdiv_metrics_text_batch(english_tokens, metrics = "ttr",
+  metadata = english_study)
+stopifnot(identical(english_batch$metadata$document_id, c("essay", "empty")),
+  identical(english_batch$metadata$writer_id, c("authored-example", NA_character_)))
 stopifnot(
   identical(english_tokens$essay$tokens$surface, c("the", "cat", "can't", "read")),
   identical(english_tokens$essay$provenance$excluded_spans$reason, c("number", "url")),
