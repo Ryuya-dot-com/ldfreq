@@ -758,9 +758,421 @@ inter-rater agreement or psycholinguistic validity.</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="phrase-agreement">Compare phrase judgments before discussion<a class="anchor" aria-label="anchor" href="#phrase-agreement"></a>
+</h2>
+<p>Two researchers may read the same <code>take off</code> match
+differently. The question here is <strong>whether they make the same
+inclusion decision, and whether their decisions change the document
+profile</strong>. It is not a test of phrase-detection recall:
+expressions absent from the list have not been sampled for review. The
+following guide-local code runs with the existing 0.3.0.9003
+installation.</p>
+<p>The design follows these distinctions in the annotation
+literature:</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Research basis</th>
+<th>Consequence for this workflow</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>
+<a href="https://aclanthology.org/J96-2004/" class="external-link">Carletta (1996)</a>,
+pp. 250–253: chance agreement and the choice of coding unit matter</td>
+<td>Declare one phrase ID at one original span as the item; retain the
+category counts and all sampled items</td>
+</tr>
+<tr class="even">
+<td>
+<a href="https://aclanthology.org/J04-1005/" class="external-link">Di Eugenio and Glass
+(2004)</a>, pp. 96–100: kappa variants and marginal distributions can
+change the interpretation</td>
+<td>Name unweighted <strong>Cohen’s kappa</strong>, show both raters’
+margins, and do not label a fixed cutoff as a universal pass
+criterion</td>
+</tr>
+<tr class="odd">
+<td>
+<a href="https://aclanthology.org/J08-4004/" class="external-link">Artstein and Poesio
+(2008)</a>, sections 2.1–2.4: agreement, validity and chance models are
+different questions</td>
+<td>Preserve independent decisions before discussion; a high agreement
+coefficient or a consensus is not evidence that the interpretation is
+correct</td>
+</tr>
+</tbody>
+</table>
+<p>For this binary inclusion task, <code>accepted</code> and
+<code>rejected</code> are nominal labels, not ordered scores.
+<code>unresolved</code> records an examined but unsettled case;
+<code>unreviewed</code> records no submitted decision. <strong>Our
+analysis policy</strong> retains all four states, but estimates binary
+agreement only where both raters made an accepted/rejected decision.
+This conditional subset may omit the hardest cases. Its agreement is not
+an estimate for all occurrences without further assumptions. If
+uncertainty itself is a substantive response category, define and
+evaluate that different coding scheme explicitly.</p>
+<div class="section level3">
+<h3 id="pair-two-unchanged-reviews-and-expose-the-denominators">Pair two unchanged reviews and expose the denominators<a class="anchor" aria-label="anchor" href="#pair-two-unchanged-reviews-and-expose-the-denominators"></a>
+</h3>
+<p>The two review columns must each belong to one declared person, with
+different IDs. Different names cannot verify independent work: in a
+study, assign the same sampled material and written criterion, collect
+decisions separately, and retain the pre-discussion files. Treat a
+repeated pass by one person as intra-rater comparison instead. The
+helper below is local to this guide.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">compare_phrase_reviews</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span>, <span class="va">reviewers</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">is.character</a></span><span class="op">(</span><span class="va">reviewers</span><span class="op">)</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">reviewers</span><span class="op">)</span> <span class="op">!=</span> <span class="fl">2L</span> <span class="op">||</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">reviewers</span><span class="op">)</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">reviewers</span><span class="op">)</span> <span class="op">||</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/validUTF8.html" class="external-link">validUTF8</a></span><span class="op">(</span><span class="va">reviewers</span><span class="op">)</span><span class="op">)</span> <span class="op">||</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="fu">stringi</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stringi/man/stri_trim.html" class="external-link">stri_trim_both</a></span><span class="op">(</span><span class="va">reviewers</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Declare two distinct, nonblank reviewer IDs."</span><span class="op">)</span></span>
+<span>  <span class="va">reviews</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">reviews</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">reviews</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="va">checked</span> <span class="op">&lt;-</span> <span class="fu">phrase_list_review</span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">source</span>, <span class="va">x</span><span class="op">$</span><span class="va">criterion</span>, <span class="va">x</span><span class="op">$</span><span class="va">worksheet</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">checked</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Review changed; reapply its worksheet first."</span><span class="op">)</span></span>
+<span>    <span class="va">submitted</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">$</span><span class="va">worksheet</span><span class="op">$</span><span class="va">status</span> <span class="op">!=</span> <span class="st">"unreviewed"</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">worksheet</span><span class="op">$</span><span class="va">reviewer</span><span class="op">[</span><span class="va">submitted</span><span class="op">]</span> <span class="op">!=</span> <span class="va">reviewers</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>      <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Each review must contain decisions from its declared reviewer only."</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">a</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">review_id</span>, <span class="va">b</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">review_id</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Reviews must share source, inventory, settings and criterion."</span><span class="op">)</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">a</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"review_id"</span>, <span class="st">"occurrence_id"</span>, <span class="st">"phrase_id"</span>, <span class="st">"document_id"</span>,</span>
+<span>    <span class="st">"segment_id"</span>, <span class="st">"start"</span>, <span class="st">"end"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>, <span class="st">"segment_text"</span><span class="op">)</span><span class="op">]</span></span>
+<span>  <span class="va">j</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">occurrence_id</span>, <span class="va">b</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">occurrence_id</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">j</span><span class="op">)</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">j</span><span class="op">)</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">j</span><span class="op">)</span> <span class="op">!=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">b</span><span class="op">$</span><span class="va">occurrences</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Keep the same complete occurrence set in both reviews."</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">field</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"status"</span>, <span class="st">"reviewer"</span>, <span class="st">"reason"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">p</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"a_"</span>, <span class="va">field</span><span class="op">)</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">a</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[[</span><span class="va">field</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="va">p</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"b_"</span>, <span class="va">field</span><span class="op">)</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">b</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[[</span><span class="va">field</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="va">j</span><span class="op">]</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"accepted"</span>, <span class="st">"rejected"</span><span class="op">)</span></span>
+<span>  <span class="va">states</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">labels</span>, <span class="st">"unresolved"</span>, <span class="st">"unreviewed"</span><span class="op">)</span></span>
+<span>  <span class="va">p</span><span class="op">$</span><span class="va">both_decided</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">$</span><span class="va">a_status</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">labels</span> <span class="op">&amp;</span> <span class="va">p</span><span class="op">$</span><span class="va">b_status</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">labels</span></span>
+<span>  <span class="va">p</span><span class="op">$</span><span class="va">outcome</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">both_decided</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">a_status</span> <span class="op">==</span> <span class="va">p</span><span class="op">$</span><span class="va">b_status</span>, <span class="st">"agreement"</span>, <span class="st">"disagreement"</span><span class="op">)</span>, <span class="st">"incomplete"</span><span class="op">)</span></span>
+<span>  <span class="va">ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">a</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">phrases</span><span class="op">)</span></span>
+<span>  <span class="va">status_counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span></span>
+<span>    phrase_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">phrase_id</span>, levels <span class="op">=</span> <span class="va">ids</span><span class="op">)</span>,</span>
+<span>    a_status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">a_status</span>, levels <span class="op">=</span> <span class="va">states</span><span class="op">)</span>,</span>
+<span>    b_status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">b_status</span>, levels <span class="op">=</span> <span class="va">states</span><span class="op">)</span><span class="op">)</span>, responseName <span class="op">=</span> <span class="st">"occurrences"</span><span class="op">)</span></span>
+<span>  <span class="va">ratings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">ids</span>, <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">rows</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">$</span><span class="va">phrase_id</span> <span class="op">==</span> <span class="va">id</span> <span class="op">&amp;</span> <span class="va">p</span><span class="op">$</span><span class="va">both_decided</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">a_status</span><span class="op">[</span><span class="va">rows</span><span class="op">]</span>, levels <span class="op">=</span> <span class="va">labels</span><span class="op">)</span>,</span>
+<span>      b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">b_status</span><span class="op">[</span><span class="va">rows</span><span class="op">]</span>, levels <span class="op">=</span> <span class="va">labels</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span>, <span class="va">ids</span><span class="op">)</span></span>
+<span>  <span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">ids</span>, <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">rows</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">$</span><span class="va">phrase_id</span> <span class="op">==</span> <span class="va">id</span></span>
+<span>    <span class="va">r</span> <span class="op">&lt;-</span> <span class="va">ratings</span><span class="op">[[</span><span class="va">id</span><span class="op">]</span><span class="op">]</span>; <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">rows</span><span class="op">)</span>; <span class="va">paired</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
+<span>    <span class="va">agreement</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">a</span> <span class="op">==</span> <span class="va">r</span><span class="op">$</span><span class="va">b</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>phrase_id <span class="op">=</span> <span class="va">id</span>, occurrences <span class="op">=</span> <span class="va">n</span>,</span>
+<span>      documents <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">document_id</span><span class="op">[</span><span class="va">rows</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>, both_decided <span class="op">=</span> <span class="va">paired</span>,</span>
+<span>      paired_documents <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">p</span><span class="op">$</span><span class="va">document_id</span><span class="op">[</span><span class="va">rows</span> <span class="op">&amp;</span> <span class="va">p</span><span class="op">$</span><span class="va">both_decided</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>      incomplete <span class="op">=</span> <span class="va">n</span> <span class="op">-</span> <span class="va">paired</span>, agreement <span class="op">=</span> <span class="va">agreement</span>, disagreement <span class="op">=</span> <span class="va">paired</span> <span class="op">-</span> <span class="va">agreement</span>,</span>
+<span>      paired_proportion <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="va">paired</span> <span class="op">/</span> <span class="va">n</span> <span class="kw">else</span> <span class="cn">NA_real_</span>,</span>
+<span>      observed_agreement <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">paired</span><span class="op">)</span> <span class="va">agreement</span> <span class="op">/</span> <span class="va">paired</span> <span class="kw">else</span> <span class="cn">NA_real_</span>,</span>
+<span>      a_accepted <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">a</span> <span class="op">==</span> <span class="st">"accepted"</span><span class="op">)</span>, b_accepted <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">b</span> <span class="op">==</span> <span class="st">"accepted"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>summary <span class="op">=</span> <span class="va">summary</span>, status_counts <span class="op">=</span> <span class="va">status_counts</span>, ratings <span class="op">=</span> <span class="va">ratings</span>,</span>
+<span>    pairs <span class="op">=</span> <span class="va">p</span>, review_queue <span class="op">=</span> <span class="va">p</span><span class="op">[</span><span class="va">p</span><span class="op">$</span><span class="va">outcome</span> <span class="op">!=</span> <span class="st">"agreement"</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,</span>
+<span>    reviews <span class="op">=</span> <span class="va">reviews</span>, reviewers <span class="op">=</span> <span class="va">reviewers</span>,</span>
+<span>    policy <span class="op">=</span> <span class="st">"Per phrase ID; binary agreement conditional on both decisive; all states retained"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>For your files, use <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> to restore the separately
+saved reviews, then call
+<code>compare_phrase_reviews(a, b, reviewers = c("rater-1", "rater-2"))</code>
+with the actual recorded IDs. It reuses the installed worksheet checks
+before pairing by occurrence identity; altered source or criterion
+cannot be joined silently. No-match phrase IDs remain in the summary
+with a zero denominator.</p>
+</div>
+<div class="section level3">
+<h3 id="run-the-authored-example-and-inspect-open-cases">Run the authored example and inspect open cases<a class="anchor" aria-label="anchor" href="#run-the-authored-example-and-inspect-open-cases"></a>
+</h3>
+<p>Continue the example above, or first run
+<code>phrase-review-demo.R</code>. The following second worksheet
+deliberately introduces disagreements and different completion states.
+<strong>It is simulated teaching material, not an independent human
+rating.</strong></p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">review_a</span> <span class="op">&lt;-</span> <span class="va">phrase_after</span></span>
+<span><span class="va">sheet_b</span> <span class="op">&lt;-</span> <span class="va">phrase_before</span><span class="op">$</span><span class="va">worksheet</span></span>
+<span><span class="va">complete</span> <span class="op">&lt;-</span> <span class="va">sheet_b</span><span class="op">$</span><span class="va">document_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"en"</span>, <span class="st">"ja"</span><span class="op">)</span></span>
+<span><span class="va">sheet_b</span><span class="op">$</span><span class="va">status</span><span class="op">[</span><span class="va">complete</span> <span class="op">&amp;</span> <span class="va">sheet_b</span><span class="op">$</span><span class="va">segment_id</span> <span class="op">==</span> <span class="st">"s1"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"accepted"</span></span>
+<span><span class="va">sheet_b</span><span class="op">$</span><span class="va">status</span><span class="op">[</span><span class="va">complete</span> <span class="op">&amp;</span> <span class="va">sheet_b</span><span class="op">$</span><span class="va">segment_id</span> <span class="op">==</span> <span class="st">"s2"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"rejected"</span></span>
+<span><span class="va">sheet_b</span><span class="op">$</span><span class="va">status</span><span class="op">[</span><span class="va">sheet_b</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"en"</span> <span class="op">&amp;</span> <span class="va">sheet_b</span><span class="op">$</span><span class="va">segment_id</span> <span class="op">==</span> <span class="st">"s2"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"accepted"</span></span>
+<span><span class="va">sheet_b</span><span class="op">$</span><span class="va">status</span><span class="op">[</span><span class="va">sheet_b</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"en"</span> <span class="op">&amp;</span> <span class="va">sheet_b</span><span class="op">$</span><span class="va">phrase_id</span> <span class="op">==</span> <span class="st">"departure_long"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"unresolved"</span></span>
+<span><span class="va">sheet_b</span><span class="op">$</span><span class="va">status</span><span class="op">[</span><span class="va">sheet_b</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"en_pending"</span> <span class="op">&amp;</span> <span class="va">sheet_b</span><span class="op">$</span><span class="va">segment_id</span> <span class="op">==</span> <span class="st">"s1"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"rejected"</span></span>
+<span><span class="va">sheet_b</span><span class="op">$</span><span class="va">status</span><span class="op">[</span><span class="va">sheet_b</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"ja_pending"</span> <span class="op">&amp;</span> <span class="va">sheet_b</span><span class="op">$</span><span class="va">segment_id</span> <span class="op">==</span> <span class="st">"s1"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"unresolved"</span></span>
+<span><span class="va">sheet_b</span><span class="op">$</span><span class="va">status</span><span class="op">[</span><span class="va">sheet_b</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"ja_pending"</span> <span class="op">&amp;</span> <span class="va">sheet_b</span><span class="op">$</span><span class="va">segment_id</span> <span class="op">==</span> <span class="st">"s2"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"accepted"</span></span>
+<span><span class="va">submitted</span> <span class="op">&lt;-</span> <span class="va">sheet_b</span><span class="op">$</span><span class="va">status</span> <span class="op">!=</span> <span class="st">"unreviewed"</span></span>
+<span><span class="va">sheet_b</span><span class="op">$</span><span class="va">reviewer</span><span class="op">[</span><span class="va">submitted</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"authored-B"</span></span>
+<span><span class="va">sheet_b</span><span class="op">$</span><span class="va">reason</span><span class="op">[</span><span class="va">submitted</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"Deliberately varied teaching decision; not a human observation."</span></span>
+<span><span class="va">review_b</span> <span class="op">&lt;-</span> <span class="fu">phrase_list_review</span><span class="op">(</span><span class="va">phrase_search</span>, <span class="va">phrase_criterion</span>,</span>
+<span>  <span class="va">sheet_b</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">sheet_b</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">phrase_comparison</span> <span class="op">&lt;-</span> <span class="fu">compare_phrase_reviews</span><span class="op">(</span><span class="va">review_a</span>, <span class="va">review_b</span>,</span>
+<span>  reviewers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"authored-demo-reviewer"</span>, <span class="st">"authored-B"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">phrase_comparison</span><span class="op">$</span><span class="va">summary</span></span>
+<span><span class="co">#&gt;        phrase_id occurrences documents both_decided paired_documents incomplete</span></span>
+<span><span class="co">#&gt; 1      departure           4         2            2                1          2</span></span>
+<span><span class="co">#&gt; 2 departure_long           2         2            0                0          2</span></span>
+<span><span class="co">#&gt; 3      hindrance           4         2            2                1          2</span></span>
+<span><span class="co">#&gt; 4         absent           0         0            0                0          0</span></span>
+<span><span class="co">#&gt;   agreement disagreement paired_proportion observed_agreement a_accepted</span></span>
+<span><span class="co">#&gt; 1         1            1               0.5                0.5          1</span></span>
+<span><span class="co">#&gt; 2         0            0               0.0                 NA          0</span></span>
+<span><span class="co">#&gt; 3         2            0               0.5                1.0          1</span></span>
+<span><span class="co">#&gt; 4         0            0                NA                 NA          0</span></span>
+<span><span class="co">#&gt;   b_accepted</span></span>
+<span><span class="co">#&gt; 1          2</span></span>
+<span><span class="co">#&gt; 2          0</span></span>
+<span><span class="co">#&gt; 3          1</span></span>
+<span><span class="co">#&gt; 4          0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">phrase_comparison</span><span class="op">$</span><span class="va">status_counts</span>, <span class="va">occurrences</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         phrase_id   a_status   b_status occurrences</span></span>
+<span><span class="co">#&gt; 1       departure   accepted   accepted           1</span></span>
+<span><span class="co">#&gt; 3       hindrance   accepted   accepted           1</span></span>
+<span><span class="co">#&gt; 5       departure   rejected   accepted           1</span></span>
+<span><span class="co">#&gt; 15      hindrance unreviewed   accepted           1</span></span>
+<span><span class="co">#&gt; 23      hindrance   rejected   rejected           1</span></span>
+<span><span class="co">#&gt; 25      departure unresolved   rejected           1</span></span>
+<span><span class="co">#&gt; 34 departure_long   accepted unresolved           1</span></span>
+<span><span class="co">#&gt; 43      hindrance unresolved unresolved           1</span></span>
+<span><span class="co">#&gt; 61      departure unreviewed unreviewed           1</span></span>
+<span><span class="co">#&gt; 62 departure_long unreviewed unreviewed           1</span></span>
+<span><span class="va">phrase_comparison</span><span class="op">$</span><span class="va">review_queue</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"phrase_id"</span>, <span class="st">"keyword"</span>,</span>
+<span>  <span class="st">"a_status"</span>, <span class="st">"b_status"</span>, <span class="st">"a_reason"</span>, <span class="st">"b_reason"</span>, <span class="st">"outcome"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;    document_id      phrase_id        keyword   a_status   b_status</span></span>
+<span><span class="co">#&gt; 2           en      departure       take off   rejected   accepted</span></span>
+<span><span class="co">#&gt; 3   en_pending      departure       take off unresolved   rejected</span></span>
+<span><span class="co">#&gt; 4   en_pending      departure       take off unreviewed unreviewed</span></span>
+<span><span class="co">#&gt; 5           en departure_long  will take off   accepted unresolved</span></span>
+<span><span class="co">#&gt; 6   en_pending departure_long  will take off unreviewed unreviewed</span></span>
+<span><span class="co">#&gt; 9   ja_pending      hindrance 足を引っ張った unresolved unresolved</span></span>
+<span><span class="co">#&gt; 10  ja_pending      hindrance 足を引っ張った unreviewed   accepted</span></span>
+<span><span class="co">#&gt;                                                                        a_reason</span></span>
+<span><span class="co">#&gt; 2  Removing a coat or physically pulling a doll's leg is outside the criterion.</span></span>
+<span><span class="co">#&gt; 3                The short authored context does not settle the interpretation.</span></span>
+<span><span class="co">#&gt; 4                                                                          &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 5                 Authored context supplies the declared target interpretation.</span></span>
+<span><span class="co">#&gt; 6                                                                          &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 9                The short authored context does not settle the interpretation.</span></span>
+<span><span class="co">#&gt; 10                                                                         &lt;NA&gt;</span></span>
+<span><span class="co">#&gt;                                                           b_reason      outcome</span></span>
+<span><span class="co">#&gt; 2  Deliberately varied teaching decision; not a human observation. disagreement</span></span>
+<span><span class="co">#&gt; 3  Deliberately varied teaching decision; not a human observation.   incomplete</span></span>
+<span><span class="co">#&gt; 4                                                             &lt;NA&gt;   incomplete</span></span>
+<span><span class="co">#&gt; 5  Deliberately varied teaching decision; not a human observation.   incomplete</span></span>
+<span><span class="co">#&gt; 6                                                             &lt;NA&gt;   incomplete</span></span>
+<span><span class="co">#&gt; 9  Deliberately varied teaching decision; not a human observation.   incomplete</span></span>
+<span><span class="co">#&gt; 10 Deliberately varied teaching decision; not a human observation.   incomplete</span></span></code></pre></div>
+<p>There are ten list matches. Four have binary decisions from both
+sides: three agree and one disagrees. The other six remain incomplete,
+including two unresolved judgments on the same occurrence. The queue
+therefore has seven rows; <code>$pairs</code> also retains the original
+KWIC and full segment text. The per-phrase summaries keep the
+denominators separate: <code>departure</code> has one agreement in two
+paired decisions out of four matches; <code>hindrance</code> has two in
+two out of four. Neither <code>departure_long</code> nor
+<code>absent</code> has any paired binary decision, for different
+reasons visible in their counts.</p>
+</div>
+<div class="section level3">
+<h3 id="optional-cohen-kappa-with-an-existing-r-package">Optional Cohen kappa with an existing R package<a class="anchor" aria-label="anchor" href="#optional-cohen-kappa-with-an-existing-r-package"></a>
+</h3>
+<p>For two fixed raters applying these binary labels, use the optional
+<a href="https://search.r-project.org/CRAN/refmans/irr/html/kappa2.html" class="external-link"><code>irr::kappa2()</code></a>
+with <code>weight = "unweighted"</code>. Its missing rows are removed
+listwise; here the paired rows have already been selected explicitly and
+their excluded states remain in the comparison. Install <code>irr</code>
+separately to run this block.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("irr")  # once, when this optional analysis is needed</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"irr"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">phrase_kappa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">phrase_comparison</span><span class="op">$</span><span class="va">ratings</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">r</span> <span class="op">&lt;-</span> <span class="va">phrase_comparison</span><span class="op">$</span><span class="va">ratings</span><span class="op">[[</span><span class="va">id</span><span class="op">]</span><span class="op">]</span></span>
+<span>  <span class="va">status</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span><span class="op">)</span> <span class="st">"no_paired_decisions"</span> <span class="kw">else</span> <span class="kw">if</span></span>
+<span>    <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">a</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">b</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1L</span><span class="op">)</span></span>
+<span>      <span class="st">"constant_single_category"</span> <span class="kw">else</span> <span class="st">"computed_descriptive"</span></span>
+<span>  <span class="va">value</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">status</span> <span class="op">==</span> <span class="st">"computed_descriptive"</span><span class="op">)</span></span>
+<span>    <span class="fu">irr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/irr/man/kappa2.html" class="external-link">kappa2</a></span><span class="op">(</span><span class="va">r</span>, weight <span class="op">=</span> <span class="st">"unweighted"</span><span class="op">)</span><span class="op">$</span><span class="va">value</span> <span class="kw">else</span> <span class="cn">NA_real_</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>phrase_id <span class="op">=</span> <span class="va">id</span>, both_decided <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span>, kappa <span class="op">=</span> <span class="va">value</span>, status <span class="op">=</span> <span class="va">status</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">phrase_kappa</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>comparison <span class="op">=</span> <span class="va">phrase_comparison</span>, estimates <span class="op">=</span> <span class="va">phrase_kappa</span>,</span>
+<span>  irr_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"irr"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">phrase_review_dir</span>, <span class="st">"kappa.rds"</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p>The authored <code>departure</code> and <code>hindrance</code> values
+are 0 and 1; their tiny paired samples are not evidence of real
+annotator reliability. No pooled kappa across different phrase
+criteria/languages is calculated. Two raters assigning only one
+identical category have observed agreement 1 but undefined kappa, not a
+kappa of 1. Ordinal ratings or more than two raters require a different
+declared model; ICC and a correlation between document scores do not
+replace this nominal-label comparison.</p>
+<p>To check the external implementation against a published calculation,
+this block reconstructs <a href="https://aclanthology.org/J08-4004/" class="external-link">Artstein and Poesio’s Tables
+1–2</a> (pp. 558, 560). The counts describe dialogue-act categories, not
+learner data.</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">published_ratings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"STAT"</span>, <span class="st">"IREQ"</span>, <span class="st">"STAT"</span>, <span class="st">"IREQ"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">20</span>, <span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"STAT"</span>, <span class="st">"STAT"</span>, <span class="st">"IREQ"</span>, <span class="st">"IREQ"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">20</span>, <span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">published_kappa</span> <span class="op">&lt;-</span> <span class="fu">irr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/irr/man/kappa2.html" class="external-link">kappa2</a></span><span class="op">(</span><span class="va">published_ratings</span>, weight <span class="op">=</span> <span class="st">"unweighted"</span><span class="op">)</span><span class="op">$</span><span class="va">value</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">published_kappa</span>, <span class="fl">8</span><span class="op">/</span><span class="fl">23</span>, tolerance <span class="op">=</span> <span class="fl">1e-12</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">published_kappa</span>  <span class="co"># 0.3478261; observed agreement is 70/100</span></span></code></pre></div>
+<p>The verification also reproduced the prevalence examples in Di
+Eugenio and Glass (2004), Figure 3 (p. 99), using <code>irr</code> 0.85:
+both tables have 90% observed agreement, but counts
+<code>90, 5; 5, 0</code> give kappa -0.052632, whereas
+<code>45, 5; 5, 45</code> give 0.8. The former figure prints -0.048; its
+displayed counts and expected agreement 0.905 instead imply
+<code>(0.9 - 0.905)/(1 - 0.905)</code>. The check follows those counts.
+Retaining the table and margins makes this distinction inspectable; a
+single threshold would conceal it. In Figure 4, the Example 5 counts
+(<code>40, 15; 20, 25</code>) imply expected agreement 0.51 and kappa
+0.285714, rather than the printed 0.52 and 0.27. Example 6
+(<code>40, 35; 0, 25</code>) gives kappa 0.363636, rather than 0.418.
+Independent exact fraction arithmetic confirms the recomputed values.
+These are count-versus-text discrepancies, not differences between
+definitions of kappa.</p>
+<p>A document can contribute several related or overlapping occurrences.
+This recipe reports descriptive point estimates, not the default test
+statistic or p-value returned by <code>irr</code>. Uncertainty analysis
+needs the study’s sampling design and dependence structure, for example
+retaining related occurrences together when resampling
+writers/documents. A different coefficient alone does not resolve
+selective missing judgments or non-independent sampling.</p>
+</div>
+<div class="section level3">
+<h3 id="record-discussion-separately-and-compare-document-profiles">Record discussion separately and compare document profiles<a class="anchor" aria-label="anchor" href="#record-discussion-separately-and-compare-document-profiles"></a>
+</h3>
+<p>After inspecting the queue, record discussion decisions separately.
+These three authored edits resolve the coat/flight examples and decide
+one Japanese context; other open cases remain open. Starting from A here
+is an explicit working-copy choice, not automatic acceptance of A
+whenever the raters differ.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">discussion</span> <span class="op">&lt;-</span> <span class="va">review_a</span><span class="op">$</span><span class="va">worksheet</span></span>
+<span><span class="va">edit</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">discussion</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"en"</span> <span class="op">&amp;</span> <span class="va">discussion</span><span class="op">$</span><span class="va">segment_id</span> <span class="op">==</span> <span class="st">"s2"</span><span class="op">)</span> <span class="op">|</span></span>
+<span>  <span class="op">(</span><span class="va">discussion</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"en"</span> <span class="op">&amp;</span> <span class="va">discussion</span><span class="op">$</span><span class="va">phrase_id</span> <span class="op">==</span> <span class="st">"departure_long"</span><span class="op">)</span> <span class="op">|</span></span>
+<span>  <span class="op">(</span><span class="va">discussion</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"ja_pending"</span> <span class="op">&amp;</span> <span class="va">discussion</span><span class="op">$</span><span class="va">segment_id</span> <span class="op">==</span> <span class="st">"s2"</span><span class="op">)</span></span>
+<span><span class="va">discussion_log</span> <span class="op">&lt;-</span> <span class="va">discussion</span><span class="op">[</span><span class="va">edit</span>, <span class="op">]</span></span>
+<span><span class="va">discussion_log</span><span class="op">$</span><span class="va">status</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">discussion_log</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"en"</span> <span class="op">&amp;</span></span>
+<span>  <span class="va">discussion_log</span><span class="op">$</span><span class="va">segment_id</span> <span class="op">==</span> <span class="st">"s2"</span>, <span class="st">"rejected"</span>, <span class="st">"accepted"</span><span class="op">)</span></span>
+<span><span class="va">discussion_log</span><span class="op">$</span><span class="va">reviewer</span> <span class="op">&lt;-</span> <span class="st">"authored-discussion"</span></span>
+<span><span class="va">discussion_log</span><span class="op">$</span><span class="va">reason</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">discussion_log</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="st">"rejected"</span>,</span>
+<span>  <span class="st">"Authored discussion: removing a coat is outside the departure criterion."</span>,</span>
+<span>  <span class="st">"Authored discussion: flight departure or hindrance in the meeting fits the criterion."</span><span class="op">)</span></span>
+<span><span class="va">j</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">discussion_log</span><span class="op">$</span><span class="va">occurrence_id</span>, <span class="va">discussion</span><span class="op">$</span><span class="va">occurrence_id</span><span class="op">)</span></span>
+<span><span class="va">discussion</span><span class="op">[</span><span class="va">j</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"status"</span>, <span class="st">"reviewer"</span>, <span class="st">"reason"</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">discussion_log</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"status"</span>, <span class="st">"reviewer"</span>, <span class="st">"reason"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">after_discussion</span> <span class="op">&lt;-</span> <span class="fu">phrase_list_review</span><span class="op">(</span><span class="va">phrase_search</span>, <span class="va">phrase_criterion</span>, <span class="va">discussion</span><span class="op">)</span></span>
+<span><span class="va">stages</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>A <span class="op">=</span> <span class="va">review_a</span>, B <span class="op">=</span> <span class="va">review_b</span>, partial_discussion <span class="op">=</span> <span class="va">after_discussion</span><span class="op">)</span></span>
+<span><span class="va">phrase_profiles</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">stages</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">stage</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>stage <span class="op">=</span> <span class="va">stage</span>, <span class="va">stages</span><span class="op">[[</span><span class="va">stage</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">documents</span>, row.names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">phrase_profiles</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span><span class="va">phrase_profiles</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stage"</span>, <span class="st">"document_id"</span>, <span class="st">"accepted"</span>, <span class="st">"unresolved"</span>, <span class="st">"unreviewed"</span>,</span>
+<span>  <span class="st">"retained_tokens"</span>, <span class="st">"accepted_covered_tokens"</span>, <span class="st">"reportable_accepted_coverage"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;                 stage document_id accepted unresolved unreviewed</span></span>
+<span><span class="co">#&gt; 1                   A          en        2          0          0</span></span>
+<span><span class="co">#&gt; 2                   A  en_pending        0          1          2</span></span>
+<span><span class="co">#&gt; 3                   A          ja        1          0          0</span></span>
+<span><span class="co">#&gt; 4                   A  ja_pending        0          1          1</span></span>
+<span><span class="co">#&gt; 5                   A    no_match        0          0          0</span></span>
+<span><span class="co">#&gt; 6                   A       empty        0          0          0</span></span>
+<span><span class="co">#&gt; 7                   B          en        2          1          0</span></span>
+<span><span class="co">#&gt; 8                   B  en_pending        0          0          2</span></span>
+<span><span class="co">#&gt; 9                   B          ja        1          0          0</span></span>
+<span><span class="co">#&gt; 10                  B  ja_pending        1          1          0</span></span>
+<span><span class="co">#&gt; 11                  B    no_match        0          0          0</span></span>
+<span><span class="co">#&gt; 12                  B       empty        0          0          0</span></span>
+<span><span class="co">#&gt; 13 partial_discussion          en        2          0          0</span></span>
+<span><span class="co">#&gt; 14 partial_discussion  en_pending        0          1          2</span></span>
+<span><span class="co">#&gt; 15 partial_discussion          ja        1          0          0</span></span>
+<span><span class="co">#&gt; 16 partial_discussion  ja_pending        1          1          0</span></span>
+<span><span class="co">#&gt; 17 partial_discussion    no_match        0          0          0</span></span>
+<span><span class="co">#&gt; 18 partial_discussion       empty        0          0          0</span></span>
+<span><span class="co">#&gt;    retained_tokens accepted_covered_tokens reportable_accepted_coverage</span></span>
+<span><span class="co">#&gt; 1               11                       3                    0.2727273</span></span>
+<span><span class="co">#&gt; 2               11                       0                           NA</span></span>
+<span><span class="co">#&gt; 3               18                       4                    0.2222222</span></span>
+<span><span class="co">#&gt; 4               13                       0                           NA</span></span>
+<span><span class="co">#&gt; 5                5                       0                    0.0000000</span></span>
+<span><span class="co">#&gt; 6                0                       0                           NA</span></span>
+<span><span class="co">#&gt; 7               11                       4                           NA</span></span>
+<span><span class="co">#&gt; 8               11                       0                           NA</span></span>
+<span><span class="co">#&gt; 9               18                       4                    0.2222222</span></span>
+<span><span class="co">#&gt; 10              13                       4                           NA</span></span>
+<span><span class="co">#&gt; 11               5                       0                    0.0000000</span></span>
+<span><span class="co">#&gt; 12               0                       0                           NA</span></span>
+<span><span class="co">#&gt; 13              11                       3                    0.2727273</span></span>
+<span><span class="co">#&gt; 14              11                       0                           NA</span></span>
+<span><span class="co">#&gt; 15              18                       4                    0.2222222</span></span>
+<span><span class="co">#&gt; 16              13                       4                           NA</span></span>
+<span><span class="co">#&gt; 17               5                       0                    0.0000000</span></span>
+<span><span class="co">#&gt; 18               0                       0                           NA</span></span></code></pre></div>
+<p>All six documents remain in each stage. For the English document, A
+accepts three original token slots, B accepts four, and the partial
+discussion returns three. B still has an unresolved match there, so its
+complete-review coverage is unavailable. Empty documents keep a zero
+denominator and missing coverage. Discussion changes neither the
+original tokens nor the stored pre-discussion agreement. Report these
+original profiles side by side, with their completion status; do not
+turn a discussion result into an independent third rating.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">agreement_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>comparison <span class="op">=</span> <span class="va">phrase_comparison</span>,</span>
+<span>  discussion_log <span class="op">=</span> <span class="va">discussion_log</span>, after_discussion <span class="op">=</span> <span class="va">after_discussion</span>,</span>
+<span>  profiles <span class="op">=</span> <span class="va">phrase_profiles</span>, session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">agreement_record</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">phrase_review_dir</span>, <span class="st">"agreement.rds"</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">phrase_comparison</span><span class="op">$</span><span class="va">summary</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">phrase_review_dir</span>, <span class="st">"agreement-summary.csv"</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>, na <span class="op">=</span> <span class="st">"&lt;MISSING&gt;"</span>, fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">phrase_profiles</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">phrase_review_dir</span>, <span class="st">"review-stage-profiles.csv"</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>, na <span class="op">=</span> <span class="st">"&lt;MISSING&gt;"</span>, fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
+<span><span class="va">agreement_restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">phrase_review_dir</span>, <span class="st">"agreement.rds"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">agreement_restored</span>, <span class="va">agreement_record</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span></span>
+<span>  <span class="fu">compare_phrase_reviews</span><span class="op">(</span><span class="va">agreement_restored</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">reviews</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>    <span class="va">agreement_restored</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">reviews</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, <span class="va">agreement_restored</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">reviewers</span><span class="op">)</span>,</span>
+<span>  <span class="va">agreement_restored</span><span class="op">$</span><span class="va">comparison</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The optional block saves <code>kappa.rds</code> with its comparison,
+estimates and <code>irr</code> version. For a study, retain the original
+submitted CSVs and the sampling record. The RDS above retains original
+text, both reviews, comparison and discussion; use a persistent study
+directory and respect the source materials’ sharing terms.</p>
+<p>A methods paragraph can follow this structure, replacing bracketed
+fields with the actual design and numbers:</p>
+<blockquote>
+<p>Two raters independently applied [criterion/version] to [sampling
+rule] occurrences from [documents/writers]. Each item was one phrase ID
+at a fixed source span under [inventory/version and segmentation]. We
+retained unresolved and unreviewed states. For each phrase, binary
+observed agreement and unweighted Cohen’s kappa (irr [version]) used the
+[n] jointly decisive occurrences of [N] sampled matches; category
+cross-tables and each rater’s margins were reported. Discussion followed
+the independent ratings and was recorded separately. We compared
+document profiles under both ratings and subsequent decisions, counting
+overlapping accepted spans by their token union and withholding
+complete-review coverage for unfinished documents.</p>
+</blockquote>
+<p>Use the independence sentence only for genuinely independent human
+work. A pilot should test the written rules on separate practice
+material before a held-out agreement sample; revised rules need a new
+recorded evaluation, not a relabeled post-discussion score. This
+executable teaching example validates the workflow, not human
+reliability, phrase-inventory completeness or learner proficiency.</p>
+</div>
+</div>
+<div class="section level2">
 <h2 id="connect-to-the-existing-ldfreq-reference-workflow">Connect to the existing ldfreq reference workflow<a class="anchor" aria-label="anchor" href="#connect-to-the-existing-ldfreq-reference-workflow"></a>
 </h2>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="va">q</span><span class="op">$</span><span class="va">positions</span></span>
 <span><span class="va">prepared</span><span class="op">$</span><span class="va">term</span> <span class="op">&lt;-</span> <span class="va">prepared</span><span class="op">$</span><span class="va">surface</span></span>
 <span><span class="va">sequences</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ngrams.html">lexdiv_ngrams</a></span><span class="op">(</span><span class="va">prepared</span>,</span>
@@ -779,7 +1191,7 @@ not proof that an unrelated tokenizer is compatible. MASC Penn tokens,
 quanteda word4 tokens and the bundled TUBELEX tokenization must not be
 silently treated as the same tokenization.</p>
 <p>Save source evidence with the analysis:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>corpus <span class="op">=</span> <span class="va">corpus</span>, quanteda <span class="op">=</span> <span class="va">q</span>, sequences <span class="op">=</span> <span class="va">sequences</span><span class="op">)</span>, <span class="va">path</span><span class="op">)</span></span>
 <span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
@@ -798,7 +1210,7 @@ eight-document Mini-MASC release, 851 of 7,263 Penn tokens have no
 <code>base</code> feature. They retain <code>NA</code> lemmas; a lemma
 analysis therefore needs an explicit missingness policy even when
 surface tokens are available.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">headers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="st">"/path/to/Mini-MASC/data"</span>, pattern <span class="op">=</span> <span class="st">"\\.anc$"</span>,</span>
 <span>                      recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">masc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_read_masc.html">lexdiv_read_masc</a></span><span class="op">(</span><span class="va">headers</span>, resource_version <span class="op">=</span> <span class="st">"Mini-MASC-1.0"</span><span class="op">)</span></span></code></pre></div>
