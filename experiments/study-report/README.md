@@ -18,10 +18,12 @@ Rscript --vanilla experiments/study-report/pelic.R . /path/to/pelic-cache /path/
 Rscript --vanilla experiments/study-report/pelic.R . --replay /path/to/local-report
 ```
 
-Keep the output **outside the repository**. `study.rds` contains original
-corpus text and tokens; `document-results.csv` contains original anonymized
-document/writer IDs. Keep both local. Only aggregate statistics and methods
-text are published here. Corpus access terms are described in the existing
+Keep the output **outside the repository**. `study.rds` contains corpus-derived
+token sequences, tokenization records and original response metadata, but not
+the complete verbatim essays. Keep the original `answer.csv` for their exact
+text, capitalization and layout. `document-results.csv` contains original
+anonymized document/writer IDs. Keep these files local. Only aggregate
+statistics and methods text are published here. Corpus access terms are described in the existing
 PELIC example; this does not bundle or relicense its contents.
 
 The script reads the three existing helper definitions from

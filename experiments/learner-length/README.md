@@ -68,8 +68,11 @@ Rscript experiments/learner-length/run.R . /path/to/local-pelic-cache /path/to/r
 ```
 
 The first run downloads about 182 MB; verified original files are reused on
-later runs. Keep `analysis-local.rds` in the cache private: it contains texts
-and token sequences. Only the four small files under `results/` are published.
+later runs. Keep `analysis-local.rds` in the cache private: it contains
+corpus-derived token sequences, tokenizations and response metadata. It does
+not contain the complete verbatim essays; retain the original `answer.csv`
+for exact source text, capitalization and layout. Only the four small files
+under `results/` are published.
 The script executes the same diagnostic/correlation helpers as the existing
 [comparison guide](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html).
 
