@@ -4608,3 +4608,61 @@ only the corresponding generated navigation-label replacement, without
 rerunning their examples. Source, CI and deployed-byte identities will be
 recorded after normal PR publication. No new API, dependency, corpus, package
 version, release/tag or CRAN submission. Evidence: reviews/ldfreq-file-reports-20261008.
+
+### Publication completion for PR #36
+
+- Main: `48641069404eb804918236283606a11dc34cbcad`; final PR head
+  `02cbb19a74f778ae9b71cb4b26aa146f21f45b9b`. Both have source tree
+  `74c006a6f8beb45ba6ab360c66b04825082b2504`.
+- PR run 37722777917: all 11 jobs successful. Current macOS, Windows, Linux
+  and R-devel each have 8,333 passing assertions, no warnings/skips, Status: OK,
+  including full vignette rebuilds. R4.1 job successful. The C job has 7,976
+  passes, no failures, one existing quanteda encoding warning and 29 skips.
+- Pages `27268b346801f7912d96c6f3582619cc061f67b5`, run 37723851564:
+  successful. Anonymous delivery of all seven changed source files and all
+  77 changed site files matches the locally validated bytes exactly. Site
+  audit: 129 HTML / 253 files, zero missing internal links or private local paths.
+  Existing report-guide content/results/figures are byte-identical after
+  disregarding automatically renumbered HTML code-block IDs.
+- The existing 0.3.0.9002 installation executes the new website examples.
+  No reinstall, new installed helper/API, dependency or tag/release is required.
+- Main run 37723785041 is separately in progress. The standard watcher saves
+  its final JSON and log in this task's evidence folder. Acceptance is based
+  on completed same-tree PR checks and actual deployed-byte verification;
+  this does not claim the main rerun has completed. No cancellation, manual
+  duplicate run or receipt-only repush. CRAN submission remains excluded.
+
+## 2026-10-08 phrase-list contextual review: local acceptance
+
+Previous main run 37723785041 completed successfully in all 11 jobs; its final
+JSON is retained in reviews/ldfreq-file-reports-20261008. No duplicate rerun.
+
+Development version 0.3.0.9003 identifies the new installed review helper and
+authored English/Japanese demo. All 57 exports, required/optional dependencies,
+core metric definitions and stored metric schemas are unchanged. Source-checked
+phrase matches receive accepted/rejected/unresolved/unreviewed states under one
+declared criterion. The complete CSV worksheet keeps source anchors and IDs;
+accepted coverage is the union of original slots, and final coverage is withheld
+for incomplete reviews. This does not compound words or infer idiomaticity.
+
+Evidence: reviews/ldfreq-phrase-review-20261008. Focused installed tests: 113
+assertions, no failures, errors, warnings or skips. Cases include overlap and
+duplicate entries, zero hits/all-excluded/empty documents, reordered UTF-8 CSV,
+full RDS replay, unchanged token sources, stale source/criterion/list/resource/
+selection, altered fixed fields, removed/duplicated rows and partial decisions.
+A source edit outside a phrase keeps its coordinates and keyword but invalidates
+the previous worksheet, as required. R CMD build rebuilt all 22 vignettes; its
+archive installed into a separate library and ran the complete example in a
+fresh session, with citation/version and exact saved-result replay checked.
+
+Archive: ldfreq_0.3.0.9003.tar.gz, 6,101,618 bytes; SHA-256
+`6874086a290e7d840f23c0e742b43e9ab2fbe555eb2508219453a66827a0e874`.
+All 340 corresponding source files match byte for byte. DESCRIPTION differs
+only by standard R metadata additions and dependency line wrapping. The first
+metadata comparison treated that whitespace as a difference; only that check
+was corrected, without rebuilding/reinstalling the successful artifact. The
+archive excludes development/experiments/caches and includes the 22 rendered
+guides. Full pkgdown build succeeded: 129 HTML / 253 files, zero missing local
+links or private local paths; 78 site files changed. API and minimum-R note
+policy audits passed. Protected PR checks, fixed development tag/prerelease
+and actual public-byte verification follow; CRAN submission remains excluded.

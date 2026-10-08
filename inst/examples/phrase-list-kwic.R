@@ -98,3 +98,91 @@ phrase_list_kwic <- function(x, phrases, resource, keep = rep(TRUE, nrow(x$token
       input_sha256 = digest::digest(list(x$provenance, phrases, resource, settings),
         algo = "sha256", serializeVersion = 2L)))
 }
+
+# Review exact list matches under one declared criterion. Not a sense classifier
+# or an exported API. Source tokens and existing lexical metrics are unchanged.
+phrase_list_review <- function(result, criterion, worksheet = NULL) {
+  fail <- function(message) stop(message, call. = FALSE)
+  blank <- function(x) is.na(x) | !nzchar(stringi::stri_trim_both(x))
+  if (!is.character(criterion) || length(criterion) != 1L ||
+      any(blank(criterion)) || !validUTF8(criterion))
+    fail("Declare one nonblank UTF-8 review criterion.")
+  if (!is.list(result) || !all(c("source", "phrases", "resource", "settings") %in% names(result)))
+    fail("Supply an unchanged phrase_list_kwic() result.")
+  # ponytail: replay the existing search for modest inspectable lists; a large
+  # dictionary workflow would need separately validated occurrence storage.
+  checked <- phrase_list_kwic(result$source, result$phrases, result$resource,
+    result$settings$keep, result$settings$window)
+  if (!identical(checked, result))
+    fail("The search result changed; repeat phrase_list_kwic() before review.")
+  hash <- function(x) digest::digest(x, algo = "sha256", serializeVersion = 2L)
+  review_id <- hash(list("phrase-list-review-v1", result$provenance$input_sha256, criterion))
+  hits <- result$occurrences
+  anchors <- c("phrase_id", "document_id", "segment_id", "from", "to", "start", "end", "keyword")
+  hits$review_id <- rep(review_id, nrow(hits))
+  hits$occurrence_id <- vapply(seq_len(nrow(hits)), function(i)
+    hash(as.list(hits[i, anchors, drop = FALSE])), character(1))
+  fixed <- c("review_id", "occurrence_id", anchors)
+  editable <- c("status", "reviewer", "reason")
+  expected <- as.data.frame(lapply(hits[fixed], as.character), stringsAsFactors = FALSE)
+  if (is.null(worksheet)) {
+    worksheet <- expected
+    worksheet$status <- rep("unreviewed", nrow(hits))
+    worksheet$reviewer <- worksheet$reason <- rep(NA_character_, nrow(hits))
+  }
+  if (!is.data.frame(worksheet) || anyDuplicated(names(worksheet)) ||
+      !setequal(names(worksheet), c(fixed, editable)) ||
+      !all(vapply(worksheet, is.character, logical(1))))
+    fail("Keep the worksheet columns as character; edit only status, reviewer and reason.")
+  if (anyNA(worksheet[fixed]) || anyDuplicated(worksheet$occurrence_id) ||
+      !setequal(worksheet$occurrence_id, expected$occurrence_id))
+    fail("Keep every original occurrence ID exactly once, including unreviewed rows.")
+  worksheet <- worksheet[match(expected$occurrence_id, worksheet$occurrence_id), c(fixed, editable)]
+  rownames(worksheet) <- NULL
+  for (field in fixed) if (!identical(worksheet[[field]], expected[[field]]))
+    fail(paste("A fixed worksheet field changed:", field))
+  states <- c("accepted", "rejected", "unresolved", "unreviewed")
+  if (anyNA(worksheet$status) || any(!worksheet$status %in% states))
+    fail("Status must be accepted, rejected, unresolved or unreviewed.")
+  submitted <- worksheet$status != "unreviewed"
+  if (any(submitted & (blank(worksheet$reviewer) | blank(worksheet$reason))))
+    fail("Every submitted decision, including unresolved, needs a reviewer and reason.")
+  if (any(!submitted & (!blank(worksheet$reviewer) | !blank(worksheet$reason))))
+    fail("An unreviewed row is partly filled; submit a decision or clear reviewer and reason.")
+  if (any(!vapply(worksheet[editable], function(x) all(validUTF8(x[!is.na(x)])), logical(1))))
+    fail("Decision text must be valid UTF-8.")
+  worksheet$reviewer[!submitted] <- worksheet$reason[!submitted] <- NA_character_
+  hits[editable] <- worksheet[editable]
+
+  documents <- result$documents
+  counts <- result$counts
+  ids <- documents$document_id
+  document_row <- match(hits$document_id, ids)
+  cell <- document_row + (match(hits$phrase_id, names(result$phrases)) - 1L) * length(ids)
+  for (state in states) {
+    documents[[state]] <- tabulate(document_row[hits$status == state], nrow(documents))
+    counts[[state]] <- tabulate(cell[hits$status == state], nrow(counts))
+  }
+  # Accepted spans contribute their union of original slots, never summed lengths.
+  source <- result$source
+  offsets <- c(0, head(cumsum(source$segments$token_count), -1L))
+  covered <- rep(FALSE, nrow(source$tokens))
+  for (i in which(hits$status == "accepted")) {
+    group <- which(source$segments$document_id == hits$document_id[i] &
+      source$segments$segment_id == hits$segment_id[i])
+    covered[offsets[group] + seq.int(hits$from[i], hits$to[i])] <- TRUE
+  }
+  documents$accepted_covered_tokens <- tabulate(
+    match(source$tokens$document_id[covered], ids), length(ids))
+  documents$accepted_coverage <- ifelse(documents$retained_tokens > 0,
+    documents$accepted_covered_tokens / documents$retained_tokens, NA_real_)
+  documents$review_complete <- documents$unresolved + documents$unreviewed == 0L
+  documents$reportable_accepted_coverage <- ifelse(documents$review_complete,
+    documents$accepted_coverage, NA_real_)
+  list(occurrences = hits, worksheet = worksheet, counts = counts, documents = documents,
+    source = result, criterion = criterion,
+    provenance = list(example_version = "1", review_id = review_id,
+      decisions = "complete worksheet; accepted/rejected/unresolved/unreviewed",
+      coverage = "accepted union / all retained tokens; no token compounding",
+      complete = "no unresolved or unreviewed matched occurrences; not inventory completeness"))
+}

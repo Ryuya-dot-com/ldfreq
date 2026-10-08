@@ -13,7 +13,10 @@ library(ldfreq)
 has_xml <- requireNamespace("xml2", quietly = TRUE)
 has_quanteda <- has_xml && requireNamespace("quanteda", quietly = TRUE)
 has_phrase_example <- requireNamespace("quanteda", quietly = TRUE) &&
+  utils::packageVersion("quanteda") >= "4.5.0" &&
   isTRUE(l10n_info()[["UTF-8"]])
+knitr::read_chunk(system.file("examples", "phrase-review-demo.R",
+  package = "ldfreq", mustWork = TRUE))
 ```
 
 Suppose a corpus already provides token boundaries, lemmas and part-of-speech
@@ -267,10 +270,10 @@ unlink(path)
 ```
 
 The saved object includes source annotations, phrase components, resource
-declarations, exclusions, settings, input hash and package versions. A review
-table can use `phrase_id`, `document_id`, `segment_id`, `from` and `to` together
-with that input hash. Record literal/idiomatic or other functional judgments
-separately, with reviewer, criteria and unresolved cases. Phrase matches do not
+declarations, exclusions, settings, input hash and package versions. The next
+section adds a checked worksheet for occurrence-specific decisions. Record
+literal/idiomatic or other functional judgments separately, with reviewer,
+criteria and unresolved cases. Phrase matches do not
 establish collocational strength, formulaicity, proficiency, or a learner's
 knowledge. The current single-token ambiguity API does not accept these phrase
 rows; this example does not create a phrase-sense classifier.
@@ -284,6 +287,144 @@ Existing [quanteda phrase patterns](https://quanteda.io/reference/phrase.html)
 and [KWIC](https://quanteda.io/reference/kwic.html) perform the search. The
 addition here is the reproducible connection to source spans, exclusions,
 overlap-aware denominators and subsequent human inspection.
+
+## Review phrase matches and return decisions to document counts {#review-phrase-matches}
+
+A match for `take off` can describe a departing plane or removing a coat.
+Whether it belongs in an analysis depends on the declared question and its
+context. Similarly, the authored Japanese examples distinguish hindering a
+plan from physically pulling a doll's leg. The search finds both; it does not
+make that contextual judgment.
+
+From development version **0.3.0.9003**, the explicitly sourced
+`phrase_list_review()` helper connects the existing phrase search to a complete
+decision worksheet. It is not an exported package API. Install that version
+or later using the [installation instructions](https://ryuya-dot-com.github.io/ldfreq/#installation),
+and use optional quanteda >= 4.5.0 in a UTF-8 R session. The standalone example
+runs offline, without a corpus, model or API key:
+
+```{r phrase-review-quick-start, eval=FALSE}
+source(system.file("examples", "phrase-review-demo.R",
+  package = "ldfreq", mustWork = TRUE), local = TRUE)
+phrase_after$documents
+phrase_after$counts
+```
+
+All texts, phrase entries and decisions are authored teaching material, not
+learner observations, an established phrase inventory or an independent human
+reference. Six document IDs include complete English/Japanese reviews, pending
+reviews, a nonempty no-match document and an empty document.
+
+```{r phrase-review-prepare, eval=has_phrase_example, include=FALSE}
+```
+
+```{r phrase-review-context, eval=has_phrase_example, echo=FALSE}
+knitr::kable(phrase_before$occurrences[c("document_id", "segment_id", "phrase_id",
+  "keyword", "segment_text")], row.names = FALSE)
+```
+
+The declared criterion accepts the English departure interpretation and the
+Japanese hindrance interpretation. A longer `will take off` entry deliberately
+overlaps `take off`, so both entries remain inspectable. The Japanese entry
+uses the supplied authored components `足 / を / 引っ張っ / た`; other
+tokenizations require correspondingly specified entries. No automatic
+lemmatization, alternative-form expansion or discontinuous search is implied.
+
+For your own unchanged search result, start with:
+
+```{r phrase-review-own-input, eval=FALSE}
+source(system.file("examples", "phrase-list-kwic.R",
+  package = "ldfreq", mustWork = TRUE), local = TRUE)
+before <- phrase_list_review(my_search,
+  criterion = "Write the study's interpretation and inclusion rule here.")
+```
+
+### Export context separately from the editable worksheet
+
+```{r phrase-review-export, eval=has_phrase_example}
+```
+
+`context.csv` is for reading the KWIC and complete original segment.
+`decisions.csv` is the editable worksheet. It has one row per **phrase ID and
+source occurrence**, including nested spans and identical forms listed under
+different IDs. Edit only `status`, `reviewer` and `reason`; keep all other cells
+and every row, although you may reorder rows. Read all columns as character
+when importing the CSV so IDs and coordinates survive unchanged.
+
+| Status | Meaning and required fields |
+|---|---|
+| `accepted` | The occurrence meets the declared criterion; supply reviewer and reason |
+| `rejected` | The match is outside that criterion; supply reviewer and reason. This does not label the writer's expression incorrect |
+| `unresolved` | It was examined but the interpretation remains unsettled; supply reviewer and reason |
+| `unreviewed` | No decision has been submitted; leave reviewer and reason missing |
+
+Here `<MISSING>` is the CSV missing-value marker. Do not use that literal string
+as a reviewer name or reason. To resume an existing review, export its latest
+`$worksheet`; starting again from the initial blank worksheet replaces the
+earlier decisions. Save each stage or rater separately when that history matters.
+
+The following edits encode the teaching interpretations and deliberately leave
+some rows unresolved or unreviewed. They are not automated semantic analysis.
+
+```{r phrase-review-decide, eval=has_phrase_example}
+```
+
+### Reapply by identity, then inspect counts and coverage
+
+```{r phrase-review-apply, eval=has_phrase_example}
+```
+
+The helper replays the original search before applying the worksheet. It
+checks the full row set, source anchors, review fingerprint and required
+decision fields. A removed/duplicated row, edited fixed cell or partly filled
+unreviewed row fails. Changed source, phrase entries, resource declaration,
+search settings **including the context window**, or criterion require a new
+worksheet. Do not replace IDs to force old decisions onto changed material.
+
+Each document and document-by-phrase cell satisfies
+`occurrences = accepted + rejected + unresolved + unreviewed`.
+`covered_tokens` describes all exact matches; `accepted_covered_tokens`
+describes only the **union** of accepted spans. The English complete review
+accepts two nested occurrences of lengths three and two, but their union is
+three tokens, so accepted coverage is `3/11`, not `5/11`. The Japanese complete
+review gives `4/18`. These authored ratios are not a language or ability comparison.
+
+`accepted_coverage` retains the coverage of decisions accepted so far.
+`reportable_accepted_coverage` is missing whenever a document still has an
+unresolved or unreviewed match. A zero in the former column for a pending
+review is therefore not reported as an observed absence of relevant uses.
+The no-match document has zero coverage; the empty document has missing
+coverage because its denominator is zero.
+
+`review_complete` means that every **matched entry** has an accepted/rejected
+decision. It does not establish that the inventory is exhaustive, that the
+annotations are correct, or that the decisions are reliable. Different list
+entries at the same span retain separate decisions; union coverage prevents
+double counting but does not adjudicate inconsistent judgments. Original
+tokens remain unchanged: this workflow does not compound accepted expressions
+into single words or alter TTR, MATTR or MTLD.
+
+### Save the complete review and reproduce its tables
+
+```{r phrase-review-save, eval=has_phrase_example}
+```
+
+The temporary directory makes the example runnable. For a study, use a
+persistent project directory and separate files for successive review stages;
+writing the same filename overwrites it. The RDS retains original text, search
+settings, the declared criterion, every judgment and the imported CSV record.
+The two result CSVs are flat tables for later analysis. Reproduction uses the
+same software versions; retain the original files and saved environment.
+These records contain source text and the phrase inventory, so their sharing
+conditions follow those materials.
+
+A methods description should identify the phrase inventory/version, analyzer
+and word unit, case/normalization policy, segment boundaries, exclusions,
+context and decision criterion, reviewers and handling of disagreements.
+Report accepted/rejected/unresolved/unreviewed counts and the retained-token
+denominator. State that overlapping accepted spans contribute their union to
+coverage, and report how many documents remain incomplete. Search and worksheet
+checks verify correspondence, not inter-rater agreement or psycholinguistic validity.
 
 ## Connect to the existing ldfreq reference workflow
 
