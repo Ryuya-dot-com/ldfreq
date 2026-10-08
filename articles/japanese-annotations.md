@@ -212,9 +212,11 @@ checks](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.ht
 The advisory 50-token floor is not a validated Japanese reliability
 threshold.
 
-A separate check reuses saved Sudachi A/B/C analyses of 28 actual
-Japanese learner essays. Surface-form scores change in 24/28 essays
-between A and C:
+A separate check reuses saved Sudachi A/B/C analyses of 28 Japanese
+essays: **24 learner essays and four Japanese-L1 essays**. The same task
+was sampled deterministically, with four writers per reported L1 across
+seven groups; see the reproduction record for selection details.
+Surface-form scores change in 24/28 essays between A and C:
 
 | Metric  | A median | C median | Paired Spearman rho |
 |---------|---------:|---------:|--------------------:|
@@ -225,22 +227,23 @@ between A and C:
 All 28 pairs are finite and retain the same original character coverage;
 none has a tail-only MTLD flag. These small-sample observations do not
 validate precision, proficiency discrimination or interchangeable score
-scales. **Sudachi C is not relabeled NINJAL LUW.** The public sentence
-comparison and the saved essay mode comparison answer different
-questions.
+scales, and are not an L2-only estimate. **Sudachi C is not relabeled
+NINJAL LUW.** The public sentence comparison and the saved essay mode
+comparison answer different questions.
 
 For a methods section, report the actual source/version, unit, form,
 selection, window and MTLD definition. For example, the essay check
 above can be described as follows (replace these conditions with those
 actually used in your study):
 
-> We compared surface-form lexical diversity in the same 28 essays using
-> saved SudachiPy 0.6.11 / SudachiDict-core 20260428 annotations in
-> modes A, B and C. Original text, including titles, was retained.
-> Whitespace and auxiliary-symbol tokens were excluded; particles,
-> auxiliaries and numbers were retained. MATTR used 50-token windows.
-> MTLD used threshold .72, strict `<`, no minimum factor length, linear
-> tail credit and the mean of directional scores. We checked
+> We compared surface-form lexical diversity in the same 28 essays (24
+> learner essays and four Japanese-L1 essays) using saved SudachiPy
+> 0.6.11 / SudachiDict-core 20260428 annotations in modes A, B and C.
+> Original text, including titles, was retained. Whitespace and
+> auxiliary-symbol tokens were excluded; particles, auxiliaries and
+> numbers were retained. MATTR used 50-token windows. MTLD used
+> threshold .72, strict `<`, no minimum factor length, linear tail
+> credit and the mean of directional scores. We checked
 > original-character coverage, paired missingness and MTLD factor
 > support before comparing scores. These comparisons assessed
 > sensitivity to the analysis mode, not proficiency or measurement
