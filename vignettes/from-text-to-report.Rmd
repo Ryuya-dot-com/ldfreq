@@ -332,6 +332,282 @@ reanalysis. For a text CSV instead of separate files, use the
 [ID-preserving CSV input recipe](english-tokenization.html#alternatively-read-a-csv-containing-the-texts).
 The remaining sections explain reference coverage, figures and citations.
 
+## Join study metadata and summarize documents {#study-metadata}
+
+The question now is **which documents and writers contribute to each reported
+summary**. Continue either file path above. The recipe keeps one row per
+original document, condition and metric, then joins a study table by ID. It
+uses standard R and guide-local functions on the existing package installation.
+No human review is required for this path; add that workflow when your study
+actually includes occurrence-level judgments.
+
+### Match study information without losing documents
+
+A study table has one row per document. `writer_id` may repeat across documents;
+`document_id` must not. The same structure works for speaker, participant or
+source-author IDs when their role is explicitly declared. Unknown writers or
+tasks remain `NA`, rather than being invented from filenames. Keep task, group,
+time and corpus information in separate columns when the study needs them.
+
+```{r report-study-join-function}
+join_study_metadata <- function(rows, metadata) {
+  if (!is.data.frame(rows) || !is.data.frame(metadata) ||
+      anyDuplicated(names(rows)) || anyDuplicated(names(metadata)) ||
+      !"document_id" %in% names(rows) ||
+      !all(c("document_id", "writer_id", "task") %in% names(metadata)))
+    stop("Supply tables with unique column names and document_id, writer_id, task metadata.")
+  valid_id <- function(x) is.character(x) && !anyNA(x) &&
+    all(validUTF8(x)) && all(nzchar(trimws(x)))
+  if (!valid_id(rows$document_id) || !valid_id(metadata$document_id))
+    stop("Keep document IDs as nonblank character strings, including leading zeros.")
+  if (anyDuplicated(metadata$document_id)) stop("Metadata contain duplicate document IDs.")
+  missing <- setdiff(unique(rows$document_id), metadata$document_id)
+  extra <- setdiff(metadata$document_id, rows$document_id)
+  if (length(missing) || length(extra)) stop(paste(
+    "Metadata must describe exactly the selected documents. Missing:",
+    paste(missing, collapse = ", "), "; extra:", paste(extra, collapse = ", ")))
+  for (field in c("writer_id", "task")) {
+    x <- metadata[[field]]
+    if (!is.character(x) || any(!is.na(x) & (!validUTF8(x) | !nzchar(trimws(x)))))
+      stop("Writer/task labels must be character strings; use NA for unknown values.")
+  }
+  add <- setdiff(names(metadata), "document_id")
+  if (any(add %in% names(rows))) stop("Rename colliding metadata columns before joining.")
+  j <- match(rows$document_id, metadata$document_id)
+  out <- rows
+  out[add] <- metadata[j, add, drop = FALSE]
+  out
+}
+```
+
+This follows the earlier ID-matching example, with explicit failures for
+missing/extra IDs and conflicting column names. If your metadata cover a
+larger corpus, deliberately select the intended roster first and record that
+selection. An unknown writer still needs a document row with `writer_id = NA`.
+
+For the English example, use the bundled study table; it is deliberately in a
+different row order from the texts. Its ten writer IDs are fictional, assigned
+to authored texts with shared passages. They are not ten sampled participants.
+For your study, replace the CSV path and use your actual recorded IDs.
+
+```{r report-study-english-metadata}
+study_record <- en_record
+metadata_path <- system.file("examples", "text-input", "metadata.csv",
+  package = "ldfreq", mustWork = TRUE)
+metadata_input <- reader$read_text_file(metadata_path, encoding = "UTF-8")
+metadata_connection <- textConnection(metadata_input$text, encoding = "UTF-8")
+study_metadata <- read.csv(metadata_connection, colClasses = "character",
+  na.strings = "<MISSING>", check.names = FALSE, encoding = "UTF-8")
+close(metadata_connection)
+use_nj8 <- TRUE
+```
+
+For the Japanese teaching path, substitute the following block for the English
+metadata block, then run the remaining steps unchanged. These deliberately
+fictional labels include an unknown author and task, repeated authors, and a
+separate task containing only zero-token selections. Supply an actual study
+CSV in research; do not infer Japanese authorship or ability from these labels.
+
+```{r report-study-japanese-metadata, eval=FALSE}
+study_record <- ja_record
+study_metadata <- data.frame(document_id = ja_ids,
+  writer_id = c("authored-A", "authored-A", NA, "authored-B", "authored-B"),
+  task = c("authored-body", "authored-body", NA, "zero-input", "zero-input"))
+metadata_input <- list(source = "Authored metadata declared in this guide; not participant data.")
+use_nj8 <- FALSE
+```
+
+### Retain settings, unavailable values and reporting decisions
+
+Use the shared settings from this one analysis record. Do not combine unrelated
+runs with different settings and label them as a single condition. The added
+parameter columns also keep different windows or thresholds apart in the
+summaries. This recipe covers the three metrics requested above; full requested
+and effective parameters remain in `study_record$results`.
+
+```{r report-study-table}
+study_rows <- study_record$diagnostics
+stopifnot(all(study_rows$metric_id %in% c("ttr", "mattr", "mtld")))
+study_rows$window_length <- ifelse(study_rows$metric_id == "mattr",
+  study_record$settings$window_length, NA_real_)
+study_rows$mtld_threshold <- ifelse(study_rows$metric_id == "mtld",
+  study_record$settings$mtld_threshold, NA_real_)
+if (!"reportable_value" %in% names(study_rows)) study_rows$reportable_value <- study_rows$value
+if (!"selection_complete" %in% names(study_rows)) study_rows$selection_complete <- TRUE
+study_table <- join_study_metadata(study_rows, study_metadata)
+```
+
+`value` is the computed value; `reportable_value` additionally reflects the
+Japanese selection-completeness policy above. Neither column automatically
+excludes short texts or tail-only MTLD estimates. Keep the original diagnostics
+and state any further exclusion rule and its effect on the sample explicitly.
+
+For this English surface-form example, optionally attach NJ8 coverage from the
+**same selected token sequences**. The denominator is retained next to the
+coverage; it is checked against `N`. This does not change the diversity values.
+For the Japanese path `use_nj8 = FALSE` leaves this English reference unused.
+Select language-appropriate references and matching units for other studies.
+
+```{r report-study-reference}
+study_references <- NULL
+study_coverage <- NULL
+if (use_nj8) {
+  study_references <- lapply(study_record$inputs, nj8_profile_batch, unit = "surface")
+  study_coverage <- do.call(rbind, lapply(names(study_references), function(condition) {
+    out <- study_references[[condition]]$coverage
+    out$condition <- condition
+    out$reference_unit <- "surface"
+    out
+  }))
+  rownames(study_coverage) <- NULL
+  study_table$nj8_eligible_tokens <- study_table$nj8_matched_tokens <- NA_real_
+  study_table$nj8_token_coverage <- NA_real_
+  for (condition in names(study_references)) {
+    rows <- which(study_table$condition == condition)
+    coverage <- study_coverage[study_coverage$condition == condition, , drop = FALSE]
+    stopifnot(!anyDuplicated(coverage$document_id))
+    j <- match(study_table$document_id[rows], coverage$document_id)
+    stopifnot(!anyNA(j), all(coverage$eligible_tokens[j] == study_table$N[rows]))
+    study_table$nj8_eligible_tokens[rows] <- coverage$eligible_tokens[j]
+    study_table$nj8_matched_tokens[rows] <- coverage$matched_tokens[j]
+    study_table$nj8_token_coverage[rows] <- coverage$token_coverage[j]
+  }
+}
+knitr::kable(head(study_table[c("document_id", "writer_id", "condition",
+  "metric_id", "N", "value", "reportable_value", "status", "mtld_tail_only")]),
+  col.names = c("Document", "Writer", "Condition", "Metric", "N", "Computed",
+    "Reportable", "Status", "Tail-only"), digits = 3)
+```
+
+The default NJ8 lookup normalizes case separately from tokenization, so two
+case conditions can have the same reference coverage while their diversity
+scores differ. Unmatched forms stay in the reference denominator; they are
+not all spelling errors or unknown vocabulary. Zero-token documents have
+undefined coverage, retained as missing. The separate `study_coverage` table
+has one row per document and condition: use that table for coverage totals,
+rather than summing coverage counts repeated on every metric row. Complete
+resource versions, notices and lookup records are saved in `study_references`.
+
+### Describe documents within declared study groups
+
+The following function describes available **document values**. A writer with
+more documents contributes more values; this is not an equal-writer mean.
+No test, confidence interval or independence assumption is supplied. Choose
+the sampling unit and dependence structure before using these rows with your
+usual modelling package. For group or time comparisons, add those metadata
+columns to `study_group_keys` explicitly; missing group labels remain visible.
+
+```{r report-study-summary-function}
+summarize_study_documents <- function(rows, keys) {
+  settings_keys <- c("condition", "metric_id", "method_id", "window_length", "mtld_threshold")
+  needed <- c("document_id", "writer_id", "value", "reportable_value", "status", "metric_id",
+    "selection_complete",
+    "mtld_tail_only", "below_quality_floor", keys)
+  if (!is.character(keys) || anyNA(keys) || anyDuplicated(keys) ||
+      !all(settings_keys %in% keys) || !all(needed %in% names(rows)) || !nrow(rows))
+    stop("Supply diagnostic rows and group keys retaining condition, metric, method and settings.")
+  if (anyDuplicated(rows[c(keys, "document_id")]))
+    stop("More than one result per document in a summary group; retain condition and setting keys.")
+  groups <- unique(rows[keys])
+  out <- lapply(seq_len(nrow(groups)), function(i) {
+    keep <- rep(TRUE, nrow(rows))
+    for (key in keys) {
+      target <- groups[[key]][i]
+      keep <- keep & if (is.na(target)) is.na(rows[[key]]) else
+        !is.na(rows[[key]]) & rows[[key]] == target
+    }
+    d <- rows[keep, , drop = FALSE]
+    calculated <- d$status == "ok" & is.finite(d$value)
+    reported <- calculated & is.finite(d$reportable_value)
+    values <- d$reportable_value[reported]
+    known_writers <- function(x) length(unique(x[!is.na(x)]))
+    data.frame(groups[i, , drop = FALSE], n_documents = nrow(d),
+      n_writers_known = known_writers(d$writer_id),
+      n_unknown_writer_documents = sum(is.na(d$writer_id)),
+      n_calculated = sum(calculated), n_reported = length(values),
+      n_unavailable = sum(!calculated), n_withheld = sum(calculated & !reported),
+      n_selection_incomplete = sum(!d$selection_complete),
+      n_reported_writers_known = known_writers(d$writer_id[reported]),
+      n_reported_unknown_writer_documents = sum(is.na(d$writer_id[reported])),
+      n_tail_only_reported = if (all(d$metric_id == "mtld"))
+        sum(d$mtld_tail_only[reported], na.rm = TRUE) else NA_integer_,
+      n_below_floor_reported = sum(d$below_quality_floor[reported], na.rm = TRUE),
+      mean = if (length(values)) mean(values) else NA_real_,
+      sd = if (length(values) > 1L) sd(values) else NA_real_,
+      median = if (length(values)) median(values) else NA_real_, row.names = NULL)
+  })
+  do.call(rbind, out)
+}
+study_group_keys <- c("condition", "task", "metric_id", "method_id",
+  "window_length", "mtld_threshold")
+study_summary <- summarize_study_documents(study_table, study_group_keys)
+knitr::kable(study_summary[c("condition", "task", "metric_id", "n_documents",
+  "n_writers_known", "n_reported", "n_unavailable", "n_withheld", "n_selection_incomplete")],
+  col.names = c("Condition", "Task", "Metric", "Docs", "Known writers", "Reported",
+    "Unavailable", "Withheld", "Incomplete"))
+knitr::kable(study_summary[c("condition", "task", "metric_id", "n_reported", "mean", "sd", "median")],
+  col.names = c("Condition", "Task", "Metric", "Reported", "Mean", "SD", "Median"), digits = 3)
+```
+
+Each English condition/metric keeps 31 documents and ten fictional writer IDs;
+30 values are reported and one is unavailable. These are not 30 independent
+participants. Unknown authors are counted as unknown documents, not one extra
+person. A task with no available values remains a row with missing mean, SD
+and median; one reported value has an undefined sample SD. Unknown task labels
+also remain a group. No absent task levels are invented.
+
+For Japanese `unlisted`, all-body TTR is retained under an unknown task/author.
+Its only token has unknown POS, so the content condition has no known selected
+tokens and no computed score. `n_selection_incomplete` still counts that
+document. `n_withheld` specifically counts finite calculated values withheld
+from reporting; it does not count every incomplete selection. A partly known
+selection can yield a finite `value` while `reportable_value` remains missing.
+The zero-input group remains in both conditions. MATTR50 is unavailable throughout.
+The short MTLD examples remain flagged; these summaries illustrate the
+reporting rules, not suitable samples for a substantive MTLD comparison.
+
+### Save the study table and its full analysis record
+
+```{r report-study-save}
+study_record$study <- list(metadata = study_metadata, metadata_input = metadata_input,
+  table = study_table, summary = study_summary, group_keys = study_group_keys,
+  references = study_references, coverage = study_coverage,
+  policy = "Document-weighted descriptive statistics of finite reportable values; no inference.")
+study_record$study$methods <- paste(
+  "Study metadata were matched by document ID with an exact document roster.",
+  "Results retained counting conditions, method IDs, window lengths and thresholds.",
+  "Within declared groups we reported document counts, known writers, unknown-writer",
+  "documents, unavailable and withheld values, and document-weighted mean, sample SD",
+  "and median of reportable values. Diagnostic flags did not automatically exclude texts.",
+  "Repeated documents were not treated as independent participants for inference.")
+study_output <- tempfile("ldfreq-study-report-")
+dir.create(study_output)
+saveRDS(study_record, file.path(study_output, "study.rds"), version = 2)
+write.csv(study_table, file.path(study_output, "document-results.csv"),
+  row.names = FALSE, na = "<MISSING>", fileEncoding = "UTF-8")
+write.csv(study_summary, file.path(study_output, "descriptive-statistics.csv"),
+  row.names = FALSE, na = "<MISSING>", fileEncoding = "UTF-8")
+if (!is.null(study_coverage)) write.csv(study_coverage,
+  file.path(study_output, "reference-coverage.csv"),
+  row.names = FALSE, na = "<MISSING>", fileEncoding = "UTF-8")
+writeLines(enc2utf8(study_record$study$methods),
+  file.path(study_output, "study-methods.txt"), useBytes = TRUE)
+study_restored <- readRDS(file.path(study_output, "study.rds"))
+stopifnot(identical(study_restored, study_record), identical(
+  summarize_study_documents(study_restored$study$table, study_restored$study$group_keys),
+  study_restored$study$summary))
+```
+
+Replace the temporary output path with a persistent study directory in actual
+work. CSV is an inspection/modelling view; the RDS retains input texts,
+annotations or tokenizations, settings, complete results, metadata and optional
+references. Use the earlier calculation-replay block on this restored record
+to recalculate the original metrics. Keep original source files and a recorded
+software environment as well. CSV readers should keep IDs as character strings
+and reserve `<MISSING>` for missing values. The methods text above describes
+this table step; combine it with your actual sampling and calculation methods.
+This executable example has not been tested for usability with novice users.
+
 ## Question and unit of analysis
 
 If your texts are in TXT files or a CSV, begin with the executable

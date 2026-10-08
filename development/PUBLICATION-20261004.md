@@ -4748,3 +4748,80 @@ only the standard HTML-to-Markdown step was then run, without rerunning the
 successful guide calculations. Final audit: 129 HTML / 253 files, zero missing
 internal links or private paths, eight changed publication files. Normal PR
 checks and anonymous delivery verification follow. Minimum-R note policy passes.
+
+### Publication completion for PR #38
+
+- Main: `ed5a8eb372229b9f719169e0b572c1daa1a0fb3a`; checked PR head
+  `08ecbb307213f74daa6a466f53d8320d16f68bec`. Both have source tree
+  `7542762050a29016785e9ff8d1e503ca8b6d6d92`.
+- PR run 37732061850 passed all 11 jobs. Current Linux, macOS, Windows and
+  R-devel each passed 8,399 assertions with no failures, warnings or skips,
+  Status: OK including vignette rebuilding. R4.1 succeeded. C locale passed
+  7,976 assertions, zero failures, one existing warning and 32 conditional
+  skips. The English/Japanese phrase example retains its UTF-8 prerequisite;
+  this does not establish C/CP932 support for that example.
+- Release-candidate classification succeeded without a new release build.
+  Version, installed helper, dependencies and the fixed v0.3.0.9003 tag remain
+  unchanged. The guide runs on that already validated installation.
+- Pages `2f22204f900543049cafcaed1e9b6a5619422c5a`, run 37733287537,
+  succeeded. All seven changed source files and eight changed site files
+  anonymously downloaded byte-identically to the validated local files.
+  Evidence is in reviews/ldfreq-phrase-agreement-20261008, including PR/main
+  identity, coefficient fixtures and publication-byte manifests.
+- Main run 37733251869 was automatically triggered and is separately in
+  progress. Its standard watcher records final JSON/log in the evidence
+  directory. Acceptance uses completed same-tree PR checks and actual
+  deployment, not an assertion of completed main checks. These completion
+  receipts remain local until a substantive subsequent change; no receipt-only
+  repush or successful calculation rerun. No CRAN submission.
+- The result establishes an executable, source-checked comparison/discussion
+  workflow and coefficient arithmetic. Independent human reliability, study-
+  specific uncertainty, inventory recall and validity remain unestablished.
+
+Follow-up on 2026-10-08: main run 37733251869 completed successfully in all
+11 jobs, as recorded by its existing watcher on the merged SHA. No rerun or
+receipt-only push was needed.
+
+## 2026-10-08 study metadata and diagnostic descriptions: local acceptance
+
+The user approved the next bounded step: connect existing document results to
+study metadata, descriptive statistics and saved analysis records. Extend the
+existing report guide; retain 57 exports, 22 guides, dependencies, core formulas,
+installed helpers, version 0.3.0.9003 and fixed tags/releases. Human agreement
+remains optional for studies that actually make annotation judgments.
+
+Evidence: reviews/ldfreq-study-report-20261008. The guide runs on the previously
+GitHub-installed 0.3.0.9003. English and Japanese paths execute independently:
+186 plus 30 diagnostic rows, six plus 18 summary groups, complete document
+rosters including empty documents and unknown task/author labels. The English
+example has 31 documents and ten fictional writers per condition/metric, 30
+reported values and one unavailable value. Those labels are not human data.
+Conditional Japanese selections preserve both computed and reportable values.
+
+Eleven rejection cases cover metadata/result duplication, missing/different
+rosters, leading-zero IDs mistakenly converted to numeric, blank/missing IDs,
+column collisions and omission of a setting key. Reordering, Unicode labels,
+unknown versus literal NA labels, zero-value groups, singleton SD and separate
+window settings pass. A hand-specified four-document fixture gives two reported
+values, one finite withheld value and one unavailable value: mean/median 2,
+sample SD sqrt(2), one contributing known writer, distinct from document count.
+The initial Japanese expectation incorrectly assumed known content tokens
+remained in unlisted; inspection showed zero. The expectation and explanation
+were corrected, and selection-incomplete counts were separated from finite
+withheld counts. A separate fixture covers finite withheld values. No core
+metric formula was changed to fit an expectation.
+
+UTF-8 and genuine C-locale tables/summaries match exactly. CSV preserves IDs,
+unknown labels and unavailable values; full RDS round trips and a fresh R
+session reproduce both language calculations and all optional NJ8 profiles.
+Reference coverage uses the same selected tokens; eligible totals match N.
+Complete profiles retain source provenance, and a separate one-row-per-document/
+condition coverage table avoids summing counts repeated over metrics.
+
+API audit and minimum-R note policy pass. Changed article, home, NEWS, search
+and Markdown outputs were built; the home CRAN lookup needed network permission,
+so only unfinished stages resumed. The descriptive display uses separate count
+and value tables with short column labels. Final site audit: 129 HTML / 253 files,
+no missing internal links or private paths, eight changed files. Normal PR CI
+and anonymous delivery checks follow. No inference, novice-user validation,
+new resource licence decision, package release or CRAN submission is claimed.

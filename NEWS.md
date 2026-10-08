@@ -1,5 +1,10 @@
 # ldfreq 0.3.0.9003 (development)
 
+- Extend the reporting guide with checked document-to-study metadata joins,
+  parameter-specific descriptive statistics, known-writer and document counts,
+  separate unavailable/incomplete/withheld states, optional same-token NJ8
+  coverage, and CSV/full-RDS replay. Existing English and Japanese examples run
+  independently; no new public API, dependency or metric calculation.
 - Extend the phrase-review guide with literature-grounded comparison of two
   raters, explicit paired-decision denominators, open-case KWIC, separately
   recorded discussion and original document profiles. An optional `irr`
