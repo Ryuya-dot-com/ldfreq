@@ -68,6 +68,14 @@ These are features for describing and comparing texts. A score alone
 does not establish proficiency, writing quality, measurement validity,
 or reliability.
 
+The [study-table
+walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#study-metadata)
+connects document results to writer/task metadata, retains unavailable
+and withheld values, and reports document-weighted descriptive
+statistics with their contributing document/writer counts. It uses the
+existing installation and saves both flat CSV tables and the complete
+analysis record.
+
 The Japanese workflow also connects [source-linked frequency
 profiles](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#connect-document-selections-to-reference-frequency)
 to full-token coverage, common-span comparisons and saved-input replay.
