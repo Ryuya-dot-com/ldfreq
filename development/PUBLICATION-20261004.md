@@ -5416,3 +5416,59 @@ The completion record and roadmap update are retained on
 `codex/api-consolidation-evidence-20261014`. They change only repository developer
 records; the fixed 9007 source archive, main/tag code and deployed site remain
 as verified above. No further numerical test run is needed for these records.
+
+## Morphology and Japanese guide revision (2026-10-14)
+
+The continuation adopts the guide-entry work identified by the morphology
+review. README, the two existing morphology/Japanese guides and an explicitly
+unreleased NEWS entry change. No new API, analyzer, dependency, metric formula,
+dictionary, resource or corpus is introduced. The fixed 9007 source archive,
+main/tag and public Pages delivery remain the published baseline; this entry
+records a verified development-branch revision and local previews.
+
+- The family/affix guide routes family counts, part counts and formation
+  relations to the existing examples. It connects Bauer–Nation inclusion,
+  Schmitt–Zimmerman productive derivative knowledge, MorphoLex and MorphyNet
+  to their respective questions and limitations. Existing complete examples
+  and source-bound review/save procedures remain available.
+- The Japanese guide routes prepared annotations, R/gibasa analysis and other
+  analyzer outputs separately. Same-dictionary wrapper agreement is separated
+  from segmentation sensitivity and linguistic accuracy, with a fixed-commit
+  link to the existing reproduction experiment. Lexeme/base-form choices and
+  Japanese short-unit categories are not converted into English affix classes
+  or educational word families.
+- The gibasa example now records 16 source tokens, 13 lexical candidates,
+  one missing base and 12 retained occurrences. The same 12 occurrences give
+  surface V = 10, TTR = 10/12 and base V = 9, TTR = 9/12; coverage is 12/13.
+  Empty-document coverage and TTR stay missing. The documented RDS retains
+  the original import, selection, coverage, common-form comparison, metrics
+  and n-grams together.
+
+Evidence is in `reviews/ldfreq-morphology-guides-20261014/`:
+
+- `reuse.json`: 319 tracked runtime/help/resource/test and package-identity
+  files are byte-identical to main `411ab0e`. The actual gibasa helper is
+  unchanged since the 16-input R/Python experiment at `6dab71b`; the guide's
+  full source hash changes with the new explanatory text. Earlier parity,
+  28-essay sensitivity and full CI evidence remain applicable to their original
+  claims and were not rerun.
+- `verify-and-render.log`: both complete package guides rendered using installed
+  9007, including gibasa and the optional review paths. The new counts match
+  the hand-counted cases; the exact documented save code preserves all six
+  components. `replay.log` confirms their independent R-session reload without
+  rerunning an analyzer. `finish-pages.log` confirms unchanged numerical tables
+  after shortening display headers and wrapping code lines.
+- `build-pages.log`: home, the two changed articles, NEWS, search and LLM outputs
+  rebuilt. Other pages reuse the verified 9007 site. The final site has 253
+  files/129 HTML pages, with 11 changed files and no broken local links/anchors
+  (`site-audit.json`). No workspace paths or internal roadmap/publication
+  references were introduced into the user-facing output.
+- Public API audit passes: 57 exports, 34 S3 registrations and 37 public help
+  topics. No full numerical-suite rerun or duplicate CI was needed for these
+  guide changes.
+- Headless Chrome with an isolated temporary profile provided desktop previews
+  at 1440 × 1100. The morphology entry, Japanese route and coverage table were
+  inspected; the final headers expose the coverage column without horizontal
+  clipping. `visual-check.json` and the three PNGs record these checks.
+  This is a local rendering check, not a novice-user study, mobile-layout
+  certification or verification of a newly deployed site.

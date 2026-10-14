@@ -76,7 +76,8 @@ and saving and reopening an analysis. In R, `?ldfreq` opens the input map;
 | One English text or a table with document IDs and text | [Getting started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html); use `lexdiv_metrics_text()` or `lexdiv_metrics_text_batch()` |
 | TXT files, a folder, or a CSV containing texts | [Read your own files](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files), including installed sample files and where to substitute your paths |
 | Ordered tokens, with one character value per occurrence | `lexdiv_metrics()` for one document; [tokenized documents and tables](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html#multiple-documents) for several |
-| Japanese text and supplied morphological annotations | [Japanese annotations](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html); reading text alone does not perform Japanese word segmentation |
+| Japanese text and supplied morphological annotations | [Choose an analysis route](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#choose-a-japanese-analysis-route); compare R/Python agreement, lexical forms and selection coverage |
+| Complete annotations for family or affix counts | [Word families, roots and affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html); choose the counting question, reference and analysis scope |
 
 Once you have results, use [From text to a report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html)
 to compare counting conditions, join study metadata, inspect vocabulary coverage

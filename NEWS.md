@@ -1,3 +1,12 @@
+# ldfreq (development version)
+
+- Clarify how to choose word-family, affix and Japanese annotation workflows.
+  Connect the research basis and resource scope to the existing examples;
+  distinguish same-dictionary R/Python agreement from segmentation sensitivity
+  and linguistic accuracy. The Japanese guide now reports missing-base coverage
+  and compares surface/base forms on common occurrences, retaining both in the
+  saved analysis. No API, dependency, formula or resource change.
+
 # ldfreq 0.3.0.9007 (development)
 
 - Run explicit plans with `lexdiv_metrics(..., plan = plan)` and
