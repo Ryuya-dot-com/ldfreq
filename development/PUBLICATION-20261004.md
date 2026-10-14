@@ -5015,6 +5015,11 @@ The existing uncommitted PR #42 publication record was retained.
 
 ### Current identity and completion evidence
 
+Current public snapshot: **0.3.0.9006**, main/tag `7f97872`, Pages `60c54d4`.
+See [the 9006 publication entry](#documentation-snapshot-0309006-publication-completion)
+for exact identities, PR CI and anonymous-delivery evidence. The bullets below
+record the 9005 baseline of the wording audit, not the latest deployed state.
+
 - GitHub reports a public repository with default branch `main`; its current
   commit and local checkout are `19bcd20feb18608c54f3c78630d5b4517bf454dd`.
   The recursive source listing contains 461 files.
@@ -5258,3 +5263,105 @@ integration, a new fixed prerelease with the verified archive, and a normal
 fast-forward gh-pages update. No manual duplicate CI runs or administrative
 bypass are planned. Actual IDs, conclusions and anonymous delivery checks will
 be retained with this evidence; earlier 9005 results are not relabeled as 9006 CI.
+
+## Documentation snapshot 0.3.0.9006: publication completion
+
+On 2026-10-14, after explicit user approval of the GitHub push, the prepared
+documentation commit was pushed and [PR #43](https://github.com/Ryuya-dot-com/ldfreq/pull/43)
+was merged without bypassing protection. Both required checks passed.
+R-CMD-check [38562881271](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/38562881271)
+completed with all 11 jobs successful; release-candidate classification and its
+required aggregate passed in run `38562881358`. Formal-candidate jobs were skipped
+as designed for the declared development snapshot, not treated as executed checks.
+
+- Main and fixed tag: `7f97872ab7d19f0048485646db52f0a1674beb80`.
+  Its tree `50617a1df28135a16e549765936eb7fb6adcb680` is identical to tested PR head
+  `ea40746a2f3642b67871228cef5a7f0f3eb9767c`.
+- [v0.3.0.9006](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.3.0.9006)
+  is a new prerelease, retaining earlier fixed tags/assets and the existing
+  latest stable release. Both the archive and checksum asset were uploaded;
+  API-reported digests and anonymous downloads match the prepared local bytes.
+- Pages commit `60c54d4ccbb4b80b51aae12a4d3fcabfe6e7642d` is a normal fast-forward
+  from `fc820453`. Its 253 built files match the verified complete site; the
+  existing `.nojekyll` deployment marker is retained. Two old generated plot
+  paths were replaced by their renumbered counterparts. Generated Markdown
+  retains R's printed trailing spaces; no source whitespace defect was inferred.
+- Pages run [38565078563](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/38565078563)
+  completed successfully in build, deploy and status-reporting jobs.
+  `public-delivery.json` confirms exact bytes for ten public home/guide/help/news/
+  search/metadata files and both release assets. The two tested internal-roadmap
+  site paths return 404. GitHub development documents remain public by design.
+- Chrome opened the deployed Getting started guide, showing version 9006 and
+  the new first-use sequence, 0.8/1/NA example and save/resume instructions.
+  This is browser loading/content verification, not a human usability study
+  or a comprehensive visual/responsive audit. The earlier local-file navigation
+  restriction was not bypassed.
+- Anonymous verification initially failed because the local Python installation
+  could not locate a trusted issuer. System curl with certificate verification
+  enabled completed the same delivery checks. Package tests/builds were not rerun.
+
+Evidence remains in `reviews/ldfreq-docs-publication-20261014`:
+`pr-final.json`, `pr-final-state.json`, `release-candidate-final.json`,
+`pr-merged.json`, `release.json`, `pages-final.json`, `public-delivery.json`, and
+`publication-state.json`. The automatic main R-CMD-check `38564970910` is still
+running at this checkpoint; `main-status.json` records it separately. Main's
+release-candidate run `38564971126` has succeeded. The identical source tree and
+completed PR checks are valid evidence; main's unfinished run is not claimed
+successful. No duplicate manual CI, cancellation or protection change was used.
+
+Follow-up verification during the API consolidation review on 2026-10-14:
+main R-CMD-check [38564970910](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/38564970910)
+has completed successfully with all 11 jobs successful at
+`7f97872ab7d19f0048485646db52f0a1674beb80`. The completed response is saved as
+`main-final.json` in the same evidence directory. The preceding monitoring
+checkpoint is resolved; no workflow was restarted. API naming/consolidation
+assessments and this completion record are on the separate review branch
+`codex/api-naming-review-20261014`, not changes to the fixed 9006 package or site.
+
+## API entry-point snapshot 0.3.0.9007: preparation (2026-10-14)
+
+The continuation adopts the bounded catalog/plan implementation in
+[API-SURFACE.md](API-SURFACE.md#9007-adopted-entry-points). No new export,
+scientific formula, resource, dependency or stored schema is introduced.
+Existing profile and catalog entry points remain supported. Runtime changes are
+limited to `R/api.R`, `R/batch.R` and `R/profile.R`.
+
+Evidence: workspace `reviews/ldfreq-api-consolidation-20261014/`.
+
+- Eight affected test groups passed 650 expectations, including 41 new checks
+  for catalog membership, explicit argument conflicts, plan integrity, document
+  order, invalid/empty inputs, zero-document inputs and pre-allocation limits.
+- A separate process using the installed 9006 archive saved ten complete objects
+  covering catalogs, plans, direct and positional metric requests, batch,
+  profile, text and metadata-bearing text-batch results. Every object is identical
+  under the corresponding 9007 old call. Both new plan entry points reproduce
+  the saved 9006 plan results exactly, including attributes and classes.
+- The installed 9007 archive reproduces those plan results, widening and RDS
+  replay. Color and monochrome plot calls return identical selected data
+  invisibly. Installed help includes the new arguments and executor boundaries.
+- The public API audit passed: 57 exports, 34 S3 registrations, 37 public topics.
+  The release note policy and whitespace checks passed.
+- `R CMD check --no-tests --ignore-vignettes --no-manual` completed with
+  `Status: OK`, including all help/example checks. The initial dependency check
+  could not locate the optional `gibasa`; the completed check uses the existing
+  Japanese R library. No metric or test failure was involved. Tests and guide
+  rendering are separate evidence, not claimed as part of this invocation.
+- Both changed package guides were rendered with 9007. Twenty unchanged guide
+  sources and their existing renderings were reused from 9006. The 183 unchanged
+  runtime/resource members are byte-identical; the changed default entry paths
+  have the compatibility evidence above. The full site was independently built
+  under 9007, including all articles, with 129 HTML pages/253 files and zero
+  missing local link/fragment targets. The initial sandbox-only site attempt
+  stopped at public CRAN URL lookup; the network-enabled build completed.
+- `ldfreq_0.3.0.9007.tar.gz` is 6,191,347 bytes, SHA-256
+  `73d43b340e2c5da5fdade481b557df8fd4f2b012c1a5d0c192a433b1e3d9d9c1`.
+  All 343 common source members match the working source; DESCRIPTION fields
+  match apart from normal R build formatting/added metadata. It contains all
+  22 rendered guides and no development/experiments/legal/site trees. Package
+  and site scans found no workspace paths or internal-roadmap references.
+
+Push authorization persists from the prior explicit instruction. Publication
+will use the existing protected PR checks, then main, a new fixed prerelease
+and verified Pages files; 9006 remains untouched. This preparation record does
+not claim CI or remote delivery has completed. No manual duplicate workflow,
+CI cancellation, CRAN submission or user-usability study is part of the work.

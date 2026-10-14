@@ -169,6 +169,9 @@ lexdiv_metric_ids <- function() {
 #'   the deterministic expected-TTR D curve fit. They are never reduced to the
 #'   document length. This experimental estimator uses no random sampling and
 #'   is not CLAN VOCD; empirical equivalence to published vocd-D is untested.
+#' @param plan Optional normalized plan from [lexdiv_plan()]. When supplied,
+#'   do not also supply `metrics` or individual metric parameters. The plan
+#'   fixes all method requests and their order.
 #'
 #' @return A `lexdiv_results` data frame with one row per requested metric and
 #'   list-columns for requested/effective parameters and diagnostics. Metric
@@ -178,6 +181,8 @@ lexdiv_metric_ids <- function() {
 #'   `status` and `missing_reason` before interpreting `value`: `ok` means a
 #'   value was computed, `missing` means the valid input did not meet a method
 #'   domain, and `invalid_input` means the token document was invalid.
+#'   With `plan`, returns the complete [lexdiv_profile()] result, including
+#'   request identities, plan fingerprint, profile class and attributes.
 #' @export
 lexdiv_metrics <- function(
     tokens,
@@ -186,7 +191,17 @@ lexdiv_metrics <- function(
     window_length = 50L,
     mtld_threshold = 0.72,
     sample_size = 42L,
-    expected_ttr_sample_sizes = 35:50) {
+    expected_ttr_sample_sizes = 35:50,
+    plan = NULL) {
+  if (!is.null(plan)) {
+    if (!missing(metrics) || !missing(segment_length) ||
+        !missing(window_length) || !missing(mtld_threshold) ||
+        !missing(sample_size) || !missing(expected_ttr_sample_sizes)) {
+      stop("With plan, omit metrics and individual metric parameters.", call. = FALSE)
+    }
+    return(lexdiv_profile(tokens, plan = plan))
+  }
+
   if (
     !is.character(metrics) ||
       is.object(metrics) ||

@@ -37,7 +37,7 @@ lexdiv_plan(
 
 \method{print}{lexdiv_plan}(x, ...)
 
-lexdiv_methods()
+lexdiv_methods(scope = c("core", "variants"))
 
 lexdiv_presets()
 
@@ -58,6 +58,11 @@ lexdiv_screen(
 )
 }
 \arguments{
+  \item{scope}{\code{"core"} (default) lists the methods accepted by
+  \code{lexdiv_spec()} and \code{lexdiv_metrics()}. \code{"variants"} lists
+  comparison methods accepted by \code{lexdiv_variant_metrics()}. The two
+  catalogs retain their own columns; selecting a catalog does not extend the
+  methods accepted by plans.}
   \item{method_id}{One versioned method identifier returned by
   \code{lexdiv_methods()}. A method fixes its formula, scale, boundary, tail,
   and aggregation rules.}
@@ -112,6 +117,12 @@ tabular view; the full identity fields remain available on the object.
 labels and definitions, \code{stability} (including experimental expected-TTR D),
 conventional within-method direction, contract scale,
 exact method identity, parameters, and advisory token floors.
+With \code{scope = "variants"}, it returns the same six-column data frame as
+\code{\link{lexdiv_variant_ids}}: \code{family}, \code{method_id},
+\code{direction}, \code{scale}, \code{reference_label}, and
+\code{comparison_scope}. Both catalogs include \code{method_id},
+\code{direction} and \code{scale}; the shared \code{maas_a2_ln_v1} occurs
+once in each. There is no combined catalog or implicit deduplication.
 \code{lexdiv_presets()} returns a preset metadata data frame.
 \code{lexdiv_profile()} returns one core metric row per plan request with a
 separate profile envelope. \code{lexdiv_profile_batch()} adds the existing batch
@@ -127,6 +138,11 @@ API. The identity hierarchy is metric family, versioned method, and normalized
 method-plus-parameter specification.
 }
 \details{
+Use \code{lexdiv_metrics(tokens, plan = plan)} or
+\code{lexdiv_metrics_batch(documents, plan = plan)} to run a plan through the
+ordinary metric entry points. The profile functions remain supported and return
+identical complete objects. With a plan, omit separate metric parameters.
+
 Preset version 0.2.0 excludes experimental expected-TTR D. The
 \code{canonical} preset contains eleven methods at their default parameters.
 The \code{length_50_100} preset adds MSTTR at segment length 100 and MATTR at
@@ -190,16 +206,20 @@ print(grid)
 print(plan)
 
 tokens <- rep(c("a", "b", "a", "c", "d"), 25)
-profile <- lexdiv_profile(tokens, plan)
+profile <- lexdiv_metrics(tokens, plan = plan)
 profile[, c("request_id", "metric_id", "value", "status")]
 
 screens <- lexdiv_screen(profile)
 screens[, c("request_id", "screen_id", "minimum_tokens", "passes_screen")]
 
 documents <- list(document_a = tokens, document_b = rev(tokens))
-batch_profile <- lexdiv_profile_batch(documents, plan)
+batch_profile <- lexdiv_metrics_batch(documents, plan = plan)
 head(batch_profile[, c("document_id", "request_id", "metric_id", "status")])
 
 all_lengths <- lexdiv_plan("length_50_100")
 length(all_lengths$specifications)
+
+# Comparison methods have a separate executor; they are not all plan methods.
+variants <- lexdiv_methods(scope = "variants")
+identical(variants, lexdiv_variant_ids())
 }

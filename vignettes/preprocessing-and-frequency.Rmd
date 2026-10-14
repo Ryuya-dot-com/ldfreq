@@ -881,8 +881,8 @@ Bestgen (2025, <https://doi.org/10.1016/j.rmal.2024.100168>) further shows why
 MATTR is useful for within-text fluctuation but should not be treated as a
 parameter-free universal score.
 
-`lexdiv_plan()` and `lexdiv_profile()` preserve parameter variants as different
-requests:
+`lexdiv_plan()` records parameter variants as different requests. Run them
+through `lexdiv_metrics(..., plan = plan)`; `lexdiv_profile()` remains supported:
 
 ```{r}
 long_tokens <- rep(
@@ -890,7 +890,7 @@ long_tokens <- rep(
   20
 )
 plan <- lexdiv_plan(presets = "length_50_100")
-profile <- lexdiv_profile(long_tokens, plan)
+profile <- lexdiv_metrics(long_tokens, plan = plan)
 profile[profile$metric_id %in% c("mattr", "msttr"), c(
   "request_id", "metric_id", "value", "status", "N", "V"
 )]

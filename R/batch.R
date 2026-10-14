@@ -173,16 +173,35 @@
 #' @param id_col Name of the explicit document-ID column for data-frame input.
 #' @param tokens_col Name of the token list-column for data-frame input.
 #' @param ... Arguments forwarded unchanged to [lexdiv_metrics()].
+#'   Must be empty when `plan` is supplied.
+#' @param plan Optional normalized plan from [lexdiv_plan()].
+#' @param max_rows Maximum document-by-specification rows when `plan` is supplied.
+#'   Omit this argument for ordinary metric requests.
 #'
 #' @return A long-form `lexdiv_batch_results` data frame ordered by document and
 #'   then requested metric. The explicit document/batch envelope is followed by
 #'   all single-document result columns, whose schema identity is preserved.
+#'   With `plan`, returns the complete [lexdiv_profile_batch()] result.
 #' @export
 lexdiv_metrics_batch <- function(
     documents,
     id_col = "document_id",
     tokens_col = "tokens",
-    ...) {
+    ...,
+    plan = NULL,
+    max_rows = 1e6) {
+  if (!is.null(plan)) {
+    if (...length() > 0L) {
+      stop("With plan, omit all metric arguments in ...; put requests in the plan.", call. = FALSE)
+    }
+    return(lexdiv_profile_batch(
+      documents, plan = plan, id_col = id_col, tokens_col = tokens_col,
+      max_rows = max_rows
+    ))
+  }
+  if (!missing(max_rows)) {
+    stop("max_rows requires a non-NULL plan.", call. = FALSE)
+  }
   id_col <- .lex_batch_scalar_name(id_col, "id_col")
   tokens_col <- .lex_batch_scalar_name(tokens_col, "tokens_col")
   if (identical(id_col, tokens_col)) {

@@ -29,6 +29,12 @@ and one. Each requested MTLD method is expanded over these thresholds.}
 \item{...}{Additional arguments passed to \code{print.data.frame()}.}
 }
 \details{
+Use \code{lexdiv_methods(scope = "variants")} to discover this catalog from
+the common method-listing entry point. \code{lexdiv_variant_ids()} remains
+supported and returns the same data frame. These IDs are selected with
+\code{lexdiv_variant_metrics(variants = ...)}; they are not all accepted by
+\code{lexdiv_spec()} or \code{lexdiv_plan()}.
+
 The Maas rows distinguish \eqn{a} from \eqn{a^2} and natural-log from
 base-10 definitions. These transformations are not numerically
 interchangeable, even where they preserve rank order. For either selected log
@@ -70,7 +76,7 @@ The print method returns \code{x} invisibly.
 \examples{
 tokens <- c(rep("a", 10), "b", "c", "d", "e")
 
-catalog <- lexdiv_variant_ids()
+catalog <- lexdiv_methods(scope = "variants")
 catalog
 
 variants <- lexdiv_variant_metrics(
