@@ -5472,3 +5472,44 @@ Evidence is in `reviews/ldfreq-morphology-guides-20261014/`:
   clipping. `visual-check.json` and the three PNGs record these checks.
   This is a local rendering check, not a novice-user study, mobile-layout
   certification or verification of a newly deployed site.
+
+## Morphology literature and interpretation (2026-10-14)
+
+The follow-up examines what prior research supports, including conflicting
+findings and the conditions of original evaluations. The two existing guides
+and unreleased NEWS explain family counting across populations/tasks, observed
+affix use versus productivity/knowledge, and Japanese analyzer/dictionary/corpus
+foundations. The current roadmap records the question, study designs,
+interpretive limits, reading scope and resulting decisions. This is a focused
+review, not a systematic review or a new validation study.
+
+The source baseline is development commit `63a01aa`. All 65 R chunks (52 Japanese,
+13 family/affix) are unchanged. No runtime code, help, API, dependency, data,
+dictionary or numerical method changes. Existing 9007 CI, R/Python agreement,
+saved unit comparisons and fresh-session replay evidence remain valid for their
+original claims. They were not rerun as new experiments.
+
+Evidence is in `reviews/ldfreq-morphology-literature-20261014/`:
+
+- `reuse.json` records unchanged chunks and the guide source hashes.
+- `build-literature.log` records successful complete package-guide rendering
+  and both pkgdown articles using installed 9007, with optional gibasa/review
+  paths active. Japanese selection, coverage and common-form results are
+  identical to the previously saved objects.
+- The next NEWS step initially failed because the sandbox could not resolve
+  `crandb.r-pkg.org`. `finish-site.log` records completion of only NEWS, search
+  and LLM outputs with network access. Successful guide rendering was retained;
+  this was a document-build network failure, not a numerical-test failure.
+- Final `site-audit.json`: 253 files/129 HTML pages, seven files changed from the
+  prior guide preview, no broken local links or anchors. `public-wording-check.json`
+  checks 202 text outputs without finding the selected workspace/internal
+  document markers. External sources were inspected for their supporting
+  content; inaccessible full text is distinguished from an invalid citation.
+- `visual-check.json` and three desktop previews show the Japanese foundation
+  table, family-evidence table and affix interpretation without horizontal
+  clipping. No mobile-layout or human-usability study is claimed.
+
+The verified guides are development-branch changes. Main, the 9007 release
+archive and the deployed Pages site retain the previously verified publication.
+The existing push workflows target main, so no duplicate full CI is scheduled
+for this documentation-only branch push.

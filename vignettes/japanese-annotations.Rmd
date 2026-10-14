@@ -93,6 +93,31 @@ review decisions through counting and saving. These operations can also be
 assembled with other tools. Neither this comparison nor source alignment shows
 that ldfreq improves an upstream analyzer's segmentation accuracy or speed.
 
+### Research foundations and their limits {#japanese-research-foundations}
+
+The analysis choices have a research basis, but each source supports a
+different part of the workflow:
+
+| Research | What it contributes | Consequence for this workflow |
+| --- | --- | --- |
+| [Kudo, Yamamoto and Matsumoto (2004)](https://aclanthology.org/W04-3230/) | Conditional random fields for joint Japanese segmentation and tagging | Cite the upstream analysis method and record the actual engine/dictionary versions |
+| [Den et al. (2008)](https://aclanthology.org/L08-1535/) | UniDic's lexical hierarchy and separate evaluation of segmentation, POS and lemma identification | Matching surfaces does not establish correct lexical identity; retain the feature used for counting |
+| [Ogiso and Nakamura (2014)](https://doi.org/10.5715/jnlp.21.301) | BCCWJ short/long units and annotation correction linked to dictionary entries | Declare the unit and distinguish automatic output from human-corrected corpus annotations |
+| [Takaoka et al. (2018)](https://aclanthology.org/L18-1355/) | Sudachi's multiple granularities and normalization for different applications | Treat mode and normalization as analysis choices; Sudachi's longest mode is not automatically BCCWJ's long unit |
+
+These are foundations, not current accuracy guarantees. For example, Den et
+al.'s evaluation included test-set words in the lexicon to isolate the modeled
+task from unknown-word handling. BCCWJ's annotation quality also involved human
+correction. Those results cannot be transferred to unreviewed learner essays
+or the particular older dictionary used in this recipe. The Sudachi paper
+explains its design; it does not validate an L2 proficiency score.
+
+Use the [saved unit comparisons](#compare-japanese-word-units) to understand
+how a choice affects lexical measures. If the research claim instead concerns
+annotation accuracy, it needs an independently reviewed reference matching the
+target texts and unit definition. Agreement between two MeCab interfaces is a
+reproducibility check of a shared analysis route, not that independent reference.
+
 ## An offline example
 
 The package's token-table importer supports R >= 4.1. The optional

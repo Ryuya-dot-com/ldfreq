@@ -6,6 +6,10 @@
   and linguistic accuracy. The Japanese guide now reports missing-base coverage
   and compares surface/base forms on common occurrences, retaining both in the
   saved analysis. No API, dependency, formula or resource change.
+- Explain the differing evidence for word-family counting across learner
+  populations and tasks. Separate observed affix use from productivity and
+  knowledge, and connect Japanese unit choices to the original analyzer and
+  corpus studies without transferring their accuracy claims to new texts.
 
 # ldfreq 0.3.0.9007 (development)
 
