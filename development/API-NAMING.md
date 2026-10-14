@@ -74,3 +74,27 @@ Before adding an exported function, reviewers should verify that:
    offline smoke test use one canonical name; and
 6. the return type, S3 interactions, and analysis-ready extraction path are
    recorded in `API-SURFACE.md`.
+
+## 2026-10-14 readability review
+
+All 57 exports were inspected against the implementation and help. Names range
+from 11 to 28 characters, with a median of 19; nine have at least 25 characters.
+These counts describe the surface, not an empirical usability threshold.
+No novice-user study or API migration was performed. The 9006 publication
+preserves all names and return contracts; the new-export freeze remains active.
+
+| Finding | Evidence and direction for a future decision |
+| --- | --- |
+| `profile` hides different operations | `lexdiv_profile()` executes a method/parameter plan; MATTR profiles expose local windows; norm/resource profiles summarize lookups. Clarify the plan-execution role first. `lexdiv_run_plan()` is a candidate name, not an adopted replacement. |
+| `_ids` does not predict one return shape | Installed calls confirm that `lexdiv_metric_ids()` and `lexdiv_overlap_ids()` return character vectors, whereas `lexdiv_variant_ids()` returns a six-column data frame. A full catalog name such as `lexdiv_variant_methods()` would better match the existing `lexdiv_methods()` vocabulary. Do not silently change the old return shape. |
+| Short names can conceal the object of an action | `lexdiv_screen()` checks declared token-count floors on profile results; it does not assess general measurement or writing quality. A future name should identify that limited operation. |
+| Action order varies | `lexdiv_compare_annotations()` is action-first; `lexdiv_ngram_compare()` and `lexdiv_ngram_reference_build()` group by object first. Document one predictable convention for future names, while considering existing family discovery and migration costs. This alone does not justify a mass rename. |
+| Some length is informative | `lexdiv_metrics_text_batch()` identifies computation, raw-text input and a multi-document contract. Removing `_text` or `_batch` obscures a real input/result distinction. The compare/evaluate/align annotation operations also have distinct purposes and accepted inputs. |
+
+Priority: clarify operation and return-shape expectations before cosmetic word
+ordering or abbreviation. The first-use input map should introduce only the
+relevant entry points. Help can explain distinctions but does not itself make
+inconsistent naming consistent. A future rename decision must specify migration
+and compatibility for already public GitHub users; lack of a CRAN release is not
+permission to break their scripts. Candidate names above neither authorize
+aliases nor change the current roadmap's implementation scope.

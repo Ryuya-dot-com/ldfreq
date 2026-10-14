@@ -5015,6 +5015,11 @@ The existing uncommitted PR #42 publication record was retained.
 
 ### Current identity and completion evidence
 
+Current public snapshot: **0.3.0.9006**, main/tag `7f97872`, Pages `60c54d4`.
+See [the 9006 publication entry](#documentation-snapshot-0309006-publication-completion)
+for exact identities, PR CI and anonymous-delivery evidence. The bullets below
+record the 9005 baseline of the wording audit, not the latest deployed state.
+
 - GitHub reports a public repository with default branch `main`; its current
   commit and local checkout are `19bcd20feb18608c54f3c78630d5b4517bf454dd`.
   The recursive source listing contains 461 files.
@@ -5258,3 +5263,48 @@ integration, a new fixed prerelease with the verified archive, and a normal
 fast-forward gh-pages update. No manual duplicate CI runs or administrative
 bypass are planned. Actual IDs, conclusions and anonymous delivery checks will
 be retained with this evidence; earlier 9005 results are not relabeled as 9006 CI.
+
+## Documentation snapshot 0.3.0.9006: publication completion
+
+On 2026-10-14, after explicit user approval of the GitHub push, the prepared
+documentation commit was pushed and [PR #43](https://github.com/Ryuya-dot-com/ldfreq/pull/43)
+was merged without bypassing protection. Both required checks passed.
+R-CMD-check [38562881271](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/38562881271)
+completed with all 11 jobs successful; release-candidate classification and its
+required aggregate passed in run `38562881358`. Formal-candidate jobs were skipped
+as designed for the declared development snapshot, not treated as executed checks.
+
+- Main and fixed tag: `7f97872ab7d19f0048485646db52f0a1674beb80`.
+  Its tree `50617a1df28135a16e549765936eb7fb6adcb680` is identical to tested PR head
+  `ea40746a2f3642b67871228cef5a7f0f3eb9767c`.
+- [v0.3.0.9006](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.3.0.9006)
+  is a new prerelease, retaining earlier fixed tags/assets and the existing
+  latest stable release. Both the archive and checksum asset were uploaded;
+  API-reported digests and anonymous downloads match the prepared local bytes.
+- Pages commit `60c54d4ccbb4b80b51aae12a4d3fcabfe6e7642d` is a normal fast-forward
+  from `fc820453`. Its 253 built files match the verified complete site; the
+  existing `.nojekyll` deployment marker is retained. Two old generated plot
+  paths were replaced by their renumbered counterparts. Generated Markdown
+  retains R's printed trailing spaces; no source whitespace defect was inferred.
+- Pages run [38565078563](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/38565078563)
+  completed successfully in build, deploy and status-reporting jobs.
+  `public-delivery.json` confirms exact bytes for ten public home/guide/help/news/
+  search/metadata files and both release assets. The two tested internal-roadmap
+  site paths return 404. GitHub development documents remain public by design.
+- Chrome opened the deployed Getting started guide, showing version 9006 and
+  the new first-use sequence, 0.8/1/NA example and save/resume instructions.
+  This is browser loading/content verification, not a human usability study
+  or a comprehensive visual/responsive audit. The earlier local-file navigation
+  restriction was not bypassed.
+- Anonymous verification initially failed because the local Python installation
+  could not locate a trusted issuer. System curl with certificate verification
+  enabled completed the same delivery checks. Package tests/builds were not rerun.
+
+Evidence remains in `reviews/ldfreq-docs-publication-20261014`:
+`pr-final.json`, `pr-final-state.json`, `release-candidate-final.json`,
+`pr-merged.json`, `release.json`, `pages-final.json`, `public-delivery.json`, and
+`publication-state.json`. The automatic main R-CMD-check `38564970910` is still
+running at this checkpoint; `main-status.json` records it separately. Main's
+release-candidate run `38564971126` has succeeded. The identical source tree and
+completed PR checks are valid evidence; main's unfinished run is not claimed
+successful. No duplicate manual CI, cancellation or protection change was used.
