@@ -80,14 +80,14 @@ articles:
   - title: Start here
     navbar: ~
     contents:
-      - from-text-to-report
       - getting-started
       - english-tokenization
-      - word-families-and-affixes
       - japanese-annotations
+      - from-text-to-report
   - title: Research design and reference resources
     contents:
       - designing-comparisons
+      - word-families-and-affixes
       - corpus-reference-profiles
       - japanese-norms
       - japanese-polysemy

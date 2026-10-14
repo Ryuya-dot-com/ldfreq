@@ -1,7 +1,9 @@
 # Japanese backend experiment
 
-Development experiment for J1/J2 in [the roadmap](../../development/ROADMAP.md#japanese-expansion-20261007).
-These scripts are excluded from the R package and public website. They add no
+This experiment connects Sudachi output to the
+[Japanese annotation workflow](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html).
+These scripts are available in this repository, but are not installed with the
+R package or rendered as website articles. They add no
 runtime dependency or exported function. Tested on macOS arm64, Python 3.14 and
 R 4.6; this is not a claim of cross-platform support or linguistic accuracy.
 
@@ -96,5 +98,6 @@ An additional R-only session reimported the saved exports and independently
 checked N/V/TTR arithmetic for all 24 authored and 84 corpus document-mode rows.
 
 GiNZA, KWJA, UDPipe Japanese models and reticulate integration are not tested by
-this experiment. Their conditional roles and adoption criteria are in the
-roadmap. No corpus or analyzer dictionary is bundled by this prototype.
+this experiment. Support for another analyzer requires checking its original-text
+alignment, feature meanings and saved-output replay separately. No corpus or
+analyzer dictionary is bundled by this prototype.

@@ -193,6 +193,7 @@ with_study$metadata
 stopifnot(identical(with_study$results,
   lexdiv_metrics_text_batch(prepared, metrics = "ttr")$results))
 }
-\seealso{\code{\link{lexdiv_metrics_text}}, \code{\link{lexdiv_convenience}},
+\seealso{\href{https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html}{Getting started: read, plot and save document results},
+\code{\link{lexdiv_metrics_text}}, \code{\link{lexdiv_convenience}},
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files}{Read your own TXT or CSV files},
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html}{From text to a research report}}

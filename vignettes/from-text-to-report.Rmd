@@ -12,6 +12,25 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(ldfreq)
 ```
 
+This guide extends a first analysis into condition comparisons and research
+reporting. If you have not yet read a result table or saved an analysis, start
+with [Getting started](getting-started.html). For importing a single TXT file
+or CSV, use the [file-input walkthrough](english-tokenization.html#import-text-files).
+
+Choose the task you need:
+
+- [Compare English case choices](#compare-english-case-from-files) or
+  [Japanese word selections](#compare-japanese-pos-from-files): run the shared
+  setup below, then the relevant language path and the saving section.
+- [Join study information and summarize documents](#study-metadata): use the
+  saved file-analysis results from those paths; the section names its required objects.
+- [Extract saved MTLD diagnostics into a wide table](#wide-mtld-diagnostics):
+  use `lexdiv_widen(..., mtld_diagnostics = TRUE)` with ldfreq 0.3.0.9004 or later.
+  The earlier helper supports long diagnostic tables and older installations;
+  a custom function is not required just to inspect a first result.
+- [Plot local vocabulary diversity](#plot-local-vocabulary-diversity): a separate
+  complete example includes its own input text and setup.
+
 ## Compare analysis conditions from local files
 
 Start here to turn your own files into a table you can inspect, save and report.

@@ -1,8 +1,10 @@
 # Pre-commit audit and patch-release plan
 
-Historical integration plan for 0.1.0. The current development version is
-0.2.0; its corrections and candidate boundary are recorded in
-`development/REVIEW-20260922.md` and `state.dcf`.
+Historical integration plan for 0.1.0. For the current version and candidate
+classification, read [state.dcf](state.dcf); for current priorities and completed
+publication, use the [roadmap](../../development/ROADMAP.md) and
+[publication evidence](../../development/PUBLICATION-20261004.md#current-identity-and-completion-evidence).
+The old commit split and pending work below are not instructions to replay it.
 
 Audit date: 2026-08-05
 

@@ -14,12 +14,74 @@ or reference-list matches. `ldfreq` helps you inspect those choices and report
 what was actually measured. It records non-computable requests and their reasons,
 and checks that reshaped tables and plots do not mix incompatible specifications.
 
-[![Local vocabulary diversity for three window sizes in an authored example](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report_files/figure-html/trajectory-overlay-1.png)](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity)
+## Installation
 
-**[Reproduce this plot in R](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity).**
-The complete example includes the text, analysis, color/monochrome drawing and
-PNG/PDF export. It illustrates local vocabulary diversity and window-size
-sensitivity with authored text, not learner data.
+Version 0.3.0.9006 is a development prerelease and has not been released on CRAN.
+The fixed tag below identifies the tested code and installed examples.
+It requires R 4.1.0 or later. Install the tested snapshot used by this
+documentation:
+
+```r
+# Run install.packages("pak") first if pak is not installed.
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9006")
+```
+
+Pinning the revision fixes the implementation, even when development snapshots
+share the same version number. The package's required dependencies are `digest`
+and `stringi`; additional tools are optional for their documented
+workflows. For example, candidate-review examples use `quanteda`.
+
+If you have a built source archive, install it locally:
+
+```r
+# Install digest and stringi first if they are not already available.
+install.packages("ldfreq_0.3.0.9006.tar.gz", repos = NULL, type = "source")
+```
+
+The built archive includes rendered guides. A GitHub source installation may
+omit them; the online guides remain available.
+
+## A first analysis
+
+Run this English example after installation:
+
+```r
+library(ldfreq)
+
+text <- "Cats chase cats and dogs."
+analysis <- lexdiv_metrics_text(
+  text, tokenizer = "english", case = "lower", metrics = "ttr"
+)
+analysis$results
+analysis$token_audit
+saveRDS(list(text = text, analysis = analysis), "analysis.rds")
+```
+
+The five word occurrences (`N = 5`) contain four distinct lowercase forms
+(`V = 4`), so the type-token ratio (TTR) is `4/5 = 0.8`. `status = "ok"`
+means the calculation succeeded. TTR depends on text length; this small example
+does not measure writing ability. Other metrics can return `NA` for short
+texts: read `missing_reason` beside the value. The saved record keeps the input
+text and complete analysis together; choose your own filename when saving research data.
+
+**[Continue with Getting started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html)**
+for several documents, expected results, unavailable scores, a table and plot,
+and saving and reopening an analysis. In R, `?ldfreq` opens the input map;
+`?lexdiv_metrics_text` explains this function and its optional preprocessing.
+
+## Choose your input
+
+| What you have | Where to start |
+| --- | --- |
+| One English text or a table with document IDs and text | [Getting started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html); use `lexdiv_metrics_text()` or `lexdiv_metrics_text_batch()` |
+| TXT files, a folder, or a CSV containing texts | [Read your own files](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files), including installed sample files and where to substitute your paths |
+| Ordered tokens, with one character value per occurrence | `lexdiv_metrics()` for one document; [tokenized documents and tables](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html#multiple-documents) for several |
+| Japanese text and supplied morphological annotations | [Japanese annotations](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html); reading text alone does not perform Japanese word segmentation |
+
+Once you have results, use [From text to a report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html)
+to compare counting conditions, join study metadata, inspect vocabulary coverage
+and prepare methods text and figures. These guides use the tested installation
+above; optional annotation and reference-resource workflows name their additional requirements.
 
 ## Why use ldfreq?
 
@@ -202,7 +264,7 @@ knowledge or acquisition history.
 
 | Existing tool | Its focus | Where ldfreq fits |
 |---|---|---|
-| [quanteda.textstats](https://quanteda.io/reference/textstat_lexdiv.html) | Text statistics and lexical diversity for quanteda tokens and document-feature matrices | Use prepared tokens with explicit method/parameter records, non-computability reasons, and reference-resource profiles |
+| [quanteda.textstats](https://search.r-project.org/CRAN/refmans/quanteda.textstats/html/textstat_lexdiv.html) | Text statistics and lexical diversity for quanteda tokens and document-feature matrices | Use prepared tokens with explicit method/parameter records, non-computability reasons, and reference-resource profiles |
 | [koRpus](https://reaktanz.de/?c=hacking&s=koRpus) | Text analysis including lemma workflows, MTLD, HD-D, MTLD-MA, and detailed diagnostics | Compare the exact definitions and add a common workflow for condition tracking and reference coverage |
 | [tidytext](https://juliasilge.github.io/tidytext/) | Text processing with tidy tables | Pass one-token-per-row tables through `lexdiv_as_documents()` |
 | [gibasa](https://paithiov909.github.io/gibasa/) | MeCab morphological analysis from R using separately supplied dictionaries | Import complete Japanese annotations with original-text alignment and retain lexical-form choices and dictionary metadata alongside analysis results |
@@ -321,41 +383,9 @@ keeps open cases, paired-decision denominators and category counts visible,
 connects optionally to `irr` for Cohen kappa, and preserves separate discussion
 decisions and document profiles. Its guide-local code runs on 0.3.0.9003.
 
-## Installation
+## Analyze files and reference vocabulary
 
-Version 0.3.0.9005 is a development prerelease and has not been released on CRAN.
-The fixed tag below identifies the tested code and installed examples.
-It requires R 4.1.0 or later. Install the tested snapshot used by this
-documentation:
-
-```r
-# Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9005")
-```
-
-Pinning the revision fixes the implementation, even when development snapshots
-share the same version number. The package's required dependencies are `digest`
-and `stringi`; additional tools are optional for their documented
-workflows. For example, candidate-review examples use `quanteda`.
-
-If you have a built source archive, install it locally:
-
-```r
-# Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9005.tar.gz", repos = NULL, type = "source")
-```
-
-The built archive includes rendered guides. A GitHub source installation may
-omit them; the online guides remain available.
-
-## A first analysis
-
-After `library(ldfreq)`, open `?ldfreq` for a short first analysis and an input
-map. `?lexdiv_metrics_text` explains the counted words and scores;
-`?lexdiv_family_profile` contains a complete Nation word-family example.
-Run `example("lexdiv_metrics_text", package = "ldfreq")` to execute the text
-examples. These help pages include expected values and explain missing results.
-
+After the first analysis, this example adds multiple files and reference-list coverage.
 
 For TXT files, folders or ID/text CSV files, start with the
 [executable file-input tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
@@ -430,6 +460,13 @@ to inspect unmatched terms and surface-to-unit mappings before interpreting cove
 [From text to a report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html) extends this example
 to English case and Japanese POS-selection comparisons from local files,
 flat diagnostic tables, replayable saved results, methods text, figures and citations.
+
+[![Local vocabulary diversity for three window sizes in an authored example](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report_files/figure-html/trajectory-overlay-1.png)](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity)
+
+**[Reproduce this plot in R](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity).**
+The complete example includes the text, analysis, color/monochrome drawing and
+PNG/PDF export. It illustrates local vocabulary diversity and window-size
+sensitivity with authored text, not learner data.
 
 ## Reference frequency needs its own tokenization
 

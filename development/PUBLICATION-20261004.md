@@ -1,4 +1,12 @@
-# Publication preparation: attributed NJ8 and user workflows
+# Publication history and verified evidence
+
+This is a cumulative, oldest-first record beginning on 2026-10-04. Start with
+the [current publication identity and completion evidence](#current-identity-and-completion-evidence),
+verified on 2026-10-14, and use [ROADMAP.md](ROADMAP.md) for current scope.
+Statements such as "no release", "private" or "pending" in earlier entries
+describe those checkpoints; they are not the present publication state.
+
+## Initial 0.2.0 preparation (2026-10-04)
 
 The 0.2.0 preparation adds a permitted default NJ8 table and explains how
 comparison settings and reference coverage support interpretable text profiles.
@@ -4981,3 +4989,272 @@ successful checks. No package code correction was required.
 The corrected installed offline smoke script completes successfully. Site build:
 129 HTML pages / 253 files, no missing internal links or private paths; 79 files
 changed. API help, file-input/report guides, NEWS, search and Markdown agree.
+
+公開完了：PR #42をmain `19bcd20feb18608c54f3c78630d5b4517bf454dd`へ統合。
+PR head `18370ff434b0f83110cdc0683691ceb3a2860dcc`とtree
+`9f6807a323188ec16575f038eaaea8a2c2a95286`が一致。run 37753734908は全11ジョブ成功。
+Linux releaseは8,522 assertions・失敗／警告／skipなし、ビネット再構築込みStatus: OK。
+Cは8,099成功・失敗0、既存quanteda encoding警告1・32 skips。R4.1・R-devel・macOS・
+Windowsのジョブも成功。途中の監視接続timeoutはwatchだけ再接続し、CI取消／再実行なし。
+固定tag v0.3.0.9005と22ガイド入りarchive／SHA-256をGitHub prereleaseへ公開。
+実pak導入はmain SHA・版／引用・新引数・31文書93行の旧版互換・metadata整列と保存が成功。
+Pages `fc820453bd2843a9a821a7a6015221490c7f256e` / run 37755605581成功。
+匿名取得はソース14件・サイト79件・release添付2件がすべてbytes一致。
+証拠はreviews/ldfreq-batch-metadata-20261008。main run 37755420636は通常起動を別途監視中。
+同一treeの成功済みPRと実配信を受入れ証拠とし、main一括成功とは混同しない。
+watcherが最終JSON/logを保存する。完了記録だけのpush、成功済み検証の重複起動はしない。
+CRAN非投稿。metadataの内容の真偽、観測の独立性、実利用者の使いやすさは検証していない。
+日本語importerの表は既存の別経路。Windows R4.1/CP932の実証も今回の対象外。
+
+## Public wording audit and roadmap refinement (2026-10-14)
+
+Scope: current 0.3.0.9005 source, package archive, deployed documentation and
+public repository development records. This is a documentation/exposure audit,
+not a security audit, a search of all Git history, or a new numerical validation.
+The existing uncommitted PR #42 publication record was retained.
+
+### Current identity and completion evidence
+
+- GitHub reports a public repository with default branch `main`; its current
+  commit and local checkout are `19bcd20feb18608c54f3c78630d5b4517bf454dd`.
+  The recursive source listing contains 461 files.
+- The previously saved `reviews/ldfreq-batch-metadata-20261008/main-final.json`
+  records run [37755420636](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/37755420636)
+  as completed/success at that commit, with all 11 jobs successful. The earlier
+  “main monitoring” entry is now resolved; no workflow was rerun.
+- Current gh-pages is `fc820453bd2843a9a821a7a6015221490c7f256e`.
+  All 253 file blob identities match the saved `site/` under the same review
+  directory. The working checkout's ignored `docs/` differs for 128 files
+  (missing or different); it was not used as evidence of the deployed site.
+- [v0.3.0.9005](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.3.0.9005)
+  remains a prerelease. The API-reported archive digest matches the saved
+  6,168,477-byte archive:
+  `a29ce96fb8b4fe81251711e29864edcfb0cba51eab1672c5524d8648d2c981e7`.
+  GitHub's latest non-prerelease remains 0.1.0; it was not substituted for the
+  current development artifact in this audit.
+
+### Reader-facing surfaces
+
+The source scan covered 246 text files in README, NEWS, DESCRIPTION, pkgdown
+configuration, lifecycle documentation, R, man, vignettes and inst. The site
+scan covered 203 text files, including all 129 HTML pages, Markdown, search JSON
+and llms text. The archive contained 411 files; 375 text members were scanned.
+No `development/`, `experiments/`, `legal/` or local `docs/` directory appeared
+in that archive.
+All 250 source members in those reader/runtime/resource paths, including
+binary resources, match the observed public main tree. The current 9005
+prerelease description was also read: it documents the behavior, installation,
+scope and validation without private paths or internal-plan references.
+
+Searches covered personal filesystem paths, the roadmap/publication/review
+record names, workspace review-directory references, user-approval language
+and internal-priority wording. No matching leak was found on these surfaces.
+Broader searches were read in context: development-version labels, statistical
+development/evaluation splits, contextual review, formula variable `M2`,
+explicit temporary output paths and source/license reproduction links are
+legitimate content, not internal-planning leaks. This is a bounded finding,
+not a claim that every possible internal phrase was mechanically excluded.
+
+Unauthenticated live GETs of `index.html`, `articles/from-text-to-report.html`,
+`reference/lexdiv_text_batch.html`, `news/index.html`, `search.json` and
+`llms.txt` returned HTTP 200 and bytes identical to the saved site. Site URLs
+`ROADMAP.html` and `development/ROADMAP.md` returned HTTP 404. The remaining
+site files were checked against the current gh-pages tree, not individually
+downloaded again. Existing source, archive and site evidence was reused;
+package calculations and site generation were not repeated.
+
+### Public repository boundary and local corrections
+
+The public source tree includes all 16 files in `development/`, as well as
+`experiments/release-candidate/COMMIT-SPLIT-PLAN.md` and other maintainer
+records. The main roadmap was independently fetched without authentication
+from raw.githubusercontent.com (HTTP 200). `.Rbuildignore` excludes these
+directories from the R-built archive, not from GitHub browsing, Git history
+or GitHub's automatic source archives. “Internal” therefore describes the
+intended reader, not confidentiality. These files remain publicly accessible;
+this audit did not change visibility, remove history or publish a replacement.
+
+The Japanese-backend README exposed the internal J1/J2 labels and depended on
+the internal roadmap for its purpose and future-backend criteria. The local
+edit replaces these with the concrete experiment purpose, the public Japanese
+annotation guide and self-contained limits. It also states that the scripts
+are available in the repository but not installed/rendered. Reproduction
+scripts, commands, numerical results and runtime behavior are unchanged.
+Maintainer-oriented release scripts and historical admission records were not
+misclassified as package help or silently removed.
+
+The roadmap now leads with the current purpose, verified capabilities, public
+boundary and conditional extension candidates. Completed metadata, diagnostic,
+Japanese-unit and phrase-review work is distinguished from remaining work.
+The old progress logs and detailed plans are retained under history; their
+“next”, “pending” and “unverified” wording is not current task status. Candidate
+adoption requires a user question, an actual gap in existing functionality,
+appropriate evidence and a defined consequence for the research decision.
+New exports, analyses, model calls and CRAN submission are not authorized by
+listing these candidates.
+
+Only documentation changed. No version increment, commit, push, release or
+site deployment was performed. The README correction is local and has not yet
+changed the public repository. Historical-text retention, document links,
+unchanged code/resources and whitespace were checked locally; no numerical
+test rerun was needed for these edits.
+
+## Reference currency review (2026-10-14)
+
+The follow-up examined whether old documents are used for current policy,
+implementation status or evidence, not merely whether their links resolve.
+The earlier wording scan did not establish that referenced documents were
+current. The roadmap now records these distinctions explicitly.
+
+Findings and corrections:
+
+- The roadmap pointed to an API inventory whose body included 9005 but whose
+  header still said pre-CRAN/0.3.0, and to this oldest-first log without a current
+  entry point. The API header and verification scope now reflect its maintained
+  role. This log and the roadmap link directly to the current identity evidence.
+- DEVELOPMENT and RELEASE-CANDIDATE retained the old 0.2.0/twelve-default-method
+  plan and proposed initial CRAN submission. They are now explicitly historical,
+  with current destinations. Their original bodies remain intact. The formal
+  checklist no longer takes its active repository rules from that old plan.
+- The conditional formal checklist's one-resource count, textstem-only R 4.1
+  exception and non-`.9000` version shorthand did not match the five-component
+  inventory, two-backend NOTE classifier or three-component candidate rule.
+  These were reconciled with the actual JSON, R policy and workflow. The
+  dynamic CITATION version, current non-CRAN scope and evidence-reuse boundary
+  are explicit. No workflow, admission decision or check policy was changed.
+- Annotation, NJ8, Kyle–Eguchi and September correction records contained
+  historical "next", unpublished or old-contract statements. Scope notes now
+  identify later implementations and current references without changing the
+  original evidence. A dated source is not thereby invalidated.
+- The metric-admission and resource/builder READMEs could be mistaken for the
+  current default-method catalog or current publication status. They now
+  distinguish the old admission evidence from current lifecycle and individual
+  artifact completion. The fixed JSON, source hashes and measurement results
+  remain unchanged. The old commit-split plan no longer identifies 0.2.0 as
+  the current version or asks readers to replay completed integration work.
+- The public README's quanteda.textstats link resolved to the old quanteda-core
+  `textstat_lexdiv` page. Quanteda's current
+  [migration notice](https://quanteda.io/reference/textstats.html) identifies the
+  package move. The link now targets the
+  [quanteda.textstats official help](https://search.r-project.org/CRAN/refmans/quanteda.textstats/html/textstat_lexdiv.html),
+  whose content was inspected. This updates an operation-reference destination,
+  not any saved benchmark's tested version or numerical result. The old link
+  also remains in the currently deployed index.html, index.md and llms.txt;
+  the local README correction has not been deployed.
+
+Retained intentionally: current API naming rules originating in 0.1.0,
+per-feature contract/schema versions, legacy-MTLD reproduction references,
+pinned upstream commits, recorded archive identities and original scholarly
+citations. Package version, interface version and source age alone do not decide
+whether a reference remains valid. The entire external bibliography was not
+re-reviewed and all external URLs were not exhaustively tested.
+
+Verification: the existing repository API audit passes with 57 exports,
+34 registered S3 methods and 37 documented public topics. Before this final
+log entry, all 69 relative Markdown file links (including 16 fragments) resolve.
+The roadmap's historical body and the bodies of six annotated developer records
+are retained. Only Markdown changed; all runtime, tests, workflow/state,
+machine-readable specifications, resource decisions and payloads are unchanged.
+This follow-up touches 16 documents; together with the prior Japanese-backend
+README correction there are 17 locally modified Markdown files. Whitespace
+checks pass. No numerical calculations, full package/site builds, CI reruns,
+commit, push, tag or deployment were performed for this reference review.
+
+## First-use documentation revision (2026-10-14)
+
+Scope: carry the adopted first-use workflow through the existing documentation.
+No public API, formula, resource, dependency or version change. Repeated-study
+support remains a candidate, not an implementation added in this revision.
+
+Changes:
+
+- README now puts installation, a hand-checkable English analysis and an input
+  map before the detailed capabilities. The existing multi-file/reference
+  example and specialist explanations remain available later in the page.
+- Getting started now follows document input, expected values and denominators,
+  unavailable results, interpretation, a table/plot, and complete RDS saving and
+  replay. Two five-word sentences and an empty document illustrate TTR 0.8/1/NA.
+  A 50-token MATTR request demonstrates an unavailable score without changing
+  the requested window. The compact token display retains the full audit in
+  the object; CSV is separated from the saved input and complete analysis.
+- Later-session instructions name a lasting output path and distinguish it
+  from the temporary demonstration directory. Optional lexical units, resources
+  and method variants follow the first workflow, with their scope retained.
+- Package and batch help, the report-guide entry, article navigation and NEWS
+  point into the same workflow. Existing section anchors are retained. The
+  report guide identifies its prerequisites and separates long diagnostic
+  helpers from the existing wide-table API.
+
+Verification in `reviews/ldfreq-onboarding-20261014`:
+
+- `reuse.json`: all 186 NAMESPACE/R/installed-resource source members match the
+  verified 9005 archive byte-for-byte. DESCRIPTION source fields match after
+  DCF normalization; R build formatting and generated fields differ as expected.
+  The installed 9005 library from that earlier verification was reused.
+- `verify.log`: execute the actual new README and guide code; check hand-counted
+  N/V/TTR, document IDs, empty/short reasons, unchanged window length, scalar CSV,
+  original input and complete RDS equality. `replay.log`: execute the documented
+  resume code in a fresh R process with only the saved path substituted; IDs,
+  values, missingness and preprocessing remain available without recalculation.
+- `build-pages.log`: rebuild home, both edited articles, the article index,
+  two edited help topics, NEWS, search and LLM documents. An initial sandboxed
+  home build stopped at pkgdown's automatic CRAN metadata request, before article
+  execution; the normal network-enabled build passed. After narrowing the token
+  display, only Getting started and its search/LLM derivatives were refreshed
+  (`finish-pages.log`). The successful numerical/save/replay checks were not rerun.
+- `site-audit.json`: the local preview combines rebuilt pages with the verified
+  unchanged site assets; it is not a fresh all-page build. Across 129 HTML pages
+  and 256 files, internal links and fragments resolve; 27 files differ from the
+  previous site snapshot. `reading-order.json` confirms the initial section
+  order, compact display and absence of the targeted internal paths/markers.
+- The generated first-analysis plot was inspected on a white background: the
+  two original TTR values, document labels and axis are legible, with no in-plot
+  title. Browser navigation to local HTML was blocked by browser policy, so page
+  layout was checked structurally rather than claiming a browser visual check.
+  This is not an assessment by first-time human users.
+
+R 4.6.1 on macOS was used for these documentation checks. Full numerical tests
+and cross-platform CI retain their earlier scope and were not repeated.
+Whitespace checks pass. Earlier local documentation changes are preserved.
+No commit, push, tag, release or site deployment has been performed; the public
+site and fixed 9005 archive still contain the earlier documentation.
+
+## Documentation snapshot 0.3.0.9006: publication preparation (2026-10-14)
+
+The continued work packages the wording/reference review and first-use revision
+for distribution. A new development snapshot identifies the changed installed
+help and guides without replacing the fixed 9005 tag or its assets. API,
+measurement contracts, dependencies, R code and installed resources are unchanged.
+The current plan remains limited to these documentation changes; no CRAN
+submission or implementation of the other extension candidates is included.
+
+Local evidence: `reviews/ldfreq-docs-publication-20261014`.
+
+- Active main rules require pull requests, resolved conversations and both
+  `R-CMD-check required` and `Release-candidate required`; force pushes and
+  deletion are blocked. The existing rules/workflows were not changed.
+- Public API audit passes with 57 exports, 34 S3 registrations and 37 topics.
+  All 186 runtime/resource members still match 9005. Prior numerical evidence
+  and first-use save/replay checks remain applicable to those unchanged parts.
+- The package archive reuses the 20 byte-identical unedited guide renderings
+  from the verified 9005 archive. Both changed guides were rendered under 9006;
+  `R CMD build --no-build-vignettes` packages the completed artifacts without
+  rerunning them. All 342 common source members match the working source.
+- `ldfreq_0.3.0.9006.tar.gz` is 6,186,105 bytes, SHA-256
+  `45df3baf3645689eafe74c30431801e7104fdad7076f85c4cbfc1796744ee77d`.
+  It includes 22 rendered guides and excludes development/experiments/legal/docs.
+- A fresh archive install passes version/citation, revised help and installed
+  guide checks, the hand-counted first analysis and complete RDS saving. It also
+  reads the earlier saved 9005 first-use record. The help-text check normalizes
+  display line wrapping; a wrapped link label was not a missing help update.
+- The complete pkgdown site was built under 9006 to refresh version/navigation
+  throughout: 129 HTML / 253 files, zero broken internal links, no private local
+  paths, with 84 files changed from the verified 9005 site. Search and LLM output
+  were rebuilt. This supersedes the earlier mixed-source preview for publication.
+
+Publication is prepared, not yet claimed complete in this checkpoint. The
+intended sequence is one final branch push, required PR checks, protected main
+integration, a new fixed prerelease with the verified archive, and a normal
+fast-forward gh-pages update. No manual duplicate CI runs or administrative
+bypass are planned. Actual IDs, conclusions and anonymous delivery checks will
+be retained with this evidence; earlier 9005 results are not relabeled as 9006 CI.

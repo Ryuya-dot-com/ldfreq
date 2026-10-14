@@ -3,6 +3,16 @@
 This checklist defines the minimum evidence for an `ldfreq` release candidate.
 It does not imply that the candidate version is approved for publication.
 
+Scope reviewed 2026-10-14: this is the conditional **formal-candidate** workflow,
+not a task list for the already published 0.3.0.9005 development snapshot.
+Current priorities are in [ROADMAP.md](ROADMAP.md); CRAN submission is outside
+that scope. A public repository or successful development CI does not by itself
+authorize changing `state.dcf` to `release-candidate`.
+Each item asks for evidence: first match source/artifact identity, environment,
+configuration and completed stages to existing records. Repeat only work whose
+evidence is invalidated or incomplete; use full checks when the change warrants
+them. Do not rebuild or rerun completed stages solely to update this checklist.
+
 The repository-only `Release candidate` workflow and the tools under
 `experiments/release-candidate/` build and check one exact source archive and
 generate the technical BOM/SBOM/provenance inputs. Their output does not replace
@@ -18,10 +28,12 @@ signature/attestation, or publication steps below.
       repository credentials. Keep `state.dcf` at `Status: development` while
       the repository URL or issue tracker is private or otherwise unreachable;
       do not classify the resulting incoming-check NOTE as acceptable.
-- [ ] Confirm that the candidate commit already contains the same non-`.9000`
-      version in `DESCRIPTION`, NEWS, and CITATION, and that the intended tag
-      and archive name match it. Commit and check any version change before
-      selecting the candidate SHA and tree.
+- [ ] Confirm that the formal candidate has a three-component version accepted
+      by the workflow classifier, ordered after earlier distributed versions.
+      `DESCRIPTION`, NEWS, installed `citation()`, tag and archive name must
+      agree. CITATION derives its version from installed metadata; do not
+      replace that behavior with a hard-coded string. Commit and check any
+      version change before selecting the candidate SHA and tree.
 - [ ] Confirm that NEWS has one coherent heading for the intended public
       version and does not describe an unpublished earlier build as a prior
       public release.
@@ -31,8 +43,11 @@ signature/attestation, or publication steps below.
       policy, and returned provenance.
 - [ ] Confirm that the commit is on protected `main` and arrived through a pull
       request.
-- [ ] Record the active `main` ruleset and verify the repository gate described
-      in [`DEVELOPMENT.md`](DEVELOPMENT.md).
+- [ ] Record the active `main` ruleset: require an up-to-date pull request,
+      resolved review conversations and `R-CMD-check required` from GitHub
+      Actions; block force pushes and branch deletion, and verify ordinary
+      work cannot bypass those protections. Do not use the archived
+      `DEVELOPMENT.md` as a statement of current GitHub settings.
 - [ ] Record the exact workflow definition hash and the protected required-check
       configuration. A same-branch job name alone is insufficient.
 - [ ] Confirm that `R-CMD-check required` succeeded for the exact candidate
@@ -73,9 +88,12 @@ signature/attestation, or publication steps below.
 - [ ] For TUBELEX, run
       `experiments/resource-admission/validate-tubelex-admission.R` against the
       candidate checkout. Confirm the repository-only maintainer decision,
-      upstream BSD-3-Clause and README URLs, approved scopes, risk controls, and
-      one release-approved resource. Treat this as resource and public-profile
-      admission evidence only, not final package release readiness.
+      upstream BSD-3-Clause and README URLs, approved scopes and risk controls.
+      Match the complete admission inventory to the installed manifest:
+      currently five components, including the example-only MorphyNet excerpt.
+      Derive the expected set from the candidate records rather than retaining
+      a historical one-resource limit. This is resource-admission evidence,
+      not final package release readiness.
 - [ ] Include each admitted resource's required license, copyright, notice, and
       manifest files under the appropriate `inst/` path, then verify their
       contents and hashes in the source, installed, and binary packages.
@@ -94,9 +112,12 @@ it as internal-only evidence.
 - [ ] In the fresh clone, run the test suite and build one named source package
       with the release R version. Verify afterward that no tracked source file
       changed and that only declared build outputs appeared.
-- [ ] Run online `R CMD check --as-cran` against that source package on current
-      and devel R, and complete current-R checks on Linux, macOS, and Windows
-      (including win-builder or its documented successor).
+- [ ] For the formal-candidate workflow, obtain online
+      `R CMD check --as-cran` results for that source package on current and
+      devel R and current-R results on Linux, macOS and Windows. The workflow
+      also includes the declared R 4.1 diagnostic. Running `--as-cran` is a
+      package check, not submission to CRAN; any submission-specific service
+      is considered only if a submission is separately in scope.
 - [ ] Build and inspect the PDF reference manual; do not treat routine
       `--no-manual` CI as release evidence.
 - [ ] Treat every package-check error or warning as blocking. Resolve each note,
@@ -105,11 +126,15 @@ it as internal-only evidence.
       in every raw log and record its explicit disposition.
 - [ ] In the labeled R 4.1 minimum-version diagnostic only, retain and explain
       the exact additional dependency NOTE caused by deliberately unavailable
-      optional package `textstem` with `_R_CHECK_FORCE_SUGGESTS_=false`. Require
+      optional packages `gibasa` and `textstem` with
+      `_R_CHECK_FORCE_SUGGESTS_=false`, matching
+      `experiments/release-candidate/check-note-policy.R`. Require
       all other jobs to install their suggested packages, and block every other
       NOTE rather than generalizing either disposition.
-- [ ] Treat an external service, runner, or infrastructure failure as an invalid
-      run that must be repeated, not as an exception to a package-check result.
+- [ ] Distinguish an external service, setup or runner failure from a completed
+      package check. Preserve valid completed stages and resume the failed or
+      uncompleted stage with matching inputs; do not waive a missing result or
+      describe combined evidence as one successful full run.
 - [ ] Check the built archive's file list, sizes, license files, vignettes,
       examples, URLs, spelling, and package metadata.
 - [ ] Confirm that locally rendered `docs/` output is absent from the source
