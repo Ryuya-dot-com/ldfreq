@@ -2,21 +2,21 @@
 
 ### Start here
 
-- [From files to a diagnostic
-  report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.md):
 - [Getting started with
   ldfreq](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.md):
 - [English tokenization and document
   input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.md):
-- [Word families, roots, and affixes: from texts to interpretable
-  profiles](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.md):
 - [Japanese annotations: from original text to lexical
   measures](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.md):
+- [From files to a diagnostic
+  report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.md):
 
 ### Research design and reference resources
 
 - [Designing comparable lexical-diversity
   analyses](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.md):
+- [Word families, roots, and affixes: from texts to interpretable
+  profiles](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.md):
 - [Using your own lexical reference data across a
   corpus](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.md):
 - [Japanese lexical norms: from stimulus items to documented

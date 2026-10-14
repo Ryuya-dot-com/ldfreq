@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,11 +18,10 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
-    <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/word-families-and-affixes.html">Word families, roots, and affixes: from texts to interpretable profiles</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
+    <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -42,6 +41,10 @@
       <small>Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0.9006" id="ldfreq-0309006-development">ldfreq 0.3.0.9006 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-0309006-development"></a></h2>
+<ul><li>Put installation and a first analysis before the detailed feature descriptions. Connect the input map, package help and guides to a complete beginner workflow: read document results and missing reasons, make a table and plot, and save and reopen the original input and full analysis. Optional annotation and resource workflows follow the initial steps. No API or calculation changes.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0.9005" id="ldfreq-0309005-development">ldfreq 0.3.0.9005 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-0309005-development"></a></h2>
 <ul><li>Add the optional named <code>metadata</code> argument to <code><a href="../reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch()</a></code>. Retain study information in a separate <code>$metadata</code> table, matched to every document by unique character ID and reordered to input order. Reject missing, duplicate or extra IDs and list/matrix columns; retain empty documents, unknown study values and column types. Default output, core calculations, token audits and preprocessing records are unchanged.</li>

@@ -1,5 +1,30 @@
 # From files to a diagnostic report
 
+This guide extends a first analysis into condition comparisons and
+research reporting. If you have not yet read a result table or saved an
+analysis, start with [Getting
+started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.md).
+For importing a single TXT file or CSV, use the [file-input
+walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
+
+Choose the task you need:
+
+- [Compare English case choices](#compare-english-case-from-files) or
+  [Japanese word selections](#compare-japanese-pos-from-files): run the
+  shared setup below, then the relevant language path and the saving
+  section.
+- [Join study information and summarize documents](#study-metadata): use
+  the saved file-analysis results from those paths; the section names
+  its required objects.
+- [Extract saved MTLD diagnostics into a wide
+  table](#wide-mtld-diagnostics): use
+  `lexdiv_widen(..., mtld_diagnostics = TRUE)` with ldfreq 0.3.0.9004 or
+  later. The earlier helper supports long diagnostic tables and older
+  installations; a custom function is not required just to inspect a
+  first result.
+- [Plot local vocabulary diversity](#plot-local-vocabulary-diversity): a
+  separate complete example includes its own input text and setup.
+
 ## Compare analysis conditions from local files
 
 Start here to turn your own files into a table you can inspect, save and
@@ -374,7 +399,7 @@ stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 #> 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.
 #> 
-#> Calculations used ldfreq 0.3.0.9005: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
+#> Calculations used ldfreq 0.3.0.9006: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
 ```
 
 The CSV is a flat inspection table; **the RDS is the complete analysis

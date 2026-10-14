@@ -35,7 +35,11 @@ examples. Several related functions share that help page, so its
 examples also include optional annotation workflows. No model, Python or
 optional R package is required for the first analysis above.
 
-For an end-to-end workflow, see [From text to a research
+For a first document table, expected results, missing scores, a plot and
+saving and reopening the complete record, see [Getting
+started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html).
+For condition comparisons and research reporting, see [From text to a
+research
 report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html).
 For your own files, see [TXT-folder and CSV
 input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).

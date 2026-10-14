@@ -204,6 +204,8 @@ complete object to retain its audits.
 
 ## See also
 
+[Getting started: read, plot and save document
+results](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html),
 [`lexdiv_metrics_text`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md),
 [`lexdiv_convenience`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md),
 [Read your own TXT or CSV
