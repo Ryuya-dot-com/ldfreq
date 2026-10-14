@@ -16,14 +16,14 @@ and checks that reshaped tables and plots do not mix incompatible specifications
 
 ## Installation
 
-Version 0.3.0.9006 is a development prerelease and has not been released on CRAN.
+Version 0.3.0.9007 is a development prerelease and has not been released on CRAN.
 The fixed tag below identifies the tested code and installed examples.
 It requires R 4.1.0 or later. Install the tested snapshot used by this
 documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9006")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9007")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
@@ -35,7 +35,7 @@ If you have a built source archive, install it locally:
 
 ```r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9006.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9007.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation may
@@ -502,7 +502,7 @@ a high match rate does not prove that arbitrary tokens use the right segmentatio
 | Evaluate external labels against a supplied reference | `lexdiv_evaluate_annotations()` returns per-label errors, document coverage and source context on the same segmentation |
 | Compare different English/Japanese token segmentations | `lexdiv_align_annotations()` separates source-span/boundary correspondence from conditional label agreement and retains split/merge KWIC |
 | Trace adjective–common-noun dependencies | `lexdiv_amod_pairs()` validates supplied basic UD trees and retains both endpoints, KWIC, document counts and incomplete-sentence coverage |
-| Parameter and definition sensitivity | `lexdiv_spec()`, `lexdiv_grid()`, `lexdiv_plan()`, `lexdiv_profile()`, `lexdiv_profile_batch()`, `lexdiv_variant_metrics()` |
+| Parameter and definition sensitivity | `lexdiv_spec()`, `lexdiv_grid()`, `lexdiv_plan()`, `lexdiv_metrics(..., plan = ...)`, `lexdiv_metrics_batch(..., plan = ...)`, `lexdiv_variant_metrics()` |
 | Local MATTR windows and exposure | `lexdiv_mattr_profile()` |
 | Exact term/content-word overlap | `lexdiv_term_overlap()`, `lexdiv_content_overlap()` |
 | Coverage of a supplied reference set | `lexdiv_reference_coverage()` |
@@ -522,6 +522,11 @@ a high match rate does not prove that arbitrary tokens use the right segmentatio
 The eleven default measures are TTR, RTTR/Guiraud, CTTR, Herdan C, Maas a-squared,
 MSTTR, MATTR, MTLD, HD-D, and Yule K/I. Experimental expected-TTR D is opt-in.
 `lexdiv_methods()` describes their definitions, scales, parameters, and direction.
+Use `lexdiv_methods(scope = "variants")` for the separate Maas/MTLD comparison
+catalog accepted by `lexdiv_variant_metrics()`. For recorded parameter plans,
+use `lexdiv_metrics(tokens, plan = plan)` or
+`lexdiv_metrics_batch(documents, plan = plan)` without additional metric arguments.
+The existing `lexdiv_profile()` and `lexdiv_profile_batch()` calls remain supported.
 Expected-TTR D fits an exact finite-population expectation; it is not CLAN VOCD.
 
 `lexdiv_screen()` and `lexdiv_length_evidence()` describe advisory token-count

@@ -113,7 +113,12 @@ distinguishes display choices, typed method dispatch, input multiplicity and
 different analysis tasks. It supersedes the priority of standalone `run_plan`
 and `variant_methods` renames above: first assess an explicit `plan` argument
 on the existing metric entry point and a scope selector on the existing method
-catalog. These are unimplemented alternatives, not additional exports.
+catalog. The following continuation adopts these arguments for 9007, including
+the existing batch metric entry point; no new export is added. The original
+profile and variant-catalog functions remain supported. Core and variant scopes
+retain their separate schemas and documented execution targets. A plan cannot
+be combined with explicit metric arguments. See the bounded implementation
+in [API-SURFACE.md](API-SURFACE.md#9007-adopted-entry-points).
 
 A different return component or validator alone is not a reason to reject an
 S3 method. Conversely, replacing several names with one name plus a collection

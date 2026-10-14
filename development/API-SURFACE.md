@@ -1,7 +1,8 @@
 # Public API surface audit
 
-Status: maintained API inventory for development version 0.3.0.9006.
-The 9006 update changes documentation only; the 9005 public API is unchanged.
+Status: maintained API inventory for development version 0.3.0.9007.
+The 9007 update adds catalog scope and explicit plan arguments to existing entry
+points. Exports, S3 registrations, formulas and stored result schemas are unchanged.
 
 Initial inventory audit: 2026-10-06; subsequent API decisions through 2026-10-08
 are recorded below. Reference/status review: 2026-10-14. Current scope and
@@ -18,8 +19,9 @@ rendered by pkgdown.
 
 These decisions describe the released interface. The
 [2026-10-14 consolidation review](#2026-10-14-api-consolidation-review)
-reassesses future shared entry points; it does not implement them or remove the
-current export freeze. A current absence of a plot/summary method is not, by
+reassesses shared entry points. The continuation adopts only the
+[9007 entry points](#9007-adopted-entry-points); the current export freeze stays
+in force. A current absence of a plot/summary method is not, by
 itself, proof that an explicit selected view could never be supported safely.
 
 - The 0.3.0.9005 text-batch `metadata` argument preserves explicit document-level
@@ -187,9 +189,9 @@ class, evaluator or implicit human decision is introduced.
 | `lexdiv_ngram_reference()` | Validated extraction or caller aggregate with completeness, opportunity totals and source metadata | One declared reference population per n; reusable across targets | Bounded composite method | No | `$counts`, `$totals`, `$provenance`; save/read RDS |
 | `lexdiv_ngram_profile()` | Exact sequence lookup and available-value means with sample zeros distinguished from unlisted keys | Per-document, per-n token/type summaries, no pooling | Bounded composite method | No: select document, n and weighting | `$lookup`, `$summary`, `$documents`, `$provenance` |
 | `lexdiv_ngram_compare()` | Reference choice, common-item means and baseline differences beside unchanged per-reference coverage | One target, named references; common set across all references, no pooling | Base list | No: select document, n, weighting and reference | `$lookup`, `$summary`, `$documents`, `$references`, `$provenance` |
-| `lexdiv_methods()` | Method registry data frame | Shared by single and batch calls | Base data-frame | No | Data frame with list-column parameters |
-| `lexdiv_metrics()` | One-row-per-metric long data frame | Paired with `lexdiv_metrics_batch()` | Result method | Single selected metric | Data frame |
-| `lexdiv_metrics_batch()` | Document-major long metric data frame | Explicit batch form | Batch-result method | Single selected metric | Data frame |
+| `lexdiv_methods()` | Core or comparison method catalog selected by scope | Shared discovery; executor documented per scope | Base data-frame | No | Core parameters or comparison metadata |
+| `lexdiv_metrics()` | Metric rows, or full request profiles with `plan` | Paired with `lexdiv_metrics_batch()` | Result/profile method | Single selected metric/request | Data frame |
+| `lexdiv_metrics_batch()` | Document-major metric or plan result data frame | Explicit batch form; plan row bound | Batch/profile-batch method | Single selected metric/request | Data frame |
 | `lexdiv_metrics_text()` | Core results plus token audit and preprocessing | Paired with `lexdiv_metrics_text_batch()` | Text-result method | Delegates to unchanged `$results` | `$results`, `$token_audit`, `$preprocessing` |
 | `lexdiv_metrics_text_batch()` | Raw/prepared document metrics with audits and provenance | Explicit text batch | Text-batch method | Delegates to complete `$results` | `$results`, `$token_audit`, `$preprocessing` |
 | `lexdiv_overlap_ids()` | Overlap measure ID character vector | Shared by both pair operations | Base | No | Vector |
@@ -387,3 +389,28 @@ classes, empty/short/all-missing cases, IDs/metadata, saved-object replay and
 resource reuse. Reconcile NAMESPACE, S3 registrations, installed help, examples,
 NEWS, the API audit and site only for the actually adopted change. Do not rerun
 unchanged numerical validation just to publish this internal assessment.
+
+### 9007 adopted entry points
+
+The subsequent continuation adopts only catalog scope and explicit plan execution.
+`lexdiv_methods()` retains its complete 12-row, 10-column default output.
+`scope = "variants"` returns the unchanged eight-row, six-column variant catalog.
+The common fields are `method_id`, `direction` and `scale`; the shared Maas ID
+occurs once per selected catalog. There is no combined table, deduplication,
+new executor membership or new export. Help names the accepted executor for
+each scope; the legacy catalog entry point remains supported.
+
+`lexdiv_metrics(..., plan = plan)` and `lexdiv_metrics_batch(..., plan = plan)`
+delegate to the existing profile executors. They retain all classes, attributes,
+request/specification identities, hashes, missingness and batch ordering.
+Explicit metric arguments conflict with a non-NULL plan even at default values.
+The batch `plan` and `max_rows` formals follow `...`, preserving prior positional
+metric forwarding. `max_rows` is accepted only with a plan and preserves the
+existing pre-allocation bound. `NULL` retains ordinary metric behavior.
+
+The original profile functions and old objects remain supported. Raw-text
+functions, diagnostics, plotting and wholesale single/batch unification are
+outside this implementation. 57 exports, 34 S3 registrations and 37 help topics
+remain. Validation and publication evidence belongs to the existing publication
+record; the executable tests cover output identity and failure boundaries,
+not a claim of measured novice usability.

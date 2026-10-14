@@ -718,11 +718,19 @@ print.lexdiv_plan <- function(x, ...) {
 
 #' List the versioned current methods
 #'
+#' @param scope `"core"` for methods accepted by [lexdiv_spec()] and
+#'   [lexdiv_metrics()], or `"variants"` for the comparison catalog accepted
+#'   by [lexdiv_variant_metrics()].
 #' @return A data frame with a human-readable name and definition, score
 #'   direction and scale, stability classification, exact method identity, default parameters, and the
-#'   method's advisory default token floor.
+#'   method's advisory default token floor for `scope = "core"`. With
+#'   `scope = "variants"`, the unchanged [lexdiv_variant_ids()] data frame.
 #' @export
-lexdiv_methods <- function() {
+lexdiv_methods <- function(scope = c("core", "variants")) {
+  scope <- match.arg(scope)
+  if (identical(scope, "variants")) {
+    return(lexdiv_variant_ids())
+  }
   methods <- .profile_method_definitions()
   output <- data.frame(
     metric_id = vapply(methods, `[[`, character(1L), "metric_id"),

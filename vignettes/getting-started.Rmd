@@ -504,12 +504,37 @@ turning descriptive token floors into alternative metric values.
 
 ```{r}
 plan <- lexdiv_plan(presets = "length_50_100")
-profile <- lexdiv_profile(tokens, plan)
+profile <- lexdiv_metrics(tokens, plan = plan)
 head(profile)
 
 screen <- lexdiv_screen(profile)
 head(screen)
+
+# The same plan can be applied to named documents, including an empty document.
+planned_batch <- lexdiv_metrics_batch(
+  list(document_a = tokens, empty = character()), plan = plan
+)
+head(planned_batch[, c("document_id", "request_id", "value", "missing_reason")])
 ```
+
+The plan supplies all method parameters: omit `metrics`, `window_length` and
+other individual metric arguments when `plan` is set. The returned data frame
+keeps the plan fingerprint, request IDs and specification IDs. Save the plan
+and complete result together with `saveRDS()` as in the earlier saving example.
+`lexdiv_profile()` and `lexdiv_profile_batch()` remain supported and return the
+same complete objects. The plan entry points accept pre-tokenized documents.
+
+Use `lexdiv_methods()` for methods accepted by plans. To inspect Maas and MTLD
+comparison definitions, select a different catalog:
+
+```{r}
+comparison_methods <- lexdiv_methods(scope = "variants")
+comparison_methods[, c("family", "method_id", "scale")]
+```
+
+Pass those method IDs to `lexdiv_variant_metrics(variants = ...)`; they are not
+all accepted by `lexdiv_spec()`. `lexdiv_variant_ids()` remains supported and
+returns the same catalog. The two scopes retain their own descriptive columns.
 
 MATTR has an additional local diagnostic surface. It accepts a MATTR-only
 canonical plan and returns each complete moving-window value plus the number

@@ -5317,3 +5317,51 @@ has completed successfully with all 11 jobs successful at
 checkpoint is resolved; no workflow was restarted. API naming/consolidation
 assessments and this completion record are on the separate review branch
 `codex/api-naming-review-20261014`, not changes to the fixed 9006 package or site.
+
+## API entry-point snapshot 0.3.0.9007: preparation (2026-10-14)
+
+The continuation adopts the bounded catalog/plan implementation in
+[API-SURFACE.md](API-SURFACE.md#9007-adopted-entry-points). No new export,
+scientific formula, resource, dependency or stored schema is introduced.
+Existing profile and catalog entry points remain supported. Runtime changes are
+limited to `R/api.R`, `R/batch.R` and `R/profile.R`.
+
+Evidence: workspace `reviews/ldfreq-api-consolidation-20261014/`.
+
+- Eight affected test groups passed 650 expectations, including 41 new checks
+  for catalog membership, explicit argument conflicts, plan integrity, document
+  order, invalid/empty inputs, zero-document inputs and pre-allocation limits.
+- A separate process using the installed 9006 archive saved ten complete objects
+  covering catalogs, plans, direct and positional metric requests, batch,
+  profile, text and metadata-bearing text-batch results. Every object is identical
+  under the corresponding 9007 old call. Both new plan entry points reproduce
+  the saved 9006 plan results exactly, including attributes and classes.
+- The installed 9007 archive reproduces those plan results, widening and RDS
+  replay. Color and monochrome plot calls return identical selected data
+  invisibly. Installed help includes the new arguments and executor boundaries.
+- The public API audit passed: 57 exports, 34 S3 registrations, 37 public topics.
+  The release note policy and whitespace checks passed.
+- `R CMD check --no-tests --ignore-vignettes --no-manual` completed with
+  `Status: OK`, including all help/example checks. The initial dependency check
+  could not locate the optional `gibasa`; the completed check uses the existing
+  Japanese R library. No metric or test failure was involved. Tests and guide
+  rendering are separate evidence, not claimed as part of this invocation.
+- Both changed package guides were rendered with 9007. Twenty unchanged guide
+  sources and their existing renderings were reused from 9006. The 183 unchanged
+  runtime/resource members are byte-identical; the changed default entry paths
+  have the compatibility evidence above. The full site was independently built
+  under 9007, including all articles, with 129 HTML pages/253 files and zero
+  missing local link/fragment targets. The initial sandbox-only site attempt
+  stopped at public CRAN URL lookup; the network-enabled build completed.
+- `ldfreq_0.3.0.9007.tar.gz` is 6,191,347 bytes, SHA-256
+  `73d43b340e2c5da5fdade481b557df8fd4f2b012c1a5d0c192a433b1e3d9d9c1`.
+  All 343 common source members match the working source; DESCRIPTION fields
+  match apart from normal R build formatting/added metadata. It contains all
+  22 rendered guides and no development/experiments/legal/site trees. Package
+  and site scans found no workspace paths or internal-roadmap references.
+
+Push authorization persists from the prior explicit instruction. Publication
+will use the existing protected PR checks, then main, a new fixed prerelease
+and verified Pages files; 9006 remains untouched. This preparation record does
+not claim CI or remote delivery has completed. No manual duplicate workflow,
+CI cancellation, CRAN submission or user-usability study is part of the work.

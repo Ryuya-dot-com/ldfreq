@@ -15,14 +15,17 @@ lexdiv_metrics(
   window_length = 50L,
   mtld_threshold = 0.72,
   sample_size = 42L,
-  expected_ttr_sample_sizes = 35:50
+  expected_ttr_sample_sizes = 35:50,
+  plan = NULL
 )
 
 lexdiv_metrics_batch(
   documents,
   id_col = "document_id",
   tokens_col = "tokens",
-  ...
+  ...,
+  plan = NULL,
+  max_rows = 1e6
 )
 
 \method{print}{lexdiv_batch_results}(x, ...)
@@ -61,9 +64,17 @@ lexdiv_metrics_batch(
   may not be marked \code{bytes} or \code{latin1}.}
   \item{tokens_col}{One plain, non-empty character string selecting the token
   list-column of data-frame input.}
+  \item{plan}{Optional normalized plan from \code{\link{lexdiv_plan}}. With a
+  non-\code{NULL} plan, omit \code{metrics} and all individual metric parameters,
+  including arguments in the batch function's \code{...}. The plan specifies
+  every method, parameter and request order. \code{NULL} keeps ordinary metric
+  selection. Name this argument explicitly in batch calls.}
+  \item{max_rows}{Positive integer bound on document-by-specification rows
+  for batch plan execution, checked before computation. Omit it when
+  \code{plan = NULL}; it is not a limit for ordinary metric requests.}
   \item{x}{A \code{lexdiv_results} or \code{lexdiv_batch_results} object.}
   \item{...}{For \code{lexdiv_metrics_batch()}, arguments forwarded to
-  \code{lexdiv_metrics()}; for print methods, arguments passed to
+  \code{lexdiv_metrics()} when no plan is supplied; for print methods, arguments passed to
   \code{print.data.frame()}.}
 }
 \value{
@@ -80,6 +91,12 @@ The print method returns its input invisibly.
 document-major, requested-metric-minor long form. Its first three columns are
 \code{document_id}, \code{batch_schema_id}, and
 \code{batch_schema_version}; all single-document record columns follow.
+
+With a non-\code{NULL} \code{plan}, the functions return exactly the result of
+\code{\link{lexdiv_profile}} or \code{lexdiv_profile_batch()}, respectively:
+a \code{lexdiv_profile_results} or \code{lexdiv_profile_batch_results} data
+frame, including the plan fingerprint, request and specification IDs, profile
+schema columns, classes and attributes. No plan metadata is discarded.
 }
 \description{
 Computes explicitly versioned lexical-diversity variants from pre-tokenized
@@ -183,6 +200,13 @@ duplicate IDs, and invalid selected-metric arguments stop the whole call.
 Named-list and data-frame inputs preserve document order, followed within each
 document by requested metric order. Batch-envelope and core-record schemas have
 separate explicit IDs and versions.
+
+For several settings of the same method, build a \code{lexdiv_plan()} and pass
+it as \code{plan}. The existing \code{lexdiv_profile()} and
+\code{lexdiv_profile_batch()} entry points remain supported. Combining a plan
+with explicit metric arguments is an error even when those arguments equal
+their defaults. This avoids an ambiguous override of the recorded plan.
+Plan execution here accepts pre-tokenized input; it does not tokenize raw text.
 }
 \section{Reading status and missing reason}{
 Interpret \code{value} only after checking both fields:
@@ -270,6 +294,13 @@ lexdiv_metrics(c("a", "b"), metrics = "mattr", window_length = 3)
 documents <- list(doc_a = c("a", "a", "b"), doc_b = character())
 batch <- lexdiv_metrics_batch(documents, metrics = "ttr")
 batch  # doc_a: N = 3, V = 2, TTR = 2/3; doc_b: missing / empty_input
+
+# Record several parameter settings before computation.
+plan <- lexdiv_plan("length_50_100")
+planned <- lexdiv_metrics(tokens, plan = plan)
+planned[, c("request_id", "metric_id", "value", "status", "missing_reason")]
+planned_batch <- lexdiv_metrics_batch(documents, plan = plan)
+stopifnot(identical(planned_batch, lexdiv_profile_batch(documents, plan)))
 
 # Further methods. Sample size 2 is for this tiny illustration only.
 lexdiv_metric_ids()
