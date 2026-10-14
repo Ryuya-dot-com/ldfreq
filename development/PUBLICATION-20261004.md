@@ -5015,8 +5015,8 @@ The existing uncommitted PR #42 publication record was retained.
 
 ### Current identity and completion evidence
 
-Current public snapshot: **0.3.0.9006**, main/tag `7f97872`, Pages `60c54d4`.
-See [the 9006 publication entry](#documentation-snapshot-0309006-publication-completion)
+Current public snapshot: **0.3.0.9007**, main/tag `411ab0e`, Pages `5284ee2`.
+See [the 9007 publication entry](#api-entry-point-snapshot-0309007-publication-completion)
 for exact identities, PR CI and anonymous-delivery evidence. The bullets below
 record the 9005 baseline of the wording audit, not the latest deployed state.
 
@@ -5365,3 +5365,54 @@ will use the existing protected PR checks, then main, a new fixed prerelease
 and verified Pages files; 9006 remains untouched. This preparation record does
 not claim CI or remote delivery has completed. No manual duplicate workflow,
 CI cancellation, CRAN submission or user-usability study is part of the work.
+
+
+## API entry-point snapshot 0.3.0.9007: publication completion
+
+- The owner explicitly approved PR #44's main merge, the 9007 prerelease and
+  site publication after the automatic approval review distinguished the prior
+  push authorization from main-branch merge authorization. No bypass was used.
+- [PR #44](https://github.com/Ryuya-dot-com/ldfreq/pull/44) merged as
+  `411ab0ea797c9afce245e44a1e54f5729c61ef32`. The tested head is
+  `959c444fc6406312a9ee1660deb6f747b9b9f0da`; both trees are
+  `b7fbfcb9cc6669dee7d01a6b445a50202ed0686c`.
+- [PR R-CMD-check 38570198268](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/38570198268)
+  completed successfully with all 11 jobs. Both protected-branch checks passed.
+  Release-candidate run `38570198079` passed the development-state classifier
+  and aggregate; formal-candidate jobs were intentionally skipped.
+- [v0.3.0.9007](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.3.0.9007)
+  is a prerelease targeting that exact main commit. Its attached archive and
+  SHA256SUMS match the preparation evidence. Older releases and the formal
+  latest-release designation are unchanged.
+- Pages commit `5284ee24d68317a0e3af54a23f713cfed8541fea` contains the verified
+  9007 site. [Pages run 38572613477](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/38572613477)
+  completed with build, deploy and status reporting all successful.
+- Anonymous delivery matched all 13 checked home/help/guide/NEWS/search/metadata
+  files and both release assets byte-for-byte. The two internal-roadmap paths
+  remain 404. The 253-file local site has 129 HTML pages and no broken local
+  targets; 201 text files passed the workspace/internal-path scan. No browser
+  was available for visual inspection in this turn, so a rendered-layout or
+  human-usability review is not claimed.
+- The reused package report guide retains the truthful statement that its
+  printed calculations used 9006. Its source, recorded results and invocation
+  are unchanged; this is provenance, not an obsolete installation instruction.
+  Both edited package guides and the complete public site were rendered with
+  9007. The fixed archive contains all 22 guides.
+- [Main R-CMD-check 38572512722](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/38572512722)
+  completed successfully with all 11 jobs, including Windows/macOS/Linux,
+  minimum R and R devel, resource checks, installed examples and the required
+  aggregate. Main Release-candidate run `38572517247` also succeeded.
+  PR and main are separate successful invocations of the same source tree;
+  no manual duplicate workflow or cancellation was used.
+
+Evidence remains under `reviews/ldfreq-api-consolidation-20261014/`, including
+`pr-final.json`, `pr-final-state.json`, `pr-merged.json`, `release.json`,
+`main-final.json`, `pages-final.json` and `public-delivery.json`. The explicit approval resolved
+all publication authorization blockers. No new export, CRAN submission, Windows
+R 4.1/CP932 validation or independent usability study is claimed.
+
+
+The completion record and roadmap update are retained on
+`codex/api-consolidation-evidence-20261014`. They change only repository developer
+records; the fixed 9007 source archive, main/tag code and deployed site remain
+as verified above. No further numerical test run is needed for these records.
