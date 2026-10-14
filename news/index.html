@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,11 @@
       <small>Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0.9007" id="ldfreq-0309007-development">ldfreq 0.3.0.9007 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-0309007-development"></a></h2>
+<ul><li>Run explicit plans with <code>lexdiv_metrics(..., plan = plan)</code> and <code>lexdiv_metrics_batch(..., plan = plan)</code>. Retain complete profile results, request identities, missing reasons and saved-plan integrity checks. Reject separate metric arguments when a plan is supplied; batch plans retain their <code>max_rows</code> allocation bound. Existing calls and profile functions remain supported.</li>
+<li>Select the Maas/MTLD comparison catalog with <code>lexdiv_methods(scope = "variants")</code>. The default core catalog and <code><a href="../reference/lexdiv_variant_metrics.html">lexdiv_variant_ids()</a></code> output are unchanged. Comparison-only methods do not become plan methods. No new export, formula, result schema or dependency.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0.9006" id="ldfreq-0309006-development">ldfreq 0.3.0.9006 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-0309006-development"></a></h2>
 <ul><li>Put installation and a first analysis before the detailed feature descriptions. Connect the input map, package help and guides to a complete beginner workflow: read document results and missing reasons, make a table and plot, and save and reopen the original input and full analysis. Optional annotation and resource workflows follow the initial steps. No API or calculation changes.</li>

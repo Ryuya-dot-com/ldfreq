@@ -1219,9 +1219,10 @@ useful for within-text fluctuation but should not be treated as a
 parameter-free universal score.
 
 [`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-and
+records parameter variants as different requests. Run them through
+`lexdiv_metrics(..., plan = plan)`;
 [`lexdiv_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-preserve parameter variants as different requests:
+remains supported:
 
 ``` r
 long_tokens <- rep(
@@ -1229,7 +1230,7 @@ long_tokens <- rep(
   20
 )
 plan <- lexdiv_plan(presets = "length_50_100")
-profile <- lexdiv_profile(long_tokens, plan)
+profile <- lexdiv_metrics(long_tokens, plan = plan)
 profile[profile$metric_id %in% c("mattr", "msttr"), c(
   "request_id", "metric_id", "value", "status", "N", "V"
 )]

@@ -19,14 +19,17 @@ lexdiv_metrics(
   window_length = 50L,
   mtld_threshold = 0.72,
   sample_size = 42L,
-  expected_ttr_sample_sizes = 35:50
+  expected_ttr_sample_sizes = 35:50,
+  plan = NULL
 )
 
 lexdiv_metrics_batch(
   documents,
   id_col = "document_id",
   tokens_col = "tokens",
-  ...
+  ...,
+  plan = NULL,
+  max_rows = 1e6
 )
 
 # S3 method for class 'lexdiv_batch_results'
@@ -100,6 +103,22 @@ print(x, ...)
   One plain, non-empty character string selecting the token list-column
   of data-frame input.
 
+- plan:
+
+  Optional normalized plan from
+  [`lexdiv_plan`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
+  With a non-`NULL` plan, omit `metrics` and all individual metric
+  parameters, including arguments in the batch function's `...`. The
+  plan specifies every method, parameter and request order. `NULL` keeps
+  ordinary metric selection. Name this argument explicitly in batch
+  calls.
+
+- max_rows:
+
+  Positive integer bound on document-by-specification rows for batch
+  plan execution, checked before computation. Omit it when
+  `plan = NULL`; it is not a limit for ordinary metric requests.
+
 - x:
 
   A `lexdiv_results` or `lexdiv_batch_results` object.
@@ -107,7 +126,8 @@ print(x, ...)
 - ...:
 
   For `lexdiv_metrics_batch()`, arguments forwarded to
-  `lexdiv_metrics()`; for print methods, arguments passed to
+  `lexdiv_metrics()` when no plan is supplied; for print methods,
+  arguments passed to
   [`print.data.frame()`](https://rdrr.io/r/base/print.dataframe.html).
 
 ## Value
@@ -125,6 +145,15 @@ invisibly.
 document-major, requested-metric-minor long form. Its first three
 columns are `document_id`, `batch_schema_id`, and
 `batch_schema_version`; all single-document record columns follow.
+
+With a non-`NULL` `plan`, the functions return exactly the result of
+[`lexdiv_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+or
+[`lexdiv_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md),
+respectively: a `lexdiv_profile_results` or
+`lexdiv_profile_batch_results` data frame, including the plan
+fingerprint, request and specification IDs, profile schema columns,
+classes and attributes. No plan metadata is discarded.
 
 ## Details
 
@@ -230,6 +259,17 @@ arguments stop the whole call. Named-list and data-frame inputs preserve
 document order, followed within each document by requested metric order.
 Batch-envelope and core-record schemas have separate explicit IDs and
 versions.
+
+For several settings of the same method, build a
+[`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+and pass it as `plan`. The existing
+[`lexdiv_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+and
+[`lexdiv_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+entry points remain supported. Combining a plan with explicit metric
+arguments is an error even when those arguments equal their defaults.
+This avoids an ambiguous override of the recorded plan. Plan execution
+here accepts pre-tokenized input; it does not tokenize raw text.
 
 ## Reading status and missing reason
 
@@ -367,6 +407,28 @@ batch  # doc_a: N = 3, V = 2, TTR = 2/3; doc_b: missing / empty_input
 #>   below_quality_floor
 #> 1               FALSE
 #> 2                TRUE
+
+# Record several parameter settings before computation.
+plan <- lexdiv_plan("length_50_100")
+planned <- lexdiv_metrics(tokens, plan = plan)
+planned[, c("request_id", "metric_id", "value", "status", "missing_reason")]
+#> <lexdiv_profile_results: 13 specifications; schema unknown>
+#>    request_id metric_id        value  status                    missing_reason
+#> 1         ttr       ttr    0.7500000      ok                              <NA>
+#> 2        rttr      rttr    1.5000000      ok                              <NA>
+#> 3        cttr      cttr    1.0606602      ok                              <NA>
+#> 4      herdan    herdan    0.7924813      ok                              <NA>
+#> 5        maas      maas    0.1496931      ok                              <NA>
+#> 6       msttr     msttr           NA missing too_short_for_requested_parameter
+#> 7       mattr     mattr           NA missing too_short_for_requested_parameter
+#> 8        mtld      mtld    4.2400000      ok                              <NA>
+#> 9         hdd       hdd           NA missing too_short_for_requested_parameter
+#> 10     yule_k    yule_k 1250.0000000      ok                              <NA>
+#> 11     yule_i    yule_i    3.0000000      ok                              <NA>
+#> 12  msttr_100     msttr           NA missing too_short_for_requested_parameter
+#> 13  mattr_100     mattr           NA missing too_short_for_requested_parameter
+planned_batch <- lexdiv_metrics_batch(documents, plan = plan)
+stopifnot(identical(planned_batch, lexdiv_profile_batch(documents, plan)))
 
 # Further methods. Sample size 2 is for this tiny illustration only.
 lexdiv_metric_ids()

@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1027,7 +1027,7 @@ duplicating MTLD or turning descriptive token floors into alternative
 metric values.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_plan</a></span><span class="op">(</span>presets <span class="op">=</span> <span class="st">"length_50_100"</span><span class="op">)</span></span>
-<span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_profile</a></span><span class="op">(</span><span class="va">tokens</span>, <span class="va">plan</span><span class="op">)</span></span>
+<span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics</a></span><span class="op">(</span><span class="va">tokens</span>, plan <span class="op">=</span> <span class="va">plan</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;lexdiv_profile_results: 6 specifications; schema 0.1.0&gt;</span></span>
 <span><span class="co">#&gt;   request_id metric_id     value  status                    missing_reason N V</span></span>
@@ -1074,12 +1074,64 @@ metric values.</p>
 <span><span class="co">#&gt; 3 rttr_guiraud_v_over_sqrt_n_v1 6  tokens_50             50         FALSE</span></span>
 <span><span class="co">#&gt; 4 rttr_guiraud_v_over_sqrt_n_v1 6 tokens_100            100         FALSE</span></span>
 <span><span class="co">#&gt; 5        cttr_v_over_sqrt_2n_v1 6  tokens_50             50         FALSE</span></span>
-<span><span class="co">#&gt; 6        cttr_v_over_sqrt_2n_v1 6 tokens_100            100         FALSE</span></span></code></pre></div>
+<span><span class="co">#&gt; 6        cttr_v_over_sqrt_2n_v1 6 tokens_100            100         FALSE</span></span>
+<span></span>
+<span><span class="co"># The same plan can be applied to named documents, including an empty document.</span></span>
+<span><span class="va">planned_batch</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>document_a <span class="op">=</span> <span class="va">tokens</span>, empty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, plan <span class="op">=</span> <span class="va">plan</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">planned_batch</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"request_id"</span>, <span class="st">"value"</span>, <span class="st">"missing_reason"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_profile_batch_results: 1 document; 6 specification results; schema unknown&gt;</span></span>
+<span><span class="co">#&gt;   document_id request_id     value                    missing_reason</span></span>
+<span><span class="co">#&gt; 1  document_a        ttr 0.6666667                              &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 2  document_a       rttr 1.6329932                              &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 3  document_a       cttr 1.1547005                              &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 4  document_a     herdan 0.7737056                              &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 5  document_a       maas 0.1262973                              &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 6  document_a      msttr        NA too_short_for_requested_parameter</span></span></code></pre></div>
+<p>The plan supplies all method parameters: omit <code>metrics</code>,
+<code>window_length</code> and other individual metric arguments when
+<code>plan</code> is set. The returned data frame keeps the plan
+fingerprint, request IDs and specification IDs. Save the plan and
+complete result together with <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS()</a></code> as in the earlier
+saving example. <code><a href="../reference/lexdiv_profile.html">lexdiv_profile()</a></code> and
+<code><a href="../reference/lexdiv_profile.html">lexdiv_profile_batch()</a></code> remain supported and return the same
+complete objects. The plan entry points accept pre-tokenized
+documents.</p>
+<p>Use <code><a href="../reference/lexdiv_profile.html">lexdiv_methods()</a></code> for methods accepted by plans. To
+inspect Maas and MTLD comparison definitions, select a different
+catalog:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">comparison_methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_methods</a></span><span class="op">(</span>scope <span class="op">=</span> <span class="st">"variants"</span><span class="op">)</span></span>
+<span><span class="va">comparison_methods</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"family"</span>, <span class="st">"method_id"</span>, <span class="st">"scale"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   family                                               method_id</span></span>
+<span><span class="co">#&gt; 1   maas                                           maas_a2_ln_v1</span></span>
+<span><span class="co">#&gt; 2   maas                                            maas_a_ln_v1</span></span>
+<span><span class="co">#&gt; 3   maas                                        maas_a2_log10_v1</span></span>
+<span><span class="co">#&gt; 4   maas                                         maas_a_log10_v1</span></span>
+<span><span class="co">#&gt; 5   mtld          mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1</span></span>
+<span><span class="co">#&gt; 6   mtld     mtld_seq_bidir_dirmean_lt_min10_finaltail_linear_v1</span></span>
+<span><span class="co">#&gt; 7   mtld mtld_seq_bidir_mfl_dirmean_lt_min10_finaltail_linear_v1</span></span>
+<span><span class="co">#&gt; 8   mtld  mtld_seq_bidir_mfl_pooled_lt_min10_finaltail_linear_v1</span></span>
+<span><span class="co">#&gt;                    scale</span></span>
+<span><span class="co">#&gt; 1              a-squared</span></span>
+<span><span class="co">#&gt; 2                      a</span></span>
+<span><span class="co">#&gt; 3              a-squared</span></span>
+<span><span class="co">#&gt; 4                      a</span></span>
+<span><span class="co">#&gt; 5      tokens-per-factor</span></span>
+<span><span class="co">#&gt; 6      tokens-per-factor</span></span>
+<span><span class="co">#&gt; 7 adjusted-factor-length</span></span>
+<span><span class="co">#&gt; 8 adjusted-factor-length</span></span></code></pre></div>
+<p>Pass those method IDs to
+<code>lexdiv_variant_metrics(variants = ...)</code>; they are not all
+accepted by <code><a href="../reference/lexdiv_profile.html">lexdiv_spec()</a></code>.
+<code><a href="../reference/lexdiv_variant_metrics.html">lexdiv_variant_ids()</a></code> remains supported and returns the same
+catalog. The two scopes retain their own descriptive columns.</p>
 <p>MATTR has an additional local diagnostic surface. It accepts a
 MATTR-only canonical plan and returns each complete moving-window value
 plus the number and nominal weight of windows containing each token
 position.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_methods</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">mattr_method</span> <span class="op">&lt;-</span> <span class="va">methods</span><span class="op">$</span><span class="va">method_id</span><span class="op">[</span><span class="va">methods</span><span class="op">$</span><span class="va">metric_id</span> <span class="op">==</span> <span class="st">"mattr"</span><span class="op">]</span></span>
 <span><span class="va">mattr_plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_plan</a></span><span class="op">(</span></span>
@@ -1149,7 +1201,7 @@ position.</p>
 <span><span class="co">#&gt; 5        5              5            0.09803922                0.009803922</span></span>
 <span><span class="co">#&gt; 6        6              6            0.11764706                0.011764706</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">local_mattr</span>, request_id <span class="op">=</span> <span class="st">"mattr_1"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="getting-started_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="" width="480"></p>
+<p><img src="getting-started_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="480"></p>
 <p>The plotted trajectory is descriptive. The package does not select an
 optimal window, infer a universal adequate text length, or interpret
 exposure weights as token-level causal contributions.</p>
@@ -1182,7 +1234,7 @@ and their bounded presets.</p>
 <p>Expected-TTR D fits an explicit D curve to exact finite-population
 expected TTR values. It uses no random sampling or arbitrary D cap and
 is not CLAN VOCD.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"a"</span>, <span class="st">"c"</span><span class="op">)</span>, <span class="fl">20</span><span class="op">)</span>,</span>
 <span>  metrics <span class="op">=</span> <span class="st">"expected_ttr_d"</span></span>
@@ -1198,7 +1250,7 @@ is not CLAN VOCD.</p>
 variants. The separate variant surface makes those choices comparable
 without changing the canonical registry or silently replacing a
 method.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">variant_catalog</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_variant_metrics.html">lexdiv_variant_ids</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">variant_catalog</span></span>
 <span><span class="co">#&gt;   family                                               method_id direction</span></span>
@@ -1273,7 +1325,7 @@ full-pipeline compatibility claim.</p>
 <p>The help pages explain ordinary use. Exact formulas, domains,
 normalization rules, result schemas, and resource boundaries are
 installed as JSON contracts:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">contract_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"lexical-diversity-contract.json"</span>,</span>
 <span>  <span class="st">"ldfreq-preprocessing-contract.json"</span>,</span>
@@ -1305,7 +1357,7 @@ run a metric, download a resource, or expose caller file paths.</p>
 </h2>
 <p>An installed smoke script exercises the public workflows without
 network access or an external runtime:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">smoke_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"offline-smoke.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="va">smoke_path</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="va">smoke_path</span>, local <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>

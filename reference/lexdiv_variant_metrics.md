@@ -48,6 +48,14 @@ print(x, ...)
 
 ## Details
 
+Use `lexdiv_methods(scope = "variants")` to discover this catalog from
+the common method-listing entry point. `lexdiv_variant_ids()` remains
+supported and returns the same data frame. These IDs are selected with
+`lexdiv_variant_metrics(variants = ...)`; they are not all accepted by
+[`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+or
+[`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
+
 The Maas rows distinguish \\a\\ from \\a^2\\ and natural-log from
 base-10 definitions. These transformations are not numerically
 interchangeable, even where they preserve rank order. For either
@@ -99,7 +107,7 @@ are explicit columns. The print method returns `x` invisibly.
 ``` r
 tokens <- c(rep("a", 10), "b", "c", "d", "e")
 
-catalog <- lexdiv_variant_ids()
+catalog <- lexdiv_methods(scope = "variants")
 catalog
 #>   family                                               method_id direction
 #> 1   maas                                           maas_a2_ln_v1     lower

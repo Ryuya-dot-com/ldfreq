@@ -934,7 +934,7 @@ MTLD or turning descriptive token floors into alternative metric values.
 
 ``` r
 plan <- lexdiv_plan(presets = "length_50_100")
-profile <- lexdiv_profile(tokens, plan)
+profile <- lexdiv_metrics(tokens, plan = plan)
 head(profile)
 #> <lexdiv_profile_results: 6 specifications; schema 0.1.0>
 #>   request_id metric_id     value  status                    missing_reason N V
@@ -982,7 +982,68 @@ head(screen)
 #> 4 rttr_guiraud_v_over_sqrt_n_v1 6 tokens_100            100         FALSE
 #> 5        cttr_v_over_sqrt_2n_v1 6  tokens_50             50         FALSE
 #> 6        cttr_v_over_sqrt_2n_v1 6 tokens_100            100         FALSE
+
+# The same plan can be applied to named documents, including an empty document.
+planned_batch <- lexdiv_metrics_batch(
+  list(document_a = tokens, empty = character()), plan = plan
+)
+head(planned_batch[, c("document_id", "request_id", "value", "missing_reason")])
+#> <lexdiv_profile_batch_results: 1 document; 6 specification results; schema unknown>
+#>   document_id request_id     value                    missing_reason
+#> 1  document_a        ttr 0.6666667                              <NA>
+#> 2  document_a       rttr 1.6329932                              <NA>
+#> 3  document_a       cttr 1.1547005                              <NA>
+#> 4  document_a     herdan 0.7737056                              <NA>
+#> 5  document_a       maas 0.1262973                              <NA>
+#> 6  document_a      msttr        NA too_short_for_requested_parameter
 ```
+
+The plan supplies all method parameters: omit `metrics`, `window_length`
+and other individual metric arguments when `plan` is set. The returned
+data frame keeps the plan fingerprint, request IDs and specification
+IDs. Save the plan and complete result together with
+[`saveRDS()`](https://rdrr.io/r/base/readRDS.html) as in the earlier
+saving example.
+[`lexdiv_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+and
+[`lexdiv_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+remain supported and return the same complete objects. The plan entry
+points accept pre-tokenized documents.
+
+Use
+[`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+for methods accepted by plans. To inspect Maas and MTLD comparison
+definitions, select a different catalog:
+
+``` r
+comparison_methods <- lexdiv_methods(scope = "variants")
+comparison_methods[, c("family", "method_id", "scale")]
+#>   family                                               method_id
+#> 1   maas                                           maas_a2_ln_v1
+#> 2   maas                                            maas_a_ln_v1
+#> 3   maas                                        maas_a2_log10_v1
+#> 4   maas                                         maas_a_log10_v1
+#> 5   mtld          mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1
+#> 6   mtld     mtld_seq_bidir_dirmean_lt_min10_finaltail_linear_v1
+#> 7   mtld mtld_seq_bidir_mfl_dirmean_lt_min10_finaltail_linear_v1
+#> 8   mtld  mtld_seq_bidir_mfl_pooled_lt_min10_finaltail_linear_v1
+#>                    scale
+#> 1              a-squared
+#> 2                      a
+#> 3              a-squared
+#> 4                      a
+#> 5      tokens-per-factor
+#> 6      tokens-per-factor
+#> 7 adjusted-factor-length
+#> 8 adjusted-factor-length
+```
+
+Pass those method IDs to `lexdiv_variant_metrics(variants = ...)`; they
+are not all accepted by
+[`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
+[`lexdiv_variant_ids()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md)
+remains supported and returns the same catalog. The two scopes retain
+their own descriptive columns.
 
 MATTR has an additional local diagnostic surface. It accepts a
 MATTR-only canonical plan and returns each complete moving-window value
@@ -1061,7 +1122,7 @@ head(local_mattr$exposure)
 plot(local_mattr, request_id = "mattr_1")
 ```
 
-![](getting-started_files/figure-html/unnamed-chunk-15-1.png)
+![](getting-started_files/figure-html/unnamed-chunk-16-1.png)
 
 The plotted trajectory is descriptive. The package does not select an
 optimal window, infer a universal adequate text length, or interpret

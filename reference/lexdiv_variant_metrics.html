@@ -9,7 +9,7 @@ changing the versioned twelve-method lexdiv_metrics() core."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,12 @@ and one. Each requested MTLD method is expanded over these thresholds.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The Maas rows distinguish \(a\) from \(a^2\) and natural-log from
+    <p>Use <code>lexdiv_methods(scope = "variants")</code> to discover this catalog from
+the common method-listing entry point. <code>lexdiv_variant_ids()</code> remains
+supported and returns the same data frame. These IDs are selected with
+<code>lexdiv_variant_metrics(variants = ...)</code>; they are not all accepted by
+<code><a href="lexdiv_profile.html">lexdiv_spec()</a></code> or <code><a href="lexdiv_profile.html">lexdiv_plan()</a></code>.</p>
+<p>The Maas rows distinguish \(a\) from \(a^2\) and natural-log from
 base-10 definitions. These transformations are not numerically
 interchangeable, even where they preserve rank order. For either selected log
 base, <code>a_squared = (log(N) - log(V)) / log(N)^2</code>; the \(a\) rows return
@@ -135,7 +140,7 @@ The print method returns <code>x</code> invisibly.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="fl">10</span><span class="op">)</span>, <span class="st">"b"</span>, <span class="st">"c"</span>, <span class="st">"d"</span>, <span class="st">"e"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">catalog</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_variant_ids</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">catalog</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_profile.html">lexdiv_methods</a></span><span class="op">(</span>scope <span class="op">=</span> <span class="st">"variants"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">catalog</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   family                                               method_id direction</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   maas                                           maas_a2_ln_v1     lower</span>

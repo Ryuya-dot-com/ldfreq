@@ -15,7 +15,7 @@ parameters, and diagnostics are returned beside each value."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,14 +69,17 @@ parameters, and diagnostics are returned beside each value.</p>
 <span>  window_length <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  mtld_threshold <span class="op">=</span> <span class="fl">0.72</span>,</span>
 <span>  sample_size <span class="op">=</span> <span class="fl">42L</span>,</span>
-<span>  expected_ttr_sample_sizes <span class="op">=</span> <span class="fl">35</span><span class="op">:</span><span class="fl">50</span></span>
+<span>  expected_ttr_sample_sizes <span class="op">=</span> <span class="fl">35</span><span class="op">:</span><span class="fl">50</span>,</span>
+<span>  plan <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">lexdiv_metrics_batch</span><span class="op">(</span></span>
 <span>  <span class="va">documents</span>,</span>
 <span>  id_col <span class="op">=</span> <span class="st">"document_id"</span>,</span>
 <span>  tokens_col <span class="op">=</span> <span class="st">"tokens"</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  plan <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  max_rows <span class="op">=</span> <span class="fl">1e6</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'lexdiv_batch_results'</span></span>
@@ -140,12 +143,24 @@ parameters, and diagnostics are returned beside each value.</p>
 <dd><p>One plain, non-empty character string selecting the token
   list-column of data-frame input.</p></dd>
 
+  <dt id="arg-plan">plan<a class="anchor" aria-label="anchor" href="#arg-plan"></a></dt>
+<dd><p>Optional normalized plan from <code><a href="lexdiv_profile.html">lexdiv_plan</a></code>. With a
+  non-<code>NULL</code> plan, omit <code>metrics</code> and all individual metric parameters,
+  including arguments in the batch function's <code>...</code>. The plan specifies
+  every method, parameter and request order. <code>NULL</code> keeps ordinary metric
+  selection. Name this argument explicitly in batch calls.</p></dd>
+
+  <dt id="arg-max-rows">max_rows<a class="anchor" aria-label="anchor" href="#arg-max-rows"></a></dt>
+<dd><p>Positive integer bound on document-by-specification rows
+  for batch plan execution, checked before computation. Omit it when
+  <code>plan = NULL</code>; it is not a limit for ordinary metric requests.</p></dd>
+
   <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>A <code>lexdiv_results</code> or <code>lexdiv_batch_results</code> object.</p></dd>
 
   <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>For <code>lexdiv_metrics_batch()</code>, arguments forwarded to
-  <code>lexdiv_metrics()</code>; for print methods, arguments passed to
+  <code>lexdiv_metrics()</code> when no plan is supplied; for print methods, arguments passed to
   <code><a href="https://rdrr.io/r/base/print.dataframe.html" class="external-link">print.data.frame()</a></code>.</p></dd>
 
 </dl></div>
@@ -163,6 +178,11 @@ The print method returns its input invisibly.</p>
 document-major, requested-metric-minor long form. Its first three columns are
 <code>document_id</code>, <code>batch_schema_id</code>, and
 <code>batch_schema_version</code>; all single-document record columns follow.</p>
+<p>With a non-<code>NULL</code> <code>plan</code>, the functions return exactly the result of
+<code><a href="lexdiv_profile.html">lexdiv_profile</a></code> or <code><a href="lexdiv_profile.html">lexdiv_profile_batch()</a></code>, respectively:
+a <code>lexdiv_profile_results</code> or <code>lexdiv_profile_batch_results</code> data
+frame, including the plan fingerprint, request and specification IDs, profile
+schema columns, classes and attributes. No plan metadata is discarded.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -252,6 +272,12 @@ duplicate IDs, and invalid selected-metric arguments stop the whole call.
 Named-list and data-frame inputs preserve document order, followed within each
 document by requested metric order. Batch-envelope and core-record schemas have
 separate explicit IDs and versions.</p>
+<p>For several settings of the same method, build a <code><a href="lexdiv_profile.html">lexdiv_plan()</a></code> and pass
+it as <code>plan</code>. The existing <code><a href="lexdiv_profile.html">lexdiv_profile()</a></code> and
+<code><a href="lexdiv_profile.html">lexdiv_profile_batch()</a></code> entry points remain supported. Combining a plan
+with explicit metric arguments is an error even when those arguments equal
+their defaults. This avoids an ambiguous override of the recorded plan.
+Plan execution here accepts pre-tokenized input; it does not tokenize raw text.</p>
     </div>
     <div class="section level2">
     <h2 id="reading-status-and-missing-reason">Reading status and missing reason<a class="anchor" aria-label="anchor" href="#reading-status-and-missing-reason"></a></h2>
@@ -373,6 +399,28 @@ Expected-TTR D is a separately named exact-expectation curve fit, not CLAN VOCD.
 <span class="r-out co"><span class="r-pr">#&gt;</span>   below_quality_floor</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1               FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                TRUE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Record several parameter settings before computation.</span></span></span>
+<span class="r-in"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_profile.html">lexdiv_plan</a></span><span class="op">(</span><span class="st">"length_50_100"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">planned</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics</span><span class="op">(</span><span class="va">tokens</span>, plan <span class="op">=</span> <span class="va">plan</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">planned</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"request_id"</span>, <span class="st">"metric_id"</span>, <span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"missing_reason"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_profile_results: 13 specifications; schema unknown&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    request_id metric_id        value  status                    missing_reason</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1         ttr       ttr    0.7500000      ok                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        rttr      rttr    1.5000000      ok                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3        cttr      cttr    1.0606602      ok                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      herdan    herdan    0.7924813      ok                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        maas      maas    0.1496931      ok                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       msttr     msttr           NA missing too_short_for_requested_parameter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       mattr     mattr           NA missing too_short_for_requested_parameter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8        mtld      mtld    4.2400000      ok                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9         hdd       hdd           NA missing too_short_for_requested_parameter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10     yule_k    yule_k 1250.0000000      ok                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11     yule_i    yule_i    3.0000000      ok                              &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12  msttr_100     msttr           NA missing too_short_for_requested_parameter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13  mattr_100     mattr           NA missing too_short_for_requested_parameter</span>
+<span class="r-in"><span><span class="va">planned_batch</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_batch</span><span class="op">(</span><span class="va">documents</span>, plan <span class="op">=</span> <span class="va">plan</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">planned_batch</span>, <span class="fu"><a href="lexdiv_profile.html">lexdiv_profile_batch</a></span><span class="op">(</span><span class="va">documents</span>, <span class="va">plan</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Further methods. Sample size 2 is for this tiny illustration only.</span></span></span>
 <span class="r-in"><span><span class="fu">lexdiv_metric_ids</span><span class="op">(</span><span class="op">)</span></span></span>

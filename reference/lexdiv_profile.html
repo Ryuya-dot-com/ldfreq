@@ -13,7 +13,7 @@ method-plus-parameter specification."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,7 +83,7 @@ method-plus-parameter specification.</p>
 <span><span class="co"># S3 method for class 'lexdiv_plan'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">lexdiv_methods</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">lexdiv_methods</span><span class="op">(</span>scope <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"core"</span>, <span class="st">"variants"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">lexdiv_presets</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -107,7 +107,14 @@ method-plus-parameter specification.</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <p></p>
-<dl><dt id="arg-method-id">method_id<a class="anchor" aria-label="anchor" href="#arg-method-id"></a></dt>
+<dl><dt id="arg-scope">scope<a class="anchor" aria-label="anchor" href="#arg-scope"></a></dt>
+<dd><p><code>"core"</code> (default) lists the methods accepted by
+  <code>lexdiv_spec()</code> and <code><a href="lexdiv_metrics.html">lexdiv_metrics()</a></code>. <code>"variants"</code> lists
+  comparison methods accepted by <code><a href="lexdiv_variant_metrics.html">lexdiv_variant_metrics()</a></code>. The two
+  catalogs retain their own columns; selecting a catalog does not extend the
+  methods accepted by plans.</p></dd>
+
+  <dt id="arg-method-id">method_id<a class="anchor" aria-label="anchor" href="#arg-method-id"></a></dt>
 <dd><p>One versioned method identifier returned by
   <code>lexdiv_methods()</code>. A method fixes its formula, scale, boundary, tail,
   and aggregation rules.</p></dd>
@@ -201,6 +208,12 @@ tabular view; the full identity fields remain available on the object.</p>
 labels and definitions, <code>stability</code> (including experimental expected-TTR D),
 conventional within-method direction, contract scale,
 exact method identity, parameters, and advisory token floors.
+With <code>scope = "variants"</code>, it returns the same six-column data frame as
+<code><a href="lexdiv_variant_metrics.html">lexdiv_variant_ids</a></code>: <code>family</code>, <code>method_id</code>,
+<code>direction</code>, <code>scale</code>, <code>reference_label</code>, and
+<code>comparison_scope</code>. Both catalogs include <code>method_id</code>,
+<code>direction</code> and <code>scale</code>; the shared <code>maas_a2_ln_v1</code> occurs
+once in each. There is no combined catalog or implicit deduplication.
 <code>lexdiv_presets()</code> returns a preset metadata data frame.
 <code>lexdiv_profile()</code> returns one core metric row per plan request with a
 separate profile envelope. <code>lexdiv_profile_batch()</code> adds the existing batch
@@ -210,7 +223,11 @@ row per source result and named floor. It deliberately has no metric-value colum
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Preset version 0.2.0 excludes experimental expected-TTR D. The
+    <p>Use <code>lexdiv_metrics(tokens, plan = plan)</code> or
+<code>lexdiv_metrics_batch(documents, plan = plan)</code> to run a plan through the
+ordinary metric entry points. The profile functions remain supported and return
+identical complete objects. With a plan, omit separate metric parameters.</p>
+<p>Preset version 0.2.0 excludes experimental expected-TTR D. The
 <code>canonical</code> preset contains eleven methods at their default parameters.
 The <code>length_50_100</code> preset adds MSTTR at segment length 100 and MATTR at
 window length 100. It has thirteen
@@ -288,7 +305,7 @@ preset requires an exact, version-pinned method contract and boundary fixtures.<
 <span class="r-out co"><span class="r-pr">#&gt;</span>              3    mattr_2     mattr mattr_sliding_step1_v1 window_length=100</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"a"</span>, <span class="st">"c"</span>, <span class="st">"d"</span><span class="op">)</span>, <span class="fl">25</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_profile</span><span class="op">(</span><span class="va">tokens</span>, <span class="va">plan</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_metrics.html">lexdiv_metrics</a></span><span class="op">(</span><span class="va">tokens</span>, plan <span class="op">=</span> <span class="va">plan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">profile</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"request_id"</span>, <span class="st">"metric_id"</span>, <span class="st">"value"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_profile_results: 3 specifications; schema unknown&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   request_id metric_id value status</span>
@@ -307,7 +324,7 @@ preset requires an exact, version-pinned method contract and boundary fixtures.<
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6    mattr_2 tokens_100            100          TRUE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>document_a <span class="op">=</span> <span class="va">tokens</span>, document_b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">tokens</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">batch_profile</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_profile_batch</span><span class="op">(</span><span class="va">documents</span>, <span class="va">plan</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">batch_profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span><span class="va">documents</span>, plan <span class="op">=</span> <span class="va">plan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">batch_profile</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"request_id"</span>, <span class="st">"metric_id"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_profile_batch_results: 2 documents; 6 specification results; schema unknown&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   document_id request_id metric_id status</span>
@@ -321,6 +338,11 @@ preset requires an exact, version-pinned method contract and boundary fixtures.<
 <span class="r-in"><span><span class="va">all_lengths</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_plan</span><span class="op">(</span><span class="st">"length_50_100"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_lengths</span><span class="op">$</span><span class="va">specifications</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 13</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Comparison methods have a separate executor; they are not all plan methods.</span></span></span>
+<span class="r-in"><span><span class="va">variants</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_methods</span><span class="op">(</span>scope <span class="op">=</span> <span class="st">"variants"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">variants</span>, <span class="fu"><a href="lexdiv_variant_metrics.html">lexdiv_variant_ids</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

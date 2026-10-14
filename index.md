@@ -18,14 +18,14 @@ not mix incompatible specifications.
 
 ## Installation
 
-Version 0.3.0.9006 is a development prerelease and has not been released
+Version 0.3.0.9007 is a development prerelease and has not been released
 on CRAN. The fixed tag below identifies the tested code and installed
 examples. It requires R 4.1.0 or later. Install the tested snapshot used
 by this documentation:
 
 ``` r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9006")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9007")
 ```
 
 Pinning the revision fixes the implementation, even when development
@@ -38,7 +38,7 @@ If you have a built source archive, install it locally:
 
 ``` r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9006.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9007.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation
@@ -599,7 +599,7 @@ rate does not prove that arbitrary tokens use the right segmentation.
 | Evaluate external labels against a supplied reference | [`lexdiv_evaluate_annotations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_evaluate_annotations.md) returns per-label errors, document coverage and source context on the same segmentation |
 | Compare different English/Japanese token segmentations | [`lexdiv_align_annotations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_align_annotations.md) separates source-span/boundary correspondence from conditional label agreement and retains split/merge KWIC |
 | Trace adjective–common-noun dependencies | [`lexdiv_amod_pairs()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_amod_pairs.md) validates supplied basic UD trees and retains both endpoints, KWIC, document counts and incomplete-sentence coverage |
-| Parameter and definition sensitivity | [`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md), [`lexdiv_grid()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md), [`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md), [`lexdiv_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md), [`lexdiv_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md), [`lexdiv_variant_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md) |
+| Parameter and definition sensitivity | [`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md), [`lexdiv_grid()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md), [`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md), `lexdiv_metrics(..., plan = ...)`, `lexdiv_metrics_batch(..., plan = ...)`, [`lexdiv_variant_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md) |
 | Local MATTR windows and exposure | [`lexdiv_mattr_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_mattr_profile.md) |
 | Exact term/content-word overlap | [`lexdiv_term_overlap()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_overlap.md), [`lexdiv_content_overlap()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_overlap.md) |
 | Coverage of a supplied reference set | [`lexdiv_reference_coverage()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_reference_coverage.md) |
@@ -620,9 +620,18 @@ The eleven default measures are TTR, RTTR/Guiraud, CTTR, Herdan C, Maas
 a-squared, MSTTR, MATTR, MTLD, HD-D, and Yule K/I. Experimental
 expected-TTR D is opt-in.
 [`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-describes their definitions, scales, parameters, and direction.
-Expected-TTR D fits an exact finite-population expectation; it is not
-CLAN VOCD.
+describes their definitions, scales, parameters, and direction. Use
+`lexdiv_methods(scope = "variants")` for the separate Maas/MTLD
+comparison catalog accepted by
+[`lexdiv_variant_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md).
+For recorded parameter plans, use `lexdiv_metrics(tokens, plan = plan)`
+or `lexdiv_metrics_batch(documents, plan = plan)` without additional
+metric arguments. The existing
+[`lexdiv_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+and
+[`lexdiv_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+calls remain supported. Expected-TTR D fits an exact finite-population
+expectation; it is not CLAN VOCD.
 
 [`lexdiv_screen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
 and

@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1306,15 +1306,17 @@ ordinary text-length dependence from sensitivity to the reduction or
 window parameter. Bestgen (2025, <a href="https://doi.org/10.1016/j.rmal.2024.100168" class="external-link uri">https://doi.org/10.1016/j.rmal.2024.100168</a>) further
 shows why MATTR is useful for within-text fluctuation but should not be
 treated as a parameter-free universal score.</p>
-<p><code><a href="../reference/lexdiv_profile.html">lexdiv_plan()</a></code> and <code><a href="../reference/lexdiv_profile.html">lexdiv_profile()</a></code> preserve
-parameter variants as different requests:</p>
+<p><code><a href="../reference/lexdiv_profile.html">lexdiv_plan()</a></code> records parameter variants as different
+requests. Run them through
+<code>lexdiv_metrics(..., plan = plan)</code>;
+<code><a href="../reference/lexdiv_profile.html">lexdiv_profile()</a></code> remains supported:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">long_tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"one"</span>, <span class="st">"two"</span>, <span class="st">"three"</span>, <span class="st">"one"</span>, <span class="st">"four"</span>, <span class="st">"five"</span>, <span class="st">"one"</span>, <span class="st">"six"</span><span class="op">)</span>,</span>
 <span>  <span class="fl">20</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_plan</a></span><span class="op">(</span>presets <span class="op">=</span> <span class="st">"length_50_100"</span><span class="op">)</span></span>
-<span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_profile</a></span><span class="op">(</span><span class="va">long_tokens</span>, <span class="va">plan</span><span class="op">)</span></span>
+<span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics</a></span><span class="op">(</span><span class="va">long_tokens</span>, plan <span class="op">=</span> <span class="va">plan</span><span class="op">)</span></span>
 <span><span class="va">profile</span><span class="op">[</span><span class="va">profile</span><span class="op">$</span><span class="va">metric_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mattr"</span>, <span class="st">"msttr"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"request_id"</span>, <span class="st">"metric_id"</span>, <span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"N"</span>, <span class="st">"V"</span></span>
 <span><span class="op">)</span><span class="op">]</span></span>

@@ -34,7 +34,7 @@ print(x, ...)
 # S3 method for class 'lexdiv_plan'
 print(x, ...)
 
-lexdiv_methods()
+lexdiv_methods(scope = c("core", "variants"))
 
 lexdiv_presets()
 
@@ -56,6 +56,15 @@ lexdiv_screen(
 ```
 
 ## Arguments
+
+- scope:
+
+  `"core"` (default) lists the methods accepted by `lexdiv_spec()` and
+  [`lexdiv_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md).
+  `"variants"` lists comparison methods accepted by
+  [`lexdiv_variant_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md).
+  The two catalogs retain their own columns; selecting a catalog does
+  not extend the methods accepted by plans.
 
 - method_id:
 
@@ -173,9 +182,15 @@ fields remain available on the object.
 `lexdiv_methods()` returns a metadata data frame with human-readable
 labels and definitions, `stability` (including experimental expected-TTR
 D), conventional within-method direction, contract scale, exact method
-identity, parameters, and advisory token floors. `lexdiv_presets()`
-returns a preset metadata data frame. `lexdiv_profile()` returns one
-core metric row per plan request with a separate profile envelope.
+identity, parameters, and advisory token floors. With
+`scope = "variants"`, it returns the same six-column data frame as
+[`lexdiv_variant_ids`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md):
+`family`, `method_id`, `direction`, `scale`, `reference_label`, and
+`comparison_scope`. Both catalogs include `method_id`, `direction` and
+`scale`; the shared `maas_a2_ln_v1` occurs once in each. There is no
+combined catalog or implicit deduplication. `lexdiv_presets()` returns a
+preset metadata data frame. `lexdiv_profile()` returns one core metric
+row per plan request with a separate profile envelope.
 `lexdiv_profile_batch()` adds the existing batch envelope and returns
 document-major, request-minor long form.
 
@@ -184,6 +199,12 @@ row per source result and named floor. It deliberately has no
 metric-value column.
 
 ## Details
+
+Use `lexdiv_metrics(tokens, plan = plan)` or
+`lexdiv_metrics_batch(documents, plan = plan)` to run a plan through the
+ordinary metric entry points. The profile functions remain supported and
+return identical complete objects. With a plan, omit separate metric
+parameters.
 
 Preset version 0.2.0 excludes experimental expected-TTR D. The
 `canonical` preset contains eleven methods at their default parameters.
@@ -272,7 +293,7 @@ print(plan)
 #>              3    mattr_2     mattr mattr_sliding_step1_v1 window_length=100
 
 tokens <- rep(c("a", "b", "a", "c", "d"), 25)
-profile <- lexdiv_profile(tokens, plan)
+profile <- lexdiv_metrics(tokens, plan = plan)
 profile[, c("request_id", "metric_id", "value", "status")]
 #> <lexdiv_profile_results: 3 specifications; schema unknown>
 #>   request_id metric_id value status
@@ -291,7 +312,7 @@ screens[, c("request_id", "screen_id", "minimum_tokens", "passes_screen")]
 #> 6    mattr_2 tokens_100            100          TRUE
 
 documents <- list(document_a = tokens, document_b = rev(tokens))
-batch_profile <- lexdiv_profile_batch(documents, plan)
+batch_profile <- lexdiv_metrics_batch(documents, plan = plan)
 head(batch_profile[, c("document_id", "request_id", "metric_id", "status")])
 #> <lexdiv_profile_batch_results: 2 documents; 6 specification results; schema unknown>
 #>   document_id request_id metric_id status
@@ -305,4 +326,9 @@ head(batch_profile[, c("document_id", "request_id", "metric_id", "status")])
 all_lengths <- lexdiv_plan("length_50_100")
 length(all_lengths$specifications)
 #> [1] 13
+
+# Comparison methods have a separate executor; they are not all plan methods.
+variants <- lexdiv_methods(scope = "variants")
+identical(variants, lexdiv_variant_ids())
+#> [1] TRUE
 ```

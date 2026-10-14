@@ -1,5 +1,19 @@
 # Changelog
 
+## ldfreq 0.3.0.9007 (development)
+
+- Run explicit plans with `lexdiv_metrics(..., plan = plan)` and
+  `lexdiv_metrics_batch(..., plan = plan)`. Retain complete profile
+  results, request identities, missing reasons and saved-plan integrity
+  checks. Reject separate metric arguments when a plan is supplied;
+  batch plans retain their `max_rows` allocation bound. Existing calls
+  and profile functions remain supported.
+- Select the Maas/MTLD comparison catalog with
+  `lexdiv_methods(scope = "variants")`. The default core catalog and
+  [`lexdiv_variant_ids()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md)
+  output are unchanged. Comparison-only methods do not become plan
+  methods. No new export, formula, result schema or dependency.
+
 ## ldfreq 0.3.0.9006 (development)
 
 - Put installation and a first analysis before the detailed feature
