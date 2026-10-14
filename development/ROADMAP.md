@@ -1,6 +1,6 @@
 # ldfreq：研究根拠・利用手順・検証を結ぶロードマップ
 
-更新日：2026-10-14。対象：文書改訂版 **0.3.0.9006**、公開main `7f97872`。改訂前の基準は `19bcd20`（9005）。
+更新日：2026-10-14。対象：公開版 **0.3.0.9007**、公開main `411ab0e`。9006の基準は `7f97872`、9005は `19bcd20`。
 冒頭の「現在の優先順位と統合計画」が現行計画であり、「実装・調査の履歴」内の
 「次の作業」「未完了」「公開待ち」は各記録時点の状態である。
 本書は開発者向けだが、公開GitHubで追跡されているため**非公開資料ではない**。
@@ -46,6 +46,54 @@ CRAN投稿、外部モデルの有料実行、新たなコーパス取得は今�
 9005の公開時点にあった「main監視中」は解消した。既存の`main-final.json`を確認したため、
 CIを再起動していない。前回からの未コミット公開記録も保持した。
 旧版の「日本語単位比較は未実施」「B/Cは計画段階」「公開確認待ち」を現在の不足へ戻さない。
+
+### 語族・接辞と日本語解析の根拠・相互運用性（2026-10-14）
+
+ユーザーの追加質問に対し、現行9007の実装・公開ガイド・一次資料・保存結果を照合した。
+目的は、資源への依拠、外部解析器との役割分担、「同じ結果」の成立条件を説明すること。
+汎用解析器の新設、全backendの性能比較、新規APIの採用へは拡張しない。
+
+| 対象 | 現在の実装と研究上の根拠 | 結論の境界 |
+| --- | --- | --- |
+| word family | `lexdiv_family_profile()`が指定資源のform/POS→familyを照合。同梱Nation BNC/COCA Level 6は25,000族・75,679行。[Bauer & Nation (1993)](https://openaccess.wgtn.ac.nz/articles/journal_contribution/Word_families/12560408)の包含基準は頻度・規則性・生産性・予測可能性。Level 6と頻度帯1–25は別 | 語尾除去から語族を生成しない。POSなしの資源に品詞・語義の判別を捏造しない。未収録・複数候補を保持し、未解決出現を含む全文書の族V/TTRはNA。族所属を個人の知識とみなさない |
+| suffix / word parts | 明示sourceするexampleでprefix/suffixという位置とderivation/inflectionという機能を別々に扱う。MorphoLexは記録済み派生分析、MorphyNetは語基→結果の一段関係 | `teachers`の派生-erと屈折-s、`smaller`の屈折-erは区別する。MorphoLex経路は屈折を除外し、教材の屈折対応を自動解析済みと扱わない。未解析≠接辞0、複数関係候補≠同時に観測した接辞数。標準形に架空の文字位置・形成順序を与えない |
+| 日本語 | 公開ガイドはgibasa/MeCab＋unidic-lite 1.0.8（UniDic 2.1.2）、実験はSudachi A/B/C。ldfreqは完全注釈の取込、原文位置、辞書・設定、除外、レビュー、集計・保存を担う | [UniDic公式用語集](https://clrd.ninjal.ac.jp/unidic/glossary.html)の短単位解析と語内形態素分解を区別する。接尾辞POS、助動詞、活用情報を一律の英語suffix分類や日本語familyへ変換しない |
+
+MorphoLexの根拠は[Sánchez-Gutiérrez et al. (2018)](https://link.springer.com/article/10.3758/s13428-017-0981-8)
+（online 2017）、MorphyNetは[Batsuren et al. (2021)](https://aclanthology.org/2021.sigmorphon-1.5/)。
+公開抄録・公式資源とローカル仕様を照合した。原著の課題・標本での結果を、ldfreqを使った
+学習者作文の形態分析精度や形態知識の妥当化として流用しない。
+[Schmitt & Zimmerman (2002)](https://onlinelibrary.wiley.com/doi/abs/10.2307/3588328)の公開抄録は、
+106人・16提示語で産出できる派生形の知識が部分的であったことを示す。
+[Schmitt et al. (2021)](https://onlinelibrary.wiley.com/doi/full/10.1002/tesj.622)のKVL採用理由も
+この区別と整合する。古いBauer–Nation論文を無効とする根拠でも、族単位を全用途に推奨する根拠でもない。
+
+**今回追加した直接比較。** `experiments/japanese-backends/compare-mecab.R`で公開ガイドの
+gibasa helperそのものを実行し、`fugashi-parity.py`によるPython出力と比較した。
+gibasa 1.1.3／fugashi 1.5.2、同一辞書5ファイルのSHA-256、同一設定ファイル、ユーザー辞書なし。
+macOS arm64、R 4.6.1、Python 3.14.3、ldfreq 9007。複合語・活用・接辞・同音表記・未知語・
+空白・CRLF・結合濁点・全角・省略記号・互換文字・引用符・空入力を含む16作成入力で、
+87行の表層／raw feature、両経路の原文文字位置、表層／orthBaseの32集計行（N/V/TTR）、
+完全RDS再読込が一致した。既存環境を再利用し、追加インストールは不要だった。
+結果・hashは`experiments/japanese-backends/mecab-parity-summary.json`、
+集計は同`mecab-parity-counts.csv`。完全出力はローカル`reviews/ldfreq-morphology-review-20261014/`。
+両wrapperのMeCabビルド同一性、任意入力・他OS・他辞書・RMeCab/RcppMeCab/GiNZAの同等性や
+分割の正確さまでは示さない。欠損orthBaseを除外すると表層条件とNが変わるため、
+単位の効果を比較する場合は、共通出現集合と条件別coverageを併記する。
+
+**再利用した異なる単位の比較。** 28作文のSudachi A/Cは元の文字被覆が同じでも
+TTR・MATTR・MTLDがそれぞれ24/28で変化した。選択token合計は9,493対9,329。
+543文のUD SUW/LUW比較は全token条件のTTRが370文で変化した。
+数値は`experiments/japanese-units/`の既存結果であり、今回の再計算ではない。
+28作文は小規模な便宜標本、UDは学習者作文ではなく、Sudachi CはNINJAL LUWではない。
+
+**次の採否基準。** まず既存ガイドの入口で、語族・接辞・短単位の違い、検証済み接続、
+同一条件での一致と異なる単位での感度をまとめて見られるようにする。英語の接辞は
+source付き対応表・派生／屈折・未解析・分母の説明を優先し、新たなsuffix APIを先行させない。
+日本語の追加比較を採用するなら一つの現行辞書条件に限定し、既存の保存入力・原文照合を再利用する。
+語彙素／書字形基本形／Sudachi dictionary_form・normalized_formを同一列とみなさず、
+新辞書の利点や精度は別の独立参照が必要。専用API昇格は反復利用時の具体的な不足から判断する。
+今回は再現用実験と開発計画の変更で、パッケージ本体・公開help・9007成果物は変更していない。
 
 ### 内部向け文言の点検結果と公開境界（2026-10-14）
 
