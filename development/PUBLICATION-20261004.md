@@ -5308,3 +5308,12 @@ running at this checkpoint; `main-status.json` records it separately. Main's
 release-candidate run `38564971126` has succeeded. The identical source tree and
 completed PR checks are valid evidence; main's unfinished run is not claimed
 successful. No duplicate manual CI, cancellation or protection change was used.
+
+Follow-up verification during the API consolidation review on 2026-10-14:
+main R-CMD-check [38564970910](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/38564970910)
+has completed successfully with all 11 jobs successful at
+`7f97872ab7d19f0048485646db52f0a1674beb80`. The completed response is saved as
+`main-final.json` in the same evidence directory. The preceding monitoring
+checkpoint is resolved; no workflow was restarted. API naming/consolidation
+assessments and this completion record are on the separate review branch
+`codex/api-naming-review-20261014`, not changes to the fixed 9006 package or site.

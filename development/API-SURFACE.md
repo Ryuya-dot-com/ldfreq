@@ -16,6 +16,12 @@ rendered by pkgdown.
 
 ## Decisions
 
+These decisions describe the released interface. The
+[2026-10-14 consolidation review](#2026-10-14-api-consolidation-review)
+reassesses future shared entry points; it does not implement them or remove the
+current export freeze. A current absence of a plot/summary method is not, by
+itself, proof that an explicit selected view could never be supported safely.
+
 - The 0.3.0.9005 text-batch `metadata` argument preserves explicit document-level
   information in an optional separate component. It uses the same document-ID
   validation as the batch input and checks the exact roster. No automatic
@@ -274,3 +280,110 @@ inventory, and pkgdown topics; requires every registered S3 method to be
 discoverable by help; rejects retired public names; and enforces the decision
 not to register information-discarding `summary()` or `as.data.frame()` methods
 for composite table objects.
+
+## 2026-10-14 API consolidation review
+
+Scope: inspect the 57-export inventory and installed signatures, all 11 registered
+plot methods and 23 print methods, and the connected implementations of adjacent
+families below. This is an interface-design review, not a new feature, a full
+numerical revalidation or a human usability study. No runtime, schema, help,
+resource, dependency or export changed. Candidate calls below are **not yet
+supported** unless explicitly described as existing.
+
+### How to decide what belongs together
+
+1. Start with the user's operation. Rendering an existing result, computing a
+   result, importing data and evaluating against a reference are different tasks.
+   Similar prefixes alone are insufficient grounds for a merge.
+2. Use an argument for a choice within the task: selected metric, weighting,
+   component, presentation or an explicit calculation plan. Use typed dispatch
+   when an existing class identifies the relevant implementation. R's
+   [S3 dispatch](https://stat.ethz.ch/R-manual/R-devel/library/base/html/UseMethod.html)
+   is ordinarily based on the first argument; a two-input comparison must still
+   validate the second input and the relationship between them.
+3. Different validators or supplementary output tables do not rule out a shared
+   generic. Specify the common result meaning, per-method additions and where
+   the complete record remains available. A selected plotting/summary view need
+   not reproduce every table; it must not silently replace the saved full result.
+4. Count required concepts, mode strings and invalid argument combinations as
+   well as function names. Reject conflicting settings early. Never silently
+   ignore tokenizer settings on prepared inputs or metric settings already
+   fixed in a plan. Preserve current named as well as positional calls.
+5. Preserve cost and failure boundaries. Plotting saved data must not recalculate
+   metrics or fetch resources. Batch calls must retain all document IDs, including
+   empty documents, and shared-resource validation and global row limits.
+6. Preserve the statistical target: units, denominators, common-item sets,
+   missingness and reference scope. Common output columns do not make distinct
+   estimands interchangeable. Do not pool unlike measures or treat missing as zero.
+7. Evaluate compatibility, not just the proposed clean syntax. Old names may
+   temporarily delegate during migration; adding a new generic plus permanent
+   synonymous wrappers alone enlarges the surface. Existing RDS classes,
+   extraction paths, examples, registration and documentation are part of the
+   migration. The published interface is not disposable because it is pre-CRAN.
+
+### Families and candidate decisions
+
+| Family | Existing implementation and judgement | Boundary for a useful consolidation |
+| --- | --- | --- |
+| Plot and print | Already consolidated through `plot()` and `print()`: 11 and 23 registered methods, no separately exported `plot_*` functions. Four metric/profile plot registrations share one function; both text-result wrappers delegate to `$results`. Preserve this model. | The common entry point does not require a single large function with every argument. Keep specialized methods and shared drawing helpers. `metric_id`, `request_id`, `weighting`, `scale`, `show_cumulative` and `monochrome` already express choices. |
+| Additional plot views | A promising extension is a selected trajectory/exposure view on an existing MATTR result; selected quantities for norm/resource results or an explicit document for a batch can be assessed similarly. | A proposed `view` selects stored data; existing graphics `type` still selects points/lines. Define one measure, specification, weighting and document scope; return exactly the displayed data invisibly. Norms and batch results may need new S3 methods/classes, not new `plot_*` exports. No automatic difference plot, missing-to-zero conversion or cross-construct pooling. |
+| Method catalogs | Prefer assessing `lexdiv_methods(scope = "variants")` over adding the proposed `lexdiv_variant_methods()` name. Both current functions list supported methods with interpretation metadata. | Current catalogs have different columns and one shared ID. Define common fields, source/accepted execution entry points and treatment of duplicates; do not just concatenate rows. Listing a variant must not imply it is accepted by core plans. Preserve existing no-argument output and the legacy variant catalog during migration. |
+| Core metrics and method plans | Prefer assessing `lexdiv_metrics(tokens, plan = plan)` over standalone `lexdiv_run_plan()`. `lexdiv_profile()` already calls the core calculator and adds a plan envelope; its result inherits `lexdiv_results`. The batch relation is analogous. | Reject simultaneous explicit plan and competing metric/parameter requests, rather than choosing one silently. Keep request/specification IDs and plan fingerprints and preserve the full profile result class/fields when a plan is supplied. No-plan calls keep their existing contract. |
+| Resource diagnostics and token screens | NJ8 and TUBELEX diagnostics answer the common task of inspecting an existing result without recalculation. A future typed `lexdiv_diagnostics(x, ...)` is a plausible shared entry point; token-floor screening could be a result-specific method if the meaning is clearly documented. | Single NJ8/TUBELEX objects have distinguishable classes. TUBELEX batches are plain lists, including an empty batch; a broad `list` method cannot safely infer their role. Plan class/adapter compatibility and retain resource-specific tables, IDs, coverage and row limits. Length screens remain advisory and must not filter metric rows or imply validity. |
+| Single-document and batch pairs | Seven explicit pairs exist across metrics, text metrics, tokenization, plans, norms, NJ8 and TUBELEX. A common entry point is technically possible with explicit input roles or typed document collections; keep it as a bounded design candidate. | Raw text and tokens can both be character data; raw and token tables are both data frames. Several batches are plain lists. Do not infer role from length, names or available columns alone. Preserve ID validation, empty-document and zero-document behavior, return shapes, metadata and one-reference-load optimization. A single-document call cannot silently become a one-row batch. |
+| Term and content overlap | Both share `.lexoverlap_term_overlap_impl()`. A future shared overlap operation could select `word_inclusion`/`unit` explicitly for annotated inputs. This is more coherent than a generic combining every kind of comparison. | Validate both inputs, source comparability and required annotation layers. Keep exclusion/coverage tables and existing default units. Dispatch must not make content-word filtering an unnoticed consequence of input class. A compatibility extension of an existing entry point should be considered before another export. |
+| Reference coverage versus overlap | Keep the different operations recognizable even though they share matching concepts. Reference coverage reports token and type denominators for multiple documents; pair overlap measures distinct term sets. | For tokens `a,a,b` and reference `a`, token coverage is 2/3 and type coverage is 1/2. A directional type-overlap score of 1/2 cannot replace both. Shared low-level counting is possible; an interchangeable top-level alias is not. |
+| NJ8, TUBELEX and generic norm profiles | A common resource-profile operation is not categorically impossible. It would need explicit resource kinds/adapters and a documented common result envelope, with resource-specific tables preserved. Lower priority than catalogs or metric plans. | Current resource identity, normalization, completeness, rank levels, frequencies and norm scales differ. Do not force them into one interchangeable score or infer a resource kind from a data-frame shape. Additional adapter constructors may offset any reduction in names. |
+| N-gram reference constructor and builder | Keep building from chunks separate from validating/constructing an in-memory reference. The builder already finishes through `lexdiv_ngram_reference()`. | The builder invokes a caller callback, checks unique documents across chunks, enforces `max_types` and returns source/document manifests beside `$reference`. Putting it behind a `build = TRUE` flag would hide material cost and error boundaries. Sharing the final constructor already avoids duplicated numerical validation. |
+| N-gram profile and reference comparison | Keep a distinction between applying one reference and comparing several references. The comparison already calls `lexdiv_ngram_profile()` for each reference. | Comparison additionally defines the intersection of available target items across all references and a baseline. A multi-reference mode is possible only if this changed estimand and its returned tables remain explicit; it is not ordinary batch processing. |
+| Annotation compare, evaluate and align | Retain the visible distinctions: before/after label changes, reference-based evaluation on identical tokens, and correspondence between different segmentations. The evaluator and aligner already share `.lexann_score()`. | Alignment's optional label evaluation is conditional on exact spans, unlike evaluation on the supplied common tokenization. A universal mode must not silently substitute one population for the other. Common internals and consistent selected plots are preferable to collapsing the tasks now. |
+| Ambiguity, contextual and response comparisons | Candidate review/agreement, imported model scores, training-based scoring, reference evaluation and paired binary response summaries represent distinct stages or evidence. No universal `compare()`/`evaluate()` switch is recommended at present. | Their imports are often ordinary lists rather than distinct S3 classes; the reference alone does not identify the intended analysis. Keep human decisions, model scores, training/reference roles and missingness separate. A shared verb without a shared user operation does not reduce learning. |
+| Tokenization, lemma/flemma and family analysis | Existing tokenizer and lemmatizer arguments already select implementations where the operation is shared. Retain explicit stages and lexical-unit choices. | Flemma mapping and family membership change the unit and ambiguity/fallback rules. An option that computes all representations eagerly would add resource work and hide unresolved choices. Do not fold annotation import, external models and scoring into a single implicit preprocessing call. |
+| Resource readers and adapters | MorphoLex/Nation data access, local MorphyNet parsing, MASC reading, annotation import, document adaptation and quanteda adaptation have different source/target roles. Group them in help by input task; no universal reader/converter is required by this review. | Preserve local-file versus bundled-data behavior, optional dependencies, declared versions, coordinates and provenance. A `format`/`to` argument is reasonable only when it simplifies actual call sequences; it must not infer licenses or download sources. |
+| Specifications, grids and plans | Keep their roles visible: one method request, expansion over parameter settings, and a normalized plan. Share constructors internally where appropriate. | Some parameters are themselves vectors, such as expected-TTR sample sizes. Automatically treating every vector as a grid would change meaning. Removing constructor names must not erase the distinction between a parameter vector and multiple requests. |
+| Widening, summaries and extraction | `lexdiv_widen()` already chooses fields and optional MTLD diagnostics by arguments. An explicit selected summary/coercion view is not inherently unsafe merely because the full result has several tables; assess its actual benefit over `$summary`/`$lookup` and widening. | Preserve denominators, IDs and original objects; never silently pick the first table. Current `audit-public-api.R` rejects all summary/as.data.frame registrations, including explicit ones. Any adopted exception requires a coordinated policy/audit/help/test change; this review leaves that guard intact. |
+
+### Focused executable evidence
+
+The verified installed 9006 archive was used with small authored inputs; no full
+suite or resource build was repeated. Inspection of its exports and signatures
+confirms the same 57 exports, 11 plot registrations and 23 print registrations.
+
+- The method catalog has 12 rows and 10 columns; the variant catalog has eight
+  rows and six columns. `maas_a2_ln_v1` appears in both. A common catalog needs
+  explicit schema and execution-scope decisions before implementation.
+- The same character value `"Cats chase cats."` is one supplied token under the
+  core API (N=1, V=1, TTR=1, with the likely-raw-text warning), and three words
+  under explicit English tokenization and lowercasing (N=3, V=2, TTR=2/3).
+  The core returns a data frame; text analysis returns results, token audit and
+  preprocessing. This demonstrates an input ambiguity, not equivalent analyses.
+- Tokenization batches and TUBELEX batches are ordinary named lists. NJ8's
+  single and batch classes are distinct. Executed NJ8/TUBELEX diagnostics also
+  confirm their different supplementary tables; shared dispatch cannot be
+  inferred from the word "profile" or the presence of `$summary` alone.
+- A TTR-only plan and the direct core call on `a,a,b` agree in N, V and value.
+  The plan adds seven envelope columns and inherits
+  `lexdiv_profile_results/lexdiv_results/data.frame`. This supports assessing
+  an explicit plan branch without discarding plan metadata.
+- Executed reference coverage and term overlap confirm the 2/3 versus 1/2
+  denominator example. Color and monochrome `plot()` calls on a text result
+  return identical selected data invisibly. Existing plot-style tests cover
+  all eleven registered result forms; those unchanged tests were not rerun.
+
+### Order of the next design decisions
+
+First assess the catalog scope and explicit metric-plan option using concrete
+old/new calls, invalid combinations and result examples. These alternatives
+take priority over the earlier standalone rename candidates; neither is adopted
+by this review. For visualization, evaluate an actual requested second view
+through `plot()` before introducing a plotting function. Next consider typed
+diagnostics if it removes repeated resource-specific decisions. Treat wholesale
+single/batch/input unification as a larger migration, not a prerequisite for
+using or improving the current package.
+
+Adoption requires targeted evidence for named/positional compatibility, selected
+data and invisible returns, conflicting/irrelevant arguments, unknown or mixed
+classes, empty/short/all-missing cases, IDs/metadata, saved-object replay and
+resource reuse. Reconcile NAMESPACE, S3 registrations, installed help, examples,
+NEWS, the API audit and site only for the actually adopted change. Do not rerun
+unchanged numerical validation just to publish this internal assessment.

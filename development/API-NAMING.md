@@ -21,10 +21,15 @@ by their feature-specific contracts.
   input-type guessing merely to shorten a name.
 - Identifier catalogs end in `_ids`. The noun before `_ids` names the public
   family rather than its implementation table.
-- An orthogonal option belongs in an argument only when all choices share the
-  same validation, identity, missingness, disclosure, and return-shape
-  contract. Otherwise a separate, explicit function remains preferable to a
-  shorter but ambiguous dispatcher.
+- Prefer an argument for a choice within one operation. Consider an S3 generic
+  when known input/result classes identify specialized implementations. Methods
+  may have different validators and result details: identical schemas are not
+  a prerequisite for a common user-facing operation. The discriminator, shared
+  meaning, method-specific arguments and return boundaries must be explicit.
+  Preserve measurement identity, missingness, provenance and document boundaries;
+  do not guess raw text versus tokens from string length or whitespace. Keep
+  separate entry points when a common call would conceal different tasks or
+  require silently ignored arguments.
 - New aliases require a demonstrated compatibility need. Synonymous aliases
   are not added solely to save keystrokes because they enlarge autocomplete,
   help, testing, and deprecation surfaces.
@@ -98,3 +103,24 @@ inconsistent naming consistent. A future rename decision must specify migration
 and compatibility for already public GitHub users; lack of a CRAN release is not
 permission to break their scripts. Candidate names above neither authorize
 aliases nor change the current roadmap's implementation scope.
+
+## Consolidation before standalone renaming
+
+The subsequent 2026-10-14 request considers shared functions and argument-driven
+output, following the existing `plot()` design. The detailed
+[consolidation review](API-SURFACE.md#2026-10-14-api-consolidation-review)
+distinguishes display choices, typed method dispatch, input multiplicity and
+different analysis tasks. It supersedes the priority of standalone `run_plan`
+and `variant_methods` renames above: first assess an explicit `plan` argument
+on the existing metric entry point and a scope selector on the existing method
+catalog. These are unimplemented alternatives, not additional exports.
+
+A different return component or validator alone is not a reason to reject an
+S3 method. Conversely, replacing several names with one name plus a collection
+of unrelated mode strings does not establish simpler use. Compare the complete
+call, discovery, invalid combinations, error messages and extraction path.
+Do not reuse base graphics' `type` argument to select a scientific quantity;
+a future quantity/component selector such as `view` has a different role.
+Actual consolidation must preserve old named/positional calls and saved objects,
+with a declared migration before retiring public names. Current exports, S3
+registrations and the audit's summary/coercion restriction remain unchanged.
