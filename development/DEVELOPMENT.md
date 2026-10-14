@@ -1,4 +1,12 @@
-# Release-candidate boundary
+# Historical 0.2.0 development boundary
+
+This is the earlier 0.2.0 planning record, not the current development or
+publication instructions. Its twelve-method defaults, CRAN-submission plan and
+pending-release language have been superseded. Use the current
+[roadmap](ROADMAP.md), [API inventory](API-SURFACE.md),
+[measurement lifecycle](../LIFECYCLE.md) and
+[publication evidence](PUBLICATION-20261004.md#current-identity-and-completion-evidence).
+CRAN submission is outside the current scope. The original record follows.
 
 The lexical-diversity core remains resource-independent and accepts ordered
 pre-tokenized vectors. The current `0.2.0` development version retains the twelve

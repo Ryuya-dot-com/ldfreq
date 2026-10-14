@@ -1,5 +1,11 @@
 # NJ8 diagnostics and literature-informed roadmap
 
+Historical implementation and literature-search record from 2026-10-04.
+Counts, unpublished status and roadmap rendering below describe those earlier
+checkpoints, not the current package or website. See the current
+[roadmap](ROADMAP.md) and
+[publication evidence](PUBLICATION-20261004.md#current-identity-and-completion-evidence).
+
 This change adds one exported, read-only aggregation API, `nj8_diagnostics()`.
 It consumes an existing single or batch profile and reports unmatched-key
 frequencies, document frequencies, surface/unit/lookup mappings, and descriptive

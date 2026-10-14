@@ -1,4 +1,13 @@
-# ldfreq 0.2.0 publication boundary
+# Historical ldfreq 0.2.0 publication boundary
+
+This records an earlier proposed publication route; it is not the current
+release state or an instruction to submit to CRAN. The public 0.3.0.9005
+development snapshot remains `Status: development` in
+[state.dcf](../experiments/release-candidate/state.dcf). Public availability does
+not turn a development snapshot into a formal candidate. Current scope is in
+[ROADMAP.md](ROADMAP.md); completed publication evidence is in
+[PUBLICATION-20261004.md](PUBLICATION-20261004.md#current-identity-and-completion-evidence).
+The original 0.2.0 record below retains its then-current assumptions.
 
 Version `0.2.0` is under development toward an initial CRAN submission. It consolidates the core,
 preprocessing, lexical-overlap, many-document reference-coverage, lexical-level,

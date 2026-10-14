@@ -4,13 +4,15 @@ These repository-only tools generate and verify evidence for the immutable
 `ldfreq` source tarball used by the `Release candidate` GitHub Actions workflow.
 They are excluded from the R source package by `.Rbuildignore`.
 
-`state.dcf` must remain `Status: development` while package metadata URLs are
-not anonymously reachable, including while the GitHub repository is private.
-Ordinary pull-request checks still exercise the cross-platform development
-matrix. Change the status to `release-candidate` only after every metadata URL
-can be checked without repository credentials and the exact candidate commit is
-otherwise ready to freeze. A private-repository 404 is not an allowed CRAN NOTE
-and must not be hidden by weakening the strict result policy.
+The current [state.dcf](state.dcf) identifies a development version; published
+development snapshots do not use this formal-candidate artifact workflow.
+Ordinary pull-request checks still exercise the development matrix. A formal
+candidate requires a separately selected three-component version, an exact
+commit and anonymously reachable metadata URLs. Public URLs alone do not
+justify changing the classification. CRAN submission is outside the current
+project scope; the `--as-cran` command below performs checks, not submission.
+A private-repository 404 is not an allowed incoming NOTE and must not be hidden
+by weakening the strict result policy.
 The classifier accepts only `development` and `release-candidate`; a mismatched
 record scope, package, version, or any other status fails the workflow rather
 than falling back to a non-candidate result.
@@ -27,9 +29,12 @@ BOM, not a historical hard-coded count.
 
 ```sh
 Rscript experiments/release-candidate/generate-release-evidence.R \
-  /path/to/ldfreq /path/to/ldfreq_0.2.0.tar.gz \
-  /path/to/ldfreq_0.2.0.pdf /new/evidence-directory
+  /path/to/ldfreq /path/to/ldfreq_VERSION.tar.gz \
+  /path/to/ldfreq_VERSION.pdf /new/evidence-directory
 ```
+
+Replace `VERSION` with the selected candidate's actual DESCRIPTION version;
+the example does not select a future release version.
 
 `run-as-cran-check.R` runs `R CMD check --as-cran --no-manual` against one
 named tarball. By default, it accepts `Status: OK` or the exact single CRAN
@@ -44,7 +49,7 @@ checkable without these optional backends.
 
 ```sh
 Rscript experiments/release-candidate/run-as-cran-check.R \
-  /path/to/ldfreq_0.2.0.tar.gz /new/check-directory job-label \
+  /path/to/ldfreq_VERSION.tar.gz /new/check-directory job-label \
   new-submission-only
 ```
 

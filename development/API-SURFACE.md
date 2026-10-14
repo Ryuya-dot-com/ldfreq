@@ -1,8 +1,13 @@
 # Public API surface audit
 
-Status: pre-CRAN audit for package version 0.3.0
+Status: maintained API inventory for development version 0.3.0.9006.
+The 9006 update changes documentation only; the 9005 public API is unchanged.
 
-Audited: 2026-10-06
+Initial inventory audit: 2026-10-06; subsequent API decisions through 2026-10-08
+are recorded below. Reference/status review: 2026-10-14. Current scope and
+publication evidence are in [ROADMAP.md](ROADMAP.md) and
+[PUBLICATION-20261004.md](PUBLICATION-20261004.md#current-identity-and-completion-evidence).
+This inventory does not schedule a CRAN submission.
 
 This repository-only record checks whether each exported function has a clear
 role, result boundary, batch relationship, standard R interaction, and
@@ -251,13 +256,14 @@ analysis column or a public-site page.
    composite score, automatic threshold, normalization, or license inference
    is introduced.
 
-## Release gate
+## API change verification
 
-Before the first CRAN submission, regenerate this inventory from `NAMESPACE`
-and fail review if an export is missing, undocumented, absent from pkgdown, or
-lacks an explicit reusable-data path. Re-run examples, vignettes, the offline
-smoke test, the complete pkgdown build, and `R CMD check` after any S3 change.
-The repository-only gate is executable as:
+When the public API changes, reconcile this inventory with `NAMESPACE` and
+fail review if an export is missing, undocumented, absent from pkgdown, or
+lacks an explicit reusable-data path. Verify affected callers, examples,
+vignettes, installed behavior and rendered documentation. Use full package/site
+checks for broad changes; reuse valid evidence for unchanged code and artifacts
+when only documentation or records change. The repository-only audit is:
 
 ```sh
 Rscript --vanilla development/audit-public-api.R .

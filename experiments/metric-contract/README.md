@@ -3,6 +3,13 @@
 This directory preserves design and admission evidence for metrics whose
 lifecycle changed while the `0.1.0` contract was being frozen.
 
+These are historical admission decisions, not the current default-method or
+stability catalog. Since package 0.3.0, expected-TTR D is experimental and
+requires explicit selection; the core contract is 0.2.0. Use
+[`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_methods.html)
+and the [measurement lifecycle](../../LIFECYCLE.md) for current behavior.
+The recorded JSON, predecessor hash and method identity below are unchanged.
+
 `expected-ttr-d-admission.json` records the decision to admit the deterministic
 expected-TTR D method to the recomposed `0.1.0` core. It supersedes the
 2026-08-03 deferral decision after the public implementation, frozen contract,

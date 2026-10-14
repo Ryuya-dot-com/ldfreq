@@ -1,7 +1,9 @@
 # Direct-source R build of the TUBELEX slim artifact
 
 Created: 2026-07-25
-Status: integrated release candidate with a maintainer-approved public API
+Scope: reproducible builder and historical transformation evidence for the
+bundled TUBELEX resource. Resource approval is distinct from package publication
+and from selecting a future formal release candidate.
 
 ## Result
 
@@ -30,7 +32,7 @@ because gzip OS bytes and deflate output may differ across zlib versions.
 
 Full evidence is in [measurement.json](measurement.json). The upstream source is
 deliberately not retained in this repository. The 2.55 MB output is installed as
-a release candidate together with its manifest, build provenance, reviewed
+a bundled resource together with its manifest, build provenance, reviewed
 notice, and package copyright declaration.
 
 ## Unicode audit finding
@@ -98,21 +100,23 @@ build input. It verifies NOTICE after copying, validates provenance/license
 fields fail-closed, records build-tool identities, and avoids replacing an
 existing staged manifest for Windows portability.
 
-## Package integration and remaining release gates
+## Package integration and evidence scope
 
-The numerical/data transformation gate and the full release-unit validator have
-passed locally on macOS. The package workflow repeats the builder, cooperative
+The original numerical/data transformation checks and full release-unit
+validator passed locally on macOS. The package workflow exercises the builder, cooperative
 lock, cleanup, and identity checks on Ubuntu and Windows, while ordinary package
 checks exercise the installed resource and its machine-readable manifest.
 
 The repository-only admission record records the maintainer's license,
 provenance, distribution, and public-profile decision. Independent review is
-optional. Release still requires a final source, installed, and platform-binary
-audit against the named release candidate after all approved resources are
-frozen.
+optional. Package-level completion is determined for a named source artifact,
+its installed/platform members and preserved verification results, not by this
+historical resource-admission record alone.
 
-Development CI already exercises source/platform/installed byte identity. That
-evidence does not substitute for the final named-candidate rerun.
+Development CI exercises source/platform/installed byte identity. Reuse that
+evidence only where source, configuration, environment and artifact identity
+support the claim; verify changed or uncompleted parts for a new candidate.
+Updating this record alone does not require another builder or package run.
 
 The artifact contains published aggregate frequencies only. It contains no raw
 subtitle text, contiguous passages, video IDs, channel IDs, document names, or

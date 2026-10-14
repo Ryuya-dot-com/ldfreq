@@ -1,7 +1,9 @@
 # TUBELEX release-admission gate
 
 Status: repository-only maintainer approval for the resource and public API;
-final package inventory and release-candidate checks remain open.
+this is not the package's publication-status record. Published development
+artifacts have their own completed checks; a future formal candidate must be
+identified and checked separately.
 
 The records in this directory contain the package maintainer's explicit license
 and distribution decision plus the complete admitted, deferred, and excluded
@@ -38,8 +40,11 @@ Rscript experiments/resource-admission/validate-tubelex-admission.R .
 
 The command must report `maintainer_decision_valid`,
 `admission_gate_passed: true`, and `installed_manifest_consistent: true`. The
-remaining package gate stays in the repository record until the exact
-release-candidate source, installed, and binary resource inventories pass.
+package-level decision is separate from this resource approval. The stored
+admission record retains the conditions of its original decision; its remaining
+gate fields must not be read as evidence that later published development
+artifacts were never checked. Use the named artifact's preserved inventory and
+CI results to determine completion.
 
 See [`OPTIONAL-REVIEW.md`](OPTIONAL-REVIEW.md) for a compact advisory review
 checklist.

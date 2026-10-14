@@ -1,3 +1,11 @@
+# ldfreq 0.3.0.9006 (development)
+
+- Put installation and a first analysis before the detailed feature descriptions.
+  Connect the input map, package help and guides to a complete beginner workflow:
+  read document results and missing reasons, make a table and plot, and save and
+  reopen the original input and full analysis. Optional annotation and resource
+  workflows follow the initial steps. No API or calculation changes.
+
 # ldfreq 0.3.0.9005 (development)
 
 - Add the optional named `metadata` argument to `lexdiv_metrics_text_batch()`.
