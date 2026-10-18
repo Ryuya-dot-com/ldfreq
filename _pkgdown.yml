@@ -96,6 +96,7 @@ articles:
       - ngram-profiles
       - annotated-corpora
       - concordance-and-dispersion
+      - collocation-association
       - ambiguity-review
       - contextual-models
       - open-access-papers

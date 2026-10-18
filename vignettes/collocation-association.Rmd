@@ -1,0 +1,233 @@
+---
+title: "Count nearby words and explain their association"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Count nearby words and explain their association}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ldfreq)
+has_quanteda <- requireNamespace("quanteda", quietly = TRUE) &&
+  utils::packageVersion("quanteda") >= "4.5.0"
+```
+
+A word can occur near a node often simply because it is common. To describe
+association, compare the observed number of pairs with an expected number
+computed from an explicit population of possible pairs. Keep both counts:
+a high association score from one occurrence deserves different interpretation
+from a frequently repeated combination.
+
+This guide uses ldfreq 0.3.0.9010 or later and optional **quanteda >= 4.5.0**.
+It starts with adjacent words, then expands to a left/right span. The two
+helpers in `examples/collocation.R` use the saved searches from
+`examples/concordance.R`. These are explicitly sourced, installed examples,
+not exported functions. The examples below are authored for hand checking;
+they are not learner data or an assessment of annotation accuracy.
+
+## Start with a complete, source-linked search
+
+```{r collocation-demo, eval=has_quanteda}
+demo <- new.env(parent = globalenv())
+sys.source(system.file("examples", "collocation-demo.R",
+  package = "ldfreq", mustWork = TRUE), demo)
+helper <- demo$helper
+search <- demo$search
+knitr::kable(demo$annotations$segments, row.names = FALSE)
+```
+
+The imported tokens retain original positions and character offsets. The
+chosen `lemma` column is missing for `gap`; the comma is explicitly excluded.
+`d2` has two separate segments. Every segment is a hard boundary. A segment
+means a sentence only when your input defines it as one; the helper does not
+split sentences automatically.
+
+For your own unchanged `lexdiv_import_annotations()` result, source both
+helpers and make a search. See the [concordance guide](concordance-and-dispersion.html)
+for preparing aligned annotations from your text or parser output.
+
+```{r own-collocation, eval=FALSE}
+helper <- new.env(parent = globalenv())
+for (file in c("concordance.R", "collocation.R"))
+  sys.source(system.file("examples", file, package = "ldfreq", mustWork = TRUE), helper)
+search <- helper$concordance_search(annotations, list(node = "learn"),
+  term_col = "lemma", keep = keep, window = 5L)
+nearby <- helper$collocation_profile(search, "node", span = c(left = 3L, right = 3L))
+```
+
+A node query must have one token pattern. Fixed, wildcard and regular-expression
+queries retain their saved search settings. A pattern matching several forms
+pools those node positions into one class. Context terms use exact UTF-8 values
+of the selected column: the node's case-insensitive matching does **not** merge
+context forms such as `Word` and `word`. No new case or Unicode normalization
+is performed. Specify and preserve any normalization in the annotations.
+
+## Adjacent words: inspect the denominator first
+
+```{r adjacent, eval=has_quanteda}
+adjacent <- helper$collocation_profile(search, "a") # L0/R1
+knitr::kable(adjacent$results, digits = 4, row.names = FALSE)
+knitr::kable(adjacent$documents, row.names = FALSE)
+```
+
+There are **8 eligible adjacent pairs**, of which **3** start at the node `a`.
+The context `b` appears at the right endpoint of **3** eligible pairs, and the
+pair `a b` occurs **2** times. Thus its expected count is
+`3 * 3 / 8 = 1.125`. These marginals count positions in eligible pairs,
+not unrestricted unigram frequencies. Final tokens, excluded endpoints and
+segment boundaries affect the denominator.
+
+For each context type, the result includes:
+
+| Column | Meaning in the saved pair population |
+|---|---|
+| `observed` | Pairs with both a matching node and this context term, O |
+| `node_marginal` | All pairs whose node endpoint matches the query, R |
+| `context_marginal` | All pairs whose context endpoint has this term, C |
+| `opportunities` | All eligible ordered pairs, N |
+| `expected` | R × C / N, E |
+| `MI` | Pointwise mutual information, log2(O / E) |
+| `t_score` | (O − E) / sqrt(O) |
+| `documents` | Distinct documents contributing to O |
+| `context_documents` | Distinct documents contributing to C |
+| `meets_min_count` | Display-selection flag; counts remain complete |
+| `status` | `ok`, `zero_observed`, or `no_node_opportunities` |
+
+The MI and t-score definitions follow Evert's
+[association-measure discussion](https://www.stephanie-evert.de/PUB/Evert2007HSK_extended_manuscript.pdf),
+Sections 4.1–4.3. MI is sensitive to rare combinations; report O and choose a
+frequency threshold explicitly. Here t-score is a descriptive association
+measure, not a Student t statistic or a significance test. Overlapping windows
+share tokens, and documents may share writers; these rows are not independent
+observations for a study-level model.
+
+The helper applies **no smoothing**. When O = 0 and E > 0, MI is `-Inf` and
+t-score is `NA` (`zero_observed`). When no eligible pair starts at a matching
+node, E = 0 and both scores are `NA` (`no_node_opportunities`). With no eligible
+pairs at all, the results table is empty and document status explains why.
+Only context types present in eligible pairs receive rows. An absent row is
+not a claim of zero frequency in an external corpus, and a missing lemma is
+not a known zero.
+
+## Expand the span without changing the meaning of a position
+
+```{r span, eval=has_quanteda}
+span <- helper$collocation_profile(search, "a", span = c(left = 2L, right = 2L))
+knitr::kable(span$results, digits = 4, row.names = FALSE)
+knitr::kable(span$documents[c("document_id", "candidate_slot_pairs",
+  "eligible_pairs", "excluded_pairs", "node_occurrences", "nodes_with_context", "node_pairs")],
+  row.names = FALSE)
+```
+
+The span example has **30 eligible ordered pairs**. Each ordered pair of
+original positions within the requested distance is one opportunity. Both
+endpoints must be searchable, and they must belong to the same segment.
+The span includes all distances from 1 to the chosen width on each side;
+`left = 0` or `right = 0` selects only the other direction.
+
+These rules determine the counts:
+
+- A node token cannot pair with itself. Two occurrences of the same word can
+  pair with each other. With both directions enabled, `(i, j)` and `(j, i)`
+  are separate ordered opportunities.
+- Repeated context tokens each count. Two node tokens may pair with the same
+  context token: their original position pairs are different.
+- Excluded or missing endpoints cannot form a pair. Intervening excluded or
+  missing slots still consume distance and do not block a wider-span pair.
+  Thus `a , b` can contribute at distance +2, but never at +1. Splitting the
+  input into sentence segments is the way to prohibit sentence crossing.
+- Node and context marginals and N are recounted over this whole pair
+  population. Do not substitute corpus unigram totals, or multiply the node
+  frequency by twice the span: boundaries and endpoint availability matter.
+- Left and right distances are pooled within a call. To describe one side,
+  run a separate call with the other width zero; filtering the saved pairs
+  afterward would invalidate the original scores and denominators.
+
+This is an independence model for the two roles in a population of **ordered
+token pairs**. It is not the conventional surface-window approximation using
+unigram frequencies times span width. Scores from tools using different
+populations or exclusion rules need not agree.
+
+The complete `$pairs` table contains background opportunities as well as
+matching node pairs. `$documents` retains empty and zero-match documents,
+original/searchable/missing token counts, candidate and eligible pair counts,
+node occurrences, and nodes with at least one eligible context.
+By default, `max_pairs = 1e6` bounds **all candidate slot pairs before endpoint
+exclusions**. Exceeding the bound raises an error rather than truncating the
+sample. This is not a full memory bound or a streaming large-corpus engine.
+
+## Select frequent combinations and return to their source
+
+```{r select-context, eval=has_quanteda}
+selected <- helper$collocation_profile(search, "a", min_count = 2L)
+shown <- subset(selected$results, meets_min_count)
+shown <- shown[order(-shown$MI, -shown$observed), ]
+knitr::kable(shown, digits = 4, row.names = FALSE)
+```
+
+`min_count` is a positive whole number. It sets a flag; it never removes pairs,
+changes marginals, or overwrites below-threshold counts. The default of 1
+includes singletons for inspection and is not a recommendation for ranking
+rare combinations. Choose a threshold appropriate to your corpus and report it.
+
+```{r source-context, eval=has_quanteda}
+pairs <- subset(span$pairs, is_node & context_term == "b")
+kwic <- span$search$occurrences[
+  match(pairs$occurrence_id, span$search$occurrences$occurrence_id), ]
+inspection <- data.frame(document_id = pairs$document_id,
+  segment_id = pairs$segment_id, node_position = pairs$node_position,
+  context_position = pairs$context_position, distance = pairs$distance,
+  pre = kwic$pre, node = kwic$keyword, post = kwic$post,
+  context = span$search$source$tokens$surface[pairs$context_row])
+knitr::kable(inspection, row.names = FALSE)
+```
+
+Each matching pair links to a saved node occurrence ID, original token rows and
+segment-local, 1-based inclusive character offsets. A node KWIC may appear
+more than once because it contributed several pairs. Its display window comes
+from the original search; choose a search window at least as wide as the
+collocation span to see all the context in this display. The full original
+segment remains available even with a narrower KWIC window.
+
+## Save the complete record and replay it
+
+```{r save-collocation, eval=has_quanteda}
+record <- list(adjacent = adjacent, span = span, session = sessionInfo())
+file <- tempfile(fileext = ".rds") # use a durable project path for your analysis
+saveRDS(record, file, version = 2)
+reopened <- readRDS(file)
+helper$collocation_validate(reopened$span)
+replayed <- helper$collocation_profile(reopened$span$search, "a",
+  span = reopened$span$settings$span)
+stopifnot(identical(replayed, reopened$span))
+unlink(file)
+```
+
+Retain the full object, source annotations, helper/package versions and session
+information; a CSV of selected scores cannot reconstruct the denominator.
+`collocation_validate()` detects accidental changes to the saved record, including
+its search. It is not an authenticity check for supplied annotations. Exact
+whole-object replay requires the same package version; after an upgrade, compare
+counts and settings explicitly instead of assuming object identity.
+
+## What was checked, and what the scores do not establish
+
+The authored example's adjacent pairs agree with `lexdiv_ngrams()`. A separate
+Cartesian enumeration verifies the pair sets and 2×2 tables for left-only,
+right-only and two-sided spans, including segment boundaries, repeated nodes,
+excluded endpoints and missing terms. Positive-count scores were checked against
+`corpora` 0.7's [am.score()](https://cran.r-project.org/web/packages/corpora/corpora.pdf)
+with the same positional marginals and `span.size = 1`: the span is already
+represented by the pair population. The deliberate `NA` t-score convention at
+O = 0 is checked separately. `corpora` is not needed to run these helpers.
+
+These checks concern counting and numerical reproduction on constructed data.
+They do not validate idiomaticity, semantic cohesion, language proficiency,
+or performance on a natural corpus. Phrase nodes, dependency relations and
+automatic sentence detection are outside this example. The existing
+[n-gram reference profiles](ngram-profiles.html) retain their own frequency and
+coverage contracts; a pruned reference table cannot supply missing marginals.
+Preserve writer, task and occasion identifiers when relating text measures
+to research outcomes, as in the [repeated-observations guide](repeated-observations.html).

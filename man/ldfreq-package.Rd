@@ -42,6 +42,8 @@ For repeated observations, planned submissions and an ordinary model data frame,
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html}{From planned observations to a mixed model}.
 For token-pattern searches, context sorting, original-position plots and within-document DP, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html}{Search words and phrases, then inspect their distribution}.
+For adjacent and left/right-span word association with source-linked counts, see
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html}{Count nearby words and explain their association}.
 For your own files, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files}{TXT-folder and CSV input}.
 For counting units and morphology, see
