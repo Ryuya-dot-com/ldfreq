@@ -18,15 +18,15 @@ not mix incompatible specifications.
 
 ## Installation
 
-The published snapshot is 0.3.0.9009, a development prerelease that has
-not been released on CRAN. It includes the concordance and
-within-document dispersion examples. The fixed tag below identifies the
-tested code and installed examples. It requires R 4.1.0 or later.
-Install the tested snapshot used by this documentation:
+The published snapshot is 0.3.0.9010, a development prerelease that has
+not been released on CRAN. It includes source-linked collocation counts,
+MI and t-score examples. The fixed tag below identifies the tested code
+and installed examples. It requires R 4.1.0 or later. Install the tested
+snapshot used by this documentation:
 
 ``` r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9009")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9010")
 ```
 
 Pinning the revision fixes the implementation, even when development
@@ -39,7 +39,7 @@ If you have a built source archive, install it locally:
 
 ``` r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9009.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9010.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation
@@ -136,6 +136,12 @@ workflows name their additional requirements.
   connects explicitly sourced helpers to saved occurrences, zero-match
   documents and single-token within-document DP with its counts and
   denominators.
+- **Inspect nearby words and association.** Count adjacent or
+  left/right-span token pairs with MI, t-score, positional marginals and
+  original KWIC links. The [collocation
+  guide](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html)
+  retains excluded positions, zero counts and the complete opportunity
+  population.
 - **Trace the effect of reference choice.** Compare the same target
   phrases across references, keeping coverage and sample sizes beside
   common-item differences. A higher mean caused by missing phrases
@@ -447,9 +453,11 @@ N-gram extraction is also established functionality in
 word and phrase measures with coverage diagnostics. In ldfreq, the
 emphasis is a shared R workflow retaining document/segment locations,
 reference definitions, eligible-window denominators and missingness
-alongside other lexical measures. The current n-gram functions provide
-frequencies, not MI/t-score or a validated phraseological-sophistication
-score.
+alongside other lexical measures. The n-gram functions provide
+frequencies. Separate explicitly sourced [collocation
+helpers](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html)
+add MI and t-score from complete token-pair opportunities. Neither
+output is a validated phraseological-sophistication score.
 
 Phrase-list profiling and source-text overlap also have existing tools.
 Masaki Eguchi’s [Multi-Word Units

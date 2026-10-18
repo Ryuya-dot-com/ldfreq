@@ -47,6 +47,9 @@ model](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.htm
 For token-pattern searches, context sorting, original-position plots and
 within-document DP, see [Search words and phrases, then inspect their
 distribution](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html).
+For adjacent and left/right-span word association with source-linked
+counts, see [Count nearby words and explain their
+association](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html).
 For your own files, see [TXT-folder and CSV
 input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
 For counting units and morphology, see [Word families, roots and

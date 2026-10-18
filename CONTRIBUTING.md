@@ -11,6 +11,15 @@ specification updates.
 
 ## Local verification
 
+During development, run checks for the affected behavior and group code,
+tests, and documentation into a complete change before pushing a pull
+request. The full R matrix tests the pull request’s merged result.
+Protected `main` requires an up-to-date pull request and both required
+checks before merging; the ordinary matrix does not repeat on the
+identical merged tree. Manual dispatch remains available for a
+deliberate environment recheck. The separate release-candidate workflow
+retains its exact-archive checks.
+
 From the repository root, build and check the source package:
 
 ``` sh

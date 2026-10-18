@@ -33,6 +33,8 @@
   profiles](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.md):
 - [Search words and phrases, then inspect their
   distribution](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.md):
+- [Count nearby words and explain their
+  association](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.md):
 - [Review lexical ambiguity with KWIC and original
   context](https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.md):
 - [Connect contextual model outputs to research

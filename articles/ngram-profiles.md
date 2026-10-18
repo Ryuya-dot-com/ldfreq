@@ -472,11 +472,15 @@ accidental changes, not false metadata or unauthorized data.
 These functions provide extraction, descriptive frequency, coverage and
 reference-choice comparisons on an explicit common set. Association
 measures such as MI and t-score need positional marginals from the same
-eligible-window population; they are not implemented here. Skip-grams,
-dependency collocations, automatic sentence parsing, streaming
-large-corpus construction and a standard large reference corpus are also
-outside this initial interface. The default extraction limit is one
-million occurrence rows; it is not a complete memory bound.
+eligible-window population. The separate [collocation
+examples](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.md)
+provide these statistics for adjacent and left/right-span token pairs,
+retaining their full opportunity table. They do not infer marginals from
+a pruned reference table. Skip-grams, dependency collocations, automatic
+sentence parsing, streaming large-corpus construction and a standard
+large reference corpus are also outside this initial interface. The
+default extraction limit is one million occurrence rows; it is not a
+complete memory bound.
 
 For SLA, a reference frequency is a text characteristic whose relation
 to performance needs validation across tasks and registers. For
