@@ -1,0 +1,327 @@
+# Trace English syntactic complexity from source to study table
+
+Does a longer T-unit reflect more words, fewer counted structures, or a
+parser decision that needs review? This guide keeps the original text,
+constituency trees, matched nodes and denominators beside three English
+syntactic measures: **MLC = W/C**, **MLT = W/T**, and **DC/C**. It then
+connects these results to writer, task and occasion without dropping
+failed or absent submissions.
+
+Use **ldfreq 0.3.0.9013 or later**. The helpers in `examples/l2sca.R`
+are explicitly sourced installed examples. The separate Python runner
+calls a locally installed, version-pinned original [L2 Syntactic
+Complexity Analyzer (L2SCA)](https://sites.psu.edu/xxl13/l2sca/). The
+original software and models are not bundled or downloaded by ldfreq.
+The runnable example below uses authored trees and declared matches, so
+it requires neither Java nor a model. It demonstrates tracing and
+arithmetic, not accuracy on learner writing or validity as a proficiency
+measure.
+
+## Inspect an example before running a parser
+
+``` r
+demo <- new.env(parent = globalenv())
+sys.source(system.file("examples", "l2sca-demo.R",
+  package = "ldfreq", mustWork = TRUE), demo)
+helper <- demo$helper
+analysis <- demo$analysis
+knitr::kable(analysis$components[c("document_id", "W", "S", "C", "T", "DC", "status")],
+  row.names = FALSE)
+```
+
+| document_id                 |   W |   S |   C |   T |  DC | status        |
+|:----------------------------|----:|----:|----:|----:|----:|:--------------|
+| manual_coord_clauses        |   5 |   1 |   2 |   2 |   0 | parsed        |
+| manual_coord_vp             |   4 |   1 |   1 |   1 |   0 | parsed        |
+| manual_finite_complement    |   5 |   1 |   2 |   1 |   1 | parsed        |
+| manual_nonfinite_complement |   5 |   1 |   1 |   1 |   0 | parsed        |
+| manual_fragment_FRAG        |   4 |   1 |   1 |   1 |   0 | parsed        |
+| manual_fragment_NP          |   4 |   1 |   0 |   0 |   0 | parsed        |
+| manual_imperative           |   3 |   1 |   1 |   1 |   0 | parsed        |
+| manual_relative             |   6 |   1 |   2 |   1 |   1 | parsed        |
+| manual_reduced_relative     |   6 |   1 |   1 |   1 |   0 | parsed        |
+| empty                       |   0 |   0 |   0 |   0 |   0 | no_words      |
+| failed                      |  NA |  NA |  NA |  NA |  NA | parser_failed |
+
+The fixture explicitly labels its provenance `authored-fixture`. Its
+rows include finite and nonfinite complements, coordination, relative
+clauses, fragments, an empty submission and a simulated process failure.
+Source text, Penn trees and node IDs are available in the installed
+`l2sca-fixture.R`. These declared structures do not imply that an
+automatic parser will assign the same tree to every sentence.
+
+| Component | Counting condition |
+|----|----|
+| W | Parser leaves whose POS is capital ASCII letters with an optional final `$`, and whose terminal text contains no parentheses or hyphen; equivalent to the pinned original word pattern on these trees |
+| S | Top-level `ROOT` matches, including punctuation-only trees |
+| C | Original clause matches `c` plus fragment correction `fc` |
+| T | Original T-unit matches `t` plus fragment correction `ft` |
+| DC | Original dependent-clause matches `dc` |
+
+These are the pinned implementation’s conditions. Consult [Lu
+(2010)](https://doi.org/10.1075/ijcl.15.4.02lu) for the linguistic
+definitions; subsequent software contains additional query rules. The
+runner reads the six original query constants from the original script
+without importing or executing that script. The complete patterns are
+saved in each real trace’s provenance. Do not replace these counts with
+VERB, `ccomp`, `xcomp` or `conj` counts from a dependency parser: those
+labels describe different structures. Likewise, keep W separate from
+word counts in a lexical diversity or readability analysis with
+different tokenization.
+
+## Follow a value back to the source
+
+``` r
+knitr::kable(subset(analysis$results,
+  document_id %in% c("manual_coord_clauses", "manual_finite_complement", "manual_fragment_NP"),
+  select = c("document_id", "measure", "numerator", "denominator",
+    "original_rule_value", "value", "status")), row.names = FALSE)
+```
+
+| document_id | measure | numerator | denominator | original_rule_value | value | status |
+|:---|:---|---:|---:|---:|---:|:---|
+| manual_coord_clauses | MLC | 5 | 2 | 2.5 | 2.5 | computed |
+| manual_coord_clauses | MLT | 5 | 2 | 2.5 | 2.5 | computed |
+| manual_coord_clauses | DC_C | 0 | 2 | 0.0 | 0.0 | computed |
+| manual_finite_complement | MLC | 5 | 2 | 2.5 | 2.5 | computed |
+| manual_finite_complement | MLT | 5 | 1 | 5.0 | 5.0 | computed |
+| manual_finite_complement | DC_C | 1 | 2 | 0.5 | 0.5 | computed |
+| manual_fragment_NP | MLC | 4 | 0 | 0.0 | NA | zero_denominator |
+| manual_fragment_NP | MLT | 4 | 0 | 0.0 | NA | zero_denominator |
+| manual_fragment_NP | DC_C | 0 | 0 | 0.0 | NA | zero_denominator |
+
+``` r
+knitr::kable(subset(analysis$matches,
+  document_id == "manual_coord_clauses" & pattern == "t",
+  select = c("tree_id", "node_id", "start", "end", "source_span")), row.names = FALSE)
+```
+
+| tree_id | node_id | start | end | source_span                 |
+|--------:|--------:|------:|----:|:----------------------------|
+|       1 |       2 |     1 |  27 | Maya reads, and Leo writes. |
+|       1 |      14 |    17 |  26 | Leo writes                  |
+
+In `Maya reads, and Leo writes.`, the two T matches overlap: the whole
+sentence and `Leo writes`. They are **query-matched subtrees**, not a
+partition into nonoverlapping linguistic T-unit boundaries. MLT is the
+document’s W divided by T, here 5/2 = 2.5; averaging the words within
+those subtrees would give a different statistic. Node IDs restart at
+each tree; token indexes and source offsets run across the whole
+document. Offsets are one-based, inclusive Unicode code-point positions,
+not byte offsets.
+
+The importer passes parser leaves through
+[`lexdiv_import_annotations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md)
+to check complete original-source coverage. It first tries literal
+surfaces, then only the six explicit Penn bracket escapes (`-LRB-`,
+`-RRB-`, `-LSB-`, `-RSB-`, `-LCB-`, `-RCB-`). Original leaves, decoded
+surfaces, conversion rules, offsets, trees and matches remain available
+under `analysis$checked` and `analysis$matches`. Only whitespace gaps
+are permitted. Other transformations are not guessed; an unmatched leaf,
+omitted source text, malformed tree or parser fallback `X` leaves that
+document `unusable_parse` with a reason and unchanged raw output.
+
+An aligned tree can still be linguistically wrong. For example, the
+pinned parser can split a closing curly quotation mark into a separate
+`ROOT`, and can analyze a fragment as `NP` rather than `FRAG`. Review
+quotations, ellipsis, fragments, segmentation and unusually short texts
+before reporting. No minimum length filter is silently applied. All
+imported results initially say `review_status = "not_reviewed"`.
+
+## Run the original model locally and keep its output
+
+Obtain `L2SCA-2023-08-15.tgz` from the [author’s distribution
+page](https://sites.psu.edu/xxl13/l2sca/) and follow its licensing
+conditions. That page labels the release 4.2.2; the bundled README
+labels it 4.2.1. The archive SHA-256 is
+`1cf48c2963b31182a4450e6e3298fbd2720a9c1cd08886029b41fe457d65b4f1`.
+Retain your archive. The runner verifies hashes of `analyzeText.py`,
+Tregex, the Stanford parser and its model jar before execution, and
+rejects changed files. It uses the bundled Stanford 4.2.0 `englishPCFG`
+model and default parse settings with explicit UTF-8 input/output. It is
+not a generic reader for other L2SCA versions, parser models or
+languages.
+
+Install Python 3 and Java separately, and ensure the `java` command
+works. The parser is given a 1,500 MB Java heap, with additional process
+memory needed. Each document is parsed separately; files are not
+concatenated to alter their sentence boundaries. Local integration has
+been checked with Python 3.14 and Java 11 on macOS. The R import example
+runs without those tools; successful R checks on other platforms do not
+establish Java/model compatibility there.
+
+Start with a complete original document table. Include submitted empty
+text as `""`; an absent submission belongs in the planned study table,
+not as a fake empty document. IDs must be unique nonblank strings, and
+text must be nonmissing UTF-8. Additional research metadata stays in
+your independently saved roster.
+
+``` r
+helper <- new.env(parent = globalenv())
+sys.source(system.file("examples", "l2sca.R", package = "ldfreq", mustWork = TRUE), helper)
+documents <- data.frame(document_id = c("d1", "d2"),
+  text = c("Maya reads books.", "Maya knows that Leo writes."))
+saveRDS(documents, "original-documents.rds")
+helper$l2sca_write_inputs(documents, "syntax-inputs.json") # optional jsonlite required
+system.file("examples", "l2sca-trace.py", package = "ldfreq", mustWork = TRUE)
+```
+
+In a terminal, replace the two paths below with the printed runner path
+and your extracted original directory. Quoting paths preserves spaces.
+The runner uses only Python’s standard library; it does not run an
+external shell script.
+
+``` bash
+python3 "/path/to/ldfreq/examples/l2sca-trace.py" \
+  --inputs "syntax-inputs.json" \
+  --l2sca-dir "/path/to/L2SCA-2023-08-15" \
+  --output "syntax-trace.json"
+```
+
+Both input writer and runner refuse to replace an existing output. Save
+to a new file for a new run. Use `--java "/path/to/java"` if Java is not
+on PATH. The trace contains original texts and their hashes, Penn
+output, each query’s tree/node IDs, process statuses, stdout/stderr,
+query definitions, model/tool hashes and runtime versions. Do not share
+it if your source texts are private. Captured output uses LF newlines.
+Invalid UTF-8 process output is retained as base64 and marked failed
+rather than silently decoded into usable text.
+
+``` r
+documents <- readRDS("original-documents.rds")
+analysis <- helper$l2sca_import("syntax-trace.json", documents)
+analysis$components
+analysis$results
+analysis$matches
+saveRDS(analysis, "syntax-analysis.rds", version = 2)
+```
+
+The independent roster must match the trace’s complete ordered IDs and
+text. Missing records, changed source/output hashes, incomplete
+successful-query records and incompatible software identities stop
+import. Structural or source-alignment problems retain the affected
+document with no usable values. The default `max_nodes = 1000000` bounds
+total node reconstruction (including terminals); a document that exceeds
+the remaining allowance has no reported score, and nothing is silently
+truncated. Raw JSON is read into memory first; this bound is not a
+general memory limit for arbitrary files.
+
+Hashes detect accidental changes relative to the saved record. They are
+not proof of authorship, model accuracy, or completeness against a
+maliciously rewritten trace. The importer does not rerun Tregex to
+independently verify every claimed match. Retain the original trace and
+the separately saved roster.
+
+## Separate failures, undefined ratios and valid zero
+
+| Status | Research value | Interpretation |
+|----|----|----|
+| `computed` | Numeric, including DC/C = 0 | Successful traced computation; still needs scientific review |
+| `no_words` | `NA` | W = 0 under these parser/counting conditions, including punctuation-only input |
+| `zero_denominator` | `NA` | Nonempty text, but C or T is zero for that measure |
+| `parser_failed`, `query_failed` | `NA`, with unavailable counts | External process failed; inspect its saved logs |
+| `unusable_parse` | `NA`, with unavailable counts | Preserved tree, matches or source could not be reconciled |
+| `not_submitted` | `NA` in study table | No document was supplied for the planned observation |
+
+`original_rule_value` recomputes the original numerator/denominator
+rule, including zero for a zero denominator. It is **unrounded and not
+an imported official CSV score**. Keep an official CSV separately if
+comparing against its four-decimal display. Failed documents have `NA`
+even in this column. A positive denominator and DC = 0 is a valid zero,
+not missingness.
+
+The original script can produce an all-zero CSV with exit status zero
+when an input file is missing. A CSV or successful exit code alone
+therefore cannot establish that the requested text was analyzed. This
+workflow requires source identity, complete coverage, raw tree/query
+outputs and their statuses together.
+
+## Carry review decisions and missing observations into a study
+
+``` r
+knitr::kable(demo$review[c("document_id", "decision", "reason")], row.names = FALSE)
+```
+
+| document_id | decision | reason |
+|:---|:---|:---|
+| manual_coord_clauses | include | Authored tree and declared matches inspected. |
+| manual_coord_vp | include | Authored tree and declared matches inspected. |
+| manual_finite_complement | include | Authored tree and declared matches inspected. |
+| manual_nonfinite_complement | include | Authored tree and declared matches inspected. |
+| manual_fragment_FRAG | withhold | Illustrative reporting protocol excludes fragments. |
+| manual_fragment_NP | include | Authored tree and declared matches inspected. |
+| manual_imperative | include | Authored tree and declared matches inspected. |
+| manual_relative | include | Authored tree and declared matches inspected. |
+| manual_reduced_relative | include | Authored tree and declared matches inspected. |
+| empty | not_applicable | No reportable score. |
+| failed | not_applicable | No reportable score. |
+
+``` r
+knitr::kable(subset(demo$study_long, measure == "MLT",
+  select = c("observation_id", "writer_id", "task", "occasion", "value",
+    "status", "review_status", "report_value")), row.names = FALSE)
+```
+
+| observation_id | writer_id | task | occasion | value | status | review_status | report_value |
+|:---|:---|:---|:---|---:|:---|:---|---:|
+| o1 | w1 | description | t1 | 2.5 | computed | include | 2.5 |
+| o2 | w1 | description | t2 | 4.0 | computed | include | 4.0 |
+| o3 | w2 | description | t1 | 5.0 | computed | include | 5.0 |
+| o4 | w2 | description | t2 | 5.0 | computed | include | 5.0 |
+| o5 | w3 | narrative | t1 | 4.0 | computed | withhold | NA |
+| o6 | w3 | narrative | t2 | NA | zero_denominator | include | NA |
+| o7 | w4 | narrative | t1 | 3.0 | computed | include | 3.0 |
+| o8 | w4 | narrative | t2 | 6.0 | computed | include | 6.0 |
+| o9 | w5 | description | t1 | 6.0 | computed | include | 6.0 |
+| o10 | w5 | description | t2 | NA | no_words | not_applicable | NA |
+| o11 | w6 | description | t1 | NA | parser_failed | not_applicable | NA |
+| o12 | w6 | description | t2 | NA | not_submitted | NA | NA |
+
+The example keeps a separate decision table keyed by document and
+`analysis_id`, with reviewer and reason. It withholds one otherwise
+computed fragment by an explicit illustrative reporting protocol. The
+original result remains intact. Only a computed value with an explicit
+`include` decision enters `report_value`. This approval is a documented
+human choice, not an automatic accuracy verdict. Adapt the decision
+table after inspecting your own parses; do not copy the fixture’s
+decisions to real data.
+
+`study_long` retains all 12 planned observations × 3 measures, including
+the unsubmitted observation. Before fitting a model, choose one measure
+and one analysis condition; the three measures from a document are not
+independent observations. `demo$model_data` is an ordinary data frame
+containing only the selected reportable MLT rows and their
+writer/task/occasion variables. It can be passed to an existing modeling
+package. The tiny authored example is not fitted to make inferential
+claims; use the [repeated-observations
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.md)
+to design an analysis with appropriate replication and random effects.
+
+## Save and replay the full record
+
+``` r
+saved <- tempfile(fileext = ".rds")
+saveRDS(demo$record, saved, version = 2)
+restored <- readRDS(saved)
+helper$l2sca_validate(restored$analysis)
+replayed <- helper$l2sca_import(restored$analysis$trace, restored$analysis$documents,
+  max_nodes = restored$analysis$settings$max_nodes)
+stopifnot(identical(replayed, restored$analysis))
+unlink(saved)
+```
+
+Save the trace, original roster, separate review decisions, study
+mapping and complete RDS together. Flat tables alone omit trees and
+settings. `l2sca_validate()` checks the imported record’s saved
+integrity hash, including its source, matches and scores. It does not
+validate separate reviewer decisions or certify the scientific
+interpretation. Replay above reconstructs the same results from saved
+output without invoking Java. Keep the ldfreq version and session
+information when replaying in another environment.
+
+The checks supporting this example distinguish three things:
+hand-declared structures test the importer and arithmetic; pinned
+external runs and original CSV comparisons test implementation
+agreement; neither is an independent accuracy evaluation on learner
+writing. Such accuracy, proficiency and text quality claims require
+evidence appropriate to the intended population and use.

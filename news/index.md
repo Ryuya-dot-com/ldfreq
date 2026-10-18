@@ -1,6 +1,20 @@
 # Changelog
 
-## ldfreq 0.3.0.9012
+## ldfreq 0.3.0.9013
+
+- Add explicitly sourced English syntactic-complexity examples for MLC,
+  MLT and DC/C. A separate local runner preserves original L2SCA source
+  texts, Penn trees, query matches, logs and pinned software/model
+  identities. Import checks complete source coverage and keeps process
+  failures, empty input, zero denominators and human reporting decisions
+  distinct. An authored offline example connects counts and source spans
+  to writer/task/occasion tables and complete-record replay. Original
+  software/models are not bundled; agreement with their counting rules
+  does not establish parser accuracy.
+- Exported functions, core calculations and R dependencies are
+  unchanged.
+
+## ldfreq 0.3.0.9012 (development)
 
 - Add explicitly sourced English readability examples for Flesch Reading
   Ease and Flesch–Kincaid Grade Level. Supplied sentence boundaries,

@@ -39,6 +39,8 @@
   corpus](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.md):
 - [Calculate English readability with visible counting
   decisions](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.md):
+- [Trace English syntactic complexity from source to study
+  table](https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.md):
 - [Review lexical ambiguity with KWIC and original
   context](https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.md):
 - [Connect contextual model outputs to research

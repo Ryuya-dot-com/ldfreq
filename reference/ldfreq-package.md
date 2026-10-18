@@ -53,6 +53,11 @@ association](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-associa
 For target/reference word comparisons with explicit denominators and
 source links, see [Compare word use against an explicit reference
 corpus](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html).
+For English syntactic complexity with source trees, matched nodes and
+review decisions, see [Trace English syntactic complexity from source to
+study
+table](https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.html).
+
 For English readability with sentence, word and syllable audits, see
 [Calculate English readability with visible counting
 decisions](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html).
