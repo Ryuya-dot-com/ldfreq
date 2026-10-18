@@ -1,7 +1,7 @@
 Package: ldfreq
 Type: Package
 Title: Reproducible Lexical Diversity and Frequency Profiles
-Version: 0.3.0.9011
+Version: 0.3.0.9012
 Authors@R:
     person(
         given = "Ryuya",
@@ -55,6 +55,7 @@ Suggests:
     knitr,
     lexicon,
     lme4,
+    nsyllable (>= 1.0.1),
     quanteda (>= 4.5.0),
     readxl,
     rmarkdown,
