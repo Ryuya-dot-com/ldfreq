@@ -40,6 +40,8 @@ For condition comparisons and research reporting, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html}{From text to a research report}.
 For repeated observations, planned submissions and an ordinary model data frame, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html}{From planned observations to a mixed model}.
+For token-pattern searches, context sorting, original-position plots and within-document DP, see
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html}{Search words and phrases, then inspect their distribution}.
 For your own files, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files}{TXT-folder and CSV input}.
 For counting units and morphology, see
