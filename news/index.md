@@ -1,5 +1,16 @@
 # Changelog
 
+## ldfreq 0.3.0.9011 (development)
+
+- Add explicitly sourced keyness examples for disjoint target and
+  reference corpora. Retain token selection, missingness, complete
+  denominators, two-by-two counts and expectations, uncorrected G²,
+  signed direction, unsmoothed log-ratio, document frequencies and
+  exact-term KWIC. The guide explains sample zeros, empty groups,
+  reference choice and complete-record replay. Scores are descriptive;
+  no p-values or significance decisions are produced.
+- Exported functions, core calculations and dependencies are unchanged.
+
 ## ldfreq 0.3.0.9010 (development)
 
 - Add explicitly sourced collocation examples for adjacent and

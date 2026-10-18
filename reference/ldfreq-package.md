@@ -50,6 +50,9 @@ distribution](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-di
 For adjacent and left/right-span word association with source-linked
 counts, see [Count nearby words and explain their
 association](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html).
+For target/reference word comparisons with explicit denominators and
+source links, see [Compare word use against an explicit reference
+corpus](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html).
 For your own files, see [TXT-folder and CSV
 input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
 For counting units and morphology, see [Word families, roots and
