@@ -16,15 +16,15 @@ and checks that reshaped tables and plots do not mix incompatible specifications
 
 ## Installation
 
-The published snapshot is 0.3.0.9008, a development prerelease that has not
-been released on CRAN. It includes the repeated-observation examples and helpers.
+The published snapshot is 0.3.0.9009, a development prerelease that has not
+been released on CRAN. It includes the concordance and within-document dispersion examples.
 The fixed tag below identifies the tested code and installed examples.
 It requires R 4.1.0 or later. Install the tested snapshot used by this
 documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9008")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9009")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
@@ -36,7 +36,7 @@ If you have a built source archive, install it locally:
 
 ```r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9008.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9009.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation may
@@ -111,6 +111,11 @@ above; optional annotation and reference-resource workflows name their additiona
   unlisted keys in pruned tables remain distinct. No corpus needs to be bundled.
   See the [n-gram guide](https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html)
   for CSV/RDS inputs, boundary requirements and phrase-level research examples.
+- **Search and locate words or phrases.** Use fixed, wildcard or regular-expression
+  token searches, sort by nearby context words, and draw original-position plots.
+  The [concordance guide](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html)
+  connects explicitly sourced helpers to saved occurrences, zero-match documents
+  and single-token within-document DP with its counts and denominators.
 - **Trace the effect of reference choice.** Compare the same target phrases
   across references, keeping coverage and sample sizes beside common-item
   differences. A higher mean caused by missing phrases should not be mistaken
