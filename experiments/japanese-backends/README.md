@@ -1,6 +1,6 @@
 # Japanese backend experiment
 
-This experiment connects Sudachi output to the
+These experiments connect Sudachi and MeCab output to the
 [Japanese annotation workflow](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html).
 These scripts are available in this repository, but are not installed with the
 R package or rendered as website articles. They add no
@@ -9,7 +9,7 @@ R 4.6; this is not a claim of cross-platform support or linguistic accuracy.
 
 The question is whether existing Japanese analyzers can feed ldfreq's source
 alignment, KWIC decisions and document counts without losing original writing.
-Sudachi performs analysis; ldfreq imports and checks positions, aligns alternative
+The external analyzers perform analysis; ldfreq imports and checks positions, aligns alternative
 annotations, reviews occurrences using quanteda, and calculates N/V/TTR.
 No analyzer or lexical-diversity formula is reimplemented here.
 
@@ -101,3 +101,60 @@ GiNZA, KWJA, UDPipe Japanese models and reticulate integration are not tested by
 this experiment. Support for another analyzer requires checking its original-text
 alignment, feature meanings and saved-output replay separately. No corpus or
 analyzer dictionary is bundled by this prototype.
+
+## Same-dictionary R/Python comparison (2026-10-14)
+
+`compare-mecab.R` runs the gibasa helper directly from the Japanese annotation
+guide and compares it with `fugashi-parity.py`. This is a bounded interoperability
+experiment, not a supported fugashi adapter or an accuracy benchmark.
+
+From the repository root, with ldfreq, gibasa, jsonlite, digest and stringi
+installed in R, and fugashi installed for the supplied Python executable:
+
+```sh
+Rscript experiments/japanese-backends/compare-mecab.R \
+  /path/to/python /path/to/unidic_lite/dicdir /tmp/ldfreq-mecab-comparison
+```
+
+Use **unidic-lite 1.0.8 (based on UniDic 2.1.2)** with its 26-field binary schema.
+The dictionary identity is supplied by the caller; the script records hashes
+and verifies that both interfaces use the same files, rather than identifying
+an arbitrary dictionary. Dictionary/configuration paths must contain no
+whitespace for this limited recipe. An existing `~/.mecabrc` is preserved and
+used by both paths; otherwise both use empty configuration files. A configuration
+activating another dictionary fails the checks. There is no automatic sentence
+splitting, user dictionary or requested input normalization.
+
+Confirmed with **gibasa 1.1.3, fugashi 1.5.2, ldfreq 0.3.0.9007, R 4.6.1,
+Python 3.14.3, macOS arm64**:
+
+- 16 authored inputs, including compounds, inflections, suffixes, variant
+  spellings, unknown forms, whitespace, CRLF, combining marks, fullwidth
+  characters, emoji, ellipses, compatibility characters and empty input.
+- All 87 analyzer rows have identical surfaces and raw feature strings.
+  POS1 and orthBase also agree after explicitly mapping missing fields.
+- Both imported outputs preserve the original text and agree on codepoint
+  positions, independently calculated in Python from MeCab nodes.
+- All 32 surface/orthBase N/V/TTR rows agree with independent Python arithmetic;
+  empty TTR remains missing. Complete RDS objects survive save/reload unchanged.
+
+`mecab-parity-summary.json` records versions and dictionary/configuration hashes;
+`mecab-parity-counts.csv` contains only authored-input counts. Running the scripts
+also saves the inputs, complete fugashi output and imported RDS locally.
+This confirms agreement for these inputs/settings, not identical MeCab builds,
+all inputs, other operating systems, dictionary versions, or other wrappers.
+The older dictionary is a reproducible integration fixture, not a recommendation
+that it best represents every contemporary Japanese corpus.
+
+The selection excludes auxiliary symbols and tokens containing whitespace,
+retains particles/auxiliaries, and excludes missing orthBase only in the base
+condition. Consequently the N values of the two conditions can differ. Compare
+the same occurrence population when attributing a score change to lexical unit
+alone, and report missingness/coverage separately. Unknown flags are supplied
+by fugashi; they are not inferred from gibasa's missing bases.
+
+Different segmentation is a separate comparison: the previously saved
+[unit sensitivity experiment](../japanese-units/README.md) found changed scores
+for Sudachi A/C on 24 of 28 essays. Agreement between two MeCab wrappers with the
+same dictionary does not imply agreement with Sudachi, nor does either establish
+linguistic correctness or learner proficiency validity.

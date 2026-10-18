@@ -5015,8 +5015,8 @@ The existing uncommitted PR #42 publication record was retained.
 
 ### Current identity and completion evidence
 
-Current public snapshot: **0.3.0.9006**, main/tag `7f97872`, Pages `60c54d4`.
-See [the 9006 publication entry](#documentation-snapshot-0309006-publication-completion)
+Current public snapshot: **0.3.0.9007**, main/tag `411ab0e`, Pages `5284ee2`.
+See [the 9007 publication entry](#api-entry-point-snapshot-0309007-publication-completion)
 for exact identities, PR CI and anonymous-delivery evidence. The bullets below
 record the 9005 baseline of the wording audit, not the latest deployed state.
 
@@ -5365,3 +5365,151 @@ will use the existing protected PR checks, then main, a new fixed prerelease
 and verified Pages files; 9006 remains untouched. This preparation record does
 not claim CI or remote delivery has completed. No manual duplicate workflow,
 CI cancellation, CRAN submission or user-usability study is part of the work.
+
+
+## API entry-point snapshot 0.3.0.9007: publication completion
+
+- The owner explicitly approved PR #44's main merge, the 9007 prerelease and
+  site publication after the automatic approval review distinguished the prior
+  push authorization from main-branch merge authorization. No bypass was used.
+- [PR #44](https://github.com/Ryuya-dot-com/ldfreq/pull/44) merged as
+  `411ab0ea797c9afce245e44a1e54f5729c61ef32`. The tested head is
+  `959c444fc6406312a9ee1660deb6f747b9b9f0da`; both trees are
+  `b7fbfcb9cc6669dee7d01a6b445a50202ed0686c`.
+- [PR R-CMD-check 38570198268](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/38570198268)
+  completed successfully with all 11 jobs. Both protected-branch checks passed.
+  Release-candidate run `38570198079` passed the development-state classifier
+  and aggregate; formal-candidate jobs were intentionally skipped.
+- [v0.3.0.9007](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.3.0.9007)
+  is a prerelease targeting that exact main commit. Its attached archive and
+  SHA256SUMS match the preparation evidence. Older releases and the formal
+  latest-release designation are unchanged.
+- Pages commit `5284ee24d68317a0e3af54a23f713cfed8541fea` contains the verified
+  9007 site. [Pages run 38572613477](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/38572613477)
+  completed with build, deploy and status reporting all successful.
+- Anonymous delivery matched all 13 checked home/help/guide/NEWS/search/metadata
+  files and both release assets byte-for-byte. The two internal-roadmap paths
+  remain 404. The 253-file local site has 129 HTML pages and no broken local
+  targets; 201 text files passed the workspace/internal-path scan. No browser
+  was available for visual inspection in this turn, so a rendered-layout or
+  human-usability review is not claimed.
+- The reused package report guide retains the truthful statement that its
+  printed calculations used 9006. Its source, recorded results and invocation
+  are unchanged; this is provenance, not an obsolete installation instruction.
+  Both edited package guides and the complete public site were rendered with
+  9007. The fixed archive contains all 22 guides.
+- [Main R-CMD-check 38572512722](https://github.com/Ryuya-dot-com/ldfreq/actions/runs/38572512722)
+  completed successfully with all 11 jobs, including Windows/macOS/Linux,
+  minimum R and R devel, resource checks, installed examples and the required
+  aggregate. Main Release-candidate run `38572517247` also succeeded.
+  PR and main are separate successful invocations of the same source tree;
+  no manual duplicate workflow or cancellation was used.
+
+Evidence remains under `reviews/ldfreq-api-consolidation-20261014/`, including
+`pr-final.json`, `pr-final-state.json`, `pr-merged.json`, `release.json`,
+`main-final.json`, `pages-final.json` and `public-delivery.json`. The explicit approval resolved
+all publication authorization blockers. No new export, CRAN submission, Windows
+R 4.1/CP932 validation or independent usability study is claimed.
+
+
+The completion record and roadmap update are retained on
+`codex/api-consolidation-evidence-20261014`. They change only repository developer
+records; the fixed 9007 source archive, main/tag code and deployed site remain
+as verified above. No further numerical test run is needed for these records.
+
+## Morphology and Japanese guide revision (2026-10-14)
+
+The continuation adopts the guide-entry work identified by the morphology
+review. README, the two existing morphology/Japanese guides and an explicitly
+unreleased NEWS entry change. No new API, analyzer, dependency, metric formula,
+dictionary, resource or corpus is introduced. The fixed 9007 source archive,
+main/tag and public Pages delivery remain the published baseline; this entry
+records a verified development-branch revision and local previews.
+
+- The family/affix guide routes family counts, part counts and formation
+  relations to the existing examples. It connects Bauer–Nation inclusion,
+  Schmitt–Zimmerman productive derivative knowledge, MorphoLex and MorphyNet
+  to their respective questions and limitations. Existing complete examples
+  and source-bound review/save procedures remain available.
+- The Japanese guide routes prepared annotations, R/gibasa analysis and other
+  analyzer outputs separately. Same-dictionary wrapper agreement is separated
+  from segmentation sensitivity and linguistic accuracy, with a fixed-commit
+  link to the existing reproduction experiment. Lexeme/base-form choices and
+  Japanese short-unit categories are not converted into English affix classes
+  or educational word families.
+- The gibasa example now records 16 source tokens, 13 lexical candidates,
+  one missing base and 12 retained occurrences. The same 12 occurrences give
+  surface V = 10, TTR = 10/12 and base V = 9, TTR = 9/12; coverage is 12/13.
+  Empty-document coverage and TTR stay missing. The documented RDS retains
+  the original import, selection, coverage, common-form comparison, metrics
+  and n-grams together.
+
+Evidence is in `reviews/ldfreq-morphology-guides-20261014/`:
+
+- `reuse.json`: 319 tracked runtime/help/resource/test and package-identity
+  files are byte-identical to main `411ab0e`. The actual gibasa helper is
+  unchanged since the 16-input R/Python experiment at `6dab71b`; the guide's
+  full source hash changes with the new explanatory text. Earlier parity,
+  28-essay sensitivity and full CI evidence remain applicable to their original
+  claims and were not rerun.
+- `verify-and-render.log`: both complete package guides rendered using installed
+  9007, including gibasa and the optional review paths. The new counts match
+  the hand-counted cases; the exact documented save code preserves all six
+  components. `replay.log` confirms their independent R-session reload without
+  rerunning an analyzer. `finish-pages.log` confirms unchanged numerical tables
+  after shortening display headers and wrapping code lines.
+- `build-pages.log`: home, the two changed articles, NEWS, search and LLM outputs
+  rebuilt. Other pages reuse the verified 9007 site. The final site has 253
+  files/129 HTML pages, with 11 changed files and no broken local links/anchors
+  (`site-audit.json`). No workspace paths or internal roadmap/publication
+  references were introduced into the user-facing output.
+- Public API audit passes: 57 exports, 34 S3 registrations and 37 public help
+  topics. No full numerical-suite rerun or duplicate CI was needed for these
+  guide changes.
+- Headless Chrome with an isolated temporary profile provided desktop previews
+  at 1440 × 1100. The morphology entry, Japanese route and coverage table were
+  inspected; the final headers expose the coverage column without horizontal
+  clipping. `visual-check.json` and the three PNGs record these checks.
+  This is a local rendering check, not a novice-user study, mobile-layout
+  certification or verification of a newly deployed site.
+
+## Morphology literature and interpretation (2026-10-14)
+
+The follow-up examines what prior research supports, including conflicting
+findings and the conditions of original evaluations. The two existing guides
+and unreleased NEWS explain family counting across populations/tasks, observed
+affix use versus productivity/knowledge, and Japanese analyzer/dictionary/corpus
+foundations. The current roadmap records the question, study designs,
+interpretive limits, reading scope and resulting decisions. This is a focused
+review, not a systematic review or a new validation study.
+
+The source baseline is development commit `63a01aa`. All 65 R chunks (52 Japanese,
+13 family/affix) are unchanged. No runtime code, help, API, dependency, data,
+dictionary or numerical method changes. Existing 9007 CI, R/Python agreement,
+saved unit comparisons and fresh-session replay evidence remain valid for their
+original claims. They were not rerun as new experiments.
+
+Evidence is in `reviews/ldfreq-morphology-literature-20261014/`:
+
+- `reuse.json` records unchanged chunks and the guide source hashes.
+- `build-literature.log` records successful complete package-guide rendering
+  and both pkgdown articles using installed 9007, with optional gibasa/review
+  paths active. Japanese selection, coverage and common-form results are
+  identical to the previously saved objects.
+- The next NEWS step initially failed because the sandbox could not resolve
+  `crandb.r-pkg.org`. `finish-site.log` records completion of only NEWS, search
+  and LLM outputs with network access. Successful guide rendering was retained;
+  this was a document-build network failure, not a numerical-test failure.
+- Final `site-audit.json`: 253 files/129 HTML pages, seven files changed from the
+  prior guide preview, no broken local links or anchors. `public-wording-check.json`
+  checks 202 text outputs without finding the selected workspace/internal
+  document markers. External sources were inspected for their supporting
+  content; inaccessible full text is distinguished from an invalid citation.
+- `visual-check.json` and three desktop previews show the Japanese foundation
+  table, family-evidence table and affix interpretation without horizontal
+  clipping. No mobile-layout or human-usability study is claimed.
+
+The verified guides are development-branch changes. Main, the 9007 release
+archive and the deployed Pages site retain the previously verified publication.
+The existing push workflows target main, so no duplicate full CI is scheduled
+for this documentation-only branch push.
