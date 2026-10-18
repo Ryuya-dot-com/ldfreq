@@ -1,5 +1,27 @@
 # Changelog
 
+## ldfreq 0.3.0.9008 (development)
+
+- Add an executable repeated-observation guide and explicitly sourced
+  study-table helpers. Preserve scheduled writer/task/occasion rows,
+  submission and calculation states, reporting decisions, plan
+  identities and exclusion reasons; select one specification for an
+  ordinary model data frame. Demonstrate optional `lme4` fitting and
+  full-record replay with synthetic inputs. `lme4` is a suggested
+  package; core calculations, exports and result schemas are unchanged.
+- Clarify how to choose word-family, affix and Japanese annotation
+  workflows. Connect the research basis and resource scope to the
+  existing examples; distinguish same-dictionary R/Python agreement from
+  segmentation sensitivity and linguistic accuracy. The Japanese guide
+  now reports missing-base coverage and compares surface/base forms on
+  common occurrences, retaining both in the saved analysis. No API,
+  dependency, formula or resource change.
+- Explain the differing evidence for word-family counting across learner
+  populations and tasks. Separate observed affix use from productivity
+  and knowledge, and connect Japanese unit choices to the original
+  analyzer and corpus studies without transferring their accuracy claims
+  to new texts.
+
 ## ldfreq 0.3.0.9007 (development)
 
 - Run explicit plans with `lexdiv_metrics(..., plan = plan)` and

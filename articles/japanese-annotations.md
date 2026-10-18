@@ -1,11 +1,5 @@
 # Japanese annotations: from original text to lexical measures
 
-For stimulus-item ratings and separately obtained AoA/BOI tables, see
-[Japanese lexical
-norms](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.md).
-That workflow retains item IDs and norm-matching decisions independently
-of morphological segmentation.
-
 Japanese text needs an explicit word-unit decision. For example,
 counting `国際連合` as one item or `国際 / 連合` as two changes both
 vocabulary diversity and the available bigrams. The default Unicode
@@ -21,13 +15,26 @@ lexical analyses. This is an integration and audit contribution, not a
 new Japanese segmentation algorithm or a validated Japanese proficiency
 scale.
 
-For a complete first workflow, start with [Read files, review words and
-save the analysis](#japanese-file-workflow). It uses small authored
-TXT/CSV files and prepared annotations, so you can learn the decisions
-without installing an analyzer. Then use the [gibasa
-recipe](#use-gibasa-and-a-local-unidic-dictionary-in-r) to supply your
-own annotations. File reading and morphological analysis are separate
-steps.
+## Choose a Japanese analysis route
+
+| Your starting point | Route | What it requires |
+|----|----|----|
+| Learn the workflow before choosing an analyzer | [Read files, review words and save](#japanese-file-workflow), or the [smaller offline example](#an-offline-example) | Authored files/annotations supplied with the package; the review exercise also uses quanteda |
+| Analyze your own Japanese text in R | [gibasa with a local UniDic dictionary](#use-gibasa-and-a-local-unidic-dictionary-in-r) | Optional gibasa and a separately acquired UTF-8 dictionary with the stated schema |
+| Already have output from R or Python | [Import complete annotations](#an-offline-example), then [select lexical forms](#choose-lexical-forms-and-preserve-exclusions) | Original text, ordered original surfaces, actual analyzer/dictionary settings and documented feature meanings |
+
+gibasa and Python’s [fugashi](https://github.com/polm/fugashi) are MeCab
+interfaces. [RMeCab](https://github.com/IshidaMotohiro/RMeCab) and
+[RcppMeCab](https://github.com/junhewk/RcppMeCab) are other R
+interfaces; their output schemas and defaults are not verified by this
+recipe. SudachiPy uses a different analyzer with A/B/C segmentation
+modes. Its [repository
+experiment](https://github.com/Ryuya-dot-com/ldfreq/tree/6dab71bb7ecd56a41042b59ecc1ea2b3dbea3863/experiments/japanese-backends)
+includes an exporter, but it is not an installed connector. The same
+experiment contains the fugashi comparison described below. GiNZA and
+other Japanese pipelines require their own feature and original-text
+alignment checks. Reading a text file alone does not perform
+morphological analysis.
 
 For a smaller comparison without the optional review dependency, use
 [all-body versus content-word
@@ -35,6 +42,74 @@ selection](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.h
 It reads the same authored files, preserves unknown POS membership,
 exposes calculation diagnostics, and saves a complete record and methods
 text.
+
+For separately obtained AoA/BOI tables, use [Japanese lexical
+norms](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.md).
+For supplied English family and affix analyses, use [word families,
+roots and
+affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.md).
+
+## Will the results agree with other tools?
+
+Agreement depends on the original text and segment boundaries, analyzer
+and dictionary versions, user dictionaries, segmentation mode,
+lexical-form field, normalization, exclusions and metric settings. Match
+those choices before attributing a difference to R versus Python or to
+ldfreq. Compare full token rows first: equal aggregate scores can
+conceal different analyses.
+
+Using the gibasa recipe from ldfreq **0.3.0.9007**, a [same-dictionary
+comparison](https://github.com/Ryuya-dot-com/ldfreq/tree/6dab71bb7ecd56a41042b59ecc1ea2b3dbea3863/experiments/japanese-backends#same-dictionary-rpython-comparison-2026-10-14)
+checked gibasa 1.1.3 against fugashi 1.5.2 with unidic-lite 1.0.8,
+identical dictionary/configuration hashes and no user dictionary. All
+**87 token rows in 16 authored inputs** agreed on original surface and
+raw features. Both imports agreed on codepoint positions; 32
+surface/orthBase N/V/TTR rows agreed with independent Python arithmetic,
+including empty inputs. Complete RDS save/reload also preserved the
+objects. The environment was macOS arm64, R 4.6.1 and Python 3.14.3.
+This verifies that route for those inputs/settings, not linguistic
+accuracy, every input or every MeCab interface/version.
+
+Changing the analysis unit is a different comparison. In the saved
+28-essay Sudachi A/C comparison, TTR, MATTR and MTLD each changed in 24
+essays despite equal original-character coverage. See [word-unit
+sensitivity](#compare-japanese-word-units) for the sample, settings and
+limitations. UniDic `lemma`, `orthBase`, and Sudachi
+`dictionary_form`/`normalized_form` are not interchangeable lexical
+keys.
+
+ldfreq’s role is to retain original occurrences, input choices,
+missingness and review decisions through counting and saving. These
+operations can also be assembled with other tools. Neither this
+comparison nor source alignment shows that ldfreq improves an upstream
+analyzer’s segmentation accuracy or speed.
+
+### Research foundations and their limits
+
+The analysis choices have a research basis, but each source supports a
+different part of the workflow:
+
+| Research | What it contributes | Consequence for this workflow |
+|----|----|----|
+| [Kudo, Yamamoto and Matsumoto (2004)](https://aclanthology.org/W04-3230/) | Conditional random fields for joint Japanese segmentation and tagging | Cite the upstream analysis method and record the actual engine/dictionary versions |
+| [Den et al. (2008)](https://aclanthology.org/L08-1535/) | UniDic’s lexical hierarchy and separate evaluation of segmentation, POS and lemma identification | Matching surfaces does not establish correct lexical identity; retain the feature used for counting |
+| [Ogiso and Nakamura (2014)](https://doi.org/10.5715/jnlp.21.301) | BCCWJ short/long units and annotation correction linked to dictionary entries | Declare the unit and distinguish automatic output from human-corrected corpus annotations |
+| [Takaoka et al. (2018)](https://aclanthology.org/L18-1355/) | Sudachi’s multiple granularities and normalization for different applications | Treat mode and normalization as analysis choices; Sudachi’s longest mode is not automatically BCCWJ’s long unit |
+
+These are foundations, not current accuracy guarantees. For example, Den
+et al.’s evaluation included test-set words in the lexicon to isolate
+the modeled task from unknown-word handling. BCCWJ’s annotation quality
+also involved human correction. Those results cannot be transferred to
+unreviewed learner essays or the particular older dictionary used in
+this recipe. The Sudachi paper explains its design; it does not validate
+an L2 proficiency score.
+
+Use the [saved unit comparisons](#compare-japanese-word-units) to
+understand how a choice affects lexical measures. If the research claim
+instead concerns annotation accuracy, it needs an independently reviewed
+reference matching the target texts and unit definition. Agreement
+between two MeCab interfaces is a reproducibility check of a shared
+analysis route, not that independent reference.
 
 ## An offline example
 
@@ -1116,6 +1191,15 @@ identify a unique lexeme: homographs may require reading, POS or
 dictionary IDs. Do not use a first-match join to resolve collisions with
 a reference table.
 
+The same [UniDic
+terminology](https://clrd.ninjal.ac.jp/unidic/glossary.html)
+distinguishes Japanese short-unit analysis from decomposition of a word
+into its morphemes. In this recipe, `学びました` contains `学び` (動詞)
+and `まし`/`た` (助動詞). Preserve these categories: a tag such as
+接尾辞, an auxiliary verb and an inflectional feature are not
+automatically one English-style suffix class. A UniDic lexeme label is
+not a derivational-family ID.
+
 This explicit example excludes auxiliary symbols and whitespace tokens,
 retains particles and auxiliary verbs, and requires an observed
 `orthBase`. Inspect and save the exclusions rather than substituting
@@ -1151,6 +1235,65 @@ grams$documents
 #> 4       empty 3            0             0           0 empty_document
 ```
 
+### Account for missing bases before comparing forms
+
+The retained sequence depends on the availability of the chosen form. In
+this example, the invented `qzxv` has a surface but no `orthBase`; it is
+excluded from the base-form calculation. The table separates tokens
+before selection, lexical candidates after symbol/whitespace exclusion,
+and candidates missing a base. Coverage uses lexical candidates as its
+denominator; an empty document has unavailable coverage rather than
+100%.
+
+``` r
+selection_counts <- do.call(rbind, lapply(ja$documents$document_id,
+  function(id) {
+  rows <- t$document_id == id
+  candidates <- rows & !punctuation & !has_whitespace
+  retained <- candidates & !missing_base
+  data.frame(document_id = id, source_tokens = sum(rows),
+    lexical_candidates = sum(candidates),
+    missing_base = sum(candidates & missing_base),
+    retained_tokens = sum(retained),
+    base_coverage = if (sum(candidates))
+      sum(retained) / sum(candidates) else NA_real_)
+}))
+knitr::kable(selection_counts, digits = 3, row.names = FALSE,
+  col.names = c("Document", "Source tokens", "Candidates",
+    "Missing base", "Retained", "Coverage"))
+```
+
+| Document | Source tokens | Candidates | Missing base | Retained | Coverage |
+|:---------|--------------:|-----------:|-------------:|---------:|---------:|
+| essay    |            16 |         13 |            1 |       12 |    0.923 |
+| empty    |             0 |          0 |            0 |        0 |       NA |
+
+To isolate the lexical-form choice, compare surface and base on the
+**same retained occurrences**. This conditional comparison answers how
+grouping those occurrences changes V and TTR; it does not describe all
+original lexical candidates. Keep the coverage table beside it.
+
+``` r
+surface_by_document <- setNames(lapply(ja$documents$document_id,
+  function(id) selected$surface[selected$document_id == id]),
+  ja$documents$document_id)
+surface_results <- lexdiv_metrics_batch(surface_by_document, metrics = "ttr")
+common_results <- rbind(
+  data.frame(unit = "surface", as.data.frame(surface_results)),
+  data.frame(unit = "orthBase", as.data.frame(results)))
+knitr::kable(
+  common_results[c("document_id", "unit", "N", "V", "value", "status")],
+  digits = 3, row.names = FALSE,
+  col.names = c("Document", "Form", "N", "V", "TTR", "Status"))
+```
+
+| Document | Form     |   N |   V |   TTR | Status  |
+|:---------|:---------|----:|----:|------:|:--------|
+| essay    | surface  |  12 |  10 | 0.833 | ok      |
+| empty    | surface  |   0 |   0 |    NA | missing |
+| essay    | orthBase |  12 |   9 | 0.750 | ok      |
+| empty    | orthBase |   0 |   0 |    NA | missing |
+
 The diversity calculation describes the retained sequence. N-grams also
 respect segment boundaries and the **original** `token_index`: excluding
 a particle, punctuation or an unavailable base leaves a gap, not a new
@@ -1160,7 +1303,8 @@ those gaps for concordances and other quanteda operations in a UTF-8 R
 session.
 
 ``` r
-saveRDS(list(imported = ja, selection = selection, metrics = results, ngrams = grams),
+saveRDS(list(imported = ja, selection = selection, coverage = selection_counts,
+  common_forms = common_results, metrics = results, ngrams = grams),
   "japanese-analysis.rds")
 ```
 

@@ -6,6 +6,23 @@ questions. This tutorial shows how to count them while retaining the
 words, reference entries, unresolved cases and decisions behind each
 result.
 
+Choose the question before choosing a resource:
+
+| What you want to describe | Start here | Keep visible |
+|----|----|----|
+| How many listed families occur, compared with surface forms or lemmas? | [Compare counting units](#what-changes-when-words-are-counted-as-families) with [`lexdiv_family_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_family_profile.md) | The inventory, common occurrences and unmatched words |
+| Which roots, prefixes and suffixes occur? | [Count supplied word parts](#which-roots-and-affixes-occur-in-the-text) with the example helpers | Derivation versus inflection, analysis coverage and part IDs |
+| Which base-to-word formation relations does a reference record? | [Inspect MorphyNet relations](#keep-alternative-formation-relations-separate) | Alternative relations and the meaning of selecting one |
+
+Family membership does not supply a complete affix analysis. Likewise,
+an affix analysis does not establish that a learner knows every related
+word. For the evidence behind that distinction, see [what the research
+supports](#morphology-research-and-interpretation). For Japanese
+segmentation and dictionary features, start with the [Japanese
+workflow](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#choose-a-japanese-analysis-route);
+Japanese short units and English word families are different counting
+units.
+
 Work through the examples in order in a fresh R session. Use the
 [documented
 installation](https://ryuya-dot-com.github.io/ldfreq/index.html#installation).
@@ -249,6 +266,27 @@ or diagnose irregular inflection.
 | Nation BNC/COCA | Which listed forms belong to an educational family? | A complete segmentation or knowledge of every member |
 | MorphoLex | What derivational segmentation and morphological variables does this reference record? | All inflections or the writer’s mental decomposition |
 | MorphyNet | Which source-to-target formation relations are recorded? | A unique full decomposition or Nation family membership |
+
+These resources answer different research questions. The inclusion
+framework of [Bauer and Nation
+(1993)](https://doi.org/10.1093/ijl/6.4.253) organizes affixes using
+frequency, regularity, productivity and predictability. It supports an
+explicit family definition; it does not turn a text’s family count into
+a learner-knowledge score. In a study of 106 L2 university students and
+16 prompt words, productive knowledge of related derivatives was usually
+partial ([Schmitt and Zimmerman,
+2002](https://doi.org/10.2307/3588328)). The counting unit should
+therefore follow the research question and population.
+
+[MorphoLex](https://doi.org/10.3758/s13428-017-0981-8) provides recorded
+derivational analyses and morphological variables for English
+word-processing research.
+[MorphyNet](https://aclanthology.org/2021.sigmorphon-1.5/) supplies
+multilingual inflectional and derivational relations; the reader used
+below handles its derivational table. Their original evaluations do not
+establish the accuracy of assigning a particular analysis to every
+occurrence in your texts. Preserve the source analysis, coverage and
+contextual judgments separately.
 
 ### Inspect recorded segmentation before counting it
 
@@ -529,3 +567,57 @@ and the installed resource notices. For an alternative family inventory,
 partial analyses, repeated roots, POS restrictions and the complete
 table contracts, see the [detailed family and morphology
 reference](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#resource-defined-word-families).
+
+## What does the research support?
+
+### Choose a counting unit for a stated claim
+
+The family framework is useful for describing related vocabulary under
+an explicit inclusion rule. Whether it also represents a learner’s
+knowledge is a separate empirical question. Findings depend on the
+learners and task:
+
+| Study | What was assessed | Implication for interpretation |
+|----|----|----|
+| [McLean (2018)](https://doi.org/10.1093/applin/amw050) | Japanese EFL learners’ written meaning recall for base, inflected and derived forms | Knowing a base did not ensure knowing its derivatives; this supports examining smaller units for that use |
+| [Kim, Stoeckel and McLean (2023)](https://doi.org/10.1111/modl.12863) | 120 Japanese learners translating spoken base and affixed forms | The assumed overlap in family-member knowledge was not supported for this listening task |
+| [Snoder and Laufer (2022)](https://doi.org/10.1002/tesq.3101) | 88 Swedish adolescents’ written meaning recognition | High knowledge of tested derivatives supports family use in some populations; one derivative per base does not establish whole-family mastery |
+| [Laufer (2024; online 2023)](https://doi.org/10.1017/S0272263123000219) | 90 Hebrew-speaking learners interpreting 22 derived pseudowords with supplied stem meanings | Higher scores in contextual conditions support examining context; supplied meanings and a fixed condition order limit generalization |
+| [Milliner et al. (online 2024)](https://doi.org/10.1177/13621688231225704) | 150 Japanese learners’ written meaning recall of real derivatives | The reported semantic-context benefit was absent; context cannot be assumed to compensate for unfamiliar derivatives |
+
+Meaning recognition, meaning recall, listening and producing a
+derivative are different demands. These studies do not provide a single
+interchangeable accuracy rate. In particular, the fixed order in
+Laufer’s study means that context and repeated exposure cannot be fully
+separated in that comparison. Neither favorable nor unfavorable findings
+justify choosing one counting unit for every population and purpose. A
+family profile of an essay describes the essay under the chosen
+inventory; it is not a vocabulary-size test.
+
+### Separate affix use, productivity and knowledge
+
+The part counts above describe observed use. Morphological productivity
+asks about the availability of a word-formation process for further
+formations. [Baayen and Lieber (1991, Section
+2)](https://doi.org/10.1515/ling.1991.29.5.801) discuss a corpus
+measure, `P = n1 / N`, where `n1` is the number of word types with a
+particular affix occurring once and `N` is the number of word tokens
+with that affix. That denominator is **not all essay tokens**, and `n1`
+counts word types, not distinct suffixes. The measure depends on
+sampling and sample size; a hapax is not necessarily a newly coined
+word. This tutorial does not calculate it or treat affixes/token as a
+productivity score.
+
+Knowledge requires evidence from people. For example, the [Word Part
+Levels Test (Sasao and Webb,
+2017)](https://doi.org/10.1177/1362168815586083) assesses affix form
+recognition, meaning and syntactic use separately. An annotated
+occurrence of `-er` does not supply those responses. Conversely, absence
+from an essay is not evidence that its writer does not know the affix:
+the task may not call for it.
+
+For a descriptive study, report the observed forms, analysis scope and
+coverage. For a claim about learners, specify the knowledge or
+performance outcome and collect evidence suited to that claim. A
+resource’s family level, its frequency band and a test’s empirically
+estimated difficulty are different quantities.

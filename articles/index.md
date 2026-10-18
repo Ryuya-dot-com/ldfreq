@@ -15,6 +15,8 @@
 
 - [Designing comparable lexical-diversity
   analyses](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.md):
+- [From planned observations to a mixed
+  model](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.md):
 - [Word families, roots, and affixes: from texts to interpretable
   profiles](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.md):
 - [Using your own lexical reference data across a

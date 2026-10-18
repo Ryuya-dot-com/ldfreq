@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,15 +65,15 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Version 0.3.0.9007 is a development prerelease and has not been released on CRAN. The fixed tag below identifies the tested code and installed examples. It requires R 4.1.0 or later. Install the tested snapshot used by this documentation:</p>
+<p>The published snapshot is 0.3.0.9008, a development prerelease that has not been released on CRAN. It includes the repeated-observation examples and helpers. The fixed tag below identifies the tested code and installed examples. It requires R 4.1.0 or later. Install the tested snapshot used by this documentation:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run install.packages("pak") first if pak is not installed.</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@v0.3.0.9007"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@v0.3.0.9008"</span><span class="op">)</span></span></code></pre></div>
 <p>Pinning the revision fixes the implementation, even when development snapshots share the same version number. The package’s required dependencies are <code>digest</code> and <code>stringi</code>; additional tools are optional for their documented workflows. For example, candidate-review examples use <code>quanteda</code>.</p>
 <p>If you have a built source archive, install it locally:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install digest and stringi first if they are not already available.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ldfreq_0.3.0.9007.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ldfreq_0.3.0.9008.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
 <p>The built archive includes rendered guides. A GitHub source installation may omit them; the online guides remain available.</p>
 </div>
 <div class="section level2">
@@ -125,7 +125,12 @@
 <tr>
 <td>Japanese text and supplied morphological annotations</td>
 <td>
-<a href="https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html">Japanese annotations</a>; reading text alone does not perform Japanese word segmentation</td>
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#choose-a-japanese-analysis-route">Choose an analysis route</a>; compare R/Python agreement, lexical forms and selection coverage</td>
+</tr>
+<tr>
+<td>Complete annotations for family or affix counts</td>
+<td>
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html">Word families, roots and affixes</a>; choose the counting question, reference and analysis scope</td>
 </tr>
 </tbody>
 </table>
@@ -151,7 +156,8 @@
 <strong>Trace the effect of reference choice.</strong> Compare the same target phrases across references, keeping coverage and sample sizes beside common-item differences. A higher mean caused by missing phrases should not be mistaken for greater familiarity.</li>
 </ul>
 <p>These are features for describing and comparing texts. A score alone does not establish proficiency, writing quality, measurement validity, or reliability.</p>
-<p>The <a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#study-metadata">study-table walkthrough</a> connects document results to writer/task metadata, retains unavailable and withheld values, and reports document-weighted descriptive statistics with their contributing document/writer counts. It uses the existing installation and saves both flat CSV tables and the complete analysis record. An <a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#pelic-study-report">executed PELIC example</a> connects saved results for 16 real learner essays to original writer/task metadata, diagnostic summaries, methods text and fresh-session report replay. Corpus texts are not bundled or downloaded during installation.</p>
+<p>The <a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#study-metadata">study-table walkthrough</a> connects document results to writer/task metadata, retains unavailable and withheld values, and reports document-weighted descriptive statistics with their contributing document/writer counts. It uses the existing installation and saves both flat CSV tables and the complete analysis record.</p>
+<p>For repeated observations, the <a href="https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html">mixed-model walkthrough</a> keeps scheduled writer/task/occasion rows, submitted documents and measurement results separate. Its explicitly sourced helpers retain absent submissions and exclusion reasons, then select one measurement specification for an ordinary <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lme4::lmer()</a></code> data frame. The optional model illustrates the connection using synthetic word sequences; it does not validate a developmental model. An <a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#pelic-study-report">executed PELIC example</a> connects saved results for 16 real learner essays to original writer/task metadata, diagnostic summaries, methods text and fresh-session report replay. Corpus texts are not bundled or downloaded during installation.</p>
 <p>The Japanese workflow also connects <a href="https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#connect-document-selections-to-reference-frequency">source-linked frequency profiles</a> to full-token coverage, common-span comparisons and saved-input replay.</p>
 <p>The text workflow supports surface forms, lemmas and AntBNC flemmas. For resource-defined word families, experimental <code><a href="reference/lexdiv_family_profile.html">lexdiv_family_profile()</a></code> matches complete imported annotations to a caller-supplied form–family table. It retains token occurrences, member counts, unresolved candidates and KWIC; <code>use</code> and <code>reusability</code> remain two tokens even if a declared table places them in one family. See the <a href="https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#resource-defined-word-families">word-family example</a>. An optional <code>review</code> connects the existing ambiguity-review workflow to occurrence-specific family choices, retaining reviewers, reasons and original lookup results. Changed source, inventory or counting policies require a new review snapshot; one decision never changes every occurrence of a spelling. Flemmas and derivational families are distinct. <code><a href="reference/bnccoca_data.html">bnccoca_data()</a></code> supplies Nation’s BNC/COCA Level 6 lists: 25,000 families and 75,679 headword/member records, with 29,798 supplementary records kept separate. The data use <strong>CC BY-SA 4.0</strong>, with attribution and ShareAlike conditions; see the <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/main/inst/licenses/bnccoca/NOTICE.md" class="external-link">source and conversion notice</a>. Family membership does not establish a learner’s knowledge of every member. The bundled version groups <code>use</code>/<code>uses</code> and <code>colour</code>/<code>color</code>; <code>reusability</code> is unlisted and remains unresolved. Frequency bands are distinct from the Bauer–Nation Level 6 inclusion criterion.</p>
 <p><code><a href="reference/morphynet_read_derivations.html">morphynet_read_derivations()</a></code> reads a separately obtained MorphyNet TSV in R, retaining formation relations, original POS symbols, source hashes and alternatives. An <a href="https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#inspect-morphynet-formation-relations">installed example</a> connects a nine-row, CC BY-SA 3.0 excerpt to existing KWIC review. Multiple incoming relations are not summed as affixes or converted to Nation families. The full database is not bundled; optional KWIC review uses quanteda. An explicitly sourced <a href="https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#source-linked-roots-and-affixes">roots-and-affixes recipe</a> links supplied parts to original occurrences, retaining analysis scope, alternatives, partial analyses and coverage. <code><a href="reference/morpholex_data.html">morpholex_data()</a></code> reads the bundled MorphoLex-en tables with their provenance and CC BY-NC-SA 4.0 terms. The word-parts recipe can use these tables offline or an optional local workbook; these recipes are not exported APIs or automatic morphology analyzers.</p>

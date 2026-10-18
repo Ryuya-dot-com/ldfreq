@@ -16,6 +16,11 @@ Choose the task you need:
 - [Join study information and summarize documents](#study-metadata): use
   the saved file-analysis results from those paths; the section names
   its required objects.
+- [Retain scheduled observations and prepare a mixed
+  model](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.md):
+  distinguish absent submissions from unavailable scores, select one
+  specification, and save the model’s observation IDs and exclusion
+  reasons.
 - [Extract saved MTLD diagnostics into a wide
   table](#wide-mtld-diagnostics): use
   `lexdiv_widen(..., mtld_diagnostics = TRUE)` with ldfreq 0.3.0.9004 or

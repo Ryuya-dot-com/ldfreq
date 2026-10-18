@@ -41,6 +41,9 @@ started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html).
 For condition comparisons and research reporting, see [From text to a
 research
 report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html).
+For repeated observations, planned submissions and an ordinary model
+data frame, see [From planned observations to a mixed
+model](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html).
 For your own files, see [TXT-folder and CSV
 input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
 For counting units and morphology, see [Word families, roots and
@@ -470,22 +473,7 @@ result <- lexdiv_metrics_text(
   tokenizer = "english", case = "lower", metrics = "ttr"
 )
 result$results  # N = 5, V = 4, TTR = 0.8
-#> <lexdiv_results: 1 metric; contract 0.2.0>
-#>   metric_id value status missing_reason N V below_quality_floor
-#> 1       ttr   0.8     ok           <NA> 5 4               FALSE
 result$token_audit
-#>   token_index surface selected_unit unit_match_rule upos eligible
-#> 1           1    cats          cats            <NA> <NA>     TRUE
-#> 2           2   chase         chase            <NA> <NA>     TRUE
-#> 3           3    cats          cats            <NA> <NA>     TRUE
-#> 4           4     and           and            <NA> <NA>     TRUE
-#> 5           5    dogs          dogs            <NA> <NA>     TRUE
-#>   exclusion_reason
-#> 1             <NA>
-#> 2             <NA>
-#> 3             <NA>
-#> 4             <NA>
-#> 5             <NA>
 
 # Several texts: names identify documents, including the empty one.
 texts <- c(essay_a = "Cats chase cats and dogs.", essay_b = "The reader reads a story.",
@@ -494,11 +482,6 @@ batch <- lexdiv_metrics_text_batch(
   texts, tokenizer = "english", case = "lower", metrics = "ttr"
 )
 batch$results  # TTR = 0.8, 1, NA; the empty text has reason "empty_input".
-#> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
-#>   document_id metric_id value  status missing_reason N V below_quality_floor
-#> 1     essay_a       ttr   0.8      ok           <NA> 5 4               FALSE
-#> 2     essay_b       ttr   1.0      ok           <NA> 5 5               FALSE
-#> 3       empty       ttr    NA missing    empty_input 0 0                TRUE
 
 # Other entry points: ?lexdiv_metrics for pre-tokenized words;
 # ?lexdiv_family_profile for a complete Nation word-family example.
