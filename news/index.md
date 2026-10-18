@@ -1,5 +1,19 @@
 # Changelog
 
+## ldfreq 0.3.0.9009 (development)
+
+- Add explicitly sourced concordance helpers and an executable guide for
+  fixed, wildcard and regular-expression token searches, including
+  multi-token patterns. Keep original spans, selection gaps, segment
+  boundaries and zero-match documents; sort by nearest context tokens
+  and plot saved absolute or relative positions.
+- Add single-token within-document DP with explicit partitions,
+  searchable-token exposure, counts and missing-value reasons. Save
+  searches, source annotations and occurrence identities for replay.
+  Phrase dispersion and between-document dispersion are outside this
+  recipe. Existing phrase-review behavior, core calculations, exports
+  and dependencies are unchanged.
+
 ## ldfreq 0.3.0.9008 (development)
 
 - Add an executable repeated-observation guide and explicitly sourced

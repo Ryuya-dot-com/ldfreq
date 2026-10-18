@@ -31,6 +31,8 @@
   corpus](https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.md):
 - [From corpus annotations to quanteda and lexical
   profiles](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.md):
+- [Search words and phrases, then inspect their
+  distribution](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.md):
 - [Review lexical ambiguity with KWIC and original
   context](https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.md):
 - [Connect contextual model outputs to research
