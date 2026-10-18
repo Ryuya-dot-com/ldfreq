@@ -1,3 +1,13 @@
+# ldfreq 0.3.0.9010 (development)
+
+- Add explicitly sourced collocation examples for adjacent and left/right-span
+  token pairs. MI and t-score retain observed/expected counts, positional
+  marginals, eligible opportunities, document coverage and original KWIC links.
+  Excluded and missing endpoints preserve original distances; thresholds flag
+  rows without changing the population. The guide covers zero counts, saved
+  records and the distinction between association and significance.
+- Existing n-gram frequency contracts and exported functions are unchanged.
+
 # ldfreq 0.3.0.9009 (development)
 
 - Add explicitly sourced concordance helpers and an executable guide for fixed,
