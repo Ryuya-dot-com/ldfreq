@@ -53,6 +53,9 @@ association](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-associa
 For target/reference word comparisons with explicit denominators and
 source links, see [Compare word use against an explicit reference
 corpus](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html).
+For English readability with sentence, word and syllable audits, see
+[Calculate English readability with visible counting
+decisions](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html).
 For your own files, see [TXT-folder and CSV
 input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
 For counting units and morphology, see [Word families, roots and

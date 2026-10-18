@@ -1,5 +1,17 @@
 # Changelog
 
+## ldfreq 0.3.0.9012
+
+- Add explicitly sourced English readability examples for Flesch Reading
+  Ease and Flesch–Kincaid Grade Level. Supplied sentence boundaries,
+  original token spans, counts, unresolved syllables and pronunciation
+  decisions remain attached. Optional nsyllable estimates distinguish
+  dictionary matches from fallback estimates; digit-bearing forms and
+  dotted initialisms require pronunciation review. A research-table
+  example retains writer, task, occasion and planned non-submissions.
+  Scores describe the recorded counting conditions, without claiming
+  original-protocol equivalence or validation on learner writing.
+
 ## ldfreq 0.3.0.9011 (development)
 
 - Add explicitly sourced keyness examples for disjoint target and

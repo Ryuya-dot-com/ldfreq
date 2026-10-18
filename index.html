@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9011</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9012</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,15 +65,15 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>The published snapshot is 0.3.0.9011, a development prerelease that has not been released on CRAN. It includes source-linked keyness comparisons with explicit corpus denominators. The fixed tag below identifies the tested code and installed examples. It requires R 4.1.0 or later. Install the tested snapshot used by this documentation:</p>
+<p>The published snapshot is 0.3.0.9012, a development prerelease that has not been released on CRAN. It includes English readability examples with visible sentence, word and syllable counts. The fixed tag below identifies the tested code and installed examples. It requires R 4.1.0 or later. Install the tested snapshot used by this documentation:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run install.packages("pak") first if pak is not installed.</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@v0.3.0.9011"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@v0.3.0.9012"</span><span class="op">)</span></span></code></pre></div>
 <p>Pinning the revision fixes the implementation, even when development snapshots share the same version number. The package’s required dependencies are <code>digest</code> and <code>stringi</code>; additional tools are optional for their documented workflows. For example, candidate-review examples use <code>quanteda</code>.</p>
 <p>If you have a built source archive, install it locally:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install digest and stringi first if they are not already available.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ldfreq_0.3.0.9011.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ldfreq_0.3.0.9012.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
 <p>The built archive includes rendered guides. A GitHub source installation may omit them; the online guides remain available.</p>
 </div>
 <div class="section level2">
@@ -158,6 +158,8 @@
 <strong>Inspect nearby words and association.</strong> Count adjacent or left/right-span token pairs with MI, t-score, positional marginals and original KWIC links. The <a href="https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html">collocation guide</a> retains excluded positions, zero counts and the complete opportunity population.</li>
 <li>
 <strong>Compare word use across corpora.</strong> Declare disjoint target and reference document sets, then inspect counts, rates, signed G², log-ratios and document frequencies. The <a href="https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html">keyness guide</a> retains selection and missingness audits, full denominators and exact-term KWIC.</li>
+<li>
+<strong>Inspect English readability counts.</strong> Calculate Flesch Reading Ease and Flesch–Kincaid Grade Level with supplied sentence boundaries, source spans and explicit syllable estimates or hand counts. The <a href="https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html">readability guide</a> preserves unresolved pronunciations, empty submissions and writer/task/occasion metadata.</li>
 <li>
 <strong>Trace the effect of reference choice.</strong> Compare the same target phrases across references, keeping coverage and sample sizes beside common-item differences. A higher mean caused by missing phrases should not be mistaken for greater familiarity.</li>
 </ul>
