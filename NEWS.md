@@ -1,4 +1,4 @@
-# ldfreq (development version)
+# ldfreq 0.3.0.9008 (development)
 
 - Add an executable repeated-observation guide and explicitly sourced study-table
   helpers. Preserve scheduled writer/task/occasion rows, submission and calculation

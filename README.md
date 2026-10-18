@@ -16,17 +16,15 @@ and checks that reshaped tables and plots do not mix incompatible specifications
 
 ## Installation
 
-The published snapshot is 0.3.0.9007, a development prerelease that has not
-been released on CRAN. The 0.3.0.9008 development sources additionally contain
-the repeated-observation helpers; those examples require installing these
-sources and are not included in the 9007 tag below.
+The published snapshot is 0.3.0.9008, a development prerelease that has not
+been released on CRAN. It includes the repeated-observation examples and helpers.
 The fixed tag below identifies the tested code and installed examples.
 It requires R 4.1.0 or later. Install the tested snapshot used by this
 documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9007")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9008")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
@@ -38,7 +36,7 @@ If you have a built source archive, install it locally:
 
 ```r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9007.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9008.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation may
