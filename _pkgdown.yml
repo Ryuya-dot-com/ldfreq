@@ -97,6 +97,7 @@ articles:
       - annotated-corpora
       - concordance-and-dispersion
       - collocation-association
+      - keyness-comparison
       - ambiguity-review
       - contextual-models
       - open-access-papers
