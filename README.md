@@ -16,7 +16,10 @@ and checks that reshaped tables and plots do not mix incompatible specifications
 
 ## Installation
 
-Version 0.3.0.9007 is a development prerelease and has not been released on CRAN.
+The published snapshot is 0.3.0.9007, a development prerelease that has not
+been released on CRAN. The 0.3.0.9008 development sources additionally contain
+the repeated-observation helpers; those examples require installing these
+sources and are not included in the 9007 tag below.
 The fixed tag below identifies the tested code and installed examples.
 It requires R 4.1.0 or later. Install the tested snapshot used by this
 documentation:
@@ -123,6 +126,14 @@ connects document results to writer/task metadata, retains unavailable and
 withheld values, and reports document-weighted descriptive statistics with
 their contributing document/writer counts. It uses the existing installation
 and saves both flat CSV tables and the complete analysis record.
+
+For repeated observations, the
+[mixed-model walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html)
+keeps scheduled writer/task/occasion rows, submitted documents and measurement
+results separate. Its explicitly sourced helpers retain absent submissions and
+exclusion reasons, then select one measurement specification for an ordinary
+`lme4::lmer()` data frame. The optional model illustrates the connection using
+synthetic word sequences; it does not validate a developmental model.
 An [executed PELIC example](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#pelic-study-report)
 connects saved results for 16 real learner essays to original writer/task
 metadata, diagnostic summaries, methods text and fresh-session report replay.

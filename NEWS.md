@@ -1,5 +1,11 @@
 # ldfreq (development version)
 
+- Add an executable repeated-observation guide and explicitly sourced study-table
+  helpers. Preserve scheduled writer/task/occasion rows, submission and calculation
+  states, reporting decisions, plan identities and exclusion reasons; select one
+  specification for an ordinary model data frame. Demonstrate optional `lme4`
+  fitting and full-record replay with synthetic inputs. `lme4` is a suggested
+  package; core calculations, exports and result schemas are unchanged.
 - Clarify how to choose word-family, affix and Japanese annotation workflows.
   Connect the research basis and resource scope to the existing examples;
   distinguish same-dictionary R/Python agreement from segmentation sensitivity
