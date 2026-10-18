@@ -46,6 +46,8 @@ For adjacent and left/right-span word association with source-linked counts, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html}{Count nearby words and explain their association}.
 For target/reference word comparisons with explicit denominators and source links, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html}{Compare word use against an explicit reference corpus}.
+For English readability with sentence, word and syllable audits, see
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html}{Calculate English readability with visible counting decisions}.
 For your own files, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files}{TXT-folder and CSV input}.
 For counting units and morphology, see
