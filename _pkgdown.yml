@@ -99,6 +99,7 @@ articles:
       - collocation-association
       - keyness-comparison
       - english-readability
+      - syntactic-complexity
       - ambiguity-review
       - contextual-models
       - open-access-papers

@@ -16,15 +16,15 @@ and checks that reshaped tables and plots do not mix incompatible specifications
 
 ## Installation
 
-The published snapshot is 0.3.0.9012, a development prerelease that has not
-been released on CRAN. It includes English readability examples with visible sentence, word and syllable counts.
+The published snapshot is 0.3.0.9013, a development prerelease that has not
+been released on CRAN. It includes English readability and traced syntactic-complexity examples.
 The fixed tag below identifies the tested code and installed examples.
 It requires R 4.1.0 or later. Install the tested snapshot used by this
 documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9012")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9013")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
@@ -36,7 +36,7 @@ If you have a built source archive, install it locally:
 
 ```r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9012.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9013.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation may
@@ -129,6 +129,11 @@ above; optional annotation and reference-resource workflows name their additiona
   explicit syllable estimates or hand counts. The
   [readability guide](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html)
   preserves unresolved pronunciations, empty submissions and writer/task/occasion metadata.
+- **Trace syntactic complexity.** Import pinned original L2SCA output with
+  source text, parse trees and matched nodes. The
+  [syntax guide](https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.html)
+  keeps MLC, MLT and DC/C beside their counts, failures and review decisions,
+  then connects them to writer/task/occasion tables.
 - **Trace the effect of reference choice.** Compare the same target phrases
   across references, keeping coverage and sample sizes beside common-item
   differences. A higher mean caused by missing phrases should not be mistaken
