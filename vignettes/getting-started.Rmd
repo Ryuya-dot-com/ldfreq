@@ -195,7 +195,14 @@ writer knows. See [comparison design](designing-comparisons.html) and the
 | Japanese text and morphological annotations | [Japanese annotations](japanese-annotations.html); imported annotation tables have their own workflow |
 | Saved results, condition comparisons and methods text | [From text to a report](from-text-to-report.html) |
 
-Your first analysis is complete. The sections below describe optional lexical
+Your first analysis is complete. Choose your next route from the
+[research-question map](../index.html#choose-a-research-question), or the
+[report guide's task list](from-text-to-report.html). Both connect required
+inputs to the result tables and source records you should inspect. In particular,
+reference-frequency profiles describe document words; keyness compares corpora,
+and a mixed-model table has one selected response per observation.
+
+The sections below describe optional lexical
 units, reference resources and method variants. Use them when those choices
 are part of your question; they are not prerequisites for the workflow above.
 

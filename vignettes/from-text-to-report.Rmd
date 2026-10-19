@@ -21,6 +21,16 @@ Choose the task you need:
 - [Compare English case choices](#compare-english-case-from-files) or
   [Japanese word selections](#compare-japanese-pos-from-files): run the shared
   setup below, then the relevant language path and the saving section.
+- [Describe frequency or vocabulary levels](getting-started.html#corpus-relative-frequency-with-coverage):
+  inspect resource matches and token/type coverage with each summary. Use
+  [the vocabulary audit](auditing-vocabulary-profiles.html) to explain unmatched
+  forms, or [corpus reference profiles](corpus-reference-profiles.html) for your
+  own norm table. A reference profile describes document words; keyness below
+  compares two declared corpora.
+- [Compare families, roots and affixes](word-families-and-affixes.html):
+  supply complete annotations and an inventory, then read shared occurrences,
+  unresolved words and coverage. Counts on the resolved subset do not replace
+  whole-document counts.
 - [Join study information and summarize documents](#study-metadata): use the
   saved file-analysis results from those paths; the section names its required objects.
 - [Retain scheduled observations and prepare a mixed model](repeated-observations.html):

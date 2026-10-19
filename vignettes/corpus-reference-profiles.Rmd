@@ -9,7 +9,6 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 ```
 
 ## Choose a question and a reference unit
@@ -33,6 +32,8 @@ register, task/topic, author/speaker, documented language background and samplin
 conditions. Keep unknown information missing; do not infer L1 from a genre label.
 
 ```{r}
+library(ldfreq)
+
 texts <- data.frame(
   document_id = c("demo_essay", "demo_turn", "demo_blank"),
   corpus_id = "authored_demo_v1",
