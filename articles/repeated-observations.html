@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9013</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9014</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,101 +100,28 @@ submitted. Other authored cases include an empty string, punctuation
 only, three words, a document withheld from reporting and an unknown
 writer ID.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"repeated-study-demo.R"</span>,</span>
 <span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">demo</span><span class="op">)</span></span>
 <span><span class="va">record</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">record</span></span>
 <span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">helper</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">planned</span>, <span class="fl">6</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">writer_id</th>
-<th align="left">task</th>
-<th align="right">occasion</th>
-<th align="left">observation_id</th>
-<th align="left">scheduled_date</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">001</td>
-<td align="left">description</td>
-<td align="right">0</td>
-<td align="left">obs-001</td>
-<td align="left">2026-01-05</td>
-</tr>
-<tr class="even">
-<td align="left">002</td>
-<td align="left">description</td>
-<td align="right">0</td>
-<td align="left">obs-002</td>
-<td align="left">2026-01-05</td>
-</tr>
-<tr class="odd">
-<td align="left">003</td>
-<td align="left">description</td>
-<td align="right">0</td>
-<td align="left">obs-003</td>
-<td align="left">2026-01-05</td>
-</tr>
-<tr class="even">
-<td align="left">004</td>
-<td align="left">description</td>
-<td align="right">0</td>
-<td align="left">obs-004</td>
-<td align="left">2026-01-05</td>
-</tr>
-<tr class="odd">
-<td align="left">005</td>
-<td align="left">description</td>
-<td align="right">0</td>
-<td align="left">obs-005</td>
-<td align="left">2026-01-05</td>
-</tr>
-<tr class="even">
-<td align="left">NA</td>
-<td align="left">description</td>
-<td align="right">0</td>
-<td align="left">obs-006</td>
-<td align="left">2026-01-05</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">submissions</span>, <span class="fl">5</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">observation_id</th>
-<th align="left">document_id</th>
-<th align="right">input_characters</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">obs-002</td>
-<td align="left">doc-002</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">obs-003</td>
-<td align="left">doc-003</td>
-<td align="right">7</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-004</td>
-<td align="left">doc-004</td>
-<td align="right">16</td>
-</tr>
-<tr class="even">
-<td align="left">obs-005</td>
-<td align="left">doc-005</td>
-<td align="right">464</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-006</td>
-<td align="left">doc-006</td>
-<td align="right">456</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">planned</span>, <span class="fl">6</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  writer_id        task occasion observation_id scheduled_date</span></span>
+<span><span class="co">#&gt;        001 description        0        obs-001     2026-01-05</span></span>
+<span><span class="co">#&gt;        002 description        0        obs-002     2026-01-05</span></span>
+<span><span class="co">#&gt;        003 description        0        obs-003     2026-01-05</span></span>
+<span><span class="co">#&gt;        004 description        0        obs-004     2026-01-05</span></span>
+<span><span class="co">#&gt;        005 description        0        obs-005     2026-01-05</span></span>
+<span><span class="co">#&gt;       &lt;NA&gt; description        0        obs-006     2026-01-05</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">submissions</span>, <span class="fl">5</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  observation_id document_id input_characters</span></span>
+<span><span class="co">#&gt;         obs-002     doc-002                0</span></span>
+<span><span class="co">#&gt;         obs-003     doc-003                7</span></span>
+<span><span class="co">#&gt;         obs-004     doc-004               16</span></span>
+<span><span class="co">#&gt;         obs-005     doc-005              464</span></span>
+<span><span class="co">#&gt;         obs-006     doc-006              456</span></span></code></pre></div>
 <p>Replace these two tables with your own scheduled rows and actual
 document map:</p>
 <table class="table">
@@ -267,7 +194,7 @@ normalization, lowercase spelling and number exclusion. It preserves the
 full tokenization objects, original texts and the selected surface-token
 vectors. The plan asks for TTR and MATTR with a fixed ten-token
 window:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_plan</a></span><span class="op">(</span>presets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, specs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_spec</a></span><span class="op">(</span><span class="st">"ttr_v_over_n_v1"</span>, request_id <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_spec</a></span><span class="op">(</span><span class="st">"mattr_sliding_step1_v1"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>window_length <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
@@ -341,116 +268,33 @@ design.</p>
 <div class="section level2">
 <h2 id="build-the-complete-study-table">Build the complete study table<a class="anchor" aria-label="anchor" href="#build-the-complete-study-table"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">study</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">study_long_table</span><span class="op">(</span></span>
 <span>  <span class="va">record</span><span class="op">$</span><span class="va">planned</span>, <span class="va">record</span><span class="op">$</span><span class="va">submissions</span>, <span class="va">record</span><span class="op">$</span><span class="va">results</span>, <span class="va">record</span><span class="op">$</span><span class="va">plan</span>,</span>
 <span>  condition_id <span class="op">=</span> <span class="va">record</span><span class="op">$</span><span class="va">condition</span><span class="op">$</span><span class="va">id</span>, reporting <span class="op">=</span> <span class="va">record</span><span class="op">$</span><span class="va">reporting</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">study</span>, <span class="va">record</span><span class="op">$</span><span class="va">study</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">view</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">study</span>, <span class="va">request_id</span> <span class="op">==</span> <span class="st">"mattr10"</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">view</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation_id"</span>, <span class="st">"input_status"</span>, <span class="st">"N"</span>, <span class="st">"value"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">7</span><span class="op">)</span>,</span>
-<span>  col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Observation"</span>, <span class="st">"Input state"</span>, <span class="st">"Tokens"</span>, <span class="st">"MATTR10"</span><span class="op">)</span>,</span>
-<span>  digits <span class="op">=</span> <span class="fl">3</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Observation</th>
-<th align="left">Input state</th>
-<th align="right">Tokens</th>
-<th align="right">MATTR10</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">obs-001</td>
-<td align="left">not_submitted</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
-<td align="left">obs-002</td>
-<td align="left">empty_text</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-003</td>
-<td align="left">no_selected_tokens</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
-<td align="left">obs-004</td>
-<td align="left">selected_tokens</td>
-<td align="right">3</td>
-<td align="right">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-005</td>
-<td align="left">selected_tokens</td>
-<td align="right">80</td>
-<td align="right">0.694</td>
-</tr>
-<tr class="even">
-<td align="left">obs-006</td>
-<td align="left">selected_tokens</td>
-<td align="right">80</td>
-<td align="right">0.655</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-007</td>
-<td align="left">selected_tokens</td>
-<td align="right">80</td>
-<td align="right">0.585</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">view</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation_id"</span>, <span class="st">"missing_reason"</span>, <span class="st">"reporting_status"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">7</span><span class="op">)</span>,</span>
-<span>  col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Observation"</span>, <span class="st">"Calculation missing reason"</span>, <span class="st">"Reporting"</span><span class="op">)</span>,</span>
-<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Observation</th>
-<th align="left">Calculation missing reason</th>
-<th align="left">Reporting</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">obs-001</td>
-<td align="left">NA</td>
-<td align="left">not_screened</td>
-</tr>
-<tr class="even">
-<td align="left">obs-002</td>
-<td align="left">empty_input</td>
-<td align="left">report</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-003</td>
-<td align="left">empty_input</td>
-<td align="left">report</td>
-</tr>
-<tr class="even">
-<td align="left">obs-004</td>
-<td align="left">too_short_for_requested_parameter</td>
-<td align="left">report</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-005</td>
-<td align="left">NA</td>
-<td align="left">withhold</td>
-</tr>
-<tr class="even">
-<td align="left">obs-006</td>
-<td align="left">NA</td>
-<td align="left">report</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-007</td>
-<td align="left">NA</td>
-<td align="left">report</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">view</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation_id"</span>, <span class="st">"input_status"</span>, <span class="st">"N"</span>, <span class="st">"value"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">7</span><span class="op">)</span>,</span>
+<span>  digits <span class="op">=</span> <span class="fl">3</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  observation_id       input_status  N value</span></span>
+<span><span class="co">#&gt;         obs-001      not_submitted NA    NA</span></span>
+<span><span class="co">#&gt;         obs-002         empty_text  0    NA</span></span>
+<span><span class="co">#&gt;         obs-003 no_selected_tokens  0    NA</span></span>
+<span><span class="co">#&gt;         obs-004    selected_tokens  3    NA</span></span>
+<span><span class="co">#&gt;         obs-005    selected_tokens 80 0.694</span></span>
+<span><span class="co">#&gt;         obs-006    selected_tokens 80 0.655</span></span>
+<span><span class="co">#&gt;         obs-007    selected_tokens 80 0.585</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">view</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation_id"</span>, <span class="st">"missing_reason"</span>, <span class="st">"reporting_status"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">7</span><span class="op">)</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  observation_id                    missing_reason reporting_status</span></span>
+<span><span class="co">#&gt;         obs-001                              &lt;NA&gt;     not_screened</span></span>
+<span><span class="co">#&gt;         obs-002                       empty_input           report</span></span>
+<span><span class="co">#&gt;         obs-003                       empty_input           report</span></span>
+<span><span class="co">#&gt;         obs-004 too_short_for_requested_parameter           report</span></span>
+<span><span class="co">#&gt;         obs-005                              &lt;NA&gt;         withhold</span></span>
+<span><span class="co">#&gt;         obs-006                              &lt;NA&gt;           report</span></span>
+<span><span class="co">#&gt;         obs-007                              &lt;NA&gt;           report</span></span></code></pre></div>
 <p>The long table has 216 rows: 108 planned observations times two
 requests. It preserves the planned row order and then the plan’s request
 order, regardless of the order of submissions or results. Complete saved
@@ -496,154 +340,45 @@ your study’s reporting rules separately.</p>
 <div class="section level2">
 <h2 id="select-one-response-and-explain-the-denominator">Select one response and explain the denominator<a class="anchor" aria-label="anchor" href="#select-one-response-and-explain-the-denominator"></a>
 </h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">selected</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">study_model_data</span><span class="op">(</span><span class="va">study</span>,</span>
 <span>  condition_id <span class="op">=</span> <span class="va">record</span><span class="op">$</span><span class="va">condition</span><span class="op">$</span><span class="va">id</span>, request_id <span class="op">=</span> <span class="st">"mattr10"</span>,</span>
 <span>  required <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"writer_id"</span>, <span class="st">"task"</span>, <span class="st">"occasion"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">selected</span>, <span class="va">record</span><span class="op">$</span><span class="va">selected</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">selected</span><span class="op">$</span><span class="va">audit</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation_id"</span>, <span class="st">"not_submitted"</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">selected</span><span class="op">$</span><span class="va">audit</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation_id"</span>, <span class="st">"not_submitted"</span>,</span>
 <span>  <span class="st">"not_computable"</span>, <span class="st">"not_reportable"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">7</span><span class="op">)</span>,</span>
-<span>  col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Observation"</span>, <span class="st">"Absent"</span>, <span class="st">"Unavailable"</span>, <span class="st">"Not reportable"</span><span class="op">)</span>,</span>
-<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Observation</th>
-<th align="left">Absent</th>
-<th align="left">Unavailable</th>
-<th align="left">Not reportable</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">obs-001</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-<td align="left">TRUE</td>
-</tr>
-<tr class="even">
-<td align="left">obs-002</td>
-<td align="left">FALSE</td>
-<td align="left">TRUE</td>
-<td align="left">FALSE</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-003</td>
-<td align="left">FALSE</td>
-<td align="left">TRUE</td>
-<td align="left">FALSE</td>
-</tr>
-<tr class="even">
-<td align="left">obs-004</td>
-<td align="left">FALSE</td>
-<td align="left">TRUE</td>
-<td align="left">FALSE</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-005</td>
-<td align="left">FALSE</td>
-<td align="left">FALSE</td>
-<td align="left">TRUE</td>
-</tr>
-<tr class="even">
-<td align="left">obs-006</td>
-<td align="left">FALSE</td>
-<td align="left">FALSE</td>
-<td align="left">FALSE</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-007</td>
-<td align="left">FALSE</td>
-<td align="left">FALSE</td>
-<td align="left">FALSE</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">selected</span><span class="op">$</span><span class="va">audit</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation_id"</span>, <span class="st">"missing_metadata"</span>, <span class="st">"included"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">7</span><span class="op">)</span>,</span>
-<span>  col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Observation"</span>, <span class="st">"Missing metadata"</span>, <span class="st">"Included"</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Observation</th>
-<th align="left">Missing metadata</th>
-<th align="left">Included</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">obs-001</td>
-<td align="left"></td>
-<td align="left">FALSE</td>
-</tr>
-<tr class="even">
-<td align="left">obs-002</td>
-<td align="left"></td>
-<td align="left">FALSE</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-003</td>
-<td align="left"></td>
-<td align="left">FALSE</td>
-</tr>
-<tr class="even">
-<td align="left">obs-004</td>
-<td align="left"></td>
-<td align="left">FALSE</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-005</td>
-<td align="left"></td>
-<td align="left">FALSE</td>
-</tr>
-<tr class="even">
-<td align="left">obs-006</td>
-<td align="left">writer_id</td>
-<td align="left">FALSE</td>
-</tr>
-<tr class="odd">
-<td align="left">obs-007</td>
-<td align="left"></td>
-<td align="left">TRUE</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Unit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Planned observations"</span>, <span class="st">"Submitted documents"</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  observation_id not_submitted not_computable not_reportable</span></span>
+<span><span class="co">#&gt;         obs-001          TRUE           TRUE           TRUE</span></span>
+<span><span class="co">#&gt;         obs-002         FALSE           TRUE          FALSE</span></span>
+<span><span class="co">#&gt;         obs-003         FALSE           TRUE          FALSE</span></span>
+<span><span class="co">#&gt;         obs-004         FALSE           TRUE          FALSE</span></span>
+<span><span class="co">#&gt;         obs-005         FALSE          FALSE           TRUE</span></span>
+<span><span class="co">#&gt;         obs-006         FALSE          FALSE          FALSE</span></span>
+<span><span class="co">#&gt;         obs-007         FALSE          FALSE          FALSE</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">selected</span><span class="op">$</span><span class="va">audit</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation_id"</span>, <span class="st">"missing_metadata"</span>, <span class="st">"included"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">7</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  observation_id missing_metadata included</span></span>
+<span><span class="co">#&gt;         obs-001                     FALSE</span></span>
+<span><span class="co">#&gt;         obs-002                     FALSE</span></span>
+<span><span class="co">#&gt;         obs-003                     FALSE</span></span>
+<span><span class="co">#&gt;         obs-004                     FALSE</span></span>
+<span><span class="co">#&gt;         obs-005                     FALSE</span></span>
+<span><span class="co">#&gt;         obs-006        writer_id    FALSE</span></span>
+<span><span class="co">#&gt;         obs-007                      TRUE</span></span>
+<span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Unit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Planned observations"</span>, <span class="st">"Submitted documents"</span>,</span>
 <span>  <span class="st">"Known planned writers"</span>, <span class="st">"Computable MATTR10"</span>, <span class="st">"Model observations"</span>, <span class="st">"Model writers"</span><span class="op">)</span>,</span>
 <span>  Count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">planned</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">submissions</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">planned</span><span class="op">$</span><span class="va">writer_id</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">view</span><span class="op">$</span><span class="va">computation_status</span> <span class="op">==</span> <span class="st">"ok"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">selected</span><span class="op">$</span><span class="va">data</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">selected</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">writer_id</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Unit</th>
-<th align="right">Count</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Planned observations</td>
-<td align="right">108</td>
-</tr>
-<tr class="even">
-<td align="left">Submitted documents</td>
-<td align="right">107</td>
-</tr>
-<tr class="odd">
-<td align="left">Known planned writers</td>
-<td align="right">18</td>
-</tr>
-<tr class="even">
-<td align="left">Computable MATTR10</td>
-<td align="right">104</td>
-</tr>
-<tr class="odd">
-<td align="left">Model observations</td>
-<td align="right">102</td>
-</tr>
-<tr class="even">
-<td align="left">Model writers</td>
-<td align="right">18</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                    Unit Count</span></span>
+<span><span class="co">#&gt; 1  Planned observations   108</span></span>
+<span><span class="co">#&gt; 2   Submitted documents   107</span></span>
+<span><span class="co">#&gt; 3 Known planned writers    18</span></span>
+<span><span class="co">#&gt; 4    Computable MATTR10   104</span></span>
+<span><span class="co">#&gt; 5    Model observations   102</span></span>
+<span><span class="co">#&gt; 6         Model writers    18</span></span></code></pre></div>
 <p>The denominator is 108 planned observations, with 107 submitted
 documents, 104 computable MATTR10 values and 102 model observations from
 18 known writers. One planned row has unknown writer identity, so 18 is
@@ -686,7 +421,7 @@ any table binding that may drop contrast attributes. The selected data
 frame uses observation IDs as row names so that the fitted model’s rows
 can be checked. <code>na.action = na.fail</code> prevents additional
 unrecorded row omission.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_data</span> <span class="op">&lt;-</span> <span class="va">selected</span><span class="op">$</span><span class="va">data</span></span>
 <span><span class="va">model_data</span><span class="op">$</span><span class="va">task</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">model_data</span><span class="op">$</span><span class="va">task</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"description"</span>, <span class="st">"argument"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/contrasts.html" class="external-link">contrasts</a></span><span class="op">(</span><span class="va">model_data</span><span class="op">$</span><span class="va">task</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/contrast.html" class="external-link">contr.treatment</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">model_data</span><span class="op">$</span><span class="va">task</span><span class="op">)</span>, base <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -752,7 +487,7 @@ the complete RDS with the source texts, preparation records, plans,
 decisions and audit. Choose a persistent output folder for your own
 analysis; a temporary folder is used here so the example does not
 overwrite research files.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"repeated-study-"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">output_dir</span><span class="op">)</span></span>
 <span><span class="va">helper_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"study-table.R"</span>,</span>
@@ -773,7 +508,7 @@ overwrite research files.</p>
 recorded helper checksum checks the implementation used for joining; the
 full session record describes the package environment. Saved source is
 retained for inspection if versions differ.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"study.rds"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">helper_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"study-table.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>

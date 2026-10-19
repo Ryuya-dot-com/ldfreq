@@ -17,22 +17,29 @@ accuracy.
 ## Start with a complete, source-linked search
 
 ``` r
+library(ldfreq)
+
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "collocation-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
 helper <- demo$helper
 search <- demo$search
-knitr::kable(demo$annotations$segments, row.names = FALSE)
+print(demo$annotations$segments, row.names = FALSE)
+#>  document_id segment_id      text token_count
+#>           d1         s1 a b a b c           5
+#>           d2         s1   a c b a           4
+#>           d2         s2       b a           2
+#>          gap         s1     a , b           3
+#>      missing         s1   a gap b           3
+#>        empty         s1                     0
+#>                                                       text_sha256
+#>  d110393ed7da5c855423fe9e64e7bac0559ce7da85188465544cfb28fe23e0cb
+#>  61312e7448895df2363ff3c60711105fdb4b61bb92389627331e76c067160a3a
+#>  beedb4a7ba34c4ea09727022655dd743d5dda2940f1c8e4ec56ff2904324026c
+#>  d33dc101d06f8d7fee912c714d098f98f64aed510d78774d6fa632967ce5a892
+#>  8e964a33b68f627c79b0409ec2adfa9ec2af20baae5d7a0815fc9a3f61e53bc0
+#>  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 ```
-
-| document_id | segment_id | text | token_count | text_sha256 |
-|:---|:---|:---|---:|:---|
-| d1 | s1 | a b a b c | 5 | d110393ed7da5c855423fe9e64e7bac0559ce7da85188465544cfb28fe23e0cb |
-| d2 | s1 | a c b a | 4 | 61312e7448895df2363ff3c60711105fdb4b61bb92389627331e76c067160a3a |
-| d2 | s2 | b a | 2 | beedb4a7ba34c4ea09727022655dd743d5dda2940f1c8e4ec56ff2904324026c |
-| gap | s1 | a , b | 3 | d33dc101d06f8d7fee912c714d098f98f64aed510d78774d6fa632967ce5a892 |
-| missing | s1 | a gap b | 3 | 8e964a33b68f627c79b0409ec2adfa9ec2af20baae5d7a0815fc9a3f61e53bc0 |
-| empty | s1 |  | 0 | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 |
 
 The imported tokens retain original positions and character offsets. The
 chosen `lemma` column is missing for `gap`; the comma is explicitly
@@ -67,26 +74,35 @@ Specify and preserve any normalization in the annotations.
 
 ``` r
 adjacent <- helper$collocation_profile(search, "a") # L0/R1
-knitr::kable(adjacent$results, digits = 4, row.names = FALSE)
+print(adjacent$results, digits = 4, row.names = FALSE)
+#>  context observed node_marginal context_marginal opportunities expected     MI
+#>        b        2             3                3             8    1.125 0.8301
+#>        a        0             3                3             8    1.125   -Inf
+#>        c        1             3                2             8    0.750 0.4150
+#>  t_score documents context_documents meets_min_count        status
+#>   0.6187         1                 2            TRUE            ok
+#>       NA         0                 2           FALSE zero_observed
+#>   0.2500         1                 2            TRUE            ok
+print(adjacent$documents, row.names = FALSE)
+#>  document_id source_tokens kept_tokens searchable_tokens missing_terms
+#>           d1             5           5                 5             0
+#>           d2             6           6                 6             0
+#>          gap             3           2                 2             0
+#>      missing             3           3                 2             1
+#>        empty             0           0                 0             0
+#>  node_occurrences candidate_slot_pairs eligible_pairs excluded_pairs node_pairs
+#>                 2                    4              4              0          2
+#>                 3                    4              4              0          1
+#>                 1                    2              0              2          0
+#>                 1                    2              0              2          0
+#>                 0                    0              0              0          0
+#>  nodes_with_context            status
+#>                   2                ok
+#>                   1                ok
+#>                   0 no_eligible_pairs
+#>                   0 no_eligible_pairs
+#>                   0 no_eligible_pairs
 ```
-
-| context | observed | node_marginal | context_marginal | opportunities | expected | MI | t_score | documents | context_documents | meets_min_count | status |
-|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---|:---|
-| b | 2 | 3 | 3 | 8 | 1.125 | 0.8301 | 0.6187 | 1 | 2 | TRUE | ok |
-| a | 0 | 3 | 3 | 8 | 1.125 | -Inf | NA | 0 | 2 | FALSE | zero_observed |
-| c | 1 | 3 | 2 | 8 | 0.750 | 0.4150 | 0.2500 | 1 | 2 | TRUE | ok |
-
-``` r
-knitr::kable(adjacent$documents, row.names = FALSE)
-```
-
-| document_id | source_tokens | kept_tokens | searchable_tokens | missing_terms | node_occurrences | candidate_slot_pairs | eligible_pairs | excluded_pairs | node_pairs | nodes_with_context | status |
-|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---|
-| d1 | 5 | 5 | 5 | 0 | 2 | 4 | 4 | 0 | 2 | 2 | ok |
-| d2 | 6 | 6 | 6 | 0 | 3 | 4 | 4 | 0 | 1 | 1 | ok |
-| gap | 3 | 2 | 2 | 0 | 1 | 2 | 0 | 2 | 0 | 0 | no_eligible_pairs |
-| missing | 3 | 3 | 2 | 1 | 1 | 2 | 0 | 2 | 0 | 0 | no_eligible_pairs |
-| empty | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | no_eligible_pairs |
 
 There are **8 eligible adjacent pairs**, of which **3** start at the
 node `a`. The context `b` appears at the right endpoint of **3**
@@ -131,28 +147,31 @@ external corpus, and a missing lemma is not a known zero.
 
 ``` r
 span <- helper$collocation_profile(search, "a", span = c(left = 2L, right = 2L))
-knitr::kable(span$results, digits = 4, row.names = FALSE)
-```
-
-| context | observed | node_marginal | context_marginal | opportunities | expected | MI | t_score | documents | context_documents | meets_min_count | status |
-|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---|:---|
-| b | 8 | 13 | 12 | 30 | 5.2000 | 0.6215 | 0.9899 | 4 | 4 | TRUE | ok |
-| a | 2 | 13 | 13 | 30 | 5.6333 | -1.4940 | -2.5692 | 1 | 4 | TRUE | ok |
-| c | 3 | 13 | 5 | 30 | 2.1667 | 0.4695 | 0.4811 | 2 | 2 | TRUE | ok |
-
-``` r
-knitr::kable(span$documents[c("document_id", "candidate_slot_pairs",
+print(span$results, digits = 4, row.names = FALSE)
+#>  context observed node_marginal context_marginal opportunities expected      MI
+#>        b        8            13               12            30    5.200  0.6215
+#>        a        2            13               13            30    5.633 -1.4940
+#>        c        3            13                5            30    2.167  0.4695
+#>  t_score documents context_documents meets_min_count status
+#>   0.9899         4                 4            TRUE     ok
+#>  -2.5692         1                 4            TRUE     ok
+#>   0.4811         2                 2            TRUE     ok
+print(span$documents[c("document_id", "candidate_slot_pairs",
   "eligible_pairs", "excluded_pairs", "node_occurrences", "nodes_with_context", "node_pairs")],
   row.names = FALSE)
+#>  document_id candidate_slot_pairs eligible_pairs excluded_pairs
+#>           d1                   14             14              0
+#>           d2                   12             12              0
+#>          gap                    6              2              4
+#>      missing                    6              2              4
+#>        empty                    0              0              0
+#>  node_occurrences nodes_with_context node_pairs
+#>                 2                  2          6
+#>                 3                  3          5
+#>                 1                  1          1
+#>                 1                  1          1
+#>                 0                  0          0
 ```
-
-| document_id | candidate_slot_pairs | eligible_pairs | excluded_pairs | node_occurrences | nodes_with_context | node_pairs |
-|:---|---:|---:|---:|---:|---:|---:|
-| d1 | 14 | 14 | 0 | 2 | 2 | 6 |
-| d2 | 12 | 12 | 0 | 3 | 3 | 5 |
-| gap | 6 | 2 | 4 | 1 | 1 | 1 |
-| missing | 6 | 2 | 4 | 1 | 1 | 1 |
-| empty | 0 | 0 | 0 | 0 | 0 | 0 |
 
 The span example has **30 eligible ordered pairs**. Each ordered pair of
 original positions within the requested distance is one opportunity.
@@ -201,12 +220,12 @@ or a streaming large-corpus engine.
 selected <- helper$collocation_profile(search, "a", min_count = 2L)
 shown <- subset(selected$results, meets_min_count)
 shown <- shown[order(-shown$MI, -shown$observed), ]
-knitr::kable(shown, digits = 4, row.names = FALSE)
+print(shown, digits = 4, row.names = FALSE)
+#>  context observed node_marginal context_marginal opportunities expected     MI
+#>        b        2             3                3             8    1.125 0.8301
+#>  t_score documents context_documents meets_min_count status
+#>   0.6187         1                 2            TRUE     ok
 ```
-
-| context | observed | node_marginal | context_marginal | opportunities | expected | MI | t_score | documents | context_documents | meets_min_count | status |
-|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---|:---|
-| b | 2 | 3 | 3 | 8 | 1.125 | 0.8301 | 0.6187 | 1 | 2 | TRUE | ok |
 
 `min_count` is a positive whole number. It sets a flag; it never removes
 pairs, changes marginals, or overwrites below-threshold counts. The
@@ -223,19 +242,26 @@ inspection <- data.frame(document_id = pairs$document_id,
   context_position = pairs$context_position, distance = pairs$distance,
   pre = kwic$pre, node = kwic$keyword, post = kwic$post,
   context = span$search$source$tokens$surface[pairs$context_row])
-knitr::kable(inspection, row.names = FALSE)
+print(inspection, row.names = FALSE)
+#>  document_id segment_id node_position context_position distance  pre node
+#>           d1         s1             1                2        1         a
+#>           d1         s1             3                2       -1 a b     a
+#>           d1         s1             3                4        1 a b     a
+#>           d2         s1             1                3        2         a
+#>           d2         s1             4                3       -1 c b     a
+#>           d2         s2             2                1       -1   b     a
+#>          gap         s1             1                3        2         a
+#>      missing         s1             1                3        2         a
+#>    post context
+#>     b a       b
+#>     b c       b
+#>     b c       b
+#>     c b       b
+#>               b
+#>               b
+#>     , b       b
+#>   gap b       b
 ```
-
-| document_id | segment_id | node_position | context_position | distance | pre | node | post | context |
-|:---|:---|---:|---:|---:|:---|:---|:---|:---|
-| d1 | s1 | 1 | 2 | 1 |  | a | b a | b |
-| d1 | s1 | 3 | 2 | -1 | a b | a | b c | b |
-| d1 | s1 | 3 | 4 | 1 | a b | a | b c | b |
-| d2 | s1 | 1 | 3 | 2 |  | a | c b | b |
-| d2 | s1 | 4 | 3 | -1 | c b | a |  | b |
-| d2 | s2 | 2 | 1 | -1 | b | a |  | b |
-| gap | s1 | 1 | 3 | 2 |  | a | , b | b |
-| missing | s1 | 1 | 3 | 2 |  | a | gap b | b |
 
 Each matching pair links to a saved node occurrence ID, original token
 rows and segment-local, 1-based inclusive character offsets. A node KWIC

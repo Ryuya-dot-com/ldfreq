@@ -66,6 +66,26 @@ input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html
 For counting units and morphology, see [Word families, roots and
 affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html).
 
+## Open a guide or installed example
+
+The built source archive includes guides that can be opened locally:
+
+    vignette("getting-started", package = "ldfreq")
+    vignette("repeated-observations", package = "ldfreq")
+
+Use `vignette(package = "ldfreq")` to list the installed guides. A
+GitHub source installation may omit rendered guides; use the online
+links above in that case.
+
+Study-table, concordance, collocation, keyness, readability and syntax
+helpers are installed example code, not exported functions. They do not
+have individual `?function` or `example("function")` entries. Each guide
+shows the [`system.file()`](https://rdrr.io/r/base/system.file.html) and
+[`sys.source()`](https://rdrr.io/r/base/sys.source.html) calls needed to
+load its helpers, which are then called as `helper$function(...)`.
+Follow the guide's input requirements when replacing its authored data
+with your own.
+
 ## Choose your input
 
 Choose the entry point from the form of data you already have:

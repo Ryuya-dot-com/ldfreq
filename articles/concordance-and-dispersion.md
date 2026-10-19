@@ -19,22 +19,22 @@ annotation system.
 ## Prepare complete annotations
 
 ``` r
+library(ldfreq)
+
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "concordance-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
 helper <- demo$helper
 annotations <- demo$annotations
-knitr::kable(annotations$segments[c("document_id", "segment_id", "text")], row.names = FALSE)
+print(annotations$segments[c("document_id", "segment_id", "text")], row.names = FALSE)
+#>  document_id segment_id                                        text
+#>       spread         s1         learn a b c learn d e f learn g h i
+#>      cluster         s1         learn learn learn a b c d e f g h i
+#>      context         s1 We learn new words. They learned new words.
+#>      context         s2                        learn very new words
+#>       absent         s1                                 read a book
+#>        empty         s1
 ```
-
-| document_id | segment_id | text                                        |
-|:------------|:-----------|:--------------------------------------------|
-| spread      | s1         | learn a b c learn d e f learn g h i         |
-| cluster     | s1         | learn learn learn a b c d e f g h i         |
-| context     | s1         | We learn new words. They learned new words. |
-| context     | s2         | learn very new words                        |
-| absent      | s1         | read a book                                 |
-| empty       | s1         |                                             |
 
 `spread` and `cluster` each contain 12 original tokens and three
 instances of `learn`, at positions 1/5/9 and 1/2/3 respectively.
@@ -108,45 +108,38 @@ search <- helper$concordance_search(annotations,
   queries = list(word = "learn", phrase = c("learn", "new"), absent = "unlisted"),
   term_col = "lemma", valuetype = "fixed", case_insensitive = FALSE,
   keep = keep, window = 2L)
-knitr::kable(search$counts, row.names = FALSE)
-```
-
-| document_id | query_id | occurrences |
-|:------------|:---------|------------:|
-| spread      | word     |           3 |
-| cluster     | word     |           3 |
-| context     | word     |           3 |
-| absent      | word     |           0 |
-| empty       | word     |           0 |
-| spread      | phrase   |           0 |
-| cluster     | phrase   |           0 |
-| context     | phrase   |           2 |
-| absent      | phrase   |           0 |
-| empty       | phrase   |           0 |
-| spread      | absent   |           0 |
-| cluster     | absent   |           0 |
-| context     | absent   |           0 |
-| absent      | absent   |           0 |
-| empty       | absent   |           0 |
-
-``` r
-knitr::kable(search$occurrences[c("query_id", "document_id", "segment_id",
+print(search$counts, row.names = FALSE)
+#>  document_id query_id occurrences
+#>       spread     word           3
+#>      cluster     word           3
+#>      context     word           3
+#>       absent     word           0
+#>        empty     word           0
+#>       spread   phrase           0
+#>      cluster   phrase           0
+#>      context   phrase           2
+#>       absent   phrase           0
+#>        empty   phrase           0
+#>       spread   absent           0
+#>      cluster   absent           0
+#>      context   absent           0
+#>       absent   absent           0
+#>        empty   absent           0
+print(search$occurrences[c("query_id", "document_id", "segment_id",
   "pre", "keyword", "post")], row.names = FALSE)
+#>  query_id document_id segment_id          pre     keyword         post
+#>      word      spread         s1                    learn          a b
+#>      word      spread         s1         b c        learn          d e
+#>      word      spread         s1         e f        learn          g h
+#>      word     cluster         s1                    learn  learn learn
+#>      word     cluster         s1       learn        learn      learn a
+#>      word     cluster         s1 learn learn        learn          a b
+#>      word     context         s1          We        learn    new words
+#>      word     context         s1      . They      learned    new words
+#>      word     context         s2                    learn     very new
+#>    phrase     context         s1          We    learn new       words.
+#>    phrase     context         s1      . They  learned new       words.
 ```
-
-| query_id | document_id | segment_id | pre         | keyword     | post        |
-|:---------|:------------|:-----------|:------------|:------------|:------------|
-| word     | spread      | s1         |             | learn       | a b         |
-| word     | spread      | s1         | b c         | learn       | d e         |
-| word     | spread      | s1         | e f         | learn       | g h         |
-| word     | cluster     | s1         |             | learn       | learn learn |
-| word     | cluster     | s1         | learn       | learn       | learn a     |
-| word     | cluster     | s1         | learn learn | learn       | a b         |
-| word     | context     | s1         | We          | learn       | new words   |
-| word     | context     | s1         | . They      | learned     | new words   |
-| word     | context     | s2         |             | learn       | very new    |
-| phrase   | context     | s1         | We          | learn new   | words.      |
-| phrase   | context     | s1         | . They      | learned new | words.      |
 
 Each named list element is one query ID. A character vector within it
 specifies consecutive token patterns: `c("learn", "new")` searches two
@@ -171,23 +164,18 @@ wildcard <- helper$concordance_search(annotations,
   list(forms = "learn*", phrase = c("learn*", "new")), valuetype = "glob", keep = keep)
 regular <- helper$concordance_search(annotations,
   list(forms = "^learn(ed)?$"), valuetype = "regex", keep = keep)
-knitr::kable(wildcard$counts, row.names = FALSE)
-```
-
-| document_id | query_id | occurrences |
-|:------------|:---------|------------:|
-| spread      | forms    |           3 |
-| cluster     | forms    |           3 |
-| context     | forms    |           3 |
-| absent      | forms    |           0 |
-| empty       | forms    |           0 |
-| spread      | phrase   |           0 |
-| cluster     | phrase   |           0 |
-| context     | phrase   |           2 |
-| absent      | phrase   |           0 |
-| empty       | phrase   |           0 |
-
-``` r
+print(wildcard$counts, row.names = FALSE)
+#>  document_id query_id occurrences
+#>       spread    forms           3
+#>      cluster    forms           3
+#>      context    forms           3
+#>       absent    forms           0
+#>        empty    forms           0
+#>       spread   phrase           0
+#>      cluster   phrase           0
+#>      context   phrase           2
+#>       absent   phrase           0
+#>        empty   phrase           0
 stopifnot(sum(regular$counts$occurrences) == 9L)
 ```
 
@@ -211,16 +199,14 @@ The example therefore does not turn `learn very new` into `learn new`
 after excluding `very`.
 
 ``` r
-knitr::kable(search$documents, row.names = FALSE)
+print(search$documents, row.names = FALSE)
+#>  document_id source_tokens kept_tokens searchable_tokens missing_terms
+#>       spread            12          12                12             0
+#>      cluster            12          12                12             0
+#>      context            14          11                11             0
+#>       absent             3           3                 3             0
+#>        empty             0           0                 0             0
 ```
-
-| document_id | source_tokens | kept_tokens | searchable_tokens | missing_terms |
-|:------------|--------------:|------------:|------------------:|--------------:|
-| spread      |            12 |          12 |                12 |             0 |
-| cluster     |            12 |          12 |                12 |             0 |
-| context     |            14 |          11 |                11 |             0 |
-| absent      |             3 |           3 |                 3 |             0 |
-| empty       |             0 |           0 |                 0 |             0 |
 
 `source_tokens` counts all original positions. `kept_tokens` applies
 `keep`; `searchable_tokens` also requires a nonblank search term.
@@ -237,22 +223,20 @@ searches before raising it for a larger input.
 ``` r
 right_sorted <- helper$concordance_sort(search, side = "right", depth = 2L)
 left_sorted <- helper$concordance_sort(search, side = "left", depth = 2L)
-knitr::kable(right_sorted[c("query_id", "document_id", "pre", "keyword", "post")], row.names = FALSE)
+print(right_sorted[c("query_id", "document_id", "pre", "keyword", "post")], row.names = FALSE)
+#>  query_id document_id          pre     keyword         post
+#>      word      spread                    learn          a b
+#>      word     cluster learn learn        learn          a b
+#>      word      spread         b c        learn          d e
+#>      word      spread         e f        learn          g h
+#>      word     cluster       learn        learn      learn a
+#>      word     cluster                    learn  learn learn
+#>      word     context          We        learn    new words
+#>      word     context      . They      learned    new words
+#>      word     context                    learn     very new
+#>    phrase     context          We    learn new       words.
+#>    phrase     context      . They  learned new       words.
 ```
-
-| query_id | document_id | pre         | keyword     | post        |
-|:---------|:------------|:------------|:------------|:------------|
-| word     | spread      |             | learn       | a b         |
-| word     | cluster     | learn learn | learn       | a b         |
-| word     | spread      | b c         | learn       | d e         |
-| word     | spread      | e f         | learn       | g h         |
-| word     | cluster     | learn       | learn       | learn a     |
-| word     | cluster     |             | learn       | learn learn |
-| word     | context     | We          | learn       | new words   |
-| word     | context     | . They      | learned     | new words   |
-| word     | context     |             | learn       | very new    |
-| phrase   | context     | We          | learn new   | words.      |
-| phrase   | context     | . They      | learned new | words.      |
 
 The saved `left_tokens` and `right_tokens` list columns start with the
 nearest surface token. Left sorting uses L1, then L2; right sorting uses
@@ -330,34 +314,24 @@ necessarily mean a geometrically narrower cluster.
 
 ``` r
 dispersion <- helper$concordance_dispersion(search, "word", parts = 3L)
-knitr::kable(dispersion$documents[c("document_id", "searchable_tokens", "occurrences",
+print(dispersion$documents[c("document_id", "searchable_tokens", "occurrences",
   "DP", "status", "missing_reason")], digits = 4, row.names = FALSE)
-```
-
-| document_id | searchable_tokens | occurrences |     DP | status  | missing_reason       |
-|:------------|------------------:|------------:|-------:|:--------|:---------------------|
-| spread      |                12 |           3 | 0.0000 | ok      | NA                   |
-| cluster     |                12 |           3 | 0.6667 | ok      | NA                   |
-| context     |                11 |           3 | 0.0606 | ok      | NA                   |
-| absent      |                 3 |           0 |     NA | missing | no_matches           |
-| empty       |                 0 |           0 |     NA | missing | no_searchable_tokens |
-
-``` r
-knitr::kable(subset(dispersion$parts, document_id %in% c("spread", "cluster"))[
+#>  document_id searchable_tokens occurrences      DP  status       missing_reason
+#>       spread                12           3 0.00000      ok                 <NA>
+#>      cluster                12           3 0.66667      ok                 <NA>
+#>      context                11           3 0.06061      ok                 <NA>
+#>       absent                 3           0      NA missing           no_matches
+#>        empty                 0           0      NA missing no_searchable_tokens
+print(subset(dispersion$parts, document_id %in% c("spread", "cluster"))[
   c("document_id", "part", "searchable_tokens", "occurrences", "expected_share", "observed_share")],
   digits = 3, row.names = FALSE)
-```
-
-| document_id | part | searchable_tokens | occurrences | expected_share | observed_share |
-|:------------|-----:|------------------:|------------:|---------------:|---------------:|
-| spread      |    1 |                 4 |           1 |          0.333 |          0.333 |
-| spread      |    2 |                 4 |           1 |          0.333 |          0.333 |
-| spread      |    3 |                 4 |           1 |          0.333 |          0.333 |
-| cluster     |    1 |                 4 |           3 |          0.333 |          1.000 |
-| cluster     |    2 |                 4 |           0 |          0.333 |          0.000 |
-| cluster     |    3 |                 4 |           0 |          0.333 |          0.000 |
-
-``` r
+#>  document_id part searchable_tokens occurrences expected_share observed_share
+#>       spread    1                 4           1          0.333          0.333
+#>       spread    2                 4           1          0.333          0.333
+#>       spread    3                 4           1          0.333          0.333
+#>      cluster    1                 4           3          0.333          1.000
+#>      cluster    2                 4           0          0.333          0.000
+#>      cluster    3                 4           0          0.333          0.000
 stopifnot(isTRUE(all.equal(dispersion$documents$DP[1:2], c(0, 2/3))))
 ```
 

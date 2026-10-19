@@ -1,5 +1,14 @@
 # Changelog
 
+## ldfreq 0.3.0.9014
+
+- Make guide setup visible when starting in a new R session, and use
+  base R table displays so reading results needs no optional formatting
+  package. Explain how to open installed guides and load example
+  helpers. Connect counting-condition comparisons to the original
+  document and counted forms, with separate guidance for corpus-level
+  statistics and structural measures.
+
 ## ldfreq 0.3.0.9013
 
 - Add explicitly sourced English syntactic-complexity examples for MLC,

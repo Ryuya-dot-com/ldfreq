@@ -27,6 +27,23 @@ Choose the task you need:
   later. The earlier helper supports long diagnostic tables and older
   installations; a custom function is not required just to inspect a
   first result.
+- [Explain corpus differences with words and
+  contexts](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.md):
+  inspect counts and reference denominators, then return to the counted
+  occurrences.
+  [Collocation](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.md)
+  and [concordance and
+  dispersion](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.md)
+  answer related questions about nearby words and positions.
+  Corpus-level statistics are not independent writer-level observations.
+- [Inspect
+  readability](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.md)
+  or [syntactic
+  complexity](https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.md)
+  alongside lexical results: match the original texts and document IDs,
+  retaining each workflow’s word, sentence, syllable or structure counts
+  and review decisions separately. A shared document ID does not
+  establish a shared denominator.
 - [Plot local vocabulary diversity](#plot-local-vocabulary-diversity): a
   separate complete example includes its own input text and setup.
 
@@ -56,6 +73,8 @@ MTLD. The full result objects retain method parameters and schema
 identities in the saved record.
 
 ``` r
+library(ldfreq)
+
 reader <- new.env(parent = baseenv())
 sys.source(system.file("examples", "text-file-input.R",
   package = "ldfreq", mustWork = TRUE), reader)
@@ -126,25 +145,23 @@ en_table <- do.call(rbind, lapply(names(en_runs), function(condition) {
 }))
 rownames(en_table) <- NULL
 en_preview <- c(head(en_ids, 1), tail(en_ids, 1))
-knitr::kable(subset(en_table, document_id %in% en_preview,
+print(subset(en_table, document_id %in% en_preview,
   c(document_id, condition, metric_id, N, V, value, status, missing_reason)),
   digits = 3, row.names = FALSE)
+#>  document_id condition metric_id   N  V   value  status missing_reason
+#>          001  preserve       ttr 107 86   0.804      ok           <NA>
+#>          001  preserve     mattr 107 86   0.856      ok           <NA>
+#>          001  preserve      mtld 107 86 152.653      ok           <NA>
+#>          031  preserve       ttr   0  0      NA missing    empty_input
+#>          031  preserve     mattr   0  0      NA missing    empty_input
+#>          031  preserve      mtld   0  0      NA missing    empty_input
+#>          001     lower       ttr 107 83   0.776      ok           <NA>
+#>          001     lower     mattr 107 83   0.829      ok           <NA>
+#>          001     lower      mtld 107 83 133.572      ok           <NA>
+#>          031     lower       ttr   0  0      NA missing    empty_input
+#>          031     lower     mattr   0  0      NA missing    empty_input
+#>          031     lower      mtld   0  0      NA missing    empty_input
 ```
-
-| document_id | condition | metric_id |   N |   V |   value | status  | missing_reason |
-|:------------|:----------|:----------|----:|----:|--------:|:--------|:---------------|
-| 001         | preserve  | ttr       | 107 |  86 |   0.804 | ok      | NA             |
-| 001         | preserve  | mattr     | 107 |  86 |   0.856 | ok      | NA             |
-| 001         | preserve  | mtld      | 107 |  86 | 152.653 | ok      | NA             |
-| 031         | preserve  | ttr       |   0 |   0 |      NA | missing | empty_input    |
-| 031         | preserve  | mattr     |   0 |   0 |      NA | missing | empty_input    |
-| 031         | preserve  | mtld      |   0 |   0 |      NA | missing | empty_input    |
-| 001         | lower     | ttr       | 107 |  83 |   0.776 | ok      | NA             |
-| 001         | lower     | mattr     | 107 |  83 |   0.829 | ok      | NA             |
-| 001         | lower     | mtld      | 107 |  83 | 133.572 | ok      | NA             |
-| 031         | lower     | ttr       |   0 |   0 |      NA | missing | empty_input    |
-| 031         | lower     | mattr     |   0 |   0 |      NA | missing | empty_input    |
-| 031         | lower     | mtld      |   0 |   0 |      NA | missing | empty_input    |
 
 Retain all rows, including `031`, whose empty input yields missing
 values. Compare conditions by ID and metric, never by an assumed row
@@ -169,14 +186,16 @@ en_counts <- do.call(rbind, lapply(settings$metrics, function(metric) {
     preserve_tail_only = if (metric == "mtld") sum(p$mtld_tail_only_preserve, na.rm = TRUE) else NA,
     lower_tail_only = if (metric == "mtld") sum(p$mtld_tail_only_lower, na.rm = TRUE) else NA)
 }))
-knitr::kable(en_counts)
+print(en_counts)
+#>   metric_id documents preserve_available lower_available paired_available
+#> 1       ttr        31                 30              30               30
+#> 2     mattr        31                 30              30               30
+#> 3      mtld        31                 30              30               30
+#>   unpaired preserve_tail_only lower_tail_only
+#> 1        1                 NA              NA
+#> 2        1                 NA              NA
+#> 3        1                 14              10
 ```
-
-| metric_id | documents | preserve_available | lower_available | paired_available | unpaired | preserve_tail_only | lower_tail_only |
-|:---|---:|---:|---:|---:|---:|---:|---:|
-| ttr | 31 | 30 | 30 | 30 | 1 | NA | NA |
-| mattr | 31 | 30 | 30 | 30 | 1 | NA | NA |
-| mtld | 31 | 30 | 30 | 30 | 1 | 14 | 10 |
 
 For these files N is unchanged, while lowercasing changes type identity.
 This is a sensitivity analysis of one counting decision, not a test of
@@ -185,6 +204,90 @@ processed text; case conversion can change Unicode character length in
 other inputs. Do not reuse these positions as original-text annotation
 anchors. Both complete tokenizations, their exclusion records and
 original texts are saved below.
+
+### Explain a result using the saved text
+
+Choose a document ID from `en_table`; do not treat a row number as its
+ID. Inspect both conditions for the same metric, then read the original
+text and counted forms. The first document is selected here only as an
+illustration.
+
+``` r
+inspected_id <- en_ids[1]
+print(subset(en_table, document_id == inspected_id & metric_id == "ttr",
+  c(document_id, condition, N, V, value, status, missing_reason)), row.names = FALSE)
+#>  document_id condition   N  V     value status missing_reason
+#>          001  preserve 107 86 0.8037383     ok           <NA>
+#>          001     lower 107 83 0.7757009     ok           <NA>
+cat(en_texts[[inspected_id]], "\n")
+#> The class visited a library near the station. Students chose books about places they hoped to visit and read a few pages in silence. One student found a map inside an old travel guide. Another compared two descriptions of the same city. The teacher asked everyone to explain one surprising detail to a partner. They then returned to the shelves to find evidence for their explanations. Before leaving, the group wrote questions that a later reading session could explore.
+#> I explained the experience in a short message to a friend. Choosing specific examples made the account clearer and helped me remember details that I had almost forgotten.
+#>
+counted_forms <- lapply(en_prepared, function(batch) {
+  words <- batch[[inspected_id]]$tokens$surface
+  data.frame(form = sort(unique(words)),
+    occurrences = as.integer(table(factor(words, levels = sort(unique(words))))))
+})
+lapply(counted_forms, head, 12)
+#> $preserve
+#>        form occurrences
+#> 1         a           7
+#> 2     about           1
+#> 3   account           1
+#> 4    almost           1
+#> 5        an           1
+#> 6       and           2
+#> 7   Another           1
+#> 8     asked           1
+#> 9    Before           1
+#> 10    books           1
+#> 11 Choosing           1
+#> 12    chose           1
+#>
+#> $lower
+#>        form occurrences
+#> 1         a           7
+#> 2     about           1
+#> 3   account           1
+#> 4    almost           1
+#> 5        an           1
+#> 6       and           2
+#> 7   another           1
+#> 8     asked           1
+#> 9    before           1
+#> 10    books           1
+#> 11 choosing           1
+#> 12    chose           1
+excluded <- lapply(en_prepared, function(batch)
+  batch[[inspected_id]]$provenance$excluded_spans)
+excluded
+#> $preserve
+#> [1] start   end     surface reason
+#> <0 rows> (or 0-length row.names)
+#>
+#> $lower
+#> [1] start   end     surface reason
+#> <0 rows> (or 0-length row.names)
+```
+
+The display shows the first 12 forms per condition; `counted_forms`
+retains the complete tables. For available TTR results, the occurrence
+counts sum to `N` and the number of distinct forms is `V`. Lowercasing
+can merge forms without removing word occurrences. An empty document has
+no forms and no TTR; retain that row. Report the two values and their
+counts before interpreting the difference. This answers a question about
+counting choices, not the writer’s ability.
+
+The original text is retrieved by document ID. The excluded-span
+positions belong to each **processed** text; do not transfer them
+between conditions or use them as original-text coordinates after
+Unicode normalization or case conversion. For exact source contexts, use
+the [complete-annotation search
+route](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html#prepare-complete-annotations).
+The following saved record keeps the texts, both tokenizations and
+exclusions, so the same inspection can be repeated from
+`restored$texts`, `restored$prepared` and `restored$diagnostics` in a
+later session.
 
 ### Japanese: all body words or content words
 
@@ -265,23 +368,32 @@ ja_table <- do.call(rbind, lapply(names(ja_runs), function(condition) {
   out
 }))
 rownames(ja_table) <- NULL
-knitr::kable(subset(ja_table, metric_id == "ttr", c(document_id, condition,
+print(subset(ja_table, metric_id == "ttr", c(document_id, condition,
   eligible_body_N, N, unknown_selection_N, known_excluded_N, value, reportable_value)),
   digits = 3, row.names = FALSE)
+#>  document_id condition eligible_body_N N unknown_selection_N known_excluded_N
+#>     variants  all_body               5 5                   0                0
+#>   homophones  all_body               9 9                   0                0
+#>     unlisted  all_body               1 1                   0                0
+#>   no_targets  all_body               0 0                   0                0
+#>        empty  all_body               0 0                   0                0
+#>     variants   content               5 3                   0                2
+#>   homophones   content               9 6                   0                3
+#>     unlisted   content               1 0                   1                0
+#>   no_targets   content               0 0                   0                0
+#>        empty   content               0 0                   0                0
+#>  value reportable_value
+#>  0.800            0.800
+#>  0.667            0.667
+#>  1.000            1.000
+#>     NA               NA
+#>     NA               NA
+#>  1.000            1.000
+#>  0.667            0.667
+#>     NA               NA
+#>     NA               NA
+#>     NA               NA
 ```
-
-| document_id | condition | eligible_body_N | N | unknown_selection_N | known_excluded_N | value | reportable_value |
-|:---|:---|---:|---:|---:|---:|---:|---:|
-| variants | all_body | 5 | 5 | 0 | 0 | 0.800 | 0.800 |
-| homophones | all_body | 9 | 9 | 0 | 0 | 0.667 | 0.667 |
-| unlisted | all_body | 1 | 1 | 0 | 0 | 1.000 | 1.000 |
-| no_targets | all_body | 0 | 0 | 0 | 0 | NA | NA |
-| empty | all_body | 0 | 0 | 0 | 0 | NA | NA |
-| variants | content | 5 | 3 | 0 | 2 | 1.000 | 1.000 |
-| homophones | content | 9 | 6 | 0 | 3 | 0.667 | 0.667 |
-| unlisted | content | 1 | 0 | 1 | 0 | NA | NA |
-| no_targets | content | 0 | 0 | 0 | 0 | NA | NA |
-| empty | content | 0 | 0 | 0 | 0 | NA | NA |
 
 The original titles and punctuation stay in `ja_import`. Here only the
 declared body is analyzed, excluding literal `。`; other corpora require
@@ -304,23 +416,21 @@ stop, whereas `empty` has no source tokens; the imported source retains
 that distinction.
 
 ``` r
-knitr::kable(as.data.frame(with(ja_table, table(condition, metric_id, status))))
+print(as.data.frame(with(ja_table, table(condition, metric_id, status))))
+#>    condition metric_id  status Freq
+#> 1   all_body     mattr missing    5
+#> 2    content     mattr missing    5
+#> 3   all_body      mtld missing    3
+#> 4    content      mtld missing    4
+#> 5   all_body       ttr missing    2
+#> 6    content       ttr missing    3
+#> 7   all_body     mattr      ok    0
+#> 8    content     mattr      ok    0
+#> 9   all_body      mtld      ok    2
+#> 10   content      mtld      ok    1
+#> 11  all_body       ttr      ok    3
+#> 12   content       ttr      ok    2
 ```
-
-| condition | metric_id | status  | Freq |
-|:----------|:----------|:--------|-----:|
-| all_body  | mattr     | missing |    5 |
-| content   | mattr     | missing |    5 |
-| all_body  | mtld      | missing |    3 |
-| content   | mtld      | missing |    4 |
-| all_body  | ttr       | missing |    2 |
-| content   | ttr       | missing |    3 |
-| all_body  | mattr     | ok      |    0 |
-| content   | mattr     | ok      |    0 |
-| all_body  | mtld      | ok      |    2 |
-| content   | mtld      | ok      |    1 |
-| all_body  | ttr       | ok      |    3 |
-| content   | ttr       | ok      |    2 |
 
 MATTR50 is unavailable for every file. MTLD nevertheless returns values
 for two all-body selections and one content selection; all three fall
@@ -403,8 +513,8 @@ replayed <- lapply(restored$inputs, function(tokens)
 stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 #> 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.
-#> 
-#> Calculations used ldfreq 0.3.0.9007: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
+#>
+#> Calculations used ldfreq 0.3.0.9014: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
 ```
 
 The CSV is a flat inspection table; **the RDS is the complete analysis
@@ -576,20 +686,23 @@ if (use_nj8) {
     study_table$nj8_token_coverage[rows] <- coverage$token_coverage[j]
   }
 }
-knitr::kable(head(study_table[c("document_id", "writer_id", "condition",
-  "metric_id", "N", "value", "reportable_value", "status", "mtld_tail_only")]),
-  col.names = c("Document", "Writer", "Condition", "Metric", "N", "Computed",
-    "Reportable", "Status", "Tail-only"), digits = 3)
+print(head(study_table[c("document_id", "writer_id", "condition",
+  "metric_id", "N", "value", "reportable_value", "status", "mtld_tail_only")]), digits = 3)
+#>   document_id         writer_id condition metric_id   N   value
+#> 1         001 example_writer_01  preserve       ttr 107   0.804
+#> 2         001 example_writer_01  preserve     mattr 107   0.856
+#> 3         001 example_writer_01  preserve      mtld 107 152.653
+#> 4         002 example_writer_02  preserve       ttr 129   0.729
+#> 5         002 example_writer_02  preserve     mattr 129   0.792
+#> 6         002 example_writer_02  preserve      mtld 129 108.104
+#>   reportable_value status mtld_tail_only
+#> 1            0.804     ok             NA
+#> 2            0.856     ok             NA
+#> 3          152.653     ok           TRUE
+#> 4            0.729     ok             NA
+#> 5            0.792     ok             NA
+#> 6          108.104     ok           TRUE
 ```
-
-| Document | Writer | Condition | Metric | N | Computed | Reportable | Status | Tail-only |
-|:---|:---|:---|:---|---:|---:|---:|:---|:---|
-| 001 | example_writer_01 | preserve | ttr | 107 | 0.804 | 0.804 | ok | NA |
-| 001 | example_writer_01 | preserve | mattr | 107 | 0.856 | 0.856 | ok | NA |
-| 001 | example_writer_01 | preserve | mtld | 107 | 152.653 | 152.653 | ok | TRUE |
-| 002 | example_writer_02 | preserve | ttr | 129 | 0.729 | 0.729 | ok | NA |
-| 002 | example_writer_02 | preserve | mattr | 129 | 0.792 | 0.792 | ok | NA |
-| 002 | example_writer_02 | preserve | mtld | 129 | 108.104 | 108.104 | ok | TRUE |
 
 The default NJ8 lookup normalizes case separately from tokenization, so
 two case conditions can have the same reference coverage while their
@@ -655,34 +768,31 @@ summarize_study_documents <- function(rows, keys) {
 study_group_keys <- c("condition", "task", "metric_id", "method_id",
   "window_length", "mtld_threshold")
 study_summary <- summarize_study_documents(study_table, study_group_keys)
-knitr::kable(study_summary[c("condition", "task", "metric_id", "n_documents",
-  "n_writers_known", "n_reported", "n_unavailable", "n_withheld", "n_selection_incomplete")],
-  col.names = c("Condition", "Task", "Metric", "Docs", "Known writers", "Reported",
-    "Unavailable", "Withheld", "Incomplete"))
+print(study_summary[c("condition", "task", "metric_id", "n_documents",
+  "n_writers_known", "n_reported", "n_unavailable", "n_withheld", "n_selection_incomplete")])
+#>   condition                 task metric_id n_documents n_writers_known
+#> 1  preserve authored-description       ttr          31              10
+#> 2  preserve authored-description     mattr          31              10
+#> 3  preserve authored-description      mtld          31              10
+#> 4     lower authored-description       ttr          31              10
+#> 5     lower authored-description     mattr          31              10
+#> 6     lower authored-description      mtld          31              10
+#>   n_reported n_unavailable n_withheld n_selection_incomplete
+#> 1         30             1          0                      0
+#> 2         30             1          0                      0
+#> 3         30             1          0                      0
+#> 4         30             1          0                      0
+#> 5         30             1          0                      0
+#> 6         30             1          0                      0
+print(study_summary[c("condition", "task", "metric_id", "n_reported", "mean", "sd", "median")], digits = 3)
+#>   condition                 task metric_id n_reported    mean      sd  median
+#> 1  preserve authored-description       ttr         30   0.711  0.0733   0.715
+#> 2  preserve authored-description     mattr         30   0.796  0.0806   0.792
+#> 3  preserve authored-description      mtld         30 107.978 41.6144 105.500
+#> 4     lower authored-description       ttr         30   0.686  0.0698   0.691
+#> 5     lower authored-description     mattr         30   0.775  0.0791   0.785
+#> 6     lower authored-description      mtld         30  93.196 34.6922  83.111
 ```
-
-| Condition | Task | Metric | Docs | Known writers | Reported | Unavailable | Withheld | Incomplete |
-|:---|:---|:---|---:|---:|---:|---:|---:|---:|
-| preserve | authored-description | ttr | 31 | 10 | 30 | 1 | 0 | 0 |
-| preserve | authored-description | mattr | 31 | 10 | 30 | 1 | 0 | 0 |
-| preserve | authored-description | mtld | 31 | 10 | 30 | 1 | 0 | 0 |
-| lower | authored-description | ttr | 31 | 10 | 30 | 1 | 0 | 0 |
-| lower | authored-description | mattr | 31 | 10 | 30 | 1 | 0 | 0 |
-| lower | authored-description | mtld | 31 | 10 | 30 | 1 | 0 | 0 |
-
-``` r
-knitr::kable(study_summary[c("condition", "task", "metric_id", "n_reported", "mean", "sd", "median")],
-  col.names = c("Condition", "Task", "Metric", "Reported", "Mean", "SD", "Median"), digits = 3)
-```
-
-| Condition | Task                 | Metric | Reported |    Mean |     SD |  Median |
-|:----------|:---------------------|:-------|---------:|--------:|-------:|--------:|
-| preserve  | authored-description | ttr    |       30 |   0.711 |  0.073 |   0.715 |
-| preserve  | authored-description | mattr  |       30 |   0.796 |  0.081 |   0.792 |
-| preserve  | authored-description | mtld   |       30 | 107.978 | 41.614 | 105.500 |
-| lower     | authored-description | ttr    |       30 |   0.686 |  0.070 |   0.691 |
-| lower     | authored-description | mattr  |       30 |   0.775 |  0.079 |   0.785 |
-| lower     | authored-description | mtld   |       30 |  93.196 | 34.692 |  83.111 |
 
 Each English condition/metric keeps 31 documents and ten fictional
 writer IDs; 30 values are reported and one is unavailable. These are not
@@ -838,15 +948,14 @@ diversity <- lexdiv_metrics_text_batch(
   prepared, metrics = c("ttr", "mattr"), window_length = 10
 )
 metrics <- diversity$results
-knitr::kable(metrics[, c("document_id", "metric_id", "N", "V", "value", "status")])
+print(metrics[, c("document_id", "metric_id", "N", "V", "value", "status")])
+#> <lexdiv_batch_results: 2 documents; 4 metric records; schema unknown>
+#>   document_id metric_id     value status  N  V
+#> 1       first       ttr 0.7500000     ok 12  9
+#> 2       first     mattr 0.8000000     ok 12  9
+#> 3      second       ttr 0.9166667     ok 12 11
+#> 4      second     mattr 0.9333333     ok 12 11
 ```
-
-| document_id | metric_id |   N |   V |     value | status |
-|:------------|:----------|----:|----:|----------:|:-------|
-| first       | ttr       |  12 |   9 | 0.7500000 | ok     |
-| first       | mattr     |  12 |   9 | 0.8000000 | ok     |
-| second      | ttr       |  12 |  11 | 0.9166667 | ok     |
-| second      | mattr     |  12 |  11 | 0.9333333 | ok     |
 
 The first text repeats `the`, `a`, and `book`; the second repeats `a`.
 Both contain 12 tokens, but the first has 9 distinct surface forms and
@@ -869,17 +978,12 @@ Do not switch units only for documents with poor matching.
 
 ``` r
 levels <- nj8_profile_batch(prepared, unit = "surface")
-knitr::kable(levels$coverage[, c(
+print(levels$coverage[, c(
   "document_id", "eligible_tokens", "matched_tokens", "token_coverage", "type_coverage"
 )])
-```
-
-| document_id | eligible_tokens | matched_tokens | token_coverage | type_coverage |
-|:------------|----------------:|---------------:|---------------:|--------------:|
-| first       |              12 |             10 |      0.8333333 |     0.7777778 |
-| second      |              12 |              9 |      0.7500000 |     0.7272727 |
-
-``` r
+#>   document_id eligible_tokens matched_tokens token_coverage type_coverage
+#> 1       first              12             10      0.8333333     0.7777778
+#> 2      second              12              9      0.7500000     0.7272727
 levels$lookup[!levels$lookup$matched, c("document_id", "term")]
 #>    document_id      term
 #> 3        first     reads
@@ -929,15 +1033,18 @@ en_wide <- lexdiv_widen(en_runs$lower,
 inspect <- c("document_id", "mtld__value", "mtld__status",
   "mtld__forward_complete_factors", "mtld__reverse_complete_factors",
   "mtld__tail_only", "mtld__gap_pct")
-knitr::kable(en_wide[c(1, 2, nrow(en_wide)), inspect], digits = 2,
+print(en_wide[c(1, 2, nrow(en_wide)), inspect], digits = 2,
   row.names = FALSE)
+#> <lexdiv_wide_results: 3 rows; 7 columns>
+#>  document_id mtld__value mtld__status mtld__forward_complete_factors
+#>          001         134           ok                              0
+#>          002         104           ok                              1
+#>          031          NA      missing                             NA
+#>  mtld__reverse_complete_factors mtld__tail_only mtld__gap_pct
+#>                               0            TRUE             0
+#>                               1           FALSE            48
+#>                              NA              NA            NA
 ```
-
-| document_id | mtld\_\_value | mtld\_\_status | mtld\_\_forward_complete_factors | mtld\_\_reverse_complete_factors | mtld\_\_tail_only | mtld\_\_gap_pct |
-|:---|---:|:---|---:|---:|:---|---:|
-| 001 | 133.57 | ok | 0 | 0 | TRUE | 0.00 |
-| 002 | 103.88 | ok | 1 | 1 | FALSE | 48.36 |
-| 031 | NA | missing | NA | NA | NA | NA |
 
 Use `mtld__tail_only` to find computable estimates with zero complete
 factors in at least one direction. `mtld__gap_pct` is the absolute
@@ -986,19 +1093,18 @@ coverage <- levels$coverage[match(analysis$document_id, levels$coverage$document
 stopifnot(identical(analysis$document_id, coverage$document_id))
 analysis$nj8_surface_token_coverage <- coverage$token_coverage
 analysis$nj8_surface_type_coverage <- coverage$type_coverage
-knitr::kable(analysis[, c(
+print(analysis[, c(
   "document_id", "ttr__value", "mattr__value",
   "nj8_surface_token_coverage", "nj8_surface_type_coverage"
-)], col.names = c("Document", "TTR", "MATTR", "NJ8 token coverage", "NJ8 type coverage"),
+)],
 digits = 3)
-```
-
-| Document |   TTR | MATTR | NJ8 token coverage | NJ8 type coverage |
-|:---------|------:|------:|-------------------:|------------------:|
-| first    | 0.750 | 0.800 |              0.833 |             0.778 |
-| second   | 0.917 | 0.933 |              0.750 |             0.727 |
-
-``` r
+#> <lexdiv_wide_results: 2 rows; 5 columns>
+#>   document_id ttr__value mattr__value nj8_surface_token_coverage
+#> 1       first      0.750        0.800                      0.833
+#> 2      second      0.917        0.933                      0.750
+#>   nj8_surface_type_coverage
+#> 1                     0.778
+#> 2                     0.727
 plot(metrics, metric_id = "mattr")
 ```
 
@@ -1302,10 +1408,10 @@ unlink(path)
 levels$provenance[c("resource_version", "resource_bundled", "resource_citation")]
 #> $resource_version
 #> [1] "jacet2016-8000-v1"
-#> 
+#>
 #> $resource_bundled
 #> [1] TRUE
-#> 
+#>
 #> $resource_citation
 #> [1] "JACET Basic Word Revision Committee (Ed.). (2016). The New JACET List of 8000 Basic Words. Tokyo: Kirihara Shoten."
 ```

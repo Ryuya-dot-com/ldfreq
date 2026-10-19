@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9013</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9014</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,125 +90,27 @@ writing or validity as a proficiency measure.</p>
 <h2 id="inspect-an-example-before-running-a-parser">Inspect an example before running a parser<a class="anchor" aria-label="anchor" href="#inspect-an-example-before-running-a-parser"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"l2sca-demo.R"</span>,</span>
 <span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">demo</span><span class="op">)</span></span>
 <span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">helper</span></span>
 <span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">analysis</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">components</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"W"</span>, <span class="st">"S"</span>, <span class="st">"C"</span>, <span class="st">"T"</span>, <span class="st">"DC"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="right">W</th>
-<th align="right">S</th>
-<th align="right">C</th>
-<th align="right">T</th>
-<th align="right">DC</th>
-<th align="left">status</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">manual_coord_clauses</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="left">parsed</td>
-</tr>
-<tr class="even">
-<td align="left">manual_coord_vp</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="left">parsed</td>
-</tr>
-<tr class="odd">
-<td align="left">manual_finite_complement</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="left">parsed</td>
-</tr>
-<tr class="even">
-<td align="left">manual_nonfinite_complement</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="left">parsed</td>
-</tr>
-<tr class="odd">
-<td align="left">manual_fragment_FRAG</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="left">parsed</td>
-</tr>
-<tr class="even">
-<td align="left">manual_fragment_NP</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="left">parsed</td>
-</tr>
-<tr class="odd">
-<td align="left">manual_imperative</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="left">parsed</td>
-</tr>
-<tr class="even">
-<td align="left">manual_relative</td>
-<td align="right">6</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="left">parsed</td>
-</tr>
-<tr class="odd">
-<td align="left">manual_reduced_relative</td>
-<td align="right">6</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="left">parsed</td>
-</tr>
-<tr class="even">
-<td align="left">empty</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="left">no_words</td>
-</tr>
-<tr class="odd">
-<td align="left">failed</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="left">parser_failed</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">components</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"W"</span>, <span class="st">"S"</span>, <span class="st">"C"</span>, <span class="st">"T"</span>, <span class="st">"DC"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>  row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                  document_id  W  S  C  T DC        status</span></span>
+<span><span class="co">#&gt;         manual_coord_clauses  5  1  2  2  0        parsed</span></span>
+<span><span class="co">#&gt;              manual_coord_vp  4  1  1  1  0        parsed</span></span>
+<span><span class="co">#&gt;     manual_finite_complement  5  1  2  1  1        parsed</span></span>
+<span><span class="co">#&gt;  manual_nonfinite_complement  5  1  1  1  0        parsed</span></span>
+<span><span class="co">#&gt;         manual_fragment_FRAG  4  1  1  1  0        parsed</span></span>
+<span><span class="co">#&gt;           manual_fragment_NP  4  1  0  0  0        parsed</span></span>
+<span><span class="co">#&gt;            manual_imperative  3  1  1  1  0        parsed</span></span>
+<span><span class="co">#&gt;              manual_relative  6  1  2  1  1        parsed</span></span>
+<span><span class="co">#&gt;      manual_reduced_relative  6  1  1  1  0        parsed</span></span>
+<span><span class="co">#&gt;                        empty  0  0  0  0  0      no_words</span></span>
+<span><span class="co">#&gt;                       failed NA NA NA NA NA parser_failed</span></span></code></pre></div>
 <p>The fixture explicitly labels its provenance
 <code>authored-fixture</code>. Its rows include finite and nonfinite
 complements, coordination, relative clauses, fragments, an empty
@@ -272,142 +174,36 @@ tokenization.</p>
 <h2 id="follow-a-value-back-to-the-source">Follow a value back to the source<a class="anchor" aria-label="anchor" href="#follow-a-value-back-to-the-source"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">results</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">results</span>,</span>
 <span>  <span class="va">document_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"manual_coord_clauses"</span>, <span class="st">"manual_finite_complement"</span>, <span class="st">"manual_fragment_NP"</span><span class="op">)</span>,</span>
 <span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"measure"</span>, <span class="st">"numerator"</span>, <span class="st">"denominator"</span>,</span>
-<span>    <span class="st">"original_rule_value"</span>, <span class="st">"value"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
-<colgroup>
-<col width="25%">
-<col width="8%">
-<col width="10%">
-<col width="12%">
-<col width="20%">
-<col width="6%">
-<col width="17%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="left">measure</th>
-<th align="right">numerator</th>
-<th align="right">denominator</th>
-<th align="right">original_rule_value</th>
-<th align="right">value</th>
-<th align="left">status</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">manual_coord_clauses</td>
-<td align="left">MLC</td>
-<td align="right">5</td>
-<td align="right">2</td>
-<td align="right">2.5</td>
-<td align="right">2.5</td>
-<td align="left">computed</td>
-</tr>
-<tr class="even">
-<td align="left">manual_coord_clauses</td>
-<td align="left">MLT</td>
-<td align="right">5</td>
-<td align="right">2</td>
-<td align="right">2.5</td>
-<td align="right">2.5</td>
-<td align="left">computed</td>
-</tr>
-<tr class="odd">
-<td align="left">manual_coord_clauses</td>
-<td align="left">DC_C</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="left">computed</td>
-</tr>
-<tr class="even">
-<td align="left">manual_finite_complement</td>
-<td align="left">MLC</td>
-<td align="right">5</td>
-<td align="right">2</td>
-<td align="right">2.5</td>
-<td align="right">2.5</td>
-<td align="left">computed</td>
-</tr>
-<tr class="odd">
-<td align="left">manual_finite_complement</td>
-<td align="left">MLT</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">5.0</td>
-<td align="right">5.0</td>
-<td align="left">computed</td>
-</tr>
-<tr class="even">
-<td align="left">manual_finite_complement</td>
-<td align="left">DC_C</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0.5</td>
-<td align="right">0.5</td>
-<td align="left">computed</td>
-</tr>
-<tr class="odd">
-<td align="left">manual_fragment_NP</td>
-<td align="left">MLC</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0.0</td>
-<td align="right">NA</td>
-<td align="left">zero_denominator</td>
-</tr>
-<tr class="even">
-<td align="left">manual_fragment_NP</td>
-<td align="left">MLT</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0.0</td>
-<td align="right">NA</td>
-<td align="left">zero_denominator</td>
-</tr>
-<tr class="odd">
-<td align="left">manual_fragment_NP</td>
-<td align="left">DC_C</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0.0</td>
-<td align="right">NA</td>
-<td align="left">zero_denominator</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">matches</span>,</span>
+<span>    <span class="st">"original_rule_value"</span>, <span class="st">"value"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;               document_id measure numerator denominator original_rule_value</span></span>
+<span><span class="co">#&gt;      manual_coord_clauses     MLC         5           2                 2.5</span></span>
+<span><span class="co">#&gt;      manual_coord_clauses     MLT         5           2                 2.5</span></span>
+<span><span class="co">#&gt;      manual_coord_clauses    DC_C         0           2                 0.0</span></span>
+<span><span class="co">#&gt;  manual_finite_complement     MLC         5           2                 2.5</span></span>
+<span><span class="co">#&gt;  manual_finite_complement     MLT         5           1                 5.0</span></span>
+<span><span class="co">#&gt;  manual_finite_complement    DC_C         1           2                 0.5</span></span>
+<span><span class="co">#&gt;        manual_fragment_NP     MLC         4           0                 0.0</span></span>
+<span><span class="co">#&gt;        manual_fragment_NP     MLT         4           0                 0.0</span></span>
+<span><span class="co">#&gt;        manual_fragment_NP    DC_C         0           0                 0.0</span></span>
+<span><span class="co">#&gt;  value           status</span></span>
+<span><span class="co">#&gt;    2.5         computed</span></span>
+<span><span class="co">#&gt;    2.5         computed</span></span>
+<span><span class="co">#&gt;    0.0         computed</span></span>
+<span><span class="co">#&gt;    2.5         computed</span></span>
+<span><span class="co">#&gt;    5.0         computed</span></span>
+<span><span class="co">#&gt;    0.5         computed</span></span>
+<span><span class="co">#&gt;     NA zero_denominator</span></span>
+<span><span class="co">#&gt;     NA zero_denominator</span></span>
+<span><span class="co">#&gt;     NA zero_denominator</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">matches</span>,</span>
 <span>  <span class="va">document_id</span> <span class="op">==</span> <span class="st">"manual_coord_clauses"</span> <span class="op">&amp;</span> <span class="va">pattern</span> <span class="op">==</span> <span class="st">"t"</span>,</span>
-<span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tree_id"</span>, <span class="st">"node_id"</span>, <span class="st">"start"</span>, <span class="st">"end"</span>, <span class="st">"source_span"</span><span class="op">)</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="right">tree_id</th>
-<th align="right">node_id</th>
-<th align="right">start</th>
-<th align="right">end</th>
-<th align="left">source_span</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">27</td>
-<td align="left">Maya reads, and Leo writes.</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">14</td>
-<td align="right">17</td>
-<td align="right">26</td>
-<td align="left">Leo writes</td>
-</tr>
-</tbody>
-</table>
+<span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tree_id"</span>, <span class="st">"node_id"</span>, <span class="st">"start"</span>, <span class="st">"end"</span>, <span class="st">"source_span"</span><span class="op">)</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  tree_id node_id start end                 source_span</span></span>
+<span><span class="co">#&gt;        1       2     1  27 Maya reads, and Leo writes.</span></span>
+<span><span class="co">#&gt;        1      14    17  26                  Leo writes</span></span></code></pre></div>
 <p>In <code>Maya reads, and Leo writes.</code>, the two T matches
 overlap: the whole sentence and <code>Leo writes</code>. They are
 <strong>query-matched subtrees</strong>, not a partition into
@@ -462,7 +258,7 @@ empty text as <code>""</code>; an absent submission belongs in the
 planned study table, not as a fake empty document. IDs must be unique
 nonblank strings, and text must be nonmissing UTF-8. Additional research
 metadata stays in your independently saved roster.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"l2sca.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">helper</span><span class="op">)</span></span>
 <span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d1"</span>, <span class="st">"d2"</span><span class="op">)</span>,</span>
@@ -474,10 +270,10 @@ metadata stays in your independently saved roster.</p>
 path and your extracted original directory. Quoting paths preserves
 spaces. The runner uses only Python’s standard library; it does not run
 an external shell script.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="ex">python3</span> <span class="st">"/path/to/ldfreq/examples/l2sca-trace.py"</span> <span class="dt">\</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="at">--inputs</span> <span class="st">"syntax-inputs.json"</span> <span class="dt">\</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">--l2sca-dir</span> <span class="st">"/path/to/L2SCA-2023-08-15"</span> <span class="dt">\</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">--output</span> <span class="st">"syntax-trace.json"</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="ex">python3</span> <span class="st">"/path/to/ldfreq/examples/l2sca-trace.py"</span> <span class="dt">\</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">--inputs</span> <span class="st">"syntax-inputs.json"</span> <span class="dt">\</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">--l2sca-dir</span> <span class="st">"/path/to/L2SCA-2023-08-15"</span> <span class="dt">\</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">--output</span> <span class="st">"syntax-trace.json"</span></span></code></pre></div>
 <p>Both input writer and runner refuse to replace an existing output.
 Save to a new file for a new run. Use
 <code>--java "/path/to/java"</code> if Java is not on PATH. The trace
@@ -487,7 +283,7 @@ model/tool hashes and runtime versions. Do not share it if your source
 texts are private. Captured output uses LF newlines. Invalid UTF-8
 process output is retained as base64 and marked failed rather than
 silently decoded into usable text.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"original-documents.rds"</span><span class="op">)</span></span>
 <span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">l2sca_import</span><span class="op">(</span><span class="st">"syntax-trace.json"</span>, <span class="va">documents</span><span class="op">)</span></span>
 <span><span class="va">analysis</span><span class="op">$</span><span class="va">components</span></span>
@@ -578,226 +374,61 @@ outputs and their statuses together.</p>
 <div class="section level2">
 <h2 id="carry-review-decisions-and-missing-observations-into-a-study">Carry review decisions and missing observations into a study<a class="anchor" aria-label="anchor" href="#carry-review-decisions-and-missing-observations-into-a-study"></a>
 </h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">review</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"decision"</span>, <span class="st">"reason"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="29%">
-<col width="15%">
-<col width="54%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="left">decision</th>
-<th align="left">reason</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">manual_coord_clauses</td>
-<td align="left">include</td>
-<td align="left">Authored tree and declared matches inspected.</td>
-</tr>
-<tr class="even">
-<td align="left">manual_coord_vp</td>
-<td align="left">include</td>
-<td align="left">Authored tree and declared matches inspected.</td>
-</tr>
-<tr class="odd">
-<td align="left">manual_finite_complement</td>
-<td align="left">include</td>
-<td align="left">Authored tree and declared matches inspected.</td>
-</tr>
-<tr class="even">
-<td align="left">manual_nonfinite_complement</td>
-<td align="left">include</td>
-<td align="left">Authored tree and declared matches inspected.</td>
-</tr>
-<tr class="odd">
-<td align="left">manual_fragment_FRAG</td>
-<td align="left">withhold</td>
-<td align="left">Illustrative reporting protocol excludes
-fragments.</td>
-</tr>
-<tr class="even">
-<td align="left">manual_fragment_NP</td>
-<td align="left">include</td>
-<td align="left">Authored tree and declared matches inspected.</td>
-</tr>
-<tr class="odd">
-<td align="left">manual_imperative</td>
-<td align="left">include</td>
-<td align="left">Authored tree and declared matches inspected.</td>
-</tr>
-<tr class="even">
-<td align="left">manual_relative</td>
-<td align="left">include</td>
-<td align="left">Authored tree and declared matches inspected.</td>
-</tr>
-<tr class="odd">
-<td align="left">manual_reduced_relative</td>
-<td align="left">include</td>
-<td align="left">Authored tree and declared matches inspected.</td>
-</tr>
-<tr class="even">
-<td align="left">empty</td>
-<td align="left">not_applicable</td>
-<td align="left">No reportable score.</td>
-</tr>
-<tr class="odd">
-<td align="left">failed</td>
-<td align="left">not_applicable</td>
-<td align="left">No reportable score.</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">study_long</span>, <span class="va">measure</span> <span class="op">==</span> <span class="st">"MLT"</span>,</span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">review</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"decision"</span>, <span class="st">"reason"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                  document_id       decision</span></span>
+<span><span class="co">#&gt;         manual_coord_clauses        include</span></span>
+<span><span class="co">#&gt;              manual_coord_vp        include</span></span>
+<span><span class="co">#&gt;     manual_finite_complement        include</span></span>
+<span><span class="co">#&gt;  manual_nonfinite_complement        include</span></span>
+<span><span class="co">#&gt;         manual_fragment_FRAG       withhold</span></span>
+<span><span class="co">#&gt;           manual_fragment_NP        include</span></span>
+<span><span class="co">#&gt;            manual_imperative        include</span></span>
+<span><span class="co">#&gt;              manual_relative        include</span></span>
+<span><span class="co">#&gt;      manual_reduced_relative        include</span></span>
+<span><span class="co">#&gt;                        empty not_applicable</span></span>
+<span><span class="co">#&gt;                       failed not_applicable</span></span>
+<span><span class="co">#&gt;                                               reason</span></span>
+<span><span class="co">#&gt;        Authored tree and declared matches inspected.</span></span>
+<span><span class="co">#&gt;        Authored tree and declared matches inspected.</span></span>
+<span><span class="co">#&gt;        Authored tree and declared matches inspected.</span></span>
+<span><span class="co">#&gt;        Authored tree and declared matches inspected.</span></span>
+<span><span class="co">#&gt;  Illustrative reporting protocol excludes fragments.</span></span>
+<span><span class="co">#&gt;        Authored tree and declared matches inspected.</span></span>
+<span><span class="co">#&gt;        Authored tree and declared matches inspected.</span></span>
+<span><span class="co">#&gt;        Authored tree and declared matches inspected.</span></span>
+<span><span class="co">#&gt;        Authored tree and declared matches inspected.</span></span>
+<span><span class="co">#&gt;                                 No reportable score.</span></span>
+<span><span class="co">#&gt;                                 No reportable score.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">study_long</span>, <span class="va">measure</span> <span class="op">==</span> <span class="st">"MLT"</span>,</span>
 <span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation_id"</span>, <span class="st">"writer_id"</span>, <span class="st">"task"</span>, <span class="st">"occasion"</span>, <span class="st">"value"</span>,</span>
-<span>    <span class="st">"status"</span>, <span class="st">"review_status"</span>, <span class="st">"report_value"</span><span class="op">)</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
-<colgroup>
-<col width="15%">
-<col width="10%">
-<col width="12%">
-<col width="9%">
-<col width="6%">
-<col width="17%">
-<col width="15%">
-<col width="13%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">observation_id</th>
-<th align="left">writer_id</th>
-<th align="left">task</th>
-<th align="left">occasion</th>
-<th align="right">value</th>
-<th align="left">status</th>
-<th align="left">review_status</th>
-<th align="right">report_value</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">o1</td>
-<td align="left">w1</td>
-<td align="left">description</td>
-<td align="left">t1</td>
-<td align="right">2.5</td>
-<td align="left">computed</td>
-<td align="left">include</td>
-<td align="right">2.5</td>
-</tr>
-<tr class="even">
-<td align="left">o2</td>
-<td align="left">w1</td>
-<td align="left">description</td>
-<td align="left">t2</td>
-<td align="right">4.0</td>
-<td align="left">computed</td>
-<td align="left">include</td>
-<td align="right">4.0</td>
-</tr>
-<tr class="odd">
-<td align="left">o3</td>
-<td align="left">w2</td>
-<td align="left">description</td>
-<td align="left">t1</td>
-<td align="right">5.0</td>
-<td align="left">computed</td>
-<td align="left">include</td>
-<td align="right">5.0</td>
-</tr>
-<tr class="even">
-<td align="left">o4</td>
-<td align="left">w2</td>
-<td align="left">description</td>
-<td align="left">t2</td>
-<td align="right">5.0</td>
-<td align="left">computed</td>
-<td align="left">include</td>
-<td align="right">5.0</td>
-</tr>
-<tr class="odd">
-<td align="left">o5</td>
-<td align="left">w3</td>
-<td align="left">narrative</td>
-<td align="left">t1</td>
-<td align="right">4.0</td>
-<td align="left">computed</td>
-<td align="left">withhold</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
-<td align="left">o6</td>
-<td align="left">w3</td>
-<td align="left">narrative</td>
-<td align="left">t2</td>
-<td align="right">NA</td>
-<td align="left">zero_denominator</td>
-<td align="left">include</td>
-<td align="right">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">o7</td>
-<td align="left">w4</td>
-<td align="left">narrative</td>
-<td align="left">t1</td>
-<td align="right">3.0</td>
-<td align="left">computed</td>
-<td align="left">include</td>
-<td align="right">3.0</td>
-</tr>
-<tr class="even">
-<td align="left">o8</td>
-<td align="left">w4</td>
-<td align="left">narrative</td>
-<td align="left">t2</td>
-<td align="right">6.0</td>
-<td align="left">computed</td>
-<td align="left">include</td>
-<td align="right">6.0</td>
-</tr>
-<tr class="odd">
-<td align="left">o9</td>
-<td align="left">w5</td>
-<td align="left">description</td>
-<td align="left">t1</td>
-<td align="right">6.0</td>
-<td align="left">computed</td>
-<td align="left">include</td>
-<td align="right">6.0</td>
-</tr>
-<tr class="even">
-<td align="left">o10</td>
-<td align="left">w5</td>
-<td align="left">description</td>
-<td align="left">t2</td>
-<td align="right">NA</td>
-<td align="left">no_words</td>
-<td align="left">not_applicable</td>
-<td align="right">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">o11</td>
-<td align="left">w6</td>
-<td align="left">description</td>
-<td align="left">t1</td>
-<td align="right">NA</td>
-<td align="left">parser_failed</td>
-<td align="left">not_applicable</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
-<td align="left">o12</td>
-<td align="left">w6</td>
-<td align="left">description</td>
-<td align="left">t2</td>
-<td align="right">NA</td>
-<td align="left">not_submitted</td>
-<td align="left">NA</td>
-<td align="right">NA</td>
-</tr>
-</tbody>
-</table>
+<span>    <span class="st">"status"</span>, <span class="st">"review_status"</span>, <span class="st">"report_value"</span><span class="op">)</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  observation_id writer_id        task occasion value           status</span></span>
+<span><span class="co">#&gt;              o1        w1 description       t1   2.5         computed</span></span>
+<span><span class="co">#&gt;              o2        w1 description       t2   4.0         computed</span></span>
+<span><span class="co">#&gt;              o3        w2 description       t1   5.0         computed</span></span>
+<span><span class="co">#&gt;              o4        w2 description       t2   5.0         computed</span></span>
+<span><span class="co">#&gt;              o5        w3   narrative       t1   4.0         computed</span></span>
+<span><span class="co">#&gt;              o6        w3   narrative       t2    NA zero_denominator</span></span>
+<span><span class="co">#&gt;              o7        w4   narrative       t1   3.0         computed</span></span>
+<span><span class="co">#&gt;              o8        w4   narrative       t2   6.0         computed</span></span>
+<span><span class="co">#&gt;              o9        w5 description       t1   6.0         computed</span></span>
+<span><span class="co">#&gt;             o10        w5 description       t2    NA         no_words</span></span>
+<span><span class="co">#&gt;             o11        w6 description       t1    NA    parser_failed</span></span>
+<span><span class="co">#&gt;             o12        w6 description       t2    NA    not_submitted</span></span>
+<span><span class="co">#&gt;   review_status report_value</span></span>
+<span><span class="co">#&gt;         include          2.5</span></span>
+<span><span class="co">#&gt;         include          4.0</span></span>
+<span><span class="co">#&gt;         include          5.0</span></span>
+<span><span class="co">#&gt;         include          5.0</span></span>
+<span><span class="co">#&gt;        withhold           NA</span></span>
+<span><span class="co">#&gt;         include           NA</span></span>
+<span><span class="co">#&gt;         include          3.0</span></span>
+<span><span class="co">#&gt;         include          6.0</span></span>
+<span><span class="co">#&gt;         include          6.0</span></span>
+<span><span class="co">#&gt;  not_applicable           NA</span></span>
+<span><span class="co">#&gt;  not_applicable           NA</span></span>
+<span><span class="co">#&gt;            &lt;NA&gt;           NA</span></span></code></pre></div>
 <p>The example keeps a separate decision table keyed by document and
 <code>analysis_id</code>, with reviewer and reason. It withholds one
 otherwise computed fragment by an explicit illustrative reporting
@@ -820,7 +451,7 @@ design an analysis with appropriate replication and random effects.</p>
 <div class="section level2">
 <h2 id="save-and-replay-the-full-record">Save and replay the full record<a class="anchor" aria-label="anchor" href="#save-and-replay-the-full-record"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">record</span>, <span class="va">saved</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">saved</span><span class="op">)</span></span>

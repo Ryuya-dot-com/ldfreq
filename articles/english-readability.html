@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9013</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9014</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,65 +88,23 @@ English input is supported.</p>
 <h2 id="start-from-sentences-and-inspect-what-was-counted">Start from sentences and inspect what was counted<a class="anchor" aria-label="anchor" href="#start-from-sentences-and-inspect-what-was-counted"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"readability-demo.R"</span>,</span>
 <span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">demo</span><span class="op">)</span></span>
 <span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">helper</span></span>
 <span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">prepared</span></span>
 <span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">analysis</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">prepared</span><span class="op">$</span><span class="va">segments</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"text"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="left">segment_id</th>
-<th align="left">text</th>
-<th align="left">status</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">d1</td>
-<td align="left">s1</td>
-<td align="left">The cat sat.</td>
-<td align="left">counted</td>
-</tr>
-<tr class="even">
-<td align="left">d1</td>
-<td align="left">s2</td>
-<td align="left">The dog ran.</td>
-<td align="left">counted</td>
-</tr>
-<tr class="odd">
-<td align="left">d1</td>
-<td align="left">heading</td>
-<td align="left">A heading to exclude.</td>
-<td align="left">excluded_segment</td>
-</tr>
-<tr class="even">
-<td align="left">d2</td>
-<td align="left">s1</td>
-<td align="left">A little rabbit runs.</td>
-<td align="left">counted</td>
-</tr>
-<tr class="odd">
-<td align="left">d3</td>
-<td align="left">s1</td>
-<td align="left">In 1918, R.F.D. grew.</td>
-<td align="left">counted</td>
-</tr>
-<tr class="even">
-<td align="left">d4</td>
-<td align="left">s1</td>
-<td align="left"></td>
-<td align="left">no_words</td>
-</tr>
-<tr class="odd">
-<td align="left">d5</td>
-<td align="left">s1</td>
-<td align="left">Bird.</td>
-<td align="left">counted</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">prepared</span><span class="op">$</span><span class="va">segments</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"text"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id segment_id                  text           status</span></span>
+<span><span class="co">#&gt;           d1         s1          The cat sat.          counted</span></span>
+<span><span class="co">#&gt;           d1         s2          The dog ran.          counted</span></span>
+<span><span class="co">#&gt;           d1    heading A heading to exclude. excluded_segment</span></span>
+<span><span class="co">#&gt;           d2         s1 A little rabbit runs.          counted</span></span>
+<span><span class="co">#&gt;           d3         s1 In 1918, R.F.D. grew.          counted</span></span>
+<span><span class="co">#&gt;           d4         s1                               no_words</span></span>
+<span><span class="co">#&gt;           d5         s1                 Bird.          counted</span></span></code></pre></div>
 <p>These short, authored texts expose the arithmetic; they are not a
 readability validation sample. Supply one sentence per segment, with
 unique <code>document_id</code>/<code>segment_id</code> pairs and the
@@ -197,179 +155,47 @@ lexical-diversity analysis with different preprocessing.</p>
 <code class="sourceCode R"><span><span class="va">automatic</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">readability_score</span><span class="op">(</span><span class="va">prepared</span><span class="op">)</span></span>
 <span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">prepared</span><span class="op">$</span><span class="va">tokens</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"original_surface"</span>, <span class="st">"counted"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  <span class="va">automatic</span><span class="op">$</span><span class="va">syllables</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"syllables"</span>, <span class="st">"method"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">audit</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="14%">
-<col width="13%">
-<col width="20%">
-<col width="9%">
-<col width="12%">
-<col width="28%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="left">segment_id</th>
-<th align="left">original_surface</th>
-<th align="left">counted</th>
-<th align="right">syllables</th>
-<th align="left">method</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">d1</td>
-<td align="left">s1</td>
-<td align="left">The</td>
-<td align="left">TRUE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="even">
-<td align="left">d1</td>
-<td align="left">s1</td>
-<td align="left">cat</td>
-<td align="left">TRUE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="odd">
-<td align="left">d1</td>
-<td align="left">s1</td>
-<td align="left">sat</td>
-<td align="left">TRUE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="even">
-<td align="left">d1</td>
-<td align="left">s2</td>
-<td align="left">The</td>
-<td align="left">TRUE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="odd">
-<td align="left">d1</td>
-<td align="left">s2</td>
-<td align="left">dog</td>
-<td align="left">TRUE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="even">
-<td align="left">d1</td>
-<td align="left">s2</td>
-<td align="left">ran</td>
-<td align="left">TRUE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="odd">
-<td align="left">d1</td>
-<td align="left">heading</td>
-<td align="left">A</td>
-<td align="left">FALSE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="even">
-<td align="left">d1</td>
-<td align="left">heading</td>
-<td align="left">heading</td>
-<td align="left">FALSE</td>
-<td align="right">2</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="odd">
-<td align="left">d1</td>
-<td align="left">heading</td>
-<td align="left">to</td>
-<td align="left">FALSE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="even">
-<td align="left">d1</td>
-<td align="left">heading</td>
-<td align="left">exclude</td>
-<td align="left">FALSE</td>
-<td align="right">2</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="odd">
-<td align="left">d2</td>
-<td align="left">s1</td>
-<td align="left">A</td>
-<td align="left">TRUE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="even">
-<td align="left">d2</td>
-<td align="left">s1</td>
-<td align="left">little</td>
-<td align="left">TRUE</td>
-<td align="right">2</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="odd">
-<td align="left">d2</td>
-<td align="left">s1</td>
-<td align="left">rabbit</td>
-<td align="left">TRUE</td>
-<td align="right">2</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="even">
-<td align="left">d2</td>
-<td align="left">s1</td>
-<td align="left">runs</td>
-<td align="left">TRUE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="odd">
-<td align="left">d3</td>
-<td align="left">s1</td>
-<td align="left">In</td>
-<td align="left">TRUE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="even">
-<td align="left">d3</td>
-<td align="left">s1</td>
-<td align="left">1918</td>
-<td align="left">TRUE</td>
-<td align="right">NA</td>
-<td align="left">pronunciation_required</td>
-</tr>
-<tr class="odd">
-<td align="left">d3</td>
-<td align="left">s1</td>
-<td align="left">R.F.D.</td>
-<td align="left">TRUE</td>
-<td align="right">NA</td>
-<td align="left">pronunciation_required</td>
-</tr>
-<tr class="even">
-<td align="left">d3</td>
-<td align="left">s1</td>
-<td align="left">grew</td>
-<td align="left">TRUE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-<tr class="odd">
-<td align="left">d5</td>
-<td align="left">s1</td>
-<td align="left">Bird</td>
-<td align="left">TRUE</td>
-<td align="right">1</td>
-<td align="left">dictionary</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">audit</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id segment_id original_surface counted syllables</span></span>
+<span><span class="co">#&gt;           d1         s1              The    TRUE         1</span></span>
+<span><span class="co">#&gt;           d1         s1              cat    TRUE         1</span></span>
+<span><span class="co">#&gt;           d1         s1              sat    TRUE         1</span></span>
+<span><span class="co">#&gt;           d1         s2              The    TRUE         1</span></span>
+<span><span class="co">#&gt;           d1         s2              dog    TRUE         1</span></span>
+<span><span class="co">#&gt;           d1         s2              ran    TRUE         1</span></span>
+<span><span class="co">#&gt;           d1    heading                A   FALSE         1</span></span>
+<span><span class="co">#&gt;           d1    heading          heading   FALSE         2</span></span>
+<span><span class="co">#&gt;           d1    heading               to   FALSE         1</span></span>
+<span><span class="co">#&gt;           d1    heading          exclude   FALSE         2</span></span>
+<span><span class="co">#&gt;           d2         s1                A    TRUE         1</span></span>
+<span><span class="co">#&gt;           d2         s1           little    TRUE         2</span></span>
+<span><span class="co">#&gt;           d2         s1           rabbit    TRUE         2</span></span>
+<span><span class="co">#&gt;           d2         s1             runs    TRUE         1</span></span>
+<span><span class="co">#&gt;           d3         s1               In    TRUE         1</span></span>
+<span><span class="co">#&gt;           d3         s1             1918    TRUE        NA</span></span>
+<span><span class="co">#&gt;           d3         s1           R.F.D.    TRUE        NA</span></span>
+<span><span class="co">#&gt;           d3         s1             grew    TRUE         1</span></span>
+<span><span class="co">#&gt;           d5         s1             Bird    TRUE         1</span></span>
+<span><span class="co">#&gt;                  method</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;  pronunciation_required</span></span>
+<span><span class="co">#&gt;  pronunciation_required</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span></code></pre></div>
 <p><a href="https://search.r-project.org/CRAN/refmans/nsyllable/html/nsyllable.html" class="external-link">nsyllable</a>
 uses a pronunciation dictionary and a vowel-group fallback for unknown
 words. The helper distinguishes dictionary matches, fallback estimates
@@ -389,112 +215,27 @@ removed from the denominator.</p>
 analysis supplies four and three syllables respectively, with the spoken
 forms recorded in <code>review_reason</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">initial</span><span class="op">$</span><span class="va">components</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
-<colgroup>
-<col width="10%">
-<col width="5%">
-<col width="8%">
-<col width="8%">
-<col width="13%">
-<col width="19%">
-<col width="18%">
-<col width="15%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="right">words</th>
-<th align="right">sentences</th>
-<th align="right">syllables</th>
-<th align="right">known_syllables</th>
-<th align="right">missing_syllable_words</th>
-<th align="left">below_word_threshold</th>
-<th align="left">status</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">d1</td>
-<td align="right">6</td>
-<td align="right">2</td>
-<td align="right">6</td>
-<td align="right">6</td>
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">ok</td>
-</tr>
-<tr class="even">
-<td align="left">d2</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">6</td>
-<td align="right">6</td>
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">ok</td>
-</tr>
-<tr class="odd">
-<td align="left">d3</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">NA</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="left">TRUE</td>
-<td align="left">missing_syllables</td>
-</tr>
-<tr class="even">
-<td align="left">d4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">no_words</td>
-</tr>
-<tr class="odd">
-<td align="left">d5</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="left">TRUE</td>
-<td align="left">ok</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">reviewed</span>, <span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="va">review_reason</span><span class="op">)</span>,</span>
-<span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">token_row</span>, <span class="va">syllables</span>, <span class="va">method</span>, <span class="va">review_reason</span><span class="op">)</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="11%">
-<col width="11%">
-<col width="25%">
-<col width="52%">
-</colgroup>
-<thead><tr class="header">
-<th align="right">token_row</th>
-<th align="right">syllables</th>
-<th align="left">method</th>
-<th align="left">review_reason</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">16</td>
-<td align="right">4</td>
-<td align="left">declared pronunciation</td>
-<td align="left">nineteen eighteen: 4 syllables</td>
-</tr>
-<tr class="even">
-<td align="right">17</td>
-<td align="right">3</td>
-<td align="left">declared pronunciation</td>
-<td align="left">letters R, F, D spoken separately: 3 syllables</td>
-</tr>
-</tbody>
-</table>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">initial</span><span class="op">$</span><span class="va">components</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id words sentences syllables known_syllables missing_syllable_words</span></span>
+<span><span class="co">#&gt;           d1     6         2         6               6                      0</span></span>
+<span><span class="co">#&gt;           d2     4         1         6               6                      0</span></span>
+<span><span class="co">#&gt;           d3     4         1        NA               2                      2</span></span>
+<span><span class="co">#&gt;           d4     0         0        NA               0                      0</span></span>
+<span><span class="co">#&gt;           d5     1         1         1               1                      0</span></span>
+<span><span class="co">#&gt;  below_word_threshold            status</span></span>
+<span><span class="co">#&gt;                  TRUE                ok</span></span>
+<span><span class="co">#&gt;                  TRUE                ok</span></span>
+<span><span class="co">#&gt;                  TRUE missing_syllables</span></span>
+<span><span class="co">#&gt;                  TRUE          no_words</span></span>
+<span><span class="co">#&gt;                  TRUE                ok</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">reviewed</span>, <span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="va">review_reason</span><span class="op">)</span>,</span>
+<span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">token_row</span>, <span class="va">syllables</span>, <span class="va">method</span>, <span class="va">review_reason</span><span class="op">)</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  token_row syllables                 method</span></span>
+<span><span class="co">#&gt;         16         4 declared pronunciation</span></span>
+<span><span class="co">#&gt;         17         3 declared pronunciation</span></span>
+<span><span class="co">#&gt;                                   review_reason</span></span>
+<span><span class="co">#&gt;                  nineteen eighteen: 4 syllables</span></span>
+<span><span class="co">#&gt;  letters R, F, D spoken separately: 3 syllables</span></span></code></pre></div>
 <p>For your own review, copy the <strong>complete</strong> syllable
 table, edit its counts and methods, and retain reasons alongside the
 unchanged first analysis. The <code>source_id</code> and
@@ -503,7 +244,7 @@ a different source or sentence policy, duplicate keys and missing rows
 fail. Rows can be reordered because the keys determine alignment. All
 source tokens, including excluded sentences, keep a row; their
 unresolved counts do not make included text unavailable.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">reviewed</span> <span class="op">&lt;-</span> <span class="va">automatic</span><span class="op">$</span><span class="va">syllables</span></span>
 <span><span class="va">reviewed</span><span class="op">$</span><span class="va">review_reason</span> <span class="op">&lt;-</span> <span class="st">""</span></span>
 <span><span class="co"># Change selected syllables, method, and review_reason after inspecting the text.</span></span>
@@ -546,133 +287,31 @@ et al. (1975), p. 40</a>. That recalibration used Navy personnel and
 training-manual passages; its <a href="https://stars.library.ucf.edu/istlibrary/56/" class="external-link">study
 description</a> does not establish a universal grade interpretation for
 L2 writers or readers.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">results</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"measure"</span>, <span class="st">"value"</span>, <span class="st">"words"</span>, <span class="st">"sentences"</span>,</span>
-<span>  <span class="st">"syllables"</span>, <span class="st">"below_word_threshold"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">3</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="12%">
-<col width="21%">
-<col width="8%">
-<col width="6%">
-<col width="10%">
-<col width="10%">
-<col width="21%">
-<col width="9%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="left">measure</th>
-<th align="right">value</th>
-<th align="right">words</th>
-<th align="right">sentences</th>
-<th align="right">syllables</th>
-<th align="left">below_word_threshold</th>
-<th align="left">status</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">d1</td>
-<td align="left">Flesch_Reading_Ease</td>
-<td align="right">119.190</td>
-<td align="right">6</td>
-<td align="right">2</td>
-<td align="right">6</td>
-<td align="left">TRUE</td>
-<td align="left">ok</td>
-</tr>
-<tr class="even">
-<td align="left">d1</td>
-<td align="left">Flesch_Kincaid_Grade</td>
-<td align="right">-2.620</td>
-<td align="right">6</td>
-<td align="right">2</td>
-<td align="right">6</td>
-<td align="left">TRUE</td>
-<td align="left">ok</td>
-</tr>
-<tr class="odd">
-<td align="left">d2</td>
-<td align="left">Flesch_Reading_Ease</td>
-<td align="right">75.875</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">6</td>
-<td align="left">TRUE</td>
-<td align="left">ok</td>
-</tr>
-<tr class="even">
-<td align="left">d2</td>
-<td align="left">Flesch_Kincaid_Grade</td>
-<td align="right">3.670</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">6</td>
-<td align="left">TRUE</td>
-<td align="left">ok</td>
-</tr>
-<tr class="odd">
-<td align="left">d3</td>
-<td align="left">Flesch_Reading_Ease</td>
-<td align="right">12.425</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">9</td>
-<td align="left">TRUE</td>
-<td align="left">ok</td>
-</tr>
-<tr class="even">
-<td align="left">d3</td>
-<td align="left">Flesch_Kincaid_Grade</td>
-<td align="right">12.520</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">9</td>
-<td align="left">TRUE</td>
-<td align="left">ok</td>
-</tr>
-<tr class="odd">
-<td align="left">d4</td>
-<td align="left">Flesch_Reading_Ease</td>
-<td align="right">NA</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="left">TRUE</td>
-<td align="left">no_words</td>
-</tr>
-<tr class="even">
-<td align="left">d4</td>
-<td align="left">Flesch_Kincaid_Grade</td>
-<td align="right">NA</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="left">TRUE</td>
-<td align="left">no_words</td>
-</tr>
-<tr class="odd">
-<td align="left">d5</td>
-<td align="left">Flesch_Reading_Ease</td>
-<td align="right">121.220</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="left">TRUE</td>
-<td align="left">ok</td>
-</tr>
-<tr class="even">
-<td align="left">d5</td>
-<td align="left">Flesch_Kincaid_Grade</td>
-<td align="right">-3.400</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="left">TRUE</td>
-<td align="left">ok</td>
-</tr>
-</tbody>
-</table>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">results</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"measure"</span>, <span class="st">"value"</span>, <span class="st">"words"</span>, <span class="st">"sentences"</span>,</span>
+<span>  <span class="st">"syllables"</span>, <span class="st">"below_word_threshold"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">3</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id              measure  value words sentences syllables</span></span>
+<span><span class="co">#&gt;           d1  Flesch_Reading_Ease 119.19     6         2         6</span></span>
+<span><span class="co">#&gt;           d1 Flesch_Kincaid_Grade  -2.62     6         2         6</span></span>
+<span><span class="co">#&gt;           d2  Flesch_Reading_Ease  75.88     4         1         6</span></span>
+<span><span class="co">#&gt;           d2 Flesch_Kincaid_Grade   3.67     4         1         6</span></span>
+<span><span class="co">#&gt;           d3  Flesch_Reading_Ease  12.43     4         1         9</span></span>
+<span><span class="co">#&gt;           d3 Flesch_Kincaid_Grade  12.52     4         1         9</span></span>
+<span><span class="co">#&gt;           d4  Flesch_Reading_Ease     NA     0         0        NA</span></span>
+<span><span class="co">#&gt;           d4 Flesch_Kincaid_Grade     NA     0         0        NA</span></span>
+<span><span class="co">#&gt;           d5  Flesch_Reading_Ease 121.22     1         1         1</span></span>
+<span><span class="co">#&gt;           d5 Flesch_Kincaid_Grade  -3.40     1         1         1</span></span>
+<span><span class="co">#&gt;  below_word_threshold   status</span></span>
+<span><span class="co">#&gt;                  TRUE       ok</span></span>
+<span><span class="co">#&gt;                  TRUE       ok</span></span>
+<span><span class="co">#&gt;                  TRUE       ok</span></span>
+<span><span class="co">#&gt;                  TRUE       ok</span></span>
+<span><span class="co">#&gt;                  TRUE       ok</span></span>
+<span><span class="co">#&gt;                  TRUE       ok</span></span>
+<span><span class="co">#&gt;                  TRUE no_words</span></span>
+<span><span class="co">#&gt;                  TRUE no_words</span></span>
+<span><span class="co">#&gt;                  TRUE       ok</span></span>
+<span><span class="co">#&gt;                  TRUE       ok</span></span></code></pre></div>
 <p>For <code>d1</code>, the two three-word sentences contain six
 syllables: W = 6, S = 2, Sy = 6. Reading Ease is
 <strong>119.190</strong>, and Grade Level is <strong>−2.620</strong>.
@@ -698,167 +337,35 @@ does not establish end-to-end equivalence for arbitrary texts.</p>
 <div class="section level2">
 <h2 id="keep-writer-task-and-occasion-in-the-research-table">Keep writer, task and occasion in the research table<a class="anchor" aria-label="anchor" href="#keep-writer-task-and-occasion-in-the-research-table"></a>
 </h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">study_long</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation_id"</span>, <span class="st">"writer_id"</span>, <span class="st">"task"</span>, <span class="st">"occasion"</span>,</span>
-<span>  <span class="st">"document_id"</span>, <span class="st">"measure"</span>, <span class="st">"value"</span>, <span class="st">"words"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">3</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="14%">
-<col width="9%">
-<col width="11%">
-<col width="8%">
-<col width="11%">
-<col width="19%">
-<col width="7%">
-<col width="5%">
-<col width="13%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">observation_id</th>
-<th align="left">writer_id</th>
-<th align="left">task</th>
-<th align="left">occasion</th>
-<th align="left">document_id</th>
-<th align="left">measure</th>
-<th align="right">value</th>
-<th align="right">words</th>
-<th align="left">status</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">o1</td>
-<td align="left">w1</td>
-<td align="left">description</td>
-<td align="left">t1</td>
-<td align="left">d1</td>
-<td align="left">Flesch_Kincaid_Grade</td>
-<td align="right">-2.620</td>
-<td align="right">6</td>
-<td align="left">ok</td>
-</tr>
-<tr class="even">
-<td align="left">o1</td>
-<td align="left">w1</td>
-<td align="left">description</td>
-<td align="left">t1</td>
-<td align="left">d1</td>
-<td align="left">Flesch_Reading_Ease</td>
-<td align="right">119.190</td>
-<td align="right">6</td>
-<td align="left">ok</td>
-</tr>
-<tr class="odd">
-<td align="left">o2</td>
-<td align="left">w1</td>
-<td align="left">narrative</td>
-<td align="left">t2</td>
-<td align="left">d2</td>
-<td align="left">Flesch_Kincaid_Grade</td>
-<td align="right">3.670</td>
-<td align="right">4</td>
-<td align="left">ok</td>
-</tr>
-<tr class="even">
-<td align="left">o2</td>
-<td align="left">w1</td>
-<td align="left">narrative</td>
-<td align="left">t2</td>
-<td align="left">d2</td>
-<td align="left">Flesch_Reading_Ease</td>
-<td align="right">75.875</td>
-<td align="right">4</td>
-<td align="left">ok</td>
-</tr>
-<tr class="odd">
-<td align="left">o3</td>
-<td align="left">w2</td>
-<td align="left">description</td>
-<td align="left">t1</td>
-<td align="left">d3</td>
-<td align="left">Flesch_Kincaid_Grade</td>
-<td align="right">12.520</td>
-<td align="right">4</td>
-<td align="left">ok</td>
-</tr>
-<tr class="even">
-<td align="left">o3</td>
-<td align="left">w2</td>
-<td align="left">description</td>
-<td align="left">t1</td>
-<td align="left">d3</td>
-<td align="left">Flesch_Reading_Ease</td>
-<td align="right">12.425</td>
-<td align="right">4</td>
-<td align="left">ok</td>
-</tr>
-<tr class="odd">
-<td align="left">o4</td>
-<td align="left">w2</td>
-<td align="left">narrative</td>
-<td align="left">t2</td>
-<td align="left">d4</td>
-<td align="left">Flesch_Kincaid_Grade</td>
-<td align="right">NA</td>
-<td align="right">0</td>
-<td align="left">no_words</td>
-</tr>
-<tr class="even">
-<td align="left">o4</td>
-<td align="left">w2</td>
-<td align="left">narrative</td>
-<td align="left">t2</td>
-<td align="left">d4</td>
-<td align="left">Flesch_Reading_Ease</td>
-<td align="right">NA</td>
-<td align="right">0</td>
-<td align="left">no_words</td>
-</tr>
-<tr class="odd">
-<td align="left">o5</td>
-<td align="left">w3</td>
-<td align="left">description</td>
-<td align="left">t1</td>
-<td align="left">d5</td>
-<td align="left">Flesch_Kincaid_Grade</td>
-<td align="right">-3.400</td>
-<td align="right">1</td>
-<td align="left">ok</td>
-</tr>
-<tr class="even">
-<td align="left">o5</td>
-<td align="left">w3</td>
-<td align="left">description</td>
-<td align="left">t1</td>
-<td align="left">d5</td>
-<td align="left">Flesch_Reading_Ease</td>
-<td align="right">121.220</td>
-<td align="right">1</td>
-<td align="left">ok</td>
-</tr>
-<tr class="odd">
-<td align="left">o6</td>
-<td align="left">w3</td>
-<td align="left">narrative</td>
-<td align="left">t2</td>
-<td align="left">NA</td>
-<td align="left">Flesch_Kincaid_Grade</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="left">not_submitted</td>
-</tr>
-<tr class="even">
-<td align="left">o6</td>
-<td align="left">w3</td>
-<td align="left">narrative</td>
-<td align="left">t2</td>
-<td align="left">NA</td>
-<td align="left">Flesch_Reading_Ease</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="left">not_submitted</td>
-</tr>
-</tbody>
-</table>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">study_long</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation_id"</span>, <span class="st">"writer_id"</span>, <span class="st">"task"</span>, <span class="st">"occasion"</span>,</span>
+<span>  <span class="st">"document_id"</span>, <span class="st">"measure"</span>, <span class="st">"value"</span>, <span class="st">"words"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">3</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  observation_id writer_id        task occasion document_id              measure</span></span>
+<span><span class="co">#&gt;              o1        w1 description       t1          d1 Flesch_Kincaid_Grade</span></span>
+<span><span class="co">#&gt;              o1        w1 description       t1          d1  Flesch_Reading_Ease</span></span>
+<span><span class="co">#&gt;              o2        w1   narrative       t2          d2 Flesch_Kincaid_Grade</span></span>
+<span><span class="co">#&gt;              o2        w1   narrative       t2          d2  Flesch_Reading_Ease</span></span>
+<span><span class="co">#&gt;              o3        w2 description       t1          d3 Flesch_Kincaid_Grade</span></span>
+<span><span class="co">#&gt;              o3        w2 description       t1          d3  Flesch_Reading_Ease</span></span>
+<span><span class="co">#&gt;              o4        w2   narrative       t2          d4 Flesch_Kincaid_Grade</span></span>
+<span><span class="co">#&gt;              o4        w2   narrative       t2          d4  Flesch_Reading_Ease</span></span>
+<span><span class="co">#&gt;              o5        w3 description       t1          d5 Flesch_Kincaid_Grade</span></span>
+<span><span class="co">#&gt;              o5        w3 description       t1          d5  Flesch_Reading_Ease</span></span>
+<span><span class="co">#&gt;              o6        w3   narrative       t2        &lt;NA&gt; Flesch_Kincaid_Grade</span></span>
+<span><span class="co">#&gt;              o6        w3   narrative       t2        &lt;NA&gt;  Flesch_Reading_Ease</span></span>
+<span><span class="co">#&gt;   value words        status</span></span>
+<span><span class="co">#&gt;   -2.62     6            ok</span></span>
+<span><span class="co">#&gt;  119.19     6            ok</span></span>
+<span><span class="co">#&gt;    3.67     4            ok</span></span>
+<span><span class="co">#&gt;   75.88     4            ok</span></span>
+<span><span class="co">#&gt;   12.52     4            ok</span></span>
+<span><span class="co">#&gt;   12.43     4            ok</span></span>
+<span><span class="co">#&gt;      NA     0      no_words</span></span>
+<span><span class="co">#&gt;      NA     0      no_words</span></span>
+<span><span class="co">#&gt;   -3.40     1            ok</span></span>
+<span><span class="co">#&gt;  121.22     1            ok</span></span>
+<span><span class="co">#&gt;      NA    NA not_submitted</span></span>
+<span><span class="co">#&gt;      NA    NA not_submitted</span></span></code></pre></div>
 <p>The executable example joins a planned observation roster and a
 unique observation/document mapping to the two measures by document ID.
 The sixth observation was not submitted; its word count stays
@@ -868,7 +375,7 @@ analysis. <code>analysis_id</code> identifies the saved input, syllable
 decisions and settings. Keep one row per observation and selected
 measure in a model; do not stack both differently scaled scores as
 replications.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">study_long</span>,</span>
 <span>  <span class="va">measure</span> <span class="op">==</span> <span class="st">"Flesch_Reading_Ease"</span> <span class="op">&amp;</span> <span class="va">status</span> <span class="op">==</span> <span class="st">"ok"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">model_data</span><span class="op">$</span><span class="va">observation_id</span><span class="op">)</span>,</span>
@@ -881,13 +388,13 @@ your research design. The <a href="repeated-observations.html">repeated-observat
 demonstrates an actual model workflow and its diagnostics. This
 readability table is separate from the lexical-metric plan contract used
 there.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">lme4</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">value</span> <span class="op">~</span> <span class="va">task</span> <span class="op">+</span> <span class="va">occasion</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">writer_id</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">model_data</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="save-enough-to-return-to-the-text">Save enough to return to the text<a class="anchor" aria-label="anchor" href="#save-enough-to-return-to-the-text"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">record</span>, <span class="st">"readability-record.rds"</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">study_long</span>, <span class="st">"readability-study-long.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>, na <span class="op">=</span> <span class="st">"NA"</span><span class="op">)</span></span>
 <span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"readability-record.rds"</span><span class="op">)</span></span>

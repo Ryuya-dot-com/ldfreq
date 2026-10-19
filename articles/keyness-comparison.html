@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9013</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9014</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,38 +87,18 @@ accuracy.</p>
 <h2 id="declare-the-documents-and-inspect-the-coverage">Declare the documents and inspect the coverage<a class="anchor" aria-label="anchor" href="#declare-the-documents-and-inspect-the-coverage"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"keyness-demo.R"</span>,</span>
 <span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">demo</span><span class="op">)</span></span>
 <span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">helper</span></span>
 <span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">comparison</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">$</span><span class="va">totals</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"corpus"</span>, <span class="st">"documents"</span>, <span class="st">"source_tokens"</span>,</span>
-<span>  <span class="st">"missing_terms"</span>, <span class="st">"counted_tokens"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">corpus</th>
-<th align="right">documents</th>
-<th align="right">source_tokens</th>
-<th align="right">missing_terms</th>
-<th align="right">counted_tokens</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">target</td>
-<td align="right">3</td>
-<td align="right">10</td>
-<td align="right">1</td>
-<td align="right">8</td>
-</tr>
-<tr class="even">
-<td align="left">reference</td>
-<td align="right">3</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">8</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">$</span><span class="va">totals</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"corpus"</span>, <span class="st">"documents"</span>, <span class="st">"source_tokens"</span>,</span>
+<span>  <span class="st">"missing_terms"</span>, <span class="st">"counted_tokens"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     corpus documents source_tokens missing_terms counted_tokens</span></span>
+<span><span class="co">#&gt;     target         3            10             1              8</span></span>
+<span><span class="co">#&gt;  reference         3             8             0              8</span></span></code></pre></div>
 <p>The target is <code>t1</code>, <code>t2</code>, <code>t_empty</code>;
 the reference is <code>r1</code>, <code>r2</code>, <code>r_empty</code>.
 Both have <strong>8 counted tokens</strong>. The target has 10 original
@@ -127,43 +107,15 @@ document <code>outside</code> is not in either corpus. Empty documents
 remain declared documents; they do not supply tokens to the
 denominator.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">segments</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"text"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="left">text</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">t1</td>
-<td align="left">learn learn learn learn read .</td>
-</tr>
-<tr class="even">
-<td align="left">t2</td>
-<td align="left">learn learn write unknown</td>
-</tr>
-<tr class="odd">
-<td align="left">t_empty</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">r1</td>
-<td align="left">learn read read read</td>
-</tr>
-<tr class="odd">
-<td align="left">r2</td>
-<td align="left">learn read read speak</td>
-</tr>
-<tr class="even">
-<td align="left">r_empty</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">outside</td>
-<td align="left">unlisted unlisted</td>
-</tr>
-</tbody>
-</table>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">annotations</span><span class="op">$</span><span class="va">segments</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"text"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id                           text</span></span>
+<span><span class="co">#&gt;           t1 learn learn learn learn read .</span></span>
+<span><span class="co">#&gt;           t2      learn learn write unknown</span></span>
+<span><span class="co">#&gt;      t_empty                               </span></span>
+<span><span class="co">#&gt;           r1           learn read read read</span></span>
+<span><span class="co">#&gt;           r2          learn read read speak</span></span>
+<span><span class="co">#&gt;      r_empty                               </span></span>
+<span><span class="co">#&gt;      outside              unlisted unlisted</span></span></code></pre></div>
 <p>For your own unchanged <code><a href="../reference/lexdiv_import_annotations.html">lexdiv_import_annotations()</a></code>
 result, source both helpers explicitly. The <a href="concordance-and-dispersion.html">concordance guide</a> explains
 how to prepare complete, aligned annotations with original offsets.</p>
@@ -206,55 +158,13 @@ its membership changes.</p>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="va">comparison</span><span class="op">$</span><span class="va">results</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">counts</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term"</span>, <span class="st">"target_count"</span>, <span class="st">"reference_count"</span>,</span>
-<span>  <span class="st">"target_documents"</span>, <span class="st">"reference_documents"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Term"</span>, <span class="st">"Target tokens"</span>, <span class="st">"Reference tokens"</span>, <span class="st">"Target documents"</span>, <span class="st">"Reference documents"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="8%">
-<col width="18%">
-<col width="22%">
-<col width="22%">
-<col width="27%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Term</th>
-<th align="right">Target tokens</th>
-<th align="right">Reference tokens</th>
-<th align="right">Target documents</th>
-<th align="right">Reference documents</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">learn</td>
-<td align="right">6</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">read</td>
-<td align="right">1</td>
-<td align="right">5</td>
-<td align="right">1</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">write</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">speak</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">counts</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term"</span>, <span class="st">"target_count"</span>, <span class="st">"reference_count"</span>,</span>
+<span>  <span class="st">"target_documents"</span>, <span class="st">"reference_documents"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   term target_count reference_count target_documents reference_documents</span></span>
+<span><span class="co">#&gt;  learn            6               2                2                   2</span></span>
+<span><span class="co">#&gt;   read            1               5                1                   2</span></span>
+<span><span class="co">#&gt;  write            1               0                1                   0</span></span>
+<span><span class="co">#&gt;  speak            0               1                0                   1</span></span></code></pre></div>
 <p><code>learn</code> occurs 6 times in the target and twice in the
 reference. Its table includes <strong>all other counted terms</strong>,
 not just words chosen for display:</p>
@@ -263,26 +173,10 @@ not just words chosen for display:</p>
 <span><span class="va">table2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">word</span><span class="op">$</span><span class="va">target_count</span>, <span class="va">word</span><span class="op">$</span><span class="va">target_other</span><span class="op">)</span>,</span>
 <span>  reference <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">word</span><span class="op">$</span><span class="va">reference_count</span>, <span class="va">word</span><span class="op">$</span><span class="va">reference_other</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">table2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"learn"</span>, <span class="st">"All other terms"</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">table2</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left"></th>
-<th align="right">learn</th>
-<th align="right">All other terms</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">target</td>
-<td align="right">6</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">reference</td>
-<td align="right">2</td>
-<td align="right">6</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">table2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;           learn All other terms</span></span>
+<span><span class="co">#&gt; target        6               2</span></span>
+<span><span class="co">#&gt; reference     2               6</span></span></code></pre></div>
 <p>For each cell, expected count E is its row total times its column
 total, divided by the grand total. Here all four expectations are 4. The
 uncorrected likelihood-ratio statistic is <strong>G² = 2 sum[O log(O /
@@ -292,80 +186,20 @@ corpus probabilities described by <a href="https://aclanthology.org/J93-1003/" c
 5.3)</a>. Every observed and expected cell is retained in
 <code>$results</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">counts</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term"</span>, <span class="st">"target_per_1000"</span>, <span class="st">"reference_per_1000"</span>, <span class="st">"log_ratio"</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  digits <span class="op">=</span> <span class="fl">4</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Term"</span>, <span class="st">"Target per 1,000"</span>, <span class="st">"Reference per 1,000"</span>, <span class="st">"Log2 ratio"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Term</th>
-<th align="right">Target per 1,000</th>
-<th align="right">Reference per 1,000</th>
-<th align="right">Log2 ratio</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">learn</td>
-<td align="right">750</td>
-<td align="right">250</td>
-<td align="right">1.5850</td>
-</tr>
-<tr class="even">
-<td align="left">read</td>
-<td align="right">125</td>
-<td align="right">625</td>
-<td align="right">-2.3219</td>
-</tr>
-<tr class="odd">
-<td align="left">write</td>
-<td align="right">125</td>
-<td align="right">0</td>
-<td align="right">Inf</td>
-</tr>
-<tr class="even">
-<td align="left">speak</td>
-<td align="right">0</td>
-<td align="right">125</td>
-<td align="right">-Inf</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">counts</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term"</span>, <span class="st">"G2"</span>, <span class="st">"signed_G2"</span>, <span class="st">"direction"</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  digits <span class="op">=</span> <span class="fl">4</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">term</th>
-<th align="right">G2</th>
-<th align="right">signed_G2</th>
-<th align="left">direction</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">learn</td>
-<td align="right">4.1860</td>
-<td align="right">4.1860</td>
-<td align="left">target</td>
-</tr>
-<tr class="even">
-<td align="left">read</td>
-<td align="right">4.5567</td>
-<td align="right">-4.5567</td>
-<td align="left">reference</td>
-</tr>
-<tr class="odd">
-<td align="left">write</td>
-<td align="right">1.4530</td>
-<td align="right">1.4530</td>
-<td align="left">target</td>
-</tr>
-<tr class="even">
-<td align="left">speak</td>
-<td align="right">1.4530</td>
-<td align="right">-1.4530</td>
-<td align="left">reference</td>
-</tr>
-</tbody>
-</table>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">counts</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term"</span>, <span class="st">"target_per_1000"</span>, <span class="st">"reference_per_1000"</span>, <span class="st">"log_ratio"</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>  digits <span class="op">=</span> <span class="fl">4</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   term target_per_1000 reference_per_1000 log_ratio</span></span>
+<span><span class="co">#&gt;  learn             750                250     1.585</span></span>
+<span><span class="co">#&gt;   read             125                625    -2.322</span></span>
+<span><span class="co">#&gt;  write             125                  0       Inf</span></span>
+<span><span class="co">#&gt;  speak               0                125      -Inf</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">counts</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term"</span>, <span class="st">"G2"</span>, <span class="st">"signed_G2"</span>, <span class="st">"direction"</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>  digits <span class="op">=</span> <span class="fl">4</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   term    G2 signed_G2 direction</span></span>
+<span><span class="co">#&gt;  learn 4.186     4.186    target</span></span>
+<span><span class="co">#&gt;   read 4.557    -4.557 reference</span></span>
+<span><span class="co">#&gt;  write 1.453     1.453    target</span></span>
+<span><span class="co">#&gt;  speak 1.453    -1.453 reference</span></span></code></pre></div>
 <ul>
 <li>
 <code>G2</code> is nonnegative. <code>signed_G2</code> adds the
@@ -406,7 +240,7 @@ workflow</a>.</p>
 <div class="section level2">
 <h2 id="select-rows-while-retaining-the-original-comparison">Select rows while retaining the original comparison<a class="anchor" aria-label="anchor" href="#select-rows-while-retaining-the-original-comparison"></a>
 </h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">selected</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">keyness_compare</span><span class="op">(</span><span class="va">comparison</span><span class="op">$</span><span class="va">source</span>,</span>
 <span>  target <span class="op">=</span> <span class="va">comparison</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">target</span>, reference <span class="op">=</span> <span class="va">comparison</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">reference</span>,</span>
 <span>  preprocessing_id <span class="op">=</span> <span class="va">comparison</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">preprocessing_id</span>,</span>
@@ -414,30 +248,11 @@ workflow</a>.</p>
 <span>  min_count <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
 <span><span class="va">shown</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">selected</span><span class="op">$</span><span class="va">results</span>, <span class="va">meets_min_count</span><span class="op">)</span></span>
 <span><span class="va">shown</span> <span class="op">&lt;-</span> <span class="va">shown</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="va">shown</span><span class="op">$</span><span class="va">signed_G2</span><span class="op">)</span>, <span class="op">]</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">shown</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term"</span>, <span class="st">"target_count"</span>, <span class="st">"reference_count"</span>, <span class="st">"signed_G2"</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  digits <span class="op">=</span> <span class="fl">4</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">term</th>
-<th align="right">target_count</th>
-<th align="right">reference_count</th>
-<th align="right">signed_G2</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">learn</td>
-<td align="right">6</td>
-<td align="right">2</td>
-<td align="right">4.1860</td>
-</tr>
-<tr class="even">
-<td align="left">read</td>
-<td align="right">1</td>
-<td align="right">5</td>
-<td align="right">-4.5567</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">shown</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"term"</span>, <span class="st">"target_count"</span>, <span class="st">"reference_count"</span>, <span class="st">"signed_G2"</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>  digits <span class="op">=</span> <span class="fl">4</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   term target_count reference_count signed_G2</span></span>
+<span><span class="co">#&gt;  learn            6               2     4.186</span></span>
+<span><span class="co">#&gt;   read            1               5    -4.557</span></span></code></pre></div>
 <p><code>min_count</code> is a positive whole number applied to pooled
 frequency. It only changes a display flag: the vocabulary, counts,
 background terms and denominators remain complete. Its default of 1
@@ -454,81 +269,22 @@ treating that as complete observation of the word’s absence.</p>
 <div class="section level2">
 <h2 id="return-to-exactly-the-counted-occurrences">Return to exactly the counted occurrences<a class="anchor" aria-label="anchor" href="#return-to-exactly-the-counted-occurrences"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">context</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">keyness_concordance</span><span class="op">(</span><span class="va">comparison</span>, <span class="st">"learn"</span>, window <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
 <span><span class="va">hits</span> <span class="op">&lt;-</span> <span class="va">context</span><span class="op">$</span><span class="va">search</span><span class="op">$</span><span class="va">occurrences</span></span>
 <span><span class="va">hits</span><span class="op">$</span><span class="va">corpus</span> <span class="op">&lt;-</span> <span class="va">comparison</span><span class="op">$</span><span class="va">documents</span><span class="op">$</span><span class="va">corpus</span><span class="op">[</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">hits</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">comparison</span><span class="op">$</span><span class="va">documents</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">hits</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"corpus"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="left">corpus</th>
-<th align="left">pre</th>
-<th align="left">keyword</th>
-<th align="left">post</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">t1</td>
-<td align="left">target</td>
-<td align="left"></td>
-<td align="left">learn</td>
-<td align="left">learn learn</td>
-</tr>
-<tr class="even">
-<td align="left">t1</td>
-<td align="left">target</td>
-<td align="left">learn</td>
-<td align="left">learn</td>
-<td align="left">learn learn</td>
-</tr>
-<tr class="odd">
-<td align="left">t1</td>
-<td align="left">target</td>
-<td align="left">learn learn</td>
-<td align="left">learn</td>
-<td align="left">learn read</td>
-</tr>
-<tr class="even">
-<td align="left">t1</td>
-<td align="left">target</td>
-<td align="left">learn learn</td>
-<td align="left">learn</td>
-<td align="left">read .</td>
-</tr>
-<tr class="odd">
-<td align="left">t2</td>
-<td align="left">target</td>
-<td align="left"></td>
-<td align="left">learn</td>
-<td align="left">learn write</td>
-</tr>
-<tr class="even">
-<td align="left">t2</td>
-<td align="left">target</td>
-<td align="left">learn</td>
-<td align="left">learn</td>
-<td align="left">write unknown</td>
-</tr>
-<tr class="odd">
-<td align="left">r1</td>
-<td align="left">reference</td>
-<td align="left"></td>
-<td align="left">learn</td>
-<td align="left">read read</td>
-</tr>
-<tr class="even">
-<td align="left">r2</td>
-<td align="left">reference</td>
-<td align="left"></td>
-<td align="left">learn</td>
-<td align="left">read read</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">hits</span><span class="op">$</span><span class="va">corpus</span> <span class="op">==</span> <span class="st">"target"</span><span class="op">)</span> <span class="op">==</span> <span class="va">word</span><span class="op">$</span><span class="va">target_count</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">hits</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"corpus"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id    corpus          pre keyword           post</span></span>
+<span><span class="co">#&gt;           t1    target                learn    learn learn</span></span>
+<span><span class="co">#&gt;           t1    target       learn    learn    learn learn</span></span>
+<span><span class="co">#&gt;           t1    target learn learn    learn     learn read</span></span>
+<span><span class="co">#&gt;           t1    target learn learn    learn         read .</span></span>
+<span><span class="co">#&gt;           t2    target                learn    learn write</span></span>
+<span><span class="co">#&gt;           t2    target       learn    learn  write unknown</span></span>
+<span><span class="co">#&gt;           r1 reference                learn      read read</span></span>
+<span><span class="co">#&gt;           r2 reference                learn      read read</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">hits</span><span class="op">$</span><span class="va">corpus</span> <span class="op">==</span> <span class="st">"target"</span><span class="op">)</span> <span class="op">==</span> <span class="va">word</span><span class="op">$</span><span class="va">target_count</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">hits</span><span class="op">$</span><span class="va">corpus</span> <span class="op">==</span> <span class="st">"reference"</span><span class="op">)</span> <span class="op">==</span> <span class="va">word</span><span class="op">$</span><span class="va">reference_count</span><span class="op">)</span></span></code></pre></div>
 <p>This search uses the saved counting mask and one exact term,
 including its case and Unicode form. It returns 6 target and 2 reference
@@ -550,7 +306,7 @@ implementation.</p>
 <div class="section level2">
 <h2 id="save-the-reasons-source-and-complete-result">Save the reasons, source and complete result<a class="anchor" aria-label="anchor" href="#save-the-reasons-source-and-complete-result"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>comparison <span class="op">=</span> <span class="va">comparison</span>,</span>
 <span>  target_reason <span class="op">=</span> <span class="st">"Authored target documents for checking the calculation"</span>,</span>
 <span>  reference_reason <span class="op">=</span> <span class="st">"Disjoint authored reference with known counts"</span>,</span>

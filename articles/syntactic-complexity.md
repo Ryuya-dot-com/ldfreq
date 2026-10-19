@@ -20,28 +20,28 @@ measure.
 ## Inspect an example before running a parser
 
 ``` r
+library(ldfreq)
+
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "l2sca-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
 helper <- demo$helper
 analysis <- demo$analysis
-knitr::kable(analysis$components[c("document_id", "W", "S", "C", "T", "DC", "status")],
+print(analysis$components[c("document_id", "W", "S", "C", "T", "DC", "status")],
   row.names = FALSE)
+#>                  document_id  W  S  C  T DC        status
+#>         manual_coord_clauses  5  1  2  2  0        parsed
+#>              manual_coord_vp  4  1  1  1  0        parsed
+#>     manual_finite_complement  5  1  2  1  1        parsed
+#>  manual_nonfinite_complement  5  1  1  1  0        parsed
+#>         manual_fragment_FRAG  4  1  1  1  0        parsed
+#>           manual_fragment_NP  4  1  0  0  0        parsed
+#>            manual_imperative  3  1  1  1  0        parsed
+#>              manual_relative  6  1  2  1  1        parsed
+#>      manual_reduced_relative  6  1  1  1  0        parsed
+#>                        empty  0  0  0  0  0      no_words
+#>                       failed NA NA NA NA NA parser_failed
 ```
-
-| document_id                 |   W |   S |   C |   T |  DC | status        |
-|:----------------------------|----:|----:|----:|----:|----:|:--------------|
-| manual_coord_clauses        |   5 |   1 |   2 |   2 |   0 | parsed        |
-| manual_coord_vp             |   4 |   1 |   1 |   1 |   0 | parsed        |
-| manual_finite_complement    |   5 |   1 |   2 |   1 |   1 | parsed        |
-| manual_nonfinite_complement |   5 |   1 |   1 |   1 |   0 | parsed        |
-| manual_fragment_FRAG        |   4 |   1 |   1 |   1 |   0 | parsed        |
-| manual_fragment_NP          |   4 |   1 |   0 |   0 |   0 | parsed        |
-| manual_imperative           |   3 |   1 |   1 |   1 |   0 | parsed        |
-| manual_relative             |   6 |   1 |   2 |   1 |   1 | parsed        |
-| manual_reduced_relative     |   6 |   1 |   1 |   1 |   0 | parsed        |
-| empty                       |   0 |   0 |   0 |   0 |   0 | no_words      |
-| failed                      |  NA |  NA |  NA |  NA |  NA | parser_failed |
 
 The fixture explicitly labels its provenance `authored-fixture`. Its
 rows include finite and nonfinite complements, coordination, relative
@@ -72,34 +72,37 @@ different tokenization.
 ## Follow a value back to the source
 
 ``` r
-knitr::kable(subset(analysis$results,
+print(subset(analysis$results,
   document_id %in% c("manual_coord_clauses", "manual_finite_complement", "manual_fragment_NP"),
   select = c("document_id", "measure", "numerator", "denominator",
     "original_rule_value", "value", "status")), row.names = FALSE)
-```
-
-| document_id | measure | numerator | denominator | original_rule_value | value | status |
-|:---|:---|---:|---:|---:|---:|:---|
-| manual_coord_clauses | MLC | 5 | 2 | 2.5 | 2.5 | computed |
-| manual_coord_clauses | MLT | 5 | 2 | 2.5 | 2.5 | computed |
-| manual_coord_clauses | DC_C | 0 | 2 | 0.0 | 0.0 | computed |
-| manual_finite_complement | MLC | 5 | 2 | 2.5 | 2.5 | computed |
-| manual_finite_complement | MLT | 5 | 1 | 5.0 | 5.0 | computed |
-| manual_finite_complement | DC_C | 1 | 2 | 0.5 | 0.5 | computed |
-| manual_fragment_NP | MLC | 4 | 0 | 0.0 | NA | zero_denominator |
-| manual_fragment_NP | MLT | 4 | 0 | 0.0 | NA | zero_denominator |
-| manual_fragment_NP | DC_C | 0 | 0 | 0.0 | NA | zero_denominator |
-
-``` r
-knitr::kable(subset(analysis$matches,
+#>               document_id measure numerator denominator original_rule_value
+#>      manual_coord_clauses     MLC         5           2                 2.5
+#>      manual_coord_clauses     MLT         5           2                 2.5
+#>      manual_coord_clauses    DC_C         0           2                 0.0
+#>  manual_finite_complement     MLC         5           2                 2.5
+#>  manual_finite_complement     MLT         5           1                 5.0
+#>  manual_finite_complement    DC_C         1           2                 0.5
+#>        manual_fragment_NP     MLC         4           0                 0.0
+#>        manual_fragment_NP     MLT         4           0                 0.0
+#>        manual_fragment_NP    DC_C         0           0                 0.0
+#>  value           status
+#>    2.5         computed
+#>    2.5         computed
+#>    0.0         computed
+#>    2.5         computed
+#>    5.0         computed
+#>    0.5         computed
+#>     NA zero_denominator
+#>     NA zero_denominator
+#>     NA zero_denominator
+print(subset(analysis$matches,
   document_id == "manual_coord_clauses" & pattern == "t",
   select = c("tree_id", "node_id", "start", "end", "source_span")), row.names = FALSE)
+#>  tree_id node_id start end                 source_span
+#>        1       2     1  27 Maya reads, and Leo writes.
+#>        1      14    17  26                  Leo writes
 ```
-
-| tree_id | node_id | start | end | source_span                 |
-|--------:|--------:|------:|----:|:----------------------------|
-|       1 |       2 |     1 |  27 | Maya reads, and Leo writes. |
-|       1 |      14 |    17 |  26 | Leo writes                  |
 
 In `Maya reads, and Leo writes.`, the two T matches overlap: the whole
 sentence and `Leo writes`. They are **query-matched subtrees**, not a
@@ -239,43 +242,61 @@ outputs and their statuses together.
 ## Carry review decisions and missing observations into a study
 
 ``` r
-knitr::kable(demo$review[c("document_id", "decision", "reason")], row.names = FALSE)
-```
-
-| document_id | decision | reason |
-|:---|:---|:---|
-| manual_coord_clauses | include | Authored tree and declared matches inspected. |
-| manual_coord_vp | include | Authored tree and declared matches inspected. |
-| manual_finite_complement | include | Authored tree and declared matches inspected. |
-| manual_nonfinite_complement | include | Authored tree and declared matches inspected. |
-| manual_fragment_FRAG | withhold | Illustrative reporting protocol excludes fragments. |
-| manual_fragment_NP | include | Authored tree and declared matches inspected. |
-| manual_imperative | include | Authored tree and declared matches inspected. |
-| manual_relative | include | Authored tree and declared matches inspected. |
-| manual_reduced_relative | include | Authored tree and declared matches inspected. |
-| empty | not_applicable | No reportable score. |
-| failed | not_applicable | No reportable score. |
-
-``` r
-knitr::kable(subset(demo$study_long, measure == "MLT",
+print(demo$review[c("document_id", "decision", "reason")], row.names = FALSE)
+#>                  document_id       decision
+#>         manual_coord_clauses        include
+#>              manual_coord_vp        include
+#>     manual_finite_complement        include
+#>  manual_nonfinite_complement        include
+#>         manual_fragment_FRAG       withhold
+#>           manual_fragment_NP        include
+#>            manual_imperative        include
+#>              manual_relative        include
+#>      manual_reduced_relative        include
+#>                        empty not_applicable
+#>                       failed not_applicable
+#>                                               reason
+#>        Authored tree and declared matches inspected.
+#>        Authored tree and declared matches inspected.
+#>        Authored tree and declared matches inspected.
+#>        Authored tree and declared matches inspected.
+#>  Illustrative reporting protocol excludes fragments.
+#>        Authored tree and declared matches inspected.
+#>        Authored tree and declared matches inspected.
+#>        Authored tree and declared matches inspected.
+#>        Authored tree and declared matches inspected.
+#>                                 No reportable score.
+#>                                 No reportable score.
+print(subset(demo$study_long, measure == "MLT",
   select = c("observation_id", "writer_id", "task", "occasion", "value",
     "status", "review_status", "report_value")), row.names = FALSE)
+#>  observation_id writer_id        task occasion value           status
+#>              o1        w1 description       t1   2.5         computed
+#>              o2        w1 description       t2   4.0         computed
+#>              o3        w2 description       t1   5.0         computed
+#>              o4        w2 description       t2   5.0         computed
+#>              o5        w3   narrative       t1   4.0         computed
+#>              o6        w3   narrative       t2    NA zero_denominator
+#>              o7        w4   narrative       t1   3.0         computed
+#>              o8        w4   narrative       t2   6.0         computed
+#>              o9        w5 description       t1   6.0         computed
+#>             o10        w5 description       t2    NA         no_words
+#>             o11        w6 description       t1    NA    parser_failed
+#>             o12        w6 description       t2    NA    not_submitted
+#>   review_status report_value
+#>         include          2.5
+#>         include          4.0
+#>         include          5.0
+#>         include          5.0
+#>        withhold           NA
+#>         include           NA
+#>         include          3.0
+#>         include          6.0
+#>         include          6.0
+#>  not_applicable           NA
+#>  not_applicable           NA
+#>            <NA>           NA
 ```
-
-| observation_id | writer_id | task | occasion | value | status | review_status | report_value |
-|:---|:---|:---|:---|---:|:---|:---|---:|
-| o1 | w1 | description | t1 | 2.5 | computed | include | 2.5 |
-| o2 | w1 | description | t2 | 4.0 | computed | include | 4.0 |
-| o3 | w2 | description | t1 | 5.0 | computed | include | 5.0 |
-| o4 | w2 | description | t2 | 5.0 | computed | include | 5.0 |
-| o5 | w3 | narrative | t1 | 4.0 | computed | withhold | NA |
-| o6 | w3 | narrative | t2 | NA | zero_denominator | include | NA |
-| o7 | w4 | narrative | t1 | 3.0 | computed | include | 3.0 |
-| o8 | w4 | narrative | t2 | 6.0 | computed | include | 6.0 |
-| o9 | w5 | description | t1 | 6.0 | computed | include | 6.0 |
-| o10 | w5 | description | t2 | NA | no_words | not_applicable | NA |
-| o11 | w6 | description | t1 | NA | parser_failed | not_applicable | NA |
-| o12 | w6 | description | t2 | NA | not_submitted | NA | NA |
 
 The example keeps a separate decision table keyed by document and
 `analysis_id`, with reviewer and reason. It withholds one otherwise

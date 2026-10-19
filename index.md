@@ -18,7 +18,7 @@ not mix incompatible specifications.
 
 ## Installation
 
-The published snapshot is 0.3.0.9013, a development prerelease that has
+The published snapshot is 0.3.0.9014, a development prerelease that has
 not been released on CRAN. It includes English readability and traced
 syntactic-complexity examples. The fixed tag below identifies the tested
 code and installed examples. It requires R 4.1.0 or later. Install the
@@ -26,7 +26,7 @@ tested snapshot used by this documentation:
 
 ``` r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9013")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9014")
 ```
 
 Pinning the revision fixes the implementation, even when development
@@ -39,11 +39,17 @@ If you have a built source archive, install it locally:
 
 ``` r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9013.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9014.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation
-may omit them; the online guides remain available.
+may omit them; the online guides remain available. Run
+`vignette(package = "ldfreq")` to list installed guides, or
+[`vignette("getting-started", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.md)
+to open the introduction.
+[`?ldfreq`](https://ryuya-dot-com.github.io/ldfreq/reference/ldfreq-package.md)
+also explains how to find explicitly sourced example helpers, which have
+no individual `?function` entry.
 
 ## A first analysis
 

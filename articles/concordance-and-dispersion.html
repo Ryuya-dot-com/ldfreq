@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9013</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9014</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,51 +88,21 @@ learner observations or an evaluation of an annotation system.</p>
 <h2 id="prepare-complete-annotations">Prepare complete annotations<a class="anchor" aria-label="anchor" href="#prepare-complete-annotations"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"concordance-demo.R"</span>,</span>
 <span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">demo</span><span class="op">)</span></span>
 <span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">helper</span></span>
 <span><span class="va">annotations</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">annotations</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">annotations</span><span class="op">$</span><span class="va">segments</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"text"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="left">segment_id</th>
-<th align="left">text</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">spread</td>
-<td align="left">s1</td>
-<td align="left">learn a b c learn d e f learn g h i</td>
-</tr>
-<tr class="even">
-<td align="left">cluster</td>
-<td align="left">s1</td>
-<td align="left">learn learn learn a b c d e f g h i</td>
-</tr>
-<tr class="odd">
-<td align="left">context</td>
-<td align="left">s1</td>
-<td align="left">We learn new words. They learned new words.</td>
-</tr>
-<tr class="even">
-<td align="left">context</td>
-<td align="left">s2</td>
-<td align="left">learn very new words</td>
-</tr>
-<tr class="odd">
-<td align="left">absent</td>
-<td align="left">s1</td>
-<td align="left">read a book</td>
-</tr>
-<tr class="even">
-<td align="left">empty</td>
-<td align="left">s1</td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">annotations</span><span class="op">$</span><span class="va">segments</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"text"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id segment_id                                        text</span></span>
+<span><span class="co">#&gt;       spread         s1         learn a b c learn d e f learn g h i</span></span>
+<span><span class="co">#&gt;      cluster         s1         learn learn learn a b c d e f g h i</span></span>
+<span><span class="co">#&gt;      context         s1 We learn new words. They learned new words.</span></span>
+<span><span class="co">#&gt;      context         s2                        learn very new words</span></span>
+<span><span class="co">#&gt;       absent         s1                                 read a book</span></span>
+<span><span class="co">#&gt;        empty         s1</span></span></code></pre></div>
 <p><code>spread</code> and <code>cluster</code> each contain 12 original
 tokens and three instances of <code>learn</code>, at positions 1/5/9 and
 1/2/3 respectively. <code>context</code> has two segments and includes
@@ -223,202 +193,37 @@ tokenizer settings.</p>
 <span>  queries <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>word <span class="op">=</span> <span class="st">"learn"</span>, phrase <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"learn"</span>, <span class="st">"new"</span><span class="op">)</span>, absent <span class="op">=</span> <span class="st">"unlisted"</span><span class="op">)</span>,</span>
 <span>  term_col <span class="op">=</span> <span class="st">"lemma"</span>, valuetype <span class="op">=</span> <span class="st">"fixed"</span>, case_insensitive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  keep <span class="op">=</span> <span class="va">keep</span>, window <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">search</span><span class="op">$</span><span class="va">counts</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="left">query_id</th>
-<th align="right">occurrences</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">spread</td>
-<td align="left">word</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="left">cluster</td>
-<td align="left">word</td>
-<td align="right">3</td>
-</tr>
-<tr class="odd">
-<td align="left">context</td>
-<td align="left">word</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="left">absent</td>
-<td align="left">word</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">empty</td>
-<td align="left">word</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">spread</td>
-<td align="left">phrase</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">cluster</td>
-<td align="left">phrase</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">context</td>
-<td align="left">phrase</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">absent</td>
-<td align="left">phrase</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">empty</td>
-<td align="left">phrase</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">spread</td>
-<td align="left">absent</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">cluster</td>
-<td align="left">absent</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">context</td>
-<td align="left">absent</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">absent</td>
-<td align="left">absent</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">empty</td>
-<td align="left">absent</td>
-<td align="right">0</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">search</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"query_id"</span>, <span class="st">"document_id"</span>, <span class="st">"segment_id"</span>,</span>
-<span>  <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="13%">
-<col width="17%">
-<col width="16%">
-<col width="17%">
-<col width="17%">
-<col width="17%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">query_id</th>
-<th align="left">document_id</th>
-<th align="left">segment_id</th>
-<th align="left">pre</th>
-<th align="left">keyword</th>
-<th align="left">post</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">word</td>
-<td align="left">spread</td>
-<td align="left">s1</td>
-<td align="left"></td>
-<td align="left">learn</td>
-<td align="left">a b</td>
-</tr>
-<tr class="even">
-<td align="left">word</td>
-<td align="left">spread</td>
-<td align="left">s1</td>
-<td align="left">b c</td>
-<td align="left">learn</td>
-<td align="left">d e</td>
-</tr>
-<tr class="odd">
-<td align="left">word</td>
-<td align="left">spread</td>
-<td align="left">s1</td>
-<td align="left">e f</td>
-<td align="left">learn</td>
-<td align="left">g h</td>
-</tr>
-<tr class="even">
-<td align="left">word</td>
-<td align="left">cluster</td>
-<td align="left">s1</td>
-<td align="left"></td>
-<td align="left">learn</td>
-<td align="left">learn learn</td>
-</tr>
-<tr class="odd">
-<td align="left">word</td>
-<td align="left">cluster</td>
-<td align="left">s1</td>
-<td align="left">learn</td>
-<td align="left">learn</td>
-<td align="left">learn a</td>
-</tr>
-<tr class="even">
-<td align="left">word</td>
-<td align="left">cluster</td>
-<td align="left">s1</td>
-<td align="left">learn learn</td>
-<td align="left">learn</td>
-<td align="left">a b</td>
-</tr>
-<tr class="odd">
-<td align="left">word</td>
-<td align="left">context</td>
-<td align="left">s1</td>
-<td align="left">We</td>
-<td align="left">learn</td>
-<td align="left">new words</td>
-</tr>
-<tr class="even">
-<td align="left">word</td>
-<td align="left">context</td>
-<td align="left">s1</td>
-<td align="left">. They</td>
-<td align="left">learned</td>
-<td align="left">new words</td>
-</tr>
-<tr class="odd">
-<td align="left">word</td>
-<td align="left">context</td>
-<td align="left">s2</td>
-<td align="left"></td>
-<td align="left">learn</td>
-<td align="left">very new</td>
-</tr>
-<tr class="even">
-<td align="left">phrase</td>
-<td align="left">context</td>
-<td align="left">s1</td>
-<td align="left">We</td>
-<td align="left">learn new</td>
-<td align="left">words.</td>
-</tr>
-<tr class="odd">
-<td align="left">phrase</td>
-<td align="left">context</td>
-<td align="left">s1</td>
-<td align="left">. They</td>
-<td align="left">learned new</td>
-<td align="left">words.</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">search</span><span class="op">$</span><span class="va">counts</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id query_id occurrences</span></span>
+<span><span class="co">#&gt;       spread     word           3</span></span>
+<span><span class="co">#&gt;      cluster     word           3</span></span>
+<span><span class="co">#&gt;      context     word           3</span></span>
+<span><span class="co">#&gt;       absent     word           0</span></span>
+<span><span class="co">#&gt;        empty     word           0</span></span>
+<span><span class="co">#&gt;       spread   phrase           0</span></span>
+<span><span class="co">#&gt;      cluster   phrase           0</span></span>
+<span><span class="co">#&gt;      context   phrase           2</span></span>
+<span><span class="co">#&gt;       absent   phrase           0</span></span>
+<span><span class="co">#&gt;        empty   phrase           0</span></span>
+<span><span class="co">#&gt;       spread   absent           0</span></span>
+<span><span class="co">#&gt;      cluster   absent           0</span></span>
+<span><span class="co">#&gt;      context   absent           0</span></span>
+<span><span class="co">#&gt;       absent   absent           0</span></span>
+<span><span class="co">#&gt;        empty   absent           0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">search</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"query_id"</span>, <span class="st">"document_id"</span>, <span class="st">"segment_id"</span>,</span>
+<span>  <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  query_id document_id segment_id          pre     keyword         post</span></span>
+<span><span class="co">#&gt;      word      spread         s1                    learn          a b</span></span>
+<span><span class="co">#&gt;      word      spread         s1         b c        learn          d e</span></span>
+<span><span class="co">#&gt;      word      spread         s1         e f        learn          g h</span></span>
+<span><span class="co">#&gt;      word     cluster         s1                    learn  learn learn</span></span>
+<span><span class="co">#&gt;      word     cluster         s1       learn        learn      learn a</span></span>
+<span><span class="co">#&gt;      word     cluster         s1 learn learn        learn          a b</span></span>
+<span><span class="co">#&gt;      word     context         s1          We        learn    new words</span></span>
+<span><span class="co">#&gt;      word     context         s1      . They      learned    new words</span></span>
+<span><span class="co">#&gt;      word     context         s2                    learn     very new</span></span>
+<span><span class="co">#&gt;    phrase     context         s1          We    learn new       words.</span></span>
+<span><span class="co">#&gt;    phrase     context         s1      . They  learned new       words.</span></span></code></pre></div>
 <p>Each named list element is one query ID. A character vector within it
 specifies consecutive token patterns: <code>c("learn", "new")</code>
 searches two tokens, while <code>"learn new"</code> is one literal token
@@ -461,73 +266,24 @@ whole token</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">wildcard</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">concordance_search</span><span class="op">(</span><span class="va">annotations</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>forms <span class="op">=</span> <span class="st">"learn*"</span>, phrase <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"learn*"</span>, <span class="st">"new"</span><span class="op">)</span><span class="op">)</span>, valuetype <span class="op">=</span> <span class="st">"glob"</span>, keep <span class="op">=</span> <span class="va">keep</span><span class="op">)</span></span>
 <span><span class="va">regular</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">concordance_search</span><span class="op">(</span><span class="va">annotations</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>forms <span class="op">=</span> <span class="st">"^learn(ed)?$"</span><span class="op">)</span>, valuetype <span class="op">=</span> <span class="st">"regex"</span>, keep <span class="op">=</span> <span class="va">keep</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">wildcard</span><span class="op">$</span><span class="va">counts</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="left">query_id</th>
-<th align="right">occurrences</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">spread</td>
-<td align="left">forms</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="left">cluster</td>
-<td align="left">forms</td>
-<td align="right">3</td>
-</tr>
-<tr class="odd">
-<td align="left">context</td>
-<td align="left">forms</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="left">absent</td>
-<td align="left">forms</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">empty</td>
-<td align="left">forms</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">spread</td>
-<td align="left">phrase</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">cluster</td>
-<td align="left">phrase</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">context</td>
-<td align="left">phrase</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">absent</td>
-<td align="left">phrase</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">empty</td>
-<td align="left">phrase</td>
-<td align="right">0</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">regular</span><span class="op">$</span><span class="va">counts</span><span class="op">$</span><span class="va">occurrences</span><span class="op">)</span> <span class="op">==</span> <span class="fl">9L</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wildcard</span><span class="op">$</span><span class="va">counts</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id query_id occurrences</span></span>
+<span><span class="co">#&gt;       spread    forms           3</span></span>
+<span><span class="co">#&gt;      cluster    forms           3</span></span>
+<span><span class="co">#&gt;      context    forms           3</span></span>
+<span><span class="co">#&gt;       absent    forms           0</span></span>
+<span><span class="co">#&gt;        empty    forms           0</span></span>
+<span><span class="co">#&gt;       spread   phrase           0</span></span>
+<span><span class="co">#&gt;      cluster   phrase           0</span></span>
+<span><span class="co">#&gt;      context   phrase           2</span></span>
+<span><span class="co">#&gt;       absent   phrase           0</span></span>
+<span><span class="co">#&gt;        empty   phrase           0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">regular</span><span class="op">$</span><span class="va">counts</span><span class="op">$</span><span class="va">occurrences</span><span class="op">)</span> <span class="op">==</span> <span class="fl">9L</span><span class="op">)</span></span></code></pre></div>
 <p>Regex is applied to tokens, <strong>not to the raw text</strong>. An
 unanchored <code>learn</code> regex also matches <code>unlearn</code>.
 Fixed matching is not a byte-identity check: quanteda may match
@@ -544,61 +300,14 @@ represented as segments. Excluded tokens and missing/blank search terms
 leave gaps and cannot complete a phrase, including a wildcard phrase.
 The example therefore does not turn <code>learn very new</code> into
 <code>learn new</code> after excluding <code>very</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">search</span><span class="op">$</span><span class="va">documents</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="17%">
-<col width="20%">
-<col width="17%">
-<col width="25%">
-<col width="20%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="right">source_tokens</th>
-<th align="right">kept_tokens</th>
-<th align="right">searchable_tokens</th>
-<th align="right">missing_terms</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">spread</td>
-<td align="right">12</td>
-<td align="right">12</td>
-<td align="right">12</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">cluster</td>
-<td align="right">12</td>
-<td align="right">12</td>
-<td align="right">12</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">context</td>
-<td align="right">14</td>
-<td align="right">11</td>
-<td align="right">11</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">absent</td>
-<td align="right">3</td>
-<td align="right">3</td>
-<td align="right">3</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">empty</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-</tr>
-</tbody>
-</table>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">search</span><span class="op">$</span><span class="va">documents</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id source_tokens kept_tokens searchable_tokens missing_terms</span></span>
+<span><span class="co">#&gt;       spread            12          12                12             0</span></span>
+<span><span class="co">#&gt;      cluster            12          12                12             0</span></span>
+<span><span class="co">#&gt;      context            14          11                11             0</span></span>
+<span><span class="co">#&gt;       absent             3           3                 3             0</span></span>
+<span><span class="co">#&gt;        empty             0           0                 0             0</span></span></code></pre></div>
 <p><code>source_tokens</code> counts all original positions.
 <code>kept_tokens</code> applies <code>keep</code>;
 <code>searchable_tokens</code> also requires a nonblank search term.
@@ -613,98 +322,22 @@ intended searches before raising it for a larger input.</p>
 <div class="section level2">
 <h2 id="sort-by-the-nearest-context-words">Sort by the nearest context words<a class="anchor" aria-label="anchor" href="#sort-by-the-nearest-context-words"></a>
 </h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">right_sorted</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">concordance_sort</span><span class="op">(</span><span class="va">search</span>, side <span class="op">=</span> <span class="st">"right"</span>, depth <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
 <span><span class="va">left_sorted</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">concordance_sort</span><span class="op">(</span><span class="va">search</span>, side <span class="op">=</span> <span class="st">"left"</span>, depth <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">right_sorted</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"query_id"</span>, <span class="st">"document_id"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">query_id</th>
-<th align="left">document_id</th>
-<th align="left">pre</th>
-<th align="left">keyword</th>
-<th align="left">post</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">word</td>
-<td align="left">spread</td>
-<td align="left"></td>
-<td align="left">learn</td>
-<td align="left">a b</td>
-</tr>
-<tr class="even">
-<td align="left">word</td>
-<td align="left">cluster</td>
-<td align="left">learn learn</td>
-<td align="left">learn</td>
-<td align="left">a b</td>
-</tr>
-<tr class="odd">
-<td align="left">word</td>
-<td align="left">spread</td>
-<td align="left">b c</td>
-<td align="left">learn</td>
-<td align="left">d e</td>
-</tr>
-<tr class="even">
-<td align="left">word</td>
-<td align="left">spread</td>
-<td align="left">e f</td>
-<td align="left">learn</td>
-<td align="left">g h</td>
-</tr>
-<tr class="odd">
-<td align="left">word</td>
-<td align="left">cluster</td>
-<td align="left">learn</td>
-<td align="left">learn</td>
-<td align="left">learn a</td>
-</tr>
-<tr class="even">
-<td align="left">word</td>
-<td align="left">cluster</td>
-<td align="left"></td>
-<td align="left">learn</td>
-<td align="left">learn learn</td>
-</tr>
-<tr class="odd">
-<td align="left">word</td>
-<td align="left">context</td>
-<td align="left">We</td>
-<td align="left">learn</td>
-<td align="left">new words</td>
-</tr>
-<tr class="even">
-<td align="left">word</td>
-<td align="left">context</td>
-<td align="left">. They</td>
-<td align="left">learned</td>
-<td align="left">new words</td>
-</tr>
-<tr class="odd">
-<td align="left">word</td>
-<td align="left">context</td>
-<td align="left"></td>
-<td align="left">learn</td>
-<td align="left">very new</td>
-</tr>
-<tr class="even">
-<td align="left">phrase</td>
-<td align="left">context</td>
-<td align="left">We</td>
-<td align="left">learn new</td>
-<td align="left">words.</td>
-</tr>
-<tr class="odd">
-<td align="left">phrase</td>
-<td align="left">context</td>
-<td align="left">. They</td>
-<td align="left">learned new</td>
-<td align="left">words.</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">right_sorted</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"query_id"</span>, <span class="st">"document_id"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  query_id document_id          pre     keyword         post</span></span>
+<span><span class="co">#&gt;      word      spread                    learn          a b</span></span>
+<span><span class="co">#&gt;      word     cluster learn learn        learn          a b</span></span>
+<span><span class="co">#&gt;      word      spread         b c        learn          d e</span></span>
+<span><span class="co">#&gt;      word      spread         e f        learn          g h</span></span>
+<span><span class="co">#&gt;      word     cluster       learn        learn      learn a</span></span>
+<span><span class="co">#&gt;      word     cluster                    learn  learn learn</span></span>
+<span><span class="co">#&gt;      word     context          We        learn    new words</span></span>
+<span><span class="co">#&gt;      word     context      . They      learned    new words</span></span>
+<span><span class="co">#&gt;      word     context                    learn     very new</span></span>
+<span><span class="co">#&gt;    phrase     context          We    learn new       words.</span></span>
+<span><span class="co">#&gt;    phrase     context      . They  learned new       words.</span></span></code></pre></div>
 <p>The saved <code>left_tokens</code> and <code>right_tokens</code> list
 columns start with the nearest surface token. Left sorting uses L1, then
 L2; right sorting uses R1, then R2. It does not alphabetize the complete
@@ -727,7 +360,7 @@ search identity; sorting does not.</p>
 <div class="section level2">
 <h2 id="plot-those-same-occurrences">Plot those same occurrences<a class="anchor" aria-label="anchor" href="#plot-those-same-occurrences"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">positions</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">concordance_positions</span><span class="op">(</span><span class="va">search</span>, <span class="st">"word"</span><span class="op">)</span></span>
 <span><span class="va">positions</span></span></code></pre></div>
 <p><img src="concordance-and-dispersion_files/figure-html/concordance-position-plot-1.png" class="r-plt" alt="" width="672"></p>
@@ -742,10 +375,10 @@ statistic.</p>
 original token slots on a common 0–1 scale. Exclusions do not shorten
 the axis. Use <code>relative = FALSE</code> for a shared absolute
 token-position axis:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">helper</span><span class="op">$</span><span class="fu">concordance_positions</span><span class="op">(</span><span class="va">search</span>, <span class="st">"phrase"</span>, relative <span class="op">=</span> <span class="cn">FALSE</span>, monochrome <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="concordance-and-dispersion_files/figure-html/concordance-position-mono-1.png" class="r-plt" alt="" width="672"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">positions</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">occurrence_id</span>,</span>
 <span>  <span class="va">search</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">occurrence_id</span><span class="op">[</span><span class="va">search</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">query_id</span> <span class="op">==</span> <span class="st">"word"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The plot reads the saved table without retokenization or a new
@@ -772,144 +405,27 @@ terms can make these exposure counts unequal. The result retains
 original interval bounds, both counts and both shares. A larger value
 indicates greater departure from the declared exposure distribution; it
 does not necessarily mean a geometrically narrower cluster.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dispersion</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">concordance_dispersion</span><span class="op">(</span><span class="va">search</span>, <span class="st">"word"</span>, parts <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">dispersion</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"searchable_tokens"</span>, <span class="st">"occurrences"</span>,</span>
-<span>  <span class="st">"DP"</span>, <span class="st">"status"</span>, <span class="st">"missing_reason"</span><span class="op">)</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">4</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="15%">
-<col width="23%">
-<col width="15%">
-<col width="8%">
-<col width="10%">
-<col width="26%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="right">searchable_tokens</th>
-<th align="right">occurrences</th>
-<th align="right">DP</th>
-<th align="left">status</th>
-<th align="left">missing_reason</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">spread</td>
-<td align="right">12</td>
-<td align="right">3</td>
-<td align="right">0.0000</td>
-<td align="left">ok</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">cluster</td>
-<td align="right">12</td>
-<td align="right">3</td>
-<td align="right">0.6667</td>
-<td align="left">ok</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">context</td>
-<td align="right">11</td>
-<td align="right">3</td>
-<td align="right">0.0606</td>
-<td align="left">ok</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">absent</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="left">missing</td>
-<td align="left">no_matches</td>
-</tr>
-<tr class="odd">
-<td align="left">empty</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="left">missing</td>
-<td align="left">no_searchable_tokens</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">dispersion</span><span class="op">$</span><span class="va">parts</span>, <span class="va">document_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"spread"</span>, <span class="st">"cluster"</span><span class="op">)</span><span class="op">)</span><span class="op">[</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">dispersion</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"searchable_tokens"</span>, <span class="st">"occurrences"</span>,</span>
+<span>  <span class="st">"DP"</span>, <span class="st">"status"</span>, <span class="st">"missing_reason"</span><span class="op">)</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">4</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id searchable_tokens occurrences      DP  status       missing_reason</span></span>
+<span><span class="co">#&gt;       spread                12           3 0.00000      ok                 &lt;NA&gt;</span></span>
+<span><span class="co">#&gt;      cluster                12           3 0.66667      ok                 &lt;NA&gt;</span></span>
+<span><span class="co">#&gt;      context                11           3 0.06061      ok                 &lt;NA&gt;</span></span>
+<span><span class="co">#&gt;       absent                 3           0      NA missing           no_matches</span></span>
+<span><span class="co">#&gt;        empty                 0           0      NA missing no_searchable_tokens</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">dispersion</span><span class="op">$</span><span class="va">parts</span>, <span class="va">document_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"spread"</span>, <span class="st">"cluster"</span><span class="op">)</span><span class="op">)</span><span class="op">[</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"part"</span>, <span class="st">"searchable_tokens"</span>, <span class="st">"occurrences"</span>, <span class="st">"expected_share"</span>, <span class="st">"observed_share"</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  digits <span class="op">=</span> <span class="fl">3</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<colgroup>
-<col width="15%">
-<col width="6%">
-<col width="23%">
-<col width="15%">
-<col width="19%">
-<col width="19%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="right">part</th>
-<th align="right">searchable_tokens</th>
-<th align="right">occurrences</th>
-<th align="right">expected_share</th>
-<th align="right">observed_share</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">spread</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">0.333</td>
-<td align="right">0.333</td>
-</tr>
-<tr class="even">
-<td align="left">spread</td>
-<td align="right">2</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">0.333</td>
-<td align="right">0.333</td>
-</tr>
-<tr class="odd">
-<td align="left">spread</td>
-<td align="right">3</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">0.333</td>
-<td align="right">0.333</td>
-</tr>
-<tr class="even">
-<td align="left">cluster</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">0.333</td>
-<td align="right">1.000</td>
-</tr>
-<tr class="odd">
-<td align="left">cluster</td>
-<td align="right">2</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0.333</td>
-<td align="right">0.000</td>
-</tr>
-<tr class="even">
-<td align="left">cluster</td>
-<td align="right">3</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0.333</td>
-<td align="right">0.000</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">dispersion</span><span class="op">$</span><span class="va">documents</span><span class="op">$</span><span class="va">DP</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  digits <span class="op">=</span> <span class="fl">3</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id part searchable_tokens occurrences expected_share observed_share</span></span>
+<span><span class="co">#&gt;       spread    1                 4           1          0.333          0.333</span></span>
+<span><span class="co">#&gt;       spread    2                 4           1          0.333          0.333</span></span>
+<span><span class="co">#&gt;       spread    3                 4           1          0.333          0.333</span></span>
+<span><span class="co">#&gt;      cluster    1                 4           3          0.333          1.000</span></span>
+<span><span class="co">#&gt;      cluster    2                 4           0          0.333          0.000</span></span>
+<span><span class="co">#&gt;      cluster    3                 4           0          0.333          0.000</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">dispersion</span><span class="op">$</span><span class="va">documents</span><span class="op">$</span><span class="va">DP</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>For <code>spread</code>, all three parts contain four searchable
 tokens and one match: both shares are <code>(1/3, 1/3, 1/3)</code>, so
 DP is 0. For <code>cluster</code>, the match shares are
@@ -938,7 +454,7 @@ policies silently.</p>
 <div class="section level2">
 <h2 id="save-and-reopen-the-complete-analysis">Save and reopen the complete analysis<a class="anchor" aria-label="anchor" href="#save-and-reopen-the-complete-analysis"></a>
 </h2>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>search <span class="op">=</span> <span class="va">search</span>, sorted <span class="op">=</span> <span class="va">right_sorted</span>, dispersion <span class="op">=</span> <span class="va">dispersion</span>,</span>
 <span>  sort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>side <span class="op">=</span> <span class="st">"right"</span>, depth <span class="op">=</span> <span class="fl">2L</span>, ignore_case <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>  session <span class="op">=</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>

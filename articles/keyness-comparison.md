@@ -17,19 +17,19 @@ evaluation of annotation accuracy.
 ## Declare the documents and inspect the coverage
 
 ``` r
+library(ldfreq)
+
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "keyness-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
 helper <- demo$helper
 comparison <- demo$comparison
-knitr::kable(comparison$totals[c("corpus", "documents", "source_tokens",
+print(comparison$totals[c("corpus", "documents", "source_tokens",
   "missing_terms", "counted_tokens")], row.names = FALSE)
+#>     corpus documents source_tokens missing_terms counted_tokens
+#>     target         3            10             1              8
+#>  reference         3             8             0              8
 ```
-
-| corpus    | documents | source_tokens | missing_terms | counted_tokens |
-|:----------|----------:|--------------:|--------------:|---------------:|
-| target    |         3 |            10 |             1 |              8 |
-| reference |         3 |             8 |             0 |              8 |
 
 The target is `t1`, `t2`, `t_empty`; the reference is `r1`, `r2`,
 `r_empty`. Both have **8 counted tokens**. The target has 10 original
@@ -38,18 +38,16 @@ document `outside` is not in either corpus. Empty documents remain
 declared documents; they do not supply tokens to the denominator.
 
 ``` r
-knitr::kable(demo$annotations$segments[c("document_id", "text")], row.names = FALSE)
+print(demo$annotations$segments[c("document_id", "text")], row.names = FALSE)
+#>  document_id                           text
+#>           t1 learn learn learn learn read .
+#>           t2      learn learn write unknown
+#>      t_empty
+#>           r1           learn read read read
+#>           r2          learn read read speak
+#>      r_empty
+#>      outside              unlisted unlisted
 ```
-
-| document_id | text                           |
-|:------------|:-------------------------------|
-| t1          | learn learn learn learn read . |
-| t2          | learn learn write unknown      |
-| t_empty     |                                |
-| r1          | learn read read read           |
-| r2          | learn read read speak          |
-| r_empty     |                                |
-| outside     | unlisted unlisted              |
 
 For your own unchanged
 [`lexdiv_import_annotations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md)
@@ -97,17 +95,14 @@ repeat the comparison if its membership changes.
 
 ``` r
 counts <- comparison$results
-knitr::kable(counts[c("term", "target_count", "reference_count",
-  "target_documents", "reference_documents")], row.names = FALSE,
-  col.names = c("Term", "Target tokens", "Reference tokens", "Target documents", "Reference documents"))
+print(counts[c("term", "target_count", "reference_count",
+  "target_documents", "reference_documents")], row.names = FALSE)
+#>   term target_count reference_count target_documents reference_documents
+#>  learn            6               2                2                   2
+#>   read            1               5                1                   2
+#>  write            1               0                1                   0
+#>  speak            0               1                0                   1
 ```
-
-| Term  | Target tokens | Reference tokens | Target documents | Reference documents |
-|:------|--------------:|-----------------:|-----------------:|--------------------:|
-| learn |             6 |                2 |                2 |                   2 |
-| read  |             1 |                5 |                1 |                   2 |
-| write |             1 |                0 |                1 |                   0 |
-| speak |             0 |                1 |                0 |                   1 |
 
 `learn` occurs 6 times in the target and twice in the reference. Its
 table includes **all other counted terms**, not just words chosen for
@@ -118,13 +113,11 @@ word <- subset(counts, term == "learn")
 table2 <- rbind(target = c(word$target_count, word$target_other),
   reference = c(word$reference_count, word$reference_other))
 colnames(table2) <- c("learn", "All other terms")
-knitr::kable(table2)
+print(table2)
+#>           learn All other terms
+#> target        6               2
+#> reference     2               6
 ```
-
-|           | learn | All other terms |
-|:----------|------:|----------------:|
-| target    |     6 |               2 |
-| reference |     2 |               6 |
 
 For each cell, expected count E is its row total times its column total,
 divided by the grand total. Here all four expectations are 4. The
@@ -136,29 +129,21 @@ probabilities described by [Dunning (1993, Section
 cell is retained in `$results`.
 
 ``` r
-knitr::kable(counts[c("term", "target_per_1000", "reference_per_1000", "log_ratio")],
-  digits = 4, row.names = FALSE,
-  col.names = c("Term", "Target per 1,000", "Reference per 1,000", "Log2 ratio"))
-```
-
-| Term  | Target per 1,000 | Reference per 1,000 | Log2 ratio |
-|:------|-----------------:|--------------------:|-----------:|
-| learn |              750 |                 250 |     1.5850 |
-| read  |              125 |                 625 |    -2.3219 |
-| write |              125 |                   0 |        Inf |
-| speak |                0 |                 125 |       -Inf |
-
-``` r
-knitr::kable(counts[c("term", "G2", "signed_G2", "direction")],
+print(counts[c("term", "target_per_1000", "reference_per_1000", "log_ratio")],
   digits = 4, row.names = FALSE)
+#>   term target_per_1000 reference_per_1000 log_ratio
+#>  learn             750                250     1.585
+#>   read             125                625    -2.322
+#>  write             125                  0       Inf
+#>  speak               0                125      -Inf
+print(counts[c("term", "G2", "signed_G2", "direction")],
+  digits = 4, row.names = FALSE)
+#>   term    G2 signed_G2 direction
+#>  learn 4.186     4.186    target
+#>   read 4.557    -4.557 reference
+#>  write 1.453     1.453    target
+#>  speak 1.453    -1.453 reference
 ```
-
-| term  |     G2 | signed_G2 | direction |
-|:------|-------:|----------:|:----------|
-| learn | 4.1860 |    4.1860 | target    |
-| read  | 4.5567 |   -4.5567 | reference |
-| write | 1.4530 |    1.4530 | target    |
-| speak | 1.4530 |   -1.4530 | reference |
 
 - `G2` is nonnegative. `signed_G2` adds the direction of the **rate**
   difference: positive for the target, negative for the reference, zero
@@ -202,14 +187,12 @@ selected <- helper$keyness_compare(comparison$source,
   min_count = 2L)
 shown <- subset(selected$results, meets_min_count)
 shown <- shown[order(-shown$signed_G2), ]
-knitr::kable(shown[c("term", "target_count", "reference_count", "signed_G2")],
+print(shown[c("term", "target_count", "reference_count", "signed_G2")],
   digits = 4, row.names = FALSE)
+#>   term target_count reference_count signed_G2
+#>  learn            6               2     4.186
+#>   read            1               5    -4.557
 ```
-
-| term  | target_count | reference_count | signed_G2 |
-|:------|-------------:|----------------:|----------:|
-| learn |            6 |               2 |    4.1860 |
-| read  |            1 |               5 |   -4.5567 |
 
 `min_count` is a positive whole number applied to pooled frequency. It
 only changes a display flag: the vocabulary, counts, background terms
@@ -232,21 +215,16 @@ context <- helper$keyness_concordance(comparison, "learn", window = 2L)
 hits <- context$search$occurrences
 hits$corpus <- comparison$documents$corpus[
   match(hits$document_id, comparison$documents$document_id)]
-knitr::kable(hits[c("document_id", "corpus", "pre", "keyword", "post")], row.names = FALSE)
-```
-
-| document_id | corpus    | pre         | keyword | post          |
-|:------------|:----------|:------------|:--------|:--------------|
-| t1          | target    |             | learn   | learn learn   |
-| t1          | target    | learn       | learn   | learn learn   |
-| t1          | target    | learn learn | learn   | learn read    |
-| t1          | target    | learn learn | learn   | read .        |
-| t2          | target    |             | learn   | learn write   |
-| t2          | target    | learn       | learn   | write unknown |
-| r1          | reference |             | learn   | read read     |
-| r2          | reference |             | learn   | read read     |
-
-``` r
+print(hits[c("document_id", "corpus", "pre", "keyword", "post")], row.names = FALSE)
+#>  document_id    corpus          pre keyword           post
+#>           t1    target                learn    learn learn
+#>           t1    target       learn    learn    learn learn
+#>           t1    target learn learn    learn     learn read
+#>           t1    target learn learn    learn         read .
+#>           t2    target                learn    learn write
+#>           t2    target       learn    learn  write unknown
+#>           r1 reference                learn      read read
+#>           r2 reference                learn      read read
 stopifnot(sum(hits$corpus == "target") == word$target_count,
   sum(hits$corpus == "reference") == word$reference_count)
 ```

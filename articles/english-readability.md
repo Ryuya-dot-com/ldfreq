@@ -18,24 +18,24 @@ proficiency level. Only declared English input is supported.
 ## Start from sentences and inspect what was counted
 
 ``` r
+library(ldfreq)
+
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "readability-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
 helper <- demo$helper
 prepared <- demo$prepared
 analysis <- demo$analysis
-knitr::kable(prepared$segments[c("document_id", "segment_id", "text", "status")], row.names = FALSE)
+print(prepared$segments[c("document_id", "segment_id", "text", "status")], row.names = FALSE)
+#>  document_id segment_id                  text           status
+#>           d1         s1          The cat sat.          counted
+#>           d1         s2          The dog ran.          counted
+#>           d1    heading A heading to exclude. excluded_segment
+#>           d2         s1 A little rabbit runs.          counted
+#>           d3         s1 In 1918, R.F.D. grew.          counted
+#>           d4         s1                               no_words
+#>           d5         s1                 Bird.          counted
 ```
-
-| document_id | segment_id | text                  | status           |
-|:------------|:-----------|:----------------------|:-----------------|
-| d1          | s1         | The cat sat.          | counted          |
-| d1          | s2         | The dog ran.          | counted          |
-| d1          | heading    | A heading to exclude. | excluded_segment |
-| d2          | s1         | A little rabbit runs. | counted          |
-| d3          | s1         | In 1918, R.F.D. grew. | counted          |
-| d4          | s1         |                       | no_words         |
-| d5          | s1         | Bird.                 | counted          |
 
 These short, authored texts expose the arithmetic; they are not a
 readability validation sample. Supply one sentence per segment, with
@@ -93,30 +93,48 @@ preprocessing.
 automatic <- helper$readability_score(prepared)
 audit <- cbind(prepared$tokens[c("document_id", "segment_id", "original_surface", "counted")],
   automatic$syllables[c("syllables", "method")])
-knitr::kable(audit, row.names = FALSE)
+print(audit, row.names = FALSE)
+#>  document_id segment_id original_surface counted syllables
+#>           d1         s1              The    TRUE         1
+#>           d1         s1              cat    TRUE         1
+#>           d1         s1              sat    TRUE         1
+#>           d1         s2              The    TRUE         1
+#>           d1         s2              dog    TRUE         1
+#>           d1         s2              ran    TRUE         1
+#>           d1    heading                A   FALSE         1
+#>           d1    heading          heading   FALSE         2
+#>           d1    heading               to   FALSE         1
+#>           d1    heading          exclude   FALSE         2
+#>           d2         s1                A    TRUE         1
+#>           d2         s1           little    TRUE         2
+#>           d2         s1           rabbit    TRUE         2
+#>           d2         s1             runs    TRUE         1
+#>           d3         s1               In    TRUE         1
+#>           d3         s1             1918    TRUE        NA
+#>           d3         s1           R.F.D.    TRUE        NA
+#>           d3         s1             grew    TRUE         1
+#>           d5         s1             Bird    TRUE         1
+#>                  method
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>  pronunciation_required
+#>  pronunciation_required
+#>              dictionary
+#>              dictionary
 ```
-
-| document_id | segment_id | original_surface | counted | syllables | method |
-|:---|:---|:---|:---|---:|:---|
-| d1 | s1 | The | TRUE | 1 | dictionary |
-| d1 | s1 | cat | TRUE | 1 | dictionary |
-| d1 | s1 | sat | TRUE | 1 | dictionary |
-| d1 | s2 | The | TRUE | 1 | dictionary |
-| d1 | s2 | dog | TRUE | 1 | dictionary |
-| d1 | s2 | ran | TRUE | 1 | dictionary |
-| d1 | heading | A | FALSE | 1 | dictionary |
-| d1 | heading | heading | FALSE | 2 | dictionary |
-| d1 | heading | to | FALSE | 1 | dictionary |
-| d1 | heading | exclude | FALSE | 2 | dictionary |
-| d2 | s1 | A | TRUE | 1 | dictionary |
-| d2 | s1 | little | TRUE | 2 | dictionary |
-| d2 | s1 | rabbit | TRUE | 2 | dictionary |
-| d2 | s1 | runs | TRUE | 1 | dictionary |
-| d3 | s1 | In | TRUE | 1 | dictionary |
-| d3 | s1 | 1918 | TRUE | NA | pronunciation_required |
-| d3 | s1 | R.F.D. | TRUE | NA | pronunciation_required |
-| d3 | s1 | grew | TRUE | 1 | dictionary |
-| d5 | s1 | Bird | TRUE | 1 | dictionary |
 
 [nsyllable](https://search.r-project.org/CRAN/refmans/nsyllable/html/nsyllable.html)
 uses a pronunciation dictionary and a vowel-group fallback for unknown
@@ -140,26 +158,28 @@ syllables respectively, with the spoken forms recorded in
 `review_reason`.
 
 ``` r
-knitr::kable(demo$initial$components, row.names = FALSE)
-```
-
-| document_id | words | sentences | syllables | known_syllables | missing_syllable_words | below_word_threshold | status |
-|:---|---:|---:|---:|---:|---:|:---|:---|
-| d1 | 6 | 2 | 6 | 6 | 0 | TRUE | ok |
-| d2 | 4 | 1 | 6 | 6 | 0 | TRUE | ok |
-| d3 | 4 | 1 | NA | 2 | 2 | TRUE | missing_syllables |
-| d4 | 0 | 0 | NA | 0 | 0 | TRUE | no_words |
-| d5 | 1 | 1 | 1 | 1 | 0 | TRUE | ok |
-
-``` r
-knitr::kable(subset(demo$reviewed, nzchar(review_reason),
+print(demo$initial$components, row.names = FALSE)
+#>  document_id words sentences syllables known_syllables missing_syllable_words
+#>           d1     6         2         6               6                      0
+#>           d2     4         1         6               6                      0
+#>           d3     4         1        NA               2                      2
+#>           d4     0         0        NA               0                      0
+#>           d5     1         1         1               1                      0
+#>  below_word_threshold            status
+#>                  TRUE                ok
+#>                  TRUE                ok
+#>                  TRUE missing_syllables
+#>                  TRUE          no_words
+#>                  TRUE                ok
+print(subset(demo$reviewed, nzchar(review_reason),
   select = c(token_row, syllables, method, review_reason)), row.names = FALSE)
+#>  token_row syllables                 method
+#>         16         4 declared pronunciation
+#>         17         3 declared pronunciation
+#>                                   review_reason
+#>                  nineteen eighteen: 4 syllables
+#>  letters R, F, D spoken separately: 3 syllables
 ```
-
-| token_row | syllables | method | review_reason |
-|---:|---:|:---|:---|
-| 16 | 4 | declared pronunciation | nineteen eighteen: 4 syllables |
-| 17 | 3 | declared pronunciation | letters R, F, D spoken separately: 3 syllables |
 
 For your own review, copy the **complete** syllable table, edit its
 counts and methods, and retain reasons alongside the unchanged first
@@ -206,22 +226,31 @@ not establish a universal grade interpretation for L2 writers or
 readers.
 
 ``` r
-knitr::kable(analysis$results[c("document_id", "measure", "value", "words", "sentences",
+print(analysis$results[c("document_id", "measure", "value", "words", "sentences",
   "syllables", "below_word_threshold", "status")], digits = 3, row.names = FALSE)
+#>  document_id              measure  value words sentences syllables
+#>           d1  Flesch_Reading_Ease 119.19     6         2         6
+#>           d1 Flesch_Kincaid_Grade  -2.62     6         2         6
+#>           d2  Flesch_Reading_Ease  75.88     4         1         6
+#>           d2 Flesch_Kincaid_Grade   3.67     4         1         6
+#>           d3  Flesch_Reading_Ease  12.43     4         1         9
+#>           d3 Flesch_Kincaid_Grade  12.52     4         1         9
+#>           d4  Flesch_Reading_Ease     NA     0         0        NA
+#>           d4 Flesch_Kincaid_Grade     NA     0         0        NA
+#>           d5  Flesch_Reading_Ease 121.22     1         1         1
+#>           d5 Flesch_Kincaid_Grade  -3.40     1         1         1
+#>  below_word_threshold   status
+#>                  TRUE       ok
+#>                  TRUE       ok
+#>                  TRUE       ok
+#>                  TRUE       ok
+#>                  TRUE       ok
+#>                  TRUE       ok
+#>                  TRUE no_words
+#>                  TRUE no_words
+#>                  TRUE       ok
+#>                  TRUE       ok
 ```
-
-| document_id | measure | value | words | sentences | syllables | below_word_threshold | status |
-|:---|:---|---:|---:|---:|---:|:---|:---|
-| d1 | Flesch_Reading_Ease | 119.190 | 6 | 2 | 6 | TRUE | ok |
-| d1 | Flesch_Kincaid_Grade | -2.620 | 6 | 2 | 6 | TRUE | ok |
-| d2 | Flesch_Reading_Ease | 75.875 | 4 | 1 | 6 | TRUE | ok |
-| d2 | Flesch_Kincaid_Grade | 3.670 | 4 | 1 | 6 | TRUE | ok |
-| d3 | Flesch_Reading_Ease | 12.425 | 4 | 1 | 9 | TRUE | ok |
-| d3 | Flesch_Kincaid_Grade | 12.520 | 4 | 1 | 9 | TRUE | ok |
-| d4 | Flesch_Reading_Ease | NA | 0 | 0 | NA | TRUE | no_words |
-| d4 | Flesch_Kincaid_Grade | NA | 0 | 0 | NA | TRUE | no_words |
-| d5 | Flesch_Reading_Ease | 121.220 | 1 | 1 | 1 | TRUE | ok |
-| d5 | Flesch_Kincaid_Grade | -3.400 | 1 | 1 | 1 | TRUE | ok |
 
 For `d1`, the two three-word sentences contain six syllables: W = 6, S =
 2, Sy = 6. Reading Ease is **119.190**, and Grade Level is **−2.620**.
@@ -249,24 +278,35 @@ does not establish end-to-end equivalence for arbitrary texts.
 ## Keep writer, task and occasion in the research table
 
 ``` r
-knitr::kable(demo$study_long[c("observation_id", "writer_id", "task", "occasion",
+print(demo$study_long[c("observation_id", "writer_id", "task", "occasion",
   "document_id", "measure", "value", "words", "status")], digits = 3, row.names = FALSE)
+#>  observation_id writer_id        task occasion document_id              measure
+#>              o1        w1 description       t1          d1 Flesch_Kincaid_Grade
+#>              o1        w1 description       t1          d1  Flesch_Reading_Ease
+#>              o2        w1   narrative       t2          d2 Flesch_Kincaid_Grade
+#>              o2        w1   narrative       t2          d2  Flesch_Reading_Ease
+#>              o3        w2 description       t1          d3 Flesch_Kincaid_Grade
+#>              o3        w2 description       t1          d3  Flesch_Reading_Ease
+#>              o4        w2   narrative       t2          d4 Flesch_Kincaid_Grade
+#>              o4        w2   narrative       t2          d4  Flesch_Reading_Ease
+#>              o5        w3 description       t1          d5 Flesch_Kincaid_Grade
+#>              o5        w3 description       t1          d5  Flesch_Reading_Ease
+#>              o6        w3   narrative       t2        <NA> Flesch_Kincaid_Grade
+#>              o6        w3   narrative       t2        <NA>  Flesch_Reading_Ease
+#>   value words        status
+#>   -2.62     6            ok
+#>  119.19     6            ok
+#>    3.67     4            ok
+#>   75.88     4            ok
+#>   12.52     4            ok
+#>   12.43     4            ok
+#>      NA     0      no_words
+#>      NA     0      no_words
+#>   -3.40     1            ok
+#>  121.22     1            ok
+#>      NA    NA not_submitted
+#>      NA    NA not_submitted
 ```
-
-| observation_id | writer_id | task | occasion | document_id | measure | value | words | status |
-|:---|:---|:---|:---|:---|:---|---:|---:|:---|
-| o1 | w1 | description | t1 | d1 | Flesch_Kincaid_Grade | -2.620 | 6 | ok |
-| o1 | w1 | description | t1 | d1 | Flesch_Reading_Ease | 119.190 | 6 | ok |
-| o2 | w1 | narrative | t2 | d2 | Flesch_Kincaid_Grade | 3.670 | 4 | ok |
-| o2 | w1 | narrative | t2 | d2 | Flesch_Reading_Ease | 75.875 | 4 | ok |
-| o3 | w2 | description | t1 | d3 | Flesch_Kincaid_Grade | 12.520 | 4 | ok |
-| o3 | w2 | description | t1 | d3 | Flesch_Reading_Ease | 12.425 | 4 | ok |
-| o4 | w2 | narrative | t2 | d4 | Flesch_Kincaid_Grade | NA | 0 | no_words |
-| o4 | w2 | narrative | t2 | d4 | Flesch_Reading_Ease | NA | 0 | no_words |
-| o5 | w3 | description | t1 | d5 | Flesch_Kincaid_Grade | -3.400 | 1 | ok |
-| o5 | w3 | description | t1 | d5 | Flesch_Reading_Ease | 121.220 | 1 | ok |
-| o6 | w3 | narrative | t2 | NA | Flesch_Kincaid_Grade | NA | NA | not_submitted |
-| o6 | w3 | narrative | t2 | NA | Flesch_Reading_Ease | NA | NA | not_submitted |
 
 The executable example joins a planned observation roster and a unique
 observation/document mapping to the two measures by document ID. The

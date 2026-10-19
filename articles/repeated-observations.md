@@ -33,34 +33,29 @@ only, three words, a document withheld from reporting and an unknown
 writer ID.
 
 ``` r
+library(ldfreq)
+
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "repeated-study-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
 record <- demo$record
 helper <- demo$helper
-knitr::kable(head(record$planned, 6), row.names = FALSE)
+print(head(record$planned, 6), row.names = FALSE)
+#>  writer_id        task occasion observation_id scheduled_date
+#>        001 description        0        obs-001     2026-01-05
+#>        002 description        0        obs-002     2026-01-05
+#>        003 description        0        obs-003     2026-01-05
+#>        004 description        0        obs-004     2026-01-05
+#>        005 description        0        obs-005     2026-01-05
+#>       <NA> description        0        obs-006     2026-01-05
+print(head(record$submissions, 5), row.names = FALSE)
+#>  observation_id document_id input_characters
+#>         obs-002     doc-002                0
+#>         obs-003     doc-003                7
+#>         obs-004     doc-004               16
+#>         obs-005     doc-005              464
+#>         obs-006     doc-006              456
 ```
-
-| writer_id | task        | occasion | observation_id | scheduled_date |
-|:----------|:------------|---------:|:---------------|:---------------|
-| 001       | description |        0 | obs-001        | 2026-01-05     |
-| 002       | description |        0 | obs-002        | 2026-01-05     |
-| 003       | description |        0 | obs-003        | 2026-01-05     |
-| 004       | description |        0 | obs-004        | 2026-01-05     |
-| 005       | description |        0 | obs-005        | 2026-01-05     |
-| NA        | description |        0 | obs-006        | 2026-01-05     |
-
-``` r
-knitr::kable(head(record$submissions, 5), row.names = FALSE)
-```
-
-| observation_id | document_id | input_characters |
-|:---------------|:------------|-----------------:|
-| obs-002        | doc-002     |                0 |
-| obs-003        | doc-003     |                7 |
-| obs-004        | doc-004     |               16 |
-| obs-005        | doc-005     |              464 |
-| obs-006        | doc-006     |              456 |
 
 Replace these two tables with your own scheduled rows and actual
 document map:
@@ -184,36 +179,27 @@ study <- helper$study_long_table(
 )
 stopifnot(identical(study, record$study))
 view <- subset(study, request_id == "mattr10")
-knitr::kable(head(view[c("observation_id", "input_status", "N", "value")], 7),
-  col.names = c("Observation", "Input state", "Tokens", "MATTR10"),
+print(head(view[c("observation_id", "input_status", "N", "value")], 7),
   digits = 3, row.names = FALSE)
-```
-
-| Observation | Input state        | Tokens | MATTR10 |
-|:------------|:-------------------|-------:|--------:|
-| obs-001     | not_submitted      |     NA |      NA |
-| obs-002     | empty_text         |      0 |      NA |
-| obs-003     | no_selected_tokens |      0 |      NA |
-| obs-004     | selected_tokens    |      3 |      NA |
-| obs-005     | selected_tokens    |     80 |   0.694 |
-| obs-006     | selected_tokens    |     80 |   0.655 |
-| obs-007     | selected_tokens    |     80 |   0.585 |
-
-``` r
-knitr::kable(head(view[c("observation_id", "missing_reason", "reporting_status")], 7),
-  col.names = c("Observation", "Calculation missing reason", "Reporting"),
+#>  observation_id       input_status  N value
+#>         obs-001      not_submitted NA    NA
+#>         obs-002         empty_text  0    NA
+#>         obs-003 no_selected_tokens  0    NA
+#>         obs-004    selected_tokens  3    NA
+#>         obs-005    selected_tokens 80 0.694
+#>         obs-006    selected_tokens 80 0.655
+#>         obs-007    selected_tokens 80 0.585
+print(head(view[c("observation_id", "missing_reason", "reporting_status")], 7),
   row.names = FALSE)
+#>  observation_id                    missing_reason reporting_status
+#>         obs-001                              <NA>     not_screened
+#>         obs-002                       empty_input           report
+#>         obs-003                       empty_input           report
+#>         obs-004 too_short_for_requested_parameter           report
+#>         obs-005                              <NA>         withhold
+#>         obs-006                              <NA>           report
+#>         obs-007                              <NA>           report
 ```
-
-| Observation | Calculation missing reason        | Reporting    |
-|:------------|:----------------------------------|:-------------|
-| obs-001     | NA                                | not_screened |
-| obs-002     | empty_input                       | report       |
-| obs-003     | empty_input                       | report       |
-| obs-004     | too_short_for_requested_parameter | report       |
-| obs-005     | NA                                | withhold     |
-| obs-006     | NA                                | report       |
-| obs-007     | NA                                | report       |
 
 The long table has 216 rows: 108 planned observations times two
 requests. It preserves the planned row order and then the plan’s request
@@ -254,55 +240,41 @@ selected <- helper$study_model_data(study,
   condition_id = record$condition$id, request_id = "mattr10",
   required = c("writer_id", "task", "occasion"))
 stopifnot(identical(selected, record$selected))
-knitr::kable(head(selected$audit[c("observation_id", "not_submitted",
+print(head(selected$audit[c("observation_id", "not_submitted",
   "not_computable", "not_reportable")], 7),
-  col.names = c("Observation", "Absent", "Unavailable", "Not reportable"),
   row.names = FALSE)
-```
-
-| Observation | Absent | Unavailable | Not reportable |
-|:------------|:-------|:------------|:---------------|
-| obs-001     | TRUE   | TRUE        | TRUE           |
-| obs-002     | FALSE  | TRUE        | FALSE          |
-| obs-003     | FALSE  | TRUE        | FALSE          |
-| obs-004     | FALSE  | TRUE        | FALSE          |
-| obs-005     | FALSE  | FALSE       | TRUE           |
-| obs-006     | FALSE  | FALSE       | FALSE          |
-| obs-007     | FALSE  | FALSE       | FALSE          |
-
-``` r
-knitr::kable(head(selected$audit[c("observation_id", "missing_metadata", "included")], 7),
-  col.names = c("Observation", "Missing metadata", "Included"), row.names = FALSE)
-```
-
-| Observation | Missing metadata | Included |
-|:------------|:-----------------|:---------|
-| obs-001     |                  | FALSE    |
-| obs-002     |                  | FALSE    |
-| obs-003     |                  | FALSE    |
-| obs-004     |                  | FALSE    |
-| obs-005     |                  | FALSE    |
-| obs-006     | writer_id        | FALSE    |
-| obs-007     |                  | TRUE     |
-
-``` r
+#>  observation_id not_submitted not_computable not_reportable
+#>         obs-001          TRUE           TRUE           TRUE
+#>         obs-002         FALSE           TRUE          FALSE
+#>         obs-003         FALSE           TRUE          FALSE
+#>         obs-004         FALSE           TRUE          FALSE
+#>         obs-005         FALSE          FALSE           TRUE
+#>         obs-006         FALSE          FALSE          FALSE
+#>         obs-007         FALSE          FALSE          FALSE
+print(head(selected$audit[c("observation_id", "missing_metadata", "included")], 7), row.names = FALSE)
+#>  observation_id missing_metadata included
+#>         obs-001                     FALSE
+#>         obs-002                     FALSE
+#>         obs-003                     FALSE
+#>         obs-004                     FALSE
+#>         obs-005                     FALSE
+#>         obs-006        writer_id    FALSE
+#>         obs-007                      TRUE
 counts <- data.frame(Unit = c("Planned observations", "Submitted documents",
   "Known planned writers", "Computable MATTR10", "Model observations", "Model writers"),
   Count = c(nrow(record$planned), nrow(record$submissions),
     length(unique(na.omit(record$planned$writer_id))),
     sum(view$computation_status == "ok"), nrow(selected$data),
     length(unique(selected$data$writer_id))))
-knitr::kable(counts)
+print(counts)
+#>                    Unit Count
+#> 1  Planned observations   108
+#> 2   Submitted documents   107
+#> 3 Known planned writers    18
+#> 4    Computable MATTR10   104
+#> 5    Model observations   102
+#> 6         Model writers    18
 ```
-
-| Unit                  | Count |
-|:----------------------|------:|
-| Planned observations  |   108 |
-| Submitted documents   |   107 |
-| Known planned writers |    18 |
-| Computable MATTR10    |   104 |
-| Model observations    |   102 |
-| Model writers         |    18 |
 
 The denominator is 108 planned observations, with 107 submitted
 documents, 104 computable MATTR10 values and 102 model observations from
