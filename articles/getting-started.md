@@ -241,10 +241,19 @@ for the next steps.
 | Japanese text and morphological annotations | [Japanese annotations](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.md); imported annotation tables have their own workflow |
 | Saved results, condition comparisons and methods text | [From text to a report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.md) |
 
-Your first analysis is complete. The sections below describe optional
-lexical units, reference resources and method variants. Use them when
-those choices are part of your question; they are not prerequisites for
-the workflow above.
+Your first analysis is complete. Choose your next route from the
+[research-question
+map](https://ryuya-dot-com.github.io/ldfreq/index.html#choose-a-research-question),
+or the [report guide’s task
+list](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.md).
+Both connect required inputs to the result tables and source records you
+should inspect. In particular, reference-frequency profiles describe
+document words; keyness compares corpora, and a mixed-model table has
+one selected response per observation.
+
+The sections below describe optional lexical units, reference resources
+and method variants. Use them when those choices are part of your
+question; they are not prerequisites for the workflow above.
 
 ## Raw text without hidden preprocessing
 
@@ -335,111 +344,111 @@ lemma_content$token_audit
 lemma_content$preprocessing
 #> $contract_id
 #> [1] "ldfreq-preprocessing"
-#> 
+#>
 #> $contract_version
 #> [1] "0.4.0"
-#> 
+#>
 #> $tokenization
 #> $tokenization$contract_id
 #> [1] "ldfreq-preprocessing"
-#> 
+#>
 #> $tokenization$contract_version
 #> [1] "0.4.0"
-#> 
+#>
 #> $tokenization$tokenizer_id
 #> [1] "ldfreq-english-word-tokenizer"
-#> 
+#>
 #> $tokenization$tokenizer_version
 #> [1] "0.1.0"
-#> 
+#>
 #> $tokenization$normalization
 #> [1] "NFC"
-#> 
+#>
 #> $tokenization$case
 #> [1] "preserve"
-#> 
+#>
 #> $tokenization$keep_numbers
 #> [1] FALSE
-#> 
+#>
 #> $tokenization$token_pattern
 #> [1] "(?:[A-Za-z]\\.){2,}|[+\\-\\x{2212}]?(?:\\p{N}+(?:[.,:/\\-]\\p{N}+)*|[.,]\\p{N}+)(?:[eE][+\\-]?\\p{N}+)?[%\\x{2030}]?(?![\\p{L}\\p{M}\\p{N}'\\-])|(?=[\\p{L}\\p{M}\\p{N}'\\-]*\\p{L})[\\p{L}\\p{N}][\\p{L}\\p{M}\\p{N}]*(?:['\\-][\\p{L}\\p{N}][\\p{L}\\p{M}\\p{N}]*)*"
-#> 
+#>
 #> $tokenization$source_text_sha256
 #> [1] "5d33ea4730a56cb3c2ac4bd306ac925d31afc67a9daeb5abf5c7ce718ce1d544"
-#> 
+#>
 #> $tokenization$processed_text_sha256
 #> [1] "5d33ea4730a56cb3c2ac4bd306ac925d31afc67a9daeb5abf5c7ce718ce1d544"
-#> 
+#>
 #> $tokenization$token_table_sha256
 #> [1] "46c007ee7a36efea8e8f48b4edf0ca7a44d4aac4c1a9fbce075d851525ad29e7"
-#> 
+#>
 #> $tokenization$input_characters
 #> [1] 21
-#> 
+#>
 #> $tokenization$processed_characters
 #> [1] 21
-#> 
+#>
 #> $tokenization$output_tokens
 #> [1] 5
-#> 
+#>
 #> $tokenization$annotation
 #> $tokenization$annotation$method
 #> [1] "supplied"
-#> 
+#>
 #> $tokenization$annotation$backend_id
 #> [1] "vignette-fixture"
-#> 
+#>
 #> $tokenization$annotation$backend_version
 #> [1] "1"
-#> 
+#>
 #> $tokenization$annotation$dictionary
 #> NULL
-#> 
+#>
 #> $tokenization$annotation$upos_backend_id
 #> [1] "vignette-upos-fixture"
-#> 
+#>
 #> $tokenization$annotation$upos_backend_version
 #> [1] "1"
-#> 
+#>
 #> $tokenization$annotation$lemma_tokens
 #> [1] 5
-#> 
+#>
 #> $tokenization$annotation$lemma_coverage
 #> [1] 1
-#> 
+#>
 #> $tokenization$annotation$upos_tokens
 #> [1] 5
-#> 
+#>
 #> $tokenization$annotation$upos_coverage
 #> [1] 1
-#> 
-#> 
+#>
+#>
 #> $tokenization$excluded_spans
-#> [1] start   end     surface reason 
+#> [1] start   end     surface reason
 #> <0 rows> (or 0-length row.names)
-#> 
+#>
 #> $tokenization$excluded_spans_sha256
 #> [1] "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-#> 
-#> 
+#>
+#>
 #> $selected_unit
 #> [1] "lemma"
-#> 
+#>
 #> $word_inclusion
 #> [1] "content"
-#> 
+#>
 #> $content_upos
-#> [1] "ADJ"   "ADV"   "NOUN"  "PROPN" "VERB" 
-#> 
+#> [1] "ADJ"   "ADV"   "NOUN"  "PROPN" "VERB"
+#>
 #> $input_tokens
 #> [1] 5
-#> 
+#>
 #> $eligible_tokens
 #> [1] 4
-#> 
+#>
 #> $excluded_tokens
 #> [1] 1
-#> 
+#>
 #> $unit_coverage
 #> [1] 0.8
 ```
@@ -461,57 +470,57 @@ if (requireNamespace("textstem", quietly = TRUE)) {
 }
 #> $method
 #> [1] "textstem"
-#> 
+#>
 #> $backend_id
 #> [1] "textstem::lemmatize_words"
-#> 
+#>
 #> $backend_version
 #> [1] "0.1.4"
-#> 
+#>
 #> $dictionary
 #> $dictionary$source
 #> [1] "lexicon"
-#> 
+#>
 #> $dictionary$id
 #> [1] "lexicon::hash_lemmas"
-#> 
+#>
 #> $dictionary$version
 #> [1] "1.3.2"
-#> 
+#>
 #> $dictionary$sha256
 #> [1] "d46e415a53f4f5133ee3e567902d2b51ce1f4928061eb35f84cf5bcfc7fc993d"
-#> 
+#>
 #> $dictionary$hash_method
 #> [1] "sha256-utf8-byte-length-pairs-v1"
-#> 
+#>
 #> $dictionary$entries
 #> [1] 41531
-#> 
+#>
 #> $dictionary$query_casefold
 #> [1] "base-tolower"
-#> 
+#>
 #> $dictionary$query_locale
 #> [1] "C.UTF-8"
-#> 
+#>
 #> $dictionary$unknown_form_policy
 #> [1] "surface"
-#> 
-#> 
+#>
+#>
 #> $upos_backend_id
 #> NULL
-#> 
+#>
 #> $upos_backend_version
 #> NULL
-#> 
+#>
 #> $lemma_tokens
 #> [1] 6
-#> 
+#>
 #> $lemma_coverage
 #> [1] 1
-#> 
+#>
 #> $upos_tokens
 #> [1] 0
-#> 
+#>
 #> $upos_coverage
 #> [1] 0
 ```
@@ -653,31 +662,31 @@ frequency$summary
 frequency$coverage
 #> $input_tokens
 #> [1] 8
-#> 
+#>
 #> $input_types
 #> [1] 8
-#> 
+#>
 #> $eligible_tokens
 #> [1] 8
-#> 
+#>
 #> $eligible_types
 #> [1] 8
-#> 
+#>
 #> $matched_tokens
 #> [1] 8
-#> 
+#>
 #> $unmatched_tokens
 #> [1] 0
-#> 
+#>
 #> $matched_types
 #> [1] 8
-#> 
+#>
 #> $unmatched_types
 #> [1] 0
-#> 
+#>
 #> $token_coverage
 #> [1] 1
-#> 
+#>
 #> $type_coverage
 #> [1] 1
 frequency$lookup
@@ -774,34 +783,34 @@ levels$summary
 levels$coverage
 #> $input_tokens
 #> [1] 5
-#> 
+#>
 #> $eligible_tokens
 #> [1] 5
-#> 
+#>
 #> $excluded_tokens
 #> [1] 0
-#> 
+#>
 #> $selection_coverage
 #> [1] 1
-#> 
+#>
 #> $matched_tokens
 #> [1] 0
-#> 
+#>
 #> $off_list_tokens
 #> [1] 5
-#> 
+#>
 #> $token_coverage
 #> [1] 0
-#> 
+#>
 #> $eligible_types
 #> [1] 3
-#> 
+#>
 #> $matched_types
 #> [1] 0
-#> 
+#>
 #> $off_list_types
 #> [1] 3
-#> 
+#>
 #> $type_coverage
 #> [1] 0
 ```
@@ -1269,13 +1278,13 @@ contract_files <- c(
 contract_paths <- system.file("spec", contract_files, package = "ldfreq")
 stopifnot(all(nzchar(contract_paths)))
 basename(contract_paths)
-#> [1] "lexical-diversity-contract.json"        
-#> [2] "ldfreq-preprocessing-contract.json"     
-#> [3] "lexical-overlap-contract.json"          
-#> [4] "reference-coverage-contract.json"       
-#> [5] "norm-profile-contract.json"             
+#> [1] "lexical-diversity-contract.json"
+#> [2] "ldfreq-preprocessing-contract.json"
+#> [3] "lexical-overlap-contract.json"
+#> [4] "reference-coverage-contract.json"
+#> [5] "norm-profile-contract.json"
 #> [6] "lexical-diversity-variant-contract.json"
-#> [7] "lexical-level-profile-contract.json"    
+#> [7] "lexical-level-profile-contract.json"
 #> [8] "tubelex-frequency-profile-contract.json"
 ```
 

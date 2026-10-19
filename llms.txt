@@ -18,7 +18,7 @@ not mix incompatible specifications.
 
 ## Installation
 
-The published snapshot is 0.3.0.9014, a development prerelease that has
+The published snapshot is 0.3.0.9015, a development prerelease that has
 not been released on CRAN. It includes English readability and traced
 syntactic-complexity examples. The fixed tag below identifies the tested
 code and installed examples. It requires R 4.1.0 or later. Install the
@@ -26,7 +26,7 @@ tested snapshot used by this documentation:
 
 ``` r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9014")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9015")
 ```
 
 Pinning the revision fixes the implementation, even when development
@@ -39,7 +39,7 @@ If you have a built source archive, install it locally:
 
 ``` r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9014.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9015.tar.gz", repos = NULL, type = "source")
 ```
 
 The built archive includes rendered guides. A GitHub source installation
@@ -100,6 +100,29 @@ to compare counting conditions, join study metadata, inspect vocabulary
 coverage and prepare methods text and figures. These guides use the
 tested installation above; optional annotation and reference-resource
 workflows name their additional requirements.
+
+## Choose a research question
+
+Start with the row that matches your question. The linked guides show
+the required input and the code to inspect each result. Keep the
+complete result and original input when saving; a display table alone
+cannot recover them.
+
+| Your question | Input and route | Read first |
+|----|----|----|
+| Does a counting choice change the lexical description of the same texts? | Texts with document IDs; [compare conditions](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#compare-english-case-from-files) | Paired document/metric rows, `N`, `V`, availability and values; [return to the original text and counted forms](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#explain-a-counting-choice). |
+| How frequent are the words, or how much matches a vocabulary list? | Prepared terms; [TUBELEX frequency and NJ8 levels](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html#corpus-relative-frequency-with-coverage). For your own norm table, use [corpus reference profiles](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html). | Resource identity, lookup rows and token/type coverage beside summaries; [inspect unmatched words and lexical units](https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.html). |
+| What changes when I count families, roots or affixes? | Complete annotations and a declared inventory; [word families and affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html) | Occurrences shared between conditions, unresolved words and coverage; keep whole-document counts separate from resolved-subset counts. |
+| Which words, contexts or positions characterize the documents? | Complete source-aligned annotations; [concordance and dispersion](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html), [collocation](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html), or [keyness](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html) | Original occurrences and zero-match documents; pair opportunities for association, or declared target/reference totals for keyness. |
+| Which writer/task/occasion observations entered my analysis? | Planned observations, submitted-document mapping and metric results; [repeated observations](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html) | Submission, calculation and reporting states; the row-selection audit and one specified response in the model table. |
+| How do lexical results relate to sentence or structural descriptions? | The same source texts and document IDs, with sentence/syllable counts or traced parser output; [English readability](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html) and [syntactic complexity](https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.html) | Each measure’s numerator, denominator, unavailable values and review decisions before joining document rows. |
+
+A document ID connects records; it does not make their counting units
+identical. A reference-vocabulary profile describes the words in each
+document, whereas keyness compares declared corpora. Do not copy a
+corpus-level statistic into writer rows as independent observations.
+Choose one response and specification for a model, and retain the
+complete record so every included or excluded row can be explained.
 
 ## Why use ldfreq?
 

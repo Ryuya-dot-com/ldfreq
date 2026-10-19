@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9014</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9015</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,9 +78,14 @@ matches New JACET 8000. Several frequent words fail to match. Before
 interpreting this as advanced vocabulary, check which lexical units were
 compared with the list. NJ8 contains representative headwords; surface
 forms and dictionary lemmas can produce different coverage. These
-authored sentences make that choice visible.</p>
+authored sentences make that choice visible. Run the examples in order
+after the <a href="../index.html#installation">documented
+installation</a>. The authored annotation examples need no optional
+package or external model.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">texts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>a <span class="op">=</span> <span class="st">"Students have jobs."</span>, b <span class="op">=</span> <span class="st">"Students enjoy jobs."</span>, blank <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">texts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>a <span class="op">=</span> <span class="st">"Students have jobs."</span>, b <span class="op">=</span> <span class="st">"Students enjoy jobs."</span>, blank <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
 <span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_tokenize_batch</a></span><span class="op">(</span><span class="va">texts</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span>
 <span><span class="va">surface</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nj8_profile.html">nj8_profile_batch</a></span><span class="op">(</span><span class="va">prepared</span>, unit <span class="op">=</span> <span class="st">"surface"</span><span class="op">)</span></span>
 <span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nj8_diagnostics.html">nj8_diagnostics</a></span><span class="op">(</span><span class="va">surface</span><span class="op">)</span></span>

@@ -1,5 +1,17 @@
 # Changelog
 
+## ldfreq 0.3.0.9015
+
+- Connect research questions to the required inputs, guides and result
+  tables in the README and package help. Keep lexical diversity,
+  reference frequency, vocabulary levels and morphology alongside corpus
+  comparisons and research tables, with their distinct units and
+  denominators.
+- Show the package load in the vocabulary-audit and corpus-reference
+  guides so their displayed examples can start in a fresh R session.
+  Calculations, exported functions, installed example helpers and
+  dependencies are unchanged.
+
 ## ldfreq 0.3.0.9014
 
 - Make guide setup visible when starting in a new R session, and use

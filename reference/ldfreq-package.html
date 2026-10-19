@@ -13,7 +13,7 @@ the words counted, analysis settings and reasons for unavailable scores."></head
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9014</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9015</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,24 +79,61 @@ required for the first analysis above.</p>
 <p>For a first document table, expected results, missing scores, a plot and
 saving and reopening the complete record, see
 <a href="https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html">Getting started</a>.
-For condition comparisons and research reporting, see
-<a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html">From text to a research report</a>.
-For repeated observations, planned submissions and an ordinary model data frame, see
-<a href="https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html">From planned observations to a mixed model</a>.
-For token-pattern searches, context sorting, original-position plots and within-document DP, see
-<a href="https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html">Search words and phrases, then inspect their distribution</a>.
-For adjacent and left/right-span word association with source-linked counts, see
-<a href="https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html">Count nearby words and explain their association</a>.
-For target/reference word comparisons with explicit denominators and source links, see
-<a href="https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html">Compare word use against an explicit reference corpus</a>.
-For English syntactic complexity with source trees, matched nodes and review decisions, see
-<a href="https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.html">Trace English syntactic complexity from source to study table</a>.</p>
-<p>For English readability with sentence, word and syllable audits, see
-<a href="https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html">Calculate English readability with visible counting decisions</a>.
 For your own files, see
-<a href="https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files">TXT-folder and CSV input</a>.
-For counting units and morphology, see
-<a href="https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html">Word families, roots and affixes</a>.</p>
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files">TXT-folder and CSV input</a>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="choose-a-research-question">Choose a research question<a class="anchor" aria-label="anchor" href="#choose-a-research-question"></a></h2>
+    <p>Choose the route from your question, then inspect the counts and availability
+beside its values. The guides specify the input tables and any optional tools.</p><dl><dt>How do counting choices change the same texts?</dt>
+<dd><p>Start with document IDs
+  and text in <a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html">From text to a research report</a>.
+  Compare paired metric rows, <code>N</code>, <code>V</code> and missing reasons, then return
+  to the original text, counted forms and exclusions.</p></dd>
+
+  <dt>How frequent are the words, or what matches a vocabulary list?</dt>
+<dd><p>Use
+  <code><a href="tubelex_profile.html">tubelex_profile</a></code> or <code><a href="nj8_profile.html">nj8_profile</a></code> with prepared terms.
+  Inspect lookup rows, resource identity and token/type coverage beside summaries.
+  <a href="https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.html">Audit unmatched words and lexical units</a>;
+  for your own norm table, follow
+  <a href="https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html">corpus reference profiles</a>.</p></dd>
+
+  <dt>What changes when counting families, roots or affixes?</dt>
+<dd><p>Use complete
+  annotations and a declared inventory in
+  <a href="https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html">Word families, roots and affixes</a>.
+  Read shared occurrences, unresolved words and coverage; distinguish
+  whole-document counts from counts on a resolved subset.</p></dd>
+
+  <dt>Which words, contexts or positions characterize the documents?</dt>
+<dd><p>Use
+  complete source-aligned annotations for
+  <a href="https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html">concordance and dispersion</a>,
+  <a href="https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html">collocation</a>, or
+  <a href="https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html">keyness</a>.
+  Inspect original occurrences, zero-match documents and the relevant search,
+  pair-opportunity or target/reference denominators.</p></dd>
+
+  <dt>Which writer/task/occasion observations entered my analysis?</dt>
+<dd><p>Keep
+  planned observations, submissions and metric results separate in
+  <a href="https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html">From planned observations to a mixed model</a>.
+  Inspect the submission, calculation and reporting states and model-row audit;
+  select one response specification for the model table.</p></dd>
+
+  <dt>How do lexical results relate to sentence or structural descriptions?</dt>
+<dd><p>Use
+  the same source texts and document IDs for
+  <a href="https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html">English readability</a> and
+  <a href="https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.html">syntactic complexity</a>.
+  Retain each measure's counts, missing reasons and review decisions separately.</p></dd>
+
+
+</dl><p>A shared document ID does not imply a shared denominator. Reference-vocabulary
+profiles describe document words; keyness compares declared corpora. Corpus-level
+statistics must not be copied into writer rows as independent observations.
+Save original inputs and complete results, not only displayed tables.</p>
     </div>
     <div class="section level2">
     <h2 id="open-a-guide-or-installed-example">Open a guide or installed example<a class="anchor" aria-label="anchor" href="#open-a-guide-or-installed-example"></a></h2>

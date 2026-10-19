@@ -13,6 +13,20 @@ Choose the task you need:
   [Japanese word selections](#compare-japanese-pos-from-files): run the
   shared setup below, then the relevant language path and the saving
   section.
+- [Describe frequency or vocabulary
+  levels](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html#corpus-relative-frequency-with-coverage):
+  inspect resource matches and token/type coverage with each summary.
+  Use [the vocabulary
+  audit](https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.md)
+  to explain unmatched forms, or [corpus reference
+  profiles](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.md)
+  for your own norm table. A reference profile describes document words;
+  keyness below compares two declared corpora.
+- [Compare families, roots and
+  affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.md):
+  supply complete annotations and an inventory, then read shared
+  occurrences, unresolved words and coverage. Counts on the resolved
+  subset do not replace whole-document counts.
 - [Join study information and summarize documents](#study-metadata): use
   the saved file-analysis results from those paths; the section names
   its required objects.
@@ -514,7 +528,7 @@ stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 #> 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.
 #>
-#> Calculations used ldfreq 0.3.0.9014: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
+#> Calculations used ldfreq 0.3.0.9015: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
 ```
 
 The CSV is a flat inspection table; **the RDS is the complete analysis

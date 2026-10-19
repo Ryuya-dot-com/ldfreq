@@ -24,6 +24,8 @@ language background and sampling conditions. Keep unknown information
 missing; do not infer L1 from a genre label.
 
 ``` r
+library(ldfreq)
+
 texts <- data.frame(
   document_id = c("demo_essay", "demo_turn", "demo_blank"),
   corpus_id = "authored_demo_v1",

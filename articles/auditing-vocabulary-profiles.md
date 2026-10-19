@@ -7,9 +7,15 @@ matches New JACET 8000. Several frequent words fail to match. Before
 interpreting this as advanced vocabulary, check which lexical units were
 compared with the list. NJ8 contains representative headwords; surface
 forms and dictionary lemmas can produce different coverage. These
-authored sentences make that choice visible.
+authored sentences make that choice visible. Run the examples in order
+after the [documented
+installation](https://ryuya-dot-com.github.io/ldfreq/index.html#installation).
+The authored annotation examples need no optional package or external
+model.
 
 ``` r
+library(ldfreq)
+
 texts <- c(a = "Students have jobs.", b = "Students enjoy jobs.", blank = "")
 prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
 surface <- nj8_profile_batch(prepared, unit = "surface")
@@ -203,17 +209,17 @@ lapply(scheme_runs, function(x) x$results[, c("document_id", "N", "V", "value")]
 #> <lexdiv_batch_results: 1 document; 1 metric record; schema unknown>
 #>   document_id     value N V
 #> 1       essay 0.9166667 6 4
-#> 
+#>
 #> $refined_all
 #> <lexdiv_batch_results: 1 document; 1 metric record; schema unknown>
 #>   document_id     value N V
 #> 1       essay 0.9166667 6 5
-#> 
+#>
 #> $base_content
 #> <lexdiv_batch_results: 1 document; 1 metric record; schema unknown>
 #>   document_id     value N V
 #> 1       essay 0.7777778 5 3
-#> 
+#>
 #> $refined_content
 #> <lexdiv_batch_results: 1 document; 1 metric record; schema unknown>
 #>   document_id     value N V
@@ -532,28 +538,28 @@ if (requireNamespace("textstem", quietly = TRUE)) {
 }
 #> $source
 #> [1] "supplied"
-#> 
+#>
 #> $id
 #> [1] "authored-demo"
-#> 
+#>
 #> $version
 #> [1] "1"
-#> 
+#>
 #> $sha256
 #> [1] "75ea2e5ea4a6cb4e1848b58bdda457dd56bfc669c4d157a8ddb889d30b7817ac"
-#> 
+#>
 #> $hash_method
 #> [1] "sha256-utf8-byte-length-pairs-v1"
-#> 
+#>
 #> $entries
 #> [1] 3
-#> 
+#>
 #> $query_casefold
 #> [1] "base-tolower"
-#> 
+#>
 #> $query_locale
 #> [1] "C.UTF-8"
-#> 
+#>
 #> $unknown_form_policy
 #> [1] "surface"
 ```
