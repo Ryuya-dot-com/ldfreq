@@ -1,3 +1,10 @@
+# ldfreq 0.3.0.9016
+
+- The file-to-report guide now follows the same annotated occurrences through
+  all-body/content-word comparisons, optional concordance searches and saved
+  study tables. It retains unknown selections and distinguishes measurement
+  rows, query hits and study observations.
+
 # ldfreq 0.3.0.9015
 
 - Connect research questions to the required inputs, guides and result tables

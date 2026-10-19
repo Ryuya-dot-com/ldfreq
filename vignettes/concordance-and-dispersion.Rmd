@@ -61,6 +61,11 @@ token vector is not a complete annotation table. See [external annotations](japa
 for analyzer recipes and [annotated corpora](annotated-corpora.html) for the
 existing corpus adapters. No analyzer or dictionary is downloaded by this guide.
 
+To explain a lexical-diversity result, follow the
+[condition-comparison example](from-text-to-report.html#counted-source-occurrences).
+It uses the same complete annotations and selection masks for counted words
+and concordance searches, then retains them in the saved study record.
+
 For a short English text without supplied annotations, the following explicit
 quanteda tokenization recipe can prepare complete surfaces. The alignment check
 will reject text that this tokenizer changes or leaves partly uncovered; inspect
