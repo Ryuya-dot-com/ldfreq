@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9019</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,6 +19,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
@@ -41,6 +42,14 @@
       <small>Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0" id="ldfreq-040">ldfreq 0.4.0<a class="anchor" aria-label="anchor" href="#ldfreq-040"></a></h2>
+<ul><li>Publish the documented research workflows as a fixed stable distribution. The release-scope guide distinguishes the stable core and resource profiles from experimental interfaces and explicitly sourced examples. It records language, dependency, external-model and interpretation limits.</li>
+<li>Calculations, 57 exports, result schemas, installed helpers and resource bytes are unchanged from 0.3.0.9019. Existing saved records keep their original calculation versions; this release does not relabel them.</li>
+<li>Migration from 0.1.0/0.2.0 includes the previously documented core-contract 0.2.0 change: no-minimum MTLD, eleven default metrics, and explicit selection of experimental expected-TTR D. Old specifications/plans must be recreated; the legacy min10 MTLD remains an explicit variant. See the release-scope guide and the earlier compatibility entries below.</li>
+<li>Update corpus, association-package and spelling references to accessible primary-source pages; guide calculations are unchanged.</li>
+<li>MCA, nonmetric MDS and Japanese readability remain outside the adopted release scope. This GitHub release is not a CRAN submission or a claim of proficiency-scale validity or general parser accuracy.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0.9019" id="ldfreq-0309019">ldfreq 0.3.0.9019<a class="anchor" aria-label="anchor" href="#ldfreq-0309019"></a></h2>
 <ul><li>Clarify persistent saving and add standalone fresh-session reopening code for concordance, collocation, keyness, readability, syntax, and ordination records. Saving examples no longer delete a user-selected persistent file. Reopening preserves original inputs, counts, decisions, and calculation-session information without requiring a new parser or model run. Calculations, exported functions, dependencies, and installed example helpers are unchanged.</li>

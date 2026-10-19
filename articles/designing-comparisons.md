@@ -36,10 +36,9 @@ contains essays by British and American native English students. For
 natural conversation, [Spoken
 BNC2014](https://www.lancaster.ac.uk/news/articles/2017/researchers-release-largest-ever-public-collection-of-british-conversations/)
 contains spontaneous British English conversations recorded among
-friends and family.
-[COCA](https://www.english-corpora.org/coca/help/tour.asp) supplies a
-broader register contrast, including spoken, fiction, news and academic
-texts. These are candidate sources, not bundled datasets or
+friends and family. [COCA](https://www.corpusdata.org/coca2020.asp)
+supplies a broader register contrast, including spoken, fiction, news
+and academic texts. These are candidate sources, not bundled datasets or
 automatically matched control groups. General-English coverage alone
 does not verify every contributor’s L1 background; use documented
 participant metadata if that is an inclusion criterion.

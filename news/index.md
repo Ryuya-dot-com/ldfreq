@@ -1,5 +1,28 @@
 # Changelog
 
+## ldfreq 0.4.0
+
+- Publish the documented research workflows as a fixed stable
+  distribution. The release-scope guide distinguishes the stable core
+  and resource profiles from experimental interfaces and explicitly
+  sourced examples. It records language, dependency, external-model and
+  interpretation limits.
+- Calculations, 57 exports, result schemas, installed helpers and
+  resource bytes are unchanged from 0.3.0.9019. Existing saved records
+  keep their original calculation versions; this release does not
+  relabel them.
+- Migration from 0.1.0/0.2.0 includes the previously documented
+  core-contract 0.2.0 change: no-minimum MTLD, eleven default metrics,
+  and explicit selection of experimental expected-TTR D. Old
+  specifications/plans must be recreated; the legacy min10 MTLD remains
+  an explicit variant. See the release-scope guide and the earlier
+  compatibility entries below.
+- Update corpus, association-package and spelling references to
+  accessible primary-source pages; guide calculations are unchanged.
+- MCA, nonmetric MDS and Japanese readability remain outside the adopted
+  release scope. This GitHub release is not a CRAN submission or a claim
+  of proficiency-scale validity or general parser accuracy.
+
 ## ldfreq 0.3.0.9019
 
 - Clarify persistent saving and add standalone fresh-session reopening

@@ -18,9 +18,28 @@ data. Package version, metric-contract version, result-schema version,
 preprocessing-contract version, and resource-profile contract version
 are independent identities and are recorded separately.
 
+## Stable distribution 0.4.0
+
+Version 0.4.0 consolidates the 0.3.0 development series without changing
+the calculations, public signatures, result schemas, installed example
+helpers or resource bytes of 0.3.0.9019. A stable package release does
+not promote every experimental interface or example helper to a stable
+API. The installed [release-scope
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/release-scope.html)
+defines the supported routes, remaining experimental interfaces,
+migration from older versions and interpretation limits. Existing
+contract versions and method identities remain authoritative; package
+and contract versions differ.
+
+The 57 exports and their documented arguments remain available.
+Explicitly sourced helpers are versioned by the package archive and
+retain their example status; pin the archive when using them. Their
+presence does not create new exports. Future changes follow the
+deprecation and measurement rules below.
+
 ## Development versions
 
-Current development builds use a fourth component, starting with
+The 0.3.0 development builds use a fourth component, starting with
 0.3.0.9001.
 [`packageVersion()`](https://rdrr.io/r/utils/packageDescription.html)
 and [`citation()`](https://rdrr.io/r/utils/citation.html) therefore
@@ -29,8 +48,9 @@ contains DESCRIPTION version 0.3.0; retain that exact tag/commit when
 identifying that historical snapshot. It is not rewritten or relabeled.
 Since 0.3.0 has already been distributed, subsequent versions must sort
 after it; a future formal version must also sort after its development
-predecessors (for example, 0.3.1 after 0.3.0.9001). The citation takes
-its version from installed DESCRIPTION metadata.
+predecessors (for example, 0.3.1 after 0.3.0.9001). The stable 0.4.0
+version sorts after 0.3.0.9019. The citation takes its version from
+installed DESCRIPTION metadata.
 
 ## Method identity
 

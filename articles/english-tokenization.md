@@ -134,10 +134,11 @@ alternatives are:
 
 ### English spelling varieties
 
-`colour` and `color` are accepted variety spellings ([Cambridge
-Dictionary](https://dictionary.cambridge.org/dictionary/english/color)).
-The bundled NJ8 snapshot matches `color`, `center` and `theater`, but
-does not match the surface queries `colour`, `centre` and `theatre`.
+`colour` and `color` are accepted variety spellings (see the
+British/American examples in the [Journal of Hellenic Studies style
+guide](https://www.cambridge.org/core/services/aop-file-manager/file/63dbd4c9778e83d75bdea726/JHS-style-guide2019-2023-revision-final.pdf),
+p. 1). The bundled NJ8 snapshot matches `color`, `center` and `theater`,
+but does not match the surface queries `colour`, `centre` and `theatre`.
 This is a lookup boundary, not evidence that the British spellings are
 errors or more advanced words. NJ8’s `expand_parenthetical` only expands
 alternatives actually present in the resource; it is not a comprehensive
@@ -163,11 +164,10 @@ reference coverage without changing the diversity calculation. Merging
 types is a separate decision. There is no universal need to prefer US
 over UK forms, and English varieties are not exhausted by those two
 labels. Avoid global suffix substitutions or rewriting names/titles.
-Some mappings depend on POS and sense; for example, [practise is a UK
-verb
-form](https://dictionary.cambridge.org/dictionary/english/practise),
-while [practice also serves as a
-noun](https://dictionary.cambridge.org/dictionary/english/practice).
+Some mappings depend on POS and sense; for example, UK usage
+distinguishes the verb `practise` from the noun `practice` ([Office for
+National Statistics style
+guide](https://service-manual.ons.gov.uk/content/language/words-to-watch#practice-or-practise)).
 Spelling equivalence is distinct from inflectional lemmatization and
 synonymy.
 

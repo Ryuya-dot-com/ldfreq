@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9019</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
@@ -299,15 +300,15 @@ compatibility</td>
 <h3 id="english-spelling-varieties">English spelling varieties<a class="anchor" aria-label="anchor" href="#english-spelling-varieties"></a>
 </h3>
 <p><code>colour</code> and <code>color</code> are accepted variety
-spellings (<a href="https://dictionary.cambridge.org/dictionary/english/color" class="external-link">Cambridge
-Dictionary</a>). The bundled NJ8 snapshot matches <code>color</code>,
-<code>center</code> and <code>theater</code>, but does not match the
-surface queries <code>colour</code>, <code>centre</code> and
-<code>theatre</code>. This is a lookup boundary, not evidence that the
-British spellings are errors or more advanced words. NJ8’s
-<code>expand_parenthetical</code> only expands alternatives actually
-present in the resource; it is not a comprehensive British/American
-conversion table.</p>
+spellings (see the British/American examples in the <a href="https://www.cambridge.org/core/services/aop-file-manager/file/63dbd4c9778e83d75bdea726/JHS-style-guide2019-2023-revision-final.pdf" class="external-link">Journal
+of Hellenic Studies style guide</a>, p. 1). The bundled NJ8 snapshot
+matches <code>color</code>, <code>center</code> and
+<code>theater</code>, but does not match the surface queries
+<code>colour</code>, <code>centre</code> and <code>theatre</code>. This
+is a lookup boundary, not evidence that the British spellings are errors
+or more advanced words. NJ8’s <code>expand_parenthetical</code> only
+expands alternatives actually present in the resource; it is not a
+comprehensive British/American conversion table.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spelling_lookup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nj8_profile.html">nj8_profile</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"colour"</span>, <span class="st">"color"</span>, <span class="st">"centre"</span>, <span class="st">"center"</span>,</span>
 <span>  <span class="st">"theatre"</span>, <span class="st">"theater"</span><span class="op">)</span>, unit <span class="op">=</span> <span class="st">"surface"</span><span class="op">)</span></span>
@@ -326,10 +327,11 @@ reference coverage without changing the diversity calculation. Merging
 types is a separate decision. There is no universal need to prefer US
 over UK forms, and English varieties are not exhausted by those two
 labels. Avoid global suffix substitutions or rewriting names/titles.
-Some mappings depend on POS and sense; for example, <a href="https://dictionary.cambridge.org/dictionary/english/practise" class="external-link">practise
-is a UK verb form</a>, while <a href="https://dictionary.cambridge.org/dictionary/english/practice" class="external-link">practice
-also serves as a noun</a>. Spelling equivalence is distinct from
-inflectional lemmatization and synonymy.</p>
+Some mappings depend on POS and sense; for example, UK usage
+distinguishes the verb <code>practise</code> from the noun
+<code>practice</code> (<a href="https://service-manual.ons.gov.uk/content/language/words-to-watch#practice-or-practise" class="external-link">Office
+for National Statistics style guide</a>). Spelling equivalence is
+distinct from inflectional lemmatization and synonymy.</p>
 <p>For frequency resources such as TUBELEX, querying the US form is
 <strong>not</strong> a pooled frequency for both spellings. Pooling
 requires compatible underlying counts and denominators and a declared

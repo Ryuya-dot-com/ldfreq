@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9019</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
@@ -423,9 +424,9 @@ settings explicitly instead of assuming object identity.</p>
 the pair sets and 2×2 tables for left-only, right-only and two-sided
 spans, including segment boundaries, repeated nodes, excluded endpoints
 and missing terms. Positive-count scores were checked against
-<code>corpora</code> 0.7’s <a href="https://cran.r-project.org/web/packages/corpora/corpora.pdf" class="external-link">am.score()</a>
-with the same positional marginals and <code>span.size = 1</code>: the
-span is already represented by the pair population. The deliberate
+<code>corpora</code> 0.7’s <a href="https://CRAN.R-project.org/package=corpora" class="external-link">am.score()</a> with
+the same positional marginals and <code>span.size = 1</code>: the span
+is already represented by the pair population. The deliberate
 <code>NA</code> t-score convention at O = 0 is checked separately.
 <code>corpora</code> is not needed to run these helpers.</p>
 <p>These checks concern counting and numerical reproduction on

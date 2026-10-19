@@ -4,6 +4,8 @@
 
 - [Getting started with
   ldfreq](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.md):
+- [Release scope and
+  compatibility](https://ryuya-dot-com.github.io/ldfreq/articles/release-scope.md):
 - [English tokenization and document
   input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.md):
 - [Japanese annotations: from original text to lexical

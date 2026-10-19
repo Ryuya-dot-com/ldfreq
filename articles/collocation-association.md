@@ -321,9 +321,9 @@ A separate Cartesian enumeration verifies the pair sets and 2×2 tables
 for left-only, right-only and two-sided spans, including segment
 boundaries, repeated nodes, excluded endpoints and missing terms.
 Positive-count scores were checked against `corpora` 0.7’s
-[am.score()](https://cran.r-project.org/web/packages/corpora/corpora.pdf)
-with the same positional marginals and `span.size = 1`: the span is
-already represented by the pair population. The deliberate `NA` t-score
+[am.score()](https://CRAN.R-project.org/package=corpora) with the same
+positional marginals and `span.size = 1`: the span is already
+represented by the pair population. The deliberate `NA` t-score
 convention at O = 0 is checked separately. `corpora` is not needed to
 run these helpers.
 
