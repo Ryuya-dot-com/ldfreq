@@ -550,6 +550,38 @@ if (!is.null(saved$linked)) {
 }
 ```
 
+To reopen a persistent record in a new R session, use the same fixed
+package version and replace the path below with the saved RDS path. This
+reloads the helpers from the installed package; it does not require the
+earlier example objects. Replaying a saved optional review also requires
+quanteda and UTF-8.
+
+``` r
+library(ldfreq)
+saved <- readRDS(file.path("results", "morphology", "analysis.rds"))
+recipes <- new.env(parent = baseenv())
+for (script in c("family-count-comparison.R", "word-parts.R")) {
+  sys.source(system.file("examples", script, package = "ldfreq", mustWork = TRUE),
+    recipes)
+}
+stopifnot(identical(recipes$compare_family_counts(saved$families), saved$counts))
+stopifnot(identical(do.call(recipes$word_parts_profile,
+  saved$authored_parts$inputs), saved$authored_parts))
+if (!is.null(saved$linked)) {
+  sys.source(system.file("examples", "morphology-link.R", package = "ldfreq",
+    mustWork = TRUE), recipes)
+  stopifnot(identical(do.call(recipes$link_morphology_candidates,
+    saved$linked$inputs), saved$linked))
+}
+saved$counts$comparison
+```
+
+The saved `session` records the calculation environment. Keep that
+record unchanged when inspecting it in another session; a new
+[`sessionInfo()`](https://rdrr.io/r/utils/sessionInfo.html) describes
+the reporting environment, not the software that originally computed the
+values.
+
 For reporting, identify the source population and document selection,
 token boundaries, counting unit, normalization/exclusions, reference
 version and license, original denominator, coverage, unresolved states

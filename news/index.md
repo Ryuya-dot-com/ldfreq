@@ -1,5 +1,17 @@
 # Changelog
 
+## ldfreq 0.3.0.9017
+
+- Show package setup in specialist guides so their displayed examples
+  can start in a fresh R session. Expose the phrase-review inputs and
+  the optional model/dictionary path setup, and remove an unnecessary
+  formatting dependency from the English tokenization and
+  ambiguity-review examples. Add a fresh-session replay block for saved
+  morphology analyses.
+- Link installation instructions to the matching fixed archive and
+  explain how to check the installed version. Calculations, exported
+  functions, resources and installed example helpers are unchanged.
+
 ## ldfreq 0.3.0.9016
 
 - The file-to-report guide now follows the same annotated occurrences

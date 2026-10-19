@@ -45,6 +45,10 @@ bundled **English**
 Acquire the frequency file explicitly, once:
 
 ``` r
+library(ldfreq)
+```
+
+``` r
 data_dir <- "japanese-resources"
 dir.create(data_dir, showWarnings = FALSE)
 revision <- "7cb5fb36add76b83a266d1967536e1a1d3faa513"

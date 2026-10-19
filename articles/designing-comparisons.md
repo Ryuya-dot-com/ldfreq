@@ -87,6 +87,8 @@ explicit. Global TTR supplies a useful contrast: it depends on the full
 document length.
 
 ``` r
+library(ldfreq)
+
 vocabulary <- c("river", "stone", "tree", "cloud")
 documents <- list(
   blocked = rep(vocabulary, each = 30),

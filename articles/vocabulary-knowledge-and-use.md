@@ -59,6 +59,8 @@ Two items use the same form, `bank`, for different intended senses.
 item and sense identities even when the lookup form is identical.
 
 ``` r
+library(ldfreq)
+
 items <- data.frame(
   item_id = c("i1", "i2", "i3", "i4"),
   target_form = c("bank", "bank", "accurate", "ldfreq"),

@@ -33,6 +33,8 @@ rejected rather than guessed into alignment.
 The installed, authored English/Japanese example runs entirely offline:
 
 ``` r
+library(ldfreq)
+
 env <- new.env(parent = baseenv())
 sys.source(system.file("examples", "annotation-alignment.R",
   package = "ldfreq", mustWork = TRUE), env)

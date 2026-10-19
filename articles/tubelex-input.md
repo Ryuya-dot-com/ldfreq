@@ -43,9 +43,11 @@ setting `preserve_line=True`, does not reproduce that step.
 ## Prepare named documents and run the script
 
 These blocks are not executed during R package installation or checking.
-Run them in your analysis directory after the Python setup. The script
-refuses to overwrite an existing output, does no runtime downloading,
-and processes the supplied text locally.
+The R steps also require the optional `jsonlite` package; install it
+with `install.packages("jsonlite")` if needed. Run them in your analysis
+directory after the Python setup. The script refuses to overwrite an
+existing output, does no runtime downloading, and processes the supplied
+text locally.
 
 ``` r
 library(ldfreq)

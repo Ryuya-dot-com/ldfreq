@@ -67,6 +67,8 @@ same declared feature; this does not establish comparable feature
 coverage across languages.
 
 ``` r
+library(ldfreq)
+
 env <- new.env(parent = baseenv())
 sys.source(system.file("examples", "amod-pairs.R", package = "ldfreq",
   mustWork = TRUE), env)
@@ -299,6 +301,14 @@ the local model file before rendering this guide, or run the code with
 `model_file` set to that path. These chunks are not run in ordinary
 package builds. The helper is an explicitly sourced recipe, not an
 exported API.
+
+If you set the environment variable, retrieve its value in your R
+session:
+
+``` r
+model_file <- Sys.getenv("LDFREQ_UDPIPE_MODEL")
+stopifnot(nzchar(model_file), file.exists(model_file))
+```
 
 ``` r
 source(system.file("examples", "udpipe-amod.R", package = "ldfreq", mustWork = TRUE), local = TRUE)

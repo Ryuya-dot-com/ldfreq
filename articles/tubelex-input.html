@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9016</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9017</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,8 +110,10 @@ a whole multi-sentence document, or setting
 <h2 id="prepare-named-documents-and-run-the-script">Prepare named documents and run the script<a class="anchor" aria-label="anchor" href="#prepare-named-documents-and-run-the-script"></a>
 </h2>
 <p>These blocks are not executed during R package installation or
-checking. Run them in your analysis directory after the Python setup.
-The script refuses to overwrite an existing output, does no runtime
+checking. The R steps also require the optional <code>jsonlite</code>
+package; install it with <code>install.packages("jsonlite")</code> if
+needed. Run them in your analysis directory after the Python setup. The
+script refuses to overwrite an existing output, does no runtime
 downloading, and processes the supplied text locally.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>

@@ -21,6 +21,8 @@ keeps approved, rejected and unresolved edits and compares complete
 original and revised texts without treating off-list words as errors.
 
 ``` r
+library(ldfreq)
+
 text <- "John’s well-known book costs 3.14. See https://example.org on 2026-10-04."
 english <- lexdiv_tokenize(text, tokenizer = "english", case = "lower")
 english$tokens
@@ -87,15 +89,11 @@ prepared <- lapply(c("unicode", "english"), function(rule) {
 })
 names(prepared) <- c("unicode", "english")
 comparison <- lexdiv_metrics_text_batch(prepared, metrics = "ttr")
-knitr::kable(comparison$results[, c("document_id", "N", "V", "value")])
-```
-
-| document_id |   N |   V | value |
-|:------------|----:|----:|------:|
-| unicode     |   8 |   7 | 0.875 |
-| english     |   4 |   3 | 0.750 |
-
-``` r
+print(comparison$results[, c("document_id", "N", "V", "value")], row.names = FALSE)
+#> <lexdiv_batch_results: 2 documents; 2 metric records; schema unknown>
+#>  document_id value N V
+#>      unicode 0.875 8 7
+#>      english 0.750 4 3
 lapply(prepared, function(x) x$tokens$surface)
 #> $unicode
 #> [1] "read"       "read"       "at"         "https"      "example"   

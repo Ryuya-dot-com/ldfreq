@@ -33,6 +33,8 @@ It does not invoke Python, download a model, load a corpus, or write
 files.
 
 ``` r
+library(ldfreq)
+
 source(system.file("examples", "annotation-evaluation.R", package = "ldfreq"))
 example <- annotation_evaluation_example
 evaluated <- example$evaluation

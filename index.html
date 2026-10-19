@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9016</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9017</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,15 +65,16 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>The published snapshot is 0.3.0.9015, a development prerelease that has not been released on CRAN. It includes English readability and traced syntactic-complexity examples. The fixed tag below identifies the tested code and installed examples. It requires R 4.1.0 or later. Install the tested snapshot used by this documentation:</p>
+<p>The published snapshot is 0.3.0.9017, a development prerelease that has not been released on CRAN. It includes English readability and traced syntactic-complexity examples. The fixed tag below identifies the tested code and installed examples. It requires R 4.1.0 or later. Install the tested snapshot used by this documentation:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run install.packages("pak") first if pak is not installed.</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@v0.3.0.9015"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@v0.3.0.9017"</span><span class="op">)</span></span></code></pre></div>
 <p>Pinning the revision fixes the implementation, even when development snapshots share the same version number. The package’s required dependencies are <code>digest</code> and <code>stringi</code>; additional tools are optional for their documented workflows. For example, candidate-review examples use <code>quanteda</code>.</p>
-<p>If you have a built source archive, install it locally:</p>
+<p>For the built source archive with rendered guides, download <a href="https://github.com/Ryuya-dot-com/ldfreq/releases/download/v0.3.0.9017/ldfreq_0.3.0.9017.tar.gz" class="external-link"><code>ldfreq_0.3.0.9017.tar.gz</code></a> from the <a href="https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.3.0.9017" class="external-link">fixed release</a>. The release also provides <code>SHA256SUMS</code> for checking the download. Install from the directory where you saved the archive, or use its full path:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install digest and stringi first if they are not already available.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ldfreq_0.3.0.9015.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ldfreq_0.3.0.9017.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
+<p>If an older ldfreq version is loaded, restart R after installation. Check <code>packageVersion("ldfreq")</code> before running these examples; it should report <code>0.3.0.9017</code> for this snapshot.</p>
 <p>The built archive includes rendered guides. A GitHub source installation may omit them; the online guides remain available. Run <code>vignette(package = "ldfreq")</code> to list installed guides, or <code><a href="articles/getting-started.html">vignette("getting-started", package = "ldfreq")</a></code> to open the introduction. <code><a href="reference/ldfreq-package.html">?ldfreq</a></code> also explains how to find explicitly sourced example helpers, which have no individual <code>?function</code> entry.</p>
 </div>
 <div class="section level2">

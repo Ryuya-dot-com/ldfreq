@@ -47,6 +47,8 @@ sense and any mapping decisions in additional columns if they differ
 from the lookup form.
 
 ``` r
+library(ldfreq)
+
 items <- data.frame(
   item_id = c("a1", "a2", "b1", "b2", "b3"),
   condition = c("A", "A", "B", "B", "B"),

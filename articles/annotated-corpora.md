@@ -15,6 +15,8 @@ installation is needed.
 ## Read an annotated document
 
 ``` r
+library(ldfreq)
+
 header <- system.file("extdata", "masc-example", "example.anc", package = "ldfreq")
 corpus <- lexdiv_read_masc(header, resource_version = "authored-example-1")
 corpus$tokens[c("annotation_id", "segment_id", "token_index",
@@ -400,6 +402,59 @@ not learner observations, an established phrase inventory or an
 independent human reference. Six document IDs include complete
 English/Japanese reviews, pending reviews, a nonempty no-match document
 and an empty document.
+
+To follow the review step by step, prepare the same inputs below, then
+run the export, decision and save chunks in order.
+
+``` r
+library(ldfreq)
+source(system.file("examples", "phrase-list-kwic.R", package = "ldfreq",
+  mustWork = TRUE), local = TRUE)
+phrase_segments <- data.frame(
+  document_id = c("en", "en", "en_pending", "en_pending", "ja", "ja",
+    "ja_pending", "ja_pending", "no_match", "empty"),
+  segment_id = c("s1", "s2", "s1", "s2", "s1", "s2", "s1", "s2", "s1", "s1"),
+  text = c("The plane will take off soon.", "Please take off your coat.",
+    "Later they take off.", "The crew will take off at noon.",
+    "\u5f7c\u306e\u5931\u8a00\u304c\u8a08\u753b\u306e\u8db3\u3092\u5f15\u3063\u5f35\u3063\u305f\u3002",
+    "\u5b50\u4f9b\u304c\u4eba\u5f62\u306e\u8db3\u3092\u5f15\u3063\u5f35\u3063\u305f\u3002",
+    "\u5f7c\u306f\u8db3\u3092\u5f15\u3063\u5f35\u3063\u305f\u3002",
+    "\u4f1a\u8b70\u3067\u307e\u305f\u8db3\u3092\u5f15\u3063\u5f35\u3063\u305f\u3002",
+    "No listed phrase occurs here.", ""))
+phrase_surfaces <- list(
+  c("The", "plane", "will", "take", "off", "soon", "."),
+  c("Please", "take", "off", "your", "coat", "."),
+  c("Later", "they", "take", "off", "."),
+  c("The", "crew", "will", "take", "off", "at", "noon", "."),
+  c("\u5f7c", "\u306e", "\u5931\u8a00", "\u304c", "\u8a08\u753b", "\u306e", "\u8db3", "\u3092", "\u5f15\u3063\u5f35\u3063", "\u305f", "\u3002"),
+  c("\u5b50\u4f9b", "\u304c", "\u4eba\u5f62", "\u306e", "\u8db3", "\u3092", "\u5f15\u3063\u5f35\u3063", "\u305f", "\u3002"),
+  c("\u5f7c", "\u306f", "\u8db3", "\u3092", "\u5f15\u3063\u5f35\u3063", "\u305f", "\u3002"),
+  c("\u4f1a\u8b70", "\u3067", "\u307e\u305f", "\u8db3", "\u3092", "\u5f15\u3063\u5f35\u3063", "\u305f", "\u3002"),
+  c("No", "listed", "phrase", "occurs", "here", "."), character())
+phrase_tokens <- do.call(rbind, lapply(seq_along(phrase_surfaces), function(i) {
+  data.frame(document_id = rep(phrase_segments$document_id[i], length(phrase_surfaces[[i]])),
+    segment_id = rep(phrase_segments$segment_id[i], length(phrase_surfaces[[i]])),
+    token_index = seq_along(phrase_surfaces[[i]]), surface = phrase_surfaces[[i]])
+}))
+phrase_annotations <- lexdiv_import_annotations(phrase_tokens, phrase_segments,
+  list(language = "en+ja", analyzer = "authored", analyzer_version = "1",
+    dictionary = "none", dictionary_version = "not-applicable",
+    unit = "authored-tokens", normalization = "none"))
+review_phrases <- list(departure = c("take", "off"),
+  departure_long = c("will", "take", "off"),
+  hindrance = c("\u8db3", "\u3092", "\u5f15\u3063\u5f35\u3063", "\u305f"),
+  absent = c("not", "present"))
+phrase_resource <- list(resource_id = "authored-phrase-review", resource_version = "1",
+  source_reference = "Original teaching list, not an established phrase inventory",
+  data_license = "MIT")
+phrase_keep <- !phrase_annotations$tokens$surface %in% c(".", "\u3002")
+phrase_search <- phrase_list_kwic(phrase_annotations, review_phrases,
+  phrase_resource, keep = phrase_keep, window = 3L)
+phrase_criterion <- paste("For departure/departure_long, accept departure for a flight;",
+  "for hindrance, accept hindering a plan rather than physically pulling a leg.",
+  "Retain nested accepted spans. Unclear context remains unresolved.")
+phrase_before <- phrase_list_review(phrase_search, criterion = phrase_criterion)
+```
 
 | document_id | segment_id | phrase_id | keyword | segment_text |
 |:---|:---|:---|:---|:---|

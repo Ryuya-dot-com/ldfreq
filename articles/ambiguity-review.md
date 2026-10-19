@@ -35,6 +35,8 @@ morphological analyzer and inspect their alignment; successful import
 does not validate their meaning.
 
 ``` r
+library(ldfreq)
+
 segments <- data.frame(document_id = c("en", "en", "empty"),
   segment_id = c("s1", "s2", "s1"),
   text = c("The bank lent money.", "The river bank flooded.", ""))
@@ -448,17 +450,15 @@ stopifnot(identical(rowSums(worksheet_report[
   identical(worksheet_report$target_occurrences, c(4L, 0L, 0L)),
   is.na(worksheet_report$reviewed_proportion[2]),
   is.na(worksheet_report$reviewed_proportion[3]))
-knitr::kable(worksheet_report, digits = 2, col.names = c("Document", "Targets",
-  "Selected", "Unresolved", "Unreviewed", "No candidates", "Reviewed / targets"))
-```
-
-| Document | Targets | Selected | Unresolved | Unreviewed | No candidates | Reviewed / targets |
-|:---|---:|---:|---:|---:|---:|---:|
-| en | 4 | 1 | 1 | 1 | 1 | 0.5 |
-| other | 0 | 0 | 0 | 0 | 0 | NA |
-| empty | 0 | 0 | 0 | 0 | 0 | NA |
-
-``` r
+print(worksheet_report, digits = 2, row.names = FALSE)
+#>  document_id target_occurrences selected unresolved unreviewed no_candidates
+#>           en                  4        1          1          1             1
+#>        other                  0        0          0          0             0
+#>        empty                  0        0          0          0             0
+#>  reviewed_proportion
+#>                  0.5
+#>                   NA
+#>                   NA
 worksheet_after$summary  # The absent target also remains, with zero occurrences.
 #>     term candidate_count occurrences unreviewed selected unresolved
 #> 1   bank               2           2          0        1          1

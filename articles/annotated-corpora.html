@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9016</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9017</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,9 @@ corresponding steps; no Python or AntConc installation is needed.</p>
 <h2 id="read-an-annotated-document">Read an annotated document<a class="anchor" aria-label="anchor" href="#read-an-annotated-document"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">header</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"masc-example"</span>, <span class="st">"example.anc"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">header</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"masc-example"</span>, <span class="st">"example.anc"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span></span>
 <span><span class="va">corpus</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_read_masc.html">lexdiv_read_masc</a></span><span class="op">(</span><span class="va">header</span>, resource_version <span class="op">=</span> <span class="st">"authored-example-1"</span><span class="op">)</span></span>
 <span><span class="va">corpus</span><span class="op">$</span><span class="va">tokens</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"annotation_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"token_index"</span>,</span>
 <span>                <span class="st">"surface"</span>, <span class="st">"lemma"</span>, <span class="st">"pos"</span>, <span class="st">"start"</span>, <span class="st">"end"</span><span class="op">)</span><span class="op">]</span></span>
@@ -462,6 +464,56 @@ material, not learner observations, an established phrase inventory or
 an independent human reference. Six document IDs include complete
 English/Japanese reviews, pending reviews, a nonempty no-match document
 and an empty document.</p>
+<p>To follow the review step by step, prepare the same inputs below,
+then run the export, decision and save chunks in order.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"phrase-list-kwic.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
+<span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, local <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">phrase_segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"en"</span>, <span class="st">"en"</span>, <span class="st">"en_pending"</span>, <span class="st">"en_pending"</span>, <span class="st">"ja"</span>, <span class="st">"ja"</span>,</span>
+<span>    <span class="st">"ja_pending"</span>, <span class="st">"ja_pending"</span>, <span class="st">"no_match"</span>, <span class="st">"empty"</span><span class="op">)</span>,</span>
+<span>  segment_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"s1"</span>, <span class="st">"s2"</span>, <span class="st">"s1"</span>, <span class="st">"s2"</span>, <span class="st">"s1"</span>, <span class="st">"s2"</span>, <span class="st">"s1"</span>, <span class="st">"s2"</span>, <span class="st">"s1"</span>, <span class="st">"s1"</span><span class="op">)</span>,</span>
+<span>  text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"The plane will take off soon."</span>, <span class="st">"Please take off your coat."</span>,</span>
+<span>    <span class="st">"Later they take off."</span>, <span class="st">"The crew will take off at noon."</span>,</span>
+<span>    <span class="st">"\u5f7c\u306e\u5931\u8a00\u304c\u8a08\u753b\u306e\u8db3\u3092\u5f15\u3063\u5f35\u3063\u305f\u3002"</span>,</span>
+<span>    <span class="st">"\u5b50\u4f9b\u304c\u4eba\u5f62\u306e\u8db3\u3092\u5f15\u3063\u5f35\u3063\u305f\u3002"</span>,</span>
+<span>    <span class="st">"\u5f7c\u306f\u8db3\u3092\u5f15\u3063\u5f35\u3063\u305f\u3002"</span>,</span>
+<span>    <span class="st">"\u4f1a\u8b70\u3067\u307e\u305f\u8db3\u3092\u5f15\u3063\u5f35\u3063\u305f\u3002"</span>,</span>
+<span>    <span class="st">"No listed phrase occurs here."</span>, <span class="st">""</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">phrase_surfaces</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"The"</span>, <span class="st">"plane"</span>, <span class="st">"will"</span>, <span class="st">"take"</span>, <span class="st">"off"</span>, <span class="st">"soon"</span>, <span class="st">"."</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Please"</span>, <span class="st">"take"</span>, <span class="st">"off"</span>, <span class="st">"your"</span>, <span class="st">"coat"</span>, <span class="st">"."</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Later"</span>, <span class="st">"they"</span>, <span class="st">"take"</span>, <span class="st">"off"</span>, <span class="st">"."</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"The"</span>, <span class="st">"crew"</span>, <span class="st">"will"</span>, <span class="st">"take"</span>, <span class="st">"off"</span>, <span class="st">"at"</span>, <span class="st">"noon"</span>, <span class="st">"."</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"\u5f7c"</span>, <span class="st">"\u306e"</span>, <span class="st">"\u5931\u8a00"</span>, <span class="st">"\u304c"</span>, <span class="st">"\u8a08\u753b"</span>, <span class="st">"\u306e"</span>, <span class="st">"\u8db3"</span>, <span class="st">"\u3092"</span>, <span class="st">"\u5f15\u3063\u5f35\u3063"</span>, <span class="st">"\u305f"</span>, <span class="st">"\u3002"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"\u5b50\u4f9b"</span>, <span class="st">"\u304c"</span>, <span class="st">"\u4eba\u5f62"</span>, <span class="st">"\u306e"</span>, <span class="st">"\u8db3"</span>, <span class="st">"\u3092"</span>, <span class="st">"\u5f15\u3063\u5f35\u3063"</span>, <span class="st">"\u305f"</span>, <span class="st">"\u3002"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"\u5f7c"</span>, <span class="st">"\u306f"</span>, <span class="st">"\u8db3"</span>, <span class="st">"\u3092"</span>, <span class="st">"\u5f15\u3063\u5f35\u3063"</span>, <span class="st">"\u305f"</span>, <span class="st">"\u3002"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"\u4f1a\u8b70"</span>, <span class="st">"\u3067"</span>, <span class="st">"\u307e\u305f"</span>, <span class="st">"\u8db3"</span>, <span class="st">"\u3092"</span>, <span class="st">"\u5f15\u3063\u5f35\u3063"</span>, <span class="st">"\u305f"</span>, <span class="st">"\u3002"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"No"</span>, <span class="st">"listed"</span>, <span class="st">"phrase"</span>, <span class="st">"occurs"</span>, <span class="st">"here"</span>, <span class="st">"."</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">phrase_tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">phrase_surfaces</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">phrase_segments</span><span class="op">$</span><span class="va">document_id</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">phrase_surfaces</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    segment_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">phrase_segments</span><span class="op">$</span><span class="va">segment_id</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">phrase_surfaces</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    token_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">phrase_surfaces</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, surface <span class="op">=</span> <span class="va">phrase_surfaces</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">phrase_annotations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_import_annotations.html">lexdiv_import_annotations</a></span><span class="op">(</span><span class="va">phrase_tokens</span>, <span class="va">phrase_segments</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>language <span class="op">=</span> <span class="st">"en+ja"</span>, analyzer <span class="op">=</span> <span class="st">"authored"</span>, analyzer_version <span class="op">=</span> <span class="st">"1"</span>,</span>
+<span>    dictionary <span class="op">=</span> <span class="st">"none"</span>, dictionary_version <span class="op">=</span> <span class="st">"not-applicable"</span>,</span>
+<span>    unit <span class="op">=</span> <span class="st">"authored-tokens"</span>, normalization <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">review_phrases</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>departure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"take"</span>, <span class="st">"off"</span><span class="op">)</span>,</span>
+<span>  departure_long <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"will"</span>, <span class="st">"take"</span>, <span class="st">"off"</span><span class="op">)</span>,</span>
+<span>  hindrance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"\u8db3"</span>, <span class="st">"\u3092"</span>, <span class="st">"\u5f15\u3063\u5f35\u3063"</span>, <span class="st">"\u305f"</span><span class="op">)</span>,</span>
+<span>  absent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"not"</span>, <span class="st">"present"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">phrase_resource</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>resource_id <span class="op">=</span> <span class="st">"authored-phrase-review"</span>, resource_version <span class="op">=</span> <span class="st">"1"</span>,</span>
+<span>  source_reference <span class="op">=</span> <span class="st">"Original teaching list, not an established phrase inventory"</span>,</span>
+<span>  data_license <span class="op">=</span> <span class="st">"MIT"</span><span class="op">)</span></span>
+<span><span class="va">phrase_keep</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="va">phrase_annotations</span><span class="op">$</span><span class="va">tokens</span><span class="op">$</span><span class="va">surface</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"."</span>, <span class="st">"\u3002"</span><span class="op">)</span></span>
+<span><span class="va">phrase_search</span> <span class="op">&lt;-</span> <span class="fu">phrase_list_kwic</span><span class="op">(</span><span class="va">phrase_annotations</span>, <span class="va">review_phrases</span>,</span>
+<span>  <span class="va">phrase_resource</span>, keep <span class="op">=</span> <span class="va">phrase_keep</span>, window <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span></span>
+<span><span class="va">phrase_criterion</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"For departure/departure_long, accept departure for a flight;"</span>,</span>
+<span>  <span class="st">"for hindrance, accept hindering a plan rather than physically pulling a leg."</span>,</span>
+<span>  <span class="st">"Retain nested accepted spans. Unclear context remains unresolved."</span><span class="op">)</span></span>
+<span><span class="va">phrase_before</span> <span class="op">&lt;-</span> <span class="fu">phrase_list_review</span><span class="op">(</span><span class="va">phrase_search</span>, criterion <span class="op">=</span> <span class="va">phrase_criterion</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
 <col width="13%">
@@ -559,7 +611,7 @@ entry uses the supplied authored components
 correspondingly specified entries. No automatic lemmatization,
 alternative-form expansion or discontinuous search is implied.</p>
 <p>For your own unchanged search result, start with:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"phrase-list-kwic.R"</span>,</span>
 <span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, local <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">before</span> <span class="op">&lt;-</span> <span class="fu">phrase_list_review</span><span class="op">(</span><span class="va">my_search</span>,</span>
@@ -567,7 +619,7 @@ alternative-form expansion or discontinuous search is implied.</p>
 <div class="section level3">
 <h3 id="export-context-separately-from-the-editable-worksheet">Export context separately from the editable worksheet<a class="anchor" aria-label="anchor" href="#export-context-separately-from-the-editable-worksheet"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">phrase_review_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"ldfreq-phrase-review-"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">phrase_review_dir</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">phrase_before</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">phrase_review_dir</span>, <span class="st">"review-before.rds"</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
@@ -623,7 +675,7 @@ Save each stage or rater separately when that history matters.</p>
 <p>The following edits encode the teaching interpretations and
 deliberately leave some rows unresolved or unreviewed. They are not
 automated semantic analysis.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Illustrative edits to the worksheet; in a study inspect context and edit the CSV.</span></span>
 <span><span class="va">phrase_sheet</span> <span class="op">&lt;-</span> <span class="va">phrase_before</span><span class="op">$</span><span class="va">worksheet</span></span>
 <span><span class="va">complete_docs</span> <span class="op">&lt;-</span> <span class="va">phrase_sheet</span><span class="op">$</span><span class="va">document_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"en"</span>, <span class="st">"ja"</span><span class="op">)</span></span>
@@ -645,7 +697,7 @@ automated semantic analysis.</p>
 <div class="section level3">
 <h3 id="reapply-by-identity-then-inspect-counts-and-coverage">Reapply by identity, then inspect counts and coverage<a class="anchor" aria-label="anchor" href="#reapply-by-identity-then-inspect-counts-and-coverage"></a>
 </h3>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">phrase_reader</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"text-file-input.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
 <span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">phrase_reader</span><span class="op">)</span></span>
@@ -725,7 +777,7 @@ single words or alter TTR, MATTR or MTLD.</p>
 <div class="section level3">
 <h3 id="save-the-complete-review-and-reproduce-its-tables">Save the complete review and reproduce its tables<a class="anchor" aria-label="anchor" href="#save-the-complete-review-and-reproduce-its-tables"></a>
 </h3>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">phrase_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>before <span class="op">=</span> <span class="va">phrase_saved</span>, after <span class="op">=</span> <span class="va">phrase_after</span>,</span>
 <span>  worksheet_input <span class="op">=</span> <span class="va">phrase_csv</span>, session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">phrase_record</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">phrase_review_dir</span>, <span class="st">"analysis.rds"</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
@@ -824,7 +876,7 @@ study, assign the same sampled material and written criterion, collect
 decisions separately, and retain the pre-discussion files. Treat a
 repeated pass by one person as intra-rater comparison instead. The
 helper below is local to this guide.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_phrase_reviews</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span>, <span class="va">reviewers</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">is.character</a></span><span class="op">(</span><span class="va">reviewers</span><span class="op">)</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">reviewers</span><span class="op">)</span> <span class="op">!=</span> <span class="fl">2L</span> <span class="op">||</span></span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">reviewers</span><span class="op">)</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">reviewers</span><span class="op">)</span> <span class="op">||</span></span>
@@ -899,7 +951,7 @@ with a zero denominator.</p>
 deliberately introduces disagreements and different completion states.
 <strong>It is simulated teaching material, not an independent human
 rating.</strong></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">review_a</span> <span class="op">&lt;-</span> <span class="va">phrase_after</span></span>
 <span><span class="va">sheet_b</span> <span class="op">&lt;-</span> <span class="va">phrase_before</span><span class="op">$</span><span class="va">worksheet</span></span>
 <span><span class="va">complete</span> <span class="op">&lt;-</span> <span class="va">sheet_b</span><span class="op">$</span><span class="va">document_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"en"</span>, <span class="st">"ja"</span><span class="op">)</span></span>
@@ -991,7 +1043,7 @@ with <code>weight = "unweighted"</code>. Its missing rows are removed
 listwise; here the paired rows have already been selected explicitly and
 their excluded states remain in the comparison. Install <code>irr</code>
 separately to run this block.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("irr")  # once, when this optional analysis is needed</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"irr"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">phrase_kappa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">phrase_comparison</span><span class="op">$</span><span class="va">ratings</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
@@ -1019,7 +1071,7 @@ replace this nominal-label comparison.</p>
 this block reconstructs <a href="https://aclanthology.org/J08-4004/" class="external-link">Artstein and Poesio’s Tables
 1–2</a> (pp. 558, 560). The counts describe dialogue-act categories, not
 learner data.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">published_ratings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"STAT"</span>, <span class="st">"IREQ"</span>, <span class="st">"STAT"</span>, <span class="st">"IREQ"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">20</span>, <span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"STAT"</span>, <span class="st">"STAT"</span>, <span class="st">"IREQ"</span>, <span class="st">"IREQ"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">20</span>, <span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -1057,7 +1109,7 @@ These three authored edits resolve the coat/flight examples and decide
 one Japanese context; other open cases remain open. Starting from A here
 is an explicit working-copy choice, not automatic acceptance of A
 whenever the raters differ.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">discussion</span> <span class="op">&lt;-</span> <span class="va">review_a</span><span class="op">$</span><span class="va">worksheet</span></span>
 <span><span class="va">edit</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">discussion</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"en"</span> <span class="op">&amp;</span> <span class="va">discussion</span><span class="op">$</span><span class="va">segment_id</span> <span class="op">==</span> <span class="st">"s2"</span><span class="op">)</span> <span class="op">|</span></span>
 <span>  <span class="op">(</span><span class="va">discussion</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"en"</span> <span class="op">&amp;</span> <span class="va">discussion</span><span class="op">$</span><span class="va">phrase_id</span> <span class="op">==</span> <span class="st">"departure_long"</span><span class="op">)</span> <span class="op">|</span></span>
@@ -1126,7 +1178,7 @@ denominator and missing coverage. Discussion changes neither the
 original tokens nor the stored pre-discussion agreement. Report these
 original profiles side by side, with their completion status; do not
 turn a discussion result into an independent third rating.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">agreement_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>comparison <span class="op">=</span> <span class="va">phrase_comparison</span>,</span>
 <span>  discussion_log <span class="op">=</span> <span class="va">discussion_log</span>, after_discussion <span class="op">=</span> <span class="va">after_discussion</span>,</span>
 <span>  profiles <span class="op">=</span> <span class="va">phrase_profiles</span>, session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
@@ -1171,7 +1223,7 @@ reliability, phrase-inventory completeness or learner proficiency.</p>
 <div class="section level2">
 <h2 id="connect-to-the-existing-ldfreq-reference-workflow">Connect to the existing ldfreq reference workflow<a class="anchor" aria-label="anchor" href="#connect-to-the-existing-ldfreq-reference-workflow"></a>
 </h2>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="va">q</span><span class="op">$</span><span class="va">positions</span></span>
 <span><span class="va">prepared</span><span class="op">$</span><span class="va">term</span> <span class="op">&lt;-</span> <span class="va">prepared</span><span class="op">$</span><span class="va">surface</span></span>
 <span><span class="va">sequences</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ngrams.html">lexdiv_ngrams</a></span><span class="op">(</span><span class="va">prepared</span>,</span>
@@ -1190,7 +1242,7 @@ not proof that an unrelated tokenizer is compatible. MASC Penn tokens,
 quanteda word4 tokens and the bundled TUBELEX tokenization must not be
 silently treated as the same tokenization.</p>
 <p>Save source evidence with the analysis:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>corpus <span class="op">=</span> <span class="va">corpus</span>, quanteda <span class="op">=</span> <span class="va">q</span>, sequences <span class="op">=</span> <span class="va">sequences</span><span class="op">)</span>, <span class="va">path</span><span class="op">)</span></span>
 <span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
@@ -1209,7 +1261,7 @@ eight-document Mini-MASC release, 851 of 7,263 Penn tokens have no
 <code>base</code> feature. They retain <code>NA</code> lemmas; a lemma
 analysis therefore needs an explicit missingness policy even when
 surface tokens are available.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">headers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="st">"/path/to/Mini-MASC/data"</span>, pattern <span class="op">=</span> <span class="st">"\\.anc$"</span>,</span>
 <span>                      recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">masc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_read_masc.html">lexdiv_read_masc</a></span><span class="op">(</span><span class="va">headers</span>, resource_version <span class="op">=</span> <span class="st">"Mini-MASC-1.0"</span><span class="op">)</span></span></code></pre></div>

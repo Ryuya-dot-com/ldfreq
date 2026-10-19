@@ -125,6 +125,8 @@ covered by the package’s MIT license; no corpus or dictionary is
 redistributed.
 
 ``` r
+library(ldfreq)
+
 segments <- data.frame(
   document_id = c("essay", "empty"), segment_id = c("s1", "s1"),
   text = c("国際連合で国際協力を学ぶ。", "")
@@ -1038,7 +1040,9 @@ ja_file_output
 interface; ldfreq does not reimplement it. Install gibasa separately
 with `install.packages("gibasa")`. Its optional installation
 requirements are separate from those of ldfreq. A UTF-8 compiled
-dictionary is also required.
+dictionary is also required. The formatted tables in this optional
+section use `knitr`; install it with `install.packages("knitr")` if
+needed.
 
 This recipe is for **unidic-lite 1.0.8, based on UniDic 2.1.2**, with
 the 26-field binary schema. It is a concrete integration example, not a
@@ -1056,6 +1060,14 @@ included dictionary license and source information with it. Set
 directory before rendering this guide, or assign that path to `dic_dir`
 and run the following chunks interactively. The package build runs the
 authored examples offline; it does not download a dictionary.
+
+If you set the environment variable, retrieve its value in your R
+session:
+
+``` r
+dic_dir <- Sys.getenv("LDFREQ_UNIDIC_LITE_1_0_8")
+stopifnot(nzchar(dic_dir), dir.exists(dic_dir))
+```
 
 Supply one sentence or turn per segment, with a separate roster for
 original document IDs. The following strings are new examples, not
@@ -1111,23 +1123,6 @@ analyze_unidic <- function(segments, dic_dir) {
 analysis <- analyze_unidic(ja_segments, dic_dir)
 ja_annotations <- analysis$tokens
 ja_annotations[c("surface", "orthBase", "lemma", "lForm", "POS1")]
-#>    surface orthBase lemma        lForm     POS1
-#> 1     国際     国際  国際     コクサイ     名詞
-#> 2     連合     連合  連合     レンゴウ     名詞
-#> 3       で       で    で           デ     助詞
-#> 4     国際     国際  国際     コクサイ     名詞
-#> 5     協力     協力  協力 キョウリョク     名詞
-#> 6       を       を    を           ヲ     助詞
-#> 7     学ぶ     学ぶ  学ぶ       マナブ     動詞
-#> 8       。       。    。         <NA> 補助記号
-#> 9     ＡＩ     ＡＩ  ＡＩ     エーアイ     名詞
-#> 10      で       で    で           デ     助詞
-#> 11    学び     学ぶ  学ぶ       マナブ     動詞
-#> 12    まし     ます  ます         マス   助動詞
-#> 13      た       た    た           タ   助動詞
-#> 14      。       。    。         <NA> 補助記号
-#> 15    qzxv     <NA>  <NA>         <NA>     名詞
-#> 16      😀     <NA>  <NA>         <NA> 補助記号
 ```
 
 Use the feature schema for the **actual dictionary**, not the default
@@ -1154,23 +1149,6 @@ ja <- lexdiv_import_annotations(ja_annotations, ja_segments, c(list(
 ), dictionary_hashes))
 ja$tokens[c("document_id", "segment_id", "token_index", "surface",
   "orthBase", "lemma", "start", "end")]
-#>    document_id segment_id token_index surface orthBase lemma start end
-#> 1        essay         s1           1    国際     国際  国際     1   2
-#> 2        essay         s1           2    連合     連合  連合     3   4
-#> 3        essay         s1           3      で       で    で     5   5
-#> 4        essay         s1           4    国際     国際  国際     6   7
-#> 5        essay         s1           5    協力     協力  協力     8   9
-#> 6        essay         s1           6      を       を    を    10  10
-#> 7        essay         s1           7    学ぶ     学ぶ  学ぶ    11  12
-#> 8        essay         s1           8      。       。    。    13  13
-#> 9        essay         s2           1    ＡＩ     ＡＩ  ＡＩ     1   2
-#> 10       essay         s2           2      で       で    で     3   3
-#> 11       essay         s2           3    学び     学ぶ  学ぶ     4   5
-#> 12       essay         s2           4    まし     ます  ます     6   7
-#> 13       essay         s2           5      た       た    た     8   8
-#> 14       essay         s2           6      。       。    。     9   9
-#> 15       essay         s2           7    qzxv     <NA>  <NA>    11  14
-#> 16       essay         s2           8      😀     <NA>  <NA>    15  15
 ```
 
 Metadata and hashes record the declared dictionary snapshot. They do not
@@ -1223,16 +1201,7 @@ results <- lexdiv_metrics_batch(by_document, metrics = "ttr")
 grams <- lexdiv_ngrams(selected, "ja-unidic-lite-1.0.8-orthBase-selection-v1",
   documents = ja$documents$document_id)
 results
-#> <lexdiv_batch_results: 2 documents; 2 metric records; schema 0.1.0>
-#>   document_id metric_id value  status missing_reason  N V below_quality_floor
-#> 1       essay       ttr  0.75      ok           <NA> 12 9               FALSE
-#> 2       empty       ttr    NA missing    empty_input  0 0                TRUE
 grams$documents
-#>   document_id n input_tokens opportunities ngram_types         status
-#> 1       essay 2           12            10          10             ok
-#> 2       essay 3           12             8           8             ok
-#> 3       empty 2            0             0           0 empty_document
-#> 4       empty 3            0             0           0 empty_document
 ```
 
 ### Account for missing bases before comparing forms
@@ -1263,11 +1232,6 @@ knitr::kable(selection_counts, digits = 3, row.names = FALSE,
     "Missing base", "Retained", "Coverage"))
 ```
 
-| Document | Source tokens | Candidates | Missing base | Retained | Coverage |
-|:---------|--------------:|-----------:|-------------:|---------:|---------:|
-| essay    |            16 |         13 |            1 |       12 |    0.923 |
-| empty    |             0 |          0 |            0 |        0 |       NA |
-
 To isolate the lexical-form choice, compare surface and base on the
 **same retained occurrences**. This conditional comparison answers how
 grouping those occurrences changes V and TTR; it does not describe all
@@ -1286,13 +1250,6 @@ knitr::kable(
   digits = 3, row.names = FALSE,
   col.names = c("Document", "Form", "N", "V", "TTR", "Status"))
 ```
-
-| Document | Form     |   N |   V |   TTR | Status  |
-|:---------|:---------|----:|----:|------:|:--------|
-| essay    | surface  |  12 |  10 | 0.833 | ok      |
-| empty    | surface  |   0 |   0 |    NA | missing |
-| essay    | orthBase |  12 |   9 | 0.750 | ok      |
-| empty    | orthBase |   0 |   0 |    NA | missing |
 
 The diversity calculation describes the retained sequence. N-grams also
 respect segment boundaries and the **original** `token_index`: excluding

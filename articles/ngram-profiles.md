@@ -30,6 +30,8 @@ block; positions increase inside it. The function never sorts input or
 joins segments.
 
 ``` r
+library(ldfreq)
+
 reference_tokens <- data.frame(
   document_id = c(rep("r1", 8), rep("r2", 4)),
   segment_id = c(rep("s1", 4), rep("s2", 4), rep("s1", 4)),

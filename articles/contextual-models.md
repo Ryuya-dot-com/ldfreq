@@ -27,6 +27,8 @@ of the same spelling, not a demonstrated related-sense manipulation. Use
 real annotations for a real study.
 
 ``` r
+library(ldfreq)
+
 words <- list(c("The", "bank", "lent", "money", "."),
               c("The", "river", "bank", "flooded", "."),
               c("その", "店", "は", "人気", "が", "ある", "。"),
