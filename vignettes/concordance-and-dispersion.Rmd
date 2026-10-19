@@ -9,7 +9,6 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 3.5)
-library(ldfreq)
 has_quanteda <- requireNamespace("quanteda", quietly = TRUE) &&
   utils::packageVersion("quanteda") >= "4.5.0"
 has_plot <- requireNamespace("ggplot2", quietly = TRUE)
@@ -32,12 +31,14 @@ evaluation of an annotation system.
 ## Prepare complete annotations
 
 ```{r concordance-demo, eval=has_quanteda}
+library(ldfreq)
+
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "concordance-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
 helper <- demo$helper
 annotations <- demo$annotations
-knitr::kable(annotations$segments[c("document_id", "segment_id", "text")], row.names = FALSE)
+print(annotations$segments[c("document_id", "segment_id", "text")], row.names = FALSE)
 ```
 
 `spread` and `cluster` each contain 12 original tokens and three instances of
@@ -100,8 +101,8 @@ search <- helper$concordance_search(annotations,
   queries = list(word = "learn", phrase = c("learn", "new"), absent = "unlisted"),
   term_col = "lemma", valuetype = "fixed", case_insensitive = FALSE,
   keep = keep, window = 2L)
-knitr::kable(search$counts, row.names = FALSE)
-knitr::kable(search$occurrences[c("query_id", "document_id", "segment_id",
+print(search$counts, row.names = FALSE)
+print(search$occurrences[c("query_id", "document_id", "segment_id",
   "pre", "keyword", "post")], row.names = FALSE)
 ```
 
@@ -126,7 +127,7 @@ wildcard <- helper$concordance_search(annotations,
   list(forms = "learn*", phrase = c("learn*", "new")), valuetype = "glob", keep = keep)
 regular <- helper$concordance_search(annotations,
   list(forms = "^learn(ed)?$"), valuetype = "regex", keep = keep)
-knitr::kable(wildcard$counts, row.names = FALSE)
+print(wildcard$counts, row.names = FALSE)
 stopifnot(sum(regular$counts$occurrences) == 9L)
 ```
 
@@ -146,7 +147,7 @@ phrase, including a wildcard phrase. The example therefore does not turn
 `learn very new` into `learn new` after excluding `very`.
 
 ```{r concordance-denominators, eval=has_quanteda}
-knitr::kable(search$documents, row.names = FALSE)
+print(search$documents, row.names = FALSE)
 ```
 
 `source_tokens` counts all original positions. `kept_tokens` applies `keep`;
@@ -163,7 +164,7 @@ before raising it for a larger input.
 ```{r concordance-sort, eval=has_quanteda}
 right_sorted <- helper$concordance_sort(search, side = "right", depth = 2L)
 left_sorted <- helper$concordance_sort(search, side = "left", depth = 2L)
-knitr::kable(right_sorted[c("query_id", "document_id", "pre", "keyword", "post")], row.names = FALSE)
+print(right_sorted[c("query_id", "document_id", "pre", "keyword", "post")], row.names = FALSE)
 ```
 
 The saved `left_tokens` and `right_tokens` list columns start with the nearest
@@ -229,9 +230,9 @@ distribution; it does not necessarily mean a geometrically narrower cluster.
 
 ```{r concordance-dp, eval=has_quanteda}
 dispersion <- helper$concordance_dispersion(search, "word", parts = 3L)
-knitr::kable(dispersion$documents[c("document_id", "searchable_tokens", "occurrences",
+print(dispersion$documents[c("document_id", "searchable_tokens", "occurrences",
   "DP", "status", "missing_reason")], digits = 4, row.names = FALSE)
-knitr::kable(subset(dispersion$parts, document_id %in% c("spread", "cluster"))[
+print(subset(dispersion$parts, document_id %in% c("spread", "cluster"))[
   c("document_id", "part", "searchable_tokens", "occurrences", "expected_share", "observed_share")],
   digits = 3, row.names = FALSE)
 stopifnot(isTRUE(all.equal(dispersion$documents$DP[1:2], c(0, 2/3))))

@@ -9,7 +9,6 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 ```
 
 This guide extends a first analysis into condition comparisons and research
@@ -31,6 +30,17 @@ Choose the task you need:
   use `lexdiv_widen(..., mtld_diagnostics = TRUE)` with ldfreq 0.3.0.9004 or later.
   The earlier helper supports long diagnostic tables and older installations;
   a custom function is not required just to inspect a first result.
+- [Explain corpus differences with words and contexts](keyness-comparison.html):
+  inspect counts and reference denominators, then return to the counted
+  occurrences. [Collocation](collocation-association.html) and
+  [concordance and dispersion](concordance-and-dispersion.html) answer related
+  questions about nearby words and positions. Corpus-level statistics are not
+  independent writer-level observations.
+- [Inspect readability](english-readability.html) or
+  [syntactic complexity](syntactic-complexity.html) alongside lexical results:
+  match the original texts and document IDs, retaining each workflow's word,
+  sentence, syllable or structure counts and review decisions separately.
+  A shared document ID does not establish a shared denominator.
 - [Plot local vocabulary diversity](#plot-local-vocabulary-diversity): a separate
   complete example includes its own input text and setup.
 
@@ -57,6 +67,8 @@ by the three requested metrics; it does not recalculate MTLD. The full result
 objects retain method parameters and schema identities in the saved record.
 
 ```{r report-file-setup}
+library(ldfreq)
+
 reader <- new.env(parent = baseenv())
 sys.source(system.file("examples", "text-file-input.R",
   package = "ldfreq", mustWork = TRUE), reader)
@@ -125,7 +137,7 @@ en_table <- do.call(rbind, lapply(names(en_runs), function(condition) {
 }))
 rownames(en_table) <- NULL
 en_preview <- c(head(en_ids, 1), tail(en_ids, 1))
-knitr::kable(subset(en_table, document_id %in% en_preview,
+print(subset(en_table, document_id %in% en_preview,
   c(document_id, condition, metric_id, N, V, value, status, missing_reason)),
   digits = 3, row.names = FALSE)
 ```
@@ -152,7 +164,7 @@ en_counts <- do.call(rbind, lapply(settings$metrics, function(metric) {
     preserve_tail_only = if (metric == "mtld") sum(p$mtld_tail_only_preserve, na.rm = TRUE) else NA,
     lower_tail_only = if (metric == "mtld") sum(p$mtld_tail_only_lower, na.rm = TRUE) else NA)
 }))
-knitr::kable(en_counts)
+print(en_counts)
 ```
 
 For these files N is unchanged, while lowercasing changes type identity. This
@@ -161,6 +173,44 @@ capitalization is correct. The tokenizer's positions refer to processed text;
 case conversion can change Unicode character length in other inputs. Do not
 reuse these positions as original-text annotation anchors. Both complete
 tokenizations, their exclusion records and original texts are saved below.
+
+### Explain a result using the saved text {#explain-a-counting-choice}
+
+Choose a document ID from `en_table`; do not treat a row number as its ID.
+Inspect both conditions for the same metric, then read the original text and
+counted forms. The first document is selected here only as an illustration.
+
+```{r report-english-source}
+inspected_id <- en_ids[1]
+print(subset(en_table, document_id == inspected_id & metric_id == "ttr",
+  c(document_id, condition, N, V, value, status, missing_reason)), row.names = FALSE)
+cat(en_texts[[inspected_id]], "\n")
+counted_forms <- lapply(en_prepared, function(batch) {
+  words <- batch[[inspected_id]]$tokens$surface
+  data.frame(form = sort(unique(words)),
+    occurrences = as.integer(table(factor(words, levels = sort(unique(words))))))
+})
+lapply(counted_forms, head, 12)
+excluded <- lapply(en_prepared, function(batch)
+  batch[[inspected_id]]$provenance$excluded_spans)
+excluded
+```
+
+The display shows the first 12 forms per condition; `counted_forms` retains
+the complete tables. For available TTR results, the occurrence counts sum to `N` and the number
+of distinct forms is `V`. Lowercasing can merge forms without removing word
+occurrences. An empty document has no forms and no TTR; retain that row.
+Report the two values and their counts before interpreting the difference.
+This answers a question about counting choices, not the writer's ability.
+
+The original text is retrieved by document ID. The excluded-span positions
+belong to each **processed** text; do not transfer them between conditions or
+use them as original-text coordinates after Unicode normalization or case
+conversion. For exact source contexts, use the
+[complete-annotation search route](concordance-and-dispersion.html#prepare-complete-annotations).
+The following saved record keeps the texts, both tokenizations and exclusions,
+so the same inspection can be repeated from `restored$texts`,
+`restored$prepared` and `restored$diagnostics` in a later session.
 
 ### Japanese: all body words or content words {#compare-japanese-pos-from-files}
 
@@ -239,7 +289,7 @@ ja_table <- do.call(rbind, lapply(names(ja_runs), function(condition) {
   out
 }))
 rownames(ja_table) <- NULL
-knitr::kable(subset(ja_table, metric_id == "ttr", c(document_id, condition,
+print(subset(ja_table, metric_id == "ttr", c(document_id, condition,
   eligible_body_N, N, unknown_selection_N, known_excluded_N, value, reportable_value)),
   digits = 3, row.names = FALSE)
 ```
@@ -263,7 +313,7 @@ this prevents an incomplete content-word sample from appearing fully observed.
 tokens; the imported source retains that distinction.
 
 ```{r report-japanese-availability}
-knitr::kable(as.data.frame(with(ja_table, table(condition, metric_id, status))))
+print(as.data.frame(with(ja_table, table(condition, metric_id, status))))
 ```
 
 MATTR50 is unavailable for every file. MTLD nevertheless returns values for
@@ -502,10 +552,8 @@ if (use_nj8) {
     study_table$nj8_token_coverage[rows] <- coverage$token_coverage[j]
   }
 }
-knitr::kable(head(study_table[c("document_id", "writer_id", "condition",
-  "metric_id", "N", "value", "reportable_value", "status", "mtld_tail_only")]),
-  col.names = c("Document", "Writer", "Condition", "Metric", "N", "Computed",
-    "Reportable", "Status", "Tail-only"), digits = 3)
+print(head(study_table[c("document_id", "writer_id", "condition",
+  "metric_id", "N", "value", "reportable_value", "status", "mtld_tail_only")]), digits = 3)
 ```
 
 The default NJ8 lookup normalizes case separately from tokenization, so two
@@ -570,12 +618,9 @@ summarize_study_documents <- function(rows, keys) {
 study_group_keys <- c("condition", "task", "metric_id", "method_id",
   "window_length", "mtld_threshold")
 study_summary <- summarize_study_documents(study_table, study_group_keys)
-knitr::kable(study_summary[c("condition", "task", "metric_id", "n_documents",
-  "n_writers_known", "n_reported", "n_unavailable", "n_withheld", "n_selection_incomplete")],
-  col.names = c("Condition", "Task", "Metric", "Docs", "Known writers", "Reported",
-    "Unavailable", "Withheld", "Incomplete"))
-knitr::kable(study_summary[c("condition", "task", "metric_id", "n_reported", "mean", "sd", "median")],
-  col.names = c("Condition", "Task", "Metric", "Reported", "Mean", "SD", "Median"), digits = 3)
+print(study_summary[c("condition", "task", "metric_id", "n_documents",
+  "n_writers_known", "n_reported", "n_unavailable", "n_withheld", "n_selection_incomplete")])
+print(study_summary[c("condition", "task", "metric_id", "n_reported", "mean", "sd", "median")], digits = 3)
 ```
 
 Each English condition/metric keeps 31 documents and ten fictional writer IDs;
@@ -720,7 +765,7 @@ diversity <- lexdiv_metrics_text_batch(
   prepared, metrics = c("ttr", "mattr"), window_length = 10
 )
 metrics <- diversity$results
-knitr::kable(metrics[, c("document_id", "metric_id", "N", "V", "value", "status")])
+print(metrics[, c("document_id", "metric_id", "N", "V", "value", "status")])
 ```
 
 The first text repeats `the`, `a`, and `book`; the second repeats `a`.
@@ -743,7 +788,7 @@ with poor matching.
 
 ```{r}
 levels <- nj8_profile_batch(prepared, unit = "surface")
-knitr::kable(levels$coverage[, c(
+print(levels$coverage[, c(
   "document_id", "eligible_tokens", "matched_tokens", "token_coverage", "type_coverage"
 )])
 levels$lookup[!levels$lookup$matched, c("document_id", "term")]
@@ -786,7 +831,7 @@ en_wide <- lexdiv_widen(en_runs$lower,
 inspect <- c("document_id", "mtld__value", "mtld__status",
   "mtld__forward_complete_factors", "mtld__reverse_complete_factors",
   "mtld__tail_only", "mtld__gap_pct")
-knitr::kable(en_wide[c(1, 2, nrow(en_wide)), inspect], digits = 2,
+print(en_wide[c(1, 2, nrow(en_wide)), inspect], digits = 2,
   row.names = FALSE)
 ```
 
@@ -832,10 +877,10 @@ coverage <- levels$coverage[match(analysis$document_id, levels$coverage$document
 stopifnot(identical(analysis$document_id, coverage$document_id))
 analysis$nj8_surface_token_coverage <- coverage$token_coverage
 analysis$nj8_surface_type_coverage <- coverage$type_coverage
-knitr::kable(analysis[, c(
+print(analysis[, c(
   "document_id", "ttr__value", "mattr__value",
   "nj8_surface_token_coverage", "nj8_surface_type_coverage"
-)], col.names = c("Document", "TTR", "MATTR", "NJ8 token coverage", "NJ8 type coverage"),
+)],
 digits = 3)
 plot(metrics, metric_id = "mattr")
 ```
