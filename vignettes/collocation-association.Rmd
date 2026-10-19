@@ -9,7 +9,6 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 has_quanteda <- requireNamespace("quanteda", quietly = TRUE) &&
   utils::packageVersion("quanteda") >= "4.5.0"
 ```
@@ -30,12 +29,14 @@ they are not learner data or an assessment of annotation accuracy.
 ## Start with a complete, source-linked search
 
 ```{r collocation-demo, eval=has_quanteda}
+library(ldfreq)
+
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "collocation-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
 helper <- demo$helper
 search <- demo$search
-knitr::kable(demo$annotations$segments, row.names = FALSE)
+print(demo$annotations$segments, row.names = FALSE)
 ```
 
 The imported tokens retain original positions and character offsets. The
@@ -68,8 +69,8 @@ is performed. Specify and preserve any normalization in the annotations.
 
 ```{r adjacent, eval=has_quanteda}
 adjacent <- helper$collocation_profile(search, "a") # L0/R1
-knitr::kable(adjacent$results, digits = 4, row.names = FALSE)
-knitr::kable(adjacent$documents, row.names = FALSE)
+print(adjacent$results, digits = 4, row.names = FALSE)
+print(adjacent$documents, row.names = FALSE)
 ```
 
 There are **8 eligible adjacent pairs**, of which **3** start at the node `a`.
@@ -115,8 +116,8 @@ not a known zero.
 
 ```{r span, eval=has_quanteda}
 span <- helper$collocation_profile(search, "a", span = c(left = 2L, right = 2L))
-knitr::kable(span$results, digits = 4, row.names = FALSE)
-knitr::kable(span$documents[c("document_id", "candidate_slot_pairs",
+print(span$results, digits = 4, row.names = FALSE)
+print(span$documents[c("document_id", "candidate_slot_pairs",
   "eligible_pairs", "excluded_pairs", "node_occurrences", "nodes_with_context", "node_pairs")],
   row.names = FALSE)
 ```
@@ -164,7 +165,7 @@ sample. This is not a full memory bound or a streaming large-corpus engine.
 selected <- helper$collocation_profile(search, "a", min_count = 2L)
 shown <- subset(selected$results, meets_min_count)
 shown <- shown[order(-shown$MI, -shown$observed), ]
-knitr::kable(shown, digits = 4, row.names = FALSE)
+print(shown, digits = 4, row.names = FALSE)
 ```
 
 `min_count` is a positive whole number. It sets a flag; it never removes pairs,
@@ -181,7 +182,7 @@ inspection <- data.frame(document_id = pairs$document_id,
   context_position = pairs$context_position, distance = pairs$distance,
   pre = kwic$pre, node = kwic$keyword, post = kwic$post,
   context = span$search$source$tokens$surface[pairs$context_row])
-knitr::kable(inspection, row.names = FALSE)
+print(inspection, row.names = FALSE)
 ```
 
 Each matching pair links to a saved node occurrence ID, original token rows and

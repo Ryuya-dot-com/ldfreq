@@ -9,7 +9,6 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 ```
 
 Does a longer T-unit reflect more words, fewer counted structures, or a parser
@@ -29,12 +28,14 @@ not accuracy on learner writing or validity as a proficiency measure.
 ## Inspect an example before running a parser
 
 ```{r syntax-demo}
+library(ldfreq)
+
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "l2sca-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
 helper <- demo$helper
 analysis <- demo$analysis
-knitr::kable(analysis$components[c("document_id", "W", "S", "C", "T", "DC", "status")],
+print(analysis$components[c("document_id", "W", "S", "C", "T", "DC", "status")],
   row.names = FALSE)
 ```
 
@@ -65,11 +66,11 @@ diversity or readability analysis with different tokenization.
 ## Follow a value back to the source
 
 ```{r syntax-ratios}
-knitr::kable(subset(analysis$results,
+print(subset(analysis$results,
   document_id %in% c("manual_coord_clauses", "manual_finite_complement", "manual_fragment_NP"),
   select = c("document_id", "measure", "numerator", "denominator",
     "original_rule_value", "value", "status")), row.names = FALSE)
-knitr::kable(subset(analysis$matches,
+print(subset(analysis$matches,
   document_id == "manual_coord_clauses" & pattern == "t",
   select = c("tree_id", "node_id", "start", "end", "source_span")), row.names = FALSE)
 ```
@@ -199,8 +200,8 @@ identity, complete coverage, raw tree/query outputs and their statuses together.
 ## Carry review decisions and missing observations into a study
 
 ```{r syntax-study}
-knitr::kable(demo$review[c("document_id", "decision", "reason")], row.names = FALSE)
-knitr::kable(subset(demo$study_long, measure == "MLT",
+print(demo$review[c("document_id", "decision", "reason")], row.names = FALSE)
+print(subset(demo$study_long, measure == "MLT",
   select = c("observation_id", "writer_id", "task", "occasion", "value",
     "status", "review_status", "report_value")), row.names = FALSE)
 ```

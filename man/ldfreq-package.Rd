@@ -56,6 +56,23 @@ For your own files, see
 For counting units and morphology, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html}{Word families, roots and affixes}.
 }
+\section{Open a guide or installed example}{
+The built source archive includes guides that can be opened locally:
+\preformatted{
+vignette("getting-started", package = "ldfreq")
+vignette("repeated-observations", package = "ldfreq")
+}
+Use \code{vignette(package = "ldfreq")} to list the installed guides.
+A GitHub source installation may omit rendered guides; use the online links
+above in that case.
+
+Study-table, concordance, collocation, keyness, readability and syntax helpers
+are installed example code, not exported functions. They do not have individual
+\code{?function} or \code{example("function")} entries. Each guide shows the
+\code{system.file()} and \code{sys.source()} calls needed to load its helpers,
+which are then called as \code{helper$function(...)}. Follow the guide's input
+requirements when replacing its authored data with your own.
+}
 \section{Choose your input}{
 Choose the entry point from the form of data you already have:
 \describe{

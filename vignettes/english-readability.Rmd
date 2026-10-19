@@ -9,7 +9,6 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 has_nsyllable <- requireNamespace("nsyllable", quietly = TRUE)
 ```
 
@@ -29,13 +28,15 @@ placement, or an L2 proficiency level. Only declared English input is supported.
 ## Start from sentences and inspect what was counted
 
 ```{r readability-demo}
+library(ldfreq)
+
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "readability-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
 helper <- demo$helper
 prepared <- demo$prepared
 analysis <- demo$analysis
-knitr::kable(prepared$segments[c("document_id", "segment_id", "text", "status")], row.names = FALSE)
+print(prepared$segments[c("document_id", "segment_id", "text", "status")], row.names = FALSE)
 ```
 
 These short, authored texts expose the arithmetic; they are not a readability
@@ -86,7 +87,7 @@ with different preprocessing.
 automatic <- helper$readability_score(prepared)
 audit <- cbind(prepared$tokens[c("document_id", "segment_id", "original_surface", "counted")],
   automatic$syllables[c("syllables", "method")])
-knitr::kable(audit, row.names = FALSE)
+print(audit, row.names = FALSE)
 ```
 
 [nsyllable](https://search.r-project.org/CRAN/refmans/nsyllable/html/nsyllable.html)
@@ -108,8 +109,8 @@ decision. The second analysis supplies four and three syllables respectively,
 with the spoken forms recorded in `review_reason`.
 
 ```{r review-syllables}
-knitr::kable(demo$initial$components, row.names = FALSE)
-knitr::kable(subset(demo$reviewed, nzchar(review_reason),
+print(demo$initial$components, row.names = FALSE)
+print(subset(demo$reviewed, nzchar(review_reason),
   select = c(token_row, syllables, method, review_reason)), row.names = FALSE)
 ```
 
@@ -152,7 +153,7 @@ That recalibration used Navy personnel and training-manual passages; its
 establish a universal grade interpretation for L2 writers or readers.
 
 ```{r formula-results}
-knitr::kable(analysis$results[c("document_id", "measure", "value", "words", "sentences",
+print(analysis$results[c("document_id", "measure", "value", "words", "sentences",
   "syllables", "below_word_threshold", "status")], digits = 3, row.names = FALSE)
 ```
 
@@ -179,7 +180,7 @@ end-to-end equivalence for arbitrary texts.
 ## Keep writer, task and occasion in the research table
 
 ```{r readability-study-table}
-knitr::kable(demo$study_long[c("observation_id", "writer_id", "task", "occasion",
+print(demo$study_long[c("observation_id", "writer_id", "task", "occasion",
   "document_id", "measure", "value", "words", "status")], digits = 3, row.names = FALSE)
 ```
 
