@@ -36,25 +36,50 @@ required for the first analysis above.
 For a first document table, expected results, missing scores, a plot and
 saving and reopening the complete record, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html}{Getting started}.
-For condition comparisons and research reporting, see
-\href{https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html}{From text to a research report}.
-For repeated observations, planned submissions and an ordinary model data frame, see
-\href{https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html}{From planned observations to a mixed model}.
-For token-pattern searches, context sorting, original-position plots and within-document DP, see
-\href{https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html}{Search words and phrases, then inspect their distribution}.
-For adjacent and left/right-span word association with source-linked counts, see
-\href{https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html}{Count nearby words and explain their association}.
-For target/reference word comparisons with explicit denominators and source links, see
-\href{https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html}{Compare word use against an explicit reference corpus}.
-For English syntactic complexity with source trees, matched nodes and review decisions, see
-\href{https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.html}{Trace English syntactic complexity from source to study table}.
-
-For English readability with sentence, word and syllable audits, see
-\href{https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html}{Calculate English readability with visible counting decisions}.
 For your own files, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files}{TXT-folder and CSV input}.
-For counting units and morphology, see
-\href{https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html}{Word families, roots and affixes}.
+}
+\section{Choose a research question}{
+Choose the route from your question, then inspect the counts and availability
+beside its values. The guides specify the input tables and any optional tools.
+\describe{
+  \item{How do counting choices change the same texts?}{Start with document IDs
+  and text in \href{https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html}{From text to a research report}.
+  Compare paired metric rows, \code{N}, \code{V} and missing reasons, then return
+  to the original text, counted forms and exclusions.}
+  \item{How frequent are the words, or what matches a vocabulary list?}{Use
+  \code{\link{tubelex_profile}} or \code{\link{nj8_profile}} with prepared terms.
+  Inspect lookup rows, resource identity and token/type coverage beside summaries.
+  \href{https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.html}{Audit unmatched words and lexical units};
+  for your own norm table, follow
+  \href{https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html}{corpus reference profiles}.}
+  \item{What changes when counting families, roots or affixes?}{Use complete
+  annotations and a declared inventory in
+  \href{https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html}{Word families, roots and affixes}.
+  Read shared occurrences, unresolved words and coverage; distinguish
+  whole-document counts from counts on a resolved subset.}
+  \item{Which words, contexts or positions characterize the documents?}{Use
+  complete source-aligned annotations for
+  \href{https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html}{concordance and dispersion},
+  \href{https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html}{collocation}, or
+  \href{https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html}{keyness}.
+  Inspect original occurrences, zero-match documents and the relevant search,
+  pair-opportunity or target/reference denominators.}
+  \item{Which writer/task/occasion observations entered my analysis?}{Keep
+  planned observations, submissions and metric results separate in
+  \href{https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html}{From planned observations to a mixed model}.
+  Inspect the submission, calculation and reporting states and model-row audit;
+  select one response specification for the model table.}
+  \item{How do lexical results relate to sentence or structural descriptions?}{Use
+  the same source texts and document IDs for
+  \href{https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html}{English readability} and
+  \href{https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.html}{syntactic complexity}.
+  Retain each measure's counts, missing reasons and review decisions separately.}
+}
+A shared document ID does not imply a shared denominator. Reference-vocabulary
+profiles describe document words; keyness compares declared corpora. Corpus-level
+statistics must not be copied into writer rows as independent observations.
+Save original inputs and complete results, not only displayed tables.
 }
 \section{Open a guide or installed example}{
 The built source archive includes guides that can be opened locally:

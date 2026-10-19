@@ -9,7 +9,6 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 ```
 
 ## Begin with the question
@@ -19,8 +18,12 @@ New JACET 8000. Several frequent words fail to match. Before interpreting this
 as advanced vocabulary, check which lexical units were compared with the list.
 NJ8 contains representative headwords; surface forms and dictionary lemmas can
 produce different coverage. These authored sentences make that choice visible.
+Run the examples in order after the [documented installation](../index.html#installation).
+The authored annotation examples need no optional package or external model.
 
 ```{r}
+library(ldfreq)
+
 texts <- c(a = "Students have jobs.", b = "Students enjoy jobs.", blank = "")
 prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
 surface <- nj8_profile_batch(prepared, unit = "surface")
