@@ -163,6 +163,14 @@ for (index in seq_along(all_paths)) {
   lines <- readLines(all_paths[[index]], warn = FALSE, encoding = "UTF-8")
   for (pattern in scan_patterns) {
     hits <- grep(pattern, lines, perl = TRUE)
+    # These exact public API descriptions are not internal workflow records.
+    if (identical(pattern, "OpenAI")) {
+      approved <- switch(relative_paths[[index]],
+        "README.md" = "and an optional OpenAI recipe. Paid requests require your own API key and an",
+        "NEWS.md" = "- Added an optional OpenAI Responses recipe using httr2. Paid requests require",
+        character())
+      hits <- hits[!lines[hits] %in% approved]
+    }
     if (length(hits)) {
       scan_findings[[length(scan_findings) + 1L]] <- list(
         path = relative_paths[[index]],
@@ -172,7 +180,10 @@ for (index in seq_along(all_paths)) {
     }
   }
 }
-check(length(scan_findings) == 0L, "Internal workflow or local-environment wording was found in the archive.")
+if (length(scan_findings)) {
+  write_json(scan_findings, file.path(output_root, "public-scope-findings.json"))
+  stop("Internal workflow or local-environment wording was found in the archive; see public-scope-findings.json.", call. = FALSE)
+}
 
 package_files <- lapply(seq_along(all_paths), function(index) {
   info <- file.info(all_paths[[index]])

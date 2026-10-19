@@ -8,13 +8,52 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: r-cmd-check-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  validation-scope:
+    name: Verify source identity and reusable checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      reuse: ${{ steps.reuse.outputs.reuse }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - id: reuse
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 experiments/release-candidate/verify-reuse.py ci
+      - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        if: steps.reuse.outputs.reuse == 'true'
+        with:
+          r-version: "release"
+      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        if: steps.reuse.outputs.reuse == 'true'
+        with:
+          packages: |
+            any::digest
+            any::jsonlite
+            any::stringi
+      - name: Recheck changed release controls
+        if: steps.reuse.outputs.reuse == 'true'
+        run: |
+          Rscript --vanilla development/audit-public-api.R .
+          Rscript --vanilla experiments/release-candidate/validate-note-policy.R
+          Rscript --vanilla experiments/release-candidate/validate-public-scan.R
+          python3 experiments/release-candidate/validate-reuse.py
+          Rscript --vanilla experiments/package-resource-inventory/check-resource-inventory.R .
+
   check:
+    needs: validation-scope
+    if: needs.validation-scope.outputs.reuse != 'true'
     name: ${{ matrix.config.os }} / R ${{ matrix.config.r }}
     runs-on: ${{ matrix.config.os }}
     timeout-minutes: 30
@@ -139,6 +178,8 @@ jobs:
   # A cold R-devel library took 21 minutes before checking started. Keep
   # that completed preparation in the standard cache, in its own time budget.
   prepare-r-devel:
+    needs: validation-scope
+    if: needs.validation-scope.outputs.reuse != 'true'
     name: ubuntu-latest / prepare R devel dependencies
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -165,7 +206,8 @@ jobs:
 
   check-r-devel:
     name: ubuntu-latest / R devel
-    needs: prepare-r-devel
+    needs: [validation-scope, prepare-r-devel]
+    if: needs.validation-scope.outputs.reuse != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -196,6 +238,8 @@ jobs:
           artifact-name: Linux-R-devel-results
 
   c-locale:
+    needs: validation-scope
+    if: needs.validation-scope.outputs.reuse != 'true'
     name: ubuntu-latest / C locale
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -224,6 +268,8 @@ jobs:
           Rscript --vanilla -e 'stopifnot(Sys.getlocale("LC_CTYPE") == "C"); library(ldfreq); stopifnot(tubelex_profile(c("the", "cat"))$status == "ok"); testthat::test_dir("tests/testthat", package = "ldfreq", stop_on_failure = TRUE)'
 
   tubelex-build-audit:
+    needs: validation-scope
+    if: needs.validation-scope.outputs.reuse != 'true'
     name: ${{ matrix.os }} / TUBELEX builder
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
@@ -293,6 +339,8 @@ jobs:
           if (!identical(status, 0L)) quit(status = status)
 
   pdf-manual:
+    env:
+      R_TEXI2DVICMD: emulation
     name: PDF reference manual
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -311,34 +359,27 @@ jobs:
       - uses: r-lib/actions/setup-tinytex@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
 
       - name: Build and verify the PDF reference manual
-        shell: Rscript {0}
-        run: |
-          manual <- file.path(Sys.getenv("RUNNER_TEMP"), "ldfreq-manual.pdf")
-          status <- system2(
-            file.path(R.home("bin"), "R"),
-            c(
-              "CMD", "Rd2pdf", "--no-preview",
-              paste0("--output=", shQuote(manual)),
-              shQuote(normalizePath(".", mustWork = TRUE))
-            )
-          )
-          if (!identical(status, 0L)) quit(status = status)
-          information <- file.info(manual)
-          stopifnot(
-            isTRUE(utils::file_test("-f", manual)),
-            is.finite(information$size[[1L]]),
-            information$size[[1L]] > 0
-          )
+        shell: bash
+        run: Rscript --vanilla experiments/release-candidate/build-manual.R . "${RUNNER_TEMP}/ldfreq-manual.pdf"
 
   required:
     name: R-CMD-check required
     if: ${{ always() }}
-    needs: [check, check-r-devel, c-locale, tubelex-build-audit, pdf-manual]
+    needs: [validation-scope, check, check-r-devel, c-locale, tubelex-build-audit, pdf-manual]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions: {}
     steps:
+      - name: Require verified scope and current manual
+        env:
+          SCOPE: ${{ needs.validation-scope.result }}
+          MANUAL: ${{ needs.pdf-manual.result }}
+        run: test "$SCOPE" = success && test "$MANUAL" = success
+      - name: Record reused numeric checks
+        if: needs.validation-scope.outputs.reuse == 'true'
+        run: echo "Numeric CI is reused only after source, workflow and completed-run identity checks. Release controls and PDF manual were checked in this run."
       - name: Require every matrix check to pass
+        if: needs.validation-scope.outputs.reuse != 'true'
         env:
           CHECK_RESULT: ${{ needs.check.result }}
           DEVEL_RESULT: ${{ needs.check-r-devel.result }}

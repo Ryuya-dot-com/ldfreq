@@ -20,6 +20,22 @@ recheck can use workflow dispatch. The build signs the source, manual and
 machine-readable evidence with GitHub build-provenance attestations and retains
 the Sigstore bundle beside the archive, including when a later check fails.
 
+A completed archive can be retained after an evidence or manual failure. The
+optional `Source-Archive-*` fields in `state.dcf` bind its original Actions run,
+commit and SHA-256. `verify-reuse.py` rejects package-source changes and records
+the excluded changes in `source-reuse.json`, which is signed with the assets.
+`Validation-Run` reuses ordinary numerical CI only when that exact source run
+completed successfully and the numerical job definitions and inputs are
+unchanged. Changed release controls and the PDF manual run again; the five
+checks on the exact archive remain required. Remove the reuse fields when
+changing package content or starting a new candidate.
+
+`build-manual.R` uses R's documented `texi2dvi` emulation, retains TeX diagnostics,
+and requires a nonempty function index. A PDF returned by the no-index fallback
+is rejected. The public-content scanner permits only the two exact existing
+API descriptions in README/NEWS; unknown workflow text and local paths fail
+with a file/line diagnostic.
+
 The classifier accepts only `development` and `release-candidate`; a mismatched
 record scope, package, version, or any other status fails the workflow rather
 than falling back to a non-candidate result.
