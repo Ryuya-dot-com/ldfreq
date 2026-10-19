@@ -9,7 +9,6 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 # Optional local model; never acquired or run merely by installing ldfreq.
 model_file <- Sys.getenv("LDFREQ_UDPIPE_MODEL")
 run_udpipe <- nzchar(model_file) && requireNamespace("udpipe", quietly = TRUE)
@@ -72,6 +71,8 @@ to exercise original Japanese source positions and the same declared feature;
 this does not establish comparable feature coverage across languages.
 
 ```{r}
+library(ldfreq)
+
 env <- new.env(parent = baseenv())
 sys.source(system.file("examples", "amod-pairs.R", package = "ldfreq",
   mustWork = TRUE), env)
@@ -212,6 +213,13 @@ To execute the following optional chunks, set `LDFREQ_UDPIPE_MODEL` to the local
 model file before rendering this guide, or run the code with `model_file` set
 to that path. These chunks are not run in ordinary package builds. The helper
 is an explicitly sourced recipe, not an exported API.
+
+If you set the environment variable, retrieve its value in your R session:
+
+```{r udpipe-path, eval=FALSE}
+model_file <- Sys.getenv("LDFREQ_UDPIPE_MODEL")
+stopifnot(nzchar(model_file), file.exists(model_file))
+```
 
 ```{r udpipe-source, eval=run_udpipe}
 source(system.file("examples", "udpipe-amod.R", package = "ldfreq", mustWork = TRUE), local = TRUE)

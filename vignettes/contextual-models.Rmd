@@ -9,7 +9,6 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 has_quanteda <- requireNamespace("quanteda", quietly = TRUE) &&
   packageVersion("quanteda") >= "4.5.0" && isTRUE(l10n_info()[["UTF-8"]])
 ```
@@ -37,6 +36,8 @@ not model predictions, corpus observations or psycholinguistic norms. Japanese
 related-sense manipulation. Use real annotations for a real study.
 
 ```{r prepare, eval=has_quanteda}
+library(ldfreq)
+
 words <- list(c("The", "bank", "lent", "money", "."),
               c("The", "river", "bank", "flooded", "."),
               c("その", "店", "は", "人気", "が", "ある", "。"),

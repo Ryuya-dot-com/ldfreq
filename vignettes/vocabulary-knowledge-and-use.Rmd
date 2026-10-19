@@ -9,7 +9,6 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 ```
 
 This guide develops one learner-focused application. The package also supports
@@ -65,6 +64,8 @@ a term outside this fixed reference corpus. Keep item and sense identities even
 when the lookup form is identical.
 
 ```{r}
+library(ldfreq)
+
 items <- data.frame(
   item_id = c("i1", "i2", "i3", "i4"),
   target_form = c("bank", "bank", "accurate", "ldfreq"),
