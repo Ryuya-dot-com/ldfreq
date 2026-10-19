@@ -1,3 +1,14 @@
+# ldfreq 0.3.0.9018
+
+- Add explicitly sourced CA and classical MDS examples for source-aligned
+  document-term counts. Preserve selected occurrences, complete-profile exclusions,
+  feature thresholds and original texts. Optional `ca` supplies correspondence
+  analysis with contributions and cos²; Jaccard and Hellinger MDS retain distances,
+  negative eigenvalues and reconstruction diagnostics without automatic correction.
+  The guide connects separate document/term maps and document pairs to source
+  evidence and full-record replay. These are descriptive analyses, not proficiency
+  scales or group-effect tests. Exported functions and core calculations are unchanged.
+
 # ldfreq 0.3.0.9017
 
 - Show package setup in specialist guides so their displayed examples can

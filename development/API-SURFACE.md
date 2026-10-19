@@ -17,6 +17,14 @@ rendered by pkgdown.
 
 ## Decisions
 
+- The 0.3.0.9018 lexical-ordination example uses complete source annotations
+  and an explicit document roster to prepare counts for optional `ca::ca()`
+  and Jaccard/Hellinger `stats::cmdscale()`. Example records retain source rows,
+  whole-document missingness exclusions, feature selection, geometry diagnostics
+  and separate document/term maps. This adds `ca` to Suggests but no export,
+  class, S3 registration or change to core numerical/schema contracts. MCA,
+  nonmetric MDS, automatic corrections and inferential tests are not included.
+
 These decisions describe the released interface. The
 [2026-10-14 consolidation review](#2026-10-14-api-consolidation-review)
 reassesses shared entry points. The continuation adopts only the

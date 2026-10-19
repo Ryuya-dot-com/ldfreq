@@ -16,7 +16,7 @@ and checks that reshaped tables and plots do not mix incompatible specifications
 
 ## Installation
 
-The published snapshot is 0.3.0.9017, a development prerelease that has not
+The published snapshot is 0.3.0.9018, a development prerelease that has not
 been released on CRAN. It includes English readability and traced syntactic-complexity examples.
 The fixed tag below identifies the tested code and installed examples.
 It requires R 4.1.0 or later. Install the tested snapshot used by this
@@ -24,28 +24,29 @@ documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9017")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9018")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
 share the same version number. The package's required dependencies are `digest`
 and `stringi`; additional tools are optional for their documented
-workflows. For example, candidate-review examples use `quanteda`.
+workflows. For example, candidate-review examples use `quanteda`, and correspondence
+analysis examples use the optional `ca` package.
 
 For the built source archive with rendered guides, download
-[`ldfreq_0.3.0.9017.tar.gz`](https://github.com/Ryuya-dot-com/ldfreq/releases/download/v0.3.0.9017/ldfreq_0.3.0.9017.tar.gz)
-from the [fixed release](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.3.0.9017).
+[`ldfreq_0.3.0.9018.tar.gz`](https://github.com/Ryuya-dot-com/ldfreq/releases/download/v0.3.0.9018/ldfreq_0.3.0.9018.tar.gz)
+from the [fixed release](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.3.0.9018).
 The release also provides `SHA256SUMS` for checking the download. Install from
 the directory where you saved the archive, or use its full path:
 
 ```r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9017.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9018.tar.gz", repos = NULL, type = "source")
 ```
 
 If an older ldfreq version is loaded, restart R after installation. Check
 `packageVersion("ldfreq")` before running these examples; it should report
-`0.3.0.9017` for this snapshot.
+`0.3.0.9018` for this snapshot.
 
 The built archive includes rendered guides. A GitHub source installation may
 omit them; the online guides remain available. Run `vignette(package = "ldfreq")`
@@ -109,6 +110,7 @@ and original input when saving; a display table alone cannot recover them.
 | What changes when I count families, roots or affixes? | Complete annotations and a declared inventory; [word families and affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html) | Occurrences shared between conditions, unresolved words and coverage; keep whole-document counts separate from resolved-subset counts. |
 | Which words, contexts or positions characterize the documents? | Complete source-aligned annotations; [concordance and dispersion](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html), [collocation](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html), or [keyness](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html) | Original occurrences and zero-match documents; pair opportunities for association, or declared target/reference totals for keyness. |
 | Which writer/task/occasion observations entered my analysis? | Planned observations, submitted-document mapping and metric results; [repeated observations](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html) | Submission, calculation and reporting states; the row-selection audit and one specified response in the model table. |
+| Which documents have similar lexical composition? | Source-aligned annotations and explicit document IDs; [CA and classical MDS](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html) (0.3.0.9018 or later). | Complete profiles and selected features, CA contributions/cos², or the chosen distance, negative eigenvalues and reconstruction; return to original occurrences. |
 | How do lexical results relate to sentence or structural descriptions? | The same source texts and document IDs, with sentence/syllable counts or traced parser output; [English readability](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html) and [syntactic complexity](https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.html) | Each measure's numerator, denominator, unavailable values and review decisions before joining document rows. |
 
 A document ID connects records; it does not make their counting units identical.
