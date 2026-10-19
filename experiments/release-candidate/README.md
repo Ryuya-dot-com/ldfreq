@@ -61,7 +61,10 @@ BOM, SBOM, and resource-BOM identity named by provenance. It deliberately leaves
 the final maintainer go/no-go decision pending after recording resource
 admission.
 
-For the R 4.1 diagnostic, CI pins the compatible `Matrix@1.6-5` and `MASS@7.3-60`; Matrix is needed by
+For the R 4.1 diagnostic, CI pins compatible `Matrix@1.6-5`, `MASS@7.3-60`
+and `readxl@1.4.5`. The current readxl requires R >= 4.2; its 1.4.5 release
+declares R >= 3.6 and retains the workbook reader on the minimum supported R.
+Matrix is needed by
 quanteda (>= 1.5-0 Matrix). Current Matrix releases require newer R; the archived
 1.6-5 DESCRIPTION declares R >= 3.5.0. Current-R jobs use their normal dependency
 resolution. This is a CI compatibility pin, not a package runtime dependency.

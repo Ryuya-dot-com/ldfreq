@@ -65,6 +65,11 @@ beside its values. The guides specify the input tables and any optional tools.
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html}{keyness}.
   Inspect original occurrences, zero-match documents and the relevant search,
   pair-opportunity or target/reference denominators.}
+  \item{Which documents have similar lexical composition?}{Use complete source
+  annotations for \href{https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html}{CA and classical MDS}.
+  Inspect document and feature selection, CA contributions and squared cosines, or the
+  chosen dissimilarity, negative eigenvalues and distance reconstruction. Return
+  to the original occurrences; a configuration does not test group differences.}
   \item{Which writer/task/occasion observations entered my analysis?}{Keep
   planned observations, submissions and metric results separate in
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html}{From planned observations to a mixed model}.
@@ -91,7 +96,7 @@ Use \code{vignette(package = "ldfreq")} to list the installed guides.
 A GitHub source installation may omit rendered guides; use the online links
 above in that case.
 
-Study-table, concordance, collocation, keyness, readability and syntax helpers
+Study-table, concordance, collocation, keyness, ordination, readability and syntax helpers
 are installed example code, not exported functions. They do not have individual
 \code{?function} or \code{example("function")} entries. Each guide shows the
 \code{system.file()} and \code{sys.source()} calls needed to load its helpers,
