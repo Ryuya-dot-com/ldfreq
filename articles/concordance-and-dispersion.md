@@ -63,6 +63,12 @@ corpora](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.md)
 for the existing corpus adapters. No analyzer or dictionary is
 downloaded by this guide.
 
+To explain a lexical-diversity result, follow the [condition-comparison
+example](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#counted-source-occurrences).
+It uses the same complete annotations and selection masks for counted
+words and concordance searches, then retains them in the saved study
+record.
+
 For a short English text without supplied annotations, the following
 explicit quanteda tokenization recipe can prepare complete surfaces. The
 alignment check will reject text that this tokenizer changes or leaves

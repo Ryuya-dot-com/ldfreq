@@ -12,7 +12,8 @@ Choose the task you need:
 - [Compare English case choices](#compare-english-case-from-files) or
   [Japanese word selections](#compare-japanese-pos-from-files): run the
   shared setup below, then the relevant language path and the saving
-  section.
+  section. The Japanese path also [connects the same counted occurrences
+  to search](#counted-source-occurrences).
 - [Describe frequency or vocabulary
   levels](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html#corpus-relative-frequency-with-coverage):
   inspect resource matches and token/type coverage with each summary.
@@ -236,7 +237,7 @@ print(subset(en_table, document_id == inspected_id & metric_id == "ttr",
 cat(en_texts[[inspected_id]], "\n")
 #> The class visited a library near the station. Students chose books about places they hoped to visit and read a few pages in silence. One student found a map inside an old travel guide. Another compared two descriptions of the same city. The teacher asked everyone to explain one surprising detail to a partner. They then returned to the shelves to find evidence for their explanations. Before leaving, the group wrote questions that a later reading session could explore.
 #> I explained the experience in a short message to a friend. Choosing specific examples made the account clearer and helped me remember details that I had almost forgotten.
-#>
+#> 
 counted_forms <- lapply(en_prepared, function(batch) {
   words <- batch[[inspected_id]]$tokens$surface
   data.frame(form = sort(unique(words)),
@@ -257,7 +258,7 @@ lapply(counted_forms, head, 12)
 #> 10    books           1
 #> 11 Choosing           1
 #> 12    chose           1
-#>
+#> 
 #> $lower
 #>        form occurrences
 #> 1         a           7
@@ -276,11 +277,11 @@ excluded <- lapply(en_prepared, function(batch)
   batch[[inspected_id]]$provenance$excluded_spans)
 excluded
 #> $preserve
-#> [1] start   end     surface reason
+#> [1] start   end     surface reason 
 #> <0 rows> (or 0-length row.names)
-#>
+#> 
 #> $lower
-#> [1] start   end     surface reason
+#> [1] start   end     surface reason 
 #> <0 rows> (or 0-length row.names)
 ```
 
@@ -459,6 +460,136 @@ occurrences rather than claiming equal coverage. For longer Japanese
 texts, see the executed [word-unit
 comparisons](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#what-the-executed-comparisons-show).
 
+### Follow the same selected occurrences into a search
+
+The Japanese path already has complete source annotations. Use those
+same annotations to explain the comparison; do not tokenize a second
+copy of the text and assume that its positions match. This example asks
+why the all-body and content-word results differ. It keeps every
+original occurrence, including titles, full stops and unknown POS, under
+both selection policies:
+
+``` r
+ja_source_audit <- do.call(rbind, lapply(names(ja_selections), function(condition) {
+  out <- ja_tokens[c("document_id", "segment_id", "token_index", "start", "end",
+    "surface", "POS1")]
+  out$condition <- rep(condition, nrow(out))
+  out$selection <- ifelse(!ja_body, "outside_body_or_full_stop",
+    ifelse(ja_selections[[condition]], "included",
+      ifelse(ja_unknown, "unknown_POS", "excluded_POS")))
+  out
+}))
+rownames(ja_source_audit) <- NULL
+stopifnot(!anyDuplicated(ja_source_audit[c("document_id", "segment_id",
+  "token_index", "condition")]))
+for (condition in names(ja_inputs)) for (id in ja_ids) {
+  selected <- ja_source_audit[ja_source_audit$document_id == id &
+    ja_source_audit$condition == condition & ja_source_audit$selection == "included", ]
+  stopifnot(identical(selected$surface, ja_inputs[[condition]][[id]]))
+}
+print(subset(ja_source_audit, document_id == "variants",
+  c(condition, token_index, surface, selection)), row.names = FALSE)
+#>  condition token_index surface                 selection
+#>   all_body           1  リンゴ outside_body_or_full_stop
+#>   all_body           2  りんご                  included
+#>   all_body           3      と                  included
+#>   all_body           4  リンゴ                  included
+#>   all_body           5      と                  included
+#>   all_body           6    林檎                  included
+#>   all_body           7      。 outside_body_or_full_stop
+#>    content           1  リンゴ outside_body_or_full_stop
+#>    content           2  りんご                  included
+#>    content           3      と              excluded_POS
+#>    content           4  リンゴ                  included
+#>    content           5      と              excluded_POS
+#>    content           6    林檎                  included
+#>    content           7      。 outside_body_or_full_stop
+```
+
+For a fixed imported source, `document_id`, `segment_id` and
+`token_index` identify the same occurrence across conditions. The
+`start`/`end` fields refer to the original segment. Preserve that source
+alongside the table: IDs alone do not identify the text after
+reannotation. Empty documents have no occurrence rows, but remain in
+`ja_import$documents` and `ja_table`. Unknown POS is an unknown
+selection only when that condition requires POS. No occurrence review or
+reference-list lookup is performed here; do not invent approval or
+coverage from these selection labels.
+
+The next block is optional and requires **quanteda \>= 4.5.0**. It
+searches the same imported source with each saved selection. The
+`particle` query explains the two excluded instances of `と` in
+`variants`; `unknown` locates the unclassified `ぷにょ語`. A zero hit
+under the content policy does not mean the word is absent from the
+original text. Each document remains in the count table, including the
+empty document.
+
+``` r
+ja_searches <- NULL
+if (requireNamespace("quanteda", quietly = TRUE) &&
+    utils::packageVersion("quanteda") >= "4.5.0") {
+  search_helper <- new.env(parent = globalenv())
+  sys.source(system.file("examples", "concordance.R", package = "ldfreq",
+    mustWork = TRUE), search_helper)
+  ja_queries <- list(particle = "\u3068", unknown = "\u3077\u306b\u3087\u8a9e")
+  ja_searches <- lapply(ja_selections, function(keep)
+    search_helper$concordance_search(ja_import, ja_queries, keep = keep, window = 2L))
+  for (condition in names(ja_searches)) {
+    searched <- ja_searches[[condition]]
+    results <- subset(ja_table, metric_id == "ttr")
+    results <- results[results$condition == condition, ]
+    j <- match(searched$documents$document_id, results$document_id)
+    stopifnot(!anyNA(j), identical(searched$source, ja_import),
+      all(searched$documents$kept_tokens == results$N[j]))
+  }
+  print(ja_searches$all_body$occurrences[c("query_id", "document_id",
+    "segment_id", "from", "to", "pre", "keyword", "post")], row.names = FALSE)
+  lapply(ja_searches, function(x) x$counts)
+}
+#>  query_id document_id segment_id from to            pre  keyword     post
+#>  particle    variants         s1    3  3 リンゴ\nりんご       と リンゴと
+#>  particle    variants         s1    5  5       とリンゴ       と   林檎。
+#>   unknown    unlisted         s1    1  1                ぷにょ語       。
+#> $all_body
+#>    document_id query_id occurrences
+#> 1     variants particle           2
+#> 2   homophones particle           0
+#> 3     unlisted particle           0
+#> 4   no_targets particle           0
+#> 5        empty particle           0
+#> 6     variants  unknown           0
+#> 7   homophones  unknown           0
+#> 8     unlisted  unknown           1
+#> 9   no_targets  unknown           0
+#> 10       empty  unknown           0
+#> 
+#> $content
+#>    document_id query_id occurrences
+#> 1     variants particle           0
+#> 2   homophones particle           0
+#> 3     unlisted particle           0
+#> 4   no_targets particle           0
+#> 5        empty particle           0
+#> 6     variants  unknown           0
+#> 7   homophones  unknown           0
+#> 8     unlisted  unknown           0
+#> 9   no_targets  unknown           0
+#> 10       empty  unknown           0
+```
+
+If quanteda is unavailable, the occurrence audit and study table still
+work; install the stated dependency to run the searches. `kept_tokens`
+agrees with the diversity denominator here because both use the same
+surface selection. Query hits count only matching occurrences, not all
+counted words or study observations. In other routes, missing lemmas can
+reduce `searchable_tokens` without reducing the lexical denominator.
+Phrases cannot bridge excluded slots. Search `occurrence_id` values
+belong to a particular search condition; compare conditions by the
+unchanged source and original positions, not by those IDs. The [search
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.md)
+explains context sorting and other queries. Both the audit and optional
+searches are saved below.
+
 ### Save a complete record and a flat table
 
 Run the appropriate record assignment after its language path. It stores
@@ -483,6 +614,7 @@ en_record <- list(texts = en_texts, sources = en_sources, prepared = en_prepared
 ja_record <- list(texts = ja_texts, sources = ja_sources, annotation_source = ja_csv,
   imported = ja_import, body_start = ja_body_start, pos_groups = ja_groups,
   selections = ja_selections, unknown_selection = ja_unknown,
+  source_audit = ja_source_audit, searches = ja_searches,
   inputs = ja_inputs, results = ja_runs, diagnostics = ja_table,
   settings = settings, session = sessionInfo(),
   methods = paste(length(ja_texts), "Japanese input files were analyzed with prepared",
@@ -527,8 +659,8 @@ replayed <- lapply(restored$inputs, function(tokens)
 stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 #> 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.
-#>
-#> Calculations used ldfreq 0.3.0.9015: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
+#> 
+#> Calculations used ldfreq 0.3.0.9016: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
 ```
 
 The CSV is a flat inspection table; **the RDS is the complete analysis
@@ -870,6 +1002,63 @@ readers should keep IDs as character strings and reserve `<MISSING>` for
 missing values. The methods text above describes this table step;
 combine it with your actual sampling and calculation methods. This
 executable example has not been tested for usability with novice users.
+
+### Return from a study row to its counted occurrences
+
+After running the **Japanese** metadata alternative and the shared study
+steps, use the saved record below. It needs no recalculation or search
+package. Select one metric and document, retaining both conditions; the
+metadata and reporting decision stay beside each value. Then select its
+source occurrences by the same document ID. Replace `"variants"` with
+another saved ID to inspect, for example, the unknown selection in
+`"unlisted"`.
+
+``` r
+saved <- readRDS(file.path(study_output, "study.rds"))
+stopifnot(!is.null(saved$source_audit))
+id <- "variants"
+result_rows <- subset(saved$study$table, document_id == id & metric_id == "ttr")
+print(result_rows[c("document_id", "writer_id", "task", "condition",
+  "N", "V", "value", "reportable_value", "unknown_selection_N")], row.names = FALSE)
+source_rows <- subset(saved$source_audit, document_id == id)
+print(source_rows[c("condition", "segment_id", "token_index", "surface", "selection")],
+  row.names = FALSE)
+cat(saved$texts[[id]], "\n")
+stopifnot(nrow(result_rows) == 2L)
+for (i in seq_len(nrow(result_rows))) {
+  words <- source_rows$surface[source_rows$condition == result_rows$condition[i] &
+    source_rows$selection == "included"]
+  stopifnot(length(words) == result_rows$N[i],
+    length(unique(words)) == result_rows$V[i])
+}
+```
+
+For this saved teaching example, a short report is:
+
+> We compared all body surface words with nouns and verbs in five
+> authored Japanese documents, retaining titles and punctuation in the
+> source audit. The study table contains 30 measurement rows (five
+> documents × two conditions × three metrics), representing two
+> fictional known authors and one document with unknown authorship. In
+> `variants`, all-body TTR is 4/5 = 0.80, whereas content-word TTR is
+> 3/3 = 1.00. The same three noun occurrences remain; removing two
+> instances of the particle `と` explains the change. This does not show
+> an improvement in the writing. `unlisted` has an unknown content-word
+> selection; `no_targets` and `empty` retain their distinct original
+> inputs and missing scores. These short authored texts illustrate
+> counting and reporting, not learner ability or a reliable comparison
+> of MTLD.
+
+Check these claims against `saved$study$table`, `saved$study$summary`
+and `saved$source_audit`. The record keeps calculation settings and the
+R session’s software versions; do not relabel earlier calculations with
+a newer reporting version. Replace the example’s counts, fictional
+labels and sampling description with those of your study. For repeated
+observations, use the separate [planned-observation and model-row
+audit](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html#select-one-response-and-explain-the-denominator):
+select one condition and response, and join inclusion decisions by
+`observation_id`. Neither these 30 measurement rows nor search hits are
+a participant count.
 
 ### Apply the same report steps to real learner writing
 
@@ -1422,10 +1611,10 @@ unlink(path)
 levels$provenance[c("resource_version", "resource_bundled", "resource_citation")]
 #> $resource_version
 #> [1] "jacet2016-8000-v1"
-#>
+#> 
 #> $resource_bundled
 #> [1] TRUE
-#>
+#> 
 #> $resource_citation
 #> [1] "JACET Basic Word Revision Committee (Ed.). (2016). The New JACET List of 8000 Basic Words. Tokyo: Kirihara Shoten."
 ```
