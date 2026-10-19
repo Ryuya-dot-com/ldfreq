@@ -32,8 +32,9 @@ changing package content or starting a new candidate.
 
 `build-manual.R` uses R's documented `texi2dvi` emulation, retains TeX diagnostics,
 and requires a nonempty function index. A PDF returned by the no-index fallback
-is rejected. The public-content scanner permits only the two exact existing
-API descriptions in README/NEWS; unknown workflow text and local paths fail
+is rejected. The public-content scanner permits only the exact existing
+API descriptions in README, NEWS and the contextual-model guide (source and
+installed copy); unknown workflow text and local paths fail
 with a file/line diagnostic.
 
 The classifier accepts only `development` and `release-candidate`; a mismatched

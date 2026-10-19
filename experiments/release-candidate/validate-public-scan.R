@@ -27,5 +27,14 @@ local({
   }
   writeLines(approved[[2L]], all_paths[[1L]])
   stopifnot(length(scan()) > 0L)
+  all_paths <- file.path(directory, "guide.Rmd")
+  guide <- readLines("vignettes/contextual-models.Rmd", warn = FALSE)
+  writeLines(guide[grepl("OpenAI", guide, fixed = TRUE)], all_paths)
+  for (path in c("vignettes/contextual-models.Rmd", "inst/doc/contextual-models.Rmd")) {
+    relative_paths <- path
+    stopifnot(length(scan()) == 0L)
+  }
+  relative_paths <- "vignettes/other.Rmd"
+  stopifnot(length(scan()) > 0L)
   cat("Public-scope scan permits only exact, file-specific API descriptions.\n")
 })

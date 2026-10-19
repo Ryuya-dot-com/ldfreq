@@ -168,6 +168,11 @@ for (index in seq_along(all_paths)) {
       approved <- switch(relative_paths[[index]],
         "README.md" = "and an optional OpenAI recipe. Paid requests require your own API key and an",
         "NEWS.md" = "- Added an optional OpenAI Responses recipe using httr2. Paid requests require",
+        "inst/doc/contextual-models.Rmd" =,
+        "vignettes/contextual-models.Rmd" = c(
+          "## Optionally obtain proposals through your OpenAI account",
+          "**This step sends the chosen texts and candidate labels to OpenAI and incurs",
+          "[OpenAI data controls](https://developers.openai.com/api/docs/guides/your-data))."),
         character())
       hits <- hits[!lines[hits] %in% approved]
     }
