@@ -60,7 +60,7 @@ jobs:
             any::rcmdcheck
             textstem=?ignore-before-r=4.4.0
             gibasa=?ignore-before-r=4.2.0
-            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5 MASS@7.3-60' || '' }}
+            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5 MASS@7.3-60 readxl@1.4.5' || '' }}
           # Keep all ldfreq check dependencies; old Matrix Enhances are not used.
           dependencies: 'if (getRversion() < "4.2.0") c("Depends", "Imports", "LinkingTo", "Suggests") else "all"'
           needs: check
