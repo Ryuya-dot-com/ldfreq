@@ -319,7 +319,7 @@ spdx_packages[[length(spdx_packages) + 1L]] <- list(
   licenseConcluded = "NOASSERTION",
   licenseDeclared = "NOASSERTION",
   comment = paste(
-    "Build-source runner R version; DESCRIPTION requirement:",
+    "Release-evidence runner R version; DESCRIPTION requirement:",
     r_requirement[[1L]]
   )
 )
@@ -373,7 +373,7 @@ dependency_sbom <- list(
     commit, "/", archive_record$sha256
   ),
   comment = paste(
-    "Dependency inventory from the release-R build-source runner.",
+    "Dependency inventory from the release-R evidence runner, not a source-build lockfile.",
     "The five check environments remain separately recorded in their raw logs",
     "and check-result records; this document does not claim a cross-platform lockfile."
   ),
