@@ -2,8 +2,8 @@ name: Release candidate
 
 on:
   pull_request:
-  push:
-    branches: [main]
+  # Check the exact PR-head artifact once; merged main must have the same tree.
+  # Dispatch is available for an explicitly needed environment recheck.
   workflow_dispatch:
 
 permissions:
@@ -65,6 +65,10 @@ jobs:
     if: ${{ needs.candidate-state.outputs.is_candidate == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     env:
       CANDIDATE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -198,7 +202,23 @@ jobs:
           )
           if (!identical(status, 0L)) quit(status = status)
 
+      - name: Attest the exact source, manual and evidence
+        id: provenance
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
+        with:
+          subject-path: |
+            ${{ runner.temp }}/release-candidate-source/ldfreq_*.tar.gz
+            ${{ runner.temp }}/release-candidate-source/ldfreq_*.pdf
+            ${{ runner.temp }}/release-candidate-source/evidence/*.json
+
+      - name: Preserve the signed attestation bundle
+        shell: bash
+        env:
+          BUNDLE_PATH: ${{ steps.provenance.outputs.bundle-path }}
+        run: cp "$BUNDLE_PATH" "${RUNNER_TEMP}/release-candidate-source/attestation.sigstore.json"
+
       - name: Upload exact source and evidence
+        if: ${{ always() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: release-candidate-source
@@ -206,6 +226,7 @@ jobs:
             ${{ runner.temp }}/release-candidate-source/ldfreq_*.tar.gz
             ${{ runner.temp }}/release-candidate-source/ldfreq_*.pdf
             ${{ runner.temp }}/release-candidate-source/evidence/*.json
+            ${{ runner.temp }}/release-candidate-source/attestation.sigstore.json
           if-no-files-found: error
           retention-days: 30
 
@@ -254,7 +275,7 @@ jobs:
             any::jsonlite
             textstem=?ignore-before-r=4.4.0
             gibasa=?ignore-before-r=4.2.0
-            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5 MASS@7.3-60' || '' }}
+            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5 MASS@7.3-60 readxl@1.4.5' || '' }}
           # Keep all ldfreq check dependencies; old Matrix Enhances are not used.
           dependencies: 'if (getRversion() < "4.2.0") c("Depends", "Imports", "LinkingTo", "Suggests") else "all"'
           needs: check
@@ -275,7 +296,7 @@ jobs:
           note_policy <- if (identical("${{ matrix.config.r }}", "4.1")) {
             "minimum-r-optional-backends"
           } else {
-            "new-submission-only"
+            "release-resource-notes"
           }
           status <- system2(
             file.path(R.home("bin"), "Rscript"),

@@ -26,6 +26,7 @@ note_policy <- if (length(arguments) == 4L) {
 if (!nzchar(job_label)) stop("job-label must not be empty.", call. = FALSE)
 allowed_note_policies <- c(
   "new-submission-only",
+  "release-resource-notes",
   "minimum-r-optional-backends"
 )
 if (!note_policy %in% allowed_note_policies) {

@@ -3,11 +3,11 @@
 This checklist defines the minimum evidence for an `ldfreq` release candidate.
 It does not imply that the candidate version is approved for publication.
 
-Scope reviewed 2026-10-14: this is the conditional **formal-candidate** workflow,
-not a task list for the already published 0.3.0.9005 development snapshot.
-Current priorities are in [ROADMAP.md](ROADMAP.md); CRAN submission is outside
-that scope. A public repository or successful development CI does not by itself
-authorize changing `state.dcf` to `release-candidate`.
+This is the **formal-candidate** workflow, used for stable distributions such
+as 0.4.0. The [release scope](../vignettes/release-scope.Rmd) defines the adopted
+compatibility boundary. Historical development snapshots remain development
+evidence; public availability alone does not promote them to stable. The
+`--as-cran` check is not a CRAN submission.
 Each item asks for evidence: first match source/artifact identity, environment,
 configuration and completed stages to existing records. Repeat only work whose
 evidence is invalidated or incomplete; use full checks when the change warrants
@@ -21,7 +21,7 @@ signature/attestation, or publication steps below.
 
 ## 1. Identify the candidate
 
-- [ ] Start from a fresh clone with no modified, staged, or untracked files.
+- [ ] Start from a clean checkout with no modified, staged, or untracked files.
 - [ ] Record the repository URL, candidate commit SHA, candidate tree SHA, and
       intended version.
 - [ ] Verify every URL in package metadata and public documentation without
@@ -124,13 +124,24 @@ it as internal-only evidence.
       or record its technical justification and maintainer disposition.
 - [ ] If CRAN incoming reports the exact single NOTE `New submission`, retain it
       in every raw log and record its explicit disposition.
+- [ ] The same incoming block may additionally contain exactly `Non-FOSS
+      package license (file LICENSE)`. Preserve the declared non-FOSS,
+      use-restricting component terms and explain that line; do not describe
+      the whole distribution as MIT or grant additional resource rights.
+- [ ] For the fixed resource-and-guide distribution, retain and explain the
+      installed-size NOTE only within `release-resource-notes`: R/doc/extdata
+      directories, required doc/extdata entries, total <= 15 MiB against the
+      10.9 MiB 9019 baseline. Require exact file/resource inventories separately.
+      A different payload area or larger total needs investigation, not a
+      threshold increase to pass the check.
 - [ ] In the labeled R 4.1 minimum-version diagnostic only, retain and explain
       the exact additional dependency NOTE caused by deliberately unavailable
       optional packages `gibasa` and `textstem` with
       `_R_CHECK_FORCE_SUGGESTS_=false`, matching
       `experiments/release-candidate/check-note-policy.R`. Require
       all other jobs to install their suggested packages, and block every other
-      NOTE rather than generalizing either disposition.
+      NOTE rather than generalizing these dispositions. Reclassify raw logs in
+      the run index and compare them to the saved results.
 - [ ] Distinguish an external service, setup or runner failure from a completed
       package check. Preserve valid completed stages and resume the failed or
       uncompleted stage with matching inputs; do not waive a missing result or
