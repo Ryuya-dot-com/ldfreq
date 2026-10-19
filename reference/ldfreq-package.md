@@ -85,6 +85,15 @@ any optional tools.
   Inspect original occurrences, zero-match documents and the relevant
   search, pair-opportunity or target/reference denominators.
 
+- Which documents have similar lexical composition?:
+
+  Use complete source annotations for [CA and classical
+  MDS](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html).
+  Inspect document and feature selection, CA contributions and squared
+  cosines, or the chosen dissimilarity, negative eigenvalues and
+  distance reconstruction. Return to the original occurrences; a
+  configuration does not test group differences.
+
 - Which writer/task/occasion observations entered my analysis?:
 
   Keep planned observations, submissions and metric results separate in
@@ -119,10 +128,11 @@ Use `vignette(package = "ldfreq")` to list the installed guides. A
 GitHub source installation may omit rendered guides; use the online
 links above in that case.
 
-Study-table, concordance, collocation, keyness, readability and syntax
-helpers are installed example code, not exported functions. They do not
-have individual `?function` or `example("function")` entries. Each guide
-shows the [`system.file()`](https://rdrr.io/r/base/system.file.html) and
+Study-table, concordance, collocation, keyness, ordination, readability
+and syntax helpers are installed example code, not exported functions.
+They do not have individual `?function` or `example("function")`
+entries. Each guide shows the
+[`system.file()`](https://rdrr.io/r/base/system.file.html) and
 [`sys.source()`](https://rdrr.io/r/base/sys.source.html) calls needed to
 load its helpers, which are then called as `helper$function(...)`.
 Follow the guide's input requirements when replacing its authored data

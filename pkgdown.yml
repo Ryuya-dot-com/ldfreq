@@ -22,6 +22,7 @@ articles:
   japanese-polysemy: japanese-polysemy.html
   japanese-stimuli: japanese-stimuli.html
   keyness-comparison: keyness-comparison.html
+  lexical-ordination: lexical-ordination.html
   ngram-profiles: ngram-profiles.html
   open-access-papers: open-access-papers.html
   preprocessing-and-frequency: preprocessing-and-frequency.html
@@ -30,7 +31,7 @@ articles:
   tubelex-input: tubelex-input.html
   vocabulary-knowledge-and-use: vocabulary-knowledge-and-use.html
   word-families-and-affixes: word-families-and-affixes.html
-last_built: 2026-10-19T04:01Z
+last_built: 2026-10-19T13:37Z
 urls:
   reference: https://ryuya-dot-com.github.io/ldfreq/reference
   article: https://ryuya-dot-com.github.io/ldfreq/articles
