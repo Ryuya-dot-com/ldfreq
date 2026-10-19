@@ -370,6 +370,11 @@ with the saved active token mask. The pair comparison above verifies the
 type-based interpretation; it does not reproduce Hellinger distance
 because that distance uses frequencies.
 
+For research, replace `path` below with a lasting private path such as
+`"ordination-record.rds"`. Relative paths start at
+[`getwd()`](https://rdrr.io/r/base/getwd.html); temporary files can
+disappear when R closes.
+
 ``` r
 record <- list(table = tab, ca = if (has_ca) ca_result else NULL,
   jaccard = jaccard, hellinger = hellinger, session = sessionInfo())
@@ -381,13 +386,26 @@ helper$ordination_validate(reopened$jaccard)
 stopifnot(identical(reopened, record))
 ```
 
-In another R session, load the package and the two helper files as shown
-above, read the saved RDS, validate its records and call
-`helper$ordination_occurrences(reopened$table, "learn")` or
-`helper$ordination_plot(reopened$hellinger)`. The saved table contains
-source texts; keep it under the same access restrictions as those texts.
-A CSV of coordinates is useful for display but does not replace this
-record.
+In another R session, use the same package snapshot and your saved path:
+
+``` r
+library(ldfreq)
+helper <- new.env(parent = globalenv())
+for (script in c("concordance.R", "lexical-ordination.R"))
+  sys.source(system.file("examples", script, package = "ldfreq", mustWork = TRUE), helper)
+reopened <- readRDS("ordination-record.rds")
+helper$ordination_validate(reopened$table)
+helper$ordination_validate(reopened$hellinger)
+helper$ordination_occurrences(reopened$table, "learn") # Choose a term in your saved table.
+helper$ordination_plot(reopened$hellinger)
+```
+
+This inspects saved counts and coordinates without fitting CA or MDS
+again. Keep the recorded calculation session unchanged; a new
+[`sessionInfo()`](https://rdrr.io/r/utils/sessionInfo.html) describes
+the current reporting session. The saved table contains source texts;
+keep it under the same access restrictions as those texts. A CSV of
+coordinates is useful for display but does not replace this record.
 
 A report should state the observational unit and included IDs,
 token/lemma and selection policy, excluded-document counts and reasons,

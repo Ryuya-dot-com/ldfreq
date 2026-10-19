@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9018</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9019</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -458,6 +458,10 @@ policies silently.</p>
 <div class="section level2">
 <h2 id="save-and-reopen-the-complete-analysis">Save and reopen the complete analysis<a class="anchor" aria-label="anchor" href="#save-and-reopen-the-complete-analysis"></a>
 </h2>
+<p>For research, replace <code>saved</code> below with a lasting private
+path such as <code>"concordance-record.rds"</code>. Paths are relative
+to <code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code> unless absolute; temporary files can disappear
+when R closes. Keep the original session record.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>search <span class="op">=</span> <span class="va">search</span>, sorted <span class="op">=</span> <span class="va">right_sorted</span>, dispersion <span class="op">=</span> <span class="va">dispersion</span>,</span>
 <span>  sort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>side <span class="op">=</span> <span class="st">"right"</span>, depth <span class="op">=</span> <span class="fl">2L</span>, ignore_case <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
@@ -469,16 +473,27 @@ policies silently.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">helper</span><span class="op">$</span><span class="fu">concordance_sort</span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">search</span>, <span class="st">"right"</span>, <span class="fl">2L</span><span class="op">)</span>, <span class="va">restored</span><span class="op">$</span><span class="va">sorted</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">helper</span><span class="op">$</span><span class="fu">concordance_dispersion</span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">search</span>, <span class="st">"word"</span>, <span class="fl">3L</span><span class="op">)</span>, <span class="va">restored</span><span class="op">$</span><span class="va">dispersion</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">dispersion</span><span class="op">$</span><span class="va">occurrence_ids</span>,</span>
-<span>    <span class="va">restored</span><span class="op">$</span><span class="va">search</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">occurrence_id</span><span class="op">[</span><span class="va">restored</span><span class="op">$</span><span class="va">search</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">query_id</span> <span class="op">==</span> <span class="st">"word"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">saved</span><span class="op">)</span></span></code></pre></div>
-<p>In a fresh R session, source <code>examples/concordance.R</code> and
-read the RDS before calling these helpers. The saved search includes
-complete source annotations, queries, selection masks, versions, counts
-and occurrence IDs. Integrity checks reject edited saved results; rerun
-the search from newly imported source when changing an input. These
-hashes check accidental changes, not authorship. A flattened CSV cannot
-retain the source object, settings and context-vector columns; use it
-only as a display or exchange table beside the complete RDS.</p>
+<span>    <span class="va">restored</span><span class="op">$</span><span class="va">search</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">occurrence_id</span><span class="op">[</span><span class="va">restored</span><span class="op">$</span><span class="va">search</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">query_id</span> <span class="op">==</span> <span class="st">"word"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>In a fresh R session, use the same package snapshot and your saved
+path:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"concordance.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
+<span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">helper</span><span class="op">)</span></span>
+<span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"concordance-record.rds"</span><span class="op">)</span></span>
+<span><span class="va">sorted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">helper</span><span class="op">$</span><span class="va">concordance_sort</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">restored</span><span class="op">$</span><span class="va">search</span><span class="op">)</span>, <span class="va">restored</span><span class="op">$</span><span class="va">sort</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">sorted</span>, <span class="va">restored</span><span class="op">$</span><span class="va">sorted</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">sorted</span></span></code></pre></div>
+<p>This sorts the saved matches without a new search. The saved search
+includes complete source annotations, queries, selection masks,
+versions, counts and occurrence IDs. Integrity checks reject edited
+saved results; rerun the search from newly imported source when changing
+an input. These hashes check accidental changes, not authorship. A
+flattened CSV cannot retain the source object, settings and
+context-vector columns; use it only as a display or exchange table
+beside the complete RDS.</p>
 <p>To connect documents to writers, tasks and occasions, join their
 retained <code>document_id</code> to your explicit metadata map; see <a href="repeated-observations.html">the repeated-observation guide</a>.
 KWIC rows and overlapping matches are not independent participants. This

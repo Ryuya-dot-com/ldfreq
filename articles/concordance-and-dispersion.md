@@ -367,6 +367,12 @@ DP; do not compare different query or partition policies silently.
 
 ## Save and reopen the complete analysis
 
+For research, replace `saved` below with a lasting private path such as
+`"concordance-record.rds"`. Paths are relative to
+[`getwd()`](https://rdrr.io/r/base/getwd.html) unless absolute;
+temporary files can disappear when R closes. Keep the original session
+record.
+
 ``` r
 record <- list(search = search, sorted = right_sorted, dispersion = dispersion,
   sort = list(side = "right", depth = 2L, ignore_case = FALSE),
@@ -379,17 +385,30 @@ stopifnot(identical(restored, record),
   identical(helper$concordance_dispersion(restored$search, "word", 3L), restored$dispersion),
   identical(restored$dispersion$occurrence_ids,
     restored$search$occurrences$occurrence_id[restored$search$occurrences$query_id == "word"]))
-unlink(saved)
 ```
 
-In a fresh R session, source `examples/concordance.R` and read the RDS
-before calling these helpers. The saved search includes complete source
-annotations, queries, selection masks, versions, counts and occurrence
-IDs. Integrity checks reject edited saved results; rerun the search from
-newly imported source when changing an input. These hashes check
-accidental changes, not authorship. A flattened CSV cannot retain the
-source object, settings and context-vector columns; use it only as a
-display or exchange table beside the complete RDS.
+In a fresh R session, use the same package snapshot and your saved path:
+
+``` r
+library(ldfreq)
+helper <- new.env(parent = globalenv())
+sys.source(system.file("examples", "concordance.R", package = "ldfreq",
+  mustWork = TRUE), helper)
+restored <- readRDS("concordance-record.rds")
+sorted <- do.call(helper$concordance_sort,
+  c(list(x = restored$search), restored$sort))
+stopifnot(identical(sorted, restored$sorted))
+sorted
+```
+
+This sorts the saved matches without a new search. The saved search
+includes complete source annotations, queries, selection masks,
+versions, counts and occurrence IDs. Integrity checks reject edited
+saved results; rerun the search from newly imported source when changing
+an input. These hashes check accidental changes, not authorship. A
+flattened CSV cannot retain the source object, settings and
+context-vector columns; use it only as a display or exchange table
+beside the complete RDS.
 
 To connect documents to writers, tasks and occasions, join their
 retained `document_id` to your explicit metadata map; see [the

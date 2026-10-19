@@ -273,6 +273,11 @@ narrower KWIC window.
 
 ## Save the complete record and replay it
 
+For research, replace `file` below with a lasting private path such as
+`"collocation-record.rds"`. Relative paths start at
+[`getwd()`](https://rdrr.io/r/base/getwd.html); temporary files can
+disappear when R closes.
+
 ``` r
 record <- list(adjacent = adjacent, span = span, session = sessionInfo())
 file <- tempfile(fileext = ".rds") # use a durable project path for your analysis
@@ -282,7 +287,22 @@ helper$collocation_validate(reopened$span)
 replayed <- helper$collocation_profile(reopened$span$search, "a",
   span = reopened$span$settings$span)
 stopifnot(identical(replayed, reopened$span))
-unlink(file)
+```
+
+In a fresh R session, use the same package snapshot and your saved path.
+The helpers below validate and inspect the stored analysis without a new
+search:
+
+``` r
+library(ldfreq)
+helper <- new.env(parent = globalenv())
+for (script in c("concordance.R", "collocation.R"))
+  sys.source(system.file("examples", script, package = "ldfreq", mustWork = TRUE), helper)
+reopened <- readRDS("collocation-record.rds")
+helper$collocation_validate(reopened$adjacent)
+helper$collocation_validate(reopened$span)
+reopened$span$results
+reopened$span$search$source$segments
 ```
 
 Retain the full object, source annotations, helper/package versions and

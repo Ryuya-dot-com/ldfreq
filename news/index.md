@@ -1,5 +1,15 @@
 # Changelog
 
+## ldfreq 0.3.0.9019
+
+- Clarify persistent saving and add standalone fresh-session reopening
+  code for concordance, collocation, keyness, readability, syntax, and
+  ordination records. Saving examples no longer delete a user-selected
+  persistent file. Reopening preserves original inputs, counts,
+  decisions, and calculation-session information without requiring a new
+  parser or model run. Calculations, exported functions, dependencies,
+  and installed example helpers are unchanged.
+
 ## ldfreq 0.3.0.9018
 
 - Add explicitly sourced CA and classical MDS examples for

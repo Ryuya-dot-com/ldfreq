@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9018</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9019</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -155,47 +155,7 @@ lexical-diversity analysis with different preprocessing.</p>
 <code class="sourceCode R"><span><span class="va">automatic</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">readability_score</span><span class="op">(</span><span class="va">prepared</span><span class="op">)</span></span>
 <span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">prepared</span><span class="op">$</span><span class="va">tokens</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"original_surface"</span>, <span class="st">"counted"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  <span class="va">automatic</span><span class="op">$</span><span class="va">syllables</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"syllables"</span>, <span class="st">"method"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">audit</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  document_id segment_id original_surface counted syllables</span></span>
-<span><span class="co">#&gt;           d1         s1              The    TRUE         1</span></span>
-<span><span class="co">#&gt;           d1         s1              cat    TRUE         1</span></span>
-<span><span class="co">#&gt;           d1         s1              sat    TRUE         1</span></span>
-<span><span class="co">#&gt;           d1         s2              The    TRUE         1</span></span>
-<span><span class="co">#&gt;           d1         s2              dog    TRUE         1</span></span>
-<span><span class="co">#&gt;           d1         s2              ran    TRUE         1</span></span>
-<span><span class="co">#&gt;           d1    heading                A   FALSE         1</span></span>
-<span><span class="co">#&gt;           d1    heading          heading   FALSE         2</span></span>
-<span><span class="co">#&gt;           d1    heading               to   FALSE         1</span></span>
-<span><span class="co">#&gt;           d1    heading          exclude   FALSE         2</span></span>
-<span><span class="co">#&gt;           d2         s1                A    TRUE         1</span></span>
-<span><span class="co">#&gt;           d2         s1           little    TRUE         2</span></span>
-<span><span class="co">#&gt;           d2         s1           rabbit    TRUE         2</span></span>
-<span><span class="co">#&gt;           d2         s1             runs    TRUE         1</span></span>
-<span><span class="co">#&gt;           d3         s1               In    TRUE         1</span></span>
-<span><span class="co">#&gt;           d3         s1             1918    TRUE        NA</span></span>
-<span><span class="co">#&gt;           d3         s1           R.F.D.    TRUE        NA</span></span>
-<span><span class="co">#&gt;           d3         s1             grew    TRUE         1</span></span>
-<span><span class="co">#&gt;           d5         s1             Bird    TRUE         1</span></span>
-<span><span class="co">#&gt;                  method</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;  pronunciation_required</span></span>
-<span><span class="co">#&gt;  pronunciation_required</span></span>
-<span><span class="co">#&gt;              dictionary</span></span>
-<span><span class="co">#&gt;              dictionary</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">audit</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><a href="https://search.r-project.org/CRAN/refmans/nsyllable/html/nsyllable.html" class="external-link">nsyllable</a>
 uses a pronunciation dictionary and a vowel-group fallback for unknown
 words. The helper distinguishes dictionary matches, fallback estimates
@@ -394,6 +354,9 @@ there.</p>
 <div class="section level2">
 <h2 id="save-enough-to-return-to-the-text">Save enough to return to the text<a class="anchor" aria-label="anchor" href="#save-enough-to-return-to-the-text"></a>
 </h2>
+<p>Choose a lasting private path for the RDS and CSV; relative paths
+start at <code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code>. The following uses the current
+directory.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">record</span>, <span class="st">"readability-record.rds"</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">study_long</span>, <span class="st">"readability-study-long.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>, na <span class="op">=</span> <span class="st">"NA"</span><span class="op">)</span></span>
@@ -402,6 +365,19 @@ there.</p>
 <span><span class="va">saved</span><span class="op">$</span><span class="va">analysis</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">segments</span></span>
 <span><span class="va">saved</span><span class="op">$</span><span class="va">analysis</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">tokens</span></span>
 <span><span class="va">saved</span><span class="op">$</span><span class="va">analysis</span><span class="op">$</span><span class="va">syllables</span></span></code></pre></div>
+<p>In a fresh R session, use the same package snapshot and your saved
+path. No automatic syllable counter is needed to inspect the retained
+counts:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"readability.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
+<span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">helper</span><span class="op">)</span></span>
+<span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"readability-record.rds"</span><span class="op">)</span></span>
+<span><span class="va">helper</span><span class="op">$</span><span class="fu">readability_validate</span><span class="op">(</span><span class="va">saved</span><span class="op">$</span><span class="va">analysis</span><span class="op">)</span></span>
+<span><span class="va">saved</span><span class="op">$</span><span class="va">analysis</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">segments</span></span>
+<span><span class="va">saved</span><span class="op">$</span><span class="va">analysis</span><span class="op">$</span><span class="va">syllables</span></span>
+<span><span class="va">saved</span><span class="op">$</span><span class="va">study_long</span></span></code></pre></div>
 <p>The full record retains both analyses, original segments,
 tokenization audits, source offsets, counts, decisions, formulas and
 session information. The hash check detects changed saved fields; it is

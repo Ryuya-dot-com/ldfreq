@@ -320,6 +320,11 @@ to design an analysis with appropriate replication and random effects.
 
 ## Save and replay the full record
 
+For research, replace `saved` below with a lasting private path such as
+`"syntax-record.rds"`. Relative paths start at
+[`getwd()`](https://rdrr.io/r/base/getwd.html); temporary files can
+disappear when R closes.
+
 ``` r
 saved <- tempfile(fileext = ".rds")
 saveRDS(demo$record, saved, version = 2)
@@ -328,7 +333,21 @@ helper$l2sca_validate(restored$analysis)
 replayed <- helper$l2sca_import(restored$analysis$trace, restored$analysis$documents,
   max_nodes = restored$analysis$settings$max_nodes)
 stopifnot(identical(replayed, restored$analysis))
-unlink(saved)
+```
+
+In a fresh R session, use the same package snapshot and your saved path.
+Inspecting the saved trace does not require Java or a parser model:
+
+``` r
+library(ldfreq)
+helper <- new.env(parent = globalenv())
+sys.source(system.file("examples", "l2sca.R", package = "ldfreq",
+  mustWork = TRUE), helper)
+restored <- readRDS("syntax-record.rds")
+helper$l2sca_validate(restored$analysis)
+restored$analysis$components
+restored$analysis$documents
+restored$study_long
 ```
 
 Save the trace, original roster, separate review decisions, study

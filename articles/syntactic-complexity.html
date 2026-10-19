@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9018</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9019</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -451,6 +451,9 @@ design an analysis with appropriate replication and random effects.</p>
 <div class="section level2">
 <h2 id="save-and-replay-the-full-record">Save and replay the full record<a class="anchor" aria-label="anchor" href="#save-and-replay-the-full-record"></a>
 </h2>
+<p>For research, replace <code>saved</code> below with a lasting private
+path such as <code>"syntax-record.rds"</code>. Relative paths start at
+<code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code>; temporary files can disappear when R closes.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">demo</span><span class="op">$</span><span class="va">record</span>, <span class="va">saved</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
@@ -458,8 +461,20 @@ design an analysis with appropriate replication and random effects.</p>
 <span><span class="va">helper</span><span class="op">$</span><span class="fu">l2sca_validate</span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">analysis</span><span class="op">)</span></span>
 <span><span class="va">replayed</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">l2sca_import</span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">analysis</span><span class="op">$</span><span class="va">trace</span>, <span class="va">restored</span><span class="op">$</span><span class="va">analysis</span><span class="op">$</span><span class="va">documents</span>,</span>
 <span>  max_nodes <span class="op">=</span> <span class="va">restored</span><span class="op">$</span><span class="va">analysis</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">max_nodes</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">replayed</span>, <span class="va">restored</span><span class="op">$</span><span class="va">analysis</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">saved</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">replayed</span>, <span class="va">restored</span><span class="op">$</span><span class="va">analysis</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>In a fresh R session, use the same package snapshot and your saved
+path. Inspecting the saved trace does not require Java or a parser
+model:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"l2sca.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
+<span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">helper</span><span class="op">)</span></span>
+<span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"syntax-record.rds"</span><span class="op">)</span></span>
+<span><span class="va">helper</span><span class="op">$</span><span class="fu">l2sca_validate</span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">analysis</span><span class="op">)</span></span>
+<span><span class="va">restored</span><span class="op">$</span><span class="va">analysis</span><span class="op">$</span><span class="va">components</span></span>
+<span><span class="va">restored</span><span class="op">$</span><span class="va">analysis</span><span class="op">$</span><span class="va">documents</span></span>
+<span><span class="va">restored</span><span class="op">$</span><span class="va">study_long</span></span></code></pre></div>
 <p>Save the trace, original roster, separate review decisions, study
 mapping and complete RDS together. Flat tables alone omit trees and
 settings. <code>l2sca_validate()</code> checks the imported record’s

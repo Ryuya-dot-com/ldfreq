@@ -42,10 +42,10 @@ print(demo$annotations$segments[c("document_id", "text")], row.names = FALSE)
 #>  document_id                           text
 #>           t1 learn learn learn learn read .
 #>           t2      learn learn write unknown
-#>      t_empty
+#>      t_empty                               
 #>           r1           learn read read read
 #>           r2          learn read read speak
-#>      r_empty
+#>      r_empty                               
 #>      outside              unlisted unlisted
 ```
 
@@ -247,6 +247,11 @@ memory use or a streaming large-corpus implementation.
 
 ## Save the reasons, source and complete result
 
+For research, replace `file` below with a lasting private path such as
+`"keyness-record.rds"`. Relative paths start at
+[`getwd()`](https://rdrr.io/r/base/getwd.html); temporary files can
+disappear when R closes.
+
 ``` r
 record <- list(comparison = comparison,
   target_reason = "Authored target documents for checking the calculation",
@@ -261,8 +266,23 @@ replayed <- helper$keyness_compare(reopened$comparison$source,
   target = s$target, reference = s$reference, preprocessing_id = s$preprocessing_id,
   term_col = s$term_col, keep = s$keep, min_count = s$min_count, max_tokens = s$max_tokens)
 stopifnot(identical(replayed, reopened$comparison))
-unlink(file)
 ```
+
+In a fresh R session, use the same package snapshot and your saved path:
+
+``` r
+library(ldfreq)
+helper <- new.env(parent = globalenv())
+for (script in c("concordance.R", "keyness.R"))
+  sys.source(system.file("examples", script, package = "ldfreq", mustWork = TRUE), helper)
+reopened <- readRDS("keyness-record.rds")
+helper$keyness_validate(reopened$comparison)
+reopened$comparison$results
+reopened$comparison$source$segments
+```
+
+This reads the stored comparison without recomputing scores or running
+KWIC.
 
 Record why the target and reference answer your question, including
 their collection and overlap checks. A different reference is a
