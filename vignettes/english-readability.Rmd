@@ -213,6 +213,9 @@ fit <- lme4::lmer(value ~ task + occasion + (1 | writer_id), data = model_data)
 
 ## Save enough to return to the text
 
+Choose a lasting private path for the RDS and CSV; relative paths start at
+`getwd()`. The following uses the current directory.
+
 ```{r save-readability, eval=FALSE}
 saveRDS(demo$record, "readability-record.rds", version = 2)
 write.csv(demo$study_long, "readability-study-long.csv", row.names = FALSE, na = "NA")
@@ -221,6 +224,21 @@ helper$readability_validate(saved$analysis)
 saved$analysis$source$segments
 saved$analysis$source$tokens
 saved$analysis$syllables
+```
+
+In a fresh R session, use the same package snapshot and your saved path.
+No automatic syllable counter is needed to inspect the retained counts:
+
+```{r resume-readability, eval=FALSE}
+library(ldfreq)
+helper <- new.env(parent = globalenv())
+sys.source(system.file("examples", "readability.R", package = "ldfreq",
+  mustWork = TRUE), helper)
+saved <- readRDS("readability-record.rds")
+helper$readability_validate(saved$analysis)
+saved$analysis$source$segments
+saved$analysis$syllables
+saved$study_long
 ```
 
 The full record retains both analyses, original segments, tokenization audits,

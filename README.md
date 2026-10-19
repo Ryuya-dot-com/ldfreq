@@ -16,7 +16,7 @@ and checks that reshaped tables and plots do not mix incompatible specifications
 
 ## Installation
 
-The published snapshot is 0.3.0.9018, a development prerelease that has not
+The published snapshot is 0.3.0.9019, a development prerelease that has not
 been released on CRAN. It includes English readability and traced syntactic-complexity examples.
 The fixed tag below identifies the tested code and installed examples.
 It requires R 4.1.0 or later. Install the tested snapshot used by this
@@ -24,7 +24,7 @@ documentation:
 
 ```r
 # Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9018")
+pak::pak("Ryuya-dot-com/ldfreq@v0.3.0.9019")
 ```
 
 Pinning the revision fixes the implementation, even when development snapshots
@@ -34,19 +34,19 @@ workflows. For example, candidate-review examples use `quanteda`, and correspond
 analysis examples use the optional `ca` package.
 
 For the built source archive with rendered guides, download
-[`ldfreq_0.3.0.9018.tar.gz`](https://github.com/Ryuya-dot-com/ldfreq/releases/download/v0.3.0.9018/ldfreq_0.3.0.9018.tar.gz)
-from the [fixed release](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.3.0.9018).
+[`ldfreq_0.3.0.9019.tar.gz`](https://github.com/Ryuya-dot-com/ldfreq/releases/download/v0.3.0.9019/ldfreq_0.3.0.9019.tar.gz)
+from the [fixed release](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.3.0.9019).
 The release also provides `SHA256SUMS` for checking the download. Install from
 the directory where you saved the archive, or use its full path:
 
 ```r
 # Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.3.0.9018.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_0.3.0.9019.tar.gz", repos = NULL, type = "source")
 ```
 
 If an older ldfreq version is loaded, restart R after installation. Check
 `packageVersion("ldfreq")` before running these examples; it should report
-`0.3.0.9018` for this snapshot.
+`0.3.0.9019` for this snapshot.
 
 The built archive includes rendered guides. A GitHub source installation may
 omit them; the online guides remain available. Run `vignette(package = "ldfreq")`
