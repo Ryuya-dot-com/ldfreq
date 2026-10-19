@@ -9,7 +9,6 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 ```
 
 ## Start with a question and a comparison unit
@@ -89,6 +88,8 @@ specified size. A common window makes its local denominator explicit. Global
 TTR supplies a useful contrast: it depends on the full document length.
 
 ```{r}
+library(ldfreq)
+
 vocabulary <- c("river", "stone", "tree", "cloud")
 documents <- list(
   blocked = rep(vocabulary, each = 30),

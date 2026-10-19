@@ -9,7 +9,6 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 dic_dir <- Sys.getenv("LDFREQ_UNIDIC_LITE_1_0_8", unset = "")
 run_gibasa <- nzchar(dic_dir) && requireNamespace("gibasa", quietly = TRUE)
 run_file_review <- requireNamespace("quanteda", quietly = TRUE) &&
@@ -130,6 +129,8 @@ Japanese gold standard. The original examples in this guide are covered by the
 package's MIT license; no corpus or dictionary is redistributed.
 
 ```{r authored}
+library(ldfreq)
+
 segments <- data.frame(
   document_id = c("essay", "empty"), segment_id = c("s1", "s1"),
   text = c("国際連合で国際協力を学ぶ。", "")
@@ -704,6 +705,8 @@ ja_file_output
 ldfreq does not reimplement it. Install gibasa separately with
 `install.packages("gibasa")`. Its optional installation requirements are
 separate from those of ldfreq. A UTF-8 compiled dictionary is also required.
+The formatted tables in this optional section use `knitr`; install it with
+`install.packages("knitr")` if needed.
 
 This recipe is for **unidic-lite 1.0.8, based on UniDic 2.1.2**, with the
 26-field binary schema. It is a concrete integration example, not a claim that
@@ -718,6 +721,13 @@ Keep the included dictionary license and source information with it. Set
 rendering this guide, or assign that path to `dic_dir` and run the following
 chunks interactively. The package build runs the authored examples offline;
 it does not download a dictionary.
+
+If you set the environment variable, retrieve its value in your R session:
+
+```{r gibasa-path, eval=FALSE}
+dic_dir <- Sys.getenv("LDFREQ_UNIDIC_LITE_1_0_8")
+stopifnot(nzchar(dic_dir), dir.exists(dic_dir))
+```
 
 Supply one sentence or turn per segment, with a separate roster for original
 document IDs. The following strings are new examples, not sampled corpus text.

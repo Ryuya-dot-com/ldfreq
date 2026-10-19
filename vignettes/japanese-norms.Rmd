@@ -9,7 +9,6 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 ```
 
 Suppose you are selecting Japanese words for a lexical-decision or reading
@@ -54,6 +53,8 @@ spelling to look up. Keep the displayed stimulus, reading, sense and any mapping
 decisions in additional columns if they differ from the lookup form.
 
 ```{r items}
+library(ldfreq)
+
 items <- data.frame(
   item_id = c("a1", "a2", "b1", "b2", "b3"),
   condition = c("A", "A", "B", "B", "B"),

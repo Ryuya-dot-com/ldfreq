@@ -9,7 +9,6 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 ```
 
 For a Japanese word-recognition experiment, you may want to vary BOI while
@@ -46,6 +45,10 @@ The helper returns `count / total_count * 1e6`, `videos / total_videos` and
 unlike the log scores of the bundled **English** `tubelex_profile()`.
 
 Acquire the frequency file explicitly, once:
+
+```{r load-package}
+library(ldfreq)
+```
 
 ```{r acquire-frequency, eval=FALSE}
 data_dir <- "japanese-resources"

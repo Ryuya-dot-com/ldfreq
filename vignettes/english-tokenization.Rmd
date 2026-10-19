@@ -9,7 +9,6 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 ```
 
 ## Choose what counts as a word
@@ -31,6 +30,8 @@ keeps approved, rejected and unresolved edits and compares complete original
 and revised texts without treating off-list words as errors.
 
 ```{r}
+library(ldfreq)
+
 text <- "John’s well-known book costs 3.14. See https://example.org on 2026-10-04."
 english <- lexdiv_tokenize(text, tokenizer = "english", case = "lower")
 english$tokens
@@ -83,7 +84,7 @@ prepared <- lapply(c("unicode", "english"), function(rule) {
 })
 names(prepared) <- c("unicode", "english")
 comparison <- lexdiv_metrics_text_batch(prepared, metrics = "ttr")
-knitr::kable(comparison$results[, c("document_id", "N", "V", "value")])
+print(comparison$results[, c("document_id", "N", "V", "value")], row.names = FALSE)
 lapply(prepared, function(x) x$tokens$surface)
 ```
 

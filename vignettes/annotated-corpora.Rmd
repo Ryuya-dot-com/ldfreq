@@ -9,7 +9,6 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 has_xml <- requireNamespace("xml2", quietly = TRUE)
 has_quanteda <- has_xml && requireNamespace("quanteda", quietly = TRUE)
 has_phrase_example <- requireNamespace("quanteda", quietly = TRUE) &&
@@ -32,6 +31,8 @@ the corresponding steps; no Python or AntConc installation is needed.
 ## Read an annotated document
 
 ```{r read, eval=has_xml}
+library(ldfreq)
+
 header <- system.file("extdata", "masc-example", "example.anc", package = "ldfreq")
 corpus <- lexdiv_read_masc(header, resource_version = "authored-example-1")
 corpus$tokens[c("annotation_id", "segment_id", "token_index",
@@ -315,7 +316,10 @@ learner observations, an established phrase inventory or an independent human
 reference. Six document IDs include complete English/Japanese reviews, pending
 reviews, a nonempty no-match document and an empty document.
 
-```{r phrase-review-prepare, eval=has_phrase_example, include=FALSE}
+To follow the review step by step, prepare the same inputs below, then run the
+export, decision and save chunks in order.
+
+```{r phrase-review-prepare, eval=has_phrase_example}
 ```
 
 ```{r phrase-review-context, eval=has_phrase_example, echo=FALSE}

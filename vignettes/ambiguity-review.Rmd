@@ -9,7 +9,6 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(ldfreq)
 has_quanteda <- requireNamespace("quanteda", quietly = TRUE)
 has_utf8 <- isTRUE(l10n_info()[["UTF-8"]])
 ```
@@ -43,6 +42,8 @@ complete annotations from an appropriate tokenizer or morphological analyzer
 and inspect their alignment; successful import does not validate their meaning.
 
 ```{r import}
+library(ldfreq)
+
 segments <- data.frame(document_id = c("en", "en", "empty"),
   segment_id = c("s1", "s2", "s1"),
   text = c("The bank lent money.", "The river bank flooded.", ""))
@@ -391,8 +392,7 @@ stopifnot(identical(rowSums(worksheet_report[
   identical(worksheet_report$target_occurrences, c(4L, 0L, 0L)),
   is.na(worksheet_report$reviewed_proportion[2]),
   is.na(worksheet_report$reviewed_proportion[3]))
-knitr::kable(worksheet_report, digits = 2, col.names = c("Document", "Targets",
-  "Selected", "Unresolved", "Unreviewed", "No candidates", "Reviewed / targets"))
+print(worksheet_report, digits = 2, row.names = FALSE)
 worksheet_after$summary  # The absent target also remains, with zero occurrences.
 
 worksheet_record <- list(before = worksheet_saved, input = worksheet_input,
