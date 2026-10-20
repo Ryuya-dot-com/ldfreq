@@ -97,6 +97,7 @@ articles:
       - ngram-profiles
       - annotated-corpora
       - concordance-and-dispersion
+      - textbook-progression
       - collocation-association
       - keyness-comparison
       - lexical-ordination
