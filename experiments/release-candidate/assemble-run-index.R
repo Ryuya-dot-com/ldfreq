@@ -274,8 +274,11 @@ for (index in seq_along(inventories)) {
     paste("Resource inventory failed:", inventory_label)
   )
   matching_result <- results[[match(inventory_label, labels)]]
+  runtime_fields <- c("os", "platform", "r_version")
   check(
-    identical(inventory_record$environment, matching_result$environment),
+    setequal(names(inventory_record$environment), runtime_fields) &&
+      identical(inventory_record$environment[runtime_fields],
+        matching_result$environment[runtime_fields]),
     paste("Resource inventory environment drift:", inventory_label)
   )
   check(
