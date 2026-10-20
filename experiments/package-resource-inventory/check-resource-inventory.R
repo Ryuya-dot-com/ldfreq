@@ -137,15 +137,25 @@ loops <- Filter(function(x) is.call(x) && identical(x[[1L]], as.name("for")) &&
 stopifnot(length(loops) == 1L)
 ids <- vapply(read_json(file.path(package_root, installed))$resources, `[[`, character(1L), "resource_id")
 env$expected_resource_ids <- ids; env$inventory_labels <- env$labels <- "fixture"
-env$results <- list(list(environment = list(os = "fixture")))
+runtime <- list(os = "fixture", platform = "fixture-platform", r_version = "fixture-R")
+env$results <- list(list(environment = c(runtime, list(remote_url_checks = TRUE))))
 env$provenance <- list(artifact = list(sha256 = "fixture"))
 record <- list(status = "source-platform-installed-resource-inventory-ok",
-  environment = env$results[[1L]]$environment,
+  environment = runtime,
   source_archive_origin = "provided-exact-release-candidate",
   comparison_authority = "provided-exact-source-archive",
   source_archive = env$provenance$artifact, installed_resource_count = length(ids),
   installed_resource_ids = unname(ids), undeclared_extdata_observed = FALSE)
 env$inventories <- list(record); eval(loops[[1L]], env)
+for (field in names(runtime)) {
+  for (value in list("different", NULL)) {
+    bad <- record; bad$environment[[field]] <- value
+    env$inventories <- list(bad)
+    result <- tryCatch({eval(loops[[1L]], env); NULL}, error = conditionMessage)
+    stopifnot(is.character(result), grepl("environment drift", result, fixed = TRUE))
+  }
+}
+cat("PASS: aggregation separates URL scope and rejects missing or changed runtime fields\n")
 for (mutation in c("stale-count", "different-id")) {
   bad <- record
   if (mutation == "stale-count") bad$installed_resource_count <- 1L else
