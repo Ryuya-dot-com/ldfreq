@@ -17,6 +17,13 @@ rendered by pkgdown.
 
 ## Decisions
 
+- Development 0.4.0.9003 adds explicitly sourced `textbook_progression()` and
+  `textbook_progression_plot()` examples. They consume one unchanged concordance
+  record, an ordered section roster and teaching introductions. Page/Unit
+  missingness, selected scope, known-match lower bounds and follow-up availability
+  remain explicit. No export, S3 registration, required dependency or existing
+  numerical/result contract changes.
+
 - Development 0.4.0.9002 adds an optional named `labels` argument only to the
   sourced MCA plotting helper. The label-to-ID mapping affects display and its
   returned table; original IDs, fitted objects, exports and defaults are unchanged.

@@ -54,6 +54,11 @@ development archive to use the new example.
 Development 0.4.0.9002 adds optional display labels to its plotting helper.
 This display-only choice leaves original IDs, saved analyses and geometry intact.
 
+Development 0.4.0.9003 adds an explicitly sourced textbook-progression example.
+It joins unchanged concordance records to a separate section roster and teaching
+introductions. It does not change existing saved records, core/resource
+contracts, exported functions or required dependencies.
+
 ## Method identity
 
 A `method_id` fixes the formula, scale, boundary and tail rules, operation

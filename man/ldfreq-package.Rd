@@ -65,6 +65,12 @@ beside its values. The guides specify the input tables and any optional tools.
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html}{keyness}.
   Inspect original occurrences, zero-match documents and the relevant search,
   pair-opportunity or target/reference denominators.}
+  \item{Where do target words recur in a textbook?}{Development 0.4.0.9003 adds
+  an explicitly sourced
+  \href{https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.html}{textbook progression example}.
+  Join one saved search to ordered pages, Units and selected sections.
+  Inspect counts, cumulative counts and recurrence after declared teaching
+  introductions, keeping missing material, follow-up scope and original uses.}
   \item{Which documents have similar lexical composition?}{Use complete source
   annotations for \href{https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html}{CA and classical MDS}.
   Inspect document and feature selection, CA contributions and squared cosines, or the
