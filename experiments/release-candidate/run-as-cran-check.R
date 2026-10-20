@@ -43,6 +43,12 @@ if (identical(note_policy, "minimum-r-optional-backends") &&
     call. = FALSE
   )
 }
+remote_url_checks <- !tolower(Sys.getenv(
+  "_R_CHECK_CRAN_INCOMING_SKIP_URL_CHECKS_IF_REMOTE_", "false"
+)) %in% c("true", "t", "1")
+if (!identical(remote_url_checks, job_label != "ubuntu-latest-r-4.1")) {
+  stop("Remote URL checks may be delegated only by the R 4.1 diagnostic.", call. = FALSE)
+}
 script_argument <- grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)
 if (length(script_argument) != 1L) {
   stop("Could not identify the check-runner script path.", call. = FALSE)
@@ -92,7 +98,7 @@ classification <- release_classify_notes(
 effective_status <- classification$effective_status
 
 result <- list(
-  schema_version = "1.1.0",
+  schema_version = "1.2.0",
   job_label = job_label,
   command = "R CMD check --as-cran --no-manual <exact-source-archive>",
   exit_code = as.integer(status),
@@ -106,7 +112,8 @@ result <- list(
   environment = list(
     os = unname(Sys.info()[["sysname"]]),
     platform = R.version$platform,
-    r_version = R.version.string
+    r_version = R.version.string,
+    remote_url_checks = remote_url_checks
   ),
   artifact = list(
     file = basename(source_archive),

@@ -70,9 +70,9 @@ local({
   disposition <- release_classify_notes("Status: 3 NOTEs", blocks,
     "minimum-r-optional-backends")
   labels <- "ubuntu-latest-r-4.1"
-  results <- list(c(list(schema_version = "1.1.0", job_label = labels,
+  results <- list(c(list(schema_version = "1.2.0", job_label = labels,
     environment = list(os = "Linux", platform = "x86_64-pc-linux-gnu",
-      r_version = "R version 4.1.3 (synthetic fixture)"),
+      r_version = "R version 4.1.3 (synthetic fixture)", remote_url_checks = FALSE),
     exit_code = 0L, note_policy = "minimum-r-optional-backends",
     check_status = "Status: 3 NOTEs", note_blocks = blocks,
     artifact = list(sha256 = "fixture")), disposition))
@@ -86,6 +86,10 @@ local({
   stopifnot(length(loops) == 1L)
   eval(loops[[1L]])
   original <- results
+  results[[1L]]$environment$remote_url_checks <- NULL
+  failure <- tryCatch({ eval(loops[[1L]]); NULL }, error = conditionMessage)
+  stopifnot(grepl("URL-check scope", failure, fixed = TRUE))
+  results <- original
   results[[1L]]$explained_notes[[1L]]$disposition <- "unreviewed exception"
   failure <- tryCatch({ eval(loops[[1L]]); NULL }, error = conditionMessage)
   stopifnot(grepl("disposition disagree", failure, fixed = TRUE))

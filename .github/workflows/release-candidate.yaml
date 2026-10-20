@@ -280,6 +280,9 @@ jobs:
       CANDIDATE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
       R_KEEP_PKG_SOURCE: yes
       _R_CHECK_FORCE_SUGGESTS_: ${{ matrix.config.r == '4.1' && 'false' || 'true' }}
+      # Current/devel R perform online URL/DOI checks on this same archive.
+      # R 4.1's older checker receives publisher bot-blocking responses.
+      _R_CHECK_CRAN_INCOMING_SKIP_URL_CHECKS_IF_REMOTE_: ${{ matrix.config.r == '4.1' && 'true' || 'false' }}
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

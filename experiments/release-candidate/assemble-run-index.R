@@ -128,10 +128,13 @@ release_r_version <- r_version_number(provenance$environment$r_version)
 check(!is.na(release_r_version), "The build-source R version is unrecognized.")
 for (result in results) {
   check(
-    identical(result$schema_version, "1.1.0"),
+    identical(result$schema_version, "1.2.0"),
     paste("Unrecognized check-result schema:", result$job_label)
   )
   expected_environment <- expected_environments[[result$job_label]]
+  check(identical(result$environment$remote_url_checks,
+    result$job_label != "ubuntu-latest-r-4.1"),
+    paste("Remote URL-check scope does not match its label:", result$job_label))
   check(
     identical(result$environment$os, expected_environment[[1L]]) &&
       is.character(result$environment$platform) &&
@@ -312,7 +315,7 @@ source_records <- lapply(evidence_paths[startsWith(normalizePath(evidence_paths)
 check_records <- lapply(evidence_paths[startsWith(normalizePath(evidence_paths), normalizePath(check_root))], record, root = check_root)
 
 index <- list(
-  schema_version = "1.1.0",
+  schema_version = "1.2.0",
   status = "technical-matrix-complete",
   candidate = provenance$candidate,
   artifact = provenance$artifact,

@@ -10,7 +10,7 @@ vignette: >
 `ldfreq` 0.4.0 is a fixed stable GitHub distribution for tracing lexical
 descriptions from original texts and counting conditions to research tables
 and reports. It is not a CRAN release. Install the named archive or fixed tag
-in the [installation instructions](../index.html#installation); keep that
+in the [installation instructions](https://ryuya-dot-com.github.io/ldfreq/index.html#installation); keep that
 archive, original inputs and complete saved results for later reuse.
 
 ## What is stable, experimental or an example?

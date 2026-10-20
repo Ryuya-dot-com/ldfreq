@@ -24,6 +24,12 @@ def rejects(function):
     raise AssertionError("Invalid reuse was accepted")
 
 reuse.verify_ci(state, [], workflow, workflow, run, "owner/repo")
+separate = {"Version": "0.4.0", "Validation-Commit": "a" * 40, "Validation-Run": "123"}
+reuse.verify_ci(separate, ["man/tubelex_profile.Rd", "vignettes/release-scope.Rmd"],
+                workflow, workflow, run, "owner/repo")
+for changed in ("R/tubelex-profile.R", "tests/testthat/test-tubelex-profile.R",
+                "inst/extdata/tubelex.csv", "DESCRIPTION", "NAMESPACE"):
+    rejects(lambda: reuse.verify_ci(separate, [changed], workflow, workflow, run, "owner/repo"))
 wrapped = workflow.replace("    runs-on:", "    needs: validation-scope\n    if: condition\n    runs-on:")
 reuse.verify_ci(state, [], workflow, wrapped, run, "owner/repo")
 rejects(lambda: reuse.verify_ci(state, [], workflow, workflow.replace("run: check", "run: skip"), run, "owner/repo"))

@@ -24,11 +24,13 @@ A completed archive can be retained after an evidence or manual failure. The
 optional `Source-Archive-*` fields in `state.dcf` bind its original Actions run,
 commit and SHA-256. `verify-reuse.py` rejects package-source changes and records
 the excluded changes in `source-reuse.json`, which is signed with the assets.
-`Validation-Run` reuses ordinary numerical CI only when that exact source run
-completed successfully and the numerical job definitions and inputs are
-unchanged. Changed release controls and the PDF manual run again; the five
-checks on the exact archive remain required. Remove the reuse fields when
-changing package content or starting a new candidate.
+`Validation-Run` and `Validation-Commit` separately identify completed ordinary
+numerical CI. Reuse requires unchanged numerical job definitions, runtime code,
+resources and tests. The verifier permits only named release-control and
+documentation repairs. Changed controls, API documentation and the PDF manual
+are checked afresh, and all five exact-archive checks remain required. Remove
+`Source-Archive-*` whenever package content changes: numerical-evidence reuse
+does not permit reuse of an archive containing superseded documentation.
 
 `build-manual.R` uses R's documented `texi2dvi` emulation, retains TeX diagnostics,
 and requires a nonempty function index. A PDF returned by the no-index fallback
@@ -85,6 +87,16 @@ Their current versions need R >= 4.2 and R >= 4.4,
 respectively. The workflow leaves both uninstalled in that one job,
 sets `_R_CHECK_FORCE_SUGGESTS_=false`, and verifies that the package remains
 checkable without these optional backends.
+
+R 4.1's older URL/DOI checker receives publisher bot-blocking responses on
+references successfully checked with current/devel R. Only that minimum-R
+diagnostic sets `_R_CHECK_CRAN_INCOMING_SKIP_URL_CHECKS_IF_REMOTE_=true`:
+it still performs incoming metadata, installation, examples, tests and
+vignettes checks. Current R on all three platforms and R-devel retain online
+URL/DOI checks on the same archive. Check-result schema 1.2.0 records this
+scope, and both the runner and aggregator reject an altered or missing scope.
+The earlier HTTP failures remain in the superseded candidate's raw logs;
+they are not reclassified as successful URL checks.
 
 ```sh
 Rscript experiments/release-candidate/run-as-cran-check.R \

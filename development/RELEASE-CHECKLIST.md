@@ -142,6 +142,10 @@ it as internal-only evidence.
       all other jobs to install their suggested packages, and block every other
       NOTE rather than generalizing these dispositions. Reclassify raw logs in
       the run index and compare them to the saved results.
+- [ ] Record that only the R 4.1 diagnostic delegates remote URL/DOI checking
+      to the four current/devel-R jobs on the exact same archive. Retain its
+      original publisher HTTP failures and the explicit check-result scope;
+      do not describe the minimum-R run as an online URL validation.
 - [ ] Distinguish an external service, setup or runner failure from a completed
       package check. Preserve valid completed stages and resume the failed or
       uncompleted stage with matching inputs; do not waive a missing result or

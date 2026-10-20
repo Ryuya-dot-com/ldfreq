@@ -2,7 +2,5 @@ Record-Scope: repository-release-evidence
 Package: ldfreq
 Version: 0.4.0
 Status: release-candidate
-Source-Archive-Run: 39278166940
-Source-Archive-Commit: 703084ac4bdb270f40a015089d89250ae517d8de
-Source-Archive-SHA256: 9c189dfb96ed681fc869379c92e76d3031b6a939e3c636d79753090d9ecf6106
 Validation-Run: 39278167249
+Validation-Commit: 703084ac4bdb270f40a015089d89250ae517d8de

@@ -41,11 +41,21 @@ def verify_source(state):
 def verify_ci(state, changed, old, new, run, repo):
     # Changed release controls are checked afresh; other test inputs must match.
     allowed_files = {".github/workflows/R-CMD-check.yaml",
-                     ".github/workflows/release-candidate.yaml"}
+                     ".github/workflows/release-candidate.yaml",
+                     "development/RELEASE-CHECKLIST.md", "README.md"}
     allowed_controls = {"generate-release-evidence.R", "validate-public-scan.R",
                         "state.dcf", "verify-reuse.py", "validate-reuse.py",
-                        "build-manual.R", "README.md", "RELEASE-CHECKLIST.md"}
+                        "build-manual.R", "README.md", "RELEASE-CHECKLIST.md",
+                        "run-as-cran-check.R", "assemble-run-index.R", "validate-note-policy.R"}
     allowed_files.update("experiments/release-candidate/" + name for name in allowed_controls)
+    # These documentation repairs are exercised by the fresh exact-archive
+    # matrix. Runtime code, resources, tests and numeric audit inputs still
+    # have to be byte-identical to the successful baseline.
+    allowed_files.update("man/" + name + ".Rd" for name in (
+        "lexdiv_evaluate_contextual", "lexdiv_score_contextual", "tubelex_profile"))
+    allowed_files.update("vignettes/" + name + ".Rmd" for name in (
+        "auditing-vocabulary-profiles", "getting-started", "release-scope",
+        "word-families-and-affixes", "designing-comparisons", "contextual-models"))
     if set(changed) - allowed_files:
         raise ValueError("Numeric CI inputs changed outside the rechecked release controls")
     for name in ("check", "prepare-r-devel", "check-r-devel", "c-locale", "tubelex-build-audit"):
@@ -53,7 +63,7 @@ def verify_ci(state, changed, old, new, run, repo):
             raise ValueError("Reused numeric CI definition changed: " + name)
     if not (str(run["id"]) == state["Validation-Run"]
             and run["conclusion"] == "success" and run["status"] == "completed"
-            and run["head_sha"] == state["Source-Archive-Commit"]
+            and run["head_sha"] == state.get("Validation-Commit", state.get("Source-Archive-Commit"))
             and run["path"] == ".github/workflows/R-CMD-check.yaml"
             and run["repository"]["full_name"] == repo):
         raise ValueError("Declared baseline CI did not complete successfully on this source")
@@ -62,20 +72,23 @@ def verify_ci(state, changed, old, new, run, repo):
 def main():
     state = dict(line.split(": ", 1) for line in
                  Path("experiments/release-candidate/state.dcf").read_text().splitlines())
-    reuse = "Source-Archive-Run" in state
+    ci_mode = sys.argv[1] == "ci"
+    reuse = "Validation-Run" in state if ci_mode else "Source-Archive-Run" in state
     output = os.environ.get("GITHUB_OUTPUT")
     if not reuse:
         if output:
             with open(output, "a") as stream:
                 stream.write("reuse=false\n")
         return
-    changed = verify_source(state)
-    for key in ("Source-Archive-Run", "Validation-Run"):
-        if not re.fullmatch(r"[0-9]+", state[key]):
-            raise ValueError("Invalid declared run: " + key)
-    if sys.argv[1] == "ci":
+    if ci_mode:
+        commit = state.get("Validation-Commit", state.get("Source-Archive-Commit", ""))
+        if not re.fullmatch(r"[0-9a-f]{40}", commit):
+            raise ValueError("Invalid validation commit")
+        if not re.fullmatch(r"[0-9]+", state["Validation-Run"]):
+            raise ValueError("Invalid declared validation run")
+        changed = git("diff", "--name-only", commit, "HEAD").splitlines()
         path = ".github/workflows/R-CMD-check.yaml"
-        old = git("show", state["Source-Archive-Commit"] + ":" + path)
+        old = git("show", commit + ":" + path)
         new = Path(path).read_text()
         repo = os.environ["GITHUB_REPOSITORY"]
         run = json.loads(subprocess.check_output([
@@ -83,6 +96,9 @@ def main():
         verify_ci(state, changed, old, new, run, repo)
         print(json.dumps({"reused_run": run["id"], "head": run["head_sha"], "changed": changed}))
     else:
+        changed = verify_source(state)
+        if not re.fullmatch(r"[0-9]+", state["Source-Archive-Run"]):
+            raise ValueError("Invalid declared source run")
         archive = Path(sys.argv[1])
         if archive.name != f"ldfreq_{state['Version']}.tar.gz" or hashlib.sha256(
                 archive.read_bytes()).hexdigest() != state["Source-Archive-SHA256"]:

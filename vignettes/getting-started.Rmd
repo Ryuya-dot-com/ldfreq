@@ -13,7 +13,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 
 This guide takes a small English document table through analysis, reading
 results, making a table and plot, and saving and reopening the complete record.
-The first workflow uses the [documented installation](../index.html#installation)
+The first workflow uses the [documented installation](https://ryuya-dot-com.github.io/ldfreq/index.html#installation)
 and requires no optional package, model or download. Run the examples in order through
 **Save and resume**; the later sections cover optional analysis choices.
 
@@ -196,7 +196,7 @@ writer knows. See [comparison design](designing-comparisons.html) and the
 | Saved results, condition comparisons and methods text | [From text to a report](from-text-to-report.html) |
 
 Your first analysis is complete. Choose your next route from the
-[research-question map](../index.html#choose-a-research-question), or the
+[research-question map](https://ryuya-dot-com.github.io/ldfreq/index.html#choose-a-research-question), or the
 [report guide's task list](from-text-to-report.html). Both connect required
 inputs to the result tables and source records you should inspect. In particular,
 reference-frequency profiles describe document words; keyness compares corpora,
