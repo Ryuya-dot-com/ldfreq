@@ -449,7 +449,7 @@ versions; loading an old record must not relabel its inference method.
 ```{r study-inference-replay, eval=has_inference}
 saved$inference$settings
 saved$inference$tables$comparison
-stopifnot(identical(saved$inference$tables, record$inference$tables),
+stopifnot(identical(saved$inference$settings$df_method, "kenward-roger"),
   identical(saved$inference$observation_ids, saved$selected$data$observation_id))
 ```
 

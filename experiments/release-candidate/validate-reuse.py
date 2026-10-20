@@ -46,6 +46,16 @@ for changed in ("R/core.R", "man/core.Rd", ".Rbuildignore", "vignettes/example.R
         rejects(lambda: reuse.verify_source(state))
 print("Evidence reuse rejects changed payload/test inputs, workflows, identity and incomplete/failed runs.")
 
+report_before = 'stopifnot(identical(saved$inference$tables, record$inference$tables),'
+report_after = 'stopifnot(identical(saved$inference$settings$df_method, "kenward-roger"),'
+with patch.object(reuse, "git", return_value=report_before):
+    with patch.object(Path, "read_text", return_value=report_after):
+        reuse.verify_ci(separate, ["vignettes/repeated-observations.Rmd"],
+                        workflow, workflow, run, "owner/repo")
+    with patch.object(Path, "read_text", return_value=report_after + "\nfit <- different_model()"):
+        rejects(lambda: reuse.verify_ci(separate, ["vignettes/repeated-observations.Rmd"],
+                                       workflow, workflow, run, "owner/repo"))
+
 platform_state = {"Platform-Validation-Commit": "a" * 40, "Platform-Validation-Run": "123"}
 platform_old = "".join(
     "  " + name + ":\n    runs-on: ${{ matrix.os }}\n"

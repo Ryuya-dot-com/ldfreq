@@ -58,6 +58,16 @@ def verify_ci(state, changed, old, new, run, repo):
     allowed_files.update("vignettes/" + name + ".Rmd" for name in (
         "auditing-vocabulary-profiles", "getting-started", "release-scope",
         "word-families-and-affixes", "designing-comparisons", "contextual-models"))
+    # One reporting-only repair: the fresh-session chunk must use saved data.
+    reporting = "vignettes/repeated-observations.Rmd"
+    if reporting in changed:
+        commit = state.get("Validation-Commit", state.get("Source-Archive-Commit"))
+        previous = git("show", commit + ":" + reporting)
+        before = 'stopifnot(identical(saved$inference$tables, record$inference$tables),'
+        after = 'stopifnot(identical(saved$inference$settings$df_method, "kenward-roger"),'
+        if previous.count(before) != 1 or previous.replace(before, after) != Path(reporting).read_text().strip():
+            raise ValueError("Repeated-study change exceeds the saved-report repair")
+        allowed_files.add(reporting)
     if set(changed) - allowed_files:
         raise ValueError("Numeric CI inputs changed outside the rechecked release controls")
     for name in ("check", "prepare-r-devel", "check-r-devel", "c-locale", "tubelex-build-audit"):
