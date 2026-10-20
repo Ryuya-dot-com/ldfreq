@@ -102,47 +102,47 @@ stopifnot(identical(plan, record$plan))
 record$condition
 #> $id
 #> [1] "english-surface-lower"
-#> 
+#>
 #> $tokenizer
 #> [1] "english"
-#> 
+#>
 #> $normalization
 #> [1] "NFC"
-#> 
+#>
 #> $case
 #> [1] "lower"
-#> 
+#>
 #> $keep_numbers
 #> [1] FALSE
-#> 
+#>
 #> $unit
 #> [1] "surface"
-#> 
+#>
 #> $inclusion
 #> [1] "all tokens returned by lexdiv_tokenize_batch"
-#> 
+#>
 #> $resources
 #> [1] "No external annotation model or lexical reference resource"
 record$prepared[[1]]$provenance[c("tokenizer_id", "tokenizer_version",
   "normalization", "case", "keep_numbers", "input_characters", "output_tokens")]
 #> $tokenizer_id
 #> [1] "ldfreq-english-word-tokenizer"
-#> 
+#>
 #> $tokenizer_version
 #> [1] "0.1.0"
-#> 
+#>
 #> $normalization
 #> [1] "NFC"
-#> 
+#>
 #> $case
 #> [1] "lower"
-#> 
+#>
 #> $keep_numbers
 #> [1] FALSE
-#> 
+#>
 #> $input_characters
 #> [1] 0
-#> 
+#>
 #> $output_tokens
 #> [1] 0
 ```
@@ -348,19 +348,19 @@ record$model <- list(
 record$model$diagnostics
 #> $warnings
 #> character(0)
-#> 
+#>
 #> $messages
 #> character(0)
-#> 
+#>
 #> $optimizer_code
 #> [1] 0
-#> 
+#>
 #> $convergence_messages
 #> NULL
-#> 
+#>
 #> $singular
 #> [1] FALSE
-#> 
+#>
 #> $singular_tolerance
 #> [1] 1e-04
 ```
@@ -422,32 +422,32 @@ record$inference$tables$cells
 #>         4 argument    0.6184924 0.02413349 18.02 0.5677935 0.6691914         18
 #>         8 argument    0.6371460 0.03044787 17.82 0.5731313 0.7011608         18
 #>  support       interval_outside_response_bounds
-#>  observed_cell FALSE                           
-#>  observed_cell FALSE                           
-#>  observed_cell FALSE                           
-#>  observed_cell FALSE                           
-#>  observed_cell FALSE                           
-#>  observed_cell FALSE                           
-#> 
-#> Degrees-of-freedom method: kenward-roger 
+#>  observed_cell FALSE
+#>  observed_cell FALSE
+#>  observed_cell FALSE
+#>  observed_cell FALSE
+#>  observed_cell FALSE
+#>  observed_cell FALSE
+#>
+#> Degrees-of-freedom method: kenward-roger
 #> Confidence level used: 0.95
 record$inference$tables$weeks
-#>  occasion    emmean         SE    df  lower.CL  upper.CL support       
+#>  occasion    emmean         SE    df  lower.CL  upper.CL support
 #>         0 0.6278178 0.02083939 17.03 0.5838558 0.6717799 observed_cells
 #>         4 0.6464714 0.02378807 17.01 0.5962844 0.6966585 observed_cells
 #>         8 0.6651250 0.03008736 17.00 0.6016465 0.7286035 observed_cells
-#> 
-#> Results are averaged over the levels of: task 
-#> Degrees-of-freedom method: kenward-roger 
+#>
+#> Results are averaged over the levels of: task
+#> Degrees-of-freedom method: kenward-roger
 #> Confidence level used: 0.95
 record$inference$tables$comparison
 #>  contrast         estimate         SE    df     lower.CL   upper.CL
 #>  week_8_minus_0 0.03730716 0.02038552 17.02 -0.005698678 0.08031299
-#>  support           
+#>  support
 #>  observed_endpoints
-#> 
-#> Results are averaged over the levels of: task 
-#> Degrees-of-freedom method: kenward-roger 
+#>
+#> Results are averaged over the levels of: task
+#> Degrees-of-freedom method: kenward-roger
 #> Confidence level used: 0.95
 ```
 
@@ -620,48 +620,48 @@ its inference method.
 saved$inference$settings
 #> $response
 #> [1] "MATTR10"
-#> 
+#>
 #> $unit
 #> [1] "original 0-1 scale"
-#> 
+#>
 #> $weeks
 #> [1] 0 4 8
-#> 
+#>
 #> $tasks
-#> [1] "description" "argument"   
-#> 
+#> [1] "description" "argument"
+#>
 #> $task_weights
-#> description    argument 
-#>         0.5         0.5 
-#> 
+#> description    argument
+#>         0.5         0.5
+#>
 #> $target
 #> [1] "Population mean under the fitted Gaussian identity-link model"
-#> 
+#>
 #> $contrast
 #> [1] "week 8 minus week 0, equal weights for the two named tasks"
-#> 
+#>
 #> $level
 #> [1] 0.95
-#> 
+#>
 #> $adjustment
 #> [1] "none"
-#> 
+#>
 #> $interval
 #> [1] "pointwise confidence intervals; one planned contrast"
-#> 
+#>
 #> $df_method
 #> [1] "kenward-roger"
-#> 
+#>
 #> $prediction_interval
 #> [1] FALSE
 saved$inference$tables$comparison
 #>  contrast         estimate         SE    df     lower.CL   upper.CL
 #>  week_8_minus_0 0.03730716 0.02038552 17.02 -0.005698678 0.08031299
-#>  support           
+#>  support
 #>  observed_endpoints
-#> 
-#> Results are averaged over the levels of: task 
-#> Degrees-of-freedom method: kenward-roger 
+#>
+#> Results are averaged over the levels of: task
+#> Degrees-of-freedom method: kenward-roger
 #> Confidence level used: 0.95
 stopifnot(identical(saved$inference$tables, record$inference$tables),
   identical(saved$inference$observation_ids, saved$selected$data$observation_id))

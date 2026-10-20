@@ -237,7 +237,7 @@ print(subset(en_table, document_id == inspected_id & metric_id == "ttr",
 cat(en_texts[[inspected_id]], "\n")
 #> The class visited a library near the station. Students chose books about places they hoped to visit and read a few pages in silence. One student found a map inside an old travel guide. Another compared two descriptions of the same city. The teacher asked everyone to explain one surprising detail to a partner. They then returned to the shelves to find evidence for their explanations. Before leaving, the group wrote questions that a later reading session could explore.
 #> I explained the experience in a short message to a friend. Choosing specific examples made the account clearer and helped me remember details that I had almost forgotten.
-#> 
+#>
 counted_forms <- lapply(en_prepared, function(batch) {
   words <- batch[[inspected_id]]$tokens$surface
   data.frame(form = sort(unique(words)),
@@ -258,7 +258,7 @@ lapply(counted_forms, head, 12)
 #> 10    books           1
 #> 11 Choosing           1
 #> 12    chose           1
-#> 
+#>
 #> $lower
 #>        form occurrences
 #> 1         a           7
@@ -277,11 +277,11 @@ excluded <- lapply(en_prepared, function(batch)
   batch[[inspected_id]]$provenance$excluded_spans)
 excluded
 #> $preserve
-#> [1] start   end     surface reason 
+#> [1] start   end     surface reason
 #> <0 rows> (or 0-length row.names)
-#> 
+#>
 #> $lower
-#> [1] start   end     surface reason 
+#> [1] start   end     surface reason
 #> <0 rows> (or 0-length row.names)
 ```
 
@@ -562,7 +562,7 @@ if (requireNamespace("quanteda", quietly = TRUE) &&
 #> 8     unlisted  unknown           1
 #> 9   no_targets  unknown           0
 #> 10       empty  unknown           0
-#> 
+#>
 #> $content
 #>    document_id query_id occurrences
 #> 1     variants particle           0
@@ -659,7 +659,7 @@ replayed <- lapply(restored$inputs, function(tokens)
 stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 #> 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.
-#> 
+#>
 #> Calculations used ldfreq 0.4.0.9005: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
 ```
 
@@ -1616,10 +1616,10 @@ unlink(path)
 levels$provenance[c("resource_version", "resource_bundled", "resource_citation")]
 #> $resource_version
 #> [1] "jacet2016-8000-v1"
-#> 
+#>
 #> $resource_bundled
 #> [1] TRUE
-#> 
+#>
 #> $resource_citation
 #> [1] "JACET Basic Word Revision Committee (Ed.). (2016). The New JACET List of 8000 Basic Words. Tokyo: Kirihara Shoten."
 ```
