@@ -52,6 +52,33 @@ release_non_foss_submission_note <- function(note_block) {
   release_new_submission_note(note_block)
 }
 
+release_recorded_external_note <- function(note_block, job_label) {
+  # Exact responses from the 0.4.0 artifact check, not a general URL exception.
+  # The named references were verified against publisher/provider records and
+  # successful peer checks of the same archive. Preserve the failed responses.
+  cases <- list(
+    "ubuntu-latest-r-4.1" = c(
+      "Found the following (possibly) invalid DOIs:",
+      "DOI: 10.1080/09296171003643098", "From: DESCRIPTION",
+      "Status: Forbidden", "Message: 403", "Size of tarball: 6490351 bytes"),
+    "ubuntu-latest-r-devel" = c(
+      "Found the following (possibly) invalid URLs:",
+      "URL: https://sites.psu.edu/xxl13/l2sca/",
+      "From: inst/doc/syntactic-complexity.html", "Status: Error",
+      "Message: libcurl error code 28:", "Connection timed out after 60000 milliseconds"),
+    "windows-latest-r-release" = c(
+      "Found the following (possibly) invalid URLs:",
+      "URL: https://uclouvain.be/en/research-institutes/ilc/cecl/locness",
+      "From: inst/doc/designing-comparisons.html", "Status: Error",
+      "Message: libcurl error code 28:",
+      "Failed to connect to uclouvain.be port 443 after 21175 ms: Could not connect to server")
+  )
+  if (is.null(job_label) || !job_label %in% names(cases)) return(FALSE)
+  prefix <- note_block; prefix$detail <- prefix$detail[seq_len(3L)]
+  release_non_foss_submission_note(prefix) &&
+    identical(unlist(note_block$detail[-seq_len(3L)], use.names = FALSE), cases[[job_label]])
+}
+
 release_resource_size_note <- function(note_block) {
   stage <- "^\\* checking installed package size \\.\\.\\. (\\[[^]]+\\] )?NOTE$"
   detail <- unlist(note_block$detail, use.names = FALSE)
@@ -69,7 +96,7 @@ release_resource_size_note <- function(note_block) {
     all(sizes >= 1 & sizes <= total) && sum(sizes) <= total + 0.2
 }
 
-release_classify_notes <- function(check_status, note_blocks, note_policy) {
+release_classify_notes <- function(check_status, note_blocks, note_policy, job_label = NULL) {
   allowed_policies <- c("new-submission-only", "release-resource-notes",
     "minimum-r-optional-backends")
   if (!note_policy %in% allowed_policies) {
@@ -84,13 +111,15 @@ release_classify_notes <- function(check_status, note_blocks, note_policy) {
     if (release_new_submission_note(block)) return("incoming")
     if (note_policy != "new-submission-only" &&
         release_non_foss_submission_note(block)) return("incoming_non_foss")
+    if (note_policy != "new-submission-only" &&
+        release_recorded_external_note(block, job_label)) return("incoming_external")
     if (note_policy == "minimum-r-optional-backends" &&
         release_unavailable_backends_note(block)) return("backends")
     if (note_policy != "new-submission-only" &&
         release_resource_size_note(block)) return("size")
     "unknown"
   }, character(1L))
-  if ("unknown" %in% kinds || anyDuplicated(sub("_non_foss$", "", kinds)) ||
+  if ("unknown" %in% kinds || anyDuplicated(sub("^incoming.*$", "incoming", kinds)) ||
       (note_policy == "minimum-r-optional-backends" && !"backends" %in% kinds)) return(fail)
   dispositions <- list(
     incoming = list(note = "New submission", disposition = paste(
@@ -101,6 +130,13 @@ release_classify_notes <- function(check_status, note_blocks, note_policy) {
         "intentionally records non-FOSS terms, including bundled MorphoLex's",
         "CC BY-NC-SA 4.0 restriction; DESCRIPTION declares License_is_FOSS: no",
         "and License_restricts_use: yes. This disposition grants no additional rights.")),
+    incoming_external = list(note = paste("New submission; Non-FOSS license; recorded external response in", job_label),
+      disposition = paste("Only the exact recorded publisher/provider response is admitted.",
+        "MATTR's DOI is confirmed by its publisher's article metadata; L2SCA and LOCNESS",
+        "were reachable in independent/current-R checks of these references.",
+        "The original HTTP 403 or connection timeout remains in the raw log.",
+        "This is not a successful access claim for this runner, a waiver for other URLs,",
+        "or permission to redistribute restricted resources.")),
     backends = list(
       note = "Packages suggested but not available for checking: gibasa, textstem",
       disposition = paste("Expected only in the declared R 4.1 minimum-version diagnostic:",

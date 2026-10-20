@@ -187,7 +187,22 @@ for (result in results) {
   raw_lines <- readLines(check_logs[[1L]], warn = FALSE)
   raw_status <- tail(grep("^Status:", raw_lines, value = TRUE), 1L)
   raw_blocks <- release_note_blocks(raw_lines)
-  classified <- release_classify_notes(raw_status, raw_blocks, expected_note_policy)
+  classified <- release_classify_notes(raw_status, raw_blocks, expected_note_policy, result$job_label)
+  if (!is.null(result$reused_check)) {
+    original_path <- file.path(dirname(result_path), "check-result-before-reclassification.json")
+    check(file.exists(original_path) && identical(sha256_file(original_path),
+      result$reused_check$original_result_sha256), "Original check record identity changed.")
+    original <- jsonlite::read_json(original_path, simplifyVector = FALSE)
+    check(identical(original$check_status, raw_status) &&
+      identical(original$note_blocks, raw_blocks) &&
+      identical(original$artifact, result$artifact) &&
+      identical(original$environment, result$environment) &&
+      identical(original$job_label, result$job_label) &&
+      identical(original$started_at_utc, result$started_at_utc) &&
+      identical(original$finished_at_utc, result$finished_at_utc) &&
+      identical(as.integer(original$exit_code), 0L),
+      "Reclassified result differs from the completed original check.")
+  }
   check(identical(raw_status, result$check_status) &&
     identical(raw_blocks, result$note_blocks) &&
     identical(classified$effective_status, result$effective_status) &&

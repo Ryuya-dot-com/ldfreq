@@ -46,7 +46,8 @@ def verify_ci(state, changed, old, new, run, repo):
     allowed_controls = {"generate-release-evidence.R", "validate-public-scan.R",
                         "state.dcf", "verify-reuse.py", "validate-reuse.py",
                         "build-manual.R", "README.md", "RELEASE-CHECKLIST.md",
-                        "run-as-cran-check.R", "assemble-run-index.R", "validate-note-policy.R"}
+                        "run-as-cran-check.R", "assemble-run-index.R", "validate-note-policy.R",
+                        "check-note-policy.R"}
     allowed_files.update("experiments/release-candidate/" + name for name in allowed_controls)
     # These documentation repairs are exercised by the fresh exact-archive
     # matrix. Runtime code, resources, tests and numeric audit inputs still
@@ -105,6 +106,26 @@ def main():
             raise ValueError("Reused source archive identity mismatch")
         evidence = {key: value for key, value in state.items() if key.startswith("Source-Archive-")}
         evidence.update(candidate_commit=git("rev-parse", "HEAD"), excluded_changes=changed)
+        if "Check-Evidence-Run" in state:
+            if state["Check-Evidence-Run"] != state["Source-Archive-Run"]:
+                raise ValueError("Check evidence must come from the declared archive run")
+            repo = os.environ["GITHUB_REPOSITORY"]
+            run = json.loads(subprocess.check_output([
+                "gh", "api", f"repos/{repo}/actions/runs/{state['Check-Evidence-Run']}"]))
+            if not (run["status"] == "completed" and
+                    run["head_sha"] == state["Source-Archive-Commit"] and
+                    run["path"] == ".github/workflows/release-candidate.yaml" and
+                    run["repository"]["full_name"] == repo):
+                raise ValueError("Completed check evidence does not match the source run")
+            evidence["check_evidence_run"] = run["id"]
+        if state.get("Reuse-Manual") == "true":
+            prior = json.loads((archive.parent / "evidence/release-provenance.json").read_text())
+            manual = archive.parent / prior["manual"]["file"]
+            index = archive.parent / (manual.name + "-build/Rd2.ind")
+            if not (hashlib.sha256(manual.read_bytes()).hexdigest() == prior["manual"]["sha256"]
+                    and index.is_file() and index.stat().st_size > 0):
+                raise ValueError("Completed indexed manual identity mismatch")
+            evidence["reused_manual"] = prior["manual"]
         (archive.parent / "source-reuse.json").write_text(json.dumps(evidence, indent=2) + "\n")
     if output:
         with open(output, "a") as stream:

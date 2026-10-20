@@ -99,3 +99,43 @@ local({
   stopifnot(grepl("disposition disagree", failure, fixed = TRUE))
   cat("Run-index aggregation rejects edited dispositions and divergent raw logs.\n")
 })
+
+# Recorded raw external responses: reject altered targets, added findings and wrong jobs.
+external_cases <- list(
+  "ubuntu-latest-r-4.1" = c(
+    "Found the following (possibly) invalid DOIs:",
+    "DOI: 10.1080/09296171003643098",
+    "From: DESCRIPTION",
+    "Status: Forbidden",
+    "Message: 403",
+    "Size of tarball: 6490351 bytes"),
+  "ubuntu-latest-r-devel" = c(
+    "Found the following (possibly) invalid URLs:",
+    "URL: https://sites.psu.edu/xxl13/l2sca/",
+    "From: inst/doc/syntactic-complexity.html",
+    "Status: Error",
+    "Message: libcurl error code 28:",
+    "Connection timed out after 60000 milliseconds"),
+  "windows-latest-r-release" = c(
+    "Found the following (possibly) invalid URLs:",
+    "URL: https://uclouvain.be/en/research-institutes/ilc/cecl/locness",
+    "From: inst/doc/designing-comparisons.html",
+    "Status: Error",
+    "Message: libcurl error code 28:",
+    "Failed to connect to uclouvain.be port 443 after 21175 ms: Could not connect to server")
+)
+for (label in names(external_cases)) {
+  block <- non_foss; block$detail <- c(block$detail, as.list(external_cases[[label]]))
+  minimum <- identical(label, "ubuntu-latest-r-4.1")
+  notes <- if (minimum) list(block, dependency) else list(block)
+  policy <- if (minimum) "minimum-r-optional-backends" else "release-resource-notes"
+  status <- if (minimum) "Status: 2 NOTEs" else "Status: 1 NOTE"
+  stopifnot(release_classify_notes(status, notes, policy, label)$effective_status != "FAIL",
+    release_classify_notes(status, notes, policy, "unverified-job")$effective_status == "FAIL")
+  original <- notes
+  notes[[1L]]$detail[[5L]] <- "URL: https://unverified.example/"
+  stopifnot(release_classify_notes(status, notes, policy, label)$effective_status == "FAIL")
+  notes <- original; notes[[1L]]$detail <- c(notes[[1L]]$detail, "Another unexplained finding")
+  stopifnot(release_classify_notes(status, notes, policy, label)$effective_status == "FAIL")
+}
+cat("Recorded external responses reject altered targets, additional findings and wrong job labels.\n")

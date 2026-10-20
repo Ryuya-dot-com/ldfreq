@@ -88,12 +88,13 @@ respectively. The workflow leaves both uninstalled in that one job,
 sets `_R_CHECK_FORCE_SUGGESTS_=false`, and verifies that the package remains
 checkable without these optional backends.
 
-R 4.1's older URL/DOI checker receives publisher bot-blocking responses on
+R 4.1's older URL checker receives publisher bot-blocking responses on
 references successfully checked with current/devel R. Only that minimum-R
 diagnostic sets `_R_CHECK_CRAN_INCOMING_SKIP_URL_CHECKS_IF_REMOTE_=true`:
 it still performs incoming metadata, installation, examples, tests and
 vignettes checks. Current R on all three platforms and R-devel retain online
-URL/DOI checks on the same archive. Check-result schema 1.2.0 records this
+URL checks on the same archive. DESCRIPTION DOI checking is controlled
+separately by R and remains enabled. Check-result schema 1.2.0 records this
 scope, and both the runner and aggregator reject an altered or missing scope.
 The earlier HTTP failures remain in the superseded candidate's raw logs;
 they are not reclassified as successful URL checks.
@@ -126,3 +127,37 @@ The R 4.1 dependency setup includes Depends, Imports, LinkingTo and Suggests,
 but excludes third-party Enhances (notably the archived Matrix graph extension).
 ldfreq declares no Enhances. Its full check dependencies remain included except
 for the two documented R-incompatible optional backends.
+
+### Recorded external responses for the 0.4.0 archive
+
+All five checks of archive SHA-256
+`c720ad309683a321ee11b61910a63b914a71c444ca67d8a7cd1288504176f921`
+completed examples, tests and vignette rebuilding successfully. Three incoming
+responses need a narrow disposition, not another numerical run:
+
+- R 4.1: HTTP 403 for DESCRIPTION DOI `10.1080/09296171003643098`.
+  The [publisher's record](https://www.tandfonline.com/doi/full/10.1080/09296171003643098)
+  identifies Covington and McFall's *Cutting the Gordian Knot* (2010),
+  Journal of Quantitative Linguistics 17(2), 94–100. Other current-R jobs
+  accepted the reference; this does not claim R 4.1 accessed the article.
+- R-devel: the [author's L2SCA page](https://sites.psu.edu/xxl13/l2sca/) timed
+  out. It passed the same-archive Linux/macOS checks and an independent R URL
+  probe during candidate review.
+- Windows: the [provider's LOCNESS page](https://uclouvain.be/en/research-institutes/ilc/cecl/locness)
+  could not be connected to. The provider page was inspected and the same
+  reference passed the Linux/macOS checks of this archive.
+
+`check-note-policy.R` recognizes only these exact job/URL/source/status/detail
+combinations, including the recorded archive size for the DOI case. Altered
+URLs, other HTTP responses and additional lines fail. The raw failed responses
+remain unchanged; they are not reported as successful access by those runners.
+
+`Check-Evidence-Run` reuses the completed raw check records from the declared
+source-archive run. Its source commit and completed workflow identity are
+verified first. Each platform checks archive bytes, OS, R version, command,
+recorded scope and completed example/test/vignette stages before reclassifying
+the raw log. Original result JSON, its hash and original dates are retained.
+The run index verifies them again. Existing resource inventories are reused;
+a missing platform inventory is still run. `Reuse-Manual: true` requires the
+original manual hash and a nonempty index. This combines recorded stages and
+does not claim that all numerical checks were rerun in the final workflow.
