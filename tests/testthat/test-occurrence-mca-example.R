@@ -105,3 +105,52 @@ test_that("degenerate MCA inputs retain audits and maps expose repeated axes", {
   expect_error(e$helper$ordination_mca_plot(e$result, monochrome = NA), "TRUE or FALSE")
   expect_error(e$helper$ordination_mca(e$tab, k = 0), "k")
 })
+
+test_that("MCA display labels follow original IDs without changing saved geometry", {
+  skip_if_not_installed("ca")
+  e <- mca_example(); saved <- e$result
+  path <- tempfile(fileext = ".pdf"); grDevices::pdf(path)
+  on.exit({grDevices::dev.off(); unlink(path)})
+  original <- suppressWarnings(e$helper$ordination_mca_plot(saved))
+  labels <- setNames(sprintf("use%02d", seq_len(nrow(original))), original$id)
+  labeled <- suppressWarnings(e$helper$ordination_mca_plot(saved, labels = rev(labels)))
+  expect_identical(labeled[c("id", "x", "y")], original[c("id", "x", "y")])
+  expect_identical(labeled$label, unname(labels))
+  expect_identical(e$result, saved)
+  expect_equal(nrow(labeled), 15L) # Co-located points keep their separate identities.
+  categories <- suppressWarnings(e$helper$ordination_mca_plot(saved, "categories"))
+  category_labels <- setNames(paste0("category", seq_len(nrow(categories))), categories$id)
+  shown <- suppressWarnings(e$helper$ordination_mca_plot(saved, "categories", labels = rev(category_labels)))
+  expect_identical(shown$label, unname(category_labels))
+  expect_identical(shown[c("id", "x", "y")], categories[c("id", "x", "y")])
+  for (invalid in list(unname(labels), labels[-1], setNames(labels, rep("u01", length(labels))),
+      setNames(labels, paste0("unknown", seq_along(labels))),
+      replace(labels, 1, NA_character_), replace(labels, 1, " "),
+      factor(labels), matrix(labels)))
+    expect_error(e$helper$ordination_mca_plot(saved, labels = invalid), "displayed point IDs")
+})
+
+test_that("ordination labels combine numerical zeroes without moving points", {
+  h <- new.env(parent = globalenv())
+  for (s in c("concordance.R", "lexical-ordination.R", "occurrence-mca.R"))
+    sys.source(system.file("examples", s, package = "ldfreq", mustWork = TRUE), h)
+  ids <- c("a", "b", "c")
+  coordinates <- matrix(c(0, 1e-16, 1, -1e-16, 2e-16, 1), 3, dimnames = list(ids, NULL))
+  rows <- data.frame(id = rep(ids, 2), axis = rep(1:2, each = 3),
+    coordinate = as.vector(coordinates))
+  axes <- data.frame(inertia_fraction = c(.6, .4), tied_with_next = FALSE)
+  drawn <- NULL
+  local_mocked_bindings(text = function(x, y, labels, ...) drawn <<- unname(labels),
+    .package = "graphics")
+  path <- tempfile(fileext = ".pdf"); grDevices::pdf(path)
+  on.exit({grDevices::dev.off(); unlink(path)})
+  for (kind in c("mca", "ca", "mds")) {
+    x <- h$.ordination_seal(list(kind = kind, rows = rows, points = coordinates,
+      axes = axes, diagnostics = list(effective_dimensions = 2L)))
+    shown <- if (kind == "mca") h$ordination_mca_plot(x) else h$ordination_plot(x)
+    expect_identical(drawn, c("a/b", "c"))
+    expect_identical(shown$id, ids)
+    expect_identical(shown$x, unname(coordinates[, 1]))
+    expect_identical(shown$y, unname(coordinates[, 2]))
+  }
+})

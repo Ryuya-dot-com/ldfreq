@@ -229,7 +229,7 @@ ordination_plot <- function(x, which = c("documents", "terms"), monochrome = FAL
     xlab = label[1], ylab = if (one_dimensional) "" else label[2],
     yaxt = if (one_dimensional) "n" else "s", xlim = expand(plotted$x), ylim = expand(plotted$y))
   # Combine co-located display labels without jittering fitted coordinates.
-  location <- paste(signif(plotted$x, 8), signif(plotted$y, 8), sep = ":")
+  location <- paste(round(plotted$x, 8), round(plotted$y, 8), sep = ":")
   first <- !duplicated(location)
   labels <- vapply(location[first], function(z) paste(plotted$id[location == z], collapse = "/"), "")
   graphics::text(plotted$x[first], plotted$y[first], labels = labels, pos = 3, cex = .8)

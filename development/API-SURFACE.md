@@ -17,6 +17,10 @@ rendered by pkgdown.
 
 ## Decisions
 
+- Development 0.4.0.9002 adds an optional named `labels` argument only to the
+  sourced MCA plotting helper. The label-to-ID mapping affects display and its
+  returned table; original IDs, fitted objects, exports and defaults are unchanged.
+
 - Development 0.4.0.9001 adds explicitly sourced occurrence-MCA helpers, not new
   exports, classes or S3 methods. They reuse complete annotation inputs and
   optional `ca::ca()` on the indicator matrix; source-bound categories, exclusions,

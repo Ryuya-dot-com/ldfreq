@@ -149,7 +149,8 @@ ordination_mca_occurrences <- function(x, ids = x$occurrences$occurrence_id) {
   out
 }
 
-ordination_mca_plot <- function(x, which = c("occurrences", "categories"), monochrome = FALSE) {
+ordination_mca_plot <- function(x, which = c("occurrences", "categories"), monochrome = FALSE,
+                                labels = NULL) {
   ordination_validate(x)
   if (!identical(x$kind, "mca")) stop("Supply an ordination_mca() record.", call. = FALSE)
   which <- match.arg(which)
@@ -160,16 +161,26 @@ ordination_mca_plot <- function(x, which = c("occurrences", "categories"), monoc
   plotted <- data.frame(id = first$id, x = first$coordinate,
     y = if (nrow(second)) second$coordinate[match(first$id, second$id)] else 0,
     label = if (which == "categories") paste(first$variable, first$level, sep = ": ") else first$id)
+  if (!is.null(labels)) {
+    if (!is.character(labels) || is.object(labels) || !is.null(dim(labels)) ||
+        anyNA(labels) || any(!validUTF8(labels)) ||
+        any(!nzchar(stringi::stri_trim_both(labels))) ||
+        is.null(names(labels)) || anyNA(names(labels)) || anyDuplicated(names(labels)) ||
+        length(labels) != nrow(plotted) || !setequal(names(labels), plotted$id))
+      stop("labels must be nonblank strings named by exactly the displayed point IDs.", call. = FALSE)
+    plotted$label <- unname(labels[match(plotted$id, names(labels))])
+  }
   if (x$axes$tied_with_next[1] || (nrow(second) > 0L && x$axes$tied_with_next[2]))
     warning("Displayed axes touch a repeated eigenvalue; their orientation is not unique. Inspect axes and diagnostics.", call. = FALSE)
   expand <- function(z) range(z) + c(-.25, .25) * max(diff(range(z)), .1)
-  labels <- sprintf("MCA %d (%.1f%% unadjusted inertia)", 1:2, 100 * x$axes$inertia_fraction[1:2])
+  axis_labels <- sprintf("MCA %d (%.1f%% unadjusted inertia)", 1:2, 100 * x$axes$inertia_fraction[1:2])
   graphics::plot(plotted$x, plotted$y, asp = 1, las = 1, bty = "l",
     pch = if (which == "occurrences") 16 else 17,
     col = if (monochrome) "black" else if (which == "occurrences") "#0072B2" else "#D55E00",
-    xlab = labels[1], ylab = if (nrow(second)) labels[2] else "",
+    xlab = axis_labels[1], ylab = if (nrow(second)) axis_labels[2] else "",
     yaxt = if (nrow(second)) "s" else "n", xlim = expand(plotted$x), ylim = expand(plotted$y))
-  location <- paste(signif(plotted$x, 8), signif(plotted$y, 8), sep = ":")
+  # Decimal rounding groups numerical zeroes without moving fitted points.
+  location <- paste(round(plotted$x, 8), round(plotted$y, 8), sep = ":")
   selected <- !duplicated(location)
   text <- vapply(location[selected], function(z) paste(plotted$label[location == z], collapse = "/"), "")
   graphics::text(plotted$x[selected], plotted$y[selected], labels = text, pos = 3, cex = .75)
