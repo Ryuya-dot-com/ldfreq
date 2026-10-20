@@ -71,12 +71,78 @@ def verify_ci(state, changed, old, new, run, repo):
         raise ValueError("Declared baseline CI did not complete successfully on this source")
 
 
+def verify_platform_reuse(state, changed, old, new, run, repo, jobs):
+    """Retain successful Windows/macOS checks when Linux setup alone is repaired."""
+    allowed = {".github/workflows/R-CMD-check.yaml",
+               "experiments/release-candidate/state.dcf",
+               "experiments/release-candidate/verify-reuse.py",
+               "experiments/release-candidate/validate-reuse.py"}
+    if set(changed) - allowed:
+        raise ValueError("Platform reuse requires identical package and test inputs")
+    if not (str(run["id"]) == state["Platform-Validation-Run"]
+            and run["status"] == "completed"
+            and run["head_sha"] == state["Platform-Validation-Commit"]
+            and run["path"] == ".github/workflows/R-CMD-check.yaml"
+            and run["repository"]["full_name"] == repo):
+        raise ValueError("Platform evidence has wrong source, workflow or completion state")
+    for name in ("check", "tubelex-build-audit"):
+        def normalized(workflow):
+            body = job_body(workflow, name).replace("ubuntu-latest", "ubuntu-24.04")
+            return "\n".join(line for line in body.splitlines() if not re.match(
+                r"^        (config|os):|^          - \{os:", line))
+        if normalized(old) != normalized(new):
+            raise ValueError("Reused platform test steps changed: " + name)
+    for name, key, field in (("check", "config", "check-matrix"),
+                             ("tubelex-build-audit", "os", "builder-matrix")):
+        expected = "        " + key + ": ${{ fromJSON(needs.validation-scope.outputs." + field + ") }}"
+        if expected not in job_body(new, name):
+            raise ValueError("Platform matrix is not controlled by verified evidence")
+    required = {"macos-latest / R release", "windows-latest / R release",
+                "windows-latest / TUBELEX builder"}
+    for name in required:
+        matching = [job for job in jobs if job["name"] == name]
+        if len(matching) != 1 or matching[0]["status"] != "completed" or \
+                matching[0]["conclusion"] != "success":
+            raise ValueError("Missing successful platform job: " + name)
+    return sorted(required)
+
+
 def main():
     state = dict(line.split(": ", 1) for line in
                  Path("experiments/release-candidate/state.dcf").read_text().splitlines())
     ci_mode = sys.argv[1] == "ci"
     reuse = "Validation-Run" in state if ci_mode else "Source-Archive-Run" in state
     output = os.environ.get("GITHUB_OUTPUT")
+    if ci_mode:
+        platform_reuse = "Platform-Validation-Run" in state
+        if platform_reuse and reuse:
+            raise ValueError("Choose full CI reuse or platform reuse, not both")
+        configs = [{"os": os_name, "r": r_version} for os_name, r_version in
+                   (("ubuntu-24.04", "release"), ("ubuntu-24.04", "4.1"),
+                    ("macos-latest", "release"), ("windows-latest", "release"))]
+        builders = ["ubuntu-24.04", "windows-latest"]
+        if platform_reuse:
+            commit = state.get("Platform-Validation-Commit", "")
+            run_id = state["Platform-Validation-Run"]
+            if not re.fullmatch(r"[0-9a-f]{40}", commit) or not re.fullmatch(r"[0-9]+", run_id):
+                raise ValueError("Invalid platform evidence identity")
+            path = ".github/workflows/R-CMD-check.yaml"
+            repo = os.environ["GITHUB_REPOSITORY"]
+            run = json.loads(subprocess.check_output([
+                "gh", "api", f"repos/{repo}/actions/runs/{run_id}"]))
+            jobs = json.loads(subprocess.check_output([
+                "gh", "api", f"repos/{repo}/actions/runs/{run_id}/jobs?per_page=100"]))["jobs"]
+            kept = verify_platform_reuse(state,
+                git("diff", "--name-only", commit, "HEAD").splitlines(),
+                git("show", commit + ":" + path), Path(path).read_text(), run, repo, jobs)
+            configs = configs[:2]
+            builders = builders[:1]
+            print(json.dumps({"reused_platform_run": run_id, "head": commit, "jobs": kept}))
+        if output:
+            with open(output, "a") as stream:
+                stream.write("check-matrix=" + json.dumps(configs) + "\n")
+                stream.write("builder-matrix=" + json.dumps(builders) + "\n")
+                stream.write("platform-reuse=" + str(platform_reuse).lower() + "\n")
     if not reuse:
         if output:
             with open(output, "a") as stream:

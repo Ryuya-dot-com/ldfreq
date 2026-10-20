@@ -17,10 +17,12 @@ concurrency:
 jobs:
   validation-scope:
     name: Verify source identity and reusable checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
       reuse: ${{ steps.reuse.outputs.reuse }}
+      check-matrix: ${{ steps.reuse.outputs.check-matrix }}
+      builder-matrix: ${{ steps.reuse.outputs.builder-matrix }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -32,18 +34,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python3 experiments/release-candidate/verify-reuse.py ci
       - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
-        if: steps.reuse.outputs.reuse == 'true'
+        if: steps.reuse.outputs.reuse == 'true' || steps.reuse.outputs.platform-reuse == 'true'
         with:
           r-version: "release"
       - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
-        if: steps.reuse.outputs.reuse == 'true'
+        if: steps.reuse.outputs.reuse == 'true' || steps.reuse.outputs.platform-reuse == 'true'
         with:
           packages: |
             any::digest
             any::jsonlite
             any::stringi
       - name: Recheck changed release controls
-        if: steps.reuse.outputs.reuse == 'true'
+        if: steps.reuse.outputs.reuse == 'true' || steps.reuse.outputs.platform-reuse == 'true'
         run: |
           Rscript --vanilla development/audit-public-api.R .
           Rscript --vanilla experiments/release-candidate/validate-note-policy.R
@@ -60,11 +62,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config:
-          - {os: ubuntu-latest, r: "release"}
-          - {os: ubuntu-latest, r: "4.1"}
-          - {os: macos-latest, r: "release"}
-          - {os: windows-latest, r: "release"}
+        config: ${{ fromJSON(needs.validation-scope.outputs.check-matrix) }}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -84,7 +82,7 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
 
       - name: Audit the documented public API surface
-        if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release' }}
+        if: ${{ matrix.config.os == 'ubuntu-24.04' && matrix.config.r == 'release' }}
         shell: bash
         run: |
           Rscript --vanilla development/audit-public-api.R .
@@ -109,7 +107,7 @@ jobs:
           args: 'c("--no-manual")'
 
       - name: Check resource inventory rejection cases
-        if: ${{ matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release' }}
+        if: ${{ matrix.config.os == 'ubuntu-24.04' && matrix.config.r == 'release' }}
         shell: Rscript {0}
         run: |
           status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
@@ -180,8 +178,8 @@ jobs:
   prepare-r-devel:
     needs: validation-scope
     if: needs.validation-scope.outputs.reuse != 'true'
-    name: ubuntu-latest / prepare R devel dependencies
-    runs-on: ubuntu-latest
+    name: ubuntu-24.04 / prepare R devel dependencies
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -205,10 +203,10 @@ jobs:
           needs: check
 
   check-r-devel:
-    name: ubuntu-latest / R devel
+    name: ubuntu-24.04 / R devel
     needs: [validation-scope, prepare-r-devel]
     if: needs.validation-scope.outputs.reuse != 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -240,8 +238,8 @@ jobs:
   c-locale:
     needs: validation-scope
     if: needs.validation-scope.outputs.reuse != 'true'
-    name: ubuntu-latest / C locale
-    runs-on: ubuntu-latest
+    name: ubuntu-24.04 / C locale
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -276,7 +274,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: ${{ fromJSON(needs.validation-scope.outputs.builder-matrix) }}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -342,7 +340,7 @@ jobs:
     env:
       R_TEXI2DVICMD: emulation
     name: PDF reference manual
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -372,7 +370,7 @@ jobs:
     name: R-CMD-check required
     if: ${{ always() }}
     needs: [validation-scope, check, check-r-devel, c-locale, tubelex-build-audit, pdf-manual]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions: {}
     steps:

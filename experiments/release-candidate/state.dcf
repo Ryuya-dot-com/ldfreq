@@ -1,4 +1,6 @@
 Record-Scope: repository-release-evidence
 Package: ldfreq
-Version: 0.4.0.9004
+Version: 0.4.0.9005
 Status: development
+Platform-Validation-Run: 39429603530
+Platform-Validation-Commit: e096c59d648adc49d4ee00df686be2be48271f32

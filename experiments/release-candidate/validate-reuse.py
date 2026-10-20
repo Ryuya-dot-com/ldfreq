@@ -43,3 +43,42 @@ for changed in ("R/core.R", "man/core.Rd", ".Rbuildignore", "vignettes/example.R
     with patch.object(reuse, "git", return_value=changed):
         rejects(lambda: reuse.verify_source(state))
 print("Evidence reuse rejects changed payload/test inputs, workflows, identity and incomplete/failed runs.")
+
+platform_state = {"Platform-Validation-Commit": "a" * 40, "Platform-Validation-Run": "123"}
+platform_old = "".join(
+    "  " + name + ":\n    runs-on: ${{ matrix.os }}\n"
+    "    strategy:\n      matrix:\n        " + key + ": old\n"
+    "    steps:\n      - run: check\n"
+    for name, key in (("check", "config"), ("tubelex-build-audit", "os")))
+platform_new = platform_old.replace("config: old",
+    "config: ${{ fromJSON(needs.validation-scope.outputs.check-matrix) }}").replace(
+    "os: old", "os: ${{ fromJSON(needs.validation-scope.outputs.builder-matrix) }}")
+platform_run = copy.deepcopy(run)
+platform_run["conclusion"] = "failure"
+platform_jobs = [{"name": name, "status": "completed", "conclusion": "success"}
+                 for name in ("macos-latest / R release", "windows-latest / R release",
+                              "windows-latest / TUBELEX builder")]
+reuse.verify_platform_reuse(platform_state, [], platform_old, platform_new,
+                           platform_run, "owner/repo", platform_jobs)
+for changed in ("R/core.R", "DESCRIPTION", "tests/testthat/test-example.R",
+                "vignettes/repeated-observations.Rmd"):
+    rejects(lambda: reuse.verify_platform_reuse(platform_state, [changed],
+        platform_old, platform_new, platform_run, "owner/repo", platform_jobs))
+for index in range(3):
+    bad = copy.deepcopy(platform_jobs)
+    bad[index]["conclusion"] = "failure"
+    rejects(lambda: reuse.verify_platform_reuse(platform_state, [],
+        platform_old, platform_new, platform_run, "owner/repo", bad))
+rejects(lambda: reuse.verify_platform_reuse(platform_state, [], platform_old,
+    platform_new.replace("run: check", "run: skip"), platform_run, "owner/repo", platform_jobs))
+for field, value in (("status", "in_progress"), ("head_sha", "b" * 40),
+                     ("path", "other.yaml"), ("id", 456),
+                     ("repository", {"full_name": "other/repo"})):
+    bad = copy.deepcopy(platform_run); bad[field] = value
+    rejects(lambda: reuse.verify_platform_reuse(platform_state, [],
+        platform_old, platform_new, bad, "owner/repo", platform_jobs))
+rejects(lambda: reuse.verify_platform_reuse(platform_state, [], platform_old,
+    platform_new, platform_run, "owner/repo", platform_jobs[:2]))
+rejects(lambda: reuse.verify_platform_reuse(platform_state, [], platform_old,
+    platform_new, platform_run, "owner/repo", platform_jobs + platform_jobs[:1]))
+print("Platform reuse requires unchanged payload, unchanged reused steps and three completed successful jobs.")
