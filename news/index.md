@@ -1,5 +1,18 @@
 # Changelog
 
+## ldfreq 0.4.0.9004
+
+- Add an explicitly sourced DDL preparation example. Teachers select
+  accepted phrase occurrences, supply activity prompts and source
+  notices, then write a learner HTML handout, separate teacher CSV and
+  complete private RDS record. Pending decisions, original contexts and
+  display order remain explicit.
+- Include authored English/Japanese examples and a guide to editing the
+  teaching tables, printing and reopening without a new search. Learner
+  HTML contains only selected contexts, prompts and attribution; teacher
+  notes stay separate. Existing APIs, dependencies, searches, resources
+  and calculations are unchanged.
+
 ## ldfreq 0.4.0.9003
 
 - Add explicitly sourced textbook-progression helpers and a worked

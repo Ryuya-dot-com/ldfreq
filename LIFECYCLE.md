@@ -68,6 +68,12 @@ roster and teaching introductions. It does not change existing saved
 records, core/resource contracts, exported functions or required
 dependencies.
 
+Development 0.4.0.9004 adds an explicitly sourced teaching-material
+example. It uses the existing exact phrase review to prepare learner
+HTML, teacher CSV and a complete private record. It adds no exported
+function or dependency and does not change source annotations, review
+semantics or numerical contracts.
+
 ## Method identity
 
 A `method_id` fixes the formula, scale, boundary and tail rules,

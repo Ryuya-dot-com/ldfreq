@@ -83,6 +83,15 @@ section roster and declared teaching introductions. Missing material and
 the available follow-up remain explicit; the example does not infer
 learning outcomes from repetition counts.
 
+The [DDL preparation
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.html)
+requires development **0.4.0.9004 or later**. Install
+`Ryuya-dot-com/ldfreq@v0.4.0.9004` with `pak`, or its named source
+archive from the release list. Select reviewed phrase examples and
+supply activity prompts to create a printable learner handout, separate
+teacher table and reusable private record. Learners do not need R. The
+helpers are explicitly sourced examples.
+
 ## Release scope and compatibility
 
 Version 0.4.0 keeps the calculations, public functions, result schemas
@@ -168,6 +177,7 @@ cannot recover them.
 | What changes when I count families, roots or affixes? | Complete annotations and a declared inventory; [word families and affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html) | Occurrences shared between conditions, unresolved words and coverage; keep whole-document counts separate from resolved-subset counts. |
 | Which words, contexts or positions characterize the documents? | Complete source-aligned annotations; [concordance and dispersion](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html), [collocation](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html), or [keyness](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html) | Original occurrences and zero-match documents; pair opportunities for association, or declared target/reference totals for keyness. |
 | Where do target words occur and recur in a textbook? | One saved search, an ordered page/Unit/section roster and declared introductions; [textbook progression](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.html) (development 0.4.0.9003 or later). | Counts, cumulative counts and later-Unit coverage with absent targets, missing material, selected scope and original contexts. |
+| How can teachers prepare materials from reviewed examples? | Accepted phrase occurrences, teacher-written prompts and source notices; [DDL preparation](https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.html) (development 0.4.0.9004 or later). | Printable learner HTML, separate teacher CSV and complete private RDS; pending candidates and original contexts remain traceable. |
 | Which writer/task/occasion observations entered my analysis? | Planned observations, submitted-document mapping and metric results; [repeated observations](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html) | Submission, calculation and reporting states; the row-selection audit and one specified response in the model table. |
 | Which documents have similar lexical composition? | Source-aligned annotations and explicit document IDs; [CA and classical MDS](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html) (0.3.0.9018 or later). | Complete profiles and selected features, CA contributions/cos², or the chosen distance, negative eigenvalues and reconstruction; return to original occurrences. |
 | Which categorical properties co-occur in individual uses? | Source-linked, explicitly coded occurrences; [MCA](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca) (development 0.4.0.9001 or later). | Complete-row exclusions, category counts, equal occurrence weights, unadjusted inertia, contributions/cos² and tied axes; retain coding decisions and source text. |

@@ -627,6 +627,13 @@ or alter TTR, MATTR or MTLD.
 
 ### Save the complete review and reproduce its tables
 
+For teacher preparation, the [DDL material
+example](https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.md)
+(development 0.4.0.9004 or later) uses an explicit subset of accepted
+occurrences to create learner HTML, a separate teacher table and a
+complete private record. It retains pending candidates and does not
+change this review’s criterion.
+
 ``` r
 phrase_record <- list(before = phrase_saved, after = phrase_after,
   worksheet_input = phrase_csv, session = sessionInfo())

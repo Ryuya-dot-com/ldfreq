@@ -95,6 +95,15 @@ any optional tools.
   teaching introductions, keeping missing material, follow-up scope and
   original uses.
 
+- How can teachers prepare materials from reviewed examples?:
+
+  Development 0.4.0.9004 adds an explicitly sourced [DDL preparation
+  example](https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.html).
+  Select accepted phrase occurrences, supply activity prompts and source
+  notices, and write learner HTML, a separate teacher CSV and a complete
+  private record. Pending candidates remain separate from the selected
+  teaching examples.
+
 - Which documents have similar lexical composition?:
 
   Use complete source annotations for [CA and classical

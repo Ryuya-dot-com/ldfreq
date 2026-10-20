@@ -30,6 +30,13 @@ sections, retaining missing material and the scope available after a
 declared teaching introduction. It is a descriptive example, not an
 automatic learning-effect assessment.
 
+Development **0.4.0.9004** adds a separately sourced [DDL preparation
+example](https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.md).
+It writes selected, reviewed phrase occurrences and teacher-written
+prompts to learner HTML, a separate teacher CSV and a complete private
+record. Original sources and pending decisions remain intact; it does
+not conduct or evaluate a classroom lesson.
+
 ## What is stable, experimental or an example?
 
 Stable means the documented computational and compatibility contract is
