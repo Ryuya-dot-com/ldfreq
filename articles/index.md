@@ -37,6 +37,8 @@
   distribution](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.md):
 - [Trace target vocabulary through textbook pages and
   units](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.md):
+- [Prepare teaching materials from reviewed
+  examples](https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.md):
 - [Count nearby words and explain their
   association](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.md):
 - [Compare word use against an explicit reference

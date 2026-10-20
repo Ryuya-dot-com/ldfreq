@@ -1,5 +1,21 @@
 # Changelog
 
+## ldfreq 0.4.0.9005
+
+- Extend the repeated-observations guide with an explicitly sourced
+  reporting recipe for task-specific means, equally task-weighted means
+  and one planned week-8 minus week-0 contrast. Optional emmeans and
+  pbkrtest supply explicitly requested Kenward–Roger intervals;
+  unavailable methods do not silently fall back to different inference.
+- Retain model-row identity, exclusions, diagnostics,
+  unobserved/extrapolated cells and original-scale observations. Problem
+  fits withhold interval tables. Save the complete record and replay
+  tables/plots without refitting.
+- The Gaussian MATTR example uses authored data to illustrate the
+  workflow, not establish model validity or learner development. No new
+  export or change to lexical calculations, resources or existing result
+  contracts.
+
 ## ldfreq 0.4.0.9004
 
 - Add an explicitly sourced DDL preparation example. Teachers select
@@ -45,11 +61,10 @@
 
 - Add an explicitly sourced occurrence-level MCA example. Original token
   anchors, coding definitions, metadata, unused levels and incomplete
-  observations remain in the saved input. Optional
-  [`ca::ca()`](https://rdrr.io/pkg/ca/man/ca.html) analyzes the complete
-  indicator matrix with equal occurrence weights and unadjusted inertia.
-  Coordinates, contributions, cosines and repeated-eigenvalue
-  diagnostics link back to the original text.
+  observations remain in the saved input. Optional `ca::ca()` analyzes
+  the complete indicator matrix with equal occurrence weights and
+  unadjusted inertia. Coordinates, contributions, cosines and
+  repeated-eigenvalue diagnostics link back to the original text.
 - Show separate occurrence/category maps and full-record reopening.
   These are descriptive examples, not automatic sense coding,
   writer-weighted inference or new exported APIs. Core calculations,

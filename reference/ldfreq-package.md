@@ -130,6 +130,11 @@ any optional tools.
   model](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html).
   Inspect the submission, calculation and reporting states and model-row
   audit; select one response specification for the model table.
+  Development 0.4.0.9005 extends this guide with specified means, one
+  planned time contrast, Kenward–Roger confidence intervals, diagnostics
+  and saved-table replay. Optional emmeans and pbkrtest support this
+  explicitly sourced reporting example; it is not an automatic
+  model-selection API.
 
 - How do lexical results relate to sentence or structural descriptions?:
 

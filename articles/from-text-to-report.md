@@ -660,7 +660,7 @@ stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 #> 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.
 #> 
-#> Calculations used ldfreq 0.3.0.9016: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
+#> Calculations used ldfreq 0.4.0.9005: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
 ```
 
 The CSV is a flat inspection table; **the RDS is the complete analysis
@@ -1420,10 +1420,15 @@ within model building and checking. For this workflow, we keep
 descriptive output separate from inference: these figures do not fit a
 model or generate confidence intervals. Choose the estimand, sampling
 units and dependence structure before using an existing modelling
-package for intervals or predictions. Overlapping MATTR windows are not
-independent replicates, and a pooled lexical network does not identify a
-person’s mental lexicon. A well-formatted figure does not supply those
-missing assumptions.
+package for intervals or predictions. Development 0.4.0.9005 adds a
+[mixed-model reporting
+example](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html#report-specified-means-and-one-planned-comparison)
+with explicitly specified means, one contrast, interval method and
+saved-table replay; its model-based intervals remain separate from the
+descriptive plots here. Overlapping MATTR windows are not independent
+replicates, and a pooled lexical network does not identify a person’s
+mental lexicon. A well-formatted figure does not supply those missing
+assumptions.
 
 ## Plot local vocabulary diversity
 
