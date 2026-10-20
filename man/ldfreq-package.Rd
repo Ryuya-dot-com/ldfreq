@@ -70,6 +70,12 @@ beside its values. The guides specify the input tables and any optional tools.
   Inspect document and feature selection, CA contributions and squared cosines, or the
   chosen dissimilarity, negative eigenvalues and distance reconstruction. Return
   to the original occurrences; a configuration does not test group differences.}
+  \item{Which categorical properties co-occur in individual uses?}{Development
+  0.4.0.9001 adds an explicitly sourced
+  \href{https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca}{occurrence-MCA example}.
+  Keep original token anchors, category definitions, incomplete-row exclusions,
+  equal occurrence weights and unadjusted inertia diagnostics. These helpers
+  do not select meanings or test group effects.}
   \item{Which writer/task/occasion observations entered my analysis?}{Keep
   planned observations, submissions and metric results separate in
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html}{From planned observations to a mixed model}.

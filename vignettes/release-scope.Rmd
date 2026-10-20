@@ -13,6 +13,14 @@ and reports. It is not a CRAN release. Install the named archive or fixed tag
 in the [installation instructions](https://ryuya-dot-com.github.io/ldfreq/index.html#installation); keep that
 archive, original inputs and complete saved results for later reuse.
 
+Development **0.4.0.9001** adds a separately sourced
+[occurrence-MCA example](lexical-ordination.html#occurrence-mca), absent from
+stable 0.4.0. It uses the existing optional `ca` package, with complete indicator
+rows, equal occurrence weights, unadjusted inertia and original source links.
+Category coding and inference remain the researcher's responsibility. It adds
+no exported API, required dependency, core calculation or bundled resource.
+The stable-release tables below continue to describe the fixed 0.4.0 archive.
+
 ## What is stable, experimental or an example?
 
 Stable means the documented computational and compatibility contract is

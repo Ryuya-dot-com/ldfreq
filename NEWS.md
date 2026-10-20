@@ -1,3 +1,14 @@
+# ldfreq 0.4.0.9001
+
+- Add an explicitly sourced occurrence-level MCA example. Original token anchors,
+  coding definitions, metadata, unused levels and incomplete observations remain
+  in the saved input. Optional `ca::ca()` analyzes the complete indicator matrix
+  with equal occurrence weights and unadjusted inertia. Coordinates, contributions,
+  cosines and repeated-eigenvalue diagnostics link back to the original text.
+- Show separate occurrence/category maps and full-record reopening. These are
+  descriptive examples, not automatic sense coding, writer-weighted inference or
+  new exported APIs. Core calculations, resource bytes and dependencies are unchanged.
+
 # ldfreq 0.4.0
 
 - Publish the documented research workflows as a fixed stable distribution.

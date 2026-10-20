@@ -17,6 +17,12 @@ rendered by pkgdown.
 
 ## Decisions
 
+- Development 0.4.0.9001 adds explicitly sourced occurrence-MCA helpers, not new
+  exports, classes or S3 methods. They reuse complete annotation inputs and
+  optional `ca::ca()` on the indicator matrix; source-bound categories, exclusions,
+  unadjusted diagnostics and complete saved records remain distinct from the
+  document-term CA interface. Existing CA/MDS records still validate.
+
 - The 0.3.0.9018 lexical-ordination example uses complete source annotations
   and an explicit document roster to prepare counts for optional `ca::ca()`
   and Jaccard/Hellinger `stats::cmdscale()`. Example records retain source rows,
