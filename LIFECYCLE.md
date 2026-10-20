@@ -52,6 +52,12 @@ predecessors (for example, 0.3.1 after 0.3.0.9001). The stable 0.4.0
 version sorts after 0.3.0.9019. The citation takes its version from
 installed DESCRIPTION metadata.
 
+The next development series starts at 0.4.0.9001. It adds the explicitly
+sourced occurrence-MCA example without changing the 0.4.0 core, resource
+or public API contracts. Stable v0.4.0 remains a separate fixed
+distribution; install a named development archive to use the new
+example.
+
 ## Method identity
 
 A `method_id` fixes the formula, scale, boundary and tail rules,

@@ -1,4 +1,4 @@
-# Explore lexical composition with CA and MDS
+# Explore lexical composition and categories with CA, MCA and MDS
 
 Which documents use similar vocabulary, and which words help explain
 their differences? Correspondence analysis (CA) describes a
@@ -14,6 +14,11 @@ R’s [`stats::cmdscale()`](https://rdrr.io/r/stats/cmdscale.html); CA
 requires the optional `ca` package (`install.packages("ca")`). No new
 tokenizer or model is needed. The example uses authored counts to make
 the calculations checkable, not empirical learner differences.
+
+The [occurrence-MCA example](#occurrence-mca) requires **0.4.0.9001 or
+later**, not stable 0.4.0. It describes several nominal variables coded
+for each original occurrence, rather than a document-by-term frequency
+table.
 
 ## Begin with the counted documents
 
@@ -127,16 +132,16 @@ if (has_ca) {
 #> 6    6 0.0008922818     0.0004812968
 #> $total_inertia
 #> [1] 1.853912
-#> 
+#>
 #> $requested_dimensions
 #> [1] 2
-#> 
+#>
 #> $effective_dimensions
 #> [1] 2
-#> 
+#>
 #> $eigenvalue_tolerance
 #> [1] 8.410747e-11
-#> 
+#>
 #>     id axis coordinate       mass contribution       cos2
 #>   rain    1 -1.6959986 0.08888889   0.30399319 0.79447114
 #>   tree    1 -1.1870903 0.15555556   0.26062645 0.75582475
@@ -226,55 +231,55 @@ coordinates.
 jaccard$diagnostics
 #> $requested_dimensions
 #> [1] 2
-#> 
+#>
 #> $effective_dimensions
 #> [1] 2
-#> 
+#>
 #> $negative_eigenvalues
 #> [1] 1
-#> 
+#>
 #> $negative_inertia_fraction
 #> [1] 0.001846276
-#> 
+#>
 #> $eigenvalue_tolerance
 #> [1] 1.095259e-10
-#> 
+#>
 #> $distance_rmse
 #> [1] 0.08992803
-#> 
+#>
 #> $relative_distance_error
 #> [1] 0.1128306
-#> 
+#>
 #> $GOF
 #> [1] 0.8834979 0.8851321
-#> 
+#>
 #> $engine_warnings
 #> character(0)
 hellinger$diagnostics
 #> $requested_dimensions
 #> [1] 2
-#> 
+#>
 #> $effective_dimensions
 #> [1] 2
-#> 
+#>
 #> $negative_eigenvalues
 #> [1] 0
-#> 
+#>
 #> $negative_inertia_fraction
 #> [1] 0
-#> 
+#>
 #> $eigenvalue_tolerance
 #> [1] 2.053396e-10
-#> 
+#>
 #> $distance_rmse
 #> [1] 0.2436704
-#> 
+#>
 #> $relative_distance_error
 #> [1] 0.2102844
-#> 
+#>
 #> $GOF
 #> [1] 0.776418 0.776418
-#> 
+#>
 #> $engine_warnings
 #> character(0)
 head(hellinger$pairs)
@@ -419,10 +424,265 @@ actual inertia and distance-reconstruction diagnostics from the saved
 results and describe their implications. Do not turn this authored
 example into an empirical claim about learner development.
 
-MCA, nonmetric MDS, automatic feature/distance selection and inferential
+Nonmetric MDS, automatic feature/distance selection and inferential
 tests are outside this recipe. CA and weighted PCoA with chi-square
 distances can describe the same geometry; agreement between such maps is
 not independent validation.
+
+## MCA: describe categories attached to original occurrences
+
+Do meanings co-occur with different grammatical roles and determiner
+choices? Here a row is one occurrence of *bank*, with author-assigned
+sense, noun-phrase role and determiner. Writer and document IDs remain
+metadata. For two variables, inspect a cross-tabulation first; use this
+MCA route when a joint low-dimensional description of several variables
+helps the question. Do not discretize a continuous score merely to make
+it suitable for MCA.
+
+``` r
+mca_demo <- new.env(parent = globalenv())
+sys.source(system.file("examples", "occurrence-mca-demo.R",
+  package = "ldfreq", mustWork = TRUE), mca_demo)
+mca_helper <- mca_demo$helper
+mca_table <- mca_demo$tab
+mca_table$variables
+#>     variable
+#> 1      sense
+#> 2       role
+#> 3 determiner
+#>                                                             definition
+#> 1 Author-intended financial institution or river edge; undecided is NA
+#> 2 Target noun phrase: subject, direct object, or prepositional oblique
+#> 3              The target phrase uses the (definite) or a (indefinite)
+#>   missing_n active_levels
+#> 1         1             2
+#> 2         1             3
+#> 3         0             2
+mca_table$observations
+#>    occurrence_id active                  status missing_variables
+#> 1            u01   TRUE                  active
+#> 2            u02   TRUE                  active
+#> 3            u03   TRUE                  active
+#> 4            u04   TRUE                  active
+#> 5            u05   TRUE                  active
+#> 6            u06   TRUE                  active
+#> 7            u07   TRUE                  active
+#> 8            u08   TRUE                  active
+#> 9            u09   TRUE                  active
+#> 10           u10   TRUE                  active
+#> 11           u11   TRUE                  active
+#> 12           u12   TRUE                  active
+#> 13           u13   TRUE                  active
+#> 14           u14   TRUE                  active
+#> 15           u15   TRUE                  active
+#> 16           u16  FALSE missing_active_category             sense
+#> 17           u17  FALSE missing_active_category              role
+mca_table$categories
+#>   category_id   variable        level observed_n active_n active
+#> 1        v1l1      sense      finance          9        8   TRUE
+#> 2        v1l2      sense        river          7        7   TRUE
+#> 3        v1l3      sense unused-sense          0        0  FALSE
+#> 4        v2l1       role       object          5        5   TRUE
+#> 5        v2l2       role      oblique          6        5   TRUE
+#> 6        v2l3       role      subject          5        5   TRUE
+#> 7        v3l1 determiner     definite         11        9   TRUE
+#> 8        v3l2 determiner   indefinite          6        6   TRUE
+#>                     status
+#> 1                   active
+#> 2                   active
+#> 3 no_complete_observations
+#> 4                   active
+#> 5                   active
+#> 6                   active
+#> 7                   active
+#> 8                   active
+```
+
+These are 17 authored occurrences, not human-subject data or model
+predictions. Two rows lack an active code, leaving 15 complete rows and
+seven active categories across three variables. An unused sense level
+stays in the audit. The missing rows remain in `occurrences` and can
+still be inspected; they are not a new category. The complete rows
+represent writers A/B/C with counts 8/4/3, so equal occurrence weighting
+is not equal writer weighting. Report exclusions by the study groups
+relevant to your question.
+
+For another source, load `concordance.R`, `lexical-ordination.R` and
+`occurrence-mca.R` into one environment. Supply an unchanged annotation
+import and an occurrence data frame with unique `occurrence_id`, the six
+unchanged source columns (`document_id`, `segment_id`, `token_index`,
+`start`, `end`, `surface`), your category columns and any study
+metadata. Each original token can appear only once. `source_text` is
+reserved for the source lookup output. This route concerns single-token
+occurrences; it does not merge a phrase into a lexical token.
+`definitions` is a named character vector describing the active columns
+and `coding_id` identifies the coding rules/version. Retain adjudication
+notes as metadata. Character categories and unordered factors are
+accepted, with `NA` for missing codes; numeric and ordered variables
+need a separate justified analysis, not implicit conversion.
+
+``` r
+mca_table <- mca_helper$ordination_mca_table(
+  annotations, occurrences,
+  definitions = c(sense = "Your explicit sense inventory",
+    role = "Your grammatical-role categories", determiner = "Your categories"),
+  coding_id = "reviewed-coding-rules-v1"
+)
+```
+
+``` r
+if (has_ca) {
+  mca_result <- mca_helper$ordination_mca(mca_table, k = 2)
+  print(mca_result$axes)
+  print(mca_result$diagnostics)
+  print(mca_result$categories, row.names = FALSE)
+}
+#>   axis   eigenvalue inertia_fraction retained tied_with_next
+#> 1    1 3.988996e-01     2.991747e-01     TRUE          FALSE
+#> 2    2 3.333333e-01     2.500000e-01     TRUE           TRUE
+#> 3    3 3.333333e-01     2.500000e-01    FALSE          FALSE
+#> 4    4 2.677670e-01     2.008253e-01    FALSE          FALSE
+#> 5    5 1.970247e-32     1.477685e-32    FALSE           TRUE
+#> 6    6 2.521422e-33     1.891067e-33    FALSE          FALSE
+#> $total_inertia
+#> [1] 1.333333
+#>
+#> $indicator_inertia
+#> [1] 1.333333
+#>
+#> $requested_dimensions
+#> [1] 2
+#>
+#> $effective_dimensions
+#> [1] 2
+#>
+#> $numerical_rank
+#> [1] 4
+#>
+#> $eigenvalue_tolerance
+#> [1] 3.988996e-11
+#>
+#> $retained_fraction
+#> [1] 0.5491747
+#>
+#> $cut_through_tied_axes
+#> [1] TRUE
+#>
+#>    id axis    coordinate      mass  distance contribution         cos2
+#>  v1l1    1 -7.235716e-01 0.1777778 0.9354143 2.333333e-01 5.983495e-01
+#>  v1l2    1  8.269389e-01 0.1555556 1.0690450 2.666667e-01 5.983495e-01
+#>  v2l1    1 -5.255105e-01 0.1111111 1.4142136 7.692308e-02 1.380806e-01
+#>  v2l2    1  1.051021e+00 0.1111111 1.4142136 3.076923e-01 5.523226e-01
+#>  v2l3    1 -5.255105e-01 0.1111111 1.4142136 7.692308e-02 1.380806e-01
+#>  v3l1    1 -1.751702e-01 0.2000000 0.8164966 1.538462e-02 4.602688e-02
+#>  v3l2    1  2.627553e-01 0.1333333 1.2247449 2.307692e-02 4.602688e-02
+#>  v1l1    2 -2.730441e-16 0.1777778 0.9354143 3.976165e-32 8.520355e-32
+#>  v1l2    2 -2.695901e-16 0.1555556 1.0690450 3.391678e-32 6.359395e-32
+#>  v2l1    2  8.383612e-01 0.1111111 1.4142136 2.342832e-01 3.514247e-01
+#>  v2l2    2  2.435153e-01 0.1111111 1.4142136 1.976656e-02 2.964984e-02
+#>  v2l3    2 -1.081876e+00 0.1111111 1.4142136 3.901522e-01 5.852283e-01
+#>  v3l1    2  4.870305e-01 0.2000000 0.8164966 1.423192e-01 3.557981e-01
+#>  v3l2    2 -7.305458e-01 0.1333333 1.2247449 2.134788e-01 3.557981e-01
+#>    variable      level
+#>       sense    finance
+#>       sense      river
+#>        role     object
+#>        role    oblique
+#>        role    subject
+#>  determiner   definite
+#>  determiner indefinite
+#>       sense    finance
+#>       sense      river
+#>        role     object
+#>        role    oblique
+#>        role    subject
+#>  determiner   definite
+#>  determiner indefinite
+```
+
+The helper passes the complete indicator matrix to
+[`ca::ca()`](https://rdrr.io/pkg/ca/man/ca.html). Each row contains one
+`1` per variable. With n rows, Q variables and J observed categories,
+row mass is 1/n, category mass is its count divided by nQ, and total
+**unadjusted** inertia is (J-Q)/Q: 4/3 here. Axis fractions use that
+full inertia, not a Benzécri/Greenacre adjustment or a denominator
+limited to plotted axes. Contributions and cos² are proportions as in
+CA. A rare category is retained with its count, not silently pooled;
+distant categories need not dominate an axis. Variables with fewer than
+two observed levels prevent fitting but keep their audit table. The
+dense indicator matrix has the declared `max_cells` limit; this is not a
+streaming or full-memory-bound implementation.
+
+The second and third eigenvalues coincide in this example. The first two
+axes account for about 54.9% of unadjusted inertia, but selecting only
+one direction from that tied eigenspace is not unique.
+`axes$tied_with_next` and `diagnostics$cut_through_tied_axes` expose
+this. Signs and tied-axis rotations can change across implementations
+without changing the complete geometry. Do not give those arbitrary
+orientations independent linguistic meanings.
+
+``` r
+if (has_ca) {
+  mca_helper$ordination_mca_plot(mca_result)
+  mca_helper$ordination_mca_plot(mca_result, "categories", monochrome = TRUE)
+}
+#> Warning: Displayed axes touch a repeated eigenvalue; their orientation is not
+#> unique. Inspect axes and diagnostics.
+```
+
+![](lexical-ordination_files/figure-html/mca-maps-1.png)
+
+    #> Warning: Displayed axes touch a repeated eigenvalue; their orientation is not
+    #> unique. Inspect axes and diagnostics.
+
+![](lexical-ordination_files/figure-html/mca-maps-2.png)
+
+The warning about repeated eigenvalues is intentional. These maps show
+the first two retained axes (one axis for rank-one inputs). Occurrence
+and category maps use separate principal coordinates: cross-map
+distances are not association strengths. Full tables retain co-located
+IDs even when display labels are combined. Interpret the coding scheme,
+category counts, contributions and representation quality together.
+Group labels used for display are not a test of group effects; MCA does
+not model repeated writers or capture every higher-order interaction.
+
+``` r
+mca_helper$ordination_mca_occurrences(mca_table, c("u01", "u16"))
+#>   document_id segment_id token_index start end surface occurrence_id writer_id
+#> 1         d01         s1           2     5   8    bank           u01  author-A
+#> 2         d16         s1           5    21  24    bank           u16  author-C
+#>     sense    role determiner                 source_text
+#> 1 finance subject   definite The bank approved the loan.
+#> 2    <NA> oblique   definite   We stopped near the bank.
+mca_record <- list(table = mca_table, mca = if (has_ca) mca_result else NULL,
+  session = sessionInfo())
+mca_path <- tempfile(fileext = ".rds") # Choose a persistent private path for research.
+saveRDS(mca_record, mca_path, version = 2)
+stopifnot(identical(readRDS(mca_path), mca_record))
+```
+
+In a fresh session, inspect stored coordinates and decisions without the
+parser, original input files or optional `ca` package; fitting is not
+rerun:
+
+``` r
+library(ldfreq)
+mca_helper <- new.env(parent = globalenv())
+for (script in c("concordance.R", "lexical-ordination.R", "occurrence-mca.R"))
+  sys.source(system.file("examples", script, package = "ldfreq", mustWork = TRUE), mca_helper)
+mca_record <- readRDS("occurrence-mca-record.rds")
+mca_helper$ordination_validate(mca_record$table)
+mca_helper$ordination_validate(mca_record$mca)
+mca_record$mca$categories
+mca_helper$ordination_mca_occurrences(mca_record$table, "u01")
+```
+
+Keep the complete record under the source text’s access conditions and
+preserve its original calculation session. The record detects accidental
+edits, not false coding or forged metadata. Cite the supplied
+annotations/coding method, ldfreq archive and the `ca` paper below. This
+example validates a computational route; it does not establish sense
+accuracy, proficiency or causal explanations.
 
 ## References
 

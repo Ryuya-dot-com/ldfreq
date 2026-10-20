@@ -39,7 +39,7 @@
   association](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.md):
 - [Compare word use against an explicit reference
   corpus](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.md):
-- [Explore lexical composition with CA and
+- [Explore lexical composition and categories with CA, MCA and
   MDS](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.md):
 - [Calculate English readability with visible counting
   decisions](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.md):

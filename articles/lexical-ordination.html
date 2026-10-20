@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Explore lexical composition with CA and MDS • ldfreq</title>
+<title>Explore lexical composition and categories with CA, MCA and MDS • ldfreq</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Explore lexical composition with CA and MDS">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Explore lexical composition and categories with CA, MCA and MDS">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Explore lexical composition with CA and MDS</h1>
+      <h1>Explore lexical composition and categories with CA, MCA and MDS</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/vignettes/lexical-ordination.Rmd" class="external-link"><code>vignettes/lexical-ordination.Rmd</code></a></small>
@@ -84,6 +84,10 @@ functions. MDS uses R’s <code><a href="https://rdrr.io/r/stats/cmdscale.html" 
 optional <code>ca</code> package (<code>install.packages("ca")</code>).
 No new tokenizer or model is needed. The example uses authored counts to
 make the calculations checkable, not empirical learner differences.</p>
+<p>The <a href="#occurrence-mca">occurrence-MCA example</a> requires
+<strong>0.4.0.9001 or later</strong>, not stable 0.4.0. It describes
+several nominal variables coded for each original occurrence, rather
+than a document-by-term frequency table.</p>
 <div class="section level2">
 <h2 id="begin-with-the-counted-documents">Begin with the counted documents<a class="anchor" aria-label="anchor" href="#begin-with-the-counted-documents"></a>
 </h2>
@@ -454,10 +458,250 @@ frequency composition with separately defined MDS distances.” Add the
 actual inertia and distance-reconstruction diagnostics from the saved
 results and describe their implications. Do not turn this authored
 example into an empirical claim about learner development.</p>
-<p>MCA, nonmetric MDS, automatic feature/distance selection and
-inferential tests are outside this recipe. CA and weighted PCoA with
-chi-square distances can describe the same geometry; agreement between
-such maps is not independent validation.</p>
+<p>Nonmetric MDS, automatic feature/distance selection and inferential
+tests are outside this recipe. CA and weighted PCoA with chi-square
+distances can describe the same geometry; agreement between such maps is
+not independent validation.</p>
+</div>
+<div class="section level2">
+<h2 id="occurrence-mca">MCA: describe categories attached to original occurrences<a class="anchor" aria-label="anchor" href="#occurrence-mca"></a>
+</h2>
+<p>Do meanings co-occur with different grammatical roles and determiner
+choices? Here a row is one occurrence of <em>bank</em>, with
+author-assigned sense, noun-phrase role and determiner. Writer and
+document IDs remain metadata. For two variables, inspect a
+cross-tabulation first; use this MCA route when a joint low-dimensional
+description of several variables helps the question. Do not discretize a
+continuous score merely to make it suitable for MCA.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mca_demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"occurrence-mca-demo.R"</span>,</span>
+<span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">mca_demo</span><span class="op">)</span></span>
+<span><span class="va">mca_helper</span> <span class="op">&lt;-</span> <span class="va">mca_demo</span><span class="op">$</span><span class="va">helper</span></span>
+<span><span class="va">mca_table</span> <span class="op">&lt;-</span> <span class="va">mca_demo</span><span class="op">$</span><span class="va">tab</span></span>
+<span><span class="va">mca_table</span><span class="op">$</span><span class="va">variables</span></span>
+<span><span class="co">#&gt;     variable</span></span>
+<span><span class="co">#&gt; 1      sense</span></span>
+<span><span class="co">#&gt; 2       role</span></span>
+<span><span class="co">#&gt; 3 determiner</span></span>
+<span><span class="co">#&gt;                                                             definition</span></span>
+<span><span class="co">#&gt; 1 Author-intended financial institution or river edge; undecided is NA</span></span>
+<span><span class="co">#&gt; 2 Target noun phrase: subject, direct object, or prepositional oblique</span></span>
+<span><span class="co">#&gt; 3              The target phrase uses the (definite) or a (indefinite)</span></span>
+<span><span class="co">#&gt;   missing_n active_levels</span></span>
+<span><span class="co">#&gt; 1         1             2</span></span>
+<span><span class="co">#&gt; 2         1             3</span></span>
+<span><span class="co">#&gt; 3         0             2</span></span>
+<span><span class="va">mca_table</span><span class="op">$</span><span class="va">observations</span></span>
+<span><span class="co">#&gt;    occurrence_id active                  status missing_variables</span></span>
+<span><span class="co">#&gt; 1            u01   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 2            u02   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 3            u03   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 4            u04   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 5            u05   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 6            u06   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 7            u07   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 8            u08   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 9            u09   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 10           u10   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 11           u11   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 12           u12   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 13           u13   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 14           u14   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 15           u15   TRUE                  active                  </span></span>
+<span><span class="co">#&gt; 16           u16  FALSE missing_active_category             sense</span></span>
+<span><span class="co">#&gt; 17           u17  FALSE missing_active_category              role</span></span>
+<span><span class="va">mca_table</span><span class="op">$</span><span class="va">categories</span></span>
+<span><span class="co">#&gt;   category_id   variable        level observed_n active_n active</span></span>
+<span><span class="co">#&gt; 1        v1l1      sense      finance          9        8   TRUE</span></span>
+<span><span class="co">#&gt; 2        v1l2      sense        river          7        7   TRUE</span></span>
+<span><span class="co">#&gt; 3        v1l3      sense unused-sense          0        0  FALSE</span></span>
+<span><span class="co">#&gt; 4        v2l1       role       object          5        5   TRUE</span></span>
+<span><span class="co">#&gt; 5        v2l2       role      oblique          6        5   TRUE</span></span>
+<span><span class="co">#&gt; 6        v2l3       role      subject          5        5   TRUE</span></span>
+<span><span class="co">#&gt; 7        v3l1 determiner     definite         11        9   TRUE</span></span>
+<span><span class="co">#&gt; 8        v3l2 determiner   indefinite          6        6   TRUE</span></span>
+<span><span class="co">#&gt;                     status</span></span>
+<span><span class="co">#&gt; 1                   active</span></span>
+<span><span class="co">#&gt; 2                   active</span></span>
+<span><span class="co">#&gt; 3 no_complete_observations</span></span>
+<span><span class="co">#&gt; 4                   active</span></span>
+<span><span class="co">#&gt; 5                   active</span></span>
+<span><span class="co">#&gt; 6                   active</span></span>
+<span><span class="co">#&gt; 7                   active</span></span>
+<span><span class="co">#&gt; 8                   active</span></span></code></pre></div>
+<p>These are 17 authored occurrences, not human-subject data or model
+predictions. Two rows lack an active code, leaving 15 complete rows and
+seven active categories across three variables. An unused sense level
+stays in the audit. The missing rows remain in <code>occurrences</code>
+and can still be inspected; they are not a new category. The complete
+rows represent writers A/B/C with counts 8/4/3, so equal occurrence
+weighting is not equal writer weighting. Report exclusions by the study
+groups relevant to your question.</p>
+<p>For another source, load <code>concordance.R</code>,
+<code>lexical-ordination.R</code> and <code>occurrence-mca.R</code> into
+one environment. Supply an unchanged annotation import and an occurrence
+data frame with unique <code>occurrence_id</code>, the six unchanged
+source columns (<code>document_id</code>, <code>segment_id</code>,
+<code>token_index</code>, <code>start</code>, <code>end</code>,
+<code>surface</code>), your category columns and any study metadata.
+Each original token can appear only once. <code>source_text</code> is
+reserved for the source lookup output. This route concerns single-token
+occurrences; it does not merge a phrase into a lexical token.
+<code>definitions</code> is a named character vector describing the
+active columns and <code>coding_id</code> identifies the coding
+rules/version. Retain adjudication notes as metadata. Character
+categories and unordered factors are accepted, with <code>NA</code> for
+missing codes; numeric and ordered variables need a separate justified
+analysis, not implicit conversion.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mca_table</span> <span class="op">&lt;-</span> <span class="va">mca_helper</span><span class="op">$</span><span class="fu">ordination_mca_table</span><span class="op">(</span></span>
+<span>  <span class="va">annotations</span>, <span class="va">occurrences</span>,</span>
+<span>  definitions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>sense <span class="op">=</span> <span class="st">"Your explicit sense inventory"</span>,</span>
+<span>    role <span class="op">=</span> <span class="st">"Your grammatical-role categories"</span>, determiner <span class="op">=</span> <span class="st">"Your categories"</span><span class="op">)</span>,</span>
+<span>  coding_id <span class="op">=</span> <span class="st">"reviewed-coding-rules-v1"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_ca</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">mca_result</span> <span class="op">&lt;-</span> <span class="va">mca_helper</span><span class="op">$</span><span class="fu">ordination_mca</span><span class="op">(</span><span class="va">mca_table</span>, k <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mca_result</span><span class="op">$</span><span class="va">axes</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mca_result</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mca_result</span><span class="op">$</span><span class="va">categories</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt;   axis   eigenvalue inertia_fraction retained tied_with_next</span></span>
+<span><span class="co">#&gt; 1    1 3.988996e-01     2.991747e-01     TRUE          FALSE</span></span>
+<span><span class="co">#&gt; 2    2 3.333333e-01     2.500000e-01     TRUE           TRUE</span></span>
+<span><span class="co">#&gt; 3    3 3.333333e-01     2.500000e-01    FALSE          FALSE</span></span>
+<span><span class="co">#&gt; 4    4 2.677670e-01     2.008253e-01    FALSE          FALSE</span></span>
+<span><span class="co">#&gt; 5    5 1.970247e-32     1.477685e-32    FALSE           TRUE</span></span>
+<span><span class="co">#&gt; 6    6 2.521422e-33     1.891067e-33    FALSE          FALSE</span></span>
+<span><span class="co">#&gt; $total_inertia</span></span>
+<span><span class="co">#&gt; [1] 1.333333</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $indicator_inertia</span></span>
+<span><span class="co">#&gt; [1] 1.333333</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $requested_dimensions</span></span>
+<span><span class="co">#&gt; [1] 2</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $effective_dimensions</span></span>
+<span><span class="co">#&gt; [1] 2</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $numerical_rank</span></span>
+<span><span class="co">#&gt; [1] 4</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $eigenvalue_tolerance</span></span>
+<span><span class="co">#&gt; [1] 3.988996e-11</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $retained_fraction</span></span>
+<span><span class="co">#&gt; [1] 0.5491747</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $cut_through_tied_axes</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    id axis    coordinate      mass  distance contribution         cos2</span></span>
+<span><span class="co">#&gt;  v1l1    1 -7.235716e-01 0.1777778 0.9354143 2.333333e-01 5.983495e-01</span></span>
+<span><span class="co">#&gt;  v1l2    1  8.269389e-01 0.1555556 1.0690450 2.666667e-01 5.983495e-01</span></span>
+<span><span class="co">#&gt;  v2l1    1 -5.255105e-01 0.1111111 1.4142136 7.692308e-02 1.380806e-01</span></span>
+<span><span class="co">#&gt;  v2l2    1  1.051021e+00 0.1111111 1.4142136 3.076923e-01 5.523226e-01</span></span>
+<span><span class="co">#&gt;  v2l3    1 -5.255105e-01 0.1111111 1.4142136 7.692308e-02 1.380806e-01</span></span>
+<span><span class="co">#&gt;  v3l1    1 -1.751702e-01 0.2000000 0.8164966 1.538462e-02 4.602688e-02</span></span>
+<span><span class="co">#&gt;  v3l2    1  2.627553e-01 0.1333333 1.2247449 2.307692e-02 4.602688e-02</span></span>
+<span><span class="co">#&gt;  v1l1    2 -2.730441e-16 0.1777778 0.9354143 3.976165e-32 8.520355e-32</span></span>
+<span><span class="co">#&gt;  v1l2    2 -2.695901e-16 0.1555556 1.0690450 3.391678e-32 6.359395e-32</span></span>
+<span><span class="co">#&gt;  v2l1    2  8.383612e-01 0.1111111 1.4142136 2.342832e-01 3.514247e-01</span></span>
+<span><span class="co">#&gt;  v2l2    2  2.435153e-01 0.1111111 1.4142136 1.976656e-02 2.964984e-02</span></span>
+<span><span class="co">#&gt;  v2l3    2 -1.081876e+00 0.1111111 1.4142136 3.901522e-01 5.852283e-01</span></span>
+<span><span class="co">#&gt;  v3l1    2  4.870305e-01 0.2000000 0.8164966 1.423192e-01 3.557981e-01</span></span>
+<span><span class="co">#&gt;  v3l2    2 -7.305458e-01 0.1333333 1.2247449 2.134788e-01 3.557981e-01</span></span>
+<span><span class="co">#&gt;    variable      level</span></span>
+<span><span class="co">#&gt;       sense    finance</span></span>
+<span><span class="co">#&gt;       sense      river</span></span>
+<span><span class="co">#&gt;        role     object</span></span>
+<span><span class="co">#&gt;        role    oblique</span></span>
+<span><span class="co">#&gt;        role    subject</span></span>
+<span><span class="co">#&gt;  determiner   definite</span></span>
+<span><span class="co">#&gt;  determiner indefinite</span></span>
+<span><span class="co">#&gt;       sense    finance</span></span>
+<span><span class="co">#&gt;       sense      river</span></span>
+<span><span class="co">#&gt;        role     object</span></span>
+<span><span class="co">#&gt;        role    oblique</span></span>
+<span><span class="co">#&gt;        role    subject</span></span>
+<span><span class="co">#&gt;  determiner   definite</span></span>
+<span><span class="co">#&gt;  determiner indefinite</span></span></code></pre></div>
+<p>The helper passes the complete indicator matrix to
+<code><a href="https://rdrr.io/pkg/ca/man/ca.html" class="external-link">ca::ca()</a></code>. Each row contains one <code>1</code> per
+variable. With n rows, Q variables and J observed categories, row mass
+is 1/n, category mass is its count divided by nQ, and total
+<strong>unadjusted</strong> inertia is (J-Q)/Q: 4/3 here. Axis fractions
+use that full inertia, not a Benzécri/Greenacre adjustment or a
+denominator limited to plotted axes. Contributions and cos² are
+proportions as in CA. A rare category is retained with its count, not
+silently pooled; distant categories need not dominate an axis. Variables
+with fewer than two observed levels prevent fitting but keep their audit
+table. The dense indicator matrix has the declared
+<code>max_cells</code> limit; this is not a streaming or
+full-memory-bound implementation.</p>
+<p>The second and third eigenvalues coincide in this example. The first
+two axes account for about 54.9% of unadjusted inertia, but selecting
+only one direction from that tied eigenspace is not unique.
+<code>axes$tied_with_next</code> and
+<code>diagnostics$cut_through_tied_axes</code> expose this. Signs and
+tied-axis rotations can change across implementations without changing
+the complete geometry. Do not give those arbitrary orientations
+independent linguistic meanings.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_ca</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">mca_helper</span><span class="op">$</span><span class="fu">ordination_mca_plot</span><span class="op">(</span><span class="va">mca_result</span><span class="op">)</span></span>
+<span>  <span class="va">mca_helper</span><span class="op">$</span><span class="fu">ordination_mca_plot</span><span class="op">(</span><span class="va">mca_result</span>, <span class="st">"categories"</span>, monochrome <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; Warning: Displayed axes touch a repeated eigenvalue; their orientation is not</span></span>
+<span><span class="co">#&gt; unique. Inspect axes and diagnostics.</span></span></code></pre></div>
+<p><img src="lexical-ordination_files/figure-html/mca-maps-1.png" class="r-plt" alt="" width="576"></p>
+<pre><code><span><span class="co">#&gt; Warning: Displayed axes touch a repeated eigenvalue; their orientation is not</span></span>
+<span><span class="co">#&gt; unique. Inspect axes and diagnostics.</span></span></code></pre>
+<p><img src="lexical-ordination_files/figure-html/mca-maps-2.png" class="r-plt" alt="" width="576"></p>
+<p>The warning about repeated eigenvalues is intentional. These maps
+show the first two retained axes (one axis for rank-one inputs).
+Occurrence and category maps use separate principal coordinates:
+cross-map distances are not association strengths. Full tables retain
+co-located IDs even when display labels are combined. Interpret the
+coding scheme, category counts, contributions and representation quality
+together. Group labels used for display are not a test of group effects;
+MCA does not model repeated writers or capture every higher-order
+interaction.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mca_helper</span><span class="op">$</span><span class="fu">ordination_mca_occurrences</span><span class="op">(</span><span class="va">mca_table</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"u01"</span>, <span class="st">"u16"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   document_id segment_id token_index start end surface occurrence_id writer_id</span></span>
+<span><span class="co">#&gt; 1         d01         s1           2     5   8    bank           u01  author-A</span></span>
+<span><span class="co">#&gt; 2         d16         s1           5    21  24    bank           u16  author-C</span></span>
+<span><span class="co">#&gt;     sense    role determiner                 source_text</span></span>
+<span><span class="co">#&gt; 1 finance subject   definite The bank approved the loan.</span></span>
+<span><span class="co">#&gt; 2    &lt;NA&gt; oblique   definite   We stopped near the bank.</span></span>
+<span><span class="va">mca_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>table <span class="op">=</span> <span class="va">mca_table</span>, mca <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">has_ca</span><span class="op">)</span> <span class="va">mca_result</span> <span class="kw">else</span> <span class="cn">NULL</span>,</span>
+<span>  session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">mca_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span> <span class="co"># Choose a persistent private path for research.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">mca_record</span>, <span class="va">mca_path</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">mca_path</span><span class="op">)</span>, <span class="va">mca_record</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>In a fresh session, inspect stored coordinates and decisions without
+the parser, original input files or optional <code>ca</code> package;
+fitting is not rerun:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span><span class="va">mca_helper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">script</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"concordance.R"</span>, <span class="st">"lexical-ordination.R"</span>, <span class="st">"occurrence-mca.R"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="va">script</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">mca_helper</span><span class="op">)</span></span>
+<span><span class="va">mca_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"occurrence-mca-record.rds"</span><span class="op">)</span></span>
+<span><span class="va">mca_helper</span><span class="op">$</span><span class="fu">ordination_validate</span><span class="op">(</span><span class="va">mca_record</span><span class="op">$</span><span class="va">table</span><span class="op">)</span></span>
+<span><span class="va">mca_helper</span><span class="op">$</span><span class="fu">ordination_validate</span><span class="op">(</span><span class="va">mca_record</span><span class="op">$</span><span class="va">mca</span><span class="op">)</span></span>
+<span><span class="va">mca_record</span><span class="op">$</span><span class="va">mca</span><span class="op">$</span><span class="va">categories</span></span>
+<span><span class="va">mca_helper</span><span class="op">$</span><span class="fu">ordination_mca_occurrences</span><span class="op">(</span><span class="va">mca_record</span><span class="op">$</span><span class="va">table</span>, <span class="st">"u01"</span><span class="op">)</span></span></code></pre></div>
+<p>Keep the complete record under the source text’s access conditions
+and preserve its original calculation session. The record detects
+accidental edits, not false coding or forged metadata. Cite the supplied
+annotations/coding method, ldfreq archive and the <code>ca</code> paper
+below. This example validates a computational route; it does not
+establish sense accuracy, proficiency or causal explanations.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

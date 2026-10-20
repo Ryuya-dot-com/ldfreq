@@ -62,6 +62,15 @@ to open the introduction.
 also explains how to find explicitly sourced example helpers, which have
 no individual `?function` entry.
 
+The occurrence-level MCA example requires the separate development
+snapshot **0.4.0.9001**. Install `Ryuya-dot-com/ldfreq@v0.4.0.9001` with
+`pak`, or its named source archive from the release list. Stable 0.4.0
+does not contain it. The [MCA
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca)
+keeps category definitions, incomplete rows, original occurrences and
+unadjusted inertia diagnostics together. Its helpers are explicitly
+sourced examples.
+
 ## Release scope and compatibility
 
 Version 0.4.0 keeps the calculations, public functions, result schemas
@@ -148,6 +157,7 @@ cannot recover them.
 | Which words, contexts or positions characterize the documents? | Complete source-aligned annotations; [concordance and dispersion](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html), [collocation](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html), or [keyness](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html) | Original occurrences and zero-match documents; pair opportunities for association, or declared target/reference totals for keyness. |
 | Which writer/task/occasion observations entered my analysis? | Planned observations, submitted-document mapping and metric results; [repeated observations](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html) | Submission, calculation and reporting states; the row-selection audit and one specified response in the model table. |
 | Which documents have similar lexical composition? | Source-aligned annotations and explicit document IDs; [CA and classical MDS](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html) (0.3.0.9018 or later). | Complete profiles and selected features, CA contributions/cos², or the chosen distance, negative eigenvalues and reconstruction; return to original occurrences. |
+| Which categorical properties co-occur in individual uses? | Source-linked, explicitly coded occurrences; [MCA](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca) (development 0.4.0.9001 or later). | Complete-row exclusions, category counts, equal occurrence weights, unadjusted inertia, contributions/cos² and tied axes; retain coding decisions and source text. |
 | How do lexical results relate to sentence or structural descriptions? | The same source texts and document IDs, with sentence/syllable counts or traced parser output; [English readability](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html) and [syntactic complexity](https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.html) | Each measure’s numerator, denominator, unavailable values and review decisions before joining document rows. |
 
 A document ID connects records; it does not make their counting units
@@ -1073,7 +1083,7 @@ resources retain their own terms; see `LICENSE` and the installed
   association](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.md):
 - [Compare word use against an explicit reference
   corpus](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.md):
-- [Explore lexical composition with CA and
+- [Explore lexical composition and categories with CA, MCA and
   MDS](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.md):
 - [Calculate English readability with visible counting
   decisions](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.md):

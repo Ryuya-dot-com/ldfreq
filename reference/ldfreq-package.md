@@ -94,6 +94,15 @@ any optional tools.
   distance reconstruction. Return to the original occurrences; a
   configuration does not test group differences.
 
+- Which categorical properties co-occur in individual uses?:
+
+  Development 0.4.0.9001 adds an explicitly sourced [occurrence-MCA
+  example](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca).
+  Keep original token anchors, category definitions, incomplete-row
+  exclusions, equal occurrence weights and unadjusted inertia
+  diagnostics. These helpers do not select meanings or test group
+  effects.
+
 - Which writer/task/occasion observations entered my analysis?:
 
   Keep planned observations, submissions and metric results separate in
