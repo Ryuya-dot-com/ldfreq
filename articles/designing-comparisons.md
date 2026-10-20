@@ -31,7 +31,7 @@ three different roles:
 | Comparison sample | How do comparable L1 and L2 responses to a task differ? | A conditional group comparison, with task and sampling differences still considered |
 
 For student writing,
-[LOCNESS](https://corpora.uclouvain.be/catalog/en/corpus/locness)
+[LOCNESS](https://uclouvain.be/en/research-institutes/ilc/cecl/locness)
 contains essays by British and American native English students. For
 natural conversation, [Spoken
 BNC2014](https://www.lancaster.ac.uk/news/articles/2017/researchers-release-largest-ever-public-collection-of-british-conversations/)

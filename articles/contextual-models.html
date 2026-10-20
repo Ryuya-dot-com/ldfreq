@@ -834,13 +834,15 @@ remain a separate operation.</p>
 <div class="section level2">
 <h2 id="use-existing-r-tools-where-they-fit">Use existing R tools where they fit<a class="anchor" aria-label="anchor" href="#use-existing-r-tools-where-they-fit"></a>
 </h2>
-<p><a href="https://www.r-text.org/" class="external-link">text</a> already calls Transformer
-models from R through Python. <code>text::textEmbed()</code> supports
-token/layer aggregation. An adapter must additionally demonstrate exact
-per-occurrence target alignment: do not label sentence or word-type
-vectors as target-token vectors. For Japanese, review preprocessing
-explicitly: the documented <code>remove_non_ascii</code> default is
-<code>TRUE</code>. See <a href="https://www.r-text.org/reference/textEmbed.html" class="external-link">textEmbed</a>.</p>
+<p><a href="https://cran.r-project.org/package=text" class="external-link">text</a> already
+calls Transformer models from R through Python.
+<code>text::textEmbed()</code> supports token/layer aggregation. An
+adapter must additionally demonstrate exact per-occurrence target
+alignment: do not label sentence or word-type vectors as target-token
+vectors. For Japanese, review preprocessing explicitly: the documented
+<code>remove_non_ascii</code> default is <code>TRUE</code>. See
+<code>textEmbed</code> in the <a href="https://cran.r-project.org/package=text" class="external-link">text package
+documentation</a>.</p>
 <p>ldfreq adds checked source joins, missing-output coverage and
 connections to human KWIC reviews and lexical resources. It does not
 claim a new embedding algorithm or better accuracy. Either R or Python

@@ -216,6 +216,8 @@ returns a named empty list.
 [`lexdiv_tokenize`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md),
 [`lexdiv_metrics_text`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md),
 [`tubelex_diagnostics`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_diagnostics.md);
+[`vignette("getting-started", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.md)
+for batch profiles;
 [`vignette("tubelex-input", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.md)
 for the optional external tokenization recipe and its reproducibility
 boundaries.
@@ -298,24 +300,6 @@ profile$provenance$formula_parameters
 #> $channel_total
 #> [1] 68405
 #> 
-
-profiles <- tubelex_profile_batch(list(essay_a = tokens, essay_b = c("the", "book")))
-profiles$essay_a$summary
-#>   weighting eligible_items matched_items coverage mean_zipf   sd_zipf
-#> 1     token              9             9        1  6.601118 0.7946027
-#> 2      type              8             8        1  6.533295 0.8211448
-#>   mean_video_prevalence mean_channel_prevalence
-#> 1            -0.3360080               -0.345417
-#> 2            -0.3712797               -0.376663
-
-# Typography alone can be normalized explicitly after token preparation.
-tubelex_profile(c("it", "\u2019s"), normalization = "tubelex_apostrophe")$lookup
-#>   query_index term lookup_term matched resource_word   count videos channels
-#> 1           1   it          it    TRUE            it 2917104  95070    56204
-#> 2           2   ’s          's    TRUE            's 2400420  93407    54909
-#>       zipf video_prevalence channel_prevalence
-#> 1 7.228367      -0.04617071        -0.08532559
-#> 2 7.143702      -0.05383470        -0.09544910
 
 contract_files <- c(
   "tubelex-frequency-profile-contract.json",

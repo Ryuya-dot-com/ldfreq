@@ -737,13 +737,14 @@ operation.
 
 ## Use existing R tools where they fit
 
-[text](https://www.r-text.org/) already calls Transformer models from R
-through Python. `text::textEmbed()` supports token/layer aggregation. An
-adapter must additionally demonstrate exact per-occurrence target
-alignment: do not label sentence or word-type vectors as target-token
-vectors. For Japanese, review preprocessing explicitly: the documented
-`remove_non_ascii` default is `TRUE`. See
-[textEmbed](https://www.r-text.org/reference/textEmbed.html).
+[text](https://cran.r-project.org/package=text) already calls
+Transformer models from R through Python. `text::textEmbed()` supports
+token/layer aggregation. An adapter must additionally demonstrate exact
+per-occurrence target alignment: do not label sentence or word-type
+vectors as target-token vectors. For Japanese, review preprocessing
+explicitly: the documented `remove_non_ascii` default is `TRUE`. See
+`textEmbed` in the [text package
+documentation](https://cran.r-project.org/package=text).
 
 ldfreq adds checked source joins, missing-output coverage and
 connections to human KWIC reviews and lexical resources. It does not
