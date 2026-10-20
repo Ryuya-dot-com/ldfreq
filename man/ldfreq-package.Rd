@@ -75,7 +75,8 @@ beside its values. The guides specify the input tables and any optional tools.
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca}{occurrence-MCA example}.
   Keep original token anchors, category definitions, incomplete-row exclusions,
   equal occurrence weights and unadjusted inertia diagnostics. These helpers
-  do not select meanings or test group effects.}
+  do not select meanings or test group effects. Version 0.4.0.9002 also accepts
+  separate display labels on its MCA maps, matched to the original point IDs.}
   \item{Which writer/task/occasion observations entered my analysis?}{Keep
   planned observations, submissions and metric results separate in
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html}{From planned observations to a mixed model}.

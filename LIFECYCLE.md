@@ -51,6 +51,9 @@ occurrence-MCA example without changing the 0.4.0 core, resource or public API
 contracts. Stable v0.4.0 remains a separate fixed distribution; install a named
 development archive to use the new example.
 
+Development 0.4.0.9002 adds optional display labels to its plotting helper.
+This display-only choice leaves original IDs, saved analyses and geometry intact.
+
 ## Method identity
 
 A `method_id` fixes the formula, scale, boundary and tail rules, operation

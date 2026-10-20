@@ -1,3 +1,14 @@
+# ldfreq 0.4.0.9002
+
+- Let the sourced MCA plot example use a named `labels` vector for readable
+  display names, including the long occurrence IDs returned by ambiguity review.
+  Labels are matched by ID and returned with original IDs and coordinates;
+  saved analyses and their geometry are unchanged. The guide shows how to keep
+  the display mapping with the complete record.
+- Group numerically co-located labels near zero in the sourced CA/MCA/MDS plots.
+  Only label grouping uses rounded coordinates; fitted and returned coordinates
+  remain unchanged.
+
 # ldfreq 0.4.0.9001
 
 - Add an explicitly sourced occurrence-level MCA example. Original token anchors,

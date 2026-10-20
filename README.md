@@ -57,11 +57,12 @@ to open the introduction. `?ldfreq` also explains how to find explicitly sourced
 example helpers, which have no individual `?function` entry.
 
 The occurrence-level MCA example requires the separate development snapshot
-**0.4.0.9001**. Install `Ryuya-dot-com/ldfreq@v0.4.0.9001` with `pak`, or its
+**0.4.0.9001 or later**. Install `Ryuya-dot-com/ldfreq@v0.4.0.9002` with `pak`, or its
 named source archive from the release list. Stable 0.4.0 does not contain it.
 The [MCA guide](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca)
 keeps category definitions, incomplete rows, original occurrences and unadjusted
 inertia diagnostics together. Its helpers are explicitly sourced examples.
+Version 0.4.0.9002 adds ID-matched display labels for long occurrence IDs.
 
 ## Release scope and compatibility
 

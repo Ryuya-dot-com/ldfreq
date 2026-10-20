@@ -21,6 +21,10 @@ Category coding and inference remain the researcher's responsibility. It adds
 no exported API, required dependency, core calculation or bundled resource.
 The stable-release tables below continue to describe the fixed 0.4.0 archive.
 
+Development **0.4.0.9002** lets that MCA plot use separately named display labels
+for long occurrence IDs. The original IDs, saved fits and numerical results
+are unchanged; save the display mapping with the complete analysis record.
+
 ## What is stable, experimental or an example?
 
 Stable means the documented computational and compatibility contract is
