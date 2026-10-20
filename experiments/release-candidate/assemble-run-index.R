@@ -106,18 +106,10 @@ expected_labels <- c(
   "windows-latest-r-release"
 )
 check(setequal(labels, expected_labels) && !anyDuplicated(labels), "The check matrix labels are incomplete or duplicated.")
-maintainer_pattern <- paste0(
-  "^Maintainer: [‘']?[^<>[:cntrl:]]+ ",
-  "<[^<>[:space:]]+@[^<>[:space:]]+>[’']?[[:space:]]*$"
-)
-incoming_stage_pattern <- paste0(
-  "^\\* checking CRAN incoming feasibility \\.\\.\\. ",
-  "(\\[[^]]+\\] )?NOTE$"
-)
-dependency_stage_pattern <- paste0(
-  "^\\* checking package dependencies \\.\\.\\. ",
-  "(\\[[^]]+\\] )?NOTE$"
-)
+script_argument <- grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)
+check(length(script_argument) == 1L, "Could not identify the run-index script.")
+script_path <- normalizePath(sub("^--file=", "", script_argument), mustWork = TRUE)
+source(file.path(dirname(script_path), "check-note-policy.R"), local = TRUE)
 expected_environments <- list(
   "ubuntu-latest-r-release" = c("Linux", "linux"),
   "ubuntu-latest-r-devel" = c("Linux", "linux"),
@@ -136,10 +128,13 @@ release_r_version <- r_version_number(provenance$environment$r_version)
 check(!is.na(release_r_version), "The build-source R version is unrecognized.")
 for (result in results) {
   check(
-    identical(result$schema_version, "1.1.0"),
+    identical(result$schema_version, "1.2.0"),
     paste("Unrecognized check-result schema:", result$job_label)
   )
   expected_environment <- expected_environments[[result$job_label]]
+  check(identical(result$environment$remote_url_checks,
+    result$job_label != "ubuntu-latest-r-4.1"),
+    paste("Remote URL-check scope does not match its label:", result$job_label))
   check(
     identical(result$environment$os, expected_environment[[1L]]) &&
       is.character(result$environment$platform) &&
@@ -179,71 +174,41 @@ for (result in results) {
   )) {
     "minimum-r-optional-backends"
   } else {
-    "new-submission-only"
+    "release-resource-notes"
   }
   check(
     identical(result$note_policy, expected_note_policy),
     paste("Wrong check NOTE policy:", result$job_label)
   )
-  if (identical(result$job_label, "ubuntu-latest-r-4.1")) {
-    check(
-      identical(result$effective_status, "PASS_WITH_EXPLAINED_NOTES"),
-      "The minimum-R check did not record both expected NOTE dispositions."
-    )
+  result_path <- result_paths[match(result$job_label, labels)]
+  check_logs <- list.files(dirname(result_path), pattern = "^00check[.]log$",
+    recursive = TRUE, full.names = TRUE)
+  check(length(check_logs) == 1L, paste("Missing/duplicated raw check log:", result$job_label))
+  raw_lines <- readLines(check_logs[[1L]], warn = FALSE)
+  raw_status <- tail(grep("^Status:", raw_lines, value = TRUE), 1L)
+  raw_blocks <- release_note_blocks(raw_lines)
+  classified <- release_classify_notes(raw_status, raw_blocks, expected_note_policy, result$job_label)
+  if (!is.null(result$reused_check)) {
+    original_path <- file.path(dirname(result_path), "check-result-before-reclassification.json")
+    check(file.exists(original_path) && identical(sha256_file(original_path),
+      result$reused_check$original_result_sha256), "Original check record identity changed.")
+    original <- jsonlite::read_json(original_path, simplifyVector = FALSE)
+    check(identical(original$check_status, raw_status) &&
+      identical(original$note_blocks, raw_blocks) &&
+      identical(original$artifact, result$artifact) &&
+      identical(original$environment, result$environment) &&
+      identical(original$job_label, result$job_label) &&
+      identical(original$started_at_utc, result$started_at_utc) &&
+      identical(original$finished_at_utc, result$finished_at_utc) &&
+      identical(as.integer(original$exit_code), 0L),
+      "Reclassified result differs from the completed original check.")
   }
-  if (identical(result$effective_status, "PASS")) {
-    check(
-      identical(result$check_status, "Status: OK") &&
-        length(result$explained_notes) == 0L &&
-        length(result$note_blocks) == 0L,
-      paste("Inconsistent passing check record:", result$job_label)
-    )
-  } else if (identical(
-    result$effective_status,
-    "PASS_WITH_EXPLAINED_NOTE"
-  )) {
-    check(
-      identical(result$check_status, "Status: 1 NOTE") &&
-        length(result$explained_notes) == 1L &&
-        identical(result$explained_notes[[1L]]$note, "New submission") &&
-        length(result$note_blocks) == 1L &&
-        grepl(incoming_stage_pattern, result$note_blocks[[1L]]$stage) &&
-        length(result$note_blocks[[1L]]$detail) == 2L &&
-        grepl(maintainer_pattern, result$note_blocks[[1L]]$detail[[1L]]) &&
-        identical(
-          result$note_blocks[[1L]]$detail[[2L]],
-          "New submission"
-        ),
-      paste("Unrecognized note disposition:", result$job_label)
-    )
-  } else {
-    textstem_pattern <- paste0(
-      "^Package suggested but not available for checking: ",
-      "[‘']textstem[’']$"
-    )
-    check(
-      identical(result$job_label, "ubuntu-latest-r-4.1") &&
-        identical(result$check_status, "Status: 2 NOTEs") &&
-        length(result$explained_notes) == 2L &&
-        identical(result$explained_notes[[1L]]$note, "New submission") &&
-        identical(
-          result$explained_notes[[2L]]$note,
-          "Package suggested but not available for checking: textstem"
-        ) &&
-        length(result$note_blocks) == 2L &&
-        grepl(incoming_stage_pattern, result$note_blocks[[1L]]$stage) &&
-        length(result$note_blocks[[1L]]$detail) == 2L &&
-        grepl(maintainer_pattern, result$note_blocks[[1L]]$detail[[1L]]) &&
-        identical(
-          result$note_blocks[[1L]]$detail[[2L]],
-          "New submission"
-        ) &&
-        grepl(dependency_stage_pattern, result$note_blocks[[2L]]$stage) &&
-        length(result$note_blocks[[2L]]$detail) == 1L &&
-        grepl(textstem_pattern, result$note_blocks[[2L]]$detail[[1L]]),
-      paste("Unrecognized minimum-R note disposition:", result$job_label)
-    )
-  }
+  check(identical(raw_status, result$check_status) &&
+    identical(raw_blocks, result$note_blocks) &&
+    identical(classified$effective_status, result$effective_status) &&
+    identical(classified$explained_notes, result$explained_notes) &&
+    classified$effective_status != "FAIL",
+    paste("Raw check log and disposition disagree:", result$job_label))
   check(
     identical(result$artifact$sha256, provenance$artifact$sha256),
     paste("Artifact drift in", result$job_label)
@@ -309,8 +274,11 @@ for (index in seq_along(inventories)) {
     paste("Resource inventory failed:", inventory_label)
   )
   matching_result <- results[[match(inventory_label, labels)]]
+  runtime_fields <- c("os", "platform", "r_version")
   check(
-    identical(inventory_record$environment, matching_result$environment),
+    setequal(names(inventory_record$environment), runtime_fields) &&
+      identical(inventory_record$environment[runtime_fields],
+        matching_result$environment[runtime_fields]),
     paste("Resource inventory environment drift:", inventory_label)
   )
   check(
@@ -365,7 +333,7 @@ source_records <- lapply(evidence_paths[startsWith(normalizePath(evidence_paths)
 check_records <- lapply(evidence_paths[startsWith(normalizePath(evidence_paths), normalizePath(check_root))], record, root = check_root)
 
 index <- list(
-  schema_version = "1.1.0",
+  schema_version = "1.2.0",
   status = "technical-matrix-complete",
   candidate = provenance$candidate,
   artifact = provenance$artifact,

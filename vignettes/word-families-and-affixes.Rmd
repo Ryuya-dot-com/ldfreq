@@ -33,7 +33,7 @@ For Japanese segmentation and dictionary features, start with the
 Japanese short units and English word families are different counting units.
 
 Work through the examples in order in a fresh R session. Use the
-[documented installation](../index.html#installation). The counting examples
+[documented installation](https://ryuya-dot-com.github.io/ldfreq/index.html#installation). The counting examples
 run offline in R; their displayed tables use `knitr` (install it once with
 `install.packages("knitr")` if needed). The final KWIC exercise also requires the optional
 `quanteda` package and a UTF-8 R session. The text, token boundaries, lemmas and

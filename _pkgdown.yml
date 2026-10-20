@@ -81,6 +81,7 @@ articles:
     navbar: ~
     contents:
       - getting-started
+      - release-scope
       - english-tokenization
       - japanese-annotations
       - from-text-to-report

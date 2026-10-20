@@ -39,11 +39,11 @@ requirement for a corpus study. A corpus can play three different roles:
 | Reference resource | Does a text's frequency profile change with the reference register? | Dependence on the reference vocabulary, corpus composition and coverage |
 | Comparison sample | How do comparable L1 and L2 responses to a task differ? | A conditional group comparison, with task and sampling differences still considered |
 
-For student writing, [LOCNESS](https://corpora.uclouvain.be/catalog/en/corpus/locness)
+For student writing, [LOCNESS](https://uclouvain.be/en/research-institutes/ilc/cecl/locness)
 contains essays by British and American native English students. For natural
 conversation, [Spoken BNC2014](https://www.lancaster.ac.uk/news/articles/2017/researchers-release-largest-ever-public-collection-of-british-conversations/)
 contains spontaneous British English conversations recorded among friends and
-family. [COCA](https://www.english-corpora.org/coca/help/tour.asp) supplies a
+family. [COCA](https://www.corpusdata.org/coca2020.asp) supplies a
 broader register contrast, including spoken, fiction, news and academic texts.
 These are candidate sources, not bundled datasets or automatically matched
 control groups. General-English coverage alone does not verify every

@@ -94,7 +94,8 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
   resource <- list(resource_id = "authored", resource_version = "1",
     source_reference = "Authored illustration", data_license = "MIT")
   review <- lexdiv_ambiguity_review(annotation, "bank", candidates, resource)
-  data <- review$occurrences[c("review_id", "occurrence_id", "segment_text", "surface", "start", "end")]
+  data <- review$occurrences[c("review_id", "occurrence_id", "segment_text",
+      "surface", "start", "end")]
   data$status <- "processed"; data$reason <- "Authored scores, not model inference"
   scores <- data.frame(occurrence_id = rep(data$occurrence_id, 2),
     candidate_id = c("a", "b"), score = c(2, 0))

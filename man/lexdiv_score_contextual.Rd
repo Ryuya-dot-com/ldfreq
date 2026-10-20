@@ -101,7 +101,8 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
       list(language = "en", analyzer = "authored", analyzer_version = "1",
         dictionary = "none", dictionary_version = "none", unit = "test", normalization = "none"))
     review <- lexdiv_ambiguity_review(source, "bank", candidates, resource)
-    data <- review$occurrences[c("review_id", "occurrence_id", "segment_text", "surface", "start", "end")]
+    data <- review$occurrences[c("review_id", "occurrence_id", "segment_text",
+      "surface", "start", "end")]
     data$status <- "processed"; data$reason <- "Authored illustration"
     rownames(vectors) <- data$occurrence_id
     output <- lexdiv_import_contextual(review, data, model, vectors)

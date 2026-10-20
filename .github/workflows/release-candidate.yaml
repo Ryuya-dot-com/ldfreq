@@ -2,8 +2,8 @@ name: Release candidate
 
 on:
   pull_request:
-  push:
-    branches: [main]
+  # Check the exact PR-head artifact once; merged main must have the same tree.
+  # Dispatch is available for an explicitly needed environment recheck.
   workflow_dispatch:
 
 permissions:
@@ -20,6 +20,8 @@ jobs:
     timeout-minutes: 5
     outputs:
       is_candidate: ${{ steps.metadata.outputs.is_candidate }}
+      source_archive_run: ${{ steps.metadata.outputs.source_archive_run }}
+      check_evidence_run: ${{ steps.metadata.outputs.check_evidence_run }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -44,6 +46,18 @@ jobs:
             echo "::error::Release-state metadata is inconsistent with DESCRIPTION."
             exit 1
           fi
+          source_run="$(sed -n 's/^Source-Archive-Run:[[:space:]]*//p' "$state_file")"
+          if test -n "$source_run" && [[ ! "$source_run" =~ ^[0-9]+$ ]]; then
+            echo "::error::Invalid source archive run."
+            exit 1
+          fi
+          echo "source_archive_run=$source_run" >> "$GITHUB_OUTPUT"
+          check_run="$(sed -n 's/^Check-Evidence-Run:[[:space:]]*//p' "$state_file")"
+          if test -n "$check_run" && test "$check_run" != "$source_run"; then
+            echo "::error::Check evidence must use the declared source archive run."
+            exit 1
+          fi
+          echo "check_evidence_run=$check_run" >> "$GITHUB_OUTPUT"
           if test "$state_status" = "release-candidate"; then
             if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo "::error::A formal candidate must not use a development version."
@@ -65,6 +79,11 @@ jobs:
     if: ${{ needs.candidate-state.outputs.is_candidate == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+      attestations: write
     env:
       CANDIDATE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -72,7 +91,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ env.CANDIDATE_COMMIT }}
+          fetch-depth: 0
           persist-credentials: false
+
+      - name: Recover the completed source archive
+        if: needs.candidate-state.outputs.source_archive_run != ''
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-candidate-source
+          run-id: ${{ needs.candidate-state.outputs.source_archive_run }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/release-candidate-source
 
       - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
@@ -83,6 +112,12 @@ jobs:
 
       - uses: r-lib/actions/setup-tinytex@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
 
+      - name: Install and expose the index tool
+        run: |
+          tlmgr install makeindex
+          tlmgr path add
+          command -v makeindex
+
       - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
           extra-packages: |
@@ -90,6 +125,7 @@ jobs:
             any::jsonlite
             any::cpp11
             any::progress
+            any::RcppEigen
           needs: check
 
       - name: Validate repository-only TUBELEX admission evidence
@@ -139,20 +175,28 @@ jobs:
 
       - name: Build one source archive and the PDF manual
         shell: Rscript {0}
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           package_root <- normalizePath(".", mustWork = TRUE)
           output_root <- file.path(
             Sys.getenv("RUNNER_TEMP"),
             "release-candidate-source"
           )
-          stopifnot(dir.create(output_root, recursive = TRUE))
-          old <- setwd(output_root)
-          on.exit(setwd(old), add = TRUE)
-          build_status <- system2(
-            file.path(R.home("bin"), "R"),
-            c("CMD", "build", shQuote(package_root))
-          )
-          if (!identical(build_status, 0L)) quit(status = build_status)
+          dir.create(output_root, recursive = TRUE, showWarnings = FALSE)
+          state <- read.dcf(file.path(package_root, "experiments/release-candidate/state.dcf"))
+          if ("Source-Archive-Run" %in% colnames(state)) {
+            archive <- file.path(output_root, paste0("ldfreq_", state[[1L, "Version"]], ".tar.gz"))
+            status <- system2("python3", c(
+              shQuote("experiments/release-candidate/verify-reuse.py"), shQuote(archive)))
+            if (!identical(status, 0L)) quit(status = status)
+          } else {
+            old <- setwd(output_root)
+            build_status <- system2(file.path(R.home("bin"), "R"),
+              c("CMD", "build", shQuote(package_root)))
+            setwd(old)
+            if (!identical(build_status, 0L)) quit(status = build_status)
+          }
           archive <- list.files(
             output_root,
             pattern = "^ldfreq_[0-9.]+[.]tar[.]gz$",
@@ -160,15 +204,17 @@ jobs:
           )
           stopifnot(length(archive) == 1L)
           manual <- file.path(output_root, paste0("ldfreq_", read.dcf(file.path(package_root, "DESCRIPTION"))[[1L, "Version"]], ".pdf"))
-          manual_status <- system2(
-            file.path(R.home("bin"), "R"),
-            c(
-              "CMD", "Rd2pdf", "--no-preview",
-              paste0("--output=", shQuote(manual)),
-              shQuote(package_root)
-            )
-          )
-          if (!identical(manual_status, 0L)) quit(status = manual_status)
+          reuse_manual <- "Reuse-Manual" %in% colnames(state) && state[[1L, "Reuse-Manual"]] == "true"
+          if (!reuse_manual) {
+            manual_status <- system2(file.path(R.home("bin"), "Rscript"), c(
+              "--vanilla", shQuote("experiments/release-candidate/build-manual.R"),
+              shQuote(package_root), shQuote(manual)))
+            if (!identical(manual_status, 0L)) quit(status = manual_status)
+          }
+          if (dir.exists(file.path(output_root, "evidence"))) {
+            stopifnot(file.rename(file.path(output_root, "evidence"),
+              file.path(output_root, "prior-evidence")))
+          }
 
       - name: Generate BOM, SBOM, resource BOM, and provenance
         shell: Rscript {0}
@@ -198,7 +244,24 @@ jobs:
           )
           if (!identical(status, 0L)) quit(status = status)
 
+      - name: Attest the exact source, manual and evidence
+        id: provenance
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
+        with:
+          subject-path: |
+            ${{ runner.temp }}/release-candidate-source/ldfreq_*.tar.gz
+            ${{ runner.temp }}/release-candidate-source/ldfreq_*.pdf
+            ${{ runner.temp }}/release-candidate-source/evidence/*.json
+            ${{ runner.temp }}/release-candidate-source/source-reuse.json
+
+      - name: Preserve the signed attestation bundle
+        shell: bash
+        env:
+          BUNDLE_PATH: ${{ steps.provenance.outputs.bundle-path }}
+        run: cp "$BUNDLE_PATH" "${RUNNER_TEMP}/release-candidate-source/attestation.sigstore.json"
+
       - name: Upload exact source and evidence
+        if: ${{ always() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: release-candidate-source
@@ -206,6 +269,11 @@ jobs:
             ${{ runner.temp }}/release-candidate-source/ldfreq_*.tar.gz
             ${{ runner.temp }}/release-candidate-source/ldfreq_*.pdf
             ${{ runner.temp }}/release-candidate-source/evidence/*.json
+            ${{ runner.temp }}/release-candidate-source/source-reuse.json
+            ${{ runner.temp }}/release-candidate-source/attestation.sigstore.json
+            ${{ runner.temp }}/release-candidate-source/*.pdf-build/*.ind
+            ${{ runner.temp }}/release-candidate-source/*.pdf-build/*.ilg
+            ${{ runner.temp }}/release-candidate-source/*.pdf-build/*.log
           if-no-files-found: error
           retention-days: 30
 
@@ -214,6 +282,9 @@ jobs:
     needs: [candidate-state, build-source]
     if: ${{ needs.candidate-state.outputs.is_candidate == 'true' && needs.build-source.result == 'success' }}
     runs-on: ${{ matrix.config.os }}
+    permissions:
+      contents: read
+      actions: read
     timeout-minutes: 40
     strategy:
       fail-fast: false
@@ -228,6 +299,10 @@ jobs:
       CANDIDATE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
       R_KEEP_PKG_SOURCE: yes
       _R_CHECK_FORCE_SUGGESTS_: ${{ matrix.config.r == '4.1' && 'false' || 'true' }}
+      # Current/devel R perform online URL checks on this same archive.
+      # R 4.1's older checker receives publisher bot-blocking responses.
+      _R_CHECK_CRAN_INCOMING_SKIP_URL_CHECKS_IF_REMOTE_: ${{ matrix.config.r == '4.1' && 'true' || 'false' }}
+      CHECK_EVIDENCE_RUN: ${{ needs.candidate-state.outputs.check_evidence_run }}
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -239,6 +314,15 @@ jobs:
         with:
           name: release-candidate-source
           path: ${{ runner.temp }}/release-candidate-source
+
+      - name: Recover completed platform checks
+        if: needs.candidate-state.outputs.check_evidence_run != ''
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-check-${{ matrix.config.label }}
+          run-id: ${{ needs.candidate-state.outputs.check_evidence_run }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/reused-platform
 
       - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
@@ -254,12 +338,12 @@ jobs:
             any::jsonlite
             textstem=?ignore-before-r=4.4.0
             gibasa=?ignore-before-r=4.2.0
-            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5 MASS@7.3-60' || '' }}
+            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5 MASS@7.3-60 readxl@1.4.5' || '' }}
           # Keep all ldfreq check dependencies; old Matrix Enhances are not used.
           dependencies: 'if (getRversion() < "4.2.0") c("Depends", "Imports", "LinkingTo", "Suggests") else "all"'
           needs: check
 
-      - name: Check the exact source archive as CRAN
+      - name: Check or reclassify exact source evidence
         shell: Rscript {0}
         run: |
           candidate_root <- file.path(
@@ -275,7 +359,7 @@ jobs:
           note_policy <- if (identical("${{ matrix.config.r }}", "4.1")) {
             "minimum-r-optional-backends"
           } else {
-            "new-submission-only"
+            "release-resource-notes"
           }
           status <- system2(
             file.path(R.home("bin"), "Rscript"),
@@ -287,7 +371,9 @@ jobs:
               shQuote(archive),
               shQuote(file.path(Sys.getenv("RUNNER_TEMP"), "as-cran-check")),
               shQuote("${{ matrix.config.label }}"),
-              shQuote(note_policy)
+              shQuote(note_policy),
+              if (nzchar(Sys.getenv("CHECK_EVIDENCE_RUN")))
+                shQuote(file.path(Sys.getenv("RUNNER_TEMP"), "reused-platform", "as-cran-check"))
             )
           )
           if (!identical(status, 0L)) quit(status = status)
@@ -305,6 +391,11 @@ jobs:
             pattern = "^ldfreq_[0-9.]+[.]tar[.]gz$",
             full.names = TRUE
           )
+          previous <- file.path(Sys.getenv("RUNNER_TEMP"), "reused-platform", "resource-inventory")
+          if (file.exists(file.path(previous, "package-resource-inventory-evidence.json"))) {
+            stopifnot(file.copy(previous, Sys.getenv("RUNNER_TEMP"), recursive = TRUE))
+            quit(status = 0L)
+          }
           status <- system2(
             file.path(R.home("bin"), "Rscript"),
             c(
@@ -326,7 +417,7 @@ jobs:
         with:
           name: release-check-${{ matrix.config.label }}
           path: |
-            ${{ runner.temp }}/as-cran-check/check-result.json
+            ${{ runner.temp }}/as-cran-check/check-result*.json
             ${{ runner.temp }}/as-cran-check/command-output.log
             ${{ runner.temp }}/as-cran-check/*.Rcheck/00check.log
             ${{ runner.temp }}/resource-inventory/package-resource-inventory-evidence.json

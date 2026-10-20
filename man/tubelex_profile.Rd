@@ -166,12 +166,6 @@ profile$coverage
 profile$lookup
 profile$provenance$formula_parameters
 
-profiles <- tubelex_profile_batch(list(essay_a = tokens, essay_b = c("the", "book")))
-profiles$essay_a$summary
-
-# Typography alone can be normalized explicitly after token preparation.
-tubelex_profile(c("it", "\u2019s"), normalization = "tubelex_apostrophe")$lookup
-
 contract_files <- c(
   "tubelex-frequency-profile-contract.json",
   "lexical-resource-lookup-contract.json"
@@ -183,6 +177,7 @@ basename(contract_paths)
 \seealso{
 \code{\link{lexdiv_tokenize}}, \code{\link{lexdiv_metrics_text}},
 \code{\link{tubelex_diagnostics}};
+\code{vignette("getting-started", package = "ldfreq")} for batch profiles;
 \code{vignette("tubelex-input", package = "ldfreq")} for the optional
 external tokenization recipe and its reproducibility boundaries.
 }

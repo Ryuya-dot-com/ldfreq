@@ -163,6 +163,19 @@ for (index in seq_along(all_paths)) {
   lines <- readLines(all_paths[[index]], warn = FALSE, encoding = "UTF-8")
   for (pattern in scan_patterns) {
     hits <- grep(pattern, lines, perl = TRUE)
+    # These exact public API descriptions are not internal workflow records.
+    if (identical(pattern, "OpenAI")) {
+      approved <- switch(relative_paths[[index]],
+        "README.md" = "and an optional OpenAI recipe. Paid requests require your own API key and an",
+        "NEWS.md" = "- Added an optional OpenAI Responses recipe using httr2. Paid requests require",
+        "inst/doc/contextual-models.Rmd" =,
+        "vignettes/contextual-models.Rmd" = c(
+          "## Optionally obtain proposals through your OpenAI account",
+          "**This step sends the chosen texts and candidate labels to OpenAI and incurs",
+          "[OpenAI data controls](https://developers.openai.com/api/docs/guides/your-data))."),
+        character())
+      hits <- hits[!lines[hits] %in% approved]
+    }
     if (length(hits)) {
       scan_findings[[length(scan_findings) + 1L]] <- list(
         path = relative_paths[[index]],
@@ -172,7 +185,10 @@ for (index in seq_along(all_paths)) {
     }
   }
 }
-check(length(scan_findings) == 0L, "Internal workflow or local-environment wording was found in the archive.")
+if (length(scan_findings)) {
+  write_json(scan_findings, file.path(output_root, "public-scope-findings.json"))
+  stop("Internal workflow or local-environment wording was found in the archive; see public-scope-findings.json.", call. = FALSE)
+}
 
 package_files <- lapply(seq_along(all_paths), function(index) {
   info <- file.info(all_paths[[index]])
@@ -303,7 +319,7 @@ spdx_packages[[length(spdx_packages) + 1L]] <- list(
   licenseConcluded = "NOASSERTION",
   licenseDeclared = "NOASSERTION",
   comment = paste(
-    "Build-source runner R version; DESCRIPTION requirement:",
+    "Release-evidence runner R version; DESCRIPTION requirement:",
     r_requirement[[1L]]
   )
 )
@@ -357,7 +373,7 @@ dependency_sbom <- list(
     commit, "/", archive_record$sha256
   ),
   comment = paste(
-    "Dependency inventory from the release-R build-source runner.",
+    "Dependency inventory from the release-R evidence runner, not a source-build lockfile.",
     "The five check environments remain separately recorded in their raw logs",
     "and check-result records; this document does not claim a cross-platform lockfile."
   ),

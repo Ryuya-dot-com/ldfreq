@@ -1,11 +1,12 @@
 # Historical ldfreq 0.2.0 publication boundary
 
 This records an earlier proposed publication route; it is not the current
-release state or an instruction to submit to CRAN. The public 0.3.0.9005
-development snapshot remains `Status: development` in
-[state.dcf](../experiments/release-candidate/state.dcf). Public availability does
-not turn a development snapshot into a formal candidate. Current scope is in
-[ROADMAP.md](ROADMAP.md); completed publication evidence is in
+release state or an instruction to submit to CRAN. The selected 0.4.0 candidate
+is identified by [state.dcf](../experiments/release-candidate/state.dcf), with
+its boundary in the [release-scope guide](../vignettes/release-scope.Rmd) and
+current mechanics in the [evidence tools](../experiments/release-candidate/README.md).
+Public availability does not turn a development snapshot into a formal candidate.
+Historical completed publication evidence is in
 [PUBLICATION-20261004.md](PUBLICATION-20261004.md#current-identity-and-completion-evidence).
 The original 0.2.0 record below retains its then-current assumptions.
 
