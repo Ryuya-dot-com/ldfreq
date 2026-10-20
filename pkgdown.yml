@@ -29,10 +29,11 @@ articles:
   release-scope: release-scope.html
   repeated-observations: repeated-observations.html
   syntactic-complexity: syntactic-complexity.html
+  textbook-progression: textbook-progression.html
   tubelex-input: tubelex-input.html
   vocabulary-knowledge-and-use: vocabulary-knowledge-and-use.html
   word-families-and-affixes: word-families-and-affixes.html
-last_built: 2026-10-20T05:00Z
+last_built: 2026-10-20T08:42Z
 urls:
   reference: https://ryuya-dot-com.github.io/ldfreq/reference
   article: https://ryuya-dot-com.github.io/ldfreq/articles

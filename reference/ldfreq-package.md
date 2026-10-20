@@ -85,6 +85,16 @@ any optional tools.
   Inspect original occurrences, zero-match documents and the relevant
   search, pair-opportunity or target/reference denominators.
 
+- Where do target words recur in a textbook?:
+
+  Development 0.4.0.9003 adds an explicitly sourced [textbook
+  progression
+  example](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.html).
+  Join one saved search to ordered pages, Units and selected sections.
+  Inspect counts, cumulative counts and recurrence after declared
+  teaching introductions, keeping missing material, follow-up scope and
+  original uses.
+
 - Which documents have similar lexical composition?:
 
   Use complete source annotations for [CA and classical

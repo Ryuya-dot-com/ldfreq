@@ -35,6 +35,8 @@
   profiles](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.md):
 - [Search words and phrases, then inspect their
   distribution](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.md):
+- [Trace target vocabulary through textbook pages and
+  units](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.md):
 - [Count nearby words and explain their
   association](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.md):
 - [Compare word use against an explicit reference

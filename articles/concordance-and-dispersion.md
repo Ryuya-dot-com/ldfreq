@@ -276,6 +276,13 @@ match and original token counts, including zero-match and empty
 documents. An empty document has no occurrence or text-length line. This
 is an occurrence plot, not a density estimate or a dispersion statistic.
 
+For page- or Unit-based counts and recurrence after a teaching
+introduction, see [textbook
+progression](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.md),
+available in development 0.4.0.9003 or later. It joins these saved
+occurrences to a separate ordered section roster; the token-position and
+DP definitions here remain unchanged.
+
 Relative coordinates are `(position - 0.5) / source_tokens`, the centers
 of the original token slots on a common 0–1 scale. Exclusions do not
 shorten the axis. Use `relative = FALSE` for a shared absolute

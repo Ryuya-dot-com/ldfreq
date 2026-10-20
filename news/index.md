@@ -1,5 +1,21 @@
 # Changelog
 
+## ldfreq 0.4.0.9003
+
+- Add explicitly sourced textbook-progression helpers and a worked
+  guide. Saved concordance matches join to an ordered page/Unit/section
+  roster and declared teaching introductions. Counts, cumulative counts,
+  later-Unit recurrence, original contexts and colour/monochrome plots
+  share one record.
+- Keep absent targets, known blank pages, excluded sections, missing
+  material and incomplete lexical annotations distinct. Exact totals
+  remain unknown when selected material is incomplete; known matches
+  remain inspectable. No later Unit is an unavailable follow-up, not
+  zero recurrence coverage.
+- This is a descriptive one-book example, not automatic textbook
+  extraction or a learning-effect score. Exports, core calculations,
+  resources and dependencies are unchanged.
+
 ## ldfreq 0.4.0.9002
 
 - Let the sourced MCA plot example use a named `labels` vector for

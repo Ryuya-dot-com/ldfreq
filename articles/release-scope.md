@@ -22,6 +22,14 @@ display labels for long occurrence IDs. The original IDs, saved fits and
 numerical results are unchanged; save the display mapping with the
 complete analysis record.
 
+Development **0.4.0.9003** adds a separately sourced [textbook
+progression
+example](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.md).
+It joins saved concordance matches to ordered pages, Units and selected
+sections, retaining missing material and the scope available after a
+declared teaching introduction. It is a descriptive example, not an
+automatic learning-effect assessment.
+
 ## What is stable, experimental or an example?
 
 Stable means the documented computational and compatibility contract is

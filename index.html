@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,6 +78,7 @@
 <p>If an older ldfreq version is loaded, restart R after installation. Check <code>packageVersion("ldfreq")</code> before running these examples; it should report <code>0.4.0</code> for this release.</p>
 <p>The built archive includes rendered guides. A GitHub source installation may omit them; the online guides remain available. Run <code>vignette(package = "ldfreq")</code> to list installed guides, or <code><a href="articles/getting-started.html">vignette("getting-started", package = "ldfreq")</a></code> to open the introduction. <code><a href="reference/ldfreq-package.html">?ldfreq</a></code> also explains how to find explicitly sourced example helpers, which have no individual <code>?function</code> entry.</p>
 <p>The occurrence-level MCA example requires the separate development snapshot <strong>0.4.0.9001 or later</strong>. Install <code>Ryuya-dot-com/ldfreq@v0.4.0.9002</code> with <code>pak</code>, or its named source archive from the release list. Stable 0.4.0 does not contain it. The <a href="https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca">MCA guide</a> keeps category definitions, incomplete rows, original occurrences and unadjusted inertia diagnostics together. Its helpers are explicitly sourced examples. Version 0.4.0.9002 adds ID-matched display labels for long occurrence IDs.</p>
+<p>The <a href="https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.html">textbook progression guide</a> requires development <strong>0.4.0.9003 or later</strong>. Install <code>Ryuya-dot-com/ldfreq@v0.4.0.9003</code> with <code>pak</code>, or <code>ldfreq_0.4.0.9003.tar.gz</code> from the release list. It traces target words through pages and Units using saved source occurrences, an ordered section roster and declared teaching introductions. Missing material and the available follow-up remain explicit; the example does not infer learning outcomes from repetition counts.</p>
 </div>
 <div class="section level2">
 <h2 id="release-scope-and-compatibility">Release scope and compatibility<a class="anchor" aria-label="anchor" href="#release-scope-and-compatibility"></a>
@@ -184,6 +185,11 @@
 <td>Complete source-aligned annotations; <a href="https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html">concordance and dispersion</a>, <a href="https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html">collocation</a>, or <a href="https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html">keyness</a>
 </td>
 <td>Original occurrences and zero-match documents; pair opportunities for association, or declared target/reference totals for keyness.</td>
+</tr>
+<tr>
+<td>Where do target words occur and recur in a textbook?</td>
+<td>One saved search, an ordered page/Unit/section roster and declared introductions; <a href="https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.html">textbook progression</a> (development 0.4.0.9003 or later).</td>
+<td>Counts, cumulative counts and later-Unit coverage with absent targets, missing material, selected scope and original contexts.</td>
 </tr>
 <tr>
 <td>Which writer/task/occasion observations entered my analysis?</td>
