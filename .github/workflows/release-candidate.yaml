@@ -105,6 +105,12 @@ jobs:
 
       - uses: r-lib/actions/setup-tinytex@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
 
+      - name: Install and expose the index tool
+        run: |
+          tlmgr install makeindex
+          tlmgr path add
+          command -v makeindex
+
       - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
           extra-packages: |

@@ -358,6 +358,12 @@ jobs:
 
       - uses: r-lib/actions/setup-tinytex@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
 
+      - name: Install and expose the index tool
+        run: |
+          tlmgr install makeindex
+          tlmgr path add
+          command -v makeindex
+
       - name: Build and verify the PDF reference manual
         shell: bash
         run: Rscript --vanilla experiments/release-candidate/build-manual.R . "${RUNNER_TEMP}/ldfreq-manual.pdf"
