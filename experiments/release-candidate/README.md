@@ -161,3 +161,8 @@ The run index verifies them again. Existing resource inventories are reused;
 a missing platform inventory is still run. `Reuse-Manual: true` requires the
 original manual hash and a nonempty index. This combines recorded stages and
 does not claim that all numerical checks were rerun in the final workflow.
+An R-devel snapshot used only to classify the stored log may differ from the
+snapshot that executed the original check. The original execution version is
+retained in `environment`; `reused_check.classification_environment` records
+the classification host separately. This does not establish runtime behavior
+on the classification host's snapshot.

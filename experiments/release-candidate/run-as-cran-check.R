@@ -67,6 +67,9 @@ log_path <- file.path(output_root, "command-output.log")
 old <- setwd(output_root)
 on.exit(setwd(old), add = TRUE)
 reused_check <- NULL
+classification_environment <- list(os = unname(Sys.info()[["sysname"]]),
+  platform = R.version$platform, r_version = R.version.string,
+  remote_url_checks = remote_url_checks)
 if (length(arguments) == 5L) {
   prior_root <- normalizePath(arguments[[5L]], winslash = "/", mustWork = TRUE)
   prior_path <- file.path(prior_root, "check-result.json")
@@ -77,7 +80,10 @@ if (length(arguments) == 5L) {
     identical(prior$command, "R CMD check --as-cran --no-manual <exact-source-archive>"),
     identical(prior$environment$os, unname(Sys.info()[["sysname"]])),
     identical(prior$environment$platform, R.version$platform),
-    identical(prior$environment$r_version, R.version.string),
+    identical(prior$environment$r_version, R.version.string) ||
+      (identical(job_label, "ubuntu-latest-r-devel") &&
+        grepl("^R Under development ", prior$environment$r_version) &&
+        grepl("^R Under development ", R.version.string)),
     identical(prior$environment$remote_url_checks, remote_url_checks),
     identical(prior$artifact$sha256, digest::digest(file = source_archive, algo = "sha256")),
     identical(as.numeric(prior$artifact$bytes), as.numeric(file.info(source_archive)$size)))
@@ -93,6 +99,7 @@ if (length(arguments) == 5L) {
   reused_check <- list(run_id = Sys.getenv("CHECK_EVIDENCE_RUN"),
     original_result_sha256 = digest::digest(file = prior_path, algo = "sha256"),
     original_effective_status = prior$effective_status,
+    classification_environment = classification_environment,
     reclassified_at_utc = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"))
 } else {
   started <- format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
@@ -145,12 +152,7 @@ result <- list(
   started_at_utc = started,
   finished_at_utc = finished,
   reused_check = reused_check,
-  environment = list(
-    os = unname(Sys.info()[["sysname"]]),
-    platform = R.version$platform,
-    r_version = R.version.string,
-    remote_url_checks = remote_url_checks
-  ),
+  environment = if (is.null(reused_check)) classification_environment else prior$environment,
   artifact = list(
     file = basename(source_archive),
     bytes = as.numeric(file.info(source_archive)$size[[1L]]),
