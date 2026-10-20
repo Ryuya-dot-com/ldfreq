@@ -71,6 +71,12 @@ beside its values. The guides specify the input tables and any optional tools.
   Join one saved search to ordered pages, Units and selected sections.
   Inspect counts, cumulative counts and recurrence after declared teaching
   introductions, keeping missing material, follow-up scope and original uses.}
+  \item{How can teachers prepare materials from reviewed examples?}{Development
+  0.4.0.9004 adds an explicitly sourced
+  \href{https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.html}{DDL preparation example}.
+  Select accepted phrase occurrences, supply activity prompts and source notices,
+  and write learner HTML, a separate teacher CSV and a complete private record.
+  Pending candidates remain separate from the selected teaching examples.}
   \item{Which documents have similar lexical composition?}{Use complete source
   annotations for \href{https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html}{CA and classical MDS}.
   Inspect document and feature selection, CA contributions and squared cosines, or the

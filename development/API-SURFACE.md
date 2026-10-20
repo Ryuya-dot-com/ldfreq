@@ -17,6 +17,13 @@ rendered by pkgdown.
 
 ## Decisions
 
+- Development 0.4.0.9004 adds explicitly sourced `ddl_material()` and
+  `ddl_material_write()` examples for teacher preparation. They validate an
+  existing phrase-review record and explicit accepted selection, activity text
+  and source notices. Learner HTML, teacher CSV and full private RDS have separate
+  contents. Reopening requires no search; all existing exports, S3 registrations,
+  dependencies, numerical contracts and review helpers remain unchanged.
+
 - Development 0.4.0.9003 adds explicitly sourced `textbook_progression()` and
   `textbook_progression_plot()` examples. They consume one unchanged concordance
   record, an ordered section roster and teaching introductions. Page/Unit
