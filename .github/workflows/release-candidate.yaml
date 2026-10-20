@@ -118,6 +118,7 @@ jobs:
             any::jsonlite
             any::cpp11
             any::progress
+            any::RcppEigen
           needs: check
 
       - name: Validate repository-only TUBELEX admission evidence

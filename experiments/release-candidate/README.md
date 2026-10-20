@@ -46,6 +46,9 @@ than falling back to a non-candidate result.
 `generate-release-evidence.R` requires a clean checkout and writes a package
 BOM, SPDX dependency SBOM, resource BOM, and release-provenance record. The
 archive and PDF manual must already exist.
+The evidence environment explicitly includes cpp11, progress and RcppEigen:
+binary dependency installation can omit these transitive LinkingTo packages,
+but the SBOM records the complete installed hard/build dependency closure.
 
 The SPDX root uses a LicenseRef with the source LICENSE text, preserving the
 component-specific terms instead of labeling the complete collection MIT.
