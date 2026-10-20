@@ -10,6 +10,8 @@ vignette: >
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 has_lme4 <- requireNamespace("lme4", quietly = TRUE)
+has_inference <- has_lme4 && requireNamespace("emmeans", quietly = TRUE) &&
+  requireNamespace("pbkrtest", quietly = TRUE)
 ```
 
 A writer may complete several tasks on several occasions. Some scheduled texts
@@ -260,6 +262,125 @@ Keeping the scheduled roster makes missingness visible but does not establish
 an ignorable missingness mechanism or remove selection bias. The example
 therefore does not interpret its fitted coefficients as research findings.
 
+## Report specified means and one planned comparison
+
+Development **0.4.0.9005 or later** adds the following optional reporting recipe.
+It uses `emmeans` and `pbkrtest` in addition to lme4. Install these optional
+packages to run it; the earlier table workflow does not require them.
+
+The target is the model's population mean MATTR10 at weeks 0, 4 and 8 for
+each of the two named tasks. We also average those tasks with **equal weights**,
+then estimate one planned comparison: week 8 minus week 0. These are
+model-based means, not the raw means of the retained documents, token-weighted
+means, or predictions for a particular writer. Equal task weights do not
+change the weighting of observations used to fit the model. The identity
+link and zero-mean Gaussian random effects make the fixed-effect expectation
+the population mean here; that shortcut does not generally hold for GLMMs.
+
+The additive model assumes the same linear time change for both tasks.
+Consequently, two separate task-specific time contrasts would repeat the
+same estimated change. This recipe reports a single predeclared contrast.
+An interaction or nonlinear trajectory is a different model and question.
+
+```{r study-inference, eval=has_inference}
+inference_path <- system.file("examples", "study-inference.R",
+  package = "ldfreq", mustWork = TRUE)
+sys.source(inference_path, envir = environment())
+record$inference_source <- readLines(inference_path, warn = FALSE)
+record$inference_md5 <- unname(tools::md5sum(inference_path))
+record$inference$status
+record$inference$tables$cells
+record$inference$tables$weeks
+record$inference$tables$comparison
+```
+
+The recipe checks the saved MATTR10 specification and requires the existing
+REML fit; it does not refit a maximum-likelihood model automatically.
+It explicitly requests Kenward--Roger covariance adjustment and
+degrees of freedom, using [emmeans' mixed-model support](https://rvlenth.github.io/emmeans/articles/sophisticated.html)
+and [pbkrtest](https://hojsgaard.github.io/pbkrtest/reference/kr-vcovAdj.html).
+Missing dependencies or a fallback to another interval method cause an error.
+These are approximate 95% confidence intervals under the fitted model.
+The intervals for the six cells and three averaged weeks are **pointwise**,
+not a simultaneous 95% band. The contrast is a separate one-comparison family;
+`adjust = "none"` does not license searching many comparisons and reporting
+only the most favourable one. No prediction intervals or automatic
+significance labels are produced.
+
+In this authored example the equally weighted change is about 0.037 MATTR10
+units, with an interval approximately -0.006 to 0.080. This illustrates how
+to report magnitude and uncertainty on the original scale. It is not a finding
+about learners. An interval including zero is not evidence that change is
+absent, and an interval excluding zero would not establish educational
+importance or causality. Precision and relevance require the actual study's
+design, sampling, missingness and a substantively meaningful comparison.
+
+`support` and `observed_n` distinguish observed cells, unobserved cells inside
+the task's observed time range, and extrapolation beyond that range. A model
+can calculate a number for an unobserved cell without supplying observations
+there. Check the endpoint-support flag before interpreting the contrast.
+Gaussian intervals outside 0--1 are flagged, not clipped. Bounds alone do not
+justify a beta or binomial model: MATTR is an average of overlapping-window
+ratios, not a binomial success proportion.
+
+The saved diagnostics retain convergence messages, fitting warnings,
+singularity and dropped fixed-effect columns. The recipe withholds interval
+tables when these checks require review; it neither changes the formula nor
+removes observations to obtain a clean fit. Passing these checks still does
+not establish model adequacy. The observation table keeps fitted values and
+residuals with writer/document IDs for inspecting nonlinearity,
+heteroscedasticity, dependence and influential writers. Inspect residuals
+against fitted values, time and task, and within writers; do not treat these
+checks as an automatic pass/fail validation of a Gaussian MATTR model.
+
+## Plot original observations and estimated means
+
+The following plot reads saved tables; it does not fit a model or calculate
+intervals. Its vertical scale is MATTR10 for both tasks. Small horizontal
+offsets separate tasks at the same week. Open symbols show observations,
+filled symbols and lines show estimated means, and whiskers show pointwise
+intervals. Use the comparison table, not overlap of the plotted intervals,
+to assess the uncertainty of the planned contrast.
+
+```{r study-estimate-plot, eval=has_inference, fig.width=6.5, fig.height=4}
+draw_study_estimates <- function(x, monochrome = FALSE) {
+  if (is.null(x$tables)) stop("Interval tables are unavailable; inspect diagnostics.")
+  observations <- x$observations
+  cells <- x$tables$cells
+  tasks <- x$settings$tasks
+  colours <- if (monochrome) c("grey35", "black") else c("#0072B2", "#D55E00")
+  plot(NA_real_, NA_real_, xlim = c(-0.6, 8.6),
+    ylim = range(c(observations$value, cells$lower.CL, cells$upper.CL), finite = TRUE),
+    xlab = "Elapsed weeks", ylab = "MATTR10", xaxt = "n", bty = "l")
+  axis(1, at = x$settings$weeks)
+  for (i in seq_along(tasks)) {
+    observed <- observations[observations$task == tasks[i], ]
+    estimated <- cells[cells$task == tasks[i], ]
+    estimated <- estimated[order(estimated$occasion), ]
+    offset <- c(-0.15, 0.15)[i]
+    points(observed$occasion + offset, observed$value, pch = c(1, 2)[i],
+      col = grDevices::adjustcolor(colours[i], alpha.f = 0.45), cex = 0.75)
+    arrows(estimated$occasion + offset, estimated$lower.CL,
+      estimated$occasion + offset, estimated$upper.CL,
+      angle = 90, code = 3, length = 0.04, col = colours[i])
+    lines(estimated$occasion + offset, estimated$emmean,
+      type = "b", pch = c(16, 17)[i], lty = i, col = colours[i])
+  }
+  legend("top", legend = c("Description", "Argument"),
+    col = colours, pch = c(16, 17), lty = 1:2, bty = "n",
+    horiz = TRUE, inset = c(0, -0.15), xpd = NA)
+  invisible(x$tables)
+}
+if (!is.null(record$inference$tables))
+  draw_study_estimates(record$inference)
+```
+
+For monochrome output, use `draw_study_estimates(record$inference,
+monochrome = TRUE)`. Place the figure number, title, sample counts and the
+explanation of symbols and interval type outside the figure in your report.
+The 102 retained observations come from 18 known writers; neither the six
+estimated means nor the number of tokens is the independent sample size.
+
 ## Save the full record and replay the selection
 
 Use CSV for a flat display; it cannot preserve parameter lists, diagnostics,
@@ -284,6 +405,11 @@ write.csv(study[c("observation_id", "writer_id", "task", "occasion",
   file.path(output_dir, "study-display.csv"), row.names = FALSE, na = "NA")
 write.csv(selected$audit, file.path(output_dir, "model-row-audit.csv"),
   row.names = FALSE, na = "NA")
+if (!is.null(record$inference$tables)) {
+  for (name in names(record$inference$tables))
+    write.csv(record$inference$tables[[name]],
+      file.path(output_dir, paste0("model-", name, ".csv")), row.names = FALSE)
+}
 ```
 
 In a fresh R session, load the same package snapshot and set `output_dir` to
@@ -313,3 +439,20 @@ resources. Recomputing scores is a separate check using the retained token
 vectors and plan. A fitted model additionally depends on its recorded formula,
 contrast settings, retained rows, lme4 version and numerical environment; its
 successful reload does not substitute for checking those conditions.
+
+When the inference section was run, the same RDS also holds its settings,
+reference grids, comparison, diagnostics and flat reporting tables. In a fresh
+session, the following displays those tables without refitting, recalculating
+intervals or loading emmeans. Keep the original calculation session and
+versions; loading an old record must not relabel its inference method.
+
+```{r study-inference-replay, eval=has_inference}
+saved$inference$settings
+saved$inference$tables$comparison
+stopifnot(identical(saved$inference$settings$df_method, "kenward-roger"),
+  identical(saved$inference$observation_ids, saved$selected$data$observation_id))
+```
+
+To redraw, define `draw_study_estimates()` from the plotting chunk and call it
+with `saved$inference`. Re-estimating with changed data, a changed model or
+different dependencies is a new analysis, not this table replay.

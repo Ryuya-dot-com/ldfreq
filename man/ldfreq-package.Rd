@@ -93,7 +93,11 @@ beside its values. The guides specify the input tables and any optional tools.
   planned observations, submissions and metric results separate in
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html}{From planned observations to a mixed model}.
   Inspect the submission, calculation and reporting states and model-row audit;
-  select one response specification for the model table.}
+  select one response specification for the model table. Development 0.4.0.9005
+  extends this guide with specified means, one planned time contrast,
+  Kenward--Roger confidence intervals, diagnostics and saved-table replay.
+  Optional \pkg{emmeans} and \pkg{pbkrtest} support this explicitly sourced
+  reporting example; it is not an automatic model-selection API.}
   \item{How do lexical results relate to sentence or structural descriptions?}{Use
   the same source texts and document IDs for
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html}{English readability} and

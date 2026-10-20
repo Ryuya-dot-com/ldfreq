@@ -1122,7 +1122,11 @@ place visualization within model building and checking. For this workflow,
 we keep descriptive output separate from inference: these figures do not fit
 a model or generate confidence intervals. Choose the estimand, sampling units
 and dependence structure before using an existing modelling package for
-intervals or predictions. Overlapping MATTR windows are not independent
+intervals or predictions. Development 0.4.0.9005 adds a
+[mixed-model reporting example](repeated-observations.html#report-specified-means-and-one-planned-comparison)
+with explicitly specified means, one contrast, interval method and saved-table
+replay; its model-based intervals remain separate from the descriptive plots here.
+Overlapping MATTR windows are not independent
 replicates, and a pooled lexical network does not identify a person's mental
 lexicon. A well-formatted figure does not supply those missing assumptions.
 

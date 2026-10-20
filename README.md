@@ -79,6 +79,14 @@ the release list. Select reviewed phrase examples and supply activity prompts
 to create a printable learner handout, separate teacher table and reusable
 private record. Learners do not need R. The helpers are explicitly sourced examples.
 
+The [mixed-model reporting recipe](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html#report-specified-means-and-one-planned-comparison)
+requires development **0.4.0.9005 or later**. Install
+`Ryuya-dot-com/ldfreq@v0.4.0.9005` with `pak`, or its named source archive.
+Optional `lme4`, `emmeans` and `pbkrtest` connect the saved study table to
+specified means, one planned contrast and Kenward--Roger confidence intervals.
+Diagnostics, exclusions and prediction support remain visible; the authored
+example does not establish a generally appropriate model for MATTR.
+
 ## Release scope and compatibility
 
 Version 0.4.0 keeps the calculations, public functions, result schemas and
@@ -236,6 +244,9 @@ results separate. Its explicitly sourced helpers retain absent submissions and
 exclusion reasons, then select one measurement specification for an ordinary
 `lme4::lmer()` data frame. The optional model illustrates the connection using
 synthetic word sequences; it does not validate a developmental model.
+Development 0.4.0.9005 extends this example with task-specific and equally
+task-weighted means, one planned time contrast, confidence intervals and
+original-scale plots, with full-record saving and table replay.
 An [executed PELIC example](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#pelic-study-report)
 connects saved results for 16 real learner essays to original writer/task
 metadata, diagnostic summaries, methods text and fresh-session report replay.

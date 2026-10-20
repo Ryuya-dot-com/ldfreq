@@ -64,6 +64,11 @@ It uses the existing exact phrase review to prepare learner HTML, teacher CSV
 and a complete private record. It adds no exported function or dependency and
 does not change source annotations, review semantics or numerical contracts.
 
+Development 0.4.0.9005 extends the repeated-observations guide with an explicitly
+sourced inference recipe. Optional emmeans and pbkrtest provide specified
+means, a planned contrast and Kenward--Roger confidence intervals. Existing
+exports, measurement contracts and saved records are unchanged.
+
 ## Method identity
 
 A `method_id` fixes the formula, scale, boundary and tail rules, operation
