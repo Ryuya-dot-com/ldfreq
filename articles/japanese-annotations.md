@@ -49,6 +49,18 @@ For supplied English family and affix analyses, use [word families,
 roots and
 affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.md).
 
+For several nominal properties coded on individual uses, the
+[occurrence-MCA
+example](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca)
+accepts the complete annotation import and source-linked occurrence
+rows. Retain the review’s full candidate inventory, resource version and
+decisions with that analysis; leave unselected candidate codes as `NA`.
+Long review occurrence IDs can use separate, ID-matched display labels
+in **0.4.0.9002 or later**. Do not replace the original IDs, turn
+unresolved judgments into known senses, or discretize normative scores
+merely to run MCA. Two-variable questions may be answered by a
+cross-tabulation without an ordination.
+
 ## Will the results agree with other tools?
 
 Agreement depends on the original text and segment boundaries, analyzer

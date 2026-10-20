@@ -622,8 +622,12 @@ without changing the complete geometry. Do not give those arbitrary
 orientations independent linguistic meanings.
 
 ``` r
+mca_labels <- NULL
 if (has_ca) {
-  mca_helper$ordination_mca_plot(mca_result)
+  # Since 0.4.0.9002: keep original IDs and choose separate display names.
+  ids <- unique(mca_result$rows$id)
+  mca_labels <- setNames(sprintf("use%02d", seq_along(ids)), ids)
+  mca_display <- mca_helper$ordination_mca_plot(mca_result, labels = mca_labels)
   mca_helper$ordination_mca_plot(mca_result, "categories", monochrome = TRUE)
 }
 #> Warning: Displayed axes touch a repeated eigenvalue; their orientation is not
@@ -637,14 +641,28 @@ if (has_ca) {
 
 ![](lexical-ordination_files/figure-html/mca-maps-2.png)
 
+The optional `labels` argument requires **0.4.0.9002 or later**. Review
+tools can return long occurrence IDs that overlap or are clipped in a
+plot. Supply a character vector whose names are exactly the displayed
+occurrence IDs (or category IDs on a category map); its order need not
+match the result table. Choose short, distinguishable display names. The
+returned `mca_display` table keeps `id`, `label`, `x` and `y` for every
+point, including co-located points. Use its original `id` to look up
+source text; a display name is not a replacement identifier. Without
+`labels`, the existing ID/category labels are used.
+
 The warning about repeated eigenvalues is intentional. These maps show
 the first two retained axes (one axis for rank-one inputs). Occurrence
 and category maps use separate principal coordinates: cross-map
 distances are not association strengths. Full tables retain co-located
-IDs even when display labels are combined. Interpret the coding scheme,
-category counts, contributions and representation quality together.
-Group labels used for display are not a test of group effects; MCA does
-not model repeated writers or capture every higher-order interaction.
+IDs even when display labels are combined. Since 0.4.0.9002, the
+CA/MCA/MDS plots group labels at coordinates equal to eight decimal
+places, including numerical zeroes. This is a display rule; stored and
+returned coordinates keep their full precision and points are not
+jittered. Interpret the coding scheme, category counts, contributions
+and representation quality together. Group labels used for display are
+not a test of group effects; MCA does not model repeated writers or
+capture every higher-order interaction.
 
 ``` r
 mca_helper$ordination_mca_occurrences(mca_table, c("u01", "u16"))
@@ -655,7 +673,7 @@ mca_helper$ordination_mca_occurrences(mca_table, c("u01", "u16"))
 #> 1 finance subject   definite The bank approved the loan.
 #> 2    <NA> oblique   definite   We stopped near the bank.
 mca_record <- list(table = mca_table, mca = if (has_ca) mca_result else NULL,
-  session = sessionInfo())
+  display_labels = mca_labels, session = sessionInfo())
 mca_path <- tempfile(fileext = ".rds") # Choose a persistent private path for research.
 saveRDS(mca_record, mca_path, version = 2)
 stopifnot(identical(readRDS(mca_path), mca_record))
@@ -675,6 +693,7 @@ mca_helper$ordination_validate(mca_record$table)
 mca_helper$ordination_validate(mca_record$mca)
 mca_record$mca$categories
 mca_helper$ordination_mca_occurrences(mca_record$table, "u01")
+mca_helper$ordination_mca_plot(mca_record$mca, labels = mca_record$display_labels)
 ```
 
 Keep the complete record under the source text’s access conditions and

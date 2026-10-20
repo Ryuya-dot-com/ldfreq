@@ -101,7 +101,8 @@ any optional tools.
   Keep original token anchors, category definitions, incomplete-row
   exclusions, equal occurrence weights and unadjusted inertia
   diagnostics. These helpers do not select meanings or test group
-  effects.
+  effects. Version 0.4.0.9002 also accepts separate display labels on
+  its MCA maps, matched to the original point IDs.
 
 - Which writer/task/occasion observations entered my analysis?:
 
