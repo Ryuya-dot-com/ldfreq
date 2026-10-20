@@ -23,6 +23,7 @@ jobs:
       reuse: ${{ steps.reuse.outputs.reuse }}
       check-matrix: ${{ steps.reuse.outputs.check-matrix }}
       builder-matrix: ${{ steps.reuse.outputs.builder-matrix }}
+      linux-reuse: ${{ steps.reuse.outputs.linux-reuse }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -97,7 +98,7 @@ jobs:
             any::rcmdcheck
             textstem=?ignore-before-r=4.4.0
             gibasa=?ignore-before-r=4.2.0
-            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5 MASS@7.3-60 readxl@1.4.5' || '' }}
+            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5 MASS@7.3-60 readxl@1.4.5 pbkrtest@0.5.2' || '' }}
           # Keep all ldfreq check dependencies; old Matrix Enhances are not used.
           dependencies: 'if (getRversion() < "4.2.0") c("Depends", "Imports", "LinkingTo", "Suggests") else "all"'
           needs: check
@@ -177,7 +178,7 @@ jobs:
   # that completed preparation in the standard cache, in its own time budget.
   prepare-r-devel:
     needs: validation-scope
-    if: needs.validation-scope.outputs.reuse != 'true'
+    if: needs.validation-scope.outputs.reuse != 'true' && needs.validation-scope.outputs.linux-reuse != 'true'
     name: ubuntu-24.04 / prepare R devel dependencies
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -205,7 +206,7 @@ jobs:
   check-r-devel:
     name: ubuntu-24.04 / R devel
     needs: [validation-scope, prepare-r-devel]
-    if: needs.validation-scope.outputs.reuse != 'true'
+    if: needs.validation-scope.outputs.reuse != 'true' && needs.validation-scope.outputs.linux-reuse != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
@@ -237,7 +238,7 @@ jobs:
 
   c-locale:
     needs: validation-scope
-    if: needs.validation-scope.outputs.reuse != 'true'
+    if: needs.validation-scope.outputs.reuse != 'true' && needs.validation-scope.outputs.linux-reuse != 'true'
     name: ubuntu-24.04 / C locale
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -267,7 +268,7 @@ jobs:
 
   tubelex-build-audit:
     needs: validation-scope
-    if: needs.validation-scope.outputs.reuse != 'true'
+    if: needs.validation-scope.outputs.reuse != 'true' && needs.validation-scope.outputs.builder-matrix != '[]'
     name: ${{ matrix.os }} / TUBELEX builder
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
@@ -390,16 +391,19 @@ jobs:
           C_LOCALE_RESULT: ${{ needs.c-locale.result }}
           TUBELEX_RESULT: ${{ needs.tubelex-build-audit.result }}
           PDF_MANUAL_RESULT: ${{ needs.pdf-manual.result }}
+          LINUX_REUSE: ${{ needs.validation-scope.outputs.linux-reuse }}
         run: |
           if [ "${CHECK_RESULT}" != "success" ]; then
             echo "::error::R-CMD-check matrix result: ${CHECK_RESULT}"
             exit 1
           fi
-          if [ "${DEVEL_RESULT}" != "success" ] || [ "${C_LOCALE_RESULT}" != "success" ]; then
+          expected=success
+          if [ "${LINUX_REUSE}" = "true" ]; then expected=skipped; fi
+          if [ "${DEVEL_RESULT}" != "$expected" ] || [ "${C_LOCALE_RESULT}" != "$expected" ]; then
             echo "::error::R-devel: ${DEVEL_RESULT}; C locale: ${C_LOCALE_RESULT}"
             exit 1
           fi
-          if [ "${TUBELEX_RESULT}" != "success" ]; then
+          if [ "${TUBELEX_RESULT}" != "$expected" ]; then
             echo "::error::TUBELEX builder matrix result: ${TUBELEX_RESULT}"
             exit 1
           fi
