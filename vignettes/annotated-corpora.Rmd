@@ -410,6 +410,11 @@ into single words or alter TTR, MATTR or MTLD.
 
 ### Save the complete review and reproduce its tables
 
+For teacher preparation, the [DDL material example](ddl-materials.html)
+(development 0.4.0.9004 or later) uses an explicit subset of accepted occurrences
+to create learner HTML, a separate teacher table and a complete private record.
+It retains pending candidates and does not change this review's criterion.
+
 ```{r phrase-review-save, eval=has_phrase_example}
 ```
 
