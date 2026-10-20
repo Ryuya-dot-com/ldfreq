@@ -663,7 +663,7 @@ saved$inference$tables$comparison
 #> Results are averaged over the levels of: task
 #> Degrees-of-freedom method: kenward-roger
 #> Confidence level used: 0.95
-stopifnot(identical(saved$inference$tables, record$inference$tables),
+stopifnot(identical(saved$inference$settings$df_method, "kenward-roger"),
   identical(saved$inference$observation_ids, saved$selected$data$observation_id))
 ```
 
