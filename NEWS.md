@@ -1,3 +1,17 @@
+# ldfreq 0.4.0.9005
+
+- Extend the repeated-observations guide with an explicitly sourced reporting
+  recipe for task-specific means, equally task-weighted means and one planned
+  week-8 minus week-0 contrast. Optional emmeans and pbkrtest supply explicitly
+  requested Kenward--Roger intervals; unavailable methods do not silently fall
+  back to different inference.
+- Retain model-row identity, exclusions, diagnostics, unobserved/extrapolated
+  cells and original-scale observations. Problem fits withhold interval tables.
+  Save the complete record and replay tables/plots without refitting.
+- The Gaussian MATTR example uses authored data to illustrate the workflow,
+  not establish model validity or learner development. No new export or
+  change to lexical calculations, resources or existing result contracts.
+
 # ldfreq 0.4.0.9004
 
 - Add an explicitly sourced DDL preparation example. Teachers select accepted
