@@ -1,8 +1,8 @@
 ---
-title: "Explore lexical composition with CA and MDS"
+title: "Explore lexical composition and categories with CA, MCA and MDS"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Explore lexical composition with CA and MDS}
+  %\VignetteIndexEntry{Explore lexical composition and categories with CA, MCA and MDS}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -23,6 +23,10 @@ installed examples, not exported functions. MDS uses R's `stats::cmdscale()`;
 CA requires the optional `ca` package (`install.packages("ca")`). No new tokenizer
 or model is needed. The example uses authored counts to make the calculations
 checkable, not empirical learner differences.
+
+The [occurrence-MCA example](#occurrence-mca) requires **0.4.0.9001 or later**,
+not stable 0.4.0. It describes several nominal variables coded for each original
+occurrence, rather than a document-by-term frequency table.
 
 ## Begin with the counted documents
 
@@ -247,10 +251,132 @@ Add the actual inertia and distance-reconstruction diagnostics from the saved
 results and describe their implications. Do not turn this authored example into
 an empirical claim about learner development.
 
-MCA, nonmetric MDS, automatic feature/distance selection and inferential tests
+Nonmetric MDS, automatic feature/distance selection and inferential tests
 are outside this recipe. CA and weighted PCoA with chi-square distances can
 describe the same geometry; agreement between such maps is not independent
 validation.
+
+## MCA: describe categories attached to original occurrences {#occurrence-mca}
+
+Do meanings co-occur with different grammatical roles and determiner choices?
+Here a row is one occurrence of *bank*, with author-assigned sense, noun-phrase
+role and determiner. Writer and document IDs remain metadata. For two variables,
+inspect a cross-tabulation first; use this MCA route when a joint low-dimensional
+description of several variables helps the question. Do not discretize a
+continuous score merely to make it suitable for MCA.
+
+```{r mca-input}
+mca_demo <- new.env(parent = globalenv())
+sys.source(system.file("examples", "occurrence-mca-demo.R",
+  package = "ldfreq", mustWork = TRUE), mca_demo)
+mca_helper <- mca_demo$helper
+mca_table <- mca_demo$tab
+mca_table$variables
+mca_table$observations
+mca_table$categories
+```
+
+These are 17 authored occurrences, not human-subject data or model predictions.
+Two rows lack an active code, leaving 15 complete rows and seven active categories
+across three variables. An unused sense level stays in the audit. The missing
+rows remain in `occurrences` and can still be inspected; they are not a new
+category. The complete rows represent writers A/B/C with counts 8/4/3, so equal
+occurrence weighting is not equal writer weighting. Report exclusions by the
+study groups relevant to your question.
+
+For another source, load `concordance.R`, `lexical-ordination.R` and
+`occurrence-mca.R` into one environment. Supply an unchanged annotation import
+and an occurrence data frame with unique `occurrence_id`, the six unchanged
+source columns (`document_id`, `segment_id`, `token_index`, `start`, `end`,
+`surface`), your category columns and any study metadata. Each original token
+can appear only once. `source_text` is reserved for the source lookup output.
+This route concerns single-token occurrences; it does not merge a phrase into
+a lexical token. `definitions` is a named character vector describing the
+active columns and `coding_id` identifies the coding rules/version. Retain
+adjudication notes as metadata. Character categories and unordered factors are
+accepted, with `NA` for missing codes; numeric and ordered variables need a
+separate justified analysis, not implicit conversion.
+
+```{r mca-own-input, eval=FALSE}
+mca_table <- mca_helper$ordination_mca_table(
+  annotations, occurrences,
+  definitions = c(sense = "Your explicit sense inventory",
+    role = "Your grammatical-role categories", determiner = "Your categories"),
+  coding_id = "reviewed-coding-rules-v1"
+)
+```
+
+```{r mca-fit}
+if (has_ca) {
+  mca_result <- mca_helper$ordination_mca(mca_table, k = 2)
+  print(mca_result$axes)
+  print(mca_result$diagnostics)
+  print(mca_result$categories, row.names = FALSE)
+}
+```
+
+The helper passes the complete indicator matrix to `ca::ca()`. Each row contains
+one `1` per variable. With n rows, Q variables and J observed categories, row
+mass is 1/n, category mass is its count divided by nQ, and total **unadjusted**
+inertia is (J-Q)/Q: 4/3 here. Axis fractions use that full inertia, not a
+Benzécri/Greenacre adjustment or a denominator limited to plotted axes.
+Contributions and cos² are proportions as in CA. A rare category is retained
+with its count, not silently pooled; distant categories need not dominate an axis.
+Variables with fewer than two observed levels prevent fitting but keep their
+audit table. The dense indicator matrix has the declared `max_cells` limit;
+this is not a streaming or full-memory-bound implementation.
+
+The second and third eigenvalues coincide in this example. The first two axes
+account for about 54.9% of unadjusted inertia, but selecting only one direction
+from that tied eigenspace is not unique. `axes$tied_with_next` and
+`diagnostics$cut_through_tied_axes` expose this. Signs and tied-axis rotations
+can change across implementations without changing the complete geometry.
+Do not give those arbitrary orientations independent linguistic meanings.
+
+```{r mca-maps}
+if (has_ca) {
+  mca_helper$ordination_mca_plot(mca_result)
+  mca_helper$ordination_mca_plot(mca_result, "categories", monochrome = TRUE)
+}
+```
+
+The warning about repeated eigenvalues is intentional. These maps show the first
+two retained axes (one axis for rank-one inputs). Occurrence and category maps
+use separate principal coordinates: cross-map distances are not association
+strengths. Full tables retain co-located IDs even when display labels are combined.
+Interpret the coding scheme, category counts, contributions and representation
+quality together. Group labels used for display are not a test of group effects;
+MCA does not model repeated writers or capture every higher-order interaction.
+
+```{r mca-source-save}
+mca_helper$ordination_mca_occurrences(mca_table, c("u01", "u16"))
+mca_record <- list(table = mca_table, mca = if (has_ca) mca_result else NULL,
+  session = sessionInfo())
+mca_path <- tempfile(fileext = ".rds") # Choose a persistent private path for research.
+saveRDS(mca_record, mca_path, version = 2)
+stopifnot(identical(readRDS(mca_path), mca_record))
+```
+
+In a fresh session, inspect stored coordinates and decisions without the parser,
+original input files or optional `ca` package; fitting is not rerun:
+
+```{r resume-mca, eval=FALSE}
+library(ldfreq)
+mca_helper <- new.env(parent = globalenv())
+for (script in c("concordance.R", "lexical-ordination.R", "occurrence-mca.R"))
+  sys.source(system.file("examples", script, package = "ldfreq", mustWork = TRUE), mca_helper)
+mca_record <- readRDS("occurrence-mca-record.rds")
+mca_helper$ordination_validate(mca_record$table)
+mca_helper$ordination_validate(mca_record$mca)
+mca_record$mca$categories
+mca_helper$ordination_mca_occurrences(mca_record$table, "u01")
+```
+
+Keep the complete record under the source text's access conditions and preserve
+its original calculation session. The record detects accidental edits, not
+false coding or forged metadata. Cite the supplied annotations/coding method,
+ldfreq archive and the `ca` paper below. This example validates a computational
+route; it does not establish sense accuracy, proficiency or causal explanations.
 
 ## References
 

@@ -6,7 +6,7 @@
 
 ordination_validate <- function(x) {
   if (!is.list(x) || !is.character(x$kind) || length(x$kind) != 1L ||
-      is.na(x$kind) || !x$kind %in% c("table", "ca", "mds") ||
+      is.na(x$kind) || !x$kind %in% c("table", "ca", "mds", "mca_table", "mca") ||
       !identical(x$integrity_sha256, .concordance_hash(x[names(x) != "integrity_sha256"])))
     stop("The saved ordination record changed; rebuild it from its source.", call. = FALSE)
   invisible(x)
