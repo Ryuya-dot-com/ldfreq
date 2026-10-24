@@ -1,8 +1,8 @@
 # Public API surface audit
 
-Status: maintained API inventory for development version 0.3.0.9007.
-The 9007 update adds catalog scope and explicit plan arguments to existing entry
-points. Exports, S3 registrations, formulas and stored result schemas are unchanged.
+Status: maintained API inventory for development version 0.4.0.9006.
+Eight study/corpus entry points and a concordance plot method are added.
+Existing formulas, legacy return shapes and saved records remain supported.
 
 Initial inventory audit: 2026-10-06; subsequent API decisions through 2026-10-08
 are recorded below. Reference/status review: 2026-10-14. Current scope and
@@ -16,6 +16,19 @@ analysis-ready extraction path. It is not installed with the package or
 rendered by pkgdown.
 
 ## Decisions
+
+- Development 0.4.0.9006 adopts public study-table construction/selection,
+  concordance/sorting/within-document dispersion, collocations and keyness with
+  an exact-term concordance handoff. These eight operations have distinct input
+  and denominator contracts not supplied by existing metrics, widening, n-grams
+  or review calls. Validators remain internal. The new concordance facade adds
+  a class for `plot()`, whose invisible return includes displayed occurrences,
+  document roster and query counts. Old source files delegate to the same
+  internal implementations and keep old plain-list/ggplot outputs and signatures.
+  Existing old saved records remain accepted. No dependencies or formulas change.
+  Other examples are not promoted by this decision. The blanket export freeze
+  is replaced by the individual naming, compatibility and integration gate.
+
 
 - Development 0.4.0.9004 adds explicitly sourced `ddl_material()` and
   `ddl_material_write()` examples for teacher preparation. They validate an
@@ -52,8 +65,8 @@ rendered by pkgdown.
 These decisions describe the released interface. The
 [2026-10-14 consolidation review](#2026-10-14-api-consolidation-review)
 reassesses shared entry points. The continuation adopts only the
-[9007 entry points](#9007-adopted-entry-points); the current export freeze stays
-in force. A current absence of a plot/summary method is not, by
+[9007 entry points](#9007-adopted-entry-points); the export freeze remained
+in force at that checkpoint; the 9006 decision above supersedes that blanket rule. A current absence of a plot/summary method is not, by
 itself, proof that an explicit selected view could never be supported safely.
 
 - The 0.3.0.9005 text-batch `metadata` argument preserves explicit document-level
@@ -192,6 +205,14 @@ class, evaluator or implicit human decision is introduced.
 
 | Export | Role and return boundary | Batch relation | Print | Plot | Analysis-ready access |
 |---|---|---|---|---|---|
+| `lexdiv_study_table()` | Planned observations joined to saved plan results; ordinary data frame with distinct submission/computation/reporting states | One selected document per observation; no recomputation or model fitting | Base | No | Complete ordinary table |
+| `lexdiv_study_model_data()` | Explicit single-condition/request selection with metadata and exclusion audit | One row per observation and unique document | Base list | No | `$data`, `$audit` |
+| `lexdiv_concordance()` | Complete source-aligned token-pattern search; classed full record | Declared source document roster including empty/zero-match documents | Base list | `plot()` selects one query, returns displayed tables invisibly | `$occurrences`, `$counts`, `$documents`, full `$source`, settings/provenance |
+| `lexdiv_concordance_sort()` | Sort saved context nearest-token-first with stable ties | Same search and occurrence IDs | Base table | No | Ordered occurrence table |
+| `lexdiv_concordance_dispersion()` | Unnormalised single-token within-document DP and per-part exposure | Document rows, not across-document dispersion | Base list | Position view belongs to search | `$documents`, `$parts`, occurrence IDs/settings/search ID |
+| `lexdiv_collocations()` | Ordered eligible slot-pair opportunities, MI and t-score | Per-document audit beside pooled counts; not n-gram reference frequency | Base list | No | `$results`, `$pairs`, `$documents`, complete `$search`, settings/provenance |
+| `lexdiv_keyness()` | Explicit disjoint target/reference counts, G-squared and unsmoothed log-ratio; no tests | Pooled token totals with document counts and coverage | Base list | No | `$results`, `$totals`, `$documents`, `$document_counts`, `$occurrences`, `$token_audit`, full `$source` |
+| `lexdiv_keyness_concordance()` | Exact counted-term return to original contexts | Same retained source; no new comparison | Base list | `plot($search)` | Comparison ID, term and classed `$search` |
 | `morphynet_read_derivations()` | Local six-field derivational TSV reader; preserves source/target/POS, affix position, alternatives and file identity | Reference resource; not a document profiler | Base list | No | `$relations`, scalar `$resource` for candidate review, `$provenance`; example preserves source row mapping and occurrence decisions |
 | `bnccoca_data()` | Bundled Nation BNC/COCA Level 6 membership, Version 1.0.0; no inferred members | Reference resource, not document data | Base list | No | `$dictionary`, separate `$supplementary`, `$catalog`, `$resource` for family lookup, `$provenance` for source/conversion identity |
 | `morpholex_data()` | Bundled MorphoLex-en worksheet values and provenance; all sheets or an explicit ordered subset | Reference resource, not document data | Base list | No | `$sheets` (character-valued original data frames), `$provenance` including source identity, license and complete sheet catalog |

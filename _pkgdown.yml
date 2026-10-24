@@ -28,6 +28,12 @@ reference:
       - lexdiv_text_batch
       - lexdiv_flemmatize
       - lexdiv_family_profile
+  - title: Study tables and corpus exploration
+    contents:
+      - lexdiv_study_table
+      - lexdiv_concordance
+      - lexdiv_collocations
+      - lexdiv_keyness
   - title: Exact lexical overlap and coverage
     contents:
       - lexdiv_overlap

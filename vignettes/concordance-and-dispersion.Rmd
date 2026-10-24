@@ -21,10 +21,11 @@ saved occurrences for context sorting, position plots and a within-document
 dispersion measure. It keeps the search unit, excluded positions and denominators
 visible so that a changed search can be explained.
 
-Use ldfreq 0.3.0.9009 or later and optional **quanteda >= 4.5.0**; plotting also
-needs **ggplot2**. Install these packages before running the guide. The four
-helpers live in `examples/concordance.R` and are explicitly sourced, installed
-example code. They are not exported package functions. The example inputs and
+Use ldfreq **0.4.0.9006 or later** and optional **quanteda >= 4.5.0**; plotting also
+needs **ggplot2**. Install these packages before running the guide. Search with
+`lexdiv_concordance()`, sort with `lexdiv_concordance_sort()`, calculate DP with
+`lexdiv_concordance_dispersion()`, and draw saved positions with `plot()`.
+These operations need no helper sourcing. The example inputs and
 lemmas are authored for hand checking; they are not learner observations or an
 evaluation of an annotation system.
 
@@ -36,7 +37,6 @@ library(ldfreq)
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "concordance-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
-helper <- demo$helper
 annotations <- demo$annotations
 print(annotations$segments[c("document_id", "segment_id", "text")], row.names = FALSE)
 ```
@@ -89,7 +89,7 @@ raw_annotations <- lexdiv_import_annotations(raw_rows, raw_segments,
     unit = "word-tokenizer-with-punctuation", normalization = "none",
     settings = paste("remove_punct=FALSE; remove_symbols=FALSE; remove_numbers=FALSE;",
       "remove_url=FALSE; remove_separators=TRUE; split_hyphens=FALSE")))
-raw_search <- helper$concordance_search(raw_annotations,
+raw_search <- lexdiv_concordance(raw_annotations,
   list(learning = "^learn(ed)?$"), valuetype = "regex")
 raw_search$counts
 ```
@@ -102,7 +102,7 @@ boundaries within that row. Save the original texts and tokenizer settings.
 
 ```{r concordance-search, eval=has_quanteda}
 keep <- !annotations$tokens$surface %in% c(".", "very")
-search <- helper$concordance_search(annotations,
+search <- lexdiv_concordance(annotations,
   queries = list(word = "learn", phrase = c("learn", "new"), absent = "unlisted"),
   term_col = "lemma", valuetype = "fixed", case_insensitive = FALSE,
   keep = keep, window = 2L)
@@ -128,9 +128,9 @@ and [value types](https://quanteda.io/reference/valuetype.html):
 | `"regex"` | `"^learn(ed)?$"` | A regular expression applied to each token; anchors restrict it to a whole token |
 
 ```{r concordance-patterns, eval=has_quanteda}
-wildcard <- helper$concordance_search(annotations,
+wildcard <- lexdiv_concordance(annotations,
   list(forms = "learn*", phrase = c("learn*", "new")), valuetype = "glob", keep = keep)
-regular <- helper$concordance_search(annotations,
+regular <- lexdiv_concordance(annotations,
   list(forms = "^learn(ed)?$"), valuetype = "regex", keep = keep)
 print(wildcard$counts, row.names = FALSE)
 stopifnot(sum(regular$counts$occurrences) == 9L)
@@ -167,8 +167,8 @@ before raising it for a larger input.
 ## Sort by the nearest context words
 
 ```{r concordance-sort, eval=has_quanteda}
-right_sorted <- helper$concordance_sort(search, side = "right", depth = 2L)
-left_sorted <- helper$concordance_sort(search, side = "left", depth = 2L)
+right_sorted <- lexdiv_concordance_sort(search, side = "right", depth = 2L)
+left_sorted <- lexdiv_concordance_sort(search, side = "left", depth = 2L)
 print(right_sorted[c("query_id", "document_id", "pre", "keyword", "post")], row.names = FALSE)
 ```
 
@@ -190,8 +190,7 @@ queries, settings or source creates a different search identity; sorting does no
 ## Plot those same occurrences
 
 ```{r concordance-position-plot, eval=has_quanteda && has_plot}
-positions <- helper$concordance_positions(search, "word")
-positions
+positions <- plot(search, "word")
 ```
 
 Each plus marks the original start position. A horizontal stroke also shows the
@@ -210,13 +209,14 @@ original token slots on a common 0–1 scale. Exclusions do not shorten the axis
 Use `relative = FALSE` for a shared absolute token-position axis:
 
 ```{r concordance-position-mono, eval=has_quanteda && has_plot}
-helper$concordance_positions(search, "phrase", relative = FALSE, monochrome = TRUE)
-stopifnot(identical(positions$data$occurrence_id,
+plot(search, "phrase", relative = FALSE, monochrome = TRUE)
+stopifnot(identical(positions$occurrences$occurrence_id,
   search$occurrences$occurrence_id[search$occurrences$query_id == "word"]))
 ```
 
 The plot reads the saved table without retokenization or a new search. Its
-`data` retains occurrence IDs and coordinates for inspection. Colour is the
+invisible return retains the displayed occurrence IDs, coordinates, document
+roster and counts for inspection. Colour is the
 default; `monochrome = TRUE` keeps the same marks and axes. Add figure numbering,
 titles and explanatory notes in the surrounding manuscript.
 
@@ -239,7 +239,7 @@ shares. A larger value indicates greater departure from the declared exposure
 distribution; it does not necessarily mean a geometrically narrower cluster.
 
 ```{r concordance-dp, eval=has_quanteda}
-dispersion <- helper$concordance_dispersion(search, "word", parts = 3L)
+dispersion <- lexdiv_concordance_dispersion(search, "word", parts = 3L)
 print(dispersion$documents[c("document_id", "searchable_tokens", "occurrences",
   "DP", "status", "missing_reason")], digits = 4, row.names = FALSE)
 print(subset(dispersion$parts, document_id %in% c("spread", "cluster"))[
@@ -284,8 +284,8 @@ saved <- tempfile(fileext = ".rds") # Choose a persistent filename for research 
 saveRDS(record, saved)
 restored <- readRDS(saved)
 stopifnot(identical(restored, record),
-  identical(helper$concordance_sort(restored$search, "right", 2L), restored$sorted),
-  identical(helper$concordance_dispersion(restored$search, "word", 3L), restored$dispersion),
+  identical(lexdiv_concordance_sort(restored$search, "right", 2L), restored$sorted),
+  identical(lexdiv_concordance_dispersion(restored$search, "word", 3L), restored$dispersion),
   identical(restored$dispersion$occurrence_ids,
     restored$search$occurrences$occurrence_id[restored$search$occurrences$query_id == "word"]))
 ```
@@ -294,11 +294,8 @@ In a fresh R session, use the same package snapshot and your saved path:
 
 ```{r resume-concordance, eval=FALSE}
 library(ldfreq)
-helper <- new.env(parent = globalenv())
-sys.source(system.file("examples", "concordance.R", package = "ldfreq",
-  mustWork = TRUE), helper)
 restored <- readRDS("concordance-record.rds")
-sorted <- do.call(helper$concordance_sort,
+sorted <- do.call(lexdiv_concordance_sort,
   c(list(x = restored$search), restored$sort))
 stopifnot(identical(sorted, restored$sorted))
 sorted
@@ -310,6 +307,13 @@ reject edited saved results; rerun the search from newly imported source when
 changing an input. These hashes check accidental changes, not authorship.
 A flattened CSV cannot retain the source object, settings and context-vector
 columns; use it only as a display or exchange table beside the complete RDS.
+
+For existing scripts, `examples/concordance.R` still defines the old helper names
+and preserves their return values, including the ggplot object returned by
+`concordance_positions()`. New searches have a class for `plot()`; old plain-list
+records remain accepted by sorting, dispersion and collocation operations.
+Recreate a search from its saved inputs to use `plot()` on the new class; do not
+edit saved classes or integrity hashes manually.
 
 To connect documents to writers, tasks and occasions, join their retained
 `document_id` to your explicit metadata map; see [the repeated-observation guide](repeated-observations.html).
