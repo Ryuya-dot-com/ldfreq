@@ -385,37 +385,103 @@ library(ldfreq)
 tokens <- c("a", "a", "b", "c")
 result <- lexdiv_metrics(tokens, metrics = "ttr")
 result  # N = 4, V = 3, value = 0.75, status = "ok"
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr  0.75     ok           <NA> 4 3               FALSE
 result$value
+#> [1] 0.75
 
 # Empty, invalid, and too-short inputs are different conditions.
 lexdiv_metrics(character(), metrics = "ttr")  # missing / empty_input
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value  status missing_reason N V below_quality_floor
+#> 1       ttr    NA missing    empty_input 0 0                TRUE
 lexdiv_metrics(c("a", NA_character_), metrics = "ttr")  # invalid_input / invalid_token
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value        status missing_reason  N  V below_quality_floor
+#> 1       ttr    NA invalid_input  invalid_token NA NA                  NA
 lexdiv_metrics(c("a", "b"), metrics = "mattr", window_length = 3)
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value  status                    missing_reason N V
+#> 1     mattr    NA missing too_short_for_requested_parameter 2 2
+#>   below_quality_floor
+#> 1                TRUE
 # The last result is missing / too_short_for_requested_parameter, not zero.
 
 # Named lists keep each document separate, including the empty document.
 documents <- list(doc_a = c("a", "a", "b"), doc_b = character())
 batch <- lexdiv_metrics_batch(documents, metrics = "ttr")
 batch  # doc_a: N = 3, V = 2, TTR = 2/3; doc_b: missing / empty_input
+#> <lexdiv_batch_results: 2 documents; 2 metric records; schema 0.1.0>
+#>   document_id metric_id     value  status missing_reason N V
+#> 1       doc_a       ttr 0.6666667      ok           <NA> 3 2
+#> 2       doc_b       ttr        NA missing    empty_input 0 0
+#>   below_quality_floor
+#> 1               FALSE
+#> 2                TRUE
 
 # Record several parameter settings before computation.
 plan <- lexdiv_plan("length_50_100")
 planned <- lexdiv_metrics(tokens, plan = plan)
 planned[, c("request_id", "metric_id", "value", "status", "missing_reason")]
+#> <lexdiv_profile_results: 13 specifications; schema unknown>
+#>    request_id metric_id        value  status                    missing_reason
+#> 1         ttr       ttr    0.7500000      ok                              <NA>
+#> 2        rttr      rttr    1.5000000      ok                              <NA>
+#> 3        cttr      cttr    1.0606602      ok                              <NA>
+#> 4      herdan    herdan    0.7924813      ok                              <NA>
+#> 5        maas      maas    0.1496931      ok                              <NA>
+#> 6       msttr     msttr           NA missing too_short_for_requested_parameter
+#> 7       mattr     mattr           NA missing too_short_for_requested_parameter
+#> 8        mtld      mtld    4.2400000      ok                              <NA>
+#> 9         hdd       hdd           NA missing too_short_for_requested_parameter
+#> 10     yule_k    yule_k 1250.0000000      ok                              <NA>
+#> 11     yule_i    yule_i    3.0000000      ok                              <NA>
+#> 12  msttr_100     msttr           NA missing too_short_for_requested_parameter
+#> 13  mattr_100     mattr           NA missing too_short_for_requested_parameter
 planned_batch <- lexdiv_metrics_batch(documents, plan = plan)
 stopifnot(identical(planned_batch, lexdiv_profile_batch(documents, plan)))
 
 # Further methods. Sample size 2 is for this tiny illustration only.
 lexdiv_metric_ids()
+#>  [1] "ttr"            "rttr"           "cttr"           "herdan"        
+#>  [5] "maas"           "msttr"          "mattr"          "mtld"          
+#>  [9] "mtld_ma"        "hdd"            "expected_ttr_d" "yule_k"        
+#> [13] "yule_i"        
 lexdiv_metrics(tokens, metrics = c("ttr", "hdd"), sample_size = 2)
+#> <lexdiv_results: 2 metrics; contract 0.2.0>
+#>   metric_id     value status missing_reason N V below_quality_floor
+#> 1       ttr 0.7500000     ok           <NA> 4 3               FALSE
+#> 2       hdd 0.9166667     ok           <NA> 4 3                TRUE
 
 lexdiv_metrics(
   rep(c("a", "b", "a", "c"), 20),
   metrics = "expected_ttr_d"
 )
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>        metric_id     value status missing_reason  N V below_quality_floor
+#> 1 expected_ttr_d 0.1164681     ok           <NA> 80 3               FALSE
 
 mtld <- lexdiv_metrics(rep(c("a", "b"), 10), metrics = "mtld")
 mtld$diagnostics[[1]]
+#> $forward_score
+#> [1] 3.333333
+#> 
+#> $reverse_score
+#> [1] 3.333333
+#> 
+#> $forward_complete_factors
+#> [1] 6
+#> 
+#> $reverse_complete_factors
+#> [1] 6
+#> 
+#> $forward_tail_credit
+#> [1] 0
+#> 
+#> $reverse_tail_credit
+#> [1] 0
+#> 
 
 # Reproduce the previous min10 formula explicitly (50 identical tokens -> 10).
 legacy <- lexdiv_variant_metrics(
@@ -423,11 +489,14 @@ legacy <- lexdiv_variant_metrics(
   variants = "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1"
 )
 legacy$value
+#> [1] 10
 lexdiv_metrics(rep("a", 50), metrics = "mtld")$value  # new definition: 2
+#> [1] 2
 
 contract_path <- system.file(
   "spec", "lexical-diversity-contract.json", package = "ldfreq"
 )
 stopifnot(nzchar(contract_path))
 basename(contract_path)
+#> [1] "lexical-diversity-contract.json"
 ```

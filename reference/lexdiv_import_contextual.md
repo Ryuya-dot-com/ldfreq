@@ -142,4 +142,6 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
   imported$summary
   imported$occurrences[c("status", "model_status", "has_embedding")]
 }
+#>       status model_status has_embedding
+#> 1 unreviewed    processed          TRUE
 ```

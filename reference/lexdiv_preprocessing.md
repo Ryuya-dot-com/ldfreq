@@ -353,7 +353,22 @@ result <- lexdiv_metrics_text(
   tokenizer = "english", case = "lower", metrics = "ttr"
 )
 result$results  # N = 5, V = 4, TTR = 0.8, status = "ok"
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr   0.8     ok           <NA> 5 4               FALSE
 result$token_audit
+#>   token_index surface selected_unit unit_match_rule upos eligible
+#> 1           1    cats          cats            <NA> <NA>     TRUE
+#> 2           2   chase         chase            <NA> <NA>     TRUE
+#> 3           3    cats          cats            <NA> <NA>     TRUE
+#> 4           4     and           and            <NA> <NA>     TRUE
+#> 5           5    dogs          dogs            <NA> <NA>     TRUE
+#>   exclusion_reason
+#> 1             <NA>
+#> 2             <NA>
+#> 3             <NA>
+#> 4             <NA>
+#> 5             <NA>
 
 # A 50-word MATTR window does not fit this five-word text.
 short <- lexdiv_metrics_text(
@@ -362,6 +377,11 @@ short <- lexdiv_metrics_text(
   window_length = 50
 )
 short$results  # NA; missing_reason = "too_short_for_requested_parameter"
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value  status                    missing_reason N V
+#> 1     mattr    NA missing too_short_for_requested_parameter 5 4
+#>   below_quality_floor
+#> 1                TRUE
 
 # 2. Inspect the English tokenizer's retained and excluded spans.
 english <- lexdiv_tokenize(
@@ -369,12 +389,24 @@ english <- lexdiv_tokenize(
   tokenizer = "english", case = "lower"
 )
 english$tokens
+#>   token_index start end    surface is_number
+#> 1           1     1   6     john's     FALSE
+#> 2           2     8  17 well-known     FALSE
+#> 3           3    19  22       book     FALSE
+#> 4           4    24  28      costs     FALSE
+#> 5           5    36  38        see     FALSE
 english$provenance$excluded_spans
+#>   start end              surface reason
+#> 1    30  33                 3.14 number
+#> 2    40  59 https://example.org.    url
 
 # 3. Change the counting unit while retaining the same five tokens.
 tokenization <- lexdiv_tokenize("Cats and cat ran run.", tokenizer = "english")
 surface <- lexdiv_metrics_text(tokenization, metrics = "ttr")
 surface$results  # Case preserved: N = 5, V = 5, TTR = 1
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr     1     ok           <NA> 5 5               FALSE
 
 # These labels were written for this example. No automatic analysis is run.
 annotated <- lexdiv_lemmatize(
@@ -388,6 +420,9 @@ annotated <- lexdiv_lemmatize(
 )
 lemma_all <- lexdiv_metrics_text(annotated, unit = "lemma", metrics = "ttr")
 lemma_all$results  # Same N = 5; V = 3, TTR = 0.6
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr   0.6     ok           <NA> 5 3               FALSE
 
 # 4. Now change word inclusion: exclude "and" using the supplied POS tags.
 lemma_content <- lexdiv_metrics_text(
@@ -397,7 +432,22 @@ lemma_content <- lexdiv_metrics_text(
   metrics = "ttr"
 )
 lemma_content$results  # N = 4, V = 2, TTR = 0.5
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr   0.5     ok           <NA> 4 2               FALSE
 lemma_content$token_audit
+#>   token_index surface selected_unit unit_match_rule  upos eligible
+#> 1           1    Cats           cat            <NA>  NOUN     TRUE
+#> 2           2     and           and            <NA> CCONJ    FALSE
+#> 3           3     cat           cat            <NA>  NOUN     TRUE
+#> 4           4     ran           run            <NA>  VERB     TRUE
+#> 5           5     run           run            <NA>  VERB     TRUE
+#>   exclusion_reason
+#> 1             <NA>
+#> 2 non_content_upos
+#> 3             <NA>
+#> 4             <NA>
+#> 5             <NA>
 
 # Optional: install.packages("textstem") to run this lookup example.
 if (requireNamespace("textstem", quietly = TRUE)) {
@@ -413,4 +463,8 @@ if (requireNamespace("textstem", quietly = TRUE)) {
   textstem_lemmas$provenance$annotation
   lexdiv_metrics_text(textstem_lemmas, unit = "lemma", metrics = "ttr")
 }
+#> <lexdiv_text_results> 6/6 eligible tokens | unit=lemma | inclusion=all
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr     1     ok           <NA> 6 6               FALSE
 ```

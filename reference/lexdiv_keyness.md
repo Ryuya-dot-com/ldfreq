@@ -111,8 +111,23 @@ source <- lexdiv_import_annotations(tokens, segments, list(language = "en",
   dictionary_version = "none", unit = "supplied tokens", normalization = "none"))
 comparison <- lexdiv_keyness(source, "target", "reference", "surface-all")
 comparison$results[c("term", "target_count", "reference_count", "log_ratio")]
+#>   term target_count reference_count log_ratio
+#> 1    a            2               1         1
+#> 2    b            1               2        -1
 if (requireNamespace("quanteda", quietly = TRUE)) {
   evidence <- lexdiv_keyness_concordance(comparison, "a")
   evidence$search$occurrences
 }
+#>   query_id document_id segment_id from to document_from document_to start end
+#> 1  feature      target         s1    1  1             1           1     1   1
+#> 2  feature      target         s1    2  2             2           2     3   3
+#> 3  feature   reference         s1    1  1             1           1     1   1
+#>   pre keyword post matched_terms left_tokens right_tokens
+#> 1           a  a b             a                     a, b
+#> 2  a        a    b             a           a            b
+#> 3           a  b b             a                     b, b
+#>                                                      occurrence_id
+#> 1 4ec6c37193104e90e9166d30bccd65daedde5cc5366753be792bbde5eba7c685
+#> 2 51944ee3acabdfe00295d12799ccef0890f25477ad2ed84781c1004f2d6967b0
+#> 3 d1b9abecf37571c303a07a04a4be6f02d73d1e8e16b29d8a66ac7043ad906ae9
 ```

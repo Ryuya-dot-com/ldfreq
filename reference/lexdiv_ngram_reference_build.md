@@ -133,6 +133,18 @@ resource <- list(resource_id = "authored_chunks", resource_version = "1",
   lookup_unit = "adjacent_surface_ngram", resource_key_normalization_id = "identity")
 built <- lexdiv_ngram_reference_build(names(documents), read, resource)
 built$reference$counts
+#>   n term1  term2  term3 count document_count
+#> 1 2  make      a   <NA>     2              2
+#> 2 2     a choice   <NA>     1              1
+#> 3 3  make      a choice     1              1
+#> 4 2     a   plan   <NA>     1              1
+#> 5 3  make      a   plan     1              1
 built$reference$totals
+#>   n opportunities documents
+#> 1 2             4         2
+#> 2 3             2         2
 built$documents
+#>   source_id document_id
+#> 1     first       first
+#> 2    second      second
 ```

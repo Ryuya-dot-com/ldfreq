@@ -15,6 +15,14 @@ lexdiv_resource_info(c("nj8"))
 lexdiv_download_resources(c("nj8"), accept_license = TRUE)
 ```
 
+``` r
+has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
+```
+
+Resource-dependent examples below run only when their verified data are
+already in the cache. The other examples run without downloading
+reference data.
+
 ## Begin with the question
 
 A teacher wants to describe how much vocabulary in student essays
@@ -33,6 +41,9 @@ library(ldfreq)
 
 texts <- c(a = "Students have jobs.", b = "Students enjoy jobs.", blank = "")
 prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
+```
+
+``` r
 surface <- nj8_profile_batch(prepared, unit = "surface")
 audit <- nj8_diagnostics(surface)
 audit$unmatched_terms
@@ -65,6 +76,9 @@ lemmas <- list(a = c("student", "have", "job"),
                b = c("student", "enjoy", "job"), blank = character())
 annotated <- Map(function(x, lemma) lexdiv_lemmatize(x, lemmas = lemma,
   backend_id = "authored-example", backend_version = "1"), prepared, lemmas)
+```
+
+``` r
 lemma <- nj8_profile_batch(annotated, unit = "lemma")
 comparison <- data.frame(document_id = surface$coverage$document_id,
   surface_coverage = surface$coverage$token_coverage,

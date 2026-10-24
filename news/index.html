@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +44,12 @@
       <small>Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.1" id="ldfreq-051">ldfreq 0.5.1<a class="anchor" aria-label="anchor" href="#ldfreq-051"></a></h2>
+<ul><li>Build the guides without downloaded reference data. Resource-dependent examples run only with a verified cache; core workflows remain executable. Include rendered vignettes in the source artifact and check their rebuilding.</li>
+<li>Keep plot-test replacements inside ldfreq and its sourced recipes instead of changing standard-package bindings or S3 registrations. Retain actual device checks for color, monochrome, labels and graphics-state restoration.</li>
+<li>Declare the test dependency on withr and require testthat &gt;= 3.1.8. Correct cached-license locations and wrap long help usage and examples.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.0.9001" id="ldfreq-0509001">ldfreq 0.5.0.9001<a class="anchor" aria-label="anchor" href="#ldfreq-0509001"></a></h2>
 <ul><li>Separate optional TUBELEX, NJ8, MorphoLex, BNC/COCA and MorphyNet reference data from the MIT package code. Review terms with <code><a href="../reference/lexdiv_resources.html">lexdiv_resource_info()</a></code> and explicitly obtain selected, versioned resources with <code>lexdiv_download_resources(..., accept_license = TRUE)</code>. Downloads and cached files are SHA-256 verified; installation and calculations never download data implicitly. Existing resource-based calls need this one-time setup. Core lexical-diversity calculations need no reference download.</li>
@@ -86,7 +92,7 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0.9001" id="ldfreq-0409001">ldfreq 0.4.0.9001<a class="anchor" aria-label="anchor" href="#ldfreq-0409001"></a></h2>
-<ul><li>Add an explicitly sourced occurrence-level MCA example. Original token anchors, coding definitions, metadata, unused levels and incomplete observations remain in the saved input. Optional <code>ca::ca()</code> analyzes the complete indicator matrix with equal occurrence weights and unadjusted inertia. Coordinates, contributions, cosines and repeated-eigenvalue diagnostics link back to the original text.</li>
+<ul><li>Add an explicitly sourced occurrence-level MCA example. Original token anchors, coding definitions, metadata, unused levels and incomplete observations remain in the saved input. Optional <code><a href="https://rdrr.io/pkg/ca/man/ca.html" class="external-link">ca::ca()</a></code> analyzes the complete indicator matrix with equal occurrence weights and unadjusted inertia. Coordinates, contributions, cosines and repeated-eigenvalue diagnostics link back to the original text.</li>
 <li>Show separate occurrence/category maps and full-record reopening. These are descriptive examples, not automatic sense coding, writer-weighted inference or new exported APIs. Core calculations, resource bytes and dependencies are unchanged.</li>
 </ul></div>
     <div class="section level2">

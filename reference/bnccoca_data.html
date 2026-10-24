@@ -13,7 +13,7 @@ or additional package is needed. These data use CC BY-SA 4.0."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -115,8 +115,9 @@ the resource metadata and examine conflicting candidates. The default example
 uses only <code>dictionary</code>.</p>
 <p>The data and this conversion are CC BY-SA 4.0; independent R code remains MIT.
 Retain attribution, changes and ShareAlike conditions when redistributing the
-data. The complete license and notice are installed under
-<code class="file">licenses/bnccoca/</code>. Other cached resources have separate terms.</p>
+data. The complete license and notice are under <code class="file">licenses/bnccoca/</code>
+inside the version directory returned by <code>lexdiv_resource_info("bnccoca")$path</code>.
+Other cached resources have separate terms.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -136,23 +137,30 @@ example, <code><a href="morpholex_data.html">morpholex_data</a></code>,
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Optional data: review and explicitly download these resources first.</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bnccoca"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">available</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span><span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu">bnccoca_data</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co"># The dictionary maps forms to families; it is not a table of corpus counts.</span></span>
-<span><span class="va">reference</span><span class="op">$</span><span class="va">dictionary</span><span class="op">[</span><span class="va">reference</span><span class="op">$</span><span class="va">dictionary</span><span class="op">$</span><span class="va">form</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"USE"</span>, <span class="st">"USES"</span>, <span class="st">"REUSABILITY"</span>, <span class="st">"COLOUR"</span>, <span class="st">"COLOR"</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"form"</span>, <span class="st">"headword"</span>, <span class="st">"frequency_band"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co"># USE/USES share a headword; COLOUR/COLOR share another. REUSABILITY has no row.</span></span>
-<span></span>
-<span><span class="co"># A longer installed workflow; the direct API example is in ?lexdiv_family_profile.</span></span>
-<span><span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"bnccoca-families.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
-<span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">env</span><span class="op">)</span></span>
-<span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="va">env</span><span class="op">$</span><span class="va">bnccoca_example</span><span class="op">$</span><span class="va">profile</span></span>
-<span><span class="va">profile</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"selected_tokens"</span>, <span class="st">"matched_tokens"</span>,</span>
-<span>  <span class="st">"unresolved_tokens"</span>, <span class="st">"family_types"</span>, <span class="st">"family_ttr"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Optional data: review and explicitly download these resources first.</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bnccoca"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">available</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu">bnccoca_data</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># The dictionary maps forms to families; it is not a table of corpus counts.</span></span></span>
+<span class="r-in"><span><span class="va">reference</span><span class="op">$</span><span class="va">dictionary</span><span class="op">[</span><span class="va">reference</span><span class="op">$</span><span class="va">dictionary</span><span class="op">$</span><span class="va">form</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"USE"</span>, <span class="st">"USES"</span>, <span class="st">"REUSABILITY"</span>, <span class="st">"COLOUR"</span>, <span class="st">"COLOR"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"form"</span>, <span class="st">"headword"</span>, <span class="st">"frequency_band"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="co"># USE/USES share a headword; COLOUR/COLOR share another. REUSABILITY has no row.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A longer installed workflow; the direct API example is in ?lexdiv_family_profile.</span></span></span>
+<span class="r-in"><span><span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"bnccoca-families.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span></span>
+<span class="r-in"><span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">env</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="va">env</span><span class="op">$</span><span class="va">bnccoca_example</span><span class="op">$</span><span class="va">profile</span></span></span>
+<span class="r-in"><span><span class="va">profile</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"selected_tokens"</span>, <span class="st">"matched_tokens"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"unresolved_tokens"</span>, <span class="st">"family_types"</span>, <span class="st">"family_ttr"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id selected_tokens matched_tokens unresolved_tokens family_types</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      listed               4              4                 0            2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    unlisted               2              1                 1           NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   family_ttr     status</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        0.5   complete</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2         NA incomplete</span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

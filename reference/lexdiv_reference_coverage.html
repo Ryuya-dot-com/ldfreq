@@ -11,7 +11,7 @@ empty-input behavior, and optional term disclosure are explicit."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -228,30 +228,93 @@ plus <code>position</code>.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  essay_a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cat"</span>, <span class="st">"cat"</span>, <span class="st">"run"</span>, <span class="st">"rare"</span><span class="op">)</span>,</span>
-<span>  essay_b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bird"</span>, <span class="st">"run"</span>, <span class="st">"unknown"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">coverage</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_reference_coverage</span><span class="op">(</span></span>
-<span>  <span class="va">documents</span>,</span>
-<span>  reference <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cat"</span>, <span class="st">"bird"</span>, <span class="st">"run"</span><span class="op">)</span>,</span>
-<span>  reference_id <span class="op">=</span> <span class="st">"course_list"</span>,</span>
-<span>  details <span class="op">=</span> <span class="st">"terms"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">coverage</span><span class="op">$</span><span class="va">summary</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"document_id"</span>, <span class="st">"weighting"</span>, <span class="st">"value"</span>, <span class="st">"numerator"</span>, <span class="st">"denominator"</span>, <span class="st">"status"</span></span>
-<span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="va">coverage</span><span class="op">$</span><span class="va">documents</span></span>
-<span><span class="va">coverage</span><span class="op">$</span><span class="va">terms</span></span>
-<span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">coverage</span>, weighting <span class="op">=</span> <span class="st">"type"</span><span class="op">)</span></span>
-<span><span class="va">plot_data</span></span>
-<span></span>
-<span><span class="va">document_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span>,</span>
-<span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">document_frame</span><span class="op">$</span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b"</span>, <span class="st">"c"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">lexdiv_reference_coverage</span><span class="op">(</span><span class="va">document_frame</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">summary</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  essay_a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cat"</span>, <span class="st">"cat"</span>, <span class="st">"run"</span>, <span class="st">"rare"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  essay_b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bird"</span>, <span class="st">"run"</span>, <span class="st">"unknown"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">coverage</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_reference_coverage</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">documents</span>,</span></span>
+<span class="r-in"><span>  reference <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cat"</span>, <span class="st">"bird"</span>, <span class="st">"run"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  reference_id <span class="op">=</span> <span class="st">"course_list"</span>,</span></span>
+<span class="r-in"><span>  details <span class="op">=</span> <span class="st">"terms"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">coverage</span><span class="op">$</span><span class="va">summary</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"document_id"</span>, <span class="st">"weighting"</span>, <span class="st">"value"</span>, <span class="st">"numerator"</span>, <span class="st">"denominator"</span>, <span class="st">"status"</span></span></span>
+<span class="r-in"><span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id weighting     value numerator denominator status</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a     token 0.7500000         3           4     ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     essay_a      type 0.6666667         2           3     ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     essay_b     token 0.6666667         2           3     ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     essay_b      type 0.6666667         2           3     ok</span>
+<span class="r-in"><span><span class="va">coverage</span><span class="op">$</span><span class="va">documents</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id state input_tokens input_types</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a    ok            4           3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     essay_b    ok            3           3</span>
+<span class="r-in"><span><span class="va">coverage</span><span class="op">$</span><span class="va">terms</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id reference_id    term document_token_count reference_token_count</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a  course_list     cat                    2                     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     essay_a  course_list    rare                    1                     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     essay_a  course_list     run                    1                     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     essay_b  course_list    bird                    1                     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     essay_b  course_list     run                    1                     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     essay_b  course_list unknown                    1                     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   matched</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   FALSE</span>
+<span class="r-in"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">coverage</span>, weighting <span class="op">=</span> <span class="st">"type"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="lexdiv_reference_coverage-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="va">plot_data</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id reference_id weighting               measure_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     essay_a  course_list      type reference_coverage_types</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     essay_b  course_list      type reference_coverage_types</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                 method_id     value numerator denominator</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 document_types_in_reference_type_set_v1 0.6666667         2           3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 document_types_in_reference_type_set_v1 0.6666667         2           3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   position</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        2</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">document_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">document_frame</span><span class="op">$</span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"b"</span>, <span class="st">"c"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">lexdiv_reference_coverage</span><span class="op">(</span><span class="va">document_frame</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">summary</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id reference_id weighting                measure_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           a    reference     token reference_coverage_tokens</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           a    reference      type  reference_coverage_types</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3           b    reference     token reference_coverage_tokens</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4           b    reference      type  reference_coverage_types</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                  method_id reference_coverage_contract_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 document_tokens_in_reference_type_set_v1      ldfreq-reference-coverage</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  document_types_in_reference_type_set_v1      ldfreq-reference-coverage</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 document_tokens_in_reference_type_set_v1      ldfreq-reference-coverage</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  document_types_in_reference_type_set_v1      ldfreq-reference-coverage</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   reference_coverage_contract_version                 result_schema_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                               0.1.0 lexdiv-reference-coverage-result</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                               0.1.0 lexdiv-reference-coverage-result</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                               0.1.0 lexdiv-reference-coverage-result</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                               0.1.0 lexdiv-reference-coverage-result</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   result_schema_version value status missing_reason numerator denominator</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                 0.1.0   1.0     ok           &lt;NA&gt;         3           3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                 0.1.0   1.0     ok           &lt;NA&gt;         2           2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                 0.1.0   0.5     ok           &lt;NA&gt;         1           2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                 0.1.0   0.5     ok           &lt;NA&gt;         1           2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_tokens document_types reference_tokens reference_types</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1               3              2                2               2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2               3              2                2               2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3               2              2                2               2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4               2              2                2               2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   matched_tokens matched_types     analysis_scope unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1              3             2 all_supplied_terms term</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2              3             2 all_supplied_terms term</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3              1             1 all_supplied_terms term</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4              1             1 all_supplied_terms term</span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

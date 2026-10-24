@@ -218,6 +218,17 @@ evaluation <- lexdiv_evaluate_annotations(predicted, reference, "upos",
     label_scheme = "UPOS subset", model_exposure = "shown",
     evaluation_role = "development"))
 evaluation$labels
+#>   label reference_n predictions_evaluated tp missing_predictions
+#> 1  NOUN           2                     2  1                   0
+#> 2  VERB           1                     1  0                   0
+#> 3 PUNCT           1                     1  1                   0
+#>   predictions_without_reference fp fn precision recall  f1
+#> 1                             0  1  1       0.5    0.5 0.5
+#> 2                             0  1  1       0.0    0.0 0.0
+#> 3                             0  0  0       1.0    1.0 1.0
 evaluation$review_queue[, c("pre", "keyword", "post",
   "reference_label", "predicted_label")]
+#>          pre keyword  post reference_label predicted_label
+#> 2      cats     cats  run.            NOUN            VERB
+#> 3 cats cats      run     .            VERB            NOUN
 ```

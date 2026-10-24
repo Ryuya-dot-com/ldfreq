@@ -15,6 +15,14 @@ lexdiv_resource_info(c("tubelex", "nj8"))
 lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
 ```
 
+``` r
+has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
+```
+
+Resource-dependent examples below run only when their verified data are
+already in the cache. The other examples run without downloading
+reference data.
+
 ## Choose what counts as a word
 
 An essay can include contractions, web addresses and dates. Counting
@@ -384,6 +392,9 @@ analysis$results
 #> 4                TRUE
 #> 5                TRUE
 #> 6                TRUE
+```
+
+``` r
 levels <- nj8_profile_batch(tokens, unit = "surface")
 levels$coverage
 #>   document_id input_tokens eligible_tokens excluded_tokens selection_coverage

@@ -1,5 +1,19 @@
 # Changelog
 
+## ldfreq 0.5.1
+
+- Build the guides without downloaded reference data. Resource-dependent
+  examples run only with a verified cache; core workflows remain
+  executable. Include rendered vignettes in the source artifact and
+  check their rebuilding.
+- Keep plot-test replacements inside ldfreq and its sourced recipes
+  instead of changing standard-package bindings or S3 registrations.
+  Retain actual device checks for color, monochrome, labels and
+  graphics-state restoration.
+- Declare the test dependency on withr and require testthat \>= 3.1.8.
+  Correct cached-license locations and wrap long help usage and
+  examples.
+
 ## ldfreq 0.5.0.9001
 
 - Separate optional TUBELEX, NJ8, MorphoLex, BNC/COCA and MorphyNet
@@ -145,10 +159,11 @@
 
 - Add an explicitly sourced occurrence-level MCA example. Original token
   anchors, coding definitions, metadata, unused levels and incomplete
-  observations remain in the saved input. Optional `ca::ca()` analyzes
-  the complete indicator matrix with equal occurrence weights and
-  unadjusted inertia. Coordinates, contributions, cosines and
-  repeated-eigenvalue diagnostics link back to the original text.
+  observations remain in the saved input. Optional
+  [`ca::ca()`](https://rdrr.io/pkg/ca/man/ca.html) analyzes the complete
+  indicator matrix with equal occurrence weights and unadjusted inertia.
+  Coordinates, contributions, cosines and repeated-eigenvalue
+  diagnostics link back to the original text.
 - Show separate occurrence/category maps and full-record reopening.
   These are descriptive examples, not automatic sense coding,
   writer-weighted inference or new exported APIs. Core calculations,

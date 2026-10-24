@@ -13,7 +13,7 @@ reader, not a morphological analyzer."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -129,8 +129,9 @@ CC BY-NC-SA 4.0, not the MIT license of the independent ldfreq code.
 The license permits noncommercial sharing and adaptation subject to
 attribution, change notices, and the applicable ShareAlike conditions.
 It does not grant commercial-use permission. See
-<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="external-link">https://creativecommons.org/licenses/by-nc-sa/4.0/</a> and the installed
-<code class="file">licenses/morpholex/NOTICE.md</code> and <code class="file">CC-BY-NC-SA-4.0.md</code>.
+<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="external-link">https://creativecommons.org/licenses/by-nc-sa/4.0/</a>. The downloaded cache
+contains <code class="file">licenses/morpholex/NOTICE.md</code> and <code class="file">CC-BY-NC-SA-4.0.md</code>;
+<code>lexdiv_resource_info("morpholex")$path</code> gives its version directory.
 Cite the resource paper when using these data; package citation alone is not
 resource attribution. Original authors do not endorse this R conversion.</p>
     </div>
@@ -156,20 +157,23 @@ are not exported package functions.</p></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Optional data: review and explicitly download these resources first.</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"morpholex"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">available</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span><span class="co"># "0-1-1" is a source worksheet: zero prefixes, one root, one suffix.</span></span>
-<span><span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu">morpholex_data</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0-1-1"</span>, <span class="st">"All roots"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">words</span> <span class="op">&lt;-</span> <span class="va">reference</span><span class="op">$</span><span class="va">sheets</span><span class="op">[[</span><span class="st">"0-1-1"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="va">words</span><span class="op">[</span><span class="va">words</span><span class="op">$</span><span class="va">Word</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"teacher"</span>, <span class="st">"teachers"</span><span class="op">)</span>,</span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Word"</span>, <span class="st">"MorphoLexSegm"</span>, <span class="st">"ROOT1_FamSize"</span>, <span class="st">"ROOT1_Freq_HAL"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co"># Both records contain teach and -er. Plural -s is outside this resource's scope.</span></span>
-<span><span class="va">roots</span> <span class="op">&lt;-</span> <span class="va">reference</span><span class="op">$</span><span class="va">sheets</span><span class="op">[[</span><span class="st">"All roots"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="va">roots</span><span class="op">$</span><span class="va">HAL_freq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">roots</span><span class="op">$</span><span class="va">HAL_freq</span><span class="op">)</span></span>
-<span><span class="va">reference</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">data_license</span></span>
-<span><span class="va">dictionary_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"morpholex"</span><span class="op">)</span><span class="op">$</span><span class="va">path</span>, <span class="st">"extdata"</span>, <span class="st">"morpholex"</span>, <span class="st">"5bc425fb"</span>,</span>
-<span>                               <span class="st">"MorphoLEX_en-Data_Dictionary.pdf"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Optional data: review and explicitly download these resources first.</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"morpholex"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">available</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># "0-1-1" is a source worksheet: zero prefixes, one root, one suffix.</span></span></span>
+<span class="r-in"><span><span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu">morpholex_data</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0-1-1"</span>, <span class="st">"All roots"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">words</span> <span class="op">&lt;-</span> <span class="va">reference</span><span class="op">$</span><span class="va">sheets</span><span class="op">[[</span><span class="st">"0-1-1"</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">words</span><span class="op">[</span><span class="va">words</span><span class="op">$</span><span class="va">Word</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"teacher"</span>, <span class="st">"teachers"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Word"</span>, <span class="st">"MorphoLexSegm"</span>, <span class="st">"ROOT1_FamSize"</span>, <span class="st">"ROOT1_Freq_HAL"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="co"># Both records contain teach and -er. Plural -s is outside this resource's scope.</span></span></span>
+<span class="r-in"><span><span class="va">roots</span> <span class="op">&lt;-</span> <span class="va">reference</span><span class="op">$</span><span class="va">sheets</span><span class="op">[[</span><span class="st">"All roots"</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">roots</span><span class="op">$</span><span class="va">HAL_freq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">roots</span><span class="op">$</span><span class="va">HAL_freq</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">reference</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">data_license</span></span></span>
+<span class="r-in"><span><span class="va">dictionary_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"morpholex"</span><span class="op">)</span><span class="op">$</span><span class="va">path</span>, <span class="st">"extdata"</span>, <span class="st">"morpholex"</span>, <span class="st">"5bc425fb"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"MorphoLEX_en-Data_Dictionary.pdf"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

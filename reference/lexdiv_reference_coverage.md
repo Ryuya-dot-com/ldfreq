@@ -224,10 +224,42 @@ coverage <- lexdiv_reference_coverage(
 coverage$summary[, c(
   "document_id", "weighting", "value", "numerator", "denominator", "status"
 )]
+#>   document_id weighting     value numerator denominator status
+#> 1     essay_a     token 0.7500000         3           4     ok
+#> 2     essay_a      type 0.6666667         2           3     ok
+#> 3     essay_b     token 0.6666667         2           3     ok
+#> 4     essay_b      type 0.6666667         2           3     ok
 coverage$documents
+#>   document_id state input_tokens input_types
+#> 1     essay_a    ok            4           3
+#> 2     essay_b    ok            3           3
 coverage$terms
+#>   document_id reference_id    term document_token_count reference_token_count
+#> 1     essay_a  course_list     cat                    2                     1
+#> 2     essay_a  course_list    rare                    1                     0
+#> 3     essay_a  course_list     run                    1                     1
+#> 4     essay_b  course_list    bird                    1                     1
+#> 5     essay_b  course_list     run                    1                     1
+#> 6     essay_b  course_list unknown                    1                     0
+#>   matched
+#> 1    TRUE
+#> 2   FALSE
+#> 3    TRUE
+#> 4    TRUE
+#> 5    TRUE
+#> 6   FALSE
 plot_data <- plot(coverage, weighting = "type")
+
 plot_data
+#>   document_id reference_id weighting               measure_id
+#> 1     essay_a  course_list      type reference_coverage_types
+#> 2     essay_b  course_list      type reference_coverage_types
+#>                                 method_id     value numerator denominator
+#> 1 document_types_in_reference_type_set_v1 0.6666667         2           3
+#> 2 document_types_in_reference_type_set_v1 0.6666667         2           3
+#>   position
+#> 1        1
+#> 2        2
 
 document_frame <- data.frame(
   document_id = c("a", "b"),
@@ -235,4 +267,34 @@ document_frame <- data.frame(
 )
 document_frame$terms <- list(c("a", "a", "b"), c("b", "c"))
 lexdiv_reference_coverage(document_frame, c("a", "b"))$summary
+#>   document_id reference_id weighting                measure_id
+#> 1           a    reference     token reference_coverage_tokens
+#> 2           a    reference      type  reference_coverage_types
+#> 3           b    reference     token reference_coverage_tokens
+#> 4           b    reference      type  reference_coverage_types
+#>                                  method_id reference_coverage_contract_id
+#> 1 document_tokens_in_reference_type_set_v1      ldfreq-reference-coverage
+#> 2  document_types_in_reference_type_set_v1      ldfreq-reference-coverage
+#> 3 document_tokens_in_reference_type_set_v1      ldfreq-reference-coverage
+#> 4  document_types_in_reference_type_set_v1      ldfreq-reference-coverage
+#>   reference_coverage_contract_version                 result_schema_id
+#> 1                               0.1.0 lexdiv-reference-coverage-result
+#> 2                               0.1.0 lexdiv-reference-coverage-result
+#> 3                               0.1.0 lexdiv-reference-coverage-result
+#> 4                               0.1.0 lexdiv-reference-coverage-result
+#>   result_schema_version value status missing_reason numerator denominator
+#> 1                 0.1.0   1.0     ok           <NA>         3           3
+#> 2                 0.1.0   1.0     ok           <NA>         2           2
+#> 3                 0.1.0   0.5     ok           <NA>         1           2
+#> 4                 0.1.0   0.5     ok           <NA>         1           2
+#>   document_tokens document_types reference_tokens reference_types
+#> 1               3              2                2               2
+#> 2               3              2                2               2
+#> 3               2              2                2               2
+#> 4               2              2                2               2
+#>   matched_tokens matched_types     analysis_scope unit
+#> 1              3             2 all_supplied_terms term
+#> 2              3             2 all_supplied_terms term
+#> 3              1             1 all_supplied_terms term
+#> 4              1             1 all_supplied_terms term
 ```

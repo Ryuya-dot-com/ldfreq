@@ -145,6 +145,58 @@ documents <- list(essay = c("book", "book", "rare", "outside"),
   conversation = c("read", "book"), blank = character())
 result <- lexdiv_norm_profile_batch(documents, norms, "term", specs, resource)
 result$coverage
+#>    document_id result_order    resource_id resource_version  measure_id
+#> 1        essay            1 authored_norms                1 familiarity
+#> 2        essay            2 authored_norms                1 familiarity
+#> 3 conversation            1 authored_norms                1 familiarity
+#> 4 conversation            2 authored_norms                1 familiarity
+#> 5        blank            1 authored_norms                1 familiarity
+#> 6        blank            2 authored_norms                1 familiarity
+#>   weighting input_units matched_units unmatched_units observed_value_units
+#> 1     token           4             3               1                    2
+#> 2      type           3             2               1                    1
+#> 3     token           2             2               0                    2
+#> 4      type           2             2               0                    2
+#> 5     token           0             0               0                    0
+#> 6      type           0             0               0                    0
+#>   matched_missing_value_units resource_coverage value_coverage
+#> 1                           1         0.7500000      0.5000000
+#> 2                           1         0.6666667      0.3333333
+#> 3                           0         1.0000000      1.0000000
+#> 4                           0         1.0000000      1.0000000
+#> 5                           0                NA             NA
+#> 6                           0                NA             NA
+#>   annotation_coverage
+#> 1           0.6666667
+#> 2           0.5000000
+#> 3           1.0000000
+#> 4           1.0000000
+#> 5                  NA
+#> 6                  NA
 result$diagnostics$documents
+#>    document_id status input_terms input_types planned_lookup_rows
+#> 1        essay     ok           4           3                   4
+#> 2 conversation     ok           2           2                   2
+#> 3        blank  empty           0           0                   0
+#>   planned_summary_rows planned_coverage_rows planned_result_rows
+#> 1                    2                     2                   8
+#> 2                    2                     2                   6
+#> 3                    2                     2                   4
 print(result)
+#> <lexdiv_norm_profile_batch: ok; 3 documents; authored_norms@1; 1 measure; 6 summary rows; 6 lookup rows; schema 0.1.0>
+#>   document_id  measure_id weighting estimate  status missing_reason
+#>         essay familiarity     token      6.0      ok           <NA>
+#>         essay familiarity      type      6.0      ok           <NA>
+#>  conversation familiarity     token      5.5      ok           <NA>
+#>  conversation familiarity      type      5.5      ok           <NA>
+#>         blank familiarity     token       NA missing    empty_input
+#>         blank familiarity      type       NA missing    empty_input
+#>  resource_coverage annotation_coverage
+#>          0.7500000           0.6666667
+#>          0.6666667           0.5000000
+#>          1.0000000           1.0000000
+#>          1.0000000           1.0000000
+#>                 NA                  NA
+#>                 NA                  NA
+#> Means remain document-specific and conditional; inspect $coverage.
 ```

@@ -285,4 +285,7 @@ plot(text_result)
 profile <- tubelex_profile(c("the", "not-in-resource"))
 plot(profile)
 }
+
+
+
 ```

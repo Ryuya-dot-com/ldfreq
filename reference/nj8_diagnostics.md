@@ -119,4 +119,8 @@ annotated <- lexdiv_lemmatize(text, lemmas = c("student", "2"),
 audit <- nj8_diagnostics(nj8_profile(annotated, unit = "lemma"))
 audit$unit_mappings[audit$unit_mappings$numeric_introduced, ]
 }
+#>   surface_term term lookup_term matched token_count document_count unit_changed
+#> 2       second    2           2   FALSE           1              1         TRUE
+#>   lookup_changed numeric_introduced whitespace_introduced
+#> 2          FALSE               TRUE                 FALSE
 ```

@@ -15,7 +15,7 @@ English sentence and then change one analysis choice at a time."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -358,74 +358,129 @@ The print methods return <code>x</code> invisibly.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 1. Paste one English text here. Lowercase before counting distinct forms.</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_text</span><span class="op">(</span></span>
-<span>  <span class="st">"Cats chase cats and dogs."</span>,</span>
-<span>  tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">results</span>  <span class="co"># N = 5, V = 4, TTR = 0.8, status = "ok"</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">token_audit</span></span>
-<span></span>
-<span><span class="co"># A 50-word MATTR window does not fit this five-word text.</span></span>
-<span><span class="va">short</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_text</span><span class="op">(</span></span>
-<span>  <span class="st">"Cats chase cats and dogs."</span>,</span>
-<span>  tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span>, metrics <span class="op">=</span> <span class="st">"mattr"</span>,</span>
-<span>  window_length <span class="op">=</span> <span class="fl">50</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">short</span><span class="op">$</span><span class="va">results</span>  <span class="co"># NA; missing_reason = "too_short_for_requested_parameter"</span></span>
-<span></span>
-<span><span class="co"># 2. Inspect the English tokenizer's retained and excluded spans.</span></span>
-<span><span class="va">english</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_tokenize</span><span class="op">(</span></span>
-<span>  <span class="st">"John's well-known book costs 3.14. See https://example.org."</span>,</span>
-<span>  tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">english</span><span class="op">$</span><span class="va">tokens</span></span>
-<span><span class="va">english</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">excluded_spans</span></span>
-<span></span>
-<span><span class="co"># 3. Change the counting unit while retaining the same five tokens.</span></span>
-<span><span class="va">tokenization</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_tokenize</span><span class="op">(</span><span class="st">"Cats and cat ran run."</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span><span class="op">)</span></span>
-<span><span class="va">surface</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_text</span><span class="op">(</span><span class="va">tokenization</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span>
-<span><span class="va">surface</span><span class="op">$</span><span class="va">results</span>  <span class="co"># Case preserved: N = 5, V = 5, TTR = 1</span></span>
-<span></span>
-<span><span class="co"># These labels were written for this example. No automatic analysis is run.</span></span>
-<span><span class="va">annotated</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_lemmatize</span><span class="op">(</span></span>
-<span>  <span class="va">tokenization</span>,</span>
-<span>  lemmas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cat"</span>, <span class="st">"and"</span>, <span class="st">"cat"</span>, <span class="st">"run"</span>, <span class="st">"run"</span><span class="op">)</span>,</span>
-<span>  upos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NOUN"</span>, <span class="st">"CCONJ"</span>, <span class="st">"NOUN"</span>, <span class="st">"VERB"</span>, <span class="st">"VERB"</span><span class="op">)</span>,</span>
-<span>  backend_id <span class="op">=</span> <span class="st">"documented-example-annotations"</span>,</span>
-<span>  backend_version <span class="op">=</span> <span class="st">"1"</span>,</span>
-<span>  upos_backend_id <span class="op">=</span> <span class="st">"documented-example-upos"</span>,</span>
-<span>  upos_backend_version <span class="op">=</span> <span class="st">"1"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">lemma_all</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_text</span><span class="op">(</span><span class="va">annotated</span>, unit <span class="op">=</span> <span class="st">"lemma"</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span>
-<span><span class="va">lemma_all</span><span class="op">$</span><span class="va">results</span>  <span class="co"># Same N = 5; V = 3, TTR = 0.6</span></span>
-<span></span>
-<span><span class="co"># 4. Now change word inclusion: exclude "and" using the supplied POS tags.</span></span>
-<span><span class="va">lemma_content</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_text</span><span class="op">(</span></span>
-<span>  <span class="va">annotated</span>,</span>
-<span>  unit <span class="op">=</span> <span class="st">"lemma"</span>,</span>
-<span>  word_inclusion <span class="op">=</span> <span class="st">"content"</span>,</span>
-<span>  metrics <span class="op">=</span> <span class="st">"ttr"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">lemma_content</span><span class="op">$</span><span class="va">results</span>  <span class="co"># N = 4, V = 2, TTR = 0.5</span></span>
-<span><span class="va">lemma_content</span><span class="op">$</span><span class="va">token_audit</span></span>
-<span></span>
-<span><span class="co"># Optional: install.packages("textstem") to run this lookup example.</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"textstem"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">textstem_tokens</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_tokenize</span><span class="op">(</span></span>
-<span>    <span class="st">"The cats were running and studies."</span>,</span>
-<span>    case <span class="op">=</span> <span class="st">"lower"</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="va">textstem_lemmas</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_lemmatize</span><span class="op">(</span></span>
-<span>    <span class="va">textstem_tokens</span>,</span>
-<span>    method <span class="op">=</span> <span class="st">"textstem"</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="va">textstem_lemmas</span><span class="op">$</span><span class="va">tokens</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"surface"</span>, <span class="st">"lemma"</span><span class="op">)</span><span class="op">]</span></span>
-<span>  <span class="va">textstem_lemmas</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">annotation</span></span>
-<span>  <span class="fu">lexdiv_metrics_text</span><span class="op">(</span><span class="va">textstem_lemmas</span>, unit <span class="op">=</span> <span class="st">"lemma"</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 1. Paste one English text here. Lowercase before counting distinct forms.</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_text</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"Cats chase cats and dogs."</span>,</span></span>
+<span class="r-in"><span>  tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span><span class="op">$</span><span class="va">results</span>  <span class="co"># N = 5, V = 4, TTR = 0.8, status = "ok"</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value status missing_reason N V below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr   0.8     ok           &lt;NA&gt; 5 4               FALSE</span>
+<span class="r-in"><span><span class="va">result</span><span class="op">$</span><span class="va">token_audit</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   token_index surface selected_unit unit_match_rule upos eligible</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           1    cats          cats            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           2   chase         chase            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3           3    cats          cats            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4           4     and           and            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5           5    dogs          dogs            &lt;NA&gt; &lt;NA&gt;     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   exclusion_reason</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5             &lt;NA&gt;</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A 50-word MATTR window does not fit this five-word text.</span></span></span>
+<span class="r-in"><span><span class="va">short</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_text</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"Cats chase cats and dogs."</span>,</span></span>
+<span class="r-in"><span>  tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span>, metrics <span class="op">=</span> <span class="st">"mattr"</span>,</span></span>
+<span class="r-in"><span>  window_length <span class="op">=</span> <span class="fl">50</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">short</span><span class="op">$</span><span class="va">results</span>  <span class="co"># NA; missing_reason = "too_short_for_requested_parameter"</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value  status                    missing_reason N V</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     mattr    NA missing too_short_for_requested_parameter 5 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                TRUE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 2. Inspect the English tokenizer's retained and excluded spans.</span></span></span>
+<span class="r-in"><span><span class="va">english</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_tokenize</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"John's well-known book costs 3.14. See https://example.org."</span>,</span></span>
+<span class="r-in"><span>  tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">english</span><span class="op">$</span><span class="va">tokens</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   token_index start end    surface is_number</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           1     1   6     john's     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           2     8  17 well-known     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3           3    19  22       book     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4           4    24  28      costs     FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5           5    36  38        see     FALSE</span>
+<span class="r-in"><span><span class="va">english</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">excluded_spans</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   start end              surface reason</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    30  33                 3.14 number</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    40  59 https://example.org.    url</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 3. Change the counting unit while retaining the same five tokens.</span></span></span>
+<span class="r-in"><span><span class="va">tokenization</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_tokenize</span><span class="op">(</span><span class="st">"Cats and cat ran run."</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">surface</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_text</span><span class="op">(</span><span class="va">tokenization</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">surface</span><span class="op">$</span><span class="va">results</span>  <span class="co"># Case preserved: N = 5, V = 5, TTR = 1</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value status missing_reason N V below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr     1     ok           &lt;NA&gt; 5 5               FALSE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># These labels were written for this example. No automatic analysis is run.</span></span></span>
+<span class="r-in"><span><span class="va">annotated</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_lemmatize</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">tokenization</span>,</span></span>
+<span class="r-in"><span>  lemmas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cat"</span>, <span class="st">"and"</span>, <span class="st">"cat"</span>, <span class="st">"run"</span>, <span class="st">"run"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  upos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NOUN"</span>, <span class="st">"CCONJ"</span>, <span class="st">"NOUN"</span>, <span class="st">"VERB"</span>, <span class="st">"VERB"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  backend_id <span class="op">=</span> <span class="st">"documented-example-annotations"</span>,</span></span>
+<span class="r-in"><span>  backend_version <span class="op">=</span> <span class="st">"1"</span>,</span></span>
+<span class="r-in"><span>  upos_backend_id <span class="op">=</span> <span class="st">"documented-example-upos"</span>,</span></span>
+<span class="r-in"><span>  upos_backend_version <span class="op">=</span> <span class="st">"1"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">lemma_all</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_text</span><span class="op">(</span><span class="va">annotated</span>, unit <span class="op">=</span> <span class="st">"lemma"</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">lemma_all</span><span class="op">$</span><span class="va">results</span>  <span class="co"># Same N = 5; V = 3, TTR = 0.6</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value status missing_reason N V below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr   0.6     ok           &lt;NA&gt; 5 3               FALSE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 4. Now change word inclusion: exclude "and" using the supplied POS tags.</span></span></span>
+<span class="r-in"><span><span class="va">lemma_content</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_metrics_text</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">annotated</span>,</span></span>
+<span class="r-in"><span>  unit <span class="op">=</span> <span class="st">"lemma"</span>,</span></span>
+<span class="r-in"><span>  word_inclusion <span class="op">=</span> <span class="st">"content"</span>,</span></span>
+<span class="r-in"><span>  metrics <span class="op">=</span> <span class="st">"ttr"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">lemma_content</span><span class="op">$</span><span class="va">results</span>  <span class="co"># N = 4, V = 2, TTR = 0.5</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value status missing_reason N V below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr   0.5     ok           &lt;NA&gt; 4 2               FALSE</span>
+<span class="r-in"><span><span class="va">lemma_content</span><span class="op">$</span><span class="va">token_audit</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   token_index surface selected_unit unit_match_rule  upos eligible</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           1    Cats           cat            &lt;NA&gt;  NOUN     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           2     and           and            &lt;NA&gt; CCONJ    FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3           3     cat           cat            &lt;NA&gt;  NOUN     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4           4     ran           run            &lt;NA&gt;  VERB     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5           5     run           run            &lt;NA&gt;  VERB     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   exclusion_reason</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 non_content_upos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4             &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5             &lt;NA&gt;</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Optional: install.packages("textstem") to run this lookup example.</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"textstem"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">textstem_tokens</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_tokenize</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="st">"The cats were running and studies."</span>,</span></span>
+<span class="r-in"><span>    case <span class="op">=</span> <span class="st">"lower"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">textstem_lemmas</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_lemmatize</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">textstem_tokens</span>,</span></span>
+<span class="r-in"><span>    method <span class="op">=</span> <span class="st">"textstem"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">textstem_lemmas</span><span class="op">$</span><span class="va">tokens</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"surface"</span>, <span class="st">"lemma"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="va">textstem_lemmas</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">annotation</span></span></span>
+<span class="r-in"><span>  <span class="fu">lexdiv_metrics_text</span><span class="op">(</span><span class="va">textstem_lemmas</span>, unit <span class="op">=</span> <span class="st">"lemma"</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_text_results&gt; 6/6 eligible tokens | unit=lemma | inclusion=all</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_results: 1 metric; contract 0.2.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   metric_id value status missing_reason N V below_quality_floor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       ttr     1     ok           &lt;NA&gt; 6 6               FALSE</span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

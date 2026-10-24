@@ -77,6 +77,14 @@ lexdiv_resource_info(c("tubelex", "nj8"))
 lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
 ```
 
+``` r
+has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
+```
+
+Resource-dependent examples below run only when their verified data are
+already in the cache. The other examples run without downloading
+reference data.
+
 ## Compare analysis conditions from local files
 
 Start here to turn your own files into a table you can inspect, save and
@@ -672,7 +680,7 @@ stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 #> 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.
 #> 
-#> Calculations used ldfreq 0.5.0.9001: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
+#> Calculations used ldfreq 0.5.1: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
 ```
 
 The CSV is a flat inspection table; **the RDS is the complete analysis
@@ -766,7 +774,7 @@ metadata_connection <- textConnection(metadata_input$text, encoding = "UTF-8")
 study_metadata <- read.csv(metadata_connection, colClasses = "character",
   na.strings = "<MISSING>", check.names = FALSE, encoding = "UTF-8")
 close(metadata_connection)
-use_nj8 <- TRUE
+use_nj8 <- has_nj8
 ```
 
 For the Japanese teaching path, substitute the following block for the
@@ -1149,6 +1157,7 @@ and document-length distribution before comparing results. Keep writer
 and task IDs with document IDs in the study’s own table.
 
 ``` r
+levels <- NULL
 texts <- c(
   first = "The student reads a book and discusses the book with a friend.",
   second = "The student explores a story and shares several ideas with a friend."
@@ -1301,22 +1310,38 @@ IDs, preserving document order.
 
 ``` r
 analysis <- lexdiv_widen(metrics)
-coverage <- levels$coverage[match(analysis$document_id, levels$coverage$document_id), ]
-stopifnot(identical(analysis$document_id, coverage$document_id))
-analysis$nj8_surface_token_coverage <- coverage$token_coverage
-analysis$nj8_surface_type_coverage <- coverage$type_coverage
-print(analysis[, c(
-  "document_id", "ttr__value", "mattr__value",
-  "nj8_surface_token_coverage", "nj8_surface_type_coverage"
-)],
-digits = 3)
-#> <lexdiv_wide_results: 2 rows; 5 columns>
-#>   document_id ttr__value mattr__value nj8_surface_token_coverage
-#> 1       first      0.750        0.800                      0.833
-#> 2      second      0.917        0.933                      0.750
-#>   nj8_surface_type_coverage
-#> 1                     0.778
-#> 2                     0.727
+if (!is.null(levels)) {
+  coverage <- levels$coverage[match(analysis$document_id, levels$coverage$document_id), ]
+  stopifnot(identical(analysis$document_id, coverage$document_id))
+  analysis$nj8_surface_token_coverage <- coverage$token_coverage
+  analysis$nj8_surface_type_coverage <- coverage$type_coverage
+}
+print(analysis, digits = 3)
+#> <lexdiv_wide_results: 2 rows; 25 columns>
+#>   document_id ttr__value ttr__status ttr__missing_reason  ttr__method_id
+#> 1       first      0.750          ok                <NA> ttr_v_over_n_v1
+#> 2      second      0.917          ok                <NA> ttr_v_over_n_v1
+#>   ttr__below_quality_floor       ttr__metric_contract_id
+#> 1                    FALSE ldfreq-lexical-diversity-core
+#> 2                    FALSE ldfreq-lexical-diversity-core
+#>   ttr__metric_contract_version ttr__requested_parameters
+#> 1                        0.2.0                          
+#> 2                        0.2.0                          
+#>   ttr__effective_parameters ttr__N ttr__V mattr__value mattr__status
+#> 1                               12      9        0.800            ok
+#> 2                               12     11        0.933            ok
+#>   mattr__missing_reason       mattr__method_id mattr__below_quality_floor
+#> 1                  <NA> mattr_sliding_step1_v1                       TRUE
+#> 2                  <NA> mattr_sliding_step1_v1                       TRUE
+#>       mattr__metric_contract_id mattr__metric_contract_version
+#> 1 ldfreq-lexical-diversity-core                          0.2.0
+#> 2 ldfreq-lexical-diversity-core                          0.2.0
+#>   mattr__requested_parameters mattr__effective_parameters mattr__N mattr__V
+#> 1                          10                          10       12        9
+#> 2                          10                          10       12       11
+#>   nj8_surface_token_coverage nj8_surface_type_coverage
+#> 1                      0.833                     0.778
+#> 2                      0.750                     0.727
 plot(metrics, metric_id = "mattr")
 ```
 

@@ -11,7 +11,7 @@ provenance without running tokenization, annotation or lookup again."></head><bo
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,24 +135,29 @@ for the full profile or a standalone analysis of all annotation failures.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Optional data: review and explicitly download these resources first.</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nj8"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">available</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_text_batch.html">lexdiv_tokenize_batch</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  essay_a <span class="op">=</span> <span class="st">"Students have part-time jobs."</span>,</span>
-<span>  essay_b <span class="op">=</span> <span class="st">"Students learn from jobs."</span></span>
-<span><span class="op">)</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span>
-<span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="nj8_profile.html">nj8_profile_batch</a></span><span class="op">(</span><span class="va">prepared</span>, unit <span class="op">=</span> <span class="st">"surface"</span><span class="op">)</span></span>
-<span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu">nj8_diagnostics</span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span>
-<span><span class="va">audit</span><span class="op">$</span><span class="va">unmatched_terms</span></span>
-<span><span class="va">audit</span><span class="op">$</span><span class="va">coverage</span></span>
-<span></span>
-<span><span class="co"># Authored annotation example: flags record a change, not its correctness.</span></span>
-<span><span class="va">text</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span><span class="st">"Students second"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span>
-<span><span class="va">annotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_lemmatize</a></span><span class="op">(</span><span class="va">text</span>, lemmas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"student"</span>, <span class="st">"2"</span><span class="op">)</span>,</span>
-<span>  backend_id <span class="op">=</span> <span class="st">"authored-example"</span>, backend_version <span class="op">=</span> <span class="st">"1"</span><span class="op">)</span></span>
-<span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu">nj8_diagnostics</span><span class="op">(</span><span class="fu"><a href="nj8_profile.html">nj8_profile</a></span><span class="op">(</span><span class="va">annotated</span>, unit <span class="op">=</span> <span class="st">"lemma"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">audit</span><span class="op">$</span><span class="va">unit_mappings</span><span class="op">[</span><span class="va">audit</span><span class="op">$</span><span class="va">unit_mappings</span><span class="op">$</span><span class="va">numeric_introduced</span>, <span class="op">]</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Optional data: review and explicitly download these resources first.</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nj8"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">available</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_text_batch.html">lexdiv_tokenize_batch</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  essay_a <span class="op">=</span> <span class="st">"Students have part-time jobs."</span>,</span></span>
+<span class="r-in"><span>  essay_b <span class="op">=</span> <span class="st">"Students learn from jobs."</span></span></span>
+<span class="r-in"><span><span class="op">)</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="nj8_profile.html">nj8_profile_batch</a></span><span class="op">(</span><span class="va">prepared</span>, unit <span class="op">=</span> <span class="st">"surface"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu">nj8_diagnostics</span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">audit</span><span class="op">$</span><span class="va">unmatched_terms</span></span></span>
+<span class="r-in"><span><span class="va">audit</span><span class="op">$</span><span class="va">coverage</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Authored annotation example: flags record a change, not its correctness.</span></span></span>
+<span class="r-in"><span><span class="va">text</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span><span class="st">"Students second"</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">annotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_lemmatize</a></span><span class="op">(</span><span class="va">text</span>, lemmas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"student"</span>, <span class="st">"2"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  backend_id <span class="op">=</span> <span class="st">"authored-example"</span>, backend_version <span class="op">=</span> <span class="st">"1"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu">nj8_diagnostics</span><span class="op">(</span><span class="fu"><a href="nj8_profile.html">nj8_profile</a></span><span class="op">(</span><span class="va">annotated</span>, unit <span class="op">=</span> <span class="st">"lemma"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">audit</span><span class="op">$</span><span class="va">unit_mappings</span><span class="op">[</span><span class="va">audit</span><span class="op">$</span><span class="va">unit_mappings</span><span class="op">$</span><span class="va">numeric_introduced</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   surface_term term lookup_term matched token_count document_count unit_changed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       second    2           2   FALSE           1              1         TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_changed numeric_introduced whitespace_introduced</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2          FALSE               TRUE                 FALSE</span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

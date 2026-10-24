@@ -15,7 +15,7 @@ method-plus-parameter specification."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -277,44 +277,85 @@ preset requires an exact, version-pinned method contract and boundary fixtures.<
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">methods</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_methods</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">lexdiv_presets</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">mattr_method</span> <span class="op">&lt;-</span> <span class="va">methods</span><span class="op">$</span><span class="va">method_id</span><span class="op">[</span><span class="va">methods</span><span class="op">$</span><span class="va">metric_id</span> <span class="op">==</span> <span class="st">"mattr"</span><span class="op">]</span></span>
-<span></span>
-<span><span class="va">mattr_25</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_spec</span><span class="op">(</span></span>
-<span>  <span class="va">mattr_method</span>,</span>
-<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>window_length <span class="op">=</span> <span class="fl">25</span><span class="op">)</span>,</span>
-<span>  request_id <span class="op">=</span> <span class="st">"mattr_25"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_grid</span><span class="op">(</span></span>
-<span>  <span class="va">mattr_method</span>,</span>
-<span>  parameter <span class="op">=</span> <span class="st">"window_length"</span>,</span>
-<span>  values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">100</span><span class="op">)</span>,</span>
-<span>  request_id_prefix <span class="op">=</span> <span class="st">"mattr"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_plan</span><span class="op">(</span>presets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, specs <span class="op">=</span> <span class="va">mattr_25</span>, grids <span class="op">=</span> <span class="va">grid</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mattr_25</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plan</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"a"</span>, <span class="st">"c"</span>, <span class="st">"d"</span><span class="op">)</span>, <span class="fl">25</span><span class="op">)</span></span>
-<span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_metrics.html">lexdiv_metrics</a></span><span class="op">(</span><span class="va">tokens</span>, plan <span class="op">=</span> <span class="va">plan</span><span class="op">)</span></span>
-<span><span class="va">profile</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"request_id"</span>, <span class="st">"metric_id"</span>, <span class="st">"value"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
-<span></span>
-<span><span class="va">screens</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_screen</span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span>
-<span><span class="va">screens</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"request_id"</span>, <span class="st">"screen_id"</span>, <span class="st">"minimum_tokens"</span>, <span class="st">"passes_screen"</span><span class="op">)</span><span class="op">]</span></span>
-<span></span>
-<span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>document_a <span class="op">=</span> <span class="va">tokens</span>, document_b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">tokens</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">batch_profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span><span class="va">documents</span>, plan <span class="op">=</span> <span class="va">plan</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">batch_profile</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"request_id"</span>, <span class="st">"metric_id"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">all_lengths</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_plan</span><span class="op">(</span><span class="st">"length_50_100"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_lengths</span><span class="op">$</span><span class="va">specifications</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Comparison methods have a separate executor; they are not all plan methods.</span></span>
-<span><span class="va">variants</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_methods</span><span class="op">(</span>scope <span class="op">=</span> <span class="st">"variants"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">variants</span>, <span class="fu"><a href="lexdiv_variant_metrics.html">lexdiv_variant_ids</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">methods</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_methods</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">lexdiv_presets</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       preset_id preset_version specification_count</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     canonical          0.2.0                  11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 length_50_100          0.2.0                  13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                              description</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 The eleven stable methods at their canonical defaults.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2          Canonical plus MSTTR and MATTR at length 100.</span>
+<span class="r-in"><span><span class="va">mattr_method</span> <span class="op">&lt;-</span> <span class="va">methods</span><span class="op">$</span><span class="va">method_id</span><span class="op">[</span><span class="va">methods</span><span class="op">$</span><span class="va">metric_id</span> <span class="op">==</span> <span class="st">"mattr"</span><span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">mattr_25</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_spec</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">mattr_method</span>,</span></span>
+<span class="r-in"><span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>window_length <span class="op">=</span> <span class="fl">25</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  request_id <span class="op">=</span> <span class="st">"mattr_25"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_grid</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">mattr_method</span>,</span></span>
+<span class="r-in"><span>  parameter <span class="op">=</span> <span class="st">"window_length"</span>,</span></span>
+<span class="r-in"><span>  values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">100</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  request_id_prefix <span class="op">=</span> <span class="st">"mattr"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_plan</span><span class="op">(</span>presets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, specs <span class="op">=</span> <span class="va">mattr_25</span>, grids <span class="op">=</span> <span class="va">grid</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mattr_25</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_spec: mattr-c60bcc139197f0321525ede59195f383&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  request_id metric_id              method_id       parameters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    mattr_25     mattr mattr_sliding_step1_v1 window_length=25</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_grid: 2 specifications&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  request_index request_id metric_id              method_id        parameters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              1    mattr_1     mattr mattr_sliding_step1_v1  window_length=50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              2    mattr_2     mattr mattr_sliding_step1_v1 window_length=100</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plan</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_plan: 3 specifications; schema 0.1.0; id 385893509c8011275b045ea68daa5cb9&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  request_index request_id metric_id              method_id        parameters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              1   mattr_25     mattr mattr_sliding_step1_v1  window_length=25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              2    mattr_1     mattr mattr_sliding_step1_v1  window_length=50</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              3    mattr_2     mattr mattr_sliding_step1_v1 window_length=100</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"a"</span>, <span class="st">"c"</span>, <span class="st">"d"</span><span class="op">)</span>, <span class="fl">25</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_metrics.html">lexdiv_metrics</a></span><span class="op">(</span><span class="va">tokens</span>, plan <span class="op">=</span> <span class="va">plan</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">profile</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"request_id"</span>, <span class="st">"metric_id"</span>, <span class="st">"value"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_profile_results: 3 specifications; schema unknown&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   request_id metric_id value status</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   mattr_25     mattr  0.16     ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    mattr_1     mattr  0.08     ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    mattr_2     mattr  0.04     ok</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">screens</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_screen</span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">screens</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"request_id"</span>, <span class="st">"screen_id"</span>, <span class="st">"minimum_tokens"</span>, <span class="st">"passes_screen"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   request_id  screen_id minimum_tokens passes_screen</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   mattr_25  tokens_50             50          TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   mattr_25 tokens_100            100          TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    mattr_1  tokens_50             50          TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    mattr_1 tokens_100            100          TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    mattr_2  tokens_50             50          TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    mattr_2 tokens_100            100          TRUE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>document_a <span class="op">=</span> <span class="va">tokens</span>, document_b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="va">tokens</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">batch_profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span><span class="va">documents</span>, plan <span class="op">=</span> <span class="va">plan</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">batch_profile</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"request_id"</span>, <span class="st">"metric_id"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_profile_batch_results: 2 documents; 6 specification results; schema unknown&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id request_id metric_id status</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  document_a   mattr_25     mattr     ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  document_a    mattr_1     mattr     ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  document_a    mattr_2     mattr     ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  document_b   mattr_25     mattr     ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  document_b    mattr_1     mattr     ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  document_b    mattr_2     mattr     ok</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">all_lengths</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_plan</span><span class="op">(</span><span class="st">"length_50_100"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_lengths</span><span class="op">$</span><span class="va">specifications</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 13</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Comparison methods have a separate executor; they are not all plan methods.</span></span></span>
+<span class="r-in"><span><span class="va">variants</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_methods</span><span class="op">(</span>scope <span class="op">=</span> <span class="st">"variants"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">variants</span>, <span class="fu"><a href="lexdiv_variant_metrics.html">lexdiv_variant_ids</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

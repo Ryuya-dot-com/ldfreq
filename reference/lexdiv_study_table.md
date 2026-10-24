@@ -134,4 +134,10 @@ study <- lexdiv_study_table(planned, submissions, results, plan,
   "surface-all", reporting)
 selected <- lexdiv_study_model_data(study, "surface-all", "ttr")
 selected$audit
+#>   observation_id document_id condition_id request_id not_submitted
+#> 1             o1          d1  surface-all        ttr         FALSE
+#> 2             o2        <NA>  surface-all        ttr          TRUE
+#>   not_computable not_reportable missing_metadata included
+#> 1          FALSE          FALSE                      TRUE
+#> 2           TRUE           TRUE                     FALSE
 ```

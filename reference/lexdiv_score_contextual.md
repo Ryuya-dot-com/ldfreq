@@ -159,4 +159,7 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
   scored$centroid$suggestions[c("surface", "candidate_id", "score")]
   scored$candidates[c("term", "candidate_id", "n_selected", "n_vectors")]
 }
+#>   term candidate_id n_selected n_vectors
+#> 1 bank            a          1         1
+#> 2 bank            b          1         1
 ```

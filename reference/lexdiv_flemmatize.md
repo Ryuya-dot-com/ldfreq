@@ -130,11 +130,36 @@ unlink(fixture)
 flemmas$tokens[, c(
   "surface", "flemma", "flemma_matched", "flemma_match_rule"
 )]
+#>       surface      flemma flemma_matched flemma_match_rule
+#> 1         the         the           TRUE            antbnc
+#> 2        cats         cat           TRUE            antbnc
+#> 3         saw         see           TRUE            antbnc
+#> 4          an          an          FALSE          identity
+#> 5 unknownword unknownword          FALSE          identity
 flemmas$provenance$flemma_annotation[c(
   "backend_id", "backend_version", "resource_id", "resource_version",
   "matched_coverage"
 )]
+#> $backend_id
+#> [1] "ldfreq-antbnc-flemma-adapter"
+#> 
+#> $backend_version
+#> [1] "0.1.0"
+#> 
+#> $resource_id
+#> [1] "antbnc-lemma-list"
+#> 
+#> $resource_version
+#> [1] "synthetic-help-fixture"
+#> 
+#> $matched_coverage
+#> [1] 0.6
+#> 
 lexdiv_metrics_text(flemmas, unit = "flemma", metrics = "ttr")
+#> <lexdiv_text_results> 5/5 eligible tokens | unit=flemma | inclusion=all
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr     1     ok           <NA> 5 5               FALSE
 
 if (FALSE) { # \dontrun{
 # Replace the synthetic fixture with a legitimately obtained AntBNC list.

@@ -78,8 +78,10 @@ conflicting candidates. The default example uses only `dictionary`.
 
 The data and this conversion are CC BY-SA 4.0; independent R code
 remains MIT. Retain attribution, changes and ShareAlike conditions when
-redistributing the data. The complete license and notice are installed
-under `licenses/bnccoca/`. Other cached resources have separate terms.
+redistributing the data. The complete license and notice are under
+`licenses/bnccoca/` inside the version directory returned by
+`lexdiv_resource_info("bnccoca")$path`. Other cached resources have
+separate terms.
 
 ## References
 
@@ -119,4 +121,10 @@ profile <- env$bnccoca_example$profile
 profile$documents[c("document_id", "selected_tokens", "matched_tokens",
   "unresolved_tokens", "family_types", "family_ttr", "status")]
 }
+#>   document_id selected_tokens matched_tokens unresolved_tokens family_types
+#> 1      listed               4              4                 0            2
+#> 2    unlisted               2              1                 1           NA
+#>   family_ttr     status
+#> 1        0.5   complete
+#> 2         NA incomplete
 ```

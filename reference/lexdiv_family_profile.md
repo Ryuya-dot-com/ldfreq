@@ -301,4 +301,22 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
   env$word_family_review_example$reviewed$documents
 }
 }
+#>   document_id tokens excluded_tokens known_selected_tokens
+#> 1     example     10               2                     8
+#> 2       empty      0               0                     0
+#>   unknown_selection_tokens selected_tokens matched_tokens unlisted_tokens
+#> 1                        0               8              8               0
+#> 2                        0               0              0               0
+#>   ambiguous_tokens missing_unit_tokens missing_pos_tokens withheld_tokens
+#> 1                0                   0                  0               0
+#> 2                0                   0                  0               0
+#>   unresolved_tokens review_selected_tokens review_unresolved_tokens
+#> 1                 0                      2                        0
+#> 2                 0                      0                        0
+#>   conditional_token_coverage token_coverage observed_family_types family_types
+#> 1                          1              1                     7            7
+#> 2                         NA             NA                     0            0
+#>   family_ttr   status
+#> 1      0.875 complete
+#> 2         NA    empty
 ```

@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -158,7 +158,47 @@ lexical-diversity analysis with different preprocessing.</p>
 <code class="sourceCode R"><span><span class="va">automatic</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">readability_score</span><span class="op">(</span><span class="va">prepared</span><span class="op">)</span></span>
 <span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">prepared</span><span class="op">$</span><span class="va">tokens</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"original_surface"</span>, <span class="st">"counted"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  <span class="va">automatic</span><span class="op">$</span><span class="va">syllables</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"syllables"</span>, <span class="st">"method"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">audit</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">audit</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  document_id segment_id original_surface counted syllables</span></span>
+<span><span class="co">#&gt;           d1         s1              The    TRUE         1</span></span>
+<span><span class="co">#&gt;           d1         s1              cat    TRUE         1</span></span>
+<span><span class="co">#&gt;           d1         s1              sat    TRUE         1</span></span>
+<span><span class="co">#&gt;           d1         s2              The    TRUE         1</span></span>
+<span><span class="co">#&gt;           d1         s2              dog    TRUE         1</span></span>
+<span><span class="co">#&gt;           d1         s2              ran    TRUE         1</span></span>
+<span><span class="co">#&gt;           d1    heading                A   FALSE         1</span></span>
+<span><span class="co">#&gt;           d1    heading          heading   FALSE         2</span></span>
+<span><span class="co">#&gt;           d1    heading               to   FALSE         1</span></span>
+<span><span class="co">#&gt;           d1    heading          exclude   FALSE         2</span></span>
+<span><span class="co">#&gt;           d2         s1                A    TRUE         1</span></span>
+<span><span class="co">#&gt;           d2         s1           little    TRUE         2</span></span>
+<span><span class="co">#&gt;           d2         s1           rabbit    TRUE         2</span></span>
+<span><span class="co">#&gt;           d2         s1             runs    TRUE         1</span></span>
+<span><span class="co">#&gt;           d3         s1               In    TRUE         1</span></span>
+<span><span class="co">#&gt;           d3         s1             1918    TRUE        NA</span></span>
+<span><span class="co">#&gt;           d3         s1           R.F.D.    TRUE        NA</span></span>
+<span><span class="co">#&gt;           d3         s1             grew    TRUE         1</span></span>
+<span><span class="co">#&gt;           d5         s1             Bird    TRUE         1</span></span>
+<span><span class="co">#&gt;                  method</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;  pronunciation_required</span></span>
+<span><span class="co">#&gt;  pronunciation_required</span></span>
+<span><span class="co">#&gt;              dictionary</span></span>
+<span><span class="co">#&gt;              dictionary</span></span></code></pre></div>
 <p><a href="https://search.r-project.org/CRAN/refmans/nsyllable/html/nsyllable.html" class="external-link">nsyllable</a>
 uses a pronunciation dictionary and a vowel-group fallback for unknown
 words. The helper distinguishes dictionary matches, fallback estimates

@@ -83,4 +83,12 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
   search <- lexdiv_concordance(source, list(node = "a"))
   lexdiv_collocations(search, "node")$results
 }
+#>   context observed node_marginal context_marginal opportunities expected   MI
+#> 1       b        2             2                2             4      1.0    1
+#> 2       a        0             2                1             4      0.5 -Inf
+#> 3       c        0             2                1             4      0.5 -Inf
+#>     t_score documents context_documents meets_min_count        status
+#> 1 0.7071068         1                 1            TRUE            ok
+#> 2        NA         0                 1           FALSE zero_observed
+#> 3        NA         0                 1           FALSE zero_observed
 ```

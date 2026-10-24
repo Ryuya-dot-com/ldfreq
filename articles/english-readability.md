@@ -94,6 +94,46 @@ automatic <- helper$readability_score(prepared)
 audit <- cbind(prepared$tokens[c("document_id", "segment_id", "original_surface", "counted")],
   automatic$syllables[c("syllables", "method")])
 print(audit, row.names = FALSE)
+#>  document_id segment_id original_surface counted syllables
+#>           d1         s1              The    TRUE         1
+#>           d1         s1              cat    TRUE         1
+#>           d1         s1              sat    TRUE         1
+#>           d1         s2              The    TRUE         1
+#>           d1         s2              dog    TRUE         1
+#>           d1         s2              ran    TRUE         1
+#>           d1    heading                A   FALSE         1
+#>           d1    heading          heading   FALSE         2
+#>           d1    heading               to   FALSE         1
+#>           d1    heading          exclude   FALSE         2
+#>           d2         s1                A    TRUE         1
+#>           d2         s1           little    TRUE         2
+#>           d2         s1           rabbit    TRUE         2
+#>           d2         s1             runs    TRUE         1
+#>           d3         s1               In    TRUE         1
+#>           d3         s1             1918    TRUE        NA
+#>           d3         s1           R.F.D.    TRUE        NA
+#>           d3         s1             grew    TRUE         1
+#>           d5         s1             Bird    TRUE         1
+#>                  method
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>              dictionary
+#>  pronunciation_required
+#>  pronunciation_required
+#>              dictionary
+#>              dictionary
 ```
 
 [nsyllable](https://search.r-project.org/CRAN/refmans/nsyllable/html/nsyllable.html)

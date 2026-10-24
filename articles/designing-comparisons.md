@@ -15,6 +15,14 @@ lexdiv_resource_info(c("tubelex"))
 lexdiv_download_resources(c("tubelex"), accept_license = TRUE)
 ```
 
+``` r
+has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
+```
+
+Resource-dependent examples below run only when their verified data are
+already in the cache. The other examples run without downloading
+reference data.
+
 ## Start with a question and a comparison unit
 
 Suppose the question is whether writers use a greater variety of word

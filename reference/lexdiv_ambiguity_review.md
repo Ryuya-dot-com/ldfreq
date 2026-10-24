@@ -169,4 +169,6 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
   reviewed <- lexdiv_ambiguity_review(x, "bank", candidates, resource, decisions)
   reviewed$summary
 }
+#>   term candidate_count occurrences unreviewed selected unresolved no_candidates
+#> 1 bank               2           1          0        1          0             0
 ```

@@ -46,7 +46,7 @@ sys.source(system.file("examples", "morpholex-word-parts.R",
   package = "ldfreq", mustWork = TRUE), recipes)
 has_review <- requireNamespace("quanteda", quietly = TRUE) &&
   isTRUE(l10n_info()[["UTF-8"]])
-linked <- NULL
+families <- counts <- nation <- morpholex <- morphynet <- linked <- NULL
 ```
 
 The functions loaded into `recipes` are explicitly sourced example
@@ -68,6 +68,16 @@ lexdiv_resource_info(c("morpholex", "bnccoca", "morphynet"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("morpholex", "bnccoca", "morphynet"), accept_license = TRUE)
 ```
+
+``` r
+has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
+has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
+has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
+```
+
+Resource-dependent examples below run only when their verified data are
+already in the cache. The other examples run without downloading
+reference data.
 
 ## What changes when words are counted as families?
 
@@ -384,11 +394,11 @@ retained: the morphology recipe uses exact surface matching, while
 Nation lookup has its separately declared normalization. No POS or lemma
 is inferred.
 
-The following three chunks require `quanteda` in a UTF-8 session. The
-core counting and resource inspection above do not. If `has_review` is
-false, install the optional package as needed and check
-[`l10n_info()`](https://rdrr.io/r/base/l10n_info.html) before this
-exercise; there is no automatic environment change.
+The following three chunks require the three cached references and
+`quanteda` in a UTF-8 session. The core counting and resource inspection
+above do not. If `has_review` is false, install the optional package as
+needed and check [`l10n_info()`](https://rdrr.io/r/base/l10n_info.html)
+before this exercise; there is no automatic environment change.
 
 ``` r
 sys.source(system.file("examples", "morphology-link.R",
@@ -552,10 +562,12 @@ bundle <- list(families = families, counts = counts, nation = nation,
   authored_parts = parts, morpholex = morpholex, morphynet = morphynet,
   linked = linked, session = sessionInfo())
 saveRDS(bundle, file.path(output_dir, "analysis.rds"))
-write.csv(counts$comparison, file.path(output_dir, "family-counts.csv"),
+if (!is.null(counts)) write.csv(counts$comparison, file.path(output_dir, "family-counts.csv"),
   row.names = FALSE, na = "", fileEncoding = "UTF-8")
 saved <- readRDS(file.path(output_dir, "analysis.rds"))
-stopifnot(identical(recipes$compare_family_counts(saved$families), saved$counts))
+if (!is.null(saved$families)) {
+  stopifnot(identical(recipes$compare_family_counts(saved$families), saved$counts))
+}
 stopifnot(identical(do.call(recipes$word_parts_profile,
   saved$authored_parts$inputs), saved$authored_parts))
 if (!is.null(saved$linked)) {

@@ -11,7 +11,7 @@ explicit alternative counting schemes."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,20 +131,42 @@ annotation labels and is not an anonymization step.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span><span class="st">"Students saw students."</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span>
-<span><span class="va">base</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_lemmatize</a></span><span class="op">(</span><span class="va">tokens</span>,</span>
-<span>  lemmas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"student"</span>, <span class="st">"see"</span>, <span class="st">"student"</span><span class="op">)</span>,</span>
-<span>  backend_id <span class="op">=</span> <span class="st">"authored-annotations"</span>, backend_version <span class="op">=</span> <span class="st">"base-v1"</span><span class="op">)</span></span>
-<span><span class="va">refined</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_lemmatize</a></span><span class="op">(</span><span class="va">tokens</span>,</span>
-<span>  lemmas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"student"</span>, <span class="st">"see_VERB_Ind_Past"</span>, <span class="st">"student"</span><span class="op">)</span>,</span>
-<span>  backend_id <span class="op">=</span> <span class="st">"authored-annotations"</span>, backend_version <span class="op">=</span> <span class="st">"tense-v1"</span><span class="op">)</span></span>
-<span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_compare_annotations</span><span class="op">(</span><span class="va">base</span>, <span class="va">refined</span><span class="op">)</span></span>
-<span><span class="va">audit</span><span class="op">$</span><span class="va">documents</span></span>
-<span><span class="va">audit</span><span class="op">$</span><span class="va">changes</span></span>
-<span></span>
-<span><span class="va">before</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>essay <span class="op">=</span> <span class="va">base</span>, blank <span class="op">=</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">after</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>blank <span class="op">=</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span>, essay <span class="op">=</span> <span class="va">refined</span><span class="op">)</span></span>
-<span><span class="fu">lexdiv_compare_annotations</span><span class="op">(</span><span class="va">before</span>, <span class="va">after</span><span class="op">)</span><span class="op">$</span><span class="va">documents</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span><span class="st">"Students saw students."</span>, case <span class="op">=</span> <span class="st">"lower"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">base</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_lemmatize</a></span><span class="op">(</span><span class="va">tokens</span>,</span></span>
+<span class="r-in"><span>  lemmas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"student"</span>, <span class="st">"see"</span>, <span class="st">"student"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  backend_id <span class="op">=</span> <span class="st">"authored-annotations"</span>, backend_version <span class="op">=</span> <span class="st">"base-v1"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">refined</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_lemmatize</a></span><span class="op">(</span><span class="va">tokens</span>,</span></span>
+<span class="r-in"><span>  lemmas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"student"</span>, <span class="st">"see_VERB_Ind_Past"</span>, <span class="st">"student"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  backend_id <span class="op">=</span> <span class="st">"authored-annotations"</span>, backend_version <span class="op">=</span> <span class="st">"tense-v1"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_compare_annotations</span><span class="op">(</span><span class="va">base</span>, <span class="va">refined</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">audit</span><span class="op">$</span><span class="va">documents</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id tokens before_has_lemma after_has_lemma lemma_changed_tokens</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  document_1      3             TRUE            TRUE                    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   before_has_upos after_has_upos upos_changed_tokens before_has_flemma</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            TRUE           TRUE                   0             FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   after_has_flemma flemma_changed_tokens changed_tokens</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            FALSE                     0              1</span>
+<span class="r-in"><span><span class="va">audit</span><span class="op">$</span><span class="va">changes</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id token_index start end surface before_lemma       after_lemma</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  document_1           2    10  12     saw          see see_VERB_Ind_Past</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   lemma_changed before_upos after_upos upos_changed before_flemma after_flemma</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1          TRUE        &lt;NA&gt;       &lt;NA&gt;        FALSE          &lt;NA&gt;         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   flemma_changed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1          FALSE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">before</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>essay <span class="op">=</span> <span class="va">base</span>, blank <span class="op">=</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">after</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>blank <span class="op">=</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span>, essay <span class="op">=</span> <span class="va">refined</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">lexdiv_compare_annotations</span><span class="op">(</span><span class="va">before</span>, <span class="va">after</span><span class="op">)</span><span class="op">$</span><span class="va">documents</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id tokens before_has_lemma after_has_lemma lemma_changed_tokens</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       essay      3             TRUE            TRUE                    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       blank      0            FALSE           FALSE                    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   before_has_upos after_has_upos upos_changed_tokens before_has_flemma</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            TRUE           TRUE                   0             FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           FALSE          FALSE                   0             FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   after_has_flemma flemma_changed_tokens changed_tokens</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            FALSE                     0              1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2            FALSE                     0              0</span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

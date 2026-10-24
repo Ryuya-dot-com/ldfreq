@@ -9,7 +9,7 @@ changing the versioned thirteen-method lexdiv_metrics() core."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -141,22 +141,78 @@ The print method returns <code>x</code> invisibly.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="fl">10</span><span class="op">)</span>, <span class="st">"b"</span>, <span class="st">"c"</span>, <span class="st">"d"</span>, <span class="st">"e"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">catalog</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_profile.html">lexdiv_methods</a></span><span class="op">(</span>scope <span class="op">=</span> <span class="st">"variants"</span><span class="op">)</span></span>
-<span><span class="va">catalog</span></span>
-<span></span>
-<span><span class="va">variants</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_variant_metrics</span><span class="op">(</span></span>
-<span>  <span class="va">tokens</span>,</span>
-<span>  mtld_thresholds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.72</span>, <span class="fl">0.92</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">variants</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"family"</span>, <span class="st">"method_id"</span>, <span class="st">"value"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
-<span></span>
-<span><span class="va">contract_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
-<span>  <span class="st">"spec"</span>, <span class="st">"lexical-diversity-variant-contract.json"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="va">contract_path</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">contract_path</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="fl">10</span><span class="op">)</span>, <span class="st">"b"</span>, <span class="st">"c"</span>, <span class="st">"d"</span>, <span class="st">"e"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">catalog</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_profile.html">lexdiv_methods</a></span><span class="op">(</span>scope <span class="op">=</span> <span class="st">"variants"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">catalog</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   family                                               method_id direction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   maas                                           maas_a2_ln_v1     lower</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   maas                                            maas_a_ln_v1     lower</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   maas                                        maas_a2_log10_v1     lower</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   maas                                         maas_a_log10_v1     lower</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   mtld          mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1    higher</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   mtld     mtld_seq_bidir_dirmean_lt_min10_finaltail_linear_v1    higher</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   mtld mtld_seq_bidir_mfl_dirmean_lt_min10_finaltail_linear_v1    higher</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   mtld  mtld_seq_bidir_mfl_pooled_lt_min10_finaltail_linear_v1    higher</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                    scale             reference_label</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1              a-squared            ldfreq-core:maas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                      a    common-formula:maas-a-ln</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3              a-squared            TAALED-0.32:maas</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                      a common-formula:maas-a-log10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5      tokens-per-factor      ldfreq-core-0.1.0:mtld</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6      tokens-per-factor           TAALED-0.32:mtldo</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7 adjusted-factor-length          TAALED-0.32:mtldav</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8 adjusted-factor-length            TAALED-0.32:mtld</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                      comparison_scope</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                                  ldfreq-core-method</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                                                             formula-comparison-only</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3               formula-aligned-with-taaled-0.32-maas-not-full-pipeline-compatibility</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                                                             formula-comparison-only</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                                           legacy-ldfreq-core-method</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">variants</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_variant_metrics</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">tokens</span>,</span></span>
+<span class="r-in"><span>  mtld_thresholds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.72</span>, <span class="fl">0.92</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">variants</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"family"</span>, <span class="st">"method_id"</span>, <span class="st">"value"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_variant_results: 12 rows; contract 0.1.0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    family                                               method_id     value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    maas                                           maas_a2_ln_v1 0.1478356</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    maas                                            maas_a_ln_v1 0.3844940</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    maas                                        maas_a2_log10_v1 0.3404041</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    maas                                         maas_a_log10_v1 0.5834416</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    mtld          mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1 8.9029126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    mtld          mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1 7.6746988</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7    mtld     mtld_seq_bidir_dirmean_lt_min10_finaltail_linear_v1 8.9029126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8    mtld     mtld_seq_bidir_dirmean_lt_min10_finaltail_linear_v1 7.6746988</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9    mtld mtld_seq_bidir_mfl_dirmean_lt_min10_finaltail_linear_v1 7.8733333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   mtld mtld_seq_bidir_mfl_dirmean_lt_min10_finaltail_linear_v1 7.6066667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11   mtld  mtld_seq_bidir_mfl_pooled_lt_min10_finaltail_linear_v1 7.1644444</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12   mtld  mtld_seq_bidir_mfl_pooled_lt_min10_finaltail_linear_v1 6.8088889</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    status</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5      ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6      ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7      ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8      ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9      ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10     ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11     ok</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12     ok</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">contract_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"spec"</span>, <span class="st">"lexical-diversity-variant-contract.json"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="va">contract_path</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">contract_path</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "lexical-diversity-variant-contract.json"</span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

@@ -8,7 +8,10 @@ reference data.
 ## Usage
 
 ``` r
-lexdiv_resource_info(resources = c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"), cache_dir = NULL)
+lexdiv_resource_info(
+  resources = c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"),
+  cache_dir = NULL
+)
 lexdiv_download_resources(resources, accept_license = FALSE, cache_dir = NULL)
 ```
 
@@ -64,6 +67,12 @@ setting there. Unused caches may be removed explicitly by the user.
 
 ``` r
 lexdiv_resource_info()[c("resource", "license", "available", "download_bytes")]
+#>    resource                                license available download_bytes
+#> 1   tubelex                           BSD-3-Clause      TRUE        2557276
+#> 2       nj8 JACET permission; attribution required      TRUE          53357
+#> 3 morpholex                        CC-BY-NC-SA-4.0      TRUE        1336656
+#> 4   bnccoca                           CC-BY-SA-4.0      TRUE         518734
+#> 5 morphynet                           CC-BY-SA-3.0      TRUE           9184
 if (FALSE) { # \dontrun{
 # Review the source, license_url and notice_url before downloading.
 lexdiv_download_resources("tubelex", accept_license = TRUE)

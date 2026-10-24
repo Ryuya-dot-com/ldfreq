@@ -256,6 +256,12 @@ tokens <- data.frame(document_id = c(rep("r1", 3), rep("r2", 3)),
   term = c("make", "a", "decision", "make", "a", "plan"))
 extracted <- lexdiv_ngrams(tokens, "authored-sentences-surface-v1")
 extracted$counts
+#>   n term1    term2    term3 count document_count
+#> 1 2  make        a     <NA>     2              2
+#> 2 2     a decision     <NA>     1              1
+#> 3 2     a     plan     <NA>     1              1
+#> 4 3  make        a decision     1              1
+#> 5 3  make        a     plan     1              1
 resource <- list(resource_id = "authored_demo", resource_version = "1",
   creator = "Example author", source_reference = "Authored token sequences",
   data_license = "Project-authored example", transformation_id = "none",
@@ -266,11 +272,54 @@ target$term[3] <- "choice"
 result <- lexdiv_ngram_profile(
   lexdiv_ngrams(target, "authored-sentences-surface-v1"), reference)
 result$lookup
+#>   document_id segment_id n start_index end_index term1  term2  term3
+#> 1          r1         s1 2           1         2  make      a   <NA>
+#> 2          r1         s1 2           2         3     a choice   <NA>
+#> 3          r1         s1 3           1         3  make      a choice
+#>   reference_status reference_count reference_document_count
+#> 1           listed               2                        2
+#> 2     not_observed               0                        0
+#> 3     not_observed               0                        0
+#>   reference_opportunities frequency_per_million
+#> 1                       4                 5e+05
+#> 2                       4                 0e+00
+#> 3                       2                 0e+00
 print(result)
+#> <lexdiv_ngram_profile; contract 0.1.0>
+#>  document_id n weighting eligible_items listed_items zero_items
+#>           r1 2     token              2            1          1
+#>           r1 2      type              2            1          1
+#>           r1 3     token              1            0          1
+#>           r1 3      type              1            0          1
+#>  unavailable_items lookup_coverage value_coverage mean_frequency_per_million
+#>                  0             0.5              1                     250000
+#>                  0             0.5              1                     250000
+#>                  0             0.0              1                          0
+#>                  0             0.0              1                          0
+#>  status missing_reason
+#>      ok           <NA>
+#>      ok           <NA>
+#>      ok           <NA>
+#>      ok           <NA>
 # Import a pruned aggregate without converting its missing rows to zero.
 partial <- lexdiv_ngram_reference(reference$counts[reference$counts$count > 1, ],
   resource, totals = reference$totals,
   preprocessing_id = "authored-sentences-surface-v1", complete = FALSE)
 lexdiv_ngram_profile(lexdiv_ngrams(target,
   "authored-sentences-surface-v1"), partial)$summary
+#>   document_id n weighting eligible_items listed_items zero_items
+#> 1          r1 2     token              2            1          0
+#> 2          r1 2      type              2            1          0
+#> 3          r1 3     token              1            0          0
+#> 4          r1 3      type              1            0          0
+#>   unavailable_items lookup_coverage value_coverage mean_frequency_per_million
+#> 1                 1             0.5            0.5                      5e+05
+#> 2                 1             0.5            0.5                      5e+05
+#> 3                 1             0.0            0.0                         NA
+#> 4                 1             0.0            0.0                         NA
+#>      status                missing_reason
+#> 1        ok                          <NA>
+#> 2        ok                          <NA>
+#> 3 no_values no_available_reference_values
+#> 4 no_values no_available_reference_values
 ```

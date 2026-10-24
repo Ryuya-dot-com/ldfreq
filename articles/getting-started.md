@@ -23,6 +23,18 @@ lexdiv_resource_info(c("tubelex", "nj8"))
 lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
 ```
 
+``` r
+has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
+has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
+has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
+has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
+has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
+```
+
+Resource-dependent examples below run only when their verified data are
+already in the cache. The other examples run without downloading
+reference data.
+
 ## Your first document table
 
 Use one row per document and a unique character ID. Here two short
@@ -1311,7 +1323,9 @@ run a metric, download a resource, or expose caller file paths.
 ## Offline installed-package check
 
 An installed smoke script exercises the public workflows without network
-access or an external runtime:
+access or an external runtime. This integration example requires all
+five reference resources to have been explicitly downloaded beforehand.
+The core examples earlier in this guide do not require them:
 
 ``` r
 smoke_path <- system.file("examples", "offline-smoke.R", package = "ldfreq")

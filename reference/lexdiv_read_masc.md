@@ -162,4 +162,11 @@ if (requireNamespace("xml2", quietly = TRUE)) {
     quanteda::tokens_ngrams(q$tokens, n = 2:4)
   }
 }
+#> tokens of 2 documents (4 tokens, 4 types) and 8 docvars.
+#> segment_1 :
+#> [1] "We_re-use"       "re-use_words"    "We_re-use_words"
+#> 
+#> segment_2 :
+#> [1] "We_go"
+#> 
 ```

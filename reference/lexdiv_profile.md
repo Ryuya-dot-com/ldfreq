@@ -264,6 +264,12 @@ and boundary fixtures.
 ``` r
 methods <- lexdiv_methods()
 lexdiv_presets()
+#>       preset_id preset_version specification_count
+#> 1     canonical          0.2.0                  11
+#> 2 length_50_100          0.2.0                  13
+#>                                              description
+#> 1 The eleven stable methods at their canonical defaults.
+#> 2          Canonical plus MSTTR and MATTR at length 100.
 mattr_method <- methods$method_id[methods$metric_id == "mattr"]
 
 mattr_25 <- lexdiv_spec(
@@ -280,24 +286,58 @@ grid <- lexdiv_grid(
 )
 plan <- lexdiv_plan(presets = character(), specs = mattr_25, grids = grid)
 print(mattr_25)
+#> <lexdiv_spec: mattr-c60bcc139197f0321525ede59195f383>
+#>  request_id metric_id              method_id       parameters
+#>    mattr_25     mattr mattr_sliding_step1_v1 window_length=25
 print(grid)
+#> <lexdiv_grid: 2 specifications>
+#>  request_index request_id metric_id              method_id        parameters
+#>              1    mattr_1     mattr mattr_sliding_step1_v1  window_length=50
+#>              2    mattr_2     mattr mattr_sliding_step1_v1 window_length=100
 print(plan)
+#> <lexdiv_plan: 3 specifications; schema 0.1.0; id 385893509c8011275b045ea68daa5cb9>
+#>  request_index request_id metric_id              method_id        parameters
+#>              1   mattr_25     mattr mattr_sliding_step1_v1  window_length=25
+#>              2    mattr_1     mattr mattr_sliding_step1_v1  window_length=50
+#>              3    mattr_2     mattr mattr_sliding_step1_v1 window_length=100
 
 tokens <- rep(c("a", "b", "a", "c", "d"), 25)
 profile <- lexdiv_metrics(tokens, plan = plan)
 profile[, c("request_id", "metric_id", "value", "status")]
+#> <lexdiv_profile_results: 3 specifications; schema unknown>
+#>   request_id metric_id value status
+#> 1   mattr_25     mattr  0.16     ok
+#> 2    mattr_1     mattr  0.08     ok
+#> 3    mattr_2     mattr  0.04     ok
 
 screens <- lexdiv_screen(profile)
 screens[, c("request_id", "screen_id", "minimum_tokens", "passes_screen")]
+#>   request_id  screen_id minimum_tokens passes_screen
+#> 1   mattr_25  tokens_50             50          TRUE
+#> 2   mattr_25 tokens_100            100          TRUE
+#> 3    mattr_1  tokens_50             50          TRUE
+#> 4    mattr_1 tokens_100            100          TRUE
+#> 5    mattr_2  tokens_50             50          TRUE
+#> 6    mattr_2 tokens_100            100          TRUE
 
 documents <- list(document_a = tokens, document_b = rev(tokens))
 batch_profile <- lexdiv_metrics_batch(documents, plan = plan)
 head(batch_profile[, c("document_id", "request_id", "metric_id", "status")])
+#> <lexdiv_profile_batch_results: 2 documents; 6 specification results; schema unknown>
+#>   document_id request_id metric_id status
+#> 1  document_a   mattr_25     mattr     ok
+#> 2  document_a    mattr_1     mattr     ok
+#> 3  document_a    mattr_2     mattr     ok
+#> 4  document_b   mattr_25     mattr     ok
+#> 5  document_b    mattr_1     mattr     ok
+#> 6  document_b    mattr_2     mattr     ok
 
 all_lengths <- lexdiv_plan("length_50_100")
 length(all_lengths$specifications)
+#> [1] 13
 
 # Comparison methods have a separate executor; they are not all plan methods.
 variants <- lexdiv_methods(scope = "variants")
 identical(variants, lexdiv_variant_ids())
+#> [1] TRUE
 ```

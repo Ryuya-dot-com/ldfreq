@@ -19,6 +19,17 @@ lexdiv_resource_info(c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"))
 lexdiv_download_resources(c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"), accept_license = TRUE)
 ```
 
+``` r
+has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
+has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
+has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
+has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
+```
+
+Resource-dependent examples below run only when their verified data are
+already in the cache. The other examples run without downloading
+reference data.
+
 ## What `ldfreq` adds to the R ecosystem
 
 R already has mature lexical-diversity implementations. In particular,
@@ -1032,9 +1043,9 @@ terms; see `licenses/morphynet/NOTICE.md`.
 
 MorphoLex-en supplies canonical segmentation and root/affix variables
 (Sánchez-Gutiérrez et al., 2018,
-<https://doi.org/10.3758/s13428-017-0981-8>). The package includes all
-34 worksheets (68,624 word records and the aggregate prefix/suffix/root
-tables), plus the original data dictionary, from
+<https://doi.org/10.3758/s13428-017-0981-8>). The optional download
+includes all 34 worksheets (68,624 word records and the aggregate
+prefix/suffix/root tables), plus the original data dictionary, from
 <https://github.com/hugomailhot/MorphoLex-en>. **These data use CC
 BY-NC-SA 4.0, not the MIT license of the R code.** Noncommercial sharing
 and adaptation require attribution and the applicable ShareAlike

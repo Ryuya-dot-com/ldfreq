@@ -13,14 +13,13 @@ selection](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html
 
 ## Install
 
-The current development release is **0.5.0.9001**. This single version
-contains all features described in the current guides. Requires R 4.1 or
-later.
+The current release is **0.5.1**. This single version contains all
+features described in the current guides. Requires R 4.1 or later.
 
 ``` r
 install.packages(c("digest", "stringi"))
 install.packages(
-  "https://github.com/Ryuya-dot-com/ldfreq/releases/download/v0.5.0.9001/ldfreq_0.5.0.9001.tar.gz",
+  "https://github.com/Ryuya-dot-com/ldfreq/releases/download/v0.5.1/ldfreq_0.5.1.tar.gz",
   repos = NULL, type = "source"
 )
 library(ldfreq)
@@ -104,13 +103,13 @@ citation("ldfreq")
 ```
 
 Komuro, R. (2026). *ldfreq: Reproducible Lexical Diversity and Frequency
-Profiles* (Version 0.5.0.9001) \[R package\]. [Fixed
-release](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.5.0.9001).
+Profiles* (Version 0.5.1) \[R package\]. [Fixed
+release](https://github.com/Ryuya-dot-com/ldfreq/tree/v0.5.1).
 
 Also cite the selected measurement methods and any reference data you
 use. See
-[CITATION.cff](https://github.com/Ryuya-dot-com/ldfreq/blob/v0.5.0.9001/CITATION.cff),
-[license](https://github.com/Ryuya-dot-com/ldfreq/blob/v0.5.0.9001/LICENSE.md),
+[CITATION.cff](https://github.com/Ryuya-dot-com/ldfreq/blob/v0.5.1/CITATION.cff),
+[license](https://github.com/Ryuya-dot-com/ldfreq/blob/v0.5.1/LICENSE.md),
 and [release
 notes](https://ryuya-dot-com.github.io/ldfreq/news/index.html).
 

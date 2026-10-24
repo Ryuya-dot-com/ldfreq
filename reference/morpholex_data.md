@@ -83,10 +83,12 @@ CC BY-NC-SA 4.0, not the MIT license of the independent ldfreq code. The
 license permits noncommercial sharing and adaptation subject to
 attribution, change notices, and the applicable ShareAlike conditions.
 It does not grant commercial-use permission. See
-<https://creativecommons.org/licenses/by-nc-sa/4.0/> and the installed
-`licenses/morpholex/NOTICE.md` and `CC-BY-NC-SA-4.0.md`. Cite the
-resource paper when using these data; package citation alone is not
-resource attribution. Original authors do not endorse this R conversion.
+<https://creativecommons.org/licenses/by-nc-sa/4.0/>. The downloaded
+cache contains `licenses/morpholex/NOTICE.md` and `CC-BY-NC-SA-4.0.md`;
+`lexdiv_resource_info("morpholex")$path` gives its version directory.
+Cite the resource paper when using these data; package citation alone is
+not resource attribution. Original authors do not endorse this R
+conversion.
 
 ## References
 
@@ -122,7 +124,9 @@ words[words$Word %in% c("teacher", "teachers"),
 roots <- reference$sheets[["All roots"]]
 roots$HAL_freq <- as.numeric(roots$HAL_freq)
 reference$provenance$data_license
-dictionary_path <- file.path(lexdiv_resource_info("morpholex")$path, "extdata", "morpholex", "5bc425fb",
-                               "MorphoLEX_en-Data_Dictionary.pdf")
+dictionary_path <- file.path(
+  lexdiv_resource_info("morpholex")$path, "extdata", "morpholex", "5bc425fb",
+  "MorphoLEX_en-Data_Dictionary.pdf"
+)
 }
 ```

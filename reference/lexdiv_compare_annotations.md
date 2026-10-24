@@ -103,9 +103,30 @@ refined <- lexdiv_lemmatize(tokens,
   backend_id = "authored-annotations", backend_version = "tense-v1")
 audit <- lexdiv_compare_annotations(base, refined)
 audit$documents
+#>   document_id tokens before_has_lemma after_has_lemma lemma_changed_tokens
+#> 1  document_1      3             TRUE            TRUE                    1
+#>   before_has_upos after_has_upos upos_changed_tokens before_has_flemma
+#> 1            TRUE           TRUE                   0             FALSE
+#>   after_has_flemma flemma_changed_tokens changed_tokens
+#> 1            FALSE                     0              1
 audit$changes
+#>   document_id token_index start end surface before_lemma       after_lemma
+#> 1  document_1           2    10  12     saw          see see_VERB_Ind_Past
+#>   lemma_changed before_upos after_upos upos_changed before_flemma after_flemma
+#> 1          TRUE        <NA>       <NA>        FALSE          <NA>         <NA>
+#>   flemma_changed
+#> 1          FALSE
 
 before <- list(essay = base, blank = lexdiv_tokenize(""))
 after <- list(blank = lexdiv_tokenize(""), essay = refined)
 lexdiv_compare_annotations(before, after)$documents
+#>   document_id tokens before_has_lemma after_has_lemma lemma_changed_tokens
+#> 1       essay      3             TRUE            TRUE                    1
+#> 2       blank      0            FALSE           FALSE                    0
+#>   before_has_upos after_has_upos upos_changed_tokens before_has_flemma
+#> 1            TRUE           TRUE                   0             FALSE
+#> 2           FALSE          FALSE                   0             FALSE
+#>   after_has_flemma flemma_changed_tokens changed_tokens
+#> 1            FALSE                     0              1
+#> 2            FALSE                     0              0
 ```

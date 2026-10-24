@@ -24,6 +24,14 @@ lexdiv_resource_info(c("tubelex"))
 lexdiv_download_resources(c("tubelex"), accept_license = TRUE)
 ```
 
+``` r
+has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
+```
+
+Resource-dependent examples below run only when their verified data are
+already in the cache. The other examples run without downloading
+reference data.
+
 ## Begin with what a learner can do
 
 A learner selects the right definition in a vocabulary test. Can that
@@ -86,14 +94,18 @@ items <- data.frame(
 stopifnot(all(vapply(items, function(x)
   is.character(x) && !anyNA(x) && all(nzchar(trimws(x))), logical(1))),
   !anyDuplicated(items$item_id))
-item_profile <- tubelex_profile(items$target_form, normalization = "identity")
-stopifnot(item_profile$status == "ok",
-  identical(item_profile$lookup$query_index, seq_len(nrow(items))),
-  identical(item_profile$lookup$term, items$target_form))
-item_features <- cbind(items, item_profile$lookup[, c(
-  "lookup_term", "matched", "count", "videos", "channels",
-  "zipf", "video_prevalence", "channel_prevalence")])
-item_features[, c("item_id", "target_form", "sense_id", "matched", "zipf")]
+item_profile <- profiles <- audit <- NULL
+item_features <- items
+if (has_tubelex) {
+  item_profile <- tubelex_profile(items$target_form, normalization = "identity")
+  stopifnot(item_profile$status == "ok",
+    identical(item_profile$lookup$query_index, seq_len(nrow(items))),
+    identical(item_profile$lookup$term, items$target_form))
+  item_features <- cbind(items, item_profile$lookup[, c(
+    "lookup_term", "matched", "count", "videos", "channels",
+    "zipf", "video_prevalence", "channel_prevalence")])
+  item_features[, c("item_id", "target_form", "sense_id", "matched", "zipf")]
+}
 #>   item_id target_form              sense_id matched     zipf
 #> 1      i1        bank financial-institution    TRUE 4.848312
 #> 2      i2        bank            river-edge    TRUE 4.848312
@@ -412,8 +424,10 @@ saveRDS(list(items = items, responses = responses, item_profile = item_profile,
 restored <- readRDS(saved)
 stopifnot(identical(restored$analysis, analysis),
   identical(lexdiv_compare_responses(restored$analysis,
-    "recognition", "meaning_recall"), restored$comparison),
-  identical(tubelex_diagnostics(restored$profiles), restored$audit))
+    "recognition", "meaning_recall"), restored$comparison))
+if (!is.null(restored$profiles)) {
+  stopifnot(identical(tubelex_diagnostics(restored$profiles), restored$audit))
+}
 unlink(saved)
 ```
 

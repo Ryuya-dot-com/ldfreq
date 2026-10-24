@@ -265,4 +265,5 @@ with_study$metadata
 stopifnot(identical(with_study$results,
   lexdiv_metrics_text_batch(prepared, metrics = "ttr")$results))
 }
+
 ```

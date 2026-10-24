@@ -237,7 +237,46 @@ term_overlap <- lexdiv_term_overlap(
   details = "terms"
 )
 term_overlap$summary
+#>                  measure_id                                         method_id
+#> 1             jaccard_types           jaccard_type_intersection_over_union_v1
+#> 2                dice_types          dice_type_twice_intersection_over_sum_v1
+#> 3      a_covered_by_b_types        a_covered_by_b_type_intersection_over_a_v1
+#> 4      b_covered_by_a_types        b_covered_by_a_type_intersection_over_b_v1
+#> 5 overlap_coefficient_types overlap_coefficient_type_intersection_over_min_v1
+#>      overlap_contract_id overlap_contract_version           result_schema_id
+#> 1 ldfreq-lexical-overlap                    0.2.0 lexdiv-type-overlap-result
+#> 2 ldfreq-lexical-overlap                    0.2.0 lexdiv-type-overlap-result
+#> 3 ldfreq-lexical-overlap                    0.2.0 lexdiv-type-overlap-result
+#> 4 ldfreq-lexical-overlap                    0.2.0 lexdiv-type-overlap-result
+#> 5 ldfreq-lexical-overlap                    0.2.0 lexdiv-type-overlap-result
+#>   result_schema_version     value status missing_reason numerator denominator
+#> 1                 0.1.0 0.5000000     ok           <NA>         2           4
+#> 2                 0.1.0 0.6666667     ok           <NA>         4           6
+#> 3                 0.1.0 0.6666667     ok           <NA>         2           3
+#> 4                 0.1.0 0.6666667     ok           <NA>         2           3
+#> 5                 0.1.0 0.6666667     ok           <NA>         2           3
+#>   document_id_a document_id_b source_document_id reference_document_id
+#> 1        text_a        text_b               <NA>                  <NA>
+#> 2        text_a        text_b               <NA>                  <NA>
+#> 3        text_a        text_b             text_a                text_b
+#> 4        text_a        text_b             text_b                text_a
+#> 5        text_a        text_b               <NA>                  <NA>
+#>   type_count_a type_count_b shared_type_count union_type_count
+#> 1            3            3                 2                4
+#> 2            3            3                 2                4
+#> 3            3            3                 2                4
+#> 4            3            3                 2                4
+#> 5            3            3                 2                4
+#>       analysis_scope unit content_set_id content_set_version
+#> 1 all_supplied_terms term           <NA>                <NA>
+#> 2 all_supplied_terms term           <NA>                <NA>
+#> 3 all_supplied_terms term           <NA>                <NA>
+#> 4 all_supplied_terms term           <NA>                <NA>
+#> 5 all_supplied_terms term           <NA>                <NA>
 term_overlap$shared_terms
+#>   term token_count_a token_count_b
+#> 1  cat             1             1
+#> 2  run             1             1
 
 x <- lexdiv_lemmatize(
   lexdiv_tokenize("Cats and dogs ran.", case = "lower"),
@@ -264,6 +303,57 @@ content_overlap <- lexdiv_content_overlap(
   document_ids = c("essay", "reference")
 )
 content_overlap$summary
+#>                  measure_id                                         method_id
+#> 1             jaccard_types           jaccard_type_intersection_over_union_v1
+#> 2                dice_types          dice_type_twice_intersection_over_sum_v1
+#> 3      a_covered_by_b_types        a_covered_by_b_type_intersection_over_a_v1
+#> 4      b_covered_by_a_types        b_covered_by_a_type_intersection_over_b_v1
+#> 5 overlap_coefficient_types overlap_coefficient_type_intersection_over_min_v1
+#>      overlap_contract_id overlap_contract_version           result_schema_id
+#> 1 ldfreq-lexical-overlap                    0.2.0 lexdiv-type-overlap-result
+#> 2 ldfreq-lexical-overlap                    0.2.0 lexdiv-type-overlap-result
+#> 3 ldfreq-lexical-overlap                    0.2.0 lexdiv-type-overlap-result
+#> 4 ldfreq-lexical-overlap                    0.2.0 lexdiv-type-overlap-result
+#> 5 ldfreq-lexical-overlap                    0.2.0 lexdiv-type-overlap-result
+#>   result_schema_version     value status missing_reason numerator denominator
+#> 1                 0.1.0 0.5000000     ok           <NA>         2           4
+#> 2                 0.1.0 0.6666667     ok           <NA>         4           6
+#> 3                 0.1.0 0.6666667     ok           <NA>         2           3
+#> 4                 0.1.0 0.6666667     ok           <NA>         2           3
+#> 5                 0.1.0 0.6666667     ok           <NA>         2           3
+#>   document_id_a document_id_b source_document_id reference_document_id
+#> 1         essay     reference               <NA>                  <NA>
+#> 2         essay     reference               <NA>                  <NA>
+#> 3         essay     reference              essay             reference
+#> 4         essay     reference          reference                 essay
+#> 5         essay     reference               <NA>                  <NA>
+#>   type_count_a type_count_b shared_type_count union_type_count
+#> 1            3            3                 2                4
+#> 2            3            3                 2                4
+#> 3            3            3                 2                4
+#> 4            3            3                 2                4
+#> 5            3            3                 2                4
+#>       analysis_scope  unit              content_set_id content_set_version
+#> 1 upos_content_words lemma universal-pos-content-words               0.1.0
+#> 2 upos_content_words lemma universal-pos-content-words               0.1.0
+#> 3 upos_content_words lemma universal-pos-content-words               0.1.0
+#> 4 upos_content_words lemma universal-pos-content-words               0.1.0
+#> 5 upos_content_words lemma universal-pos-content-words               0.1.0
 content_overlap$coverage
+#>   document_id input_tokens content_tokens eligible_tokens excluded_tokens
+#> 1       essay            4              3               3               1
+#> 2   reference            4              3               3               1
+#>   missing_upos_tokens non_content_upos_tokens missing_unit_tokens
+#> 1                   0                       1                   0
+#> 2                   0                       1                   0
+#>   identity_fallback_tokens eligible_types upos_coverage unit_coverage
+#> 1                        0              3             1             1
+#> 2                        0              3             1             1
+#>   content_unit_coverage selection_coverage
+#> 1                     1               0.75
+#> 2                     1               0.75
 content_overlap$shared_terms
+#>   term token_count_a token_count_b
+#> 1  cat             1             1
+#> 2  run             1             1
 ```

@@ -148,4 +148,6 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
     model_exposure = "unknown", evaluation_role = "development"))
   evaluated$summary[c("agreement", "paired", "agreement_among_paired", "prediction_coverage")]
 }
+#>   agreement paired agreement_among_paired prediction_coverage
+#> 1         1      1                      1                   1
 ```

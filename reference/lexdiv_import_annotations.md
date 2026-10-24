@@ -150,6 +150,19 @@ x <- lexdiv_import_annotations(tokens, segments, list(
   dictionary = "none", dictionary_version = "not-applicable",
   unit = "authored-example", normalization = "none"))
 x$tokens
+#>   document_id segment_id token_index surface start end
+#> 1          ja         s1           1      猫     1   1
+#> 2          ja         s1           2      が     2   2
+#> 3          ja         s1           3      来     3   3
+#> 4          ja         s1           4      た     4   4
+#> 5          ja         s1           5      。     5   5
 lexdiv_metrics(x$tokens$surface[1:4], metrics = "ttr")
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr     1     ok           <NA> 4 4               FALSE
 lexdiv_ngrams(x$tokens[1:4, ], "authored-surface-v1", term_col = "surface")
+#> <lexdiv_ngrams; contract 0.1.0>
+#>  document_id n input_tokens opportunities ngram_types status
+#>           ja 2            4             3           3     ok
+#>           ja 3            4             2           2     ok
 ```

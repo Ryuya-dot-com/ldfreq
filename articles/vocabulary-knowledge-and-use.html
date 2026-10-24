@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,6 +92,11 @@ not require these downloads.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># After reviewing each resource's license and notice:</span></span>
 <span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_download_resources</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span><span class="op">)</span>, accept_license <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">has_tubelex</span> <span class="op">&lt;-</span> <span class="fu">ldfreq</span><span class="fu">::</span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"tubelex"</span><span class="op">)</span><span class="op">$</span><span class="va">available</span></span></code></pre></div>
+<p>Resource-dependent examples below run only when their verified data
+are already in the cache. The other examples run without downloading
+reference data.</p>
 </div>
 <div class="section level2">
 <h2 id="begin-with-what-a-learner-can-do">Begin with what a learner can do<a class="anchor" aria-label="anchor" href="#begin-with-what-a-learner-can-do"></a>
@@ -177,7 +182,7 @@ Two items use the same form, <code>bank</code>, for different intended
 senses. <code>ldfreq</code> illustrates a term outside this fixed
 reference corpus. Keep item and sense identities even when the lookup
 form is identical.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -190,14 +195,18 @@ form is identical.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">items</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">is.character</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/trimws.html" class="external-link">trimws</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">items</span><span class="op">$</span><span class="va">item_id</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">item_profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="va">items</span><span class="op">$</span><span class="va">target_form</span>, normalization <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="va">item_profile</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="st">"ok"</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">item_profile</span><span class="op">$</span><span class="va">lookup</span><span class="op">$</span><span class="va">query_index</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">items</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">item_profile</span><span class="op">$</span><span class="va">lookup</span><span class="op">$</span><span class="va">term</span>, <span class="va">items</span><span class="op">$</span><span class="va">target_form</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">item_features</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">items</span>, <span class="va">item_profile</span><span class="op">$</span><span class="va">lookup</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"lookup_term"</span>, <span class="st">"matched"</span>, <span class="st">"count"</span>, <span class="st">"videos"</span>, <span class="st">"channels"</span>,</span>
-<span>  <span class="st">"zipf"</span>, <span class="st">"video_prevalence"</span>, <span class="st">"channel_prevalence"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">item_features</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"item_id"</span>, <span class="st">"target_form"</span>, <span class="st">"sense_id"</span>, <span class="st">"matched"</span>, <span class="st">"zipf"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">item_profile</span> <span class="op">&lt;-</span> <span class="va">profiles</span> <span class="op">&lt;-</span> <span class="va">audit</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span><span class="va">item_features</span> <span class="op">&lt;-</span> <span class="va">items</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="va">has_tubelex</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">item_profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="va">items</span><span class="op">$</span><span class="va">target_form</span>, normalization <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="va">item_profile</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="st">"ok"</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">item_profile</span><span class="op">$</span><span class="va">lookup</span><span class="op">$</span><span class="va">query_index</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">items</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">item_profile</span><span class="op">$</span><span class="va">lookup</span><span class="op">$</span><span class="va">term</span>, <span class="va">items</span><span class="op">$</span><span class="va">target_form</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">item_features</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">items</span>, <span class="va">item_profile</span><span class="op">$</span><span class="va">lookup</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"lookup_term"</span>, <span class="st">"matched"</span>, <span class="st">"count"</span>, <span class="st">"videos"</span>, <span class="st">"channels"</span>,</span>
+<span>    <span class="st">"zipf"</span>, <span class="st">"video_prevalence"</span>, <span class="st">"channel_prevalence"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">item_features</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"item_id"</span>, <span class="st">"target_form"</span>, <span class="st">"sense_id"</span>, <span class="st">"matched"</span>, <span class="st">"zipf"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="op">}</span></span>
 <span><span class="co">#&gt;   item_id target_form              sense_id matched     zipf</span></span>
 <span><span class="co">#&gt; 1      i1        bank financial-institution    TRUE 4.848312</span></span>
 <span><span class="co">#&gt; 2      i2        bank            river-edge    TRUE 4.848312</span></span>
@@ -221,7 +230,7 @@ meaning-recall responses. It does not score free text. Real data also
 need the prompt, scoring rubric/version, rater or adjudication record,
 administration order and missingness reason. Use separate rows/IDs for
 repeated occasions or senses.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>item_id <span class="op">=</span> <span class="va">items</span><span class="op">$</span><span class="va">item_id</span>,</span>
 <span>  learner_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"learner_a"</span>, <span class="st">"learner_b"</span>, <span class="st">"learner_c"</span><span class="op">)</span>,</span>
 <span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span>, KEEP.OUT.ATTRS <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -257,7 +266,7 @@ word missed in the recognition test. Following the comparison logic of
 Kremmel and Schmitt, count both directions against the stated criterion,
 without treating the criterion as an infallible observation of
 real-world ability.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_compare_responses.html">lexdiv_compare_responses</a></span><span class="op">(</span><span class="va">analysis</span>,</span>
 <span>  test <span class="op">=</span> <span class="st">"recognition"</span>, criterion <span class="op">=</span> <span class="st">"meaning_recall"</span><span class="op">)</span></span>
 <span><span class="va">comparison</span><span class="op">$</span><span class="va">counts</span></span>
@@ -319,7 +328,7 @@ example, <code>001</code> stays distinct from <code>1</code>. This
 convention uses an empty CSV field for a missing value, and preserves
 the literal text <code>NA</code> as a possible ID. Scores must be
 exactly <code>0</code>, <code>1</code>, or missing.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">input_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"vocabulary-example-"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">input_dir</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">items</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">input_dir</span>, <span class="st">"items.csv"</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -375,7 +384,7 @@ a completion denominator.</p>
 strata explicitly. Merely adding <code>by</code> does not permit
 duplicate learner/item keys. This duplicated demonstration is a software
 example, not evidence of change.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">repeated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">analysis</span>, occasion_id <span class="op">=</span> <span class="st">"pre"</span><span class="op">)</span>,</span>
 <span>                  <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">analysis</span>, occasion_id <span class="op">=</span> <span class="st">"post"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">by_occasion</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_compare_responses.html">lexdiv_compare_responses</a></span><span class="op">(</span><span class="va">repeated</span>,</span>
@@ -424,7 +433,7 @@ tables while retaining failed and empty documents. The following tokens
 are authored inputs; their preparation is explicit, and the package
 still records vector alignment as unverified. See the <a href="tubelex-input.html">TUBELEX input guide</a> for connected
 text.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">profiles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_profile.html">tubelex_profile_batch</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"the"</span>, <span class="st">"bank"</span>, <span class="st">"bank"</span>, <span class="st">"ldfreq"</span><span class="op">)</span>,</span>
 <span>  b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"an"</span>, <span class="st">"accurate"</span>, <span class="st">"description"</span><span class="op">)</span>, blank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -495,7 +504,7 @@ different question, but they cannot establish employability of
 particular words. The package currently supports the descriptive inputs
 and audit trail, not a validated employability measure or an automatic
 response scorer.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>items <span class="op">=</span> <span class="va">items</span>, responses <span class="op">=</span> <span class="va">responses</span>, item_profile <span class="op">=</span> <span class="va">item_profile</span>,</span>
 <span>  analysis <span class="op">=</span> <span class="va">analysis</span>, comparison <span class="op">=</span> <span class="va">comparison</span>, profiles <span class="op">=</span> <span class="va">profiles</span>, audit <span class="op">=</span> <span class="va">audit</span>,</span>
@@ -504,8 +513,10 @@ response scorer.</p>
 <span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">saved</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">analysis</span>, <span class="va">analysis</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/lexdiv_compare_responses.html">lexdiv_compare_responses</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">analysis</span>,</span>
-<span>    <span class="st">"recognition"</span>, <span class="st">"meaning_recall"</span><span class="op">)</span>, <span class="va">restored</span><span class="op">$</span><span class="va">comparison</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/tubelex_diagnostics.html">tubelex_diagnostics</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">profiles</span><span class="op">)</span>, <span class="va">restored</span><span class="op">$</span><span class="va">audit</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="st">"recognition"</span>, <span class="st">"meaning_recall"</span><span class="op">)</span>, <span class="va">restored</span><span class="op">$</span><span class="va">comparison</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">profiles</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/tubelex_diagnostics.html">tubelex_diagnostics</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">profiles</span><span class="op">)</span>, <span class="va">restored</span><span class="op">$</span><span class="va">audit</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">saved</span><span class="op">)</span></span></code></pre></div>
 <p>Use a persistent destination for actual research. Save full records
 before exporting display tables to CSV; the CSV alone cannot retain the
