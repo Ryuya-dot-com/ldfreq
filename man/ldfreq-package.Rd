@@ -39,6 +39,16 @@ saving and reopening the complete record, see
 For your own files, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files}{TXT-folder and CSV input}.
 }
+\section{Study tables and corpus exploration}{
+Development 0.4.0.9006 provides \code{\link{lexdiv_study_table}},
+\code{\link{lexdiv_study_model_data}}, \code{\link{lexdiv_concordance}},
+\code{\link{lexdiv_concordance_sort}}, \code{\link{lexdiv_concordance_dispersion}},
+\code{\link{lexdiv_collocations}}, \code{\link{lexdiv_keyness}} and
+\code{\link{lexdiv_keyness_concordance}} as public functions. Their operations
+need no helper sourcing. Use \code{plot(search, query_id)} for saved concordance
+positions. Old sourced names and saved records remain supported; other explicitly
+sourced examples retain their documented roles.
+}
 \section{Choose a research question}{
 Choose the route from your question, then inspect the counts and availability
 beside its values. The guides specify the input tables and any optional tools.

@@ -1,3 +1,20 @@
+# ldfreq 0.4.0.9006
+
+- Call `lexdiv_study_table()` and `lexdiv_study_model_data()` directly to retain
+  planned observations, submitted documents, measurement specifications and
+  model-row exclusions, without sourcing a helper or fitting a model.
+- Use `lexdiv_concordance()`, `lexdiv_concordance_sort()` and
+  `lexdiv_concordance_dispersion()` for source-linked searches and saved
+  within-document distributions. `plot()` on the new concordance result draws
+  positions and invisibly returns the displayed occurrences, documents and counts.
+- Add `lexdiv_collocations()`, `lexdiv_keyness()` and
+  `lexdiv_keyness_concordance()` with the existing opportunity/denominator rules,
+  complete source records and missingness distinctions. No new dependencies or
+  measurement formulas are introduced.
+- Keep old sourced names, their return shapes and existing saved records usable.
+  Public help and the main workflow guides now show the direct entry points.
+  Other source-based recipes retain their scope. Stable 0.4.0 remains available.
+
 # ldfreq 0.4.0.9005
 
 - Extend the repeated-observations guide with an explicitly sourced reporting

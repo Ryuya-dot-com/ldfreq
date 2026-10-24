@@ -56,6 +56,15 @@ to list installed guides, or `vignette("getting-started", package = "ldfreq")`
 to open the introduction. `?ldfreq` also explains how to find explicitly sourced
 example helpers, which have no individual `?function` entry.
 
+Development **0.4.0.9006** makes study tables, concordance/dispersion,
+collocations and keyness available as public functions, without helper sourcing.
+Install `Ryuya-dot-com/ldfreq@v0.4.0.9006` with `pak`, or the corresponding
+`ldfreq_0.4.0.9006.tar.gz` from the release list, to follow the updated guides.
+Use `?lexdiv_study_table`, `?lexdiv_concordance`, `?lexdiv_collocations` and
+`?lexdiv_keyness` for arguments and complete return descriptions. The original
+sourced helper names and saved records remain supported. Stable 0.4.0 stays
+available as its own fixed release.
+
 The occurrence-level MCA example requires the separate development snapshot
 **0.4.0.9001 or later**. Install `Ryuya-dot-com/ldfreq@v0.4.0.9002` with `pak`, or its
 named source archive from the release list. Stable 0.4.0 does not contain it.
@@ -80,8 +89,9 @@ to create a printable learner handout, separate teacher table and reusable
 private record. Learners do not need R. The helpers are explicitly sourced examples.
 
 The [mixed-model reporting recipe](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html#report-specified-means-and-one-planned-comparison)
-requires development **0.4.0.9005 or later**. Install
-`Ryuya-dot-com/ldfreq@v0.4.0.9005` with `pak`, or its named source archive.
+was introduced in development 0.4.0.9005. Its updated guide uses the public
+study-table calls in **0.4.0.9006**; install `Ryuya-dot-com/ldfreq@v0.4.0.9006`
+with `pak`, or its named source archive.
 Optional `lme4`, `emmeans` and `pbkrtest` connect the saved study table to
 specified means, one planned contrast and Kenward--Roger confidence intervals.
 Diagnostics, exclusions and prediction support remain visible; the authored
@@ -240,8 +250,9 @@ and saves both flat CSV tables and the complete analysis record.
 For repeated observations, the
 [mixed-model walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html)
 keeps scheduled writer/task/occasion rows, submitted documents and measurement
-results separate. Its explicitly sourced helpers retain absent submissions and
-exclusion reasons, then select one measurement specification for an ordinary
+results separate. In development 0.4.0.9006, `lexdiv_study_table()` retains absent
+submissions and `lexdiv_study_model_data()` selects one measurement specification
+with exclusion reasons for an ordinary
 `lme4::lmer()` data frame. The optional model illustrates the connection using
 synthetic word sequences; it does not validate a developmental model.
 Development 0.4.0.9005 extends this example with task-specific and equally
@@ -478,9 +489,9 @@ N-gram extraction is also established functionality in
 phrase measures with coverage diagnostics. In ldfreq, the emphasis is a shared
 R workflow retaining document/segment locations, reference definitions,
 eligible-window denominators and missingness alongside other lexical measures.
-The n-gram functions provide frequencies. Separate explicitly sourced
-[collocation helpers](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html)
-add MI and t-score from complete token-pair opportunities. Neither output is a
+The n-gram functions provide frequencies. The public
+[collocation API](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html)
+adds MI and t-score from complete token-pair opportunities. Neither output is a
 validated phraseological-sophistication score.
 
 Phrase-list profiling and source-text overlap also have existing tools.

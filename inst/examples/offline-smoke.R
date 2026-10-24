@@ -365,4 +365,35 @@ if (!is.null(morphynet$reviewed)) {
     sum(morphynet$reviewed$occurrences$status == "no_candidates") == 1L)
 }
 
+# Public research/corpus entry points work without sourcing their helpers.
+public_plan <- lexdiv_plan(presets = character(), specs = list(
+  lexdiv_spec("ttr_v_over_n_v1", request_id = "ttr")))
+public_planned <- data.frame(observation_id = "o1", writer_id = "001",
+  task = "essay", occasion = 1)
+public_submissions <- data.frame(observation_id = "o1", document_id = "d1",
+  input_characters = 5)
+public_results <- lexdiv_metrics_batch(list(d1 = c("a", "b", "a")), plan = public_plan)
+public_reporting <- data.frame(document_id = "d1", request_id = "ttr",
+  reporting_status = "report", reporting_reason = "Planned specification")
+public_study <- lexdiv_study_table(public_planned, public_submissions,
+  public_results, public_plan, "surface", public_reporting)
+stopifnot(nrow(lexdiv_study_model_data(public_study, "surface", "ttr")$data) == 1L)
+
+public_segments <- data.frame(document_id = c("target", "reference"),
+  segment_id = "s1", text = c("a a b", "a b b"))
+public_tokens <- data.frame(document_id = rep(public_segments$document_id, each = 3),
+  segment_id = "s1", token_index = rep(1:3, 2), surface = c("a", "a", "b", "a", "b", "b"))
+public_source <- lexdiv_import_annotations(public_tokens, public_segments,
+  list(language = "en", analyzer = "authored", analyzer_version = "1",
+    dictionary = "none", dictionary_version = "none", unit = "tokens", normalization = "none"))
+public_keyness <- lexdiv_keyness(public_source, "target", "reference", "surface-all")
+stopifnot(identical(public_keyness$results$log_ratio, c(1, -1)))
+if (requireNamespace("quanteda", quietly = TRUE)) {
+  public_search <- lexdiv_concordance(public_source, list(a = "a"))
+  stopifnot(nrow(lexdiv_concordance_sort(public_search)) == 3L,
+    nrow(lexdiv_concordance_dispersion(public_search, "a", 3)$documents) == 2L,
+    nrow(lexdiv_collocations(public_search, "a")$pairs) == 4L,
+    nrow(lexdiv_keyness_concordance(public_keyness, "a")$search$occurrences) == 3L)
+}
+
 invisible(TRUE)

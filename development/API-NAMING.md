@@ -5,6 +5,14 @@ This document fixes the naming rules for exported R functions from the initial
 formulas, denominators, result schemas, and resource identities remain governed
 by their feature-specific contracts.
 
+## Current adoption policy (2026-10-24)
+
+New exports require the individual design gate below, not a numerical ceiling.
+Development 0.4.0.9006 adopts eight study/corpus operations after considering
+existing entry points, source-loading burden, result contracts and compatibility.
+The dated freeze and consolidation decisions below remain historical evidence.
+Validators stay internal; legacy sourced names remain compatibility entry points.
+
 ## Rules
 
 - General lexical-diversity and analysis operations use the `lexdiv_` prefix.

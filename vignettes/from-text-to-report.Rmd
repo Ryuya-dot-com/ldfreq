@@ -389,12 +389,9 @@ including the empty document.
 ja_searches <- NULL
 if (requireNamespace("quanteda", quietly = TRUE) &&
     utils::packageVersion("quanteda") >= "4.5.0") {
-  search_helper <- new.env(parent = globalenv())
-  sys.source(system.file("examples", "concordance.R", package = "ldfreq",
-    mustWork = TRUE), search_helper)
   ja_queries <- list(particle = "\u3068", unknown = "\u3077\u306b\u3087\u8a9e")
   ja_searches <- lapply(ja_selections, function(keep)
-    search_helper$concordance_search(ja_import, ja_queries, keep = keep, window = 2L))
+    lexdiv_concordance(ja_import, ja_queries, keep = keep, window = 2L))
   for (condition in names(ja_searches)) {
     searched <- ja_searches[[condition]]
     results <- subset(ja_table, metric_id == "ttr")
