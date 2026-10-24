@@ -42,6 +42,12 @@
     function_name = ".metric_mtld",
     unavailable_diagnostics_name = ".mtld_unavailable_diagnostics"
   ),
+  mtld_ma = list(
+    method_id = "mtld_ma_forward_lt_min10_step1_complete_v1",
+    quality_floor_tokens = 50,
+    function_name = ".metric_mtld_ma",
+    unavailable_diagnostics_name = ".mtld_ma_unavailable_diagnostics"
+  ),
   hdd = list(
     method_id = "hdd_expected_ttr_scaled_v1",
     quality_floor_tokens = 42,
@@ -72,7 +78,7 @@
 #' finite-population expected TTR values. It is not CLAN VOCD.
 #'
 #' @return All supported identifiers in registry order, including experimental
-#'   `expected_ttr_d`, which is excluded from default computations.
+#'   `expected_ttr_d` and opt-in `mtld_ma`, both excluded from default computations.
 #' @export
 lexdiv_metric_ids <- function() {
   names(.lex_metric_registry)
@@ -90,6 +96,7 @@ lexdiv_metric_ids <- function() {
     msttr = list(segment_length = segment_length),
     mattr = list(window_length = window_length),
     mtld = list(threshold = mtld_threshold),
+    mtld_ma = list(threshold = mtld_threshold),
     hdd = list(sample_size = sample_size),
     expected_ttr_d = list(sample_sizes = expected_ttr_sample_sizes),
     list()
@@ -110,6 +117,7 @@ lexdiv_metric_ids <- function() {
       50L
     ),
     mtld = .mtld_parameters(parameters),
+    mtld_ma = .mtld_parameters(parameters),
     hdd = .hdd_sample_size(parameters),
     expected_ttr_d = .expected_ttr_d_sample_sizes(parameters),
     .basic_empty_parameters(parameters)
@@ -156,7 +164,7 @@ lexdiv_metric_ids <- function() {
 #'   contains whitespace triggers a warning because it may be un-tokenized
 #'   prose. Use [lexdiv_metrics_text()] for raw text.
 #' @param metrics Plain, non-empty, duplicate-free character vector selected
-#'   from [lexdiv_metric_ids()]. The default excludes experimental `expected_ttr_d`.
+#'   from [lexdiv_metric_ids()]. The default excludes experimental `expected_ttr_d` and opt-in `mtld_ma`.
 #' @param segment_length Requested complete non-overlapping segment length for
 #'   MSTTR. It is never reduced to the document length.
 #' @param window_length Requested step-one window length for MATTR. It is never
@@ -186,7 +194,7 @@ lexdiv_metric_ids <- function() {
 #' @export
 lexdiv_metrics <- function(
     tokens,
-    metrics = setdiff(lexdiv_metric_ids(), "expected_ttr_d"),
+    metrics = setdiff(lexdiv_metric_ids(), c("expected_ttr_d", "mtld_ma")),
     segment_length = 50L,
     window_length = 50L,
     mtld_threshold = 0.72,

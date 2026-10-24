@@ -37,7 +37,7 @@ high MI at low counts does not establish idiomaticity or semantic unity.
 
 The computations and layout preserve the previous installed example.
 \code{examples/collocation.R} remains a compatibility entry for
-\code{collocation_profile()}. See \code{vignette("collocation-association")}.
+\code{collocation_profile()}. See \href{https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html}{collocation association guide}.
 }
 \value{
 A plain list with \code{results} (counts, marginals, opportunities, expectation,

@@ -1,15 +1,21 @@
 \name{lexdiv_concordance}
 \alias{lexdiv_concordance}
 \alias{lexdiv_concordance_sort}
+\alias{lexdiv_sort_concordance}
 \alias{lexdiv_concordance_dispersion}
 \alias{plot.lexdiv_concordance}
 \title{Search source-aligned words and phrases and inspect their distribution}
 \description{
+\code{lexdiv_sort_concordance()} is the canonical name; \code{lexdiv_concordance_sort()} remains a compatibility alias.
+
 Search complete annotations, preserving original text, token positions,
 selection masks and zero-match documents. Sort saved contexts, draw positions,
 or compute single-token within-document dispersion without searching again.
 }
 \usage{
+lexdiv_sort_concordance(x, side = c("right", "left"), depth = 1L,
+                        ignore_case = FALSE)
+
 lexdiv_concordance(x, queries, term_col = "surface",
     valuetype = c("fixed", "glob", "regex"), case_insensitive = FALSE,
     keep = rep(TRUE, nrow(x$tokens)), window = 5L, max_cells = 1e6)
@@ -73,7 +79,7 @@ names and returns plain lists; \code{concordance_positions()} still returns a
 ggplot object. Existing saved records remain accepted by the applicable
 operations. Do not change classes or integrity hashes by hand; to obtain the new
 plot interface for an old search, recreate it from its saved source and settings.
-See \code{vignette("concordance-and-dispersion")}.
+See \href{https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html}{concordance and dispersion guide}.
 }
 \value{
 \code{lexdiv_concordance()} returns a classed list with \code{occurrences}

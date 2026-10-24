@@ -9,8 +9,9 @@ nj8_fixture <- function() {
   )
 }
 
-test_that("the bundled NJ8 table contains every verified rank and remains optional", {
-  path <- system.file("extdata", "nj8", "2016", "NJ8.csv", package = "ldfreq")
+test_that("the cached NJ8 table contains every verified rank and remains optional", {
+  skip_optional_resources(c("nj8"))
+  path <- file.path(lexdiv_resource_info("nj8")$path, "extdata", "nj8", "2016", "NJ8.csv")
   table <- utils::read.csv(path, colClasses = c("integer", "character"),
                            na.strings = character())
   expect_identical(table$NJ8, 1:8000)
@@ -24,7 +25,8 @@ test_that("the bundled NJ8 table contains every verified rank and remains option
   expect_identical(result$summary, external$summary)
   expect_identical(result$lookup, external$lookup)
   expect_identical(result$diagnostics$missing_rank_count, 0)
-  expect_true(result$provenance$resource_bundled)
+  expect_false(result$provenance$resource_bundled)
+  expect_true(result$provenance$resource_cached)
   expect_false(external$provenance$resource_bundled)
   expect_identical(result$provenance$resource_version, "jacet2016-8000-v1")
   expect_match(result$provenance$resource_citation, "JACET.*2016")
@@ -32,14 +34,16 @@ test_that("the bundled NJ8 table contains every verified rank and remains option
   restored <- unserialize(serialize(result, NULL))
   expect_identical(restored, result)
   batch <- nj8_profile_batch(list(a = terms, b = character()), normalization = "identity")
-  expect_true(batch$provenance$resource_bundled)
+  expect_false(batch$provenance$resource_bundled)
+  expect_true(batch$provenance$resource_cached)
   expect_identical(batch$lookup$rank, result$lookup$rank)
   expect_identical(batch$coverage$token_coverage, c(3 / 4, NA_real_))
   expect_identical(nj8_profile_batch(setNames(list(), character()))$status, "empty")
 })
 
-test_that("a damaged bundled NJ8 table fails without an external fallback", {
-  path <- system.file("extdata", "nj8", "2016", "NJ8.csv", package = "ldfreq")
+test_that("a damaged cached NJ8 table fails without an external fallback", {
+  skip_optional_resources(c("nj8"))
+  path <- file.path(lexdiv_resource_info("nj8")$path, "extdata", "nj8", "2016", "NJ8.csv")
   bytes <- ldfreq:::.nj8_read_file_bytes(path)
   bytes[length(bytes) - 2L] <- as.raw(88L)
   local_mocked_bindings(.nj8_read_file_bytes = function(path) bytes, .package = "ldfreq")
@@ -577,8 +581,8 @@ test_that("the installed level-profile contract matches the public result", {
   expect_identical(contract$contract_version, "0.2.0")
   expect_identical(contract$status, "normative")
   expect_identical(contract$resource_boundary$caller_supplied, TRUE)
-  expect_identical(contract$resource_boundary$bundled, TRUE)
-  expect_identical(contract$resource_boundary$downloaded, FALSE)
+  expect_identical(contract$resource_boundary$bundled, FALSE)
+  expect_identical(contract$resource_boundary$downloaded, TRUE)
   expect_identical(contract$provenance$source_filename_only, TRUE)
   expect_identical(contract$provenance$absolute_path_retained, FALSE)
   expect_identical(contract$provenance$absolute_path_printed, FALSE)

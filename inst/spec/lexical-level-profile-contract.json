@@ -7,20 +7,33 @@
   "resource_boundary": {
     "resource_id": "new-jacet8000",
     "caller_supplied": true,
-    "bundled": true,
-    "downloaded": false,
+    "bundled": false,
+    "downloaded": true,
     "full_list_returned": false,
     "redistribution_claimed": true,
-    "accepted_inputs": ["bundled-default", "data-frame", "local-csv", "local-xlsx"],
+    "accepted_inputs": [
+      "verified-cache-default",
+      "data-frame",
+      "local-csv",
+      "local-xlsx"
+    ],
     "official_xlsx_sheet": "新J8",
-    "official_xlsx_columns": ["新J8順位", "代表レマ", "品詞"],
-    "observed_use_terms": "bundled rank/entry table redistributed with JACET permission and source attribution; external copies retain their applicable terms",
+    "official_xlsx_columns": [
+      "新J8順位",
+      "代表レマ",
+      "品詞"
+    ],
+    "observed_use_terms": "Separately downloaded rank/entry table redistributed with JACET permission and source attribution; external copies retain their applicable terms",
     "public-download-is-not-redistribution-permission": true,
-    "bundled_notice": "licenses/nj8/NOTICE.md",
-    "bundled_resource_version": "jacet2016-8000-v1"
+    "network_at_profile_time": false,
+    "cache_notice": "licenses/nj8/NOTICE.md",
+    "fixed_resource_version": "jacet2016-8000-v1"
   },
   "rank_to_level": {
-    "valid_ranks": [1, 8000],
+    "valid_ranks": [
+      1,
+      8000
+    ],
     "level_count": 8,
     "rule": "ceiling(rank/1000)",
     "parenthetical_alias_default": true,
@@ -29,12 +42,20 @@
   "lexical_unit": {
     "resource_unit": "representative-lemma",
     "default_input_unit": "lemma",
-    "input_unit_choices": ["surface", "lemma", "flemma"],
+    "input_unit_choices": [
+      "surface",
+      "lemma",
+      "flemma"
+    ],
     "surface_input_available_as_explicit-sensitivity-choice": true,
     "caller-supplied-antbnc-flemma-available": true
   },
   "flemma_conflict": {
-    "choices": ["antbnc", "wordlist", "error"],
+    "choices": [
+      "antbnc",
+      "wordlist",
+      "error"
+    ],
     "default": "antbnc",
     "explicit-overrides-applied-upstream": true,
     "token-level-conflict-reported": true,
@@ -49,17 +70,34 @@
     "same_transform_for_queries_and_entries": true
   },
   "lookup_columns": [
-    "query_index", "token_index", "surface_term", "term", "lookup_term",
-    "unit_match_rule", "headword_conflict", "headword_conflict_resolution",
-    "conflicting_surface_rank", "conflicting_surface_level", "matched",
-    "rank", "level"
+    "query_index",
+    "token_index",
+    "surface_term",
+    "term",
+    "lookup_term",
+    "unit_match_rule",
+    "headword_conflict",
+    "headword_conflict_resolution",
+    "conflicting_surface_rank",
+    "conflicting_surface_level",
+    "matched",
+    "rank",
+    "level"
   ],
   "summary_columns": [
-    "weighting", "level", "level_label", "items", "proportion",
-    "cumulative_items", "cumulative_proportion"
+    "weighting",
+    "level",
+    "level_label",
+    "items",
+    "proportion",
+    "cumulative_items",
+    "cumulative_proportion"
   ],
   "summary": {
-    "weightings": ["token", "type"],
+    "weightings": [
+      "token",
+      "type"
+    ],
     "denominator": "all-eligible-items",
     "off_list_in_denominator": true,
     "off_list_separate_row": true,
@@ -69,14 +107,22 @@
   "batch": {
     "contract_id": "ldfreq-lexical-level-profile-batch",
     "contract_version": "0.2.0",
-    "accepted_containers": ["plain-named-list", "explicit-id-and-list-column-data-frame"],
+    "accepted_containers": [
+      "plain-named-list",
+      "explicit-id-and-list-column-data-frame"
+    ],
     "document_order": "input-order",
     "resource_read_validate_normalize_hash_count": 1,
     "default_max_rows": 1000000,
     "bound_definition": "combined-summary-and-token-lookup-rows",
     "components": [
-      "summary", "lookup", "coverage", "document_diagnostics",
-      "exclusion_reasons", "document_provenance", "provenance",
+      "summary",
+      "lookup",
+      "coverage",
+      "document_diagnostics",
+      "exclusion_reasons",
+      "document_provenance",
+      "provenance",
       "resource_diagnostics"
     ],
     "absolute_path_retained": false
@@ -89,7 +135,6 @@
     "returned_plot_data": true
   },
   "provenance": {
-    "bundled_citation_recorded": true,
     "bundled_status_recorded": true,
     "local_file_sha256": true,
     "canonical_rank_entry_sha256": true,
@@ -98,6 +143,8 @@
     "source_filename_only": true,
     "absolute_path_retained": false,
     "absolute_path_printed": false,
-    "absolute_path_echoed_in_errors": false
+    "absolute_path_echoed_in_errors": false,
+    "resource_cached_recorded": true,
+    "resource_citation_recorded": true
   }
 }

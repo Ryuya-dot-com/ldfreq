@@ -1,4 +1,5 @@
 sensitivity_example <- function() {
+  skip_optional_resources("nj8")
   env <- new.env(parent = globalenv())
   invisible(capture.output(sys.source(system.file("examples", "annotation-sensitivity-demo.R",
     package = "ldfreq", mustWork = TRUE), envir = env)))

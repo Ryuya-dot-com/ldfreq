@@ -120,20 +120,14 @@ statistics must not be copied into writer rows as independent observations.
 Save original inputs and complete results, not only displayed tables.
 }
 \section{Open a guide or installed example}{
-The built source archive includes guides that can be opened locally:
-\preformatted{
-vignette("getting-started", package = "ldfreq")
-vignette("repeated-observations", package = "ldfreq")
-}
-Use \code{vignette(package = "ldfreq")} to list the installed guides.
-A GitHub source installation may omit rendered guides; use the online links
-above in that case.
+Use the online guide links above. The compact source archive includes guide
+sources; rendered guides are published on the website separately.
 
-Study-table, concordance, collocation, keyness, ordination, readability and syntax helpers
-are installed example code, not exported functions. They do not have individual
-\code{?function} or \code{example("function")} entries. Each guide shows the
-\code{system.file()} and \code{sys.source()} calls needed to load its helpers,
-which are then called as \code{helper$function(...)}. Follow the guide's input
+Study-table, concordance, collocation and keyness functions are exported and
+have ordinary help entries. Ordination, readability, syntax and teaching
+recipes remain installed example code. Their guides show the
+\code{system.file()} and \code{sys.source()} calls needed to load the helpers.
+Follow the guide's input
 requirements when replacing its authored data with your own.
 }
 \section{Choose your input}{
@@ -184,9 +178,9 @@ Choose the entry point from the form of data you already have:
   \code{\link{lexdiv_import_annotations}} to verify complete supplied surfaces
   against original segment text and retain source positions and dictionary
   declarations. See the Japanese annotations guide for an optional gibasa/UniDic
-  recipe; bundled frequency resources remain English.}
+  recipe; optional frequency resources remain English.}
   \item{A corpus-relative reference profile}{Use
-  \code{tubelex_profile()} for bundled TUBELEX frequency/prevalence,
+  \code{tubelex_profile()} for cached TUBELEX frequency/prevalence,
   or \code{nj8_profile()} for New JACET 8000 levels.}
 }
 
@@ -208,14 +202,14 @@ surfaces. It also provides local MATTR window and positional-exposure
 diagnostics, exact term and annotated-content-word type overlap,
 many-document coverage by one explicit reference term set, caller-supplied
 lexical-norm profiles with separate resource and annotation coverage, plus
-New JACET 8000 level profiles using the bundled table or an external copy.
+New JACET 8000 level profiles using the cached table or an external copy.
 \code{\link{bnccoca_data}} supplies Nation's BNC/COCA Level 6 family
 membership and separate supplementary lists under CC BY-SA 4.0, for use with
 \code{\link{lexdiv_family_profile}}.
 \code{\link{morphynet_read_derivations}} reads local MorphyNet formation
 relations, preserving source and target POS, affixes and alternatives. Only a
-nine-row CC BY-SA 3.0 teaching excerpt is bundled, not the full database.
-\code{\link{morpholex_data}} provides the bundled MorphoLex English worksheet
+nine-row CC BY-SA 3.0 teaching excerpt is an optional download, not the full database.
+\code{\link{morpholex_data}} provides the cached MorphoLex English worksheet
 tables and provenance. Those data and their dictionary use CC BY-NC-SA 4.0
 (noncommercial use, attribution and applicable ShareAlike conditions),
 separately from the MIT license of the independent R code.
@@ -238,7 +232,7 @@ transcription conventions. Document repeated speakers and turn boundaries
 when preparing spoken data.
 
 Native-speaker status does not establish a universal proficiency or quality
-norm. The bundled TUBELEX resource describes YouTube subtitle word forms; it
+norm. The cached TUBELEX resource describes YouTube subtitle word forms; it
 does not certify the first-language background or ability of each speaker.
 }
 \section{Input boundary}{
@@ -343,10 +337,10 @@ They are not direct measures of proficiency, writing quality, academic
 register, or context-independent lexical sophistication.
 }
 \section{Lexical frequency levels}{
-\code{nj8_profile()} maps bundled or caller-supplied ranks to Levels 1--8 and
+\code{nj8_profile()} maps cached or caller-supplied ranks to Levels 1--8 and
 reports exact and cumulative token/type proportions beside off-list coverage.
 The Level 8 cumulative proportion equals matched coverage because off-list
-items remain in the denominator. The package bundles the versioned New JACET 8000 table with JACET
+items remain in the denominator. The optional download supplies the versioned New JACET 8000 table with JACET
 permission and source attribution; an external list can be supplied explicitly. Flemma input exposes conflicts between AntBNC families and
 New JACET headwords instead of silently choosing one mapping.
 }

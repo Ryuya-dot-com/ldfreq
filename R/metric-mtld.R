@@ -80,7 +80,7 @@
   if (is.null(parameters)) {
     parameters <- list()
   }
-  if (!is.list(parameters)) {
+  if (!is.list(parameters) || is.object(parameters) || !is.null(dim(parameters))) {
     stop("`parameters` must be a named list.", call. = FALSE)
   }
   parameter_names <- names(parameters)
@@ -113,6 +113,59 @@
     stop("`threshold` must be one finite number strictly between 0 and 1.", call. = FALSE)
   }
   list(threshold = as.double(threshold))
+}
+
+# Each start contributes its first completed factor, without extending a short
+# factor to ten tokens. Stop at the first start that cannot complete a factor.
+# This implements the MTLD-MA definition with koRpus min.tokens = 9, steps = 1;
+# the algorithm here is independently written, not copied from koRpus.
+.mtld_ma_unavailable_diagnostics <- function() {
+  list(complete_factors = NA_integer_, retained_factors = NA_integer_,
+       excluded_short_factors = NA_integer_)
+}
+
+.metric_mtld_ma <- function(tokens, counts = NULL, parameters = list()) {
+  if (is.null(counts)) counts <- .lex_counts(tokens)
+  parameters <- .mtld_parameters(parameters)
+  ids <- match(tokens, unique(tokens))
+  n <- length(ids)
+  lengths <- integer(n)
+  completed <- 0L
+  seen <- integer(counts$V)
+  for (start in seq_len(n)) {
+    types <- 0L
+    closed <- FALSE
+    for (end in seq.int(start, n)) {
+      id <- ids[[end]]
+      if (seen[[id]] != start) {
+        seen[[id]] <- start
+        types <- types + 1L
+      }
+      size <- end - start + 1L
+      if (types / size < parameters$threshold) {
+        completed <- completed + 1L
+        lengths[[completed]] <- size
+        closed <- TRUE
+        break
+      }
+    }
+    if (!closed) break
+  }
+  lengths <- lengths[seq_len(completed)]
+  retained <- lengths[lengths >= 10L]
+  diagnostics <- list(complete_factors = completed,
+    retained_factors = length(retained), excluded_short_factors = sum(lengths < 10L))
+  arguments <- list(metric_id = "mtld_ma",
+    method_id = "mtld_ma_forward_lt_min10_step1_complete_v1",
+    requested_parameters = parameters, counts = counts,
+    quality_floor_tokens = 50L, diagnostics = diagnostics)
+  if (!length(retained)) {
+    arguments$missing_reason <- if (n == 0L) "empty_input" else "no_factor"
+    return(do.call(.lex_missing, arguments))
+  }
+  arguments$value <- mean(retained)
+  arguments$effective_parameters <- parameters
+  do.call(.lex_ok, arguments)
 }
 
 .metric_mtld <- function(

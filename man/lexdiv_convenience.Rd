@@ -204,6 +204,8 @@ Print returns its input invisibly. Plot methods return their plot-data frame
 invisibly.
 }
 \examples{
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("tubelex"))$available)) {
 tidy_tokens <- data.frame(
   document_id = c("a", "a", "b", "b"),
   token = c("one", "two", "three", "three")
@@ -229,4 +231,5 @@ plot(text_result)
 
 profile <- tubelex_profile(c("the", "not-in-resource"))
 plot(profile)
+}
 }

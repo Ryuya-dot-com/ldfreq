@@ -1,4 +1,5 @@
 test_that("the Nation snapshot separates families, supplements and placeholders", {
+  skip_optional_resources(c("bnccoca"))
   x <- bnccoca_data()
   d <- x$dictionary
   expect_equal(nrow(d), 75679L)
@@ -26,6 +27,7 @@ test_that("the Nation snapshot separates families, supplements and placeholders"
 })
 
 test_that("real family lookup preserves missingness, spelling and replay", {
+  skip_optional_resources(c("bnccoca"))
   env <- new.env(parent = baseenv())
   sys.source(system.file("examples", "bnccoca-families.R", package = "ldfreq",
     mustWork = TRUE), env)
@@ -52,6 +54,7 @@ test_that("real family lookup preserves missingness, spelling and replay", {
 })
 
 test_that("common-token comparisons disclose changed denominators and incomplete totals", {
+  skip_optional_resources(c("bnccoca"))
   e <- new.env(parent = baseenv())
   for (file in c("bnccoca-families.R", "family-count-comparison.R"))
     sys.source(system.file("examples", file, package = "ldfreq", mustWork = TRUE), e)

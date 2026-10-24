@@ -40,7 +40,8 @@ test_that("English normalization, offsets and exclusions survive validation", {
   on.exit(unlink(path))
   saveRDS(x, path)
   expect_identical(readRDS(path), x)
-  expect_no_error(nj8_profile(readRDS(path), unit = "surface"))
+  if (lexdiv_resource_info("nj8")$available)
+    expect_no_error(nj8_profile(readRDS(path), unit = "surface"))
   expect_error(tubelex_profile(x), "Treebank")
   for (field in c("start", "end", "surface", "reason")) {
     edited <- x
@@ -84,7 +85,8 @@ test_that("Raw-text batch calls retain IDs, empty documents and complete results
   expect_equal(result$results$value[c(1, 3)], c(1, 0.5))
   expect_identical(result$results$status, c("ok", "ok", "ok", "missing", "missing", "missing"))
   expect_identical(unique(result$token_audit$document_id), docs$id[1:2])
-  expect_identical(nj8_profile_batch(prepared, unit = "surface")$coverage$document_id, docs$id)
+  if (lexdiv_resource_info("nj8")$available)
+    expect_identical(nj8_profile_batch(prepared, unit = "surface")$coverage$document_id, docs$id)
   for (i in seq_along(prepared)) {
     single <- lexdiv_metrics_text(prepared[[i]], metrics = c("ttr", "mattr"), window_length = 3)
     expect_identical(result$preprocessing[[i]], single$preprocessing)

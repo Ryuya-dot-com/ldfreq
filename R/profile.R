@@ -103,6 +103,7 @@
     msttr = "Mean segmental TTR",
     mattr = "Moving-average TTR",
     mtld = "Measure of textual lexical diversity",
+    mtld_ma = "Moving-average MTLD",
     hdd = "HD-D on expected-TTR scale",
     expected_ttr_d = "Deterministic expected-TTR D fit",
     yule_k = "Yule's K",
@@ -117,6 +118,7 @@
     msttr = "mean TTR of complete non-overlapping segments",
     mattr = "mean TTR of all step-one overlapping windows",
     mtld = "mean forward/reverse tokens per factor; strict <, no minimum length",
+    mtld_ma = "mean forward complete-factor length >= 10; step-one starts, strict <",
     hdd = "expected sample types divided by sample size",
     expected_ttr_d = "D fitted to exact finite-population expected TTR",
     yule_k = "10000 * (M2 - N) / N^2",
@@ -124,14 +126,14 @@
   )
   directions <- c(
     ttr = "higher", rttr = "higher", cttr = "higher", herdan = "higher",
-    maas = "lower", msttr = "higher", mattr = "higher", mtld = "higher",
+    maas = "lower", msttr = "higher", mattr = "higher", mtld = "higher", mtld_ma = "higher",
     hdd = "higher", expected_ttr_d = "higher", yule_k = "lower",
     yule_i = "higher"
   )
   scales <- c(
     ttr = "[0, 1]", rttr = "[0, Inf)", cttr = "[0, Inf)",
     herdan = "[0, 1]", maas = "[0, 1/ln(2)]", msttr = "[0, 1]",
-    mattr = "[0, 1]", mtld = "[0, Inf)", hdd = "[0, 1]",
+    mattr = "[0, 1]", mtld = "[0, Inf)", mtld_ma = "[10, Inf)", hdd = "[0, 1]",
     expected_ttr_d = "(0, Inf)", yule_k = "[0, 10000)",
     yule_i = "[0, Inf)"
   )
@@ -141,6 +143,7 @@
       msttr = "segment_length",
       mattr = "window_length",
       mtld = "threshold",
+      mtld_ma = "threshold",
       hdd = "sample_size",
       expected_ttr_d = "sample_sizes",
       NA_character_
@@ -150,6 +153,7 @@
       msttr = list(segment_length = 50L),
       mattr = list(window_length = 50L),
       mtld = list(threshold = 0.72),
+      mtld_ma = list(threshold = 0.72),
       hdd = list(sample_size = 42L),
       expected_ttr_d = list(sample_sizes = 35:50),
       list()
@@ -208,6 +212,7 @@
       .basic_positive_integer_parameter(parameters, "window_length", 50L)
     )),
     mtld = .mtld_parameters(parameters),
+    mtld_ma = .mtld_parameters(parameters),
     hdd = list(sample_size = .profile_canonical_integer(
       .hdd_sample_size(parameters)
     )),
@@ -366,7 +371,9 @@ lexdiv_grid <- function(
 
 .profile_canonical_specs <- function() {
   methods <- .profile_method_definitions()
-  methods <- Filter(function(method) identical(method$stability, "stable"), methods)
+  # The immutable canonical preset retains the original eleven methods.
+  methods <- Filter(function(method) identical(method$stability, "stable") &&
+    !identical(method$metric_id, "mtld_ma"), methods)
   lapply(methods, function(method) {
     lexdiv_spec(
       method_id = method$method_id,
@@ -786,6 +793,7 @@ lexdiv_presets <- function() {
     msttr = arguments$segment_length <- parameters$segment_length,
     mattr = arguments$window_length <- parameters$window_length,
     mtld = arguments$mtld_threshold <- parameters$threshold,
+    mtld_ma = arguments$mtld_threshold <- parameters$threshold,
     hdd = arguments$sample_size <- parameters$sample_size,
     expected_ttr_d = arguments$expected_ttr_sample_sizes <- parameters$sample_sizes
   )

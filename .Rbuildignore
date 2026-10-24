@@ -10,3 +10,4 @@
 ^legal$
 ^LIFECYCLE\.md$
 ^inst/examples/__pycache__$
+^CITATION\.cff$

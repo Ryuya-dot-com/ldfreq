@@ -1318,7 +1318,7 @@ lexdiv_metrics_text <- function(
     normalization = "NFC",
     case = "preserve",
     keep_numbers = FALSE,
-    metrics = setdiff(lexdiv_metric_ids(), "expected_ttr_d"),
+    metrics = setdiff(lexdiv_metric_ids(), c("expected_ttr_d", "mtld_ma")),
     segment_length = 50L,
     window_length = 50L,
     mtld_threshold = 0.72,

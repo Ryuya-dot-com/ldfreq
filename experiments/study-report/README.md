@@ -72,7 +72,7 @@ sample. Since there is one essay per writer, the example does not exercise
 repeated-writer inference or support group/level comparisons. Missing and
 withheld values are covered by the separate authored guide checks, not by
 this all-available sample. This integration check does not establish metric
-validity or novice usability.
+validity.
 
 ## Inspect, report and reopen
 

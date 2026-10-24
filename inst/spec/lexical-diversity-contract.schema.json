@@ -59,8 +59,8 @@
     "r_profile_contract": {"$ref": "#/$defs/rProfileContract"},
     "metrics": {
       "type": "array",
-      "minItems": 12,
-      "maxItems": 12,
+      "minItems": 13,
+      "maxItems": 13,
       "uniqueItems": true,
       "items": {"$ref": "#/$defs/metric"}
     }

@@ -1,4 +1,4 @@
-# Authored text and declared decisions. Uses bundled reference snapshots;
+# Authored text and declared decisions. Uses explicitly downloaded reference snapshots;
 # these decisions illustrate accounting, not independently validated analyses.
 morphology_link_example <- local({
   forms <- c("teacher", "teachers", "reusability", "reusability", "quux")
@@ -13,8 +13,8 @@ morphology_link_example <- local({
   sys.source(system.file("examples", "morpholex-word-parts.R", package = "ldfreq", mustWork = TRUE), e)
   sheets <- grep("^[0-9]+-[0-9]+-[0-9]+$", names(ldfreq::morpholex_data()$sheets), value = TRUE)
   ml <- e$read_morpholex_parts(sheets = sheets, words = unique(forms))
-  mn <- ldfreq::morphynet_read_derivations(system.file("extdata", "morphynet-example",
-    "eng.derivational.example.tsv", package = "ldfreq", mustWork = TRUE), "en", "Nine-row teaching excerpt")
+  mn <- ldfreq::morphynet_read_derivations(file.path(ldfreq::lexdiv_resource_info("morphynet")$path, "extdata", "morphynet-example",
+    "eng.derivational.example.tsv"), "en", "Nine-row teaching excerpt")
   initial <- link_morphology_candidates(family, ml, mn)
   review <- initial$reviews$morpholex
   md <- review$occurrences[review$occurrences$surface %in% c("teacher", "teachers"), c("review_id", "occurrence_id")]

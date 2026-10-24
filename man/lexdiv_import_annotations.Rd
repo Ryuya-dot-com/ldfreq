@@ -64,7 +64,7 @@ Keep selection settings and missingness counts with the imported object.
 Surface, orthographic base and lexeme are different analytical choices. The
 importer does not translate source POS to UPOS, infer unknown-word status,
 merge Japanese homographs, or establish compatibility with a frequency table.
-The bundled NJ8 and TUBELEX profiles are English resources. See the Japanese
+The cached NJ8 and TUBELEX profiles are English resources. See the Japanese
 annotations vignette for an R-only gibasa/UniDic recipe. Other analyzers may
 provide these same columns; successful alignment is not evidence of accurate
 morphology or cross-language measurement equivalence.
@@ -103,4 +103,4 @@ lexdiv_ngrams(x$tokens[1:4, ], "authored-surface-v1", term_col = "surface")
 }
 \seealso{\code{\link{lexdiv_ambiguity_review}},
 \code{\link{lexdiv_ngrams}}, \code{\link{lexdiv_as_quanteda}},
-\code{\link{lexdiv_metrics}}, \code{vignette("japanese-annotations", package = "ldfreq")}}
+\code{\link{lexdiv_metrics}}, \href{https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html}{japanese annotations guide}}

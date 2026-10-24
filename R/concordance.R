@@ -12,7 +12,8 @@
 }
 
 .concordance_whole <- function(x, name, minimum = 1) {
-  if (!is.numeric(x) || length(x) != 1L || is.na(x) || !is.finite(x) ||
+  if (!is.numeric(x) || is.object(x) || !is.null(dim(x)) ||
+      length(x) != 1L || is.na(x) || !is.finite(x) ||
       x < minimum || x != floor(x) || x > .Machine$integer.max)
     stop(name, " must be a whole number >= ", minimum, ".", call. = FALSE)
   as.integer(x)

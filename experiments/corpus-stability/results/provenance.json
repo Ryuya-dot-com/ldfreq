@@ -1,0 +1,44 @@
+{
+  "identity": {
+    "inputs": {
+      "answer": "8fc5b9dc8148f0330231d67efc2f855a6ee520aeabe2be4afdb442b3ce6e6f82",
+      "course": "d6b710cd284126383f96dd9fccc088ba3dcb28b5e80349cde531d565254c22c2",
+      "question": "0b789694740ffae6620bb3f3e65d3ed18dcde3278fa1de5d821fbcaf5873e5cf"
+    },
+    "preparation": "e4c1c7b39e0c695acbc34333e46236f06efdced3681ba4343dd0cff99c782ef2",
+    "source": {
+      "api.R": "3575593d4e6d6173d38d9c0b46b3ae12cca0511fb9bb2087e3b53b4dc11c4aa8",
+      "metric-mtld.R": "85c2ee20a1ddc804029a86ef648a9520643910be544c8e206f52c38ea0a2dfc4",
+      "metric-expected-ttr-d.R": "d3edf9a004d9604e4623109e6425146de5125f65852c91f87689e8a818c15476"
+    },
+    "protocol": "9e0c065f8531d2275b586f9cb5e0e62213b11eb51120a9b69e65d1654f8c2056"
+  },
+  "corpus": {
+    "documents": 2786,
+    "writers": 696,
+    "prompts": 297,
+    "tokens": 1196348
+  },
+  "cohort": {
+    "documents": 1330,
+    "writers": 421,
+    "prompts": 237
+  },
+  "bootstrap": {
+    "replicates": 2000,
+    "seed": 20261025,
+    "unit": "writer",
+    "interval": "percentile 95%"
+  },
+  "R": "4.6.1",
+  "checks": {
+    "complete_nonoverlapping_blocks": 1330,
+    "independent_anova_iccs": 48,
+    "final_implementation_documents": 20,
+    "final_source_sha256": {
+      "api.R": "2bb48a0e47e934fc885382387872e177d636e7e117b669e75c3bda0f1286dd5f",
+      "metric-mtld.R": "85c2ee20a1ddc804029a86ef648a9520643910be544c8e206f52c38ea0a2dfc4",
+      "metric-expected-ttr-d.R": "d3edf9a004d9604e4623109e6425146de5125f65852c91f87689e8a818c15476"
+    }
+  }
+}

@@ -4,8 +4,10 @@
 \alias{print.tubelex_profile}
 \title{Coverage-aware TUBELEX frequency and prevalence profile}
 \description{
+Reference snapshots require a prior explicit download; see \code{\link{lexdiv_download_resources}} for terms and cache setup.
+
 Look up surface-form frequency, video prevalence, and channel prevalence in the
-byte-pinned TUBELEX-EN Treebank aggregate bundled with \pkg{ldfreq}.
+byte-pinned TUBELEX-EN Treebank aggregate downloaded separately for \pkg{ldfreq}.
 }
 \usage{
 tubelex_profile(
@@ -50,7 +52,7 @@ rows, checked before resource loading.}
 }
 \details{
 The general-purpose \code{lexdiv_tokenize()} tokenizer retains contractions
-such as \samp{don't}, whereas the bundled resource uses Treebank units such
+such as \samp{don't}, whereas the cached resource uses Treebank units such
 as \samp{do} and \samp{n't}. A spelling can match a resource entry even when
 segmentation is inappropriate: 100 percent coverage does not verify alignment.
 Do not extract the surface column merely to bypass the object mismatch check.
@@ -74,7 +76,7 @@ criteria; neither frequency nor video/channel prevalence demonstrates an
 individual's meaning recall, processing speed or appropriate contextual use.
 }
 \section{Locales and resource failures}{
-The bundled CSV is decoded as UTF-8 independently of \code{LC_CTYPE}.
+The cached CSV is decoded as UTF-8 independently of \code{LC_CTYPE}.
 C/POSIX sessions can use ASCII or explicitly UTF-8-encoded query terms.
 An accented character may be displayed with a Unicode escape in a C console
 even though its bytes and lookup result are correct.
@@ -133,7 +135,7 @@ separately from the measurement contract.
 \code{status = "ok"} means a non-empty valid input was looked up successfully;
 \code{"empty"} means a valid zero-term input produced typed empty output;
 \code{"invalid_input"} means the supplied terms failed validation; and
-\code{"resource_error"} means the bundled resource failed an availability or
+\code{"resource_error"} means the cached resource failed an availability or
 integrity check. \code{failure_reason} is missing for \code{"ok"} and
 \code{"empty"}, and otherwise gives the specific failure reason. Coverage is
 missing when its denominator is zero or the lookup could not be completed.
@@ -158,6 +160,8 @@ example, \code{profiles[["essay_a"]]$summary}; do not concatenate documents to
 avoid repeated resource loading. An empty batch returns a named empty list.
 }
 \examples{
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("tubelex"))$available)) {
 # Explicit illustrative Treebank units; no automatic tokenization is implied.
 tokens <- c("I", "do", "n't", "think", "it", "'s", "John", "'s", "book")
 profile <- tubelex_profile(tokens)
@@ -174,11 +178,12 @@ contract_paths <- system.file("spec", contract_files, package = "ldfreq")
 stopifnot(all(nzchar(contract_paths)))
 basename(contract_paths)
 }
+}
 \seealso{
 \code{\link{lexdiv_tokenize}}, \code{\link{lexdiv_metrics_text}},
 \code{\link{tubelex_diagnostics}};
-\code{vignette("getting-started", package = "ldfreq")} for batch profiles;
-\code{vignette("tubelex-input", package = "ldfreq")} for the optional
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html}{getting started guide} for batch profiles;
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.html}{tubelex input guide} for the optional
 external tokenization recipe and its reproducibility boundaries.
 }
 \keyword{text}

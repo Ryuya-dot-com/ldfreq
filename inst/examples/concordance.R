@@ -5,6 +5,6 @@
 .concordance_check <- utils::getFromNamespace(".concordance_check", "ldfreq")
 .concordance_whole <- utils::getFromNamespace(".concordance_whole", "ldfreq")
 concordance_search <- utils::getFromNamespace("concordance_search", "ldfreq")
-concordance_sort <- ldfreq::lexdiv_concordance_sort
+concordance_sort <- ldfreq::lexdiv_sort_concordance
 concordance_positions <- utils::getFromNamespace("concordance_positions", "ldfreq")
 concordance_dispersion <- ldfreq::lexdiv_concordance_dispersion

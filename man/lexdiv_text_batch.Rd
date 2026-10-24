@@ -123,7 +123,7 @@ denominators describe different stages.
 The complete tokenization list can also be passed to
 \code{\link{nj8_profile_batch}}. Neither tokenizer provides TUBELEX's Treebank
 segmentation; its explicit mismatch policy still applies. See
-\code{vignette("english-tokenization", package = "ldfreq")} for CSV and text
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html}{english tokenization guide} for CSV and text
 file input and segmentation examples.
 }
 \value{
@@ -148,6 +148,8 @@ metric rows invisibly, with the same selection rules as
 create a metric table; save the complete object to retain its audits.
 }
 \examples{
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("nj8"))$available)) {
 library(ldfreq)
 
 # 1. One row per text; keep the empty document in the input.
@@ -192,6 +194,7 @@ with_study <- lexdiv_metrics_text_batch(prepared, metrics = "ttr", metadata = st
 with_study$metadata
 stopifnot(identical(with_study$results,
   lexdiv_metrics_text_batch(prepared, metrics = "ttr")$results))
+}
 }
 \seealso{\href{https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html}{Getting started: read, plot and save document results},
 \code{\link{lexdiv_metrics_text}}, \code{\link{lexdiv_convenience}},

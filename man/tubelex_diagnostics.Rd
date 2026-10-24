@@ -2,6 +2,8 @@
 \alias{tubelex_diagnostics}
 \title{Tabulate TUBELEX profiles while retaining coverage and input conditions}
 \description{
+Reference snapshots require a prior explicit download; see \code{\link{lexdiv_download_resources}} for terms and cache setup.
+
 Combine existing profiles into document and summary tables, count confirmed
 unmatched terms, and inspect term normalization. No resource lookup,
 tokenization, annotation, model download, or learner scoring is performed.
@@ -14,7 +16,7 @@ tubelex_diagnostics(x, max_rows = 1e6)
 as returned by \code{tubelex_profile_batch()}. IDs must be unique, non-empty
 valid-UTF-8 strings. A single profile uses \code{document_1}. An empty named
 list is allowed. Profiles must use profile contract 0.2.0 and the currently
-bundled resource; unsupported records must be recreated from their inputs.}
+cached resource; unsupported records must be recreated from their inputs.}
 \item{max_rows}{Positive whole-number limit on total input lookup rows plus
 two summary rows per document, checked before constructing aggregate tables.}
 }
@@ -70,6 +72,8 @@ Empty batches return typed zero-row tables and empty named metadata lists.
 Keep the original profiles for occurrence positions and complete lookup values.
 }
 \examples{
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("tubelex"))$available)) {
 profiles <- tubelex_profile_batch(list(
   first = c("Apple", "apple", "zzunmatchedxyz"),
   second = c("the", "zzunmatchedxyz"), blank = character(),
@@ -80,9 +84,10 @@ audit$summary[, c("document_id", "status", "weighting", "coverage", "mean_zipf")
 audit$unmatched_terms
 audit$normalization_mappings
 }
+}
 \seealso{
 \code{\link{tubelex_profile}}, \code{\link{nj8_diagnostics}};
-\code{vignette("vocabulary-knowledge-and-use", package = "ldfreq")} for a
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/vocabulary-knowledge-and-use.html}{vocabulary knowledge and use guide} for a
 worked separation of learner responses and corpus features.
 }
 \keyword{text}

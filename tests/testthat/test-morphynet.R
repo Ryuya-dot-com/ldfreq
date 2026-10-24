@@ -1,6 +1,6 @@
 test_that("MorphyNet source relations and scoped identities survive import", {
-  path <- system.file("extdata", "morphynet-example", "eng.derivational.example.tsv",
-    package = "ldfreq", mustWork = TRUE)
+  skip_optional_resources("morphynet")
+  path <- file.path(lexdiv_resource_info("morphynet")$path, "extdata", "morphynet-example", "eng.derivational.example.tsv")
   x <- morphynet_read_derivations(path, "en", "v1 excerpt")
   d <- x$relations
   expect_equal(nrow(d), 9L)
@@ -59,6 +59,7 @@ test_that("malformed or truncated relations fail instead of changing columns", {
 })
 
 test_that("KWIC decisions retain alternatives and distinguish repeated occurrences", {
+  skip_optional_resources("morphynet")
   skip_if_not_installed("quanteda")
   env <- new.env(parent = asNamespace("ldfreq"))
   sys.source(system.file("examples", "morphynet-relations.R", package = "ldfreq",

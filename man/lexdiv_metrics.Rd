@@ -10,7 +10,7 @@ lexdiv_metric_ids()
 
 lexdiv_metrics(
   tokens,
-  metrics = setdiff(lexdiv_metric_ids(), "expected_ttr_d"),
+  metrics = setdiff(lexdiv_metric_ids(), c("expected_ttr_d", "mtld_ma")),
   segment_length = 50L,
   window_length = 50L,
   mtld_threshold = 0.72,
@@ -43,7 +43,7 @@ lexdiv_metrics_batch(
   raw prose. Use \code{lexdiv_metrics_text()} for raw text.}
   \item{metrics}{A plain, non-empty, duplicate-free character vector selected
   from \code{lexdiv_metric_ids()}. The default excludes experimental
-  \code{expected_ttr_d}; the catalog still lists every supported metric.}
+  \code{expected_ttr_d} and opt-in \code{mtld_ma}; the catalog still lists every supported metric.}
   \item{segment_length}{One plain finite numeric scalar with an integer value
   at least one; requested complete non-overlapping MSTTR segment length.}
   \item{window_length}{One plain finite numeric scalar with an integer value at
@@ -106,6 +106,17 @@ short document. Missingness, method identity, sufficient counts, quality flags,
 parameters, and diagnostics are returned beside each value.
 }
 \details{
+MTLD-MA is available as \code{metrics = "mtld_ma"}. It computes the mean of
+forward overlapping complete-factor lengths of at least ten tokens, with
+step-one starts and a strict TTR threshold. It stops at the first start that
+cannot complete a factor. Short completed factors are excluded, not extended.
+There is no reverse pass or fractional tail. No retained factor produces
+\code{no_factor}. This corresponds to koRpus min.tokens=9, MTLDMA.steps=1;
+its method ID distinguishes it from ordinary MTLD. It is excluded from the
+eleven-method default and canonical preset. The advisory 50-token floor is
+not a reliability guarantee; see the metric-selection vignette.
+
+
 Start with \code{lexdiv_metrics(c("a", "a", "b", "c"), metrics = "ttr")}.
 Each vector element is one word occurrence: \code{N = 4} tokens contain
 \code{V = 3} distinct types, so \code{value = 0.75}. The result is already a
@@ -246,9 +257,9 @@ wide-table and plot checks reject mixed measurement identities.
 
 Default results now have eleven rows, and the canonical and length presets
 have eleven and thirteen requests. \code{lexdiv_metric_ids()} still lists all
-twelve supported metrics. Explicit \code{metrics = lexdiv_metric_ids()} includes
-experimental expected-TTR D. Its estimator and method ID are unchanged.
-Result schemas, tokenization and bundled reference data are unchanged.
+thirteen supported metrics. Explicit \code{metrics = lexdiv_metric_ids()} includes
+opt-in moving-average MTLD and experimental expected-TTR D. Its estimator and method ID are unchanged.
+Result schemas, tokenization and reference-data values are unchanged.
 }
 \section{Formal contract}{
 Exact formulas, domains, floating-point policy, method IDs, result fields, and

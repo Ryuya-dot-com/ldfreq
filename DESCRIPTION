@@ -1,7 +1,7 @@
 Package: ldfreq
 Type: Package
 Title: Reproducible Lexical Diversity and Frequency Profiles
-Version: 0.4.0.9006
+Version: 0.5.0.9001
 Authors@R:
     person(
         given = "Ryuya",
@@ -12,18 +12,18 @@ Authors@R:
 Description: Compares lexical diversity and reference-vocabulary profiles while
     retaining the formula, parameters, preprocessing choices, and match coverage
     used in each analysis. Supports eleven default lexical-diversity measures
-    and an experimental expected-TTR D estimator, computed from
+    and optional moving-average MTLD and an experimental expected-TTR D estimator, computed from
     ordered tokens or raw English text; compares selected Maas and MTLD
-    definitions; and exposes local MATTR windows. Bundled New JACET 8000 and
+    definitions; and exposes local MATTR windows. Optional New JACET 8000 and
     TUBELEX tables support lexical-level coverage and corpus-relative frequency
     profiles, with off-list terms and non-computable requests kept explicit.
     Additional functions provide exact lexical overlap, reference-set coverage,
     caller-supplied word-family, lexical norm and adjacent n-gram frequency profiles,
     descriptive comparisons of scored
     vocabulary response pairs, multi-document workflows, and plots.
-    Bundled MorphoLex English worksheets provide derivational morphology
-    reference data under CC BY-NC-SA 4.0 (noncommercial use).
-    Nation's BNC/COCA Level 6 word-family lists are bundled under CC BY-SA 4.0.
+    MorphoLex English and Nation's BNC/COCA Level 6 word-family lists are
+    optional reference resources. Reference data require explicit download
+    and acceptance of their separate licenses; ordinary calculations are offline.
     A local MorphyNet reader retains derivational relations and source identity.
     External annotations, local MASC Penn annotations and optional 'quanteda' integration retain
     supplied token boundaries and source positions for corpus analysis.
@@ -34,9 +34,7 @@ Description: Compares lexical diversity and reference-vocabulary profiles while
     The methods include Covington and McFall (2010)
     <doi:10.1080/09296171003643098> and McCarthy and Jarvis (2010)
     <doi:10.3758/BRM.42.2.381>.
-License: file LICENSE
-License_is_FOSS: no
-License_restricts_use: yes
+License: MIT + file LICENSE
 Copyright: See inst/COPYRIGHTS.
 URL: https://ryuya-dot-com.github.io/ldfreq/,
     https://github.com/Ryuya-dot-com/ldfreq

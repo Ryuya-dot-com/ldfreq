@@ -82,7 +82,7 @@ key with an \code{NA} norm is \code{missing_annotation}; an unmatched key is
 compare unlike scales, form composite scores, or approve a data license.
 }
 \seealso{
-\code{vignette("japanese-norms", package = "ldfreq")} for stimulus-item
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.html}{japanese norms guide} for stimulus-item
 tables, local Japanese norm files, scale interpretation and data terms.
 }
 \examples{

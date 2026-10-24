@@ -21,8 +21,8 @@ source occurrences**. Learners need a browser or a printed handout, not R.
 An R user prepares the search and runs the input/output steps; a teacher can
 edit the selection and activity tables.
 
-Use development **ldfreq 0.4.0.9004 or later**; see the
-[installation instructions](https://ryuya-dot-com.github.io/ldfreq/index.html#installation).
+Use development **ldfreq 0.5.0.9001**; see the
+[installation instructions](https://ryuya-dot-com.github.io/ldfreq/index.html#install).
 `ddl_material()` and `ddl_material_write()` are installed examples to source
 explicitly, not exported functions. Construction revalidates the existing
 phrase review and requires optional **quanteda >= 4.5.0**. Japanese input also
@@ -176,8 +176,7 @@ frequency sample.
 This recipe does not download corpora, parse textbook PDFs, infer teaching
 level, generate readings or furigana, choose examples by a quality score,
 collect learner responses or grade them. Such information, when needed, must
-come from an explicit source or teacher judgment. Actual preparation time,
-classroom usability and learning outcomes have not been evaluated.
+come from an explicit source or teacher judgment.
 
 ## Reopen and reproduce without a new search
 

@@ -4,7 +4,7 @@
 \description{
 Count the word families represented in each document using an explicit
 form-to-family inventory. The example below imports a small token table and
-uses the bundled Nation inventory from \code{\link{bnccoca_data}}.
+uses the cached Nation inventory from \code{\link{bnccoca_data}}.
 Original word occurrences and unresolved matches remain available for
 inspection. This experimental function requires prepared tokens; it does
 not tokenize raw text or run a morphological analyzer.
@@ -179,6 +179,8 @@ Bauer, L., and Nation, P. (1993). Word families.
 \code{\link{lexdiv_metrics}}, \code{\link{lexdiv_compare_ambiguity}},
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html}{Word families, roots and affixes tutorial}}
 \examples{
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("bnccoca"))$available)) {
 library(ldfreq)
 
 # 1. Complete authored texts and their tokens. Empty documents have no
@@ -202,7 +204,7 @@ annotations <- lexdiv_import_annotations(tokens, segments, list(
   unit = "word", normalization = "none"
 ))
 
-# 2. Load Nation's bundled inventory. It does not include REUSABILITY.
+# 2. Load Nation's cached inventory. It does not include REUSABILITY.
 reference <- bnccoca_data()
 profile <- lexdiv_family_profile(
   annotations, reference$dictionary, reference$resource,
@@ -234,5 +236,6 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
   sys.source(system.file("examples", "word-family-review.R", package = "ldfreq",
     mustWork = TRUE), env)
   env$word_family_review_example$reviewed$documents
+}
 }
 }

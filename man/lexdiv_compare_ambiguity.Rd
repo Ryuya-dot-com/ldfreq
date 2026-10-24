@@ -94,4 +94,4 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
 }
 }
 \seealso{\code{\link{lexdiv_ambiguity_review}},
-\code{vignette("ambiguity-review", package = "ldfreq")}}
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.html}{ambiguity review guide}}

@@ -164,7 +164,7 @@ outputs. Source text need not be bundled with a reference table or package.
 These descriptive frequencies are not association scores, lexical
 employability or proficiency estimates. There is no MI, t-score, smoothing,
 automatic threshold, skip-gram, semantic matching or document pooling.
-Bundled TUBELEX unigram counts cannot recover observed n-gram co-occurrences.
+Cached TUBELEX unigram counts cannot recover observed n-gram co-occurrences.
 }
 \examples{
 # Authored, pre-segmented example; no external corpus.

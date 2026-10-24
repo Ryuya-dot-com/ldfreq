@@ -62,6 +62,8 @@ check of a saved profile. The result is an audit summary, not a replacement
 for the full profile or a standalone analysis of all annotation failures.
 }
 \examples{
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("nj8"))$available)) {
 prepared <- lexdiv_tokenize_batch(c(
   essay_a = "Students have part-time jobs.",
   essay_b = "Students learn from jobs."
@@ -77,5 +79,6 @@ annotated <- lexdiv_lemmatize(text, lemmas = c("student", "2"),
   backend_id = "authored-example", backend_version = "1")
 audit <- nj8_diagnostics(nj8_profile(annotated, unit = "lemma"))
 audit$unit_mappings[audit$unit_mappings$numeric_introduced, ]
+}
 }
 \seealso{\code{\link{nj8_profile}}, \code{\link{lexdiv_preprocessing}}}

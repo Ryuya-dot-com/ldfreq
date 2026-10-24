@@ -61,7 +61,7 @@ inputs, plan, reporting decisions and the complete table in the study record.
 Introduced as public interfaces in 0.4.0.9006 with the computations and table
 layout of the previous installed example. Sourcing \code{examples/study-table.R}
 still defines \code{study_long_table()} and \code{study_model_data()} with the
-same arguments and return values. See \code{vignette("repeated-observations")}.
+same arguments and return values. See \href{https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html}{repeated observations guide}.
 }
 \value{
 \code{lexdiv_study_table()} returns a plain data frame with planned metadata,

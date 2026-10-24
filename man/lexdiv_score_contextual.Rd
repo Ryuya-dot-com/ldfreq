@@ -62,7 +62,7 @@ evaluation determine what research claims these scores can support.
 
 Audit column names such as \code{n_selected}, \code{prototype_status}, and
 \code{centroid_status} are reserved. Conflicting input columns are rejected.
-See \code{vignette("contextual-models", package = "ldfreq")} for a complete
+See \href{https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.html}{contextual models guide} for a complete
 English/Japanese scoring, baseline comparison and KWIC example.
 }
 \value{

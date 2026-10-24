@@ -14,7 +14,7 @@
     if (identical(tokenization_mismatch, "error")) {
       stop(
         paste0(
-          "lexdiv_tokenize() does not use the bundled TUBELEX Treebank segmentation. ",
+          "lexdiv_tokenize() does not use the cached TUBELEX Treebank segmentation. ",
           "Supply source-aligned tokens, or explicitly set tokenization_mismatch = ",
           "\"allow\" for a segmentation-sensitivity analysis. Coverage does not verify alignment."
         ),
@@ -213,7 +213,7 @@
 #' Compute a coverage-aware TUBELEX frequency profile
 #'
 #' Looks up token or type frequency, video prevalence, and channel prevalence
-#' in the byte-pinned TUBELEX-EN Treebank aggregate bundled with `ldfreq`.
+#' in the byte-pinned TUBELEX-EN Treebank aggregate downloaded separately for `ldfreq`.
 #' Token- and type-weighted summaries are calculated from matched terms only;
 #' coverage is returned beside those conditional means. Unmatched terms remain
 #' missing and are never converted to artificial zero-frequency observations.
@@ -238,7 +238,7 @@
 #'   `"allow"` records their explicit use for segmentation sensitivity. Character
 #'   vectors remain caller-prepared terms whose segmentation is not verified.
 #'
-#' The bundled CSV is decoded as UTF-8 independently of LC_CTYPE. C/POSIX
+#' The cached CSV is decoded as UTF-8 independently of LC_CTYPE. C/POSIX
 #' sessions can query ASCII and explicitly encoded UTF-8 terms. Schema-failure
 #' printing retains the machine-readable reason and suggests checking the
 #' resource and encoding; a non-UTF-8 locale is a possible cause in older loaders,
@@ -337,7 +337,7 @@ print.tubelex_profile <- function(x, ...) {
     if (identical(x$failure_reason, "schema_mismatch")) {
       violations <- x$diagnostics$resource_diagnostics$schema_violations
       if (length(violations)) cat("Schema checks:", paste(violations, collapse = ", "), "\n")
-      cat("Check the bundled resource and UTF-8 decoding; LC_CTYPE =",
+      cat("Check the cached resource and UTF-8 decoding; LC_CTYPE =",
         Sys.getlocale("LC_CTYPE"), "\n")
       if (!isTRUE(l10n_info()[["UTF-8"]])) {
         cat("Older loaders can fail in a non-UTF-8 locale; update ldfreq or try a UTF-8 locale.\n")

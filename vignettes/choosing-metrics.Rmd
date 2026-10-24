@@ -1,0 +1,218 @@
+---
+title: "Choosing a lexical-diversity measure"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Choosing a lexical-diversity measure}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ldfreq)
+read_result <- function(name) read.csv(system.file("extdata", "corpus-stability",
+  name, package = "ldfreq", mustWork = TRUE))
+```
+
+## Choose the property you want to measure
+
+**Start with MATTR at a fixed window size when comparing local lexical variety
+in texts of different lengths.** Use HD-D at a fixed sample size when you want
+a summary of the whole text's frequency distribution that ignores word order.
+Use MTLD when sequential factor lengths answer your question or a study you
+are extending used the same definition. None of these choices, by itself,
+turns word counts into a measure of vocabulary knowledge or writing quality.
+
+| Question or constraint | Choice | Conditions that matter |
+|---|---|---|
+| How varied is vocabulary within local stretches? | `mattr`, fixed `window_length` | Fix the window across texts. Texts below the window produce no score. Changing the window changes the property measured. |
+| How diverse is the text's frequency distribution? | `hdd`, fixed `sample_size` | Fix the sample size. Order is ignored. Topic expansion and unequal coverage can still affect the result. |
+| How long does a sequence maintain lexical variety? | `mtld`, fixed threshold | Inspect completed factors and tail contribution; short texts may be dominated by the tail calculation. Record the exact method ID. |
+| Reproduce koRpus's moving-average MTLD? | Explicit `mtld_ma` | This is a separate forward, overlapping, complete-factor method. It is often unavailable or strongly selected in short texts. |
+| Compare type counts at exactly the same length? | `ttr` with a controlled sampling design | Preserve document and writer boundaries. A common length does not guarantee a reliable individual score. |
+| Reproduce an existing segment-based study? | `msttr`, fixed segment length | Incomplete final segments are dropped; segment boundaries matter. |
+| Study repetition/concentration? | `yule_k` | Lower values indicate less concentration. This answers a different question from rare-word knowledge or local sequence variety. |
+
+Do not select RTTR, CTTR, Herdan's C, Maas or Yule's I simply because a formula
+adjusts TTR or uses logarithms. Their length behavior must suit the comparison.
+The experimental `expected_ttr_d` fits an exact expected-TTR curve; it is not
+CLAN VOCD and is excluded from default computations.
+
+## Why these recommendations?
+
+Covington and McFall (2010) define MATTR through a fixed moving window. This
+makes the unit of local comparison explicit, and allows variation inside a
+text to be inspected. It does not make different window sizes interchangeable.
+[Original method](https://doi.org/10.1080/09296171003643098).
+
+Fergadiotis, Wright and Green (2015) compared four measures in discourse from
+442 adults. Their modeling supported MTLD and MATTR more strongly than D and
+Maas with respect to length-related method variance. These were monolingual
+adult spoken samples in four discourse tasks, so that result is useful evidence,
+not a universal ranking for learner writing or other languages.
+[Study](https://doi.org/10.1044/2015_JSLHR-L-14-0280).
+
+Our package evaluation adds direct evidence for the implemented definitions in
+English learner essays. It asks two separate questions: does a score shift as
+more of the same text is included, and does it agree across different sampled
+parts of that text? The second question matters even when the average score
+has little length dependence.
+
+## Evidence from 2,786 PELIC essays
+
+The evaluation uses the fixed [PELIC v1.0 corpus](https://doi.org/10.5281/zenodo.3991977),
+original responses to essay questions in writing classes, retaining the first
+response per writer and prompt. This gives **2,786 essays, 696 writers,
+297 prompts and 1,196,348 tokens**. Tokenization uses the package's English
+rules, NFC, lower case, surface words, and excludes numbers; spelling errors
+remain. Source file hashes and selection code are recorded in the
+[reproduction directory](https://github.com/Ryuya-dot-com/ldfreq/tree/v0.5.0.9001/experiments/corpus-stability).
+
+For the controlled-length comparison, the same **1,330 essays from 421 writers**
+with at least 400 tokens contribute at every length. Each essay supplies a
+uniformly selected pair of disjoint 200-token blocks. Nested prefixes give
+50-, 100-, 150- and 200-token samples without reordering words. MATTR/MSTTR use
+50, HD-D uses 42, and both MTLD methods use a strict threshold of .72.
+Selection and analysis were specified before examining metric outcomes.
+
+### Length sensitivity
+
+These are means across the two blocks per essay, with unavailable blocks
+excluded. MTLD-MA therefore has a changing observed subset; its missing counts
+must be read alongside its means.
+
+```{r length-summary, echo=FALSE}
+s <- read_result("block-summaries.csv")
+show <- s[s$metric %in% c("ttr", "mattr", "msttr", "hdd", "mtld", "mtld_ma"),
+  c("metric", "length", "mean", "computed", "missing")]
+knitr::kable(show, digits = 4, row.names = FALSE,
+  col.names = c("Measure", "Tokens", "Mean", "Computed blocks", "Missing blocks"))
+```
+
+The curves show the original values at each length, using a common bandwidth
+and evaluation range within each measure. MTLD-MA curves include only
+computable blocks; the missing counts above identify the changing subset.
+
+```{r length-distributions, echo=FALSE, fig.width=7, fig.height=5}
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  d <- read_result("block-densities.csv")
+  d$length <- factor(d$length, levels = c(50, 100, 150, 200))
+  d$metric <- factor(d$metric, levels = c("mattr", "hdd", "mtld", "mtld_ma"),
+    labels = c("MATTR", "HD-D", "MTLD", "MTLD-MA"))
+  ggplot2::ggplot(d, ggplot2::aes(value, density, colour = length, linetype = length)) +
+    ggplot2::geom_line(linewidth = .55) +
+    ggplot2::facet_wrap(~metric, scales = "free", ncol = 2) +
+    ggplot2::scale_colour_manual(values = c("#0072B2", "#D55E00", "#009E73", "#CC79A7")) +
+    ggplot2::labs(x = "Score", y = "Density", colour = "Tokens", linetype = "Tokens") +
+    ggplot2::theme_classic(base_size = 11) +
+    ggplot2::theme(legend.position = "bottom")
+}
+```
+
+MATTR's mean changed from .7749 to .7759. Its paired 200-minus-50 change was
+.00106, with a writer-cluster bootstrap 95% interval of −.00110 to .00326.
+MSTTR showed a similarly small average shift. This supports their use for
+length-heterogeneous local-variety comparisons at these settings.
+
+HD-D increased from .8005 to .8124 despite keeping the sample size at 42;
+its paired change was .01192 [.00997, .01396]. MTLD increased from 66.95 to
+71.46, a paired change of 4.51 [3.52, 5.52]. At 50 tokens, 80.3% of MTLD
+blocks had no complete factor in at least one direction. A numeric output
+alone therefore does not establish that the text supports the intended
+sequential interpretation.
+
+TTR fell from its 50-token level by .2118 [−.2145, −.2090]. On a common
+standardized scale, RTTR, CTTR, Herdan, Maas and Yule's I also showed substantial
+changes. The downloadable paired-change table reports every tested measure,
+including signs and intervals, rather than selecting only favorable results.
+
+### Sampling reliability
+
+Here reliability means **ICC(1,1) for one sampled block**, treating the two
+random blocks as exchangeable measurements of an essay. It estimates the
+share of score variation associated with differences between essays rather
+than the sampled position inside an essay. It is not test–retest reliability
+of a writer's ability, nor reliability of an average of two blocks.
+
+```{r reliability-summary, echo=FALSE}
+r <- read_result("sampling-reliability.csv")
+show <- r[r$metric %in% c("mattr", "msttr", "hdd", "mtld", "mtld_ma") &
+  r$length %in% c(50, 200),
+  c("metric", "length", "complete_pairs", "icc", "icc_lower", "icc_upper")]
+knitr::kable(show, digits = 3, row.names = FALSE,
+  col.names = c("Measure", "Tokens", "Complete pairs", "ICC", "95% lower", "95% upper"))
+```
+
+MATTR at 200 tokens had ICC .444 [.373, .508]; HD-D .470 [.407, .532];
+MTLD .464 [.402, .521]. At 50 tokens all three were around .14–.18.
+Thus, **small mean length effects do not justify precise ranking of individual
+essays from a short excerpt**. Use more representative text, report sampling
+uncertainty, and use multiple tasks or occasions when your claim concerns a
+writer rather than this essay. The point estimates do not establish a
+meaningful reliability advantage of HD-D or MTLD over MATTR.
+
+Intervals use 2,000 bootstrap samples of writers, keeping each writer's essays
+together. The estimand weights essays equally and is conditional on these
+prompts; it is not a probability sample of all learner writing. Topic differences
+can increase between-essay variation. Longer-essay selection, the two-block
+sampling design and fixed parameters limit generalization. These limitations
+describe what was estimated; they do not replace the numerical evidence.
+
+### MTLD-MA and short texts
+
+`mtld_ma` starts at each successive token, finds the first complete factor,
+and averages retained lengths of at least 10. It stops when a start cannot
+complete a factor, uses no reverse pass and gives no fractional tail credit.
+This corresponds to koRpus `min.tokens = 9` and `MTLDMA.steps = 1`.
+A factor closing before ten tokens is excluded, not extended to ten.
+[koRpus definition](https://cran.r-project.org/web/packages/koRpus/refman/koRpus.html#lex.div).
+
+At 50 tokens, **1,987 of 2,660 blocks (74.7%) had no retained factor**.
+Only 105 essays had two usable blocks, compared with 1,329 at 200 tokens.
+The 50-token mean and reliability describe that selected subset. For this
+reason MTLD-MA is opt-in and is not recommended as the sole outcome for short
+responses. Reducing its minimum factor length to rescue missing values would
+change the method.
+
+```{r moving-average-mtld}
+tokens <- rep(letters[1:20], 8)
+lexdiv_metrics(tokens, metrics = c("mtld", "mtld_ma"))[
+  c("metric_id", "value", "status", "diagnostics")]
+```
+
+## Does the implementation agree with external tools?
+
+Actual koRpus 0.13-9 calls were run on **202 real essays**, selected across
+recorded course levels and length quartiles, with at least 50 tokens. A supplied
+token table bypassed its raw-character retokenization, and the retained token
+vector was checked for identity. TTR, MATTR, HD-D on the expected-TTR scale,
+MTLD, and MTLD-MA agreed within 1e-10 wherever computable. MTLD-MA was missing
+in the same two essays in both implementations.
+
+```{r external-summary, echo=FALSE}
+knitr::kable(read_result("external-comparison.csv"), digits = 12, row.names = FALSE)
+```
+
+The existing nine authored boundary sequences remain useful: they expose a
+terminal two-token difference in ordinary MTLD that did not occur in this
+real-text subset. The external comparison tests computational correspondence;
+the length and sampling analyses above provide different evidence for choosing
+a measure. Neither comparison establishes proficiency validity.
+
+## Specify and report your decision
+
+1. Define the target: local word variety, frequency-distribution diversity,
+   repetition, or a specific published construct.
+2. Fix tokenization, word unit, window/sample size and method definition before
+   comparing groups. Do not silently shorten windows for short documents.
+3. Keep original lengths and missing results. Check a controlled-length
+   sensitivity analysis within your own design, preserving writers and tasks.
+4. Report the package version, method ID, parameters, included/excluded counts,
+   and the sampling or repeated-task evidence relevant to your claim.
+
+Use [study tables](repeated-observations.html) to retain writer, task and occasion
+identities and pass the resulting table to an appropriate statistical model.
+Use [comparison design](designing-comparisons.html) for window, order and
+preprocessing sensitivity. `lexdiv_methods()` lists definitions and
+`lexdiv_length_evidence()` distinguishes published length guidance from a
+formula's minimum computational domain.

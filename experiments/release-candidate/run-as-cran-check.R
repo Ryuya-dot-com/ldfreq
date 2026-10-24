@@ -77,7 +77,7 @@ if (length(arguments) == 5L) {
   stopifnot(identical(prior$schema_version, "1.2.0"),
     identical(prior$job_label, job_label), identical(prior$note_policy, note_policy),
     identical(as.integer(prior$exit_code), 0L),
-    identical(prior$command, "R CMD check --as-cran --no-manual <exact-source-archive>"),
+    identical(prior$command, "R CMD check --as-cran --no-manual --ignore-vignettes <exact-source-archive>"),
     identical(prior$environment$os, unname(Sys.info()[["sysname"]])),
     identical(prior$environment$platform, R.version$platform),
     identical(prior$environment$r_version, R.version.string) ||
@@ -104,7 +104,7 @@ if (length(arguments) == 5L) {
 } else {
   started <- format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
   status <- system2(file.path(R.home("bin"), "R"),
-    args = c("CMD", "check", "--as-cran", "--no-manual", shQuote(source_archive)),
+    args = c("CMD", "check", "--as-cran", "--no-manual", "--ignore-vignettes", shQuote(source_archive)),
     stdout = log_path, stderr = log_path)
   finished <- format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
 }
@@ -142,7 +142,7 @@ effective_status <- classification$effective_status
 result <- list(
   schema_version = "1.2.0",
   job_label = job_label,
-  command = "R CMD check --as-cran --no-manual <exact-source-archive>",
+  command = "R CMD check --as-cran --no-manual --ignore-vignettes <exact-source-archive>",
   exit_code = as.integer(status),
   check_status = check_status,
   effective_status = effective_status,

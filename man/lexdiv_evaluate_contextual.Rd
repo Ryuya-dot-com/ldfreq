@@ -66,7 +66,7 @@ Model-assisted reference judgments are not independent validation. Even a
 declared blinded held-out reference requires external checks of the annotation
 protocol, candidate inventory, sampling and split. These outputs describe
 agreement, not automatically gold-standard accuracy or learner knowledge.
-See \code{vignette("contextual-models", package = "ldfreq")}.
+See \href{https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.html}{contextual models guide}.
 }
 \value{
 A plain list with overall \code{summary}, per-target \code{terms} (including

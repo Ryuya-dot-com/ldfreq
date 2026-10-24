@@ -4,7 +4,7 @@ These repository-only tools generate and verify evidence for the immutable
 `ldfreq` source tarball used by the `Release candidate` GitHub Actions workflow.
 They are excluded from the R source package by `.Rbuildignore`.
 
-The current [state.dcf](state.dcf) identifies the 0.4.0 formal candidate.
+The current [state.dcf](state.dcf) identifies the development snapshot.
 Published development snapshots do not use this artifact workflow.
 Ordinary pull-request checks still exercise the development matrix. A formal
 candidate requires a separately selected three-component version, an exact
@@ -13,7 +13,7 @@ justify changing the classification. CRAN submission is outside the current
 project scope; the `--as-cran` command below performs checks, not submission.
 A private-repository 404 is not an allowed incoming NOTE and must not be hidden
 by weakening the strict result policy.
-The [release-scope guide](../../vignettes/release-scope.Rmd) defines the 0.4.0
+The [release-scope guide](../../vignettes/release-scope.Rmd) defines the current
 compatibility boundary. The exact PR-head artifact is checked once; merging
 the same tree does not start another artifact build. A deliberate environment
 recheck can use workflow dispatch. The build signs the source, manual and
@@ -52,8 +52,8 @@ The evidence environment explicitly includes cpp11, progress and RcppEigen:
 binary dependency installation can omit these transitive LinkingTo packages,
 but the SBOM records the complete installed hard/build dependency closure.
 
-The SPDX root uses a LicenseRef with the source LICENSE text, preserving the
-component-specific terms instead of labeling the complete collection MIT.
+The SPDX root records MIT code and the BSD-3-Clause tokenizer example.
+Optional reference datasets are distributed separately with their own terms.
 The resource BOM embeds both the installed manifest and repository admission
 inventory. The run index compares resource IDs and counts against this exact
 BOM, not a historical hard-coded count.

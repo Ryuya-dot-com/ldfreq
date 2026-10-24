@@ -1,4 +1,5 @@
 test_that("the installed offline smoke script exercises exported workflows", {
+  skip_optional_resources(c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"))
   smoke_path <- system.file(
     "examples",
     "offline-smoke.R",

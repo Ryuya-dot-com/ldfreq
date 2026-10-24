@@ -8,6 +8,7 @@ morphology_link_recipe <- function() {
 }
 
 test_that("morphology joins retain token identity and distinguish decisions from lookup", {
+  skip_optional_resources(c("bnccoca", "morpholex", "morphynet"))
   e <- morphology_link_recipe(); a <- e$morphology_link_example$initial; b <- e$morphology_link_example$reviewed
   expect_equal(nrow(a$occurrences), 5)
   expect_identical(a$occurrences$occurrence_id, b$occurrences$occurrence_id)
@@ -38,6 +39,7 @@ test_that("morphology joins retain token identity and distinguish decisions from
 })
 
 test_that("invalid joins, exclusions and stale decisions fail rather than change denominators", {
+  skip_optional_resources(c("bnccoca", "morpholex", "morphynet"))
   e <- morphology_link_recipe(); b <- e$morphology_link_example$reviewed; input <- b$inputs
   changed <- input; changed$family$occurrences$family_id[1] <- "other"
   expect_error(do.call(e$link_morphology_candidates, changed), "unmodified")
@@ -62,6 +64,7 @@ test_that("invalid joins, exclusions and stale decisions fail rather than change
 })
 
 test_that("alternative segmentations are candidates, not additional observed parts", {
+  skip_optional_resources(c("bnccoca", "morpholex", "morphynet"))
   e <- morphology_link_recipe(); input <- e$morphology_link_example$initial$inputs
   ml <- input$morpholex
   row <- which(ml$analyses$form == "teacher")

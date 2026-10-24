@@ -15,6 +15,19 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(ldfreq)
 ```
 
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache instructions](reference-data.html), then obtain
+only the resources needed for the sections you will run. Core calculations
+and examples using your own tables do not require these downloads.
+
+```{r reference-setup, eval=FALSE}
+lexdiv_resource_info(c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"), accept_license = TRUE)
+```
+
 ## What `ldfreq` adds to the R ecosystem
 
 R already has mature lexical-diversity implementations. In particular,
@@ -273,7 +286,7 @@ families$candidates[families$candidates$document_id == "unresolved", ]
 families$members
 ```
 
-#### Use Nation's bundled BNC/COCA inventory
+#### Use Nation's cached BNC/COCA inventory
 
 `bnccoca_data()` returns Nation's **Level 6, Version 1.0.0** family lists
 under **CC BY-SA 4.0**, including attribution and ShareAlike conditions.
@@ -321,7 +334,7 @@ compounds and acronyms separate, with `NA` frequency bands. Membership in a
 proper-name list does not label the use of that string in context. Placeholder
 slots 26–30 and Range software are excluded. Any explicit combination with
 the core dictionary needs its own declared scope and candidate checks.
-See `?bnccoca_data` and the installed `licenses/bnccoca/NOTICE.md`.
+See `?bnccoca_data` and the cached `licenses/bnccoca/NOTICE.md`.
 
 #### Compare counting units without hiding unlisted words
 
@@ -620,7 +633,7 @@ relations. Its English derivational table records `transmit` → `retransmit`
 with prefix `re`, and `transmit` → `transmitter` with suffix `er`. A relation
 is not a complete word segmentation; graph connectivity does not establish a
 Nation family. MorphyNet's 15 languages do not include Japanese. It uses
-CC BY-SA 3.0. A nine-row teaching excerpt is bundled; the full file is read
+CC BY-SA 3.0. A nine-row teaching excerpt is available by explicit download; the full file is read
 from a separately obtained local copy as shown below.
 
 For Japanese, [J-UniMorph](https://github.com/cl-tohoku/J-UniMorph) is a
@@ -723,7 +736,7 @@ trees and validated morphological-productivity estimates are separate tasks.
 For adaptation or redistribution, retain source attribution and applicable
 ShareAlike terms; see `licenses/morphynet/NOTICE.md`.
 
-#### Use the bundled MorphoLex reference
+#### Use the cached MorphoLex reference
 
 MorphoLex-en supplies canonical segmentation and root/affix variables
 (Sánchez-Gutiérrez et al., 2018, <https://doi.org/10.3758/s13428-017-0981-8>).
@@ -732,7 +745,7 @@ prefix/suffix/root tables), plus the original data dictionary, from
 <https://github.com/hugomailhot/MorphoLex-en>. **These data use CC BY-NC-SA 4.0,
 not the MIT license of the R code.** Noncommercial sharing and adaptation
 require attribution and the applicable ShareAlike conditions; commercial use
-is not granted by that license. See the installed `licenses/morpholex/NOTICE.md`.
+is not granted by that license. See the cached `licenses/morpholex/NOTICE.md`.
 
 ```{r}
 morpholex <- morpholex_data(c("0-1-1", "All roots"))
@@ -749,7 +762,7 @@ returns all sheets; `$provenance$sheet_catalog` lists their names and dimensions
 Two source `Word` cells (ELP IDs 42162 and 65908) are logical values and appear
 as `TRUE` and `FALSE`; an exact lowercase query will not match them. The source
 values are preserved, so any case normalization should be an explicit decision.
-No `readxl`, Python, model, or internet connection is needed for bundled data.
+After the explicit download, reading the cached data needs no `readxl`, Python, model or internet connection.
 The word-parts recipe can use the same snapshot:
 
 ```{r}
@@ -807,7 +820,7 @@ and incoming formation relations alongside the **same source occurrence**.
 The explicitly sourced recipe below reuses `lexdiv_family_profile()`, the
 word-parts recipe and `lexdiv_ambiguity_review()`. It requires optional quanteda
 in a UTF-8 R session. Text and decisions are authored; references are the
-bundled Nation/MorphoLex snapshots and the nine-row MorphyNet teaching excerpt.
+cached Nation/MorphoLex snapshots and the nine-row MorphyNet teaching excerpt.
 
 ```{r morphology-link-example, eval=requireNamespace("quanteda", quietly=TRUE) && isTRUE(l10n_info()[["UTF-8"]])}
 source(system.file("examples", "morphology-link.R", package = "ldfreq"))
@@ -1001,7 +1014,7 @@ what is their average frequency or prevalence?" Coverage answers the separate
 question: "How much of this text did the resource measure?" Neither should be
 reported without the other.
 
-The Unicode tokenizer preserves contractions; the bundled TUBELEX resource
+The Unicode tokenizer preserves contractions; the cached TUBELEX resource
 uses Treebank segmentation. A `lexdiv_tokenization` object therefore requires
 an explicit `tokenization_mismatch = "allow"` override and is marked as using
 a different tokenizer. Plain term vectors carry unverified alignment rather
@@ -1037,11 +1050,11 @@ BNC and COCA evidence plus Japanese educational materials. The workbook labels
 the entries as representative lemmas. This is a ranked pedagogical list, not
 the same estimand as a TUBELEX mean frequency.
 
-`nj8_profile()` uses the bundled `jacet2016-8000-v1` table by default.
+`nj8_profile()` uses the cached `jacet2016-8000-v1` table by default.
 JACET has permitted redistribution with source attribution. Cite:
 JACET Basic Word Revision Committee (Ed.). (2016).
 *The New JACET List of 8000 Basic Words*. Tokyo: Kirihara Shoten.
-The installed `licenses/nj8/NOTICE.md` contains the full attribution and the
+The cached `licenses/nj8/NOTICE.md` contains the full attribution and the
 three verified corrections to the supplied snapshot. All 8,000 pairs match
 the official workbook. The permission does not relicense the table as MIT.
 

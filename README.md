@@ -1,737 +1,101 @@
 # ldfreq
 
-**Compare lexical diversity and vocabulary profiles while keeping the analysis
-conditions attached to the results.** `ldfreq` is an R package for researchers
-working with first- and additional-language writing, transcribed speech,
-teaching materials, and other texts. It combines
-lexical-diversity measures, New JACET 8000 level coverage, and TUBELEX reference
-frequency with explicit preprocessing, parameter settings, and match coverage.
-The bundled resources and built-in linguistic rules target English; prepared
-tokens can represent other languages, with an experimental Japanese workflow.
+**Lexical diversity, vocabulary profiles and corpus comparisons in R.**
+Keep the original text, token choices, reference coverage and measurement settings
+connected to the results you report.
 
-A difference between two scores can reflect different word units, window sizes,
-or reference-list matches. `ldfreq` helps you inspect those choices and report
-what was actually measured. It records non-computable requests and their reasons,
-and checks that reshaped tables and plots do not mix incompatible specifications.
+[Guides](https://ryuya-dot-com.github.io/ldfreq/articles/index.html) ·
+[Function reference](https://ryuya-dot-com.github.io/ldfreq/reference/index.html) ·
+[Metric selection](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html) ·
+[Issues](https://github.com/Ryuya-dot-com/ldfreq/issues)
 
-## Installation
+## Install
 
-The stable GitHub release is 0.4.0; it has not been released on CRAN.
-It includes the documented research workflows and source-linked examples,
-including CA and classical MDS. The [release scope and migration](#release-scope-and-compatibility)
-distinguishes stable contracts, experimental interfaces and external-tool limits.
-The fixed tag below identifies the tested code and installed examples.
-It requires R 4.1.0 or later. Install the fixed release used by this
-documentation:
+The current development release is **0.5.0.9001**. This single version contains
+all features described in the current guides. Requires R 4.1 or later.
 
 ```r
-# Run install.packages("pak") first if pak is not installed.
-pak::pak("Ryuya-dot-com/ldfreq@v0.4.0")
-```
-
-Pinning the revision fixes the implementation, even when development snapshots
-share the same version number. The package's required dependencies are `digest`
-and `stringi`; additional tools are optional for their documented
-workflows. For example, candidate-review examples use `quanteda`, and correspondence
-analysis examples use the optional `ca` package.
-
-For the built source archive with rendered guides, download
-`ldfreq_0.4.0.tar.gz` from **v0.4.0** in the
-[release list](https://github.com/Ryuya-dot-com/ldfreq/releases).
-The release also provides `SHA256SUMS` for checking the download. Install from
-the directory where you saved the archive, or use its full path:
-
-```r
-# Install digest and stringi first if they are not already available.
-install.packages("ldfreq_0.4.0.tar.gz", repos = NULL, type = "source")
-```
-
-If an older ldfreq version is loaded, restart R after installation. Check
-`packageVersion("ldfreq")` before running these examples; it should report
-`0.4.0` for this release.
-
-The built archive includes rendered guides. A GitHub source installation may
-omit them; the online guides remain available. Run `vignette(package = "ldfreq")`
-to list installed guides, or `vignette("getting-started", package = "ldfreq")`
-to open the introduction. `?ldfreq` also explains how to find explicitly sourced
-example helpers, which have no individual `?function` entry.
-
-Development **0.4.0.9006** makes study tables, concordance/dispersion,
-collocations and keyness available as public functions, without helper sourcing.
-Install `Ryuya-dot-com/ldfreq@v0.4.0.9006` with `pak`, or the corresponding
-`ldfreq_0.4.0.9006.tar.gz` from the release list, to follow the updated guides.
-Use `?lexdiv_study_table`, `?lexdiv_concordance`, `?lexdiv_collocations` and
-`?lexdiv_keyness` for arguments and complete return descriptions. The original
-sourced helper names and saved records remain supported. Stable 0.4.0 stays
-available as its own fixed release.
-
-The occurrence-level MCA example requires the separate development snapshot
-**0.4.0.9001 or later**. Install `Ryuya-dot-com/ldfreq@v0.4.0.9002` with `pak`, or its
-named source archive from the release list. Stable 0.4.0 does not contain it.
-The [MCA guide](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca)
-keeps category definitions, incomplete rows, original occurrences and unadjusted
-inertia diagnostics together. Its helpers are explicitly sourced examples.
-Version 0.4.0.9002 adds ID-matched display labels for long occurrence IDs.
-
-The [textbook progression guide](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.html)
-requires development **0.4.0.9003 or later**. Install
-`Ryuya-dot-com/ldfreq@v0.4.0.9003` with `pak`, or `ldfreq_0.4.0.9003.tar.gz`
-from the release list. It traces target words through pages and Units using
-saved source occurrences, an ordered section roster and declared teaching
-introductions. Missing material and the available follow-up remain explicit;
-the example does not infer learning outcomes from repetition counts.
-
-The [DDL preparation guide](https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.html)
-requires development **0.4.0.9004 or later**. Install
-`Ryuya-dot-com/ldfreq@v0.4.0.9004` with `pak`, or its named source archive from
-the release list. Select reviewed phrase examples and supply activity prompts
-to create a printable learner handout, separate teacher table and reusable
-private record. Learners do not need R. The helpers are explicitly sourced examples.
-
-The [mixed-model reporting recipe](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html#report-specified-means-and-one-planned-comparison)
-was introduced in development 0.4.0.9005. Its updated guide uses the public
-study-table calls in **0.4.0.9006**; install `Ryuya-dot-com/ldfreq@v0.4.0.9006`
-with `pak`, or its named source archive.
-Optional `lme4`, `emmeans` and `pbkrtest` connect the saved study table to
-specified means, one planned contrast and Kenward--Roger confidence intervals.
-Diagnostics, exclusions and prediction support remain visible; the authored
-example does not establish a generally appropriate model for MATTR.
-
-## Release scope and compatibility
-
-Version 0.4.0 keeps the calculations, public functions, result schemas and
-resource bytes of development version 0.3.0.9019. Experimental interfaces
-retain their labels; explicitly sourced helpers remain versioned examples.
-The release includes CA and classical MDS. MCA, nonmetric MDS and Japanese
-readability remain outside its scope.
-
-From the earlier 0.1.0/0.2.0 versions, review the no-minimum MTLD definition,
-eleven default metrics and old-plan migration in `?lexdiv_metrics`. Preserve
-old saved values, method IDs and calculation-session information. Resource
-coverage, reproducible computation and parser agreement do not establish
-proficiency or general measurement validity.
-
-Open `vignette("release-scope", package = "ldfreq")` for the stable/experimental
-boundary, language and dependency requirements, external-model limits, and
-migration instructions. The online article is listed under **Start here**.
-
-## A first analysis
-
-Run this English example after installation:
-
-```r
+install.packages(c("digest", "stringi"))
+install.packages(
+  "https://github.com/Ryuya-dot-com/ldfreq/releases/download/v0.5.0.9001/ldfreq_0.5.0.9001.tar.gz",
+  repos = NULL, type = "source"
+)
 library(ldfreq)
-
-text <- "Cats chase cats and dogs."
-analysis <- lexdiv_metrics_text(
-  text, tokenizer = "english", case = "lower", metrics = "ttr"
-)
-analysis$results
-analysis$token_audit
-saveRDS(list(text = text, analysis = analysis), "analysis.rds")
 ```
 
-The five word occurrences (`N = 5`) contain four distinct lowercase forms
-(`V = 4`), so the type-token ratio (TTR) is `4/5 = 0.8`. `status = "ok"`
-means the calculation succeeded. TTR depends on text length; this small example
-does not measure writing ability. Other metrics can return `NA` for short
-texts: read `missing_reason` beside the value. The saved record keeps the input
-text and complete analysis together; choose your own filename when saving research data.
+Optional integrations state their additional packages in the relevant guide.
+Earlier releases remain available in the [release archive](https://github.com/Ryuya-dot-com/ldfreq/releases).
 
-**[Continue with Getting started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html)**
-for several documents, expected results, unavailable scores, a table and plot,
-and saving and reopening an analysis. In R, `?ldfreq` opens the input map;
-`?lexdiv_metrics_text` explains this function and its optional preprocessing.
-
-## Choose your input
-
-| What you have | Where to start |
-| --- | --- |
-| One English text or a table with document IDs and text | [Getting started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html); use `lexdiv_metrics_text()` or `lexdiv_metrics_text_batch()` |
-| TXT files, a folder, or a CSV containing texts | [Read your own files](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files), including installed sample files and where to substitute your paths |
-| Ordered tokens, with one character value per occurrence | `lexdiv_metrics()` for one document; [tokenized documents and tables](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html#multiple-documents) for several |
-| Japanese text and supplied morphological annotations | [Choose an analysis route](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#choose-a-japanese-analysis-route); compare R/Python agreement, lexical forms and selection coverage |
-| Complete annotations for family or affix counts | [Word families, roots and affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html); choose the counting question, reference and analysis scope |
-
-Once you have results, use [From text to a report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html)
-to compare counting conditions, join study metadata, inspect vocabulary coverage
-and prepare methods text and figures. These guides use the tested installation
-above; optional annotation and reference-resource workflows name their additional requirements.
-
-## Choose a research question
-
-Start with the row that matches your question. The linked guides show the
-required input and the code to inspect each result. Keep the complete result
-and original input when saving; a display table alone cannot recover them.
-
-| Your question | Input and route | Read first |
-| --- | --- | --- |
-| Does a counting choice change the lexical description of the same texts? | Texts with document IDs; [compare conditions](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#compare-english-case-from-files) | Paired document/metric rows, `N`, `V`, availability and values; [return to the original text and counted forms](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#explain-a-counting-choice). |
-| How frequent are the words, or how much matches a vocabulary list? | Prepared terms; [TUBELEX frequency and NJ8 levels](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html#corpus-relative-frequency-with-coverage). For your own norm table, use [corpus reference profiles](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html). | Resource identity, lookup rows and token/type coverage beside summaries; [inspect unmatched words and lexical units](https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.html). |
-| What changes when I count families, roots or affixes? | Complete annotations and a declared inventory; [word families and affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html) | Occurrences shared between conditions, unresolved words and coverage; keep whole-document counts separate from resolved-subset counts. |
-| Which words, contexts or positions characterize the documents? | Complete source-aligned annotations; [concordance and dispersion](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html), [collocation](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html), or [keyness](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html) | Original occurrences and zero-match documents; pair opportunities for association, or declared target/reference totals for keyness. |
-| Where do target words occur and recur in a textbook? | One saved search, an ordered page/Unit/section roster and declared introductions; [textbook progression](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.html) (development 0.4.0.9003 or later). | Counts, cumulative counts and later-Unit coverage with absent targets, missing material, selected scope and original contexts. |
-| How can teachers prepare materials from reviewed examples? | Accepted phrase occurrences, teacher-written prompts and source notices; [DDL preparation](https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.html) (development 0.4.0.9004 or later). | Printable learner HTML, separate teacher CSV and complete private RDS; pending candidates and original contexts remain traceable. |
-| Which writer/task/occasion observations entered my analysis? | Planned observations, submitted-document mapping and metric results; [repeated observations](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html) | Submission, calculation and reporting states; the row-selection audit and one specified response in the model table. |
-| Which documents have similar lexical composition? | Source-aligned annotations and explicit document IDs; [CA and classical MDS](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html) (0.3.0.9018 or later). | Complete profiles and selected features, CA contributions/cos², or the chosen distance, negative eigenvalues and reconstruction; return to original occurrences. |
-| Which categorical properties co-occur in individual uses? | Source-linked, explicitly coded occurrences; [MCA](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca) (development 0.4.0.9001 or later). | Complete-row exclusions, category counts, equal occurrence weights, unadjusted inertia, contributions/cos² and tied axes; retain coding decisions and source text. |
-| How do lexical results relate to sentence or structural descriptions? | The same source texts and document IDs, with sentence/syllable counts or traced parser output; [English readability](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html) and [syntactic complexity](https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.html) | Each measure's numerator, denominator, unavailable values and review decisions before joining document rows. |
-
-A document ID connects records; it does not make their counting units identical.
-A reference-vocabulary profile describes the words in each document, whereas
-keyness compares declared corpora. Do not copy a corpus-level statistic into
-writer rows as independent observations. Choose one response and specification
-for a model, and retain the complete record so every included or excluded row
-can be explained.
-
-## Why use ldfreq?
-
-- **Keep comparisons explicit.** Retain the formula, requested and effective
-  parameters, token/type counts, and preprocessing decisions with each result.
-  Short documents do not silently reduce a requested window for other documents.
-- **Connect diversity with reference vocabulary.** Describe New JACET 8000
-  levels and TUBELEX frequency/prevalence alongside token/type coverage. Unmatched
-  terms remain visible; missing frequency values are not replaced by zero.
-- **Examine sensitivity.** Compare lexical units, parameter settings, and selected
-  Maas/MTLD definitions; inspect local MATTR windows and positional exposure.
-- **Connect word families, roots and affixes to the original text.** Compare
-  counting units on shared occurrences, distinguish derivation from inflection,
-  and retain reference entries, coverage and review decisions. The executable
-  [word families and affixes tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html)
-  connects Nation, MorphoLex and MorphyNet with CSV decisions and saved results.
-- **Trace annotation errors to the analysis.** Evaluate supplied labels against
-  an explicit reference on the same tokenization. Keep missing labels and
-  class-specific precision/recall beside source-text context, then examine how
-  different word selections change document scores. See the
-  [annotation evaluation guide](https://ryuya-dot-com.github.io/ldfreq/articles/annotation-evaluation.html).
-- **Describe word combinations with your own reference.** Extract adjacent
-  bigrams/trigrams from prepared segments and original positions, then look up
-  local reference counts with explicit opportunity totals. Sample zeros and
-  unlisted keys in pruned tables remain distinct. No corpus needs to be bundled.
-  See the [n-gram guide](https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html)
-  for CSV/RDS inputs, boundary requirements and phrase-level research examples.
-- **Search and locate words or phrases.** Use fixed, wildcard or regular-expression
-  token searches, sort by nearby context words, and draw original-position plots.
-  The [concordance guide](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html)
-  connects explicitly sourced helpers to saved occurrences, zero-match documents
-  and single-token within-document DP with its counts and denominators.
-- **Inspect nearby words and association.** Count adjacent or left/right-span
-  token pairs with MI, t-score, positional marginals and original KWIC links.
-  The [collocation guide](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html)
-  retains excluded positions, zero counts and the complete opportunity population.
-- **Compare word use across corpora.** Declare disjoint target and reference
-  document sets, then inspect counts, rates, signed G², log-ratios and document
-  frequencies. The [keyness guide](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html)
-  retains selection and missingness audits, full denominators and exact-term KWIC.
-- **Inspect English readability counts.** Calculate Flesch Reading Ease and
-  Flesch–Kincaid Grade Level with supplied sentence boundaries, source spans and
-  explicit syllable estimates or hand counts. The
-  [readability guide](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.html)
-  preserves unresolved pronunciations, empty submissions and writer/task/occasion metadata.
-- **Trace syntactic complexity.** Import pinned original L2SCA output with
-  source text, parse trees and matched nodes. The
-  [syntax guide](https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.html)
-  keeps MLC, MLT and DC/C beside their counts, failures and review decisions,
-  then connects them to writer/task/occasion tables.
-- **Trace the effect of reference choice.** Compare the same target phrases
-  across references, keeping coverage and sample sizes beside common-item
-  differences. A higher mean caused by missing phrases should not be mistaken
-  for greater familiarity.
-
-These are features for describing and comparing texts. A score alone does not
-establish proficiency, writing quality, measurement validity, or reliability.
-
-The [study-table walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#study-metadata)
-connects document results to writer/task metadata, retains unavailable and
-withheld values, and reports document-weighted descriptive statistics with
-their contributing document/writer counts. It uses the existing installation
-and saves both flat CSV tables and the complete analysis record.
-
-For repeated observations, the
-[mixed-model walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html)
-keeps scheduled writer/task/occasion rows, submitted documents and measurement
-results separate. In development 0.4.0.9006, `lexdiv_study_table()` retains absent
-submissions and `lexdiv_study_model_data()` selects one measurement specification
-with exclusion reasons for an ordinary
-`lme4::lmer()` data frame. The optional model illustrates the connection using
-synthetic word sequences; it does not validate a developmental model.
-Development 0.4.0.9005 extends this example with task-specific and equally
-task-weighted means, one planned time contrast, confidence intervals and
-original-scale plots, with full-record saving and table replay.
-An [executed PELIC example](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#pelic-study-report)
-connects saved results for 16 real learner essays to original writer/task
-metadata, diagnostic summaries, methods text and fresh-session report replay.
-Corpus texts are not bundled or downloaded during installation.
-
-The Japanese workflow also connects [source-linked frequency profiles](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#connect-document-selections-to-reference-frequency)
-to full-token coverage, common-span comparisons and saved-input replay.
-
-The text workflow supports surface forms, lemmas and AntBNC flemmas.
-For resource-defined word families, experimental `lexdiv_family_profile()`
-matches complete imported annotations to a caller-supplied form–family table.
-It retains token occurrences, member counts, unresolved candidates and KWIC;
-`use` and `reusability` remain two tokens even if a declared table places them
-in one family. See the [word-family example](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#resource-defined-word-families).
-An optional `review` connects the existing ambiguity-review workflow to
-occurrence-specific family choices, retaining reviewers, reasons and original
-lookup results. Changed source, inventory or counting policies require a new
-review snapshot; one decision never changes every occurrence of a spelling.
-Flemmas and derivational families are distinct. `bnccoca_data()` supplies
-Nation's BNC/COCA Level 6 lists: 25,000 families and 75,679 headword/member
-records, with 29,798 supplementary records kept separate. The data use
-**CC BY-SA 4.0**, with attribution and ShareAlike conditions; see the
-[source and conversion notice](https://github.com/Ryuya-dot-com/ldfreq/blob/main/inst/licenses/bnccoca/NOTICE.md).
-Family membership does not establish a learner's knowledge of every member.
-The bundled version groups `use`/`uses` and `colour`/`color`; `reusability`
-is unlisted and remains unresolved. Frequency bands are distinct from the
-Bauer–Nation Level 6 inclusion criterion.
-
-`morphynet_read_derivations()` reads a separately obtained MorphyNet TSV in R,
-retaining formation relations, original POS symbols, source hashes and
-alternatives. An [installed example](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#inspect-morphynet-formation-relations)
-connects a nine-row, CC BY-SA 3.0 excerpt to existing KWIC review. Multiple
-incoming relations are not summed as affixes or converted to Nation families.
-The full database is not bundled; optional KWIC review uses quanteda.
-An explicitly sourced [roots-and-affixes recipe](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#source-linked-roots-and-affixes)
-links supplied parts to original occurrences, retaining analysis scope, alternatives,
-partial analyses and coverage. `morpholex_data()` reads the bundled MorphoLex-en
-tables with their provenance and CC BY-NC-SA 4.0 terms. The word-parts recipe
-can use these tables offline or an optional local workbook;
-these recipes are not exported APIs or automatic morphology analyzers.
-
-## Corpus scope
-
-The same analysis functions accept native-speaker and learner texts. Research
-can examine variation within native-speaker corpora, compare matched L1/L2
-samples, or evaluate reference-frequency choices across registers. Learner
-assessment is one application; no participant knowledge scores are required
-for descriptive corpus analysis.
-
-Keep author/speaker, task, register, corpus version and documented language
-background in a metadata table linked by document ID. Match relevant sampling
-conditions before interpreting L1/L2 differences. Native-speaker status is not
-a universal quality target, and a general English corpus need not contain only
-verified L1 speakers. See [corpus roles and comparison design](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html)
-for reference-corpus candidates and limits.
-
-The token-based calculations accept caller-prepared strings without inferring a
-language. Segmentation and lexical units still need validation for the target
-language and register. The raw-text English rules and bundled English reference
-resources have narrower scope. Automatic POS tagging, sense disambiguation,
-corpus-XML import and proficiency scoring are not part of the default pipeline.
-
-To inspect lexical ambiguity in context, `lexdiv_ambiguity_review()` connects
-complete imported annotations to optional quanteda KWIC displays. It keeps
-original segment text, source positions, caller-supplied candidates and explicit
-reviewer decisions together, including unresolved occurrences. See the
-[English/Japanese review guide](https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.html).
-It does not infer senses or split aggregate reference frequencies by meaning.
-`lexdiv_compare_ambiguity()` pairs two reviews, reports descriptive agreement
-alongside joint-selection coverage, and returns open cases with both contexts
-and reasons. The guide also connects a separately obtained WLSP inventory to
-the same review interface.
-The [Japanese polysemy guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-polysemy.html)
-connects separately obtained WLSP-norms estimates to reviewed stimulus items
-and KWIC occurrences, preserving source IDs, signed values and selection coverage.
-
-`lexdiv_import_contextual()` attaches externally computed target embeddings or
-candidate scores after checking original text, positions and review identity.
-Model suggestions stay separate from human choices; failed or absent outputs
-remain in the denominator. The [contextual model guide](https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.html)
-includes an offline example and an optional, explicit Python call using a cached
-Hugging Face model. No model or Python installation is required for the R importer.
-The same guide also provides an [offline categorical-proposal worksheet](https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.html#review-categorical-proposals-without-inventing-scores)
-and an optional OpenAI recipe. Paid requests require your own API key and an
-explicit opt-in; saved responses are reused. Candidate choices, abstentions and
-human judgments remain separate, and ordinary analysis makes no model calls.
-`lexdiv_evaluate_contextual()` compares scored candidates to an explicitly
-declared reference review. It abstains on incomplete inventories and ties,
-keeps all-occurrence coverage beside conditional agreement, and returns a KWIC
-queue of disagreements and unavailable comparisons. A human reference is not
-automatically a validated gold standard; model exposure and evaluation role
-remain part of the research design.
-`lexdiv_score_contextual()` supplies two explicit baselines from separately
-labeled training examples: cosine to a candidate's mean target vector and its
-training-label count. It checks document/context separation, candidate inventories
-and embedding compatibility, and retains missing prototypes and excluded examples.
-Both score outputs connect to evaluation and KWIC; no model weights or new R
-dependency are needed. These baselines do not establish semantic validity.
-The guide includes a copyable three-script study folder for preparation,
-development/frozen evaluation and replay in a new R session. It checks declared
-document/group splits, keeps individual judgments alongside the reference, and
-compares methods on all available cases and their common evaluable occurrences.
-Its authored English/Japanese values demonstrate the workflow, not model accuracy.
-
-For Japanese, use an existing morphological analyzer and import its complete
-annotations with `lexdiv_import_annotations()`. It verifies surfaces against
-original text, derives source positions, retains lexical-form/POS columns and
-dictionary metadata, and connects to the existing metrics and n-gram functions.
-The [Japanese guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html)
-provides an R-only gibasa/UniDic recipe, explicit missing-feature handling, and
-gap-preserving exclusions. Start with the executable
-[Japanese file-to-review walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#japanese-file-workflow):
-read authored files, retain title/body boundaries, review contextual identities,
-and save whole-body measures separately from target counts. This first example
-uses prepared annotations and needs no analyzer or dictionary.
-Continue with [document descriptions](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#describe-script-word-origin-and-pos-by-document)
-to separate script/codepoint counts from dictionary word origins and declared
-POS groups, retaining exclusions, missing labels, denominators and saved inputs.
-A Japanese dictionary is optional and separately
-obtained; the package does not bundle one or establish cross-language score
-equivalence. The Unicode tokenizer alone is not a Japanese word segmenter.
-The [word-unit comparison](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html#compare-japanese-word-units)
-shows how segmentation and punctuation selection affect counts, paired score
-comparisons and short-text eligibility, using separately obtained annotations.
-
-For experimental stimuli, the [Japanese norms guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.html)
-shows how to attach separately obtained AoA or BOI ratings while retaining item
-IDs, experimental conditions, rating counts, missing matches and resource terms.
-It includes an offline illustration and a local-file R example; external norm
-data are not bundled. A WLSP-familiarity example lists spelling candidates and
-retains explicit record choices and reasons, including unresolved items.
-The [stimulus-selection guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-stimuli.html)
-adds a pinned Japanese TUBELEX base-form lookup and joins all four resources by
-study item ID. It retains source denominators and mapping decisions, inspects
-per-condition missingness and distributions, and saves a complete RDS record.
-Adult native-speaker norms do not measure individual L2
-knowledge or acquisition history.
-
-## Relationship to existing tools
-
-| Existing tool | Its focus | Where ldfreq fits |
-|---|---|---|
-| [quanteda.textstats](https://search.r-project.org/CRAN/refmans/quanteda.textstats/html/textstat_lexdiv.html) | Text statistics and lexical diversity for quanteda tokens and document-feature matrices | Use prepared tokens with explicit method/parameter records, non-computability reasons, and reference-resource profiles |
-| [koRpus](https://reaktanz.de/?c=hacking&s=koRpus) | Text analysis including lemma workflows, MTLD, HD-D, MTLD-MA, and detailed diagnostics | Compare the exact definitions and add a common workflow for condition tracking and reference coverage |
-| [tidytext](https://juliasilge.github.io/tidytext/) | Text processing with tidy tables | Pass one-token-per-row tables through `lexdiv_as_documents()` |
-| [gibasa](https://paithiov909.github.io/gibasa/) | MeCab morphological analysis from R using separately supplied dictionaries | Import complete Japanese annotations with original-text alignment and retain lexical-form choices and dictionary metadata alongside analysis results |
-| [text](https://cran.r-project.org/package=text) | Transformer embeddings and language analysis from R using Python | Attach source-aligned external outputs to KWIC reviews, human decisions and explicit missing-output coverage; model inference is not reimplemented |
-| [zipfR](https://r-forge.r-project.org/projects/zipfr/) | Statistical models for word-frequency distributions and vocabulary growth | Use ldfreq for document-level descriptive measures and reference-list profiles |
-| [KH Coder](https://khcoder.net/diagram.html) | An application for quantitative content analysis: exploratory word analysis, explicit concept-coding rules, KWIC, correspondence analysis and co-occurrence networks | Complement content analysis with lexical-measure definitions, NJ8/TUBELEX/norm profiles and preprocessing sensitivity; direct KH Coder interoperability is not implemented or validated |
-
-Existing R packages already implement many of these metrics and document their
-parameters. The contribution here is their integration with explicit comparison
-conditions and resource coverage, not a claim to have invented the measures.
-Same-named metrics can differ in formula, log base, aggregation, or short-text
-handling. See [definition and preprocessing comparisons](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html).
-No speed or empirical-validity advantage over these packages is claimed.
-
-From package 0.3.0 (core contract 0.2.0), `mtld` has no minimum factor
-length, uses strict `<`, and checks every token including the last. The
-previous min10 calculation remains explicitly available through
-`lexdiv_variant_metrics()`; it is not silently relabelled. The
-[executed external comparisons](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/external-metrics)
-record identical inputs, tool versions, outputs and reasons for differences.
-The [raw-text comparison](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/raw-text-comparison)
-additionally records eight preprocessing configurations, actual scoring tokens
-and native/common-formula scores. It distinguishes TAALED's space-split fallback
-from pinned Pylats surface, lemma/POS and explicit content-word configurations.
-`expected_ttr_d` is experimental: accurate computation of this estimator does
-not establish equivalence to CLAN vocd-D. `lexdiv_methods()` reports each
-method's classification. Default computations and presets exclude it; request
-`metrics = "expected_ttr_d"` to compute it explicitly. See
-`?lexdiv_metrics` for the migration example and keep the full saved results.
-The [worked migration comparison](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html#check-the-effect-on-your-documents)
-shows how to check paired scores, missing cases and rank correlation on your
-own texts. All 30 authored tutorial essays retain their values; this does not
-estimate effects in a learner population.
-
-`below_quality_floor` is an advisory screen, not a quality score. TTR's value
-of 1 merely checks for non-empty input. MATTR's fixed 50-token floor does not
-validate every possible window size: consult `lexdiv_length_evidence()` and
-report the chosen window and available text length separately.
-
-For MTLD, also inspect factor support. From development version 0.3.0.9002,
-the compact display flags `mtld_tail_only` when either direction has no
-complete factors and shows `mtld_gap_pct`, the absolute directional difference
-as a percentage of their mean. `status = "ok"` means computable. Passing
-the advisory 50-token floor does not establish precision, and a zero
-directional gap can occur when **both** directions depend entirely on their
-fractional tails. The gap describes order sensitivity, not a confidence
-interval. The [factor-support example](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html#inspect-mtld-factor-support)
-extracts the underlying counts and scores into an ordinary table, including
-when using an earlier package version. The 50-token MTLD screen is inherited
-guidance, not a validated reliability cutoff for the present definition.
-For your own sample, the same guide supplies a token-count correlation recipe
-and an [executed PELIC learner-text example](https://github.com/Ryuya-dot-com/ldfreq/tree/main/experiments/learner-length).
-These are descriptive checks, not evidence of length invariance or a validated
-novice-user workflow.
-
-From 0.3.0.9004, use `lexdiv_widen(result, mtld_diagnostics = TRUE)` to
-extract directional scores, complete-factor counts, tail credits,
-`mtld__tail_only` and `mtld__gap_pct` as ordinary columns. The
-[wide-table walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#wide-mtld-diagnostics)
-shows how to select a compact analysis table while retaining the full record.
-
-KH Coder already uses R and documents
-[exporting plotting commands as R Source](https://khcoder.net/scr_r.html).
-R integration, Japanese support and returning to source context therefore do
-not by themselves distinguish ldfreq. A complementary study could link content
-codes and lexical measures through explicit document IDs, without treating a
-topic/code as a lexical type or corpus co-occurrence as a direct measure of
-mental lexical organization. Its documented
-[document-by-word exports](https://khcoder.net/FAQ.html) are an exchange route
-to assess, not a tested ldfreq connector. An unordered count matrix cannot
-recover original-token MATTR, MTLD, adjacent n-grams or occurrence-level KWIC.
-Record tokenization, selected POS, text versions, aggregation units and export
-filters; complete token/source exports require separate validation. Current
-compatibility with KH Coder 5 has not been tested.
-
-KH Coder is an optional companion, not a prerequisite for ldfreq. Its current
-[official distributions](https://khcoder.net/dl3.html) include paid editions
-and a restricted free Windows edition; the
-[Mac distribution](https://khcoder.net/mac_com.html) is paid and requires
-Apple Silicon. These distribution conditions are distinct from the older
-public source release. The ldfreq workflow does not require a KH Coder purchase.
-
-N-gram extraction is also established functionality in
-[quanteda](https://quanteda.io/reference/tokens_ngrams.html), and
-[TAALES](https://www.linguisticanalysistools.org/taales.html) provides word and
-phrase measures with coverage diagnostics. In ldfreq, the emphasis is a shared
-R workflow retaining document/segment locations, reference definitions,
-eligible-window denominators and missingness alongside other lexical measures.
-The n-gram functions provide frequencies. The public
-[collocation API](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html)
-adds MI and t-score from complete token-pair opportunities. Neither output is a
-validated phraseological-sophistication score.
-
-Phrase-list profiling and source-text overlap also have existing tools.
-Masaki Eguchi's [Multi-Word Units Profiler](https://github.com/egumasa/Multi-Word-Units-Profiler)
-highlights expressions from published phrase lists, while
-[cx-overlaps](https://github.com/egumasa/cx-overlaps), his extension of Philip
-Tillman's fluencysimilarity, compares unigram/trigram use across performances
-or against a source. Phrase matching, overlap and cosine similarity are not
-new contributions of ldfreq. Its focus is connecting analysis units and source
-locations to reference-resource definitions, human decisions and missingness
-in an R workflow. An [installed phrase-list example](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.html#match-your-phrase-list-and-inspect-its-coverage)
-uses quanteda for exact sequences of two or more supplied tokens, including
-long expressions, and returns original-text KWIC and overlap-aware document
-coverage. It is an explicitly sourced helper, not an exported API or a
-phrase-sense/discourse-function classifier. Phrase lists are supplied by the
-caller and are not bundled.
-
-The [phrase-review walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.html#review-phrase-matches)
-adds accepted/rejected/unresolved/unreviewed decisions, a checked CSV worksheet
-and document-by-phrase counts. It distinguishes coverage of accepted spans
-from a complete review, retains overlap without double counting tokens, and
-saves the complete source-linked record. It does not change the original
-word tokens or infer whether an expression is idiomatic.
-
-The [two-rater comparison](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.html#phrase-agreement)
-keeps open cases, paired-decision denominators and category counts visible,
-connects optionally to `irr` for Cohen kappa, and preserves separate discussion
-decisions and document profiles. Its guide-local code runs on 0.3.0.9003.
-
-## Analyze files and reference vocabulary
-
-After the first analysis, this example adds multiple files and reference-list coverage.
-
-For TXT files, folders or ID/text CSV files, start with the
-[executable file-input tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
-It includes sample files, metadata joins and complete analysis saving.
-From 0.3.0.9005, `lexdiv_metrics_text_batch(..., metadata = study)` retains
-writer/task/occasion information in `$metadata`, matched by `document_id`.
-Missing, duplicate or extra document IDs are rejected; metric and token tables
-remain unchanged. See the [metadata example](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#retain-study-metadata).
+## Start with your text
 
 ```r
-library(ldfreq)
-
-# Thirty authored texts and one empty file, supplied with the package.
-paths <- list.files(
-  system.file("examples", "text-input", "texts", package = "ldfreq"),
-  pattern = "\\.txt$", full.names = TRUE
+text <- paste(
+  "Students compared two versions of a short story in their writing class.",
+  "They marked repeated words and discussed how each writer introduced new ideas.",
+  "One group revised the opening while another group examined the ending.",
+  "After reading the stories again, the students explained their choices and",
+  "saved both the original texts and their revised versions for later comparison."
 )
-texts <- setNames(vapply(paths, function(path) {
-  paste(readLines(path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
-}, character(1)), tools::file_path_sans_ext(basename(paths)))
-prepared <- lexdiv_tokenize_batch(
-  texts, tokenizer = "english", normalization = "NFC", case = "lower"
-)
-
-# Use the same declared 50-token window for every document.
-analysis <- lexdiv_metrics_text_batch(
-  prepared, metrics = c("ttr", "mattr"), window_length = 50
-)
-print(analysis$results)  # Compact display; full metadata stay in the object.
-
-# The bundled NJ8 table is available offline, with JACET's permission.
-# This is surface-form coverage; it does not silently lemmatize the text.
-levels <- nj8_profile_batch(prepared, unit = "surface")
-levels$coverage
-nj8_diagnostics(levels)$unmatched_terms
-plot(analysis, metric_id = "mattr")
-plot(analysis, metric_id = "mattr", monochrome = TRUE)
-saveRDS(analysis, "analysis.rds")
+result <- lexdiv_metrics_text(text, metrics = c("mattr", "hdd", "mtld"))
+result$results[c("metric_id", "value", "N", "status", "missing_reason")]
 ```
 
-All package plots default to color; `monochrome = TRUE` selects black and gray.
-No title or subtitle is added automatically. Place figure numbers, titles and
-notes outside the image in the manuscript. Both color modes distinguish
-points below the advisory token floor by shape; custom `pch` settings are retained.
-The plotted values and returned data are identical in both modes. Plot defaults
-use a sans serif font, horizontal tick labels and an open frame.
-See the [report guide](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html)
-for final-size PDF/PNG export and the distinction between descriptive and
-inferential figures.
+Use `lexdiv_metrics(tokens, ...)` for an already ordered character vector of
+words, and `lexdiv_metrics_text_batch()` for multiple named texts. Inspect
+`status` and `missing_reason`: an unavailable score is not zero. Keep window
+and sample sizes fixed when comparing documents.
 
-The English tokenizer runs entirely in R. It retains contractions and
-hyphenated words, recognizes dotted initialisms, and records excluded URLs,
-email addresses and number-like spans. Named text vectors and ID/text data
-frames share the same batch interface. Existing calls keep the original
-`tokenizer = "unicode"` default; select the English rules explicitly.
-See [English tokenization and document input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html)
-for segmentation examples, CSV/text-file input, and limitations. An offline
-counting-policy example separates spelling equivalence from lookup aliases,
-proper-noun/numeral selection, and symbol boundaries without altering the source.
+## Choose a measure for your question
 
-These authored texts illustrate the workflow, not a population effect. The
-empty file remains visible with a missing result; the plot has 30 scored texts.
-Report the counting unit, tokenizer/case choices, document length, window size,
-and reference version/coverage alongside the results.
-TTR uses the full document denominator; MATTR uses the selected local window.
-NJ8 coverage asks how much of the selected vocabulary matches the list, not how
-much vocabulary a writer knows. For lemma coverage, supply or explicitly generate
-lemmas first. Report the selected unit, exclusions, and off-list proportion.
-Use [the vocabulary-audit guide](https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.html)
-to inspect unmatched terms and surface-to-unit mappings before interpreting coverage.
+For a first analysis of texts of unequal length, start with **MATTR at a fixed
+window size**, then check its consistency for your material. Use **HD-D at a
+fixed sample size** when the distribution of word frequencies, rather than
+local sequence, is the target. MTLD and MTLD-MA measure factor lengths and need
+particular care with short texts. TTR is useful at a controlled length; it is
+strongly affected by length otherwise.
 
-[From text to a report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html) extends this example
-to English case and Japanese POS-selection comparisons from local files,
-flat diagnostic tables, replayable saved results, methods text, figures and citations.
+The [metric-selection guide](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html)
+explains these choices using published research and results from 2,786 PELIC
+essays, including length sensitivity, sampling reliability, and actual
+external-tool comparisons. No single measure answers every research question.
 
-[![Local vocabulary diversity for three window sizes in an authored example](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report_files/figure-html/trajectory-overlay-1.png)](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity)
+## Follow a workflow
 
-**[Reproduce this plot in R](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity).**
-The complete example includes the text, analysis, color/monochrome drawing and
-PNG/PDF export. It illustrates local vocabulary diversity and window-size
-sensitivity with authored text, not learner data.
-
-## Reference frequency needs its own tokenization
-
-The bundled TUBELEX table uses NLTK Treebank tokenization. The general
-`lexdiv_tokenize()` keeps contractions together and is a different tokenizer.
-For example, the appropriate segmentation of this illustrative sentence is:
-
-```r
-terms <- c("I", "do", "n't", "think", "it", "'s", "John", "'s", "book")
-frequency <- tubelex_profile(terms)
-frequency$summary
-frequency$coverage
-```
-
-For raw text, follow the optional, executable
-[TUBELEX input recipe](https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.html). It uses NLTK externally,
-records its version and sentence-model identity, and reproduces the English
-word-splitting and filtering steps of the pinned TUBELEX source. It does not
-reproduce subtitle collection, cleaning, or deduplication. R calculations have
-no Python or network dependency. Character-vector inputs remain caller-supplied;
-a high match rate does not prove that arbitrary tokens use the right segmentation.
-
-## Available analyses
-
-| Task | Entry points |
+| Your task | Guide |
 |---|---|
-| Twelve diversity measures | `lexdiv_metrics()`, `lexdiv_metrics_text()`, `lexdiv_metrics_batch()` |
-| Named raw texts or document ID/text tables | `lexdiv_tokenize_batch()`, `lexdiv_metrics_text_batch()` |
-| Raw text, lemmas, or externally supplied AntBNC flemmas | `lexdiv_tokenize()`, `lexdiv_lemmatize()`, `lexdiv_flemmatize()` |
-| Count families under an explicit inventory | `lexdiv_family_profile()` retains occurrences, candidates, member counts, KWIC and incomplete coverage |
-| Record or choose the lemma dictionary | `lexdiv_lemmatize(method = "textstem", dictionary = ...)` records content identity and lookup locale |
-| Audit annotation changes on the same documents | `lexdiv_compare_annotations()` retains changed labels and both provenance records |
-| Evaluate external labels against a supplied reference | `lexdiv_evaluate_annotations()` returns per-label errors, document coverage and source context on the same segmentation |
-| Compare different English/Japanese token segmentations | `lexdiv_align_annotations()` separates source-span/boundary correspondence from conditional label agreement and retains split/merge KWIC |
-| Trace adjective–common-noun dependencies | `lexdiv_amod_pairs()` validates supplied basic UD trees and retains both endpoints, KWIC, document counts and incomplete-sentence coverage |
-| Parameter and definition sensitivity | `lexdiv_spec()`, `lexdiv_grid()`, `lexdiv_plan()`, `lexdiv_metrics(..., plan = ...)`, `lexdiv_metrics_batch(..., plan = ...)`, `lexdiv_variant_metrics()` |
-| Local MATTR windows and exposure | `lexdiv_mattr_profile()` |
-| Exact term/content-word overlap | `lexdiv_term_overlap()`, `lexdiv_content_overlap()` |
-| Coverage of a supplied reference set | `lexdiv_reference_coverage()` |
-| Numeric lexical norms with observed-value and annotation coverage | `lexdiv_norm_profile()` |
-| Apply your reference table across a corpus with document-level coverage | `lexdiv_norm_profile_batch()` |
-| Bundled or external NJ8 levels | `nj8_profile()`, `nj8_profile_batch()` |
-| Bundled TUBELEX frequency/prevalence | `tubelex_profile()`, `tubelex_profile_batch()` |
-| Tabulate TUBELEX results with coverage and input conditions | `tubelex_diagnostics()` |
-| Compare scored recognition/recall pairs with explicit denominators | `lexdiv_compare_responses()` |
-| Token-table adapters, wide tables, and plots | `lexdiv_as_documents()`, `lexdiv_widen()`, `plot()` |
-| Import local MASC Penn annotations with original positions | `lexdiv_read_masc()` (experimental; Mini-MASC 1.0 and a validated subset of MASC 3.0.0) |
-| Import complete external annotations, including Japanese morphology | `lexdiv_import_annotations()` (experimental; exact source alignment before exclusions) |
-| Use quanteda n-grams and KWIC while retaining gaps and source IDs | `lexdiv_as_quanteda()` (optional quanteda dependency) |
-| Compare reference choices with coverage and a common set of target phrases | `lexdiv_ngram_compare()` |
-| Build local reference counts from whole-document chunks | `lexdiv_ngram_reference_build()` (retains types and document IDs in memory) |
+| Go from text files to a reproducible report | [Text to report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html) |
+| Compare writers, tasks or occasions | [Study tables and models](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html) |
+| Inspect concordances and dispersion | [Concordances](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html) |
+| Examine collocations or keywords | [Collocations](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html), [keyness](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html) |
+| Use vocabulary lists and morphology data | [Optional reference data](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.html) |
+| Work with Japanese annotations | [Japanese workflows](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html) |
 
-The eleven default measures are TTR, RTTR/Guiraud, CTTR, Herdan C, Maas a-squared,
-MSTTR, MATTR, MTLD, HD-D, and Yule K/I. Experimental expected-TTR D is opt-in.
-`lexdiv_methods()` describes their definitions, scales, parameters, and direction.
-Use `lexdiv_methods(scope = "variants")` for the separate Maas/MTLD comparison
-catalog accepted by `lexdiv_variant_metrics()`. For recorded parameter plans,
-use `lexdiv_metrics(tokens, plan = plan)` or
-`lexdiv_metrics_batch(documents, plan = plan)` without additional metric arguments.
-The existing `lexdiv_profile()` and `lexdiv_profile_batch()` calls remain supported.
-Expected-TTR D fits an exact finite-population expectation; it is not CLAN VOCD.
+## Optional reference data
 
-`lexdiv_screen()` and `lexdiv_length_evidence()` describe advisory token-count
-criteria. Passing a screen does not establish validity or precision. Missing
-results do not change the requested parameters or silently remove documents.
-
-## Learning and reporting
-
-- [Annotated corpora and quanteda](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.html): import supplied annotations, preserve exclusions and return from KWIC to source positions; includes an offline authored example.
-- [Getting started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html): inputs, result tables, annotation, and parameter plans.
-- [From text to a report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html): one complete workflow and what to cite.
-- [Designing comparisons](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.html): questions, common settings, sensitivity, answers, and limits.
-- [Audit annotations and vocabulary profiles](https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.html): connect changed labels to original context, document-score differences, selection/reference coverage and saved-input replay. Includes a reviewed-text example that preserves learner errors in the original and compares explicitly approved spelling/grammar edits under separate policies.
-- [Evaluate annotations and their effect on document scores](https://ryuya-dot-com.github.io/ldfreq/articles/annotation-evaluation.html): explicit references, label-specific errors, missing predictions and English/Japanese examples.
-- [Compare token boundaries and document scores](https://ryuya-dot-com.github.io/ldfreq/articles/annotation-alignment.html): source-based split/merge correspondence, conditional label coverage, and full-document TTR/MATTR sensitivity.
-- [Trace adjective–noun dependencies](https://ryuya-dot-com.github.io/ldfreq/articles/dependency-pairs.html): source-linked basic UD pairs, missing annotations, and occurrence differences hidden by equal document counts; offline English/Japanese examples and an optional real-parser workflow using a local UDPipe model in R.
-- [Your own reference data across a corpus](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html): custom norms, document metadata, missingness, and reproducible saving.
-- [Analyze open-access papers](https://ryuya-dot-com.github.io/ldfreq/articles/open-access-papers.html): a reproducible example using three CC BY papers, with explicit text extraction, attribution and unknown author language backgrounds.
-- [Preprocessing and frequency](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html): lexical units, formula variants, and resource coverage.
-- [Vocabulary knowledge and use](https://ryuya-dot-com.github.io/ldfreq/articles/vocabulary-knowledge-and-use.html): relate corpus features to learner evidence without inferring ability from frequency.
-- [TUBELEX input recipe](https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.html): optional external token preparation.
-
-Use `vignette(package = "ldfreq")` to list guides included in your installation.
-Exact formulas and result specifications are installed under `system.file("spec",
-package = "ldfreq")`. Preserve the full results with `saveRDS()`, together with
-preprocessing and session information; flat exports of selected values alone
-cannot retain all analysis settings.
-
-## Data and attribution
-
-New JACET 8000 is copyright JACET and is redistributed with permission and source
-attribution. Cite JACET Basic Word Revision Committee (Ed.). (2016).
-*The New JACET List of 8000 Basic Words*. Tokyo: Kirihara Shoten.
-The bundled `jacet2016-8000-v1` table has all 8,000 rank/entry pairs, checked
-against the official workbook. Three corrections to the supplied snapshot
-(`nan`, `true`, and `false`) are documented in the
-[NJ8 notice](https://github.com/Ryuya-dot-com/ldfreq/blob/main/inst/licenses/nj8/NOTICE.md).
-An external data frame, CSV, or XLSX can still be supplied as `wordlist`.
-
-TUBELEX is copyright Adam Nohejl and is distributed under BSD-3-Clause.
-Cite Nohejl et al. (2025),
-[Beyond Film Subtitles: Is YouTube the Best Approximation of Spoken Vocabulary?](https://aclanthology.org/2025.coling-main.641/).
-The bundled resource is a slim aggregate at source commit `7cb5fb36`; no raw
-subtitles are included. Its source, changes, and complete license are recorded
-in the [TUBELEX notice](https://github.com/Ryuya-dot-com/ldfreq/blob/main/inst/licenses/tubelex/NOTICE.md).
-NGSL, Open English WordNet, and AntBNC data are not bundled.
-
-MorphoLex-en is bundled under **CC BY-NC-SA 4.0**, which permits noncommercial
-sharing and adaptation with attribution and applicable ShareAlike conditions;
-it does not grant commercial-use permission. Cite Sánchez-Gutiérrez, Mailhot,
-Deacon, and Wilson (2018), [MorphoLex: A derivational morphological database
-for 70,000 English words](https://doi.org/10.3758/s13428-017-0981-8).
-All 34 worksheets and the original data dictionary are included, with no
-inferred parts or corrections. The [MorphoLex notice](https://github.com/Ryuya-dot-com/ldfreq/blob/main/inst/licenses/morpholex/NOTICE.md)
-records the conversion, source checksums and full license location.
+The package code is MIT licensed. Third-party reference data are **not bundled**.
+Inspect the terms for the resource you need, then explicitly download it:
 
 ```r
-reference <- morpholex_data(c("0-1-1", "All roots"))
-words <- reference$sheets[["0-1-1"]]
-words[words$Word %in% c("teacher", "teachers"),
-      c("Word", "MorphoLexSegm", "ROOT1_FamSize")]
-reference$provenance$data_license
+lexdiv_resource_info("tubelex")  # source, fixed version, license and size
+# After reviewing the linked terms:
+lexdiv_download_resources("tubelex", accept_license = TRUE)
 ```
 
-Columns retain source values as character strings; convert selected numeric
-measures explicitly. See `?morpholex_data` for sheet names and interpretation.
+The verified cache is reused offline; installation and ordinary calculations
+do not download data. MorphoLex remains CC BY-NC-SA 4.0, BNC/COCA CC BY-SA 4.0,
+MorphyNet CC BY-SA 3.0, TUBELEX BSD-3-Clause, and NJ8 has its own permission and
+attribution terms. Downloading a resource does not change its license.
 
-Use `citation("ldfreq")` for the software and cite the methods and resources
-used in the analysis. The R code is MIT licensed. Bundled resources retain
-their own terms; see `LICENSE` and the installed `COPYRIGHTS` file.
+## Cite the version you used
+
+```r
+citation("ldfreq")
+```
+
+Komuro, R. (2026). *ldfreq: Reproducible Lexical Diversity and Frequency Profiles*
+(Version 0.5.0.9001) [R package].
+[Fixed release](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.5.0.9001).
+
+Also cite the selected measurement methods and any reference data you use.
+See [CITATION.cff](CITATION.cff), [license](LICENSE.md), and
+[release notes](https://ryuya-dot-com.github.io/ldfreq/news/index.html).

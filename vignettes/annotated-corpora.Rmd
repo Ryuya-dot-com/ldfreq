@@ -411,7 +411,7 @@ into single words or alter TTR, MATTR or MTLD.
 ### Save the complete review and reproduce its tables
 
 For teacher preparation, the [DDL material example](ddl-materials.html)
-(development 0.4.0.9004 or later) uses an explicit subset of accepted occurrences
+(development 0.5.0.9001) uses an explicit subset of accepted occurrences
 to create learner HTML, a separate teacher table and a complete private record.
 It retains pending candidates and does not change this review's criterion.
 
@@ -736,7 +736,7 @@ sequences$counts
 Follow the **Adjacent n-gram frequency profiles** guide to build a local
 reference with explicit source metadata and denominators. A preprocessing ID
 is a declaration of comparable rules, not proof that an unrelated tokenizer
-is compatible. MASC Penn tokens, quanteda word4 tokens and the bundled TUBELEX
+is compatible. MASC Penn tokens, quanteda word4 tokens and the cached TUBELEX
 tokenization must not be silently treated as the same tokenization.
 
 Save source evidence with the analysis:
@@ -809,7 +809,7 @@ annotation choices and sparse long n-grams matter. A reference's usefulness
 for your question requires more than successful file import. These functions
 do not yet provide a validated standard MASC/OANC frequency resource.
 
-Once inputs have been validated, `lexdiv_ngram_reference_build()` can accumulate
+Once inputs have been validated, `lexdiv_build_ngram_reference()` can accumulate
 references in whole-document chunks. This avoids retaining every occurrence
 table, while counts and the document roster remain in memory. See the
 [n-gram guide](ngram-profiles.html#accumulate-a-reference-in-whole-document-chunks)

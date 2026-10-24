@@ -1,17 +1,18 @@
 {
   "$schema": "ldfreq-installed-resource-manifest.schema.json",
-  "schema_version": "1.2.0",
-  "package_scope": "installed-lexical-resources",
+  "schema_version": "2.0.0",
+  "package_scope": "optional-reference-resources",
   "runtime_policy": {
     "network_access": false,
-    "implicit_download_or_fallback": false
+    "implicit_download_or_fallback": false,
+    "explicit_download_api": "lexdiv_download_resources"
   },
   "resources": [
     {
       "resource_id": "tubelex-en-treebank-slim",
       "resource_version": "7cb5fb36-slim-v1",
-      "distribution": "bundled",
-      "runtime_state": "public",
+      "distribution": "explicit-download",
+      "runtime_state": "optional",
       "public_api": true,
       "license_spdx": "BSD-3-Clause",
       "source_repository": "https://github.com/naist-nlp/tubelex",
@@ -26,48 +27,54 @@
       "provenance_path": "extdata/tubelex/7cb5fb36/build-provenance.json",
       "package_members": [
         {
-          "path": "extdata/tubelex/7cb5fb36/resource.manifest.dcf",
-          "role": "runtime resource manifest",
-          "bytes": 964,
-          "sha256": "a8d5dc3b2a5fee7eadf5a0648762350f9835b4b5e2633d9fe428dcf210120591"
-        },
-        {
-          "path": "extdata/tubelex/7cb5fb36/tubelex_en_treebank_7cb5fb36_slim.csv.gz",
-          "role": "runtime aggregate data",
-          "bytes": 2549714,
-          "sha256": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d"
-        },
-        {
-          "path": "extdata/tubelex/7cb5fb36/build-provenance.json",
-          "role": "source and transformation provenance",
-          "bytes": 6232,
-          "sha256": "834e70d09b983f75c6623fb56191706d1ec6f5f836c249a88816a1d93d2336f8"
+          "path": "COPYRIGHTS",
+          "role": "code attribution",
+          "bytes": 684,
+          "sha256": "1330f71a24fd2762babd56d1e3bd248f687743095ec88ba3083e44a079606bb1"
         },
         {
           "path": "licenses/tubelex/NOTICE.md",
-          "role": "upstream license, attribution, and change notice",
-          "bytes": 4175,
-          "sha256": "a3ea8312a5bbf8e7178155259460f089d0377a8c99094f70875910c428cb4cb5"
+          "role": "adapted code notice",
+          "bytes": 494,
+          "sha256": "3ea8452c2b04c63e56a2391b9c4e0e8bc31345c299d26c1b4c4ef0fe598e08be"
         },
         {
-          "path": "COPYRIGHTS",
-          "role": "component copyright index",
-          "bytes": 3066,
-          "sha256": "27056951661decd9211a8f7e4558717d6144d64b480dbdac60f0ee207909be2c"
+          "path": "licenses/tubelex/LICENSE",
+          "role": "adapted code license",
+          "bytes": 1521,
+          "sha256": "51b9e39825bbf19e4bb777bf11a7520a3935ff859c4d0ee724dfe9ddb26a961f"
         },
         {
           "path": "examples/tubelex-tokenize.py",
-          "role": "optional external token preparation example",
+          "role": "adapted code example",
           "bytes": 8184,
           "sha256": "abe30786ceedc28495f9742ffdd28b308c0934262f76675ca3808897c5c506f0"
         }
-      ]
+      ],
+      "resource_name": "tubelex",
+      "download": {
+        "version": "7cb5fb36",
+        "license": "BSD-3-Clause",
+        "license_url": "https://opensource.org/license/bsd-3-clause",
+        "citation": "Nohejl et al. (2025). Beyond Film Subtitles. https://aclanthology.org/2025.coling-main.641/",
+        "url": "https://github.com/Ryuya-dot-com/ldfreq/releases/download/reference-data-20261024/ldfreq-resource-tubelex-7cb5fb36.tar.gz",
+        "bytes": 2557276,
+        "sha256": "2b192ddd6d972d230a3c0b2198c89f33269f5a35c4b0d0cfec9231fb10340aa4",
+        "files": {
+          "README.txt": "0220774aa5993e0056dd32eff9406ef06db9d126eab0c75ed410d2927640f836",
+          "extdata/tubelex/7cb5fb36/build-provenance.json": "834e70d09b983f75c6623fb56191706d1ec6f5f836c249a88816a1d93d2336f8",
+          "extdata/tubelex/7cb5fb36/resource.manifest.dcf": "a8d5dc3b2a5fee7eadf5a0648762350f9835b4b5e2633d9fe428dcf210120591",
+          "extdata/tubelex/7cb5fb36/tubelex_en_treebank_7cb5fb36_slim.csv.gz": "ded083e5b9f59ddfb719ebd88063778500cb347e1eab0f2d79ff55085d92fb4d",
+          "licenses/tubelex/NOTICE.md": "a3ea8312a5bbf8e7178155259460f089d0377a8c99094f70875910c428cb4cb5"
+        }
+      },
+      "paths_relative_to": "verified-resource-cache"
     },
     {
       "resource_id": "new-jacet8000",
       "resource_version": "jacet2016-8000-v1",
-      "distribution": "bundled",
-      "runtime_state": "public",
+      "distribution": "explicit-download",
+      "runtime_state": "optional",
       "public_api": true,
       "license_spdx": null,
       "license_name": "JACET permission with source attribution",
@@ -82,38 +89,31 @@
       "content_sha256": "6797238778c4b67bdce9657f16bfbdcc65982c72e4fd29eca93f7fef2d010f59",
       "notice_path": "licenses/nj8/NOTICE.md",
       "provenance_path": "extdata/nj8/2016/provenance.json",
-      "package_members": [
-        {
-          "path": "extdata/nj8/2016/NJ8.csv",
-          "role": "rank and representative-lemma table",
-          "bytes": 120181,
-          "sha256": "6797238778c4b67bdce9657f16bfbdcc65982c72e4fd29eca93f7fef2d010f59"
-        },
-        {
-          "path": "extdata/nj8/2016/resource.manifest.dcf",
-          "role": "runtime resource manifest",
-          "bytes": 333,
-          "sha256": "6a802a0de9a4fd534d224508586fbefff764890839a4fb4c896b9e1b0e4035b0"
-        },
-        {
-          "path": "extdata/nj8/2016/provenance.json",
-          "role": "source verification and corrections",
-          "bytes": 1163,
-          "sha256": "27754e491fab1b64f0c96efb9843fce7be27952f8e89760d8861f8712cc62826"
-        },
-        {
-          "path": "licenses/nj8/NOTICE.md",
-          "role": "permission, attribution, and changes",
-          "bytes": 1786,
-          "sha256": "c676ae232916910290454f5e27d643f69958d72caad53a3cd6fe259535596232"
+      "package_members": [],
+      "resource_name": "nj8",
+      "download": {
+        "version": "2016",
+        "license": "JACET permission; attribution required",
+        "license_url": "https://www.jacet.org/official-word-list/",
+        "citation": "JACET Basic Word Revision Committee (2016). The New JACET List of 8000 Basic Words. Kirihara Shoten.",
+        "url": "https://github.com/Ryuya-dot-com/ldfreq/releases/download/reference-data-20261024/ldfreq-resource-nj8-2016.tar.gz",
+        "bytes": 53357,
+        "sha256": "39f8093fe84db2a18e1f687894a858e7e30f3550b8822a632b38a4280cc27df6",
+        "files": {
+          "README.txt": "0a67a6870d25fbdce49e14d42d5bef3bb4a7e8161595e308ba37d319ca87903d",
+          "extdata/nj8/2016/NJ8.csv": "6797238778c4b67bdce9657f16bfbdcc65982c72e4fd29eca93f7fef2d010f59",
+          "extdata/nj8/2016/provenance.json": "27754e491fab1b64f0c96efb9843fce7be27952f8e89760d8861f8712cc62826",
+          "extdata/nj8/2016/resource.manifest.dcf": "6a802a0de9a4fd534d224508586fbefff764890839a4fb4c896b9e1b0e4035b0",
+          "licenses/nj8/NOTICE.md": "c676ae232916910290454f5e27d643f69958d72caad53a3cd6fe259535596232"
         }
-      ]
+      },
+      "paths_relative_to": "verified-resource-cache"
     },
     {
       "resource_id": "morpholex-en",
       "resource_version": "5bc425fbb710f3d63cab69e77ee731fa466653ed0ace94937cac6c1fd6de52c6",
-      "distribution": "bundled",
-      "runtime_state": "public",
+      "distribution": "explicit-download",
+      "runtime_state": "optional",
       "public_api": true,
       "license_spdx": "CC-BY-NC-SA-4.0",
       "source_repository": "https://github.com/hugomailhot/MorphoLex-en",
@@ -128,38 +128,31 @@
       "content_scope": "All 34 workbook sheets converted to character tables, with embedded provenance and the original data dictionary. Not the original workbook.",
       "notice_path": "licenses/morpholex/NOTICE.md",
       "provenance_path": "extdata/morpholex/5bc425fb/morpholex_en.rds",
-      "package_members": [
-        {
-          "path": "extdata/morpholex/5bc425fb/morpholex_en.rds",
-          "role": "all worksheet tables and embedded provenance",
-          "bytes": 1185716,
-          "sha256": "85d03be16c3013ab984c55bce8799699ac6a4b03992b2df0c07ab2b79dc8b2b1"
-        },
-        {
-          "path": "extdata/morpholex/5bc425fb/MorphoLEX_en-Data_Dictionary.pdf",
-          "role": "unchanged upstream data dictionary",
-          "bytes": 143626,
-          "sha256": "af01e0db5e953ad3b7bbc06ea06b3c8a1af6dac60e7600d826a5e079e4068575"
-        },
-        {
-          "path": "licenses/morpholex/NOTICE.md",
-          "role": "attribution, scope, conversion and noncommercial terms",
-          "bytes": 3246,
-          "sha256": "0f7547a2f5ce174e965ce54f76a18b9a3c3d4812c34aea9c21a5d48760c34506"
-        },
-        {
-          "path": "licenses/morpholex/CC-BY-NC-SA-4.0.md",
-          "role": "unchanged upstream license",
-          "bytes": 19129,
-          "sha256": "051131b5ef3596dad9bf0cffee19c248ff9751596a86b25c70f0cd82d6f6d713"
+      "package_members": [],
+      "resource_name": "morpholex",
+      "download": {
+        "version": "5bc425fb",
+        "license": "CC-BY-NC-SA-4.0",
+        "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+        "citation": "Sanchez-Gutierrez et al. (2018). MorphoLex. https://doi.org/10.3758/s13428-017-0981-8",
+        "url": "https://github.com/Ryuya-dot-com/ldfreq/releases/download/reference-data-20261024/ldfreq-resource-morpholex-5bc425fb.tar.gz",
+        "bytes": 1336656,
+        "sha256": "a811a596c21c63b2da3197800aab94b61260be46f766cf84b45ac45ea74e6156",
+        "files": {
+          "README.txt": "725af52f60159861556747c381664890fbc3df1f75d34a5105d8588367bb2ade",
+          "extdata/morpholex/5bc425fb/MorphoLEX_en-Data_Dictionary.pdf": "af01e0db5e953ad3b7bbc06ea06b3c8a1af6dac60e7600d826a5e079e4068575",
+          "extdata/morpholex/5bc425fb/morpholex_en.rds": "85d03be16c3013ab984c55bce8799699ac6a4b03992b2df0c07ab2b79dc8b2b1",
+          "licenses/morpholex/CC-BY-NC-SA-4.0.md": "051131b5ef3596dad9bf0cffee19c248ff9751596a86b25c70f0cd82d6f6d713",
+          "licenses/morpholex/NOTICE.md": "0f7547a2f5ce174e965ce54f76a18b9a3c3d4812c34aea9c21a5d48760c34506"
         }
-      ]
+      },
+      "paths_relative_to": "verified-resource-cache"
     },
     {
       "resource_id": "bnccoca-level6",
       "resource_version": "1.0.0; sha256:ac81c7a60e5c76cd2bbf0c59b0501808f0d4fa026b2936919dd54329a9bb6a69",
-      "distribution": "bundled",
-      "runtime_state": "public",
+      "distribution": "explicit-download",
+      "runtime_state": "optional",
       "public_api": true,
       "license_spdx": "CC-BY-SA-4.0",
       "source_repository": null,
@@ -174,32 +167,30 @@
       "content_scope": "25,000 Level 6 families (75,679 rows) and 29,798 separate supplementary rows. Placeholder lists 26-30 and Range software excluded.",
       "notice_path": "licenses/bnccoca/NOTICE.md",
       "provenance_path": "extdata/bnccoca/ac81c7a6/bnccoca.rds",
-      "package_members": [
-        {
-          "path": "extdata/bnccoca/ac81c7a6/bnccoca.rds",
-          "role": "family and supplementary tables, source catalog and embedded provenance",
-          "bytes": 509712,
-          "sha256": "c44bce49580066d8216f34f9643203fe0041a5735664ac9bbf580fcbe5e12ad1"
-        },
-        {
-          "path": "licenses/bnccoca/NOTICE.md",
-          "role": "attribution, source identity and conversion notice",
-          "bytes": 3248,
-          "sha256": "da93ad9348bd61b8dfd97d2ee99b6cc401e8a7d294b8961f3f983c2a944cc60f"
-        },
-        {
-          "path": "licenses/bnccoca/CC-BY-SA-4.0.txt",
-          "role": "full license text",
-          "bytes": 20138,
-          "sha256": "28a9529c7d0bb4dc51f4bf5c116a3d16ef247a052f7591466768ddf563fd1cf5"
+      "package_members": [],
+      "resource_name": "bnccoca",
+      "download": {
+        "version": "ac81c7a6",
+        "license": "CC-BY-SA-4.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "citation": "Nation's BNC/COCA Level 6 word-family lists. https://www.wgtn.ac.nz/lals/resources/paul-nations-resources/vocabulary-analysis-programs",
+        "url": "https://github.com/Ryuya-dot-com/ldfreq/releases/download/reference-data-20261024/ldfreq-resource-bnccoca-ac81c7a6.tar.gz",
+        "bytes": 518734,
+        "sha256": "0469e4e5189be843e643611409c52be0b14da3bb045fd2193a9bd10e5d29df1f",
+        "files": {
+          "README.txt": "7073faf90d8143cf2a7b74b797ecbd7a2734d491c29ffd4e5f111a039986c23e",
+          "extdata/bnccoca/ac81c7a6/bnccoca.rds": "c44bce49580066d8216f34f9643203fe0041a5735664ac9bbf580fcbe5e12ad1",
+          "licenses/bnccoca/CC-BY-SA-4.0.txt": "28a9529c7d0bb4dc51f4bf5c116a3d16ef247a052f7591466768ddf563fd1cf5",
+          "licenses/bnccoca/NOTICE.md": "da93ad9348bd61b8dfd97d2ee99b6cc401e8a7d294b8961f3f983c2a944cc60f"
         }
-      ]
+      },
+      "paths_relative_to": "verified-resource-cache"
     },
     {
       "resource_id": "morphynet-en-example",
       "resource_version": "eng.derivational.v1; nine-relation-excerpt-v1",
-      "distribution": "bundled",
-      "runtime_state": "example-only",
+      "distribution": "explicit-download",
+      "runtime_state": "optional",
       "public_api": false,
       "license_spdx": "CC-BY-SA-3.0",
       "source_repository": "https://github.com/kbatsuren/MorphyNet",
@@ -214,32 +205,25 @@
       "content_scope": "Nine unchanged English v1 relation rows selected for examples, with original source-line mapping. The complete MorphyNet table is not bundled.",
       "notice_path": "licenses/morphynet/NOTICE.md",
       "provenance_path": "extdata/morphynet-example/source-rows.csv",
-      "package_members": [
-        {
-          "path": "extdata/morphynet-example/eng.derivational.example.tsv",
-          "role": "nine-row upstream relation excerpt",
-          "bytes": 316,
-          "sha256": "d6aae849b1a04f394ea2987a5304afe3f8f337507a9ac7f5ff64795ebe508b44"
-        },
-        {
-          "path": "extdata/morphynet-example/source-rows.csv",
-          "role": "excerpt-to-original source rows and full source hash",
-          "bytes": 726,
-          "sha256": "6f05d15db28c70c363d2bdd2fa7b34242fc8d5fb7455dfc80db10f7d33b8c901"
-        },
-        {
-          "path": "licenses/morphynet/NOTICE.md",
-          "role": "attribution, selection scope and change notice",
-          "bytes": 2445,
-          "sha256": "1a53aa15a5bab19439d26ba1e1bb69fdfd8f2b30c86a2080b34f2e0aa5023b94"
-        },
-        {
-          "path": "licenses/morphynet/CC-BY-SA-3.0.txt",
-          "role": "full license text",
-          "bytes": 22240,
-          "sha256": "3f941b3b89cf7b8370ceb83cc76d2120d471b58735d8ca60238a751a48d7f72f"
+      "package_members": [],
+      "resource_name": "morphynet",
+      "download": {
+        "version": "example-v1",
+        "license": "CC-BY-SA-3.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+        "citation": "Batsuren, Bella and Giunchiglia (2021). MorphyNet. https://github.com/kbatsuren/MorphyNet",
+        "url": "https://github.com/Ryuya-dot-com/ldfreq/releases/download/reference-data-20261024/ldfreq-resource-morphynet-example-v1.tar.gz",
+        "bytes": 9184,
+        "sha256": "69e5e33ee7f0c87676b0d16dcee5866cbfa6872d38c2742f277d18762d42ab34",
+        "files": {
+          "README.txt": "663cabd0550f323c6f6de76d25637e65d4e7b964696ae51897c07c10dc1e56be",
+          "extdata/morphynet-example/eng.derivational.example.tsv": "d6aae849b1a04f394ea2987a5304afe3f8f337507a9ac7f5ff64795ebe508b44",
+          "extdata/morphynet-example/source-rows.csv": "6f05d15db28c70c363d2bdd2fa7b34242fc8d5fb7455dfc80db10f7d33b8c901",
+          "licenses/morphynet/CC-BY-SA-3.0.txt": "3f941b3b89cf7b8370ceb83cc76d2120d471b58735d8ca60238a751a48d7f72f",
+          "licenses/morphynet/NOTICE.md": "1a53aa15a5bab19439d26ba1e1bb69fdfd8f2b30c86a2080b34f2e0aa5023b94"
         }
-      ]
+      },
+      "paths_relative_to": "verified-resource-cache"
     }
   ]
 }

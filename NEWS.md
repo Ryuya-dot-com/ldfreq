@@ -1,3 +1,32 @@
+# ldfreq 0.5.0.9001
+
+- Separate optional TUBELEX, NJ8, MorphoLex, BNC/COCA and MorphyNet reference
+  data from the MIT package code. Review terms with `lexdiv_resource_info()`
+  and explicitly obtain selected, versioned resources with
+  `lexdiv_download_resources(..., accept_license = TRUE)`. Downloads and
+  cached files are SHA-256 verified; installation and calculations never
+  download data implicitly. Existing resource-based calls need this one-time
+  setup. Core lexical-diversity calculations need no reference download.
+- Add opt-in `mtld_ma`: forward moving-average MTLD with strict threshold
+  crossing, complete factors of at least ten tokens, and no fractional tail.
+  The eleven default metrics and existing MTLD definition are unchanged.
+- Add a metric-selection guide with a 2,786-essay PELIC analysis, controlled
+  50–200-token comparisons, writer-cluster bootstrap intervals, and sampling
+  reliability from disjoint blocks. Compare five measures against actual
+  koRpus calls on 202 essays. Publish aggregate results and reproduction code.
+- Use the consistent names `lexdiv_compare_ngrams()`,
+  `lexdiv_build_ngram_reference()`, `lexdiv_screen_lengths()` and
+  `lexdiv_sort_concordance()`. The previous names remain exact aliases;
+  arguments and saved results are unchanged.
+- Reject classed and dimensional inputs that could previously pass scalar
+  or plain-column checks in MTLD options, concordance, collocation,
+  study tables and MorphoLex selection. Preserve structured `invalid_input`
+  results for invalid core token vectors and intended categorical metadata.
+- Shorten the README, align all guides to one fixed installation version,
+  add version-specific R and GitHub citation records, and remove internal
+  planning documents and obsolete usability-status statements from the
+  current public files. Prior releases and repository history are retained.
+
 # ldfreq 0.4.0.9006
 
 - Call `lexdiv_study_table()` and `lexdiv_study_model_data()` directly to retain

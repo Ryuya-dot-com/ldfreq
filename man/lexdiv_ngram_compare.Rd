@@ -1,13 +1,18 @@
 \name{lexdiv_ngram_compare}
 \alias{lexdiv_ngram_compare}
+\alias{lexdiv_compare_ngrams}
 \title{Compare N-gram References on the Same Target Items}
 \description{
+\code{lexdiv_compare_ngrams()} is the canonical name; \code{lexdiv_ngram_compare()} remains a compatibility alias.
+
 Applies multiple reference frequency tables to one unchanged target extraction.
 Reports each reference's coverage and available-value mean, then compares rates
 on the items with defined values in every reference. Uses the existing
 \code{lexdiv_ngram_profile()} arithmetic without re-extracting target tokens.
 }
 \usage{
+lexdiv_compare_ngrams(x, references, baseline = NULL, max_rows = 1e6)
+
 lexdiv_ngram_compare(x, references, baseline = NULL, max_rows = 1e6)
 }
 \arguments{

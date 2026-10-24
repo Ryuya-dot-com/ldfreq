@@ -1,6 +1,6 @@
 \name{morpholex_data}
 \alias{morpholex_data}
-\title{Read the Bundled MorphoLex English Database}
+\title{Read the Cached MorphoLex English Database}
 \usage{
 morpholex_data(sheets = NULL)
 }
@@ -9,7 +9,9 @@ morpholex_data(sheets = NULL)
 of unique worksheet names in the desired order. Unknown names are errors.}
 }
 \description{
-Reads the bundled MorphoLex-en worksheet values without downloading data or
+Reference snapshots require a prior explicit download; see \code{\link{lexdiv_download_resources}} for terms and cache setup.
+
+Reads the cached MorphoLex-en worksheet values without downloading data or
 requiring Excel, \pkg{readxl}, Python, or a model. This is a reference-data
 reader, not a morphological analyzer.
 }
@@ -55,7 +57,7 @@ cells use R text representation; the source \code{Word} cells for ELP IDs
 42162 and 65908 are logical values and read as \code{TRUE} and \code{FALSE}.
 Exact lowercase queries do not match these uppercase values. No linguistic
 corrections or inferred parts are added.
-The bundled original data dictionary describes the variables, including PFMF,
+The cached original data dictionary describes the variables, including PFMF,
 family size, HAL frequency, P, and P*. Its path is shown in the examples.
 The explicitly sourced \file{examples/morpholex-word-parts.R} recipe selects
 word records and extracts supported canonical parts for the accompanying
@@ -84,6 +86,8 @@ MorphoLex: A derivational morphological database for 70,000 English words.
 The tutorial explains how to source the word-parts recipes; those helpers
 are not exported package functions.}
 \examples{
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("morpholex"))$available)) {
 # "0-1-1" is a source worksheet: zero prefixes, one root, one suffix.
 reference <- morpholex_data(c("0-1-1", "All roots"))
 words <- reference$sheets[["0-1-1"]]
@@ -93,6 +97,7 @@ words[words$Word \%in\% c("teacher", "teachers"),
 roots <- reference$sheets[["All roots"]]
 roots$HAL_freq <- as.numeric(roots$HAL_freq)
 reference$provenance$data_license
-dictionary_path <- system.file("extdata", "morpholex", "5bc425fb",
-                               "MorphoLEX_en-Data_Dictionary.pdf", package = "ldfreq")
+dictionary_path <- file.path(lexdiv_resource_info("morpholex")$path, "extdata", "morpholex", "5bc425fb",
+                               "MorphoLEX_en-Data_Dictionary.pdf")
+}
 }

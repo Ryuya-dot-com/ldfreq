@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "Cite the ldfreq version used in your analysis, along with its measurement methods and reference data."
+type: software
+title: "ldfreq: Reproducible Lexical Diversity and Frequency Profiles"
+authors:
+  - family-names: Komuro
+    given-names: Ryuya
+version: 0.5.0.9001
+date-released: 2026-10-24
+url: "https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.5.0.9001"
+repository-code: "https://github.com/Ryuya-dot-com/ldfreq"
+license: MIT

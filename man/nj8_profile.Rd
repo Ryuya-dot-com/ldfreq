@@ -6,8 +6,10 @@
 \alias{plot.lexical_level_profile}
 \title{Profile lexical coverage by New JACET 8000 frequency level}
 \description{
+Reference snapshots require a prior explicit download; see \code{\link{lexdiv_download_resources}} for terms and cache setup.
+
 Creates exact and cumulative token- and type-weighted lexical profiles from a
-bundled New JACET 8000 table or an explicit caller-supplied copy. The bundled
+cached New JACET 8000 table or an explicit caller-supplied copy. The cached
 table is redistributed with permission from JACET and source attribution.
 No resource is downloaded at runtime.
 }
@@ -69,7 +71,7 @@ nj8_profile_batch(
   \item{documents}{A plain named list of character vectors or tokenization
   objects, or a data frame containing an explicit ID column and a list-column
   of those inputs.}
-  \item{wordlist}{\code{NULL} selects the bundled, versioned table. Alternatively,
+  \item{wordlist}{\code{NULL} selects the cached, versioned table. Alternatively,
   a data frame containing New JACET 8000 ranks and entries, or
   a path to the official local XLSX file or a local CSV file. Direct XLSX input
   requires the suggested \pkg{readxl} package.}
@@ -96,7 +98,7 @@ nj8_profile_batch(
   rank.}
   \item{resource_version}{An optional version label for an external table. If
   \code{NULL}, its canonical rank-entry SHA-256 supplies the identity. The
-  bundled table has a fixed version and cannot be relabelled.}
+  cached table has a fixed version and cannot be relabelled.}
   \item{id_col, terms_col}{Names of the explicit document-ID and lexical-input
   list-columns for data-frame batch input.}
   \item{max_rows}{A positive integer bounding the combined number of returned
@@ -189,15 +191,15 @@ rank-entry SHA-256. The absolute directory is not stored, printed, or repeated
 in package-generated error messages. A data-frame input has a canonical hash
 but no file hash.
 
-The bundled table is redistributed with permission from JACET and source
+The cached table is redistributed with permission from JACET and source
 attribution. Cite JACET Basic Word Revision Committee (Ed.). (2016).
 \emph{The New JACET List of 8000 Basic Words}. Tokyo: Kirihara Shoten.
-The installed \file{licenses/nj8/NOTICE.md} records the permission and changes.
-All 8,000 rank/entry pairs match the official workbook. The bundled edition
+The cached \file{licenses/nj8/NOTICE.md} records the permission and changes.
+All 8,000 rank/entry pairs match the official workbook. The cached edition
 restores the missing word \code{nan} at rank 6926 and lowercase
 \code{true}/\code{false} at ranks 326/2382 in the supplied snapshot.
 External copies retain their applicable terms; supplying a table does not
-verify that it is the official edition. Provenance distinguishes bundled from
+verify that it is the official edition. Provenance distinguishes cached from
 external input and records the source hash and selected version.
 }
 \section{Batch output}{
@@ -216,7 +218,7 @@ The exact denominator, normalization, alias, flemma-conflict, batch, plot, and
 resource-boundary rules are installed in
 \file{lexical-level-profile-contract.json}. Locate it with
 \code{system.file("spec", "lexical-level-profile-contract.json", package =
-"ldfreq")}. The contract distinguishes the bundled default from external
+"ldfreq")}. The contract distinguishes the cached default from external
 input. The adapter's measurement contract is normative for version 0.2.0.
 }
 \value{
@@ -244,6 +246,8 @@ The plot method invisibly returns the summary rows and exact values drawn.
 document-major tables while the external resource provenance is stored once.
 }
 \examples{
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("nj8"))$available)) {
 nj8_profile(c("the", "true", "false", "nan"))
 
 wordlist <- data.frame(
@@ -282,6 +286,7 @@ official <- nj8_profile(
 if (interactive()) {
   plot(profile)
   plot(profile, weighting = "type", include_off_list = FALSE)
+}
 }
 }
 \seealso{

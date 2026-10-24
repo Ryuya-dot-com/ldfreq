@@ -1,0 +1,6 @@
+"metric","documents","comparable","missing_disagreements","matches_1e_10","max_abs_difference"
+"hdd",202,202,0,202,1.86517468137026e-14
+"mattr",202,202,0,202,1.11022302462516e-16
+"mtld",202,202,0,202,0
+"mtld_ma",202,200,0,200,1.56319401867222e-13
+"ttr",202,202,0,202,0

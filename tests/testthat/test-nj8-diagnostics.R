@@ -35,6 +35,7 @@ test_that("mapping flags are descriptive and missing lemmas stay excluded", {
 })
 
 test_that("empty, all-matched and wholly excluded profiles retain typed tables", {
+  skip_optional_resources(c("nj8"))
   empty <- nj8_diagnostics(nj8_profile(character()))
   zero <- nj8_diagnostics(nj8_profile_batch(setNames(list(), character())))
   expect_identical(empty$unmatched_terms, zero$unmatched_terms)
@@ -80,6 +81,7 @@ test_that("grouping does not collide on user punctuation and uses literal IDs", 
 })
 
 test_that("diagnostics reject wrong inputs and inconsistent profile counts", {
+  skip_optional_resources(c("nj8"))
   expect_error(nj8_diagnostics(c("the", "word")), "must be a result")
   expect_error(nj8_diagnostics(list()), "must be a result")
   x <- nj8_profile_batch(list(a = "the"))
