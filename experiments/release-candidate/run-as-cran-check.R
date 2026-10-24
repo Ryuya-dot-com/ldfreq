@@ -33,12 +33,12 @@ if (!note_policy %in% allowed_note_policies) {
   stop("Unrecognized check NOTE policy: ", note_policy, call. = FALSE)
 }
 if (identical(note_policy, "minimum-r-optional-backends") &&
-    (!identical(job_label, "ubuntu-latest-r-4.1") ||
+    (!identical(job_label, "ubuntu-24.04-r-4.1") ||
       !grepl("^R version 4[.]1[.]", R.version.string))) {
   stop(
     paste(
       "The minimum-r-optional-backends NOTE policy is restricted to the",
-      "ubuntu-latest-r-4.1 job running R 4.1.x."
+      "ubuntu-24.04-r-4.1 job running R 4.1.x."
     ),
     call. = FALSE
   )
@@ -46,7 +46,7 @@ if (identical(note_policy, "minimum-r-optional-backends") &&
 remote_url_checks <- !tolower(Sys.getenv(
   "_R_CHECK_CRAN_INCOMING_SKIP_URL_CHECKS_IF_REMOTE_", "false"
 )) %in% c("true", "t", "1")
-if (!identical(remote_url_checks, job_label != "ubuntu-latest-r-4.1")) {
+if (!identical(remote_url_checks, job_label != "ubuntu-24.04-r-4.1")) {
   stop("Remote URL checks may be delegated only by the R 4.1 diagnostic.", call. = FALSE)
 }
 script_argument <- grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)
@@ -81,7 +81,7 @@ if (length(arguments) == 5L) {
     identical(prior$environment$os, unname(Sys.info()[["sysname"]])),
     identical(prior$environment$platform, R.version$platform),
     identical(prior$environment$r_version, R.version.string) ||
-      (identical(job_label, "ubuntu-latest-r-devel") &&
+      (identical(job_label, "ubuntu-24.04-r-devel") &&
         grepl("^R Under development ", prior$environment$r_version) &&
         grepl("^R Under development ", R.version.string)),
     identical(prior$environment$remote_url_checks, remote_url_checks),

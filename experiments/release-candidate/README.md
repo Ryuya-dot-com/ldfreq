@@ -106,7 +106,7 @@ reference snapshots. The exact file BOM and independent resource inventories
 still have to pass.
 
 The `minimum-r-optional-backends` policy is restricted to the
-`ubuntu-latest-r-4.1` job on R 4.1.x. It also requires the exact dependency NOTE
+`ubuntu-24.04-r-4.1` job on R 4.1.x. It also requires the exact dependency NOTE
 naming `gibasa` and `textstem`; no other unavailable package is accepted.
 Their current versions need R >= 4.2 and R >= 4.4,
 respectively. The workflow leaves both uninstalled in that one job,

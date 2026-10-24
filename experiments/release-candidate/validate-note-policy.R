@@ -74,7 +74,7 @@ local({
   blocks <- release_note_blocks(raw)
   disposition <- release_classify_notes("Status: 3 NOTEs", blocks,
     "minimum-r-optional-backends")
-  labels <- "ubuntu-latest-r-4.1"
+  labels <- "ubuntu-24.04-r-4.1"
   results <- list(c(list(schema_version = "1.2.0", job_label = labels,
     environment = list(os = "Linux", platform = "x86_64-pc-linux-gnu",
       r_version = "R version 4.1.3 (synthetic fixture)", remote_url_checks = FALSE),
@@ -82,7 +82,7 @@ local({
     check_status = "Status: 3 NOTEs", note_blocks = blocks,
     artifact = list(sha256 = "fixture")), disposition))
   result_paths <- file.path(directory, "check-result.json")
-  expected_environments <- list("ubuntu-latest-r-4.1" = c("Linux", "linux"))
+  expected_environments <- list("ubuntu-24.04-r-4.1" = c("Linux", "linux"))
   provenance <- list(artifact = list(sha256 = "fixture"))
   check <- function(condition, message) if (!isTRUE(condition)) stop(message)
   expressions <- parse("experiments/release-candidate/assemble-run-index.R")
@@ -107,14 +107,14 @@ local({
 
 # Historical exceptions must not admit old non-FOSS or URL findings for the current package.
 external_cases <- list(
-  "ubuntu-latest-r-4.1" = c(
+  "ubuntu-24.04-r-4.1" = c(
     "Found the following (possibly) invalid DOIs:",
     "DOI: 10.1080/09296171003643098",
     "From: DESCRIPTION",
     "Status: Forbidden",
     "Message: 403",
     "Size of tarball: 6490351 bytes"),
-  "ubuntu-latest-r-devel" = c(
+  "ubuntu-24.04-r-devel" = c(
     "Found the following (possibly) invalid URLs:",
     "URL: https://sites.psu.edu/xxl13/l2sca/",
     "From: inst/doc/syntactic-complexity.html",
@@ -131,7 +131,7 @@ external_cases <- list(
 )
 for (label in names(external_cases)) {
   block <- non_foss; block$detail <- c(block$detail, as.list(external_cases[[label]]))
-  minimum <- identical(label, "ubuntu-latest-r-4.1")
+  minimum <- identical(label, "ubuntu-24.04-r-4.1")
   notes <- if (minimum) list(block, dependency) else list(block)
   policy <- if (minimum) "minimum-r-optional-backends" else "release-resource-notes"
   status <- if (minimum) "Status: 2 NOTEs" else "Status: 1 NOTE"

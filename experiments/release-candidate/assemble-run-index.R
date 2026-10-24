@@ -99,9 +99,9 @@ check(length(result_paths) == 5L, "Exactly five check-result.json files are requ
 results <- lapply(result_paths, jsonlite::read_json, simplifyVector = FALSE)
 labels <- vapply(results, function(value) value$job_label, character(1L))
 expected_labels <- c(
-  "ubuntu-latest-r-release",
-  "ubuntu-latest-r-devel",
-  "ubuntu-latest-r-4.1",
+  "ubuntu-24.04-r-release",
+  "ubuntu-24.04-r-devel",
+  "ubuntu-24.04-r-4.1",
   "macos-latest-r-release",
   "windows-latest-r-release"
 )
@@ -111,9 +111,9 @@ check(length(script_argument) == 1L, "Could not identify the run-index script.")
 script_path <- normalizePath(sub("^--file=", "", script_argument), mustWork = TRUE)
 source(file.path(dirname(script_path), "check-note-policy.R"), local = TRUE)
 expected_environments <- list(
-  "ubuntu-latest-r-release" = c("Linux", "linux"),
-  "ubuntu-latest-r-devel" = c("Linux", "linux"),
-  "ubuntu-latest-r-4.1" = c("Linux", "linux"),
+  "ubuntu-24.04-r-release" = c("Linux", "linux"),
+  "ubuntu-24.04-r-devel" = c("Linux", "linux"),
+  "ubuntu-24.04-r-4.1" = c("Linux", "linux"),
   "macos-latest-r-release" = c("Darwin", "apple-darwin"),
   "windows-latest-r-release" = c("Windows", "mingw32")
 )
@@ -133,7 +133,7 @@ for (result in results) {
   )
   expected_environment <- expected_environments[[result$job_label]]
   check(identical(result$environment$remote_url_checks,
-    result$job_label != "ubuntu-latest-r-4.1"),
+    result$job_label != "ubuntu-24.04-r-4.1"),
     paste("Remote URL-check scope does not match its label:", result$job_label))
   check(
     identical(result$environment$os, expected_environment[[1L]]) &&
@@ -142,12 +142,12 @@ for (result in results) {
       grepl(expected_environment[[2L]], result$environment$platform),
     paste("Check environment does not match its label:", result$job_label)
   )
-  if (identical(result$job_label, "ubuntu-latest-r-devel")) {
+  if (identical(result$job_label, "ubuntu-24.04-r-devel")) {
     check(
       grepl("^R Under development ", result$environment$r_version),
       "The R-devel check did not use R Under development."
     )
-  } else if (identical(result$job_label, "ubuntu-latest-r-4.1")) {
+  } else if (identical(result$job_label, "ubuntu-24.04-r-4.1")) {
     check(
       grepl("^R version 4[.]1[.]", result$environment$r_version),
       "The minimum-R check did not use R 4.1.x."
@@ -170,7 +170,7 @@ for (result in results) {
   )
   expected_note_policy <- if (identical(
     result$job_label,
-    "ubuntu-latest-r-4.1"
+    "ubuntu-24.04-r-4.1"
   )) {
     "minimum-r-optional-backends"
   } else {
@@ -249,7 +249,7 @@ check(length(expected_resource_ids) > 0L && !anyDuplicated(expected_resource_ids
 inventory_labels <- sub("/.*$", "", inventory_relative_paths)
 inventory_labels <- sub("^release-check-", "", inventory_labels)
 expected_inventory_labels <- c(
-  "ubuntu-latest-r-release",
+  "ubuntu-24.04-r-release",
   "macos-latest-r-release",
   "windows-latest-r-release"
 )
