@@ -114,6 +114,7 @@ jobs:
 
       - name: Install and expose the index tool
         run: |
+          tlmgr update --self
           tlmgr install makeindex
           tlmgr path add
           command -v makeindex
