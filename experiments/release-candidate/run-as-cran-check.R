@@ -131,11 +131,14 @@ if (!is.null(reused_check)) {
     stopifnot(any(grepl(paste0("^\\* checking ", stage, " \\.\\.\\. .*OK$"), check_lines)))
   }
 }
+external_cases <- Filter(Negate(is.null), lapply(note_blocks, release_external_case, label = job_label))
+external_verifications <- lapply(external_cases, release_recheck_external)
 classification <- release_classify_notes(
   check_status,
   note_blocks,
   note_policy,
-  job_label
+  job_label,
+  external_verifications
 )
 effective_status <- classification$effective_status
 
@@ -149,6 +152,7 @@ result <- list(
   note_policy = note_policy,
   explained_notes = classification$explained_notes,
   note_blocks = note_blocks,
+  external_verifications = external_verifications,
   started_at_utc = started,
   finished_at_utc = finished,
   reused_check = reused_check,

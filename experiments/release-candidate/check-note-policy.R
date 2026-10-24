@@ -63,7 +63,65 @@ release_resource_size_note <- function(note_block) {
     sum(sizes) <= total + 0.2
 }
 
-release_classify_notes <- function(check_status, note_blocks, note_policy, job_label = NULL) {
+# These two observed responses require a fresh successful identity check.
+release_external_case <- function(block, label) {
+  prefix <- block; prefix$detail <- head(block$detail, 2L)
+  if (!release_new_submission_note(prefix)) return(NULL)
+  lancaster <- paste0("https://www.lancaster.ac.uk/news/articles/2017/",
+    "researchers-release-largest-ever-public-collection-of-british-conversations/")
+  cases <- list(
+    "windows-latest-r-release" = list(id = "lancaster-dns", url = lancaster,
+      verification_url = lancaster,
+      identity = "Researchers release largest ever public collection of British conversations",
+      detail = c("Found the following (possibly) invalid URLs:", paste("URL:", lancaster),
+        "From: inst/doc/designing-comparisons.html", "Status: Error",
+        "Message: libcurl error code 6:", "Could not resolve host: www.lancaster.ac.uk")),
+    "ubuntu-24.04-r-4.1" = list(id = "mattr-doi-403",
+      url = "https://doi.org/10.1080/09296171003643098",
+      verification_url = "https://api.crossref.org/works/10.1080%2F09296171003643098",
+      identity = "10.1080/09296171003643098",
+      detail = c("Found the following (possibly) invalid DOIs:",
+        "DOI: 10.1080/09296171003643098", "From: DESCRIPTION",
+        "Status: Forbidden", "Message: 403")))
+  if (is.null(label) || length(label) != 1L) return(NULL)
+  case <- cases[[label]]
+  if (is.null(case) || !identical(unlist(block$detail[-c(1L, 2L)], use.names = FALSE),
+      case$detail)) return(NULL)
+  case
+}
+
+release_external_verified <- function(case, records) {
+  if (is.null(case) || length(records) != 1L) return(FALSE)
+  proof <- records[[1L]]
+  identical(proof$id, case$id) && identical(proof$url, case$url) &&
+    identical(proof$verification_url, case$verification_url) &&
+    identical(as.integer(proof$status), 200L) && identical(proof$identity, case$identity) &&
+    is.character(proof$body_sha256) && length(proof$body_sha256) == 1L &&
+    grepl("^[0-9a-f]{64}$", proof$body_sha256) &&
+    is.character(proof$checked_at_utc) && length(proof$checked_at_utc) == 1L &&
+    grepl("^[0-9-]+T[0-9:]+Z$", proof$checked_at_utc)
+}
+
+release_recheck_external <- function(case) {
+  response <- curl::curl_fetch_memory(case$verification_url,
+    curl::new_handle(timeout = 60, followlocation = TRUE))
+  stopifnot(response$status_code == 200L)
+  body <- rawToChar(response$content)
+  if (case$id == "mattr-doi-403") {
+    metadata <- jsonlite::fromJSON(body)$message
+    stopifnot(identical(metadata$DOI, case$identity),
+      any(grepl("Cutting the Gordian Knot", metadata$title, fixed = TRUE)))
+  } else {
+    stopifnot(grepl(case$identity, body, fixed = TRUE))
+  }
+  list(id = case$id, url = case$url, verification_url = case$verification_url,
+    status = as.integer(response$status_code), identity = case$identity,
+    body_sha256 = digest::digest(response$content, algo = "sha256", serialize = FALSE),
+    checked_at_utc = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"))
+}
+
+release_classify_notes <- function(check_status, note_blocks, note_policy, job_label = NULL,
+                                   external_verifications = NULL) {
   allowed_policies <- c("new-submission-only", "release-resource-notes",
     "minimum-r-optional-backends")
   if (!note_policy %in% allowed_policies) {
@@ -76,6 +134,9 @@ release_classify_notes <- function(check_status, note_blocks, note_policy, job_l
   if (!identical(check_status, expected)) return(fail)
   kinds <- vapply(note_blocks, function(block) {
     if (release_new_submission_note(block)) return("incoming")
+    if (note_policy != "new-submission-only" &&
+        release_external_verified(release_external_case(block, job_label), external_verifications))
+      return("incoming_external")
     if (note_policy == "minimum-r-optional-backends" &&
         release_unavailable_backends_note(block)) return("backends")
     if (note_policy != "new-submission-only" &&
@@ -85,6 +146,10 @@ release_classify_notes <- function(check_status, note_blocks, note_policy, job_l
   if ("unknown" %in% kinds || anyDuplicated(sub("^incoming.*$", "incoming", kinds)) ||
       (note_policy == "minimum-r-optional-backends" && !"backends" %in% kinds)) return(fail)
   dispositions <- list(
+    incoming_external = list(note = "New submission with a separately verified external response",
+      disposition = paste("The original DNS/DOI response remains in the raw log.",
+        "A fresh HTTP 200 response and expected page/DOI identity are recorded in external_verifications.",
+        "Current-R peer checks of the same artifact must have clean incoming URL/DOI results.")),
     incoming = list(note = "New submission", disposition = paste(
       "Expected CRAN incoming note for a package version that has not",
       "previously been published on CRAN; no package defect is asserted.")),

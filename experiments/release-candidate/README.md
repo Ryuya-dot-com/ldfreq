@@ -193,3 +193,13 @@ snapshot that executed the original check. The original execution version is
 retained in `environment`; `reused_check.classification_environment` records
 the classification host separately. This does not establish runtime behavior
 on the classification host's snapshot.
+
+The 0.5.1 exact-artifact run completed all tests, examples and vignette rebuilds.
+Its Windows incoming check recorded one Lancaster DNS resolution failure; R 4.1
+recorded one publisher DOI 403. Only these exact response blocks may be
+reclassified after a fresh HTTP 200 response with the expected page identity or
+Crossref DOI/title. Response hashes and timestamps accompany the unchanged raw
+logs. The aggregate also requires three current-R peer checks of the identical
+artifact with clean incoming URL/DOI results. Unknown URLs, status codes, extra
+findings, missing verification or failed peer checks remain blocking. This is
+combined evidence, not a claim that the original network responses disappeared.

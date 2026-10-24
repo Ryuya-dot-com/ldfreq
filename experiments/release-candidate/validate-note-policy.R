@@ -144,3 +144,67 @@ for (label in names(external_cases)) {
   stopifnot(release_classify_notes(status, notes, policy, label)$effective_status == "FAIL")
 }
 cat("Historical external-response exceptions are no longer accepted.\n")
+
+# Current external responses need fresh verification and exactly matched findings.
+local({
+  cases <- list(
+    'windows-latest-r-release' = c(
+      'Found the following (possibly) invalid URLs:',
+      paste0('URL: https://www.lancaster.ac.uk/news/articles/2017/',
+        'researchers-release-largest-ever-public-collection-of-british-conversations/'),
+      'From: inst/doc/designing-comparisons.html', 'Status: Error',
+      'Message: libcurl error code 6:', 'Could not resolve host: www.lancaster.ac.uk'),
+    'ubuntu-24.04-r-4.1' = c('Found the following (possibly) invalid DOIs:',
+      'DOI: 10.1080/09296171003643098', 'From: DESCRIPTION', 'Status: Forbidden', 'Message: 403'))
+  for (label in names(cases)) {
+    block <- incoming; block$detail <- c(block$detail, as.list(cases[[label]]))
+    minimum <- label == 'ubuntu-24.04-r-4.1'
+    notes <- if (minimum) list(block, dependency) else list(block)
+    policy <- if (minimum) 'minimum-r-optional-backends' else 'release-resource-notes'
+    status <- if (minimum) 'Status: 2 NOTEs' else 'Status: 1 NOTE'
+    case <- release_external_case(block, label)
+    proof <- list(id = case$id, url = case$url, verification_url = case$verification_url,
+      status = 200L, identity = case$identity, body_sha256 = paste(rep('a', 64), collapse=''),
+      checked_at_utc = '2026-10-24T14:00:00Z')
+    classify_proof <- function(records, blocks = notes, job = label)
+      release_classify_notes(status, blocks, policy, job, records)$effective_status
+    stopifnot(classify_proof(NULL) == 'FAIL', classify_proof(list(proof)) != 'FAIL',
+      classify_proof(list(proof, proof)) == 'FAIL', classify_proof(list(proof), job='other') == 'FAIL')
+    for (field in names(proof)) {
+      altered <- proof; altered[[field]] <- if (field=='status') 403L else 'unverified'
+      stopifnot(classify_proof(list(altered)) == 'FAIL')
+    }
+    for (line in seq.int(3L, length(block$detail))) {
+      altered <- notes; altered[[1L]]$detail[[line]] <- 'unexpected response'
+      stopifnot(classify_proof(list(proof), altered) == 'FAIL')
+    }
+    altered <- notes; altered[[1L]]$detail <- c(altered[[1L]]$detail, 'another finding')
+    stopifnot(classify_proof(list(proof), altered) == 'FAIL')
+  }
+  cat('Exact external-response findings require successful, identity-matched verification; unknown or incomplete records fail.\n')
+})
+
+local({
+  expressions <- as.list(parse('experiments/release-candidate/assemble-run-index.R'))
+  loop <- Filter(function(x) is.call(x) && identical(x[[1L]], as.name('for')) &&
+    any(grepl('three clean current-R peer checks', deparse(x), fixed=TRUE)), expressions)[[1L]]
+  peer_check <- Filter(function(x) is.call(x) && identical(x[[1L]], as.name('if')) &&
+    any(grepl('three clean current-R peer checks', deparse(x), fixed=TRUE)), as.list(loop[[4L]]))[[1L]]
+  check <- function(condition, message) if (!isTRUE(condition)) stop(message)
+  result <- list(external_verifications=list(list()), artifact=list(sha256='same'))
+  results <- lapply(c('ubuntu-24.04-r-release','ubuntu-24.04-r-devel','macos-latest-r-release'),
+    function(label) list(job_label=label,artifact=list(sha256='same'),
+      environment=list(remote_url_checks=TRUE),note_blocks=list(incoming)))
+  eval(peer_check)
+  original <- results
+  for (failure_kind in c('missing','artifact','scope','incoming')) {
+    results <- original
+    if (failure_kind=='missing') results <- results[-1L]
+    if (failure_kind=='artifact') results[[1L]]$artifact$sha256 <- 'other'
+    if (failure_kind=='scope') results[[1L]]$environment$remote_url_checks <- FALSE
+    if (failure_kind=='incoming') results[[1L]]$note_blocks <- list(non_foss)
+    failed <- tryCatch({eval(peer_check); FALSE}, error=function(e) TRUE)
+    stopifnot(failed)
+  }
+  cat('External-response aggregation requires all three clean current-R peers with the identical artifact.\n')
+})

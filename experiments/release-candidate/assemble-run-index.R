@@ -187,7 +187,17 @@ for (result in results) {
   raw_lines <- readLines(check_logs[[1L]], warn = FALSE)
   raw_status <- tail(grep("^Status:", raw_lines, value = TRUE), 1L)
   raw_blocks <- release_note_blocks(raw_lines)
-  classified <- release_classify_notes(raw_status, raw_blocks, expected_note_policy, result$job_label)
+  classified <- release_classify_notes(raw_status, raw_blocks, expected_note_policy, result$job_label,
+    result$external_verifications)
+  if (length(result$external_verifications)) {
+    peers <- Filter(function(x) x$job_label %in% c("ubuntu-24.04-r-release",
+      "ubuntu-24.04-r-devel", "macos-latest-r-release"), results)
+    check(length(peers) == 3L && all(vapply(peers, function(x)
+      identical(x$artifact$sha256, result$artifact$sha256) &&
+      isTRUE(x$environment$remote_url_checks) &&
+      all(vapply(x$note_blocks, release_new_submission_note, logical(1L))), logical(1L))),
+      "External-response disposition requires three clean current-R peer checks of the same artifact.")
+  }
   if (!is.null(result$reused_check)) {
     original_path <- file.path(dirname(result_path), "check-result-before-reclassification.json")
     check(file.exists(original_path) && identical(sha256_file(original_path),
