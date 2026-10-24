@@ -80,6 +80,27 @@ provide specified means, a planned contrast and Kenward–Roger confidence
 intervals. Existing exports, measurement contracts and saved records are
 unchanged.
 
+## Public study and corpus interfaces in 0.4.0.9006
+
+Eight public entry points cover study-table construction/selection,
+concordance search/sorting/within-document dispersion, collocations and
+keyness with a concordance handoff. Their initial interface preserves
+the existing example computations, units, missingness and component
+layouts. The new search facade adds a `lexdiv_concordance` class and a
+registered [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
+method. Full source records and checksums remain in the results. The
+formula and resource contracts are unchanged; a public interface is not
+a claim of universal validity.
+
+The four installed helper files remain compatibility entry points,
+delegating to the same package implementations. Old named and positional
+calls retain plain lists, ordinary tables and the legacy ggplot return.
+Saved old concordance records are accepted by sorting, dispersion and
+collocations; old keyness records can feed the public concordance
+handoff. No saved object is silently rewritten. Save the full record and
+retain the package archive; checksums of a compatibility script alone no
+longer identify its underlying computation.
+
 ## Method identity
 
 A `method_id` fixes the formula, scale, boundary and tail rules,

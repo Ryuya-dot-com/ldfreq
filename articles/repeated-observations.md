@@ -17,12 +17,14 @@ to have different starting values and linear time slopes. The inputs are
 checks the connection between tables and a model; it supplies no
 evidence of development, proficiency or causation.
 
-This guide requires the 0.3.0.9008 development sources or later. The
-helpers are installed example code, sourced explicitly below; they are
-not exported package functions. They use
-`lexdiv_metrics_batch(..., plan = plan)` and do not fit or choose a
-model. The table workflow needs no additional package. Only the model
-section uses optional [lme4](https://lme4.github.io/lme4/).
+This guide requires **ldfreq 0.4.0.9006 or later**. The public functions
+[`lexdiv_study_table()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+and
+[`lexdiv_study_model_data()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+use saved results from `lexdiv_metrics_batch(..., plan = plan)` and do
+not fit or choose a model. The table workflow needs no additional
+package. Only the model section uses optional
+[lme4](https://lme4.github.io/lme4/).
 
 ## Start with the planned observations
 
@@ -39,7 +41,6 @@ demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "repeated-study-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
 record <- demo$record
-helper <- demo$helper
 print(head(record$planned, 6), row.names = FALSE)
 #>  writer_id        task occasion observation_id scheduled_date
 #>        001 description        0        obs-001     2026-01-05
@@ -102,47 +103,47 @@ stopifnot(identical(plan, record$plan))
 record$condition
 #> $id
 #> [1] "english-surface-lower"
-#>
+#> 
 #> $tokenizer
 #> [1] "english"
-#>
+#> 
 #> $normalization
 #> [1] "NFC"
-#>
+#> 
 #> $case
 #> [1] "lower"
-#>
+#> 
 #> $keep_numbers
 #> [1] FALSE
-#>
+#> 
 #> $unit
 #> [1] "surface"
-#>
+#> 
 #> $inclusion
 #> [1] "all tokens returned by lexdiv_tokenize_batch"
-#>
+#> 
 #> $resources
 #> [1] "No external annotation model or lexical reference resource"
 record$prepared[[1]]$provenance[c("tokenizer_id", "tokenizer_version",
   "normalization", "case", "keep_numbers", "input_characters", "output_tokens")]
 #> $tokenizer_id
 #> [1] "ldfreq-english-word-tokenizer"
-#>
+#> 
 #> $tokenizer_version
 #> [1] "0.1.0"
-#>
+#> 
 #> $normalization
 #> [1] "NFC"
-#>
+#> 
 #> $case
 #> [1] "lower"
-#>
+#> 
 #> $keep_numbers
 #> [1] FALSE
-#>
+#> 
 #> $input_characters
 #> [1] 0
-#>
+#> 
 #> $output_tokens
 #> [1] 0
 ```
@@ -173,7 +174,7 @@ its computational specification, not a study design.
 ## Build the complete study table
 
 ``` r
-study <- helper$study_long_table(
+study <- lexdiv_study_table(
   record$planned, record$submissions, record$results, record$plan,
   condition_id = record$condition$id, reporting = record$reporting
 )
@@ -236,7 +237,7 @@ diagnostics and your study’s reporting rules separately.
 ## Select one response and explain the denominator
 
 ``` r
-selected <- helper$study_model_data(study,
+selected <- lexdiv_study_model_data(study,
   condition_id = record$condition$id, request_id = "mattr10",
   required = c("writer_id", "task", "occasion"))
 stopifnot(identical(selected, record$selected))
@@ -348,19 +349,19 @@ record$model <- list(
 record$model$diagnostics
 #> $warnings
 #> character(0)
-#>
+#> 
 #> $messages
 #> character(0)
-#>
+#> 
 #> $optimizer_code
 #> [1] 0
-#>
+#> 
 #> $convergence_messages
 #> NULL
-#>
+#> 
 #> $singular
 #> [1] FALSE
-#>
+#> 
 #> $singular_tolerance
 #> [1] 1e-04
 ```
@@ -422,32 +423,32 @@ record$inference$tables$cells
 #>         4 argument    0.6184924 0.02413349 18.02 0.5677935 0.6691914         18
 #>         8 argument    0.6371460 0.03044787 17.82 0.5731313 0.7011608         18
 #>  support       interval_outside_response_bounds
-#>  observed_cell FALSE
-#>  observed_cell FALSE
-#>  observed_cell FALSE
-#>  observed_cell FALSE
-#>  observed_cell FALSE
-#>  observed_cell FALSE
-#>
-#> Degrees-of-freedom method: kenward-roger
+#>  observed_cell FALSE                           
+#>  observed_cell FALSE                           
+#>  observed_cell FALSE                           
+#>  observed_cell FALSE                           
+#>  observed_cell FALSE                           
+#>  observed_cell FALSE                           
+#> 
+#> Degrees-of-freedom method: kenward-roger 
 #> Confidence level used: 0.95
 record$inference$tables$weeks
-#>  occasion    emmean         SE    df  lower.CL  upper.CL support
+#>  occasion    emmean         SE    df  lower.CL  upper.CL support       
 #>         0 0.6278178 0.02083939 17.03 0.5838558 0.6717799 observed_cells
 #>         4 0.6464714 0.02378807 17.01 0.5962844 0.6966585 observed_cells
 #>         8 0.6651250 0.03008736 17.00 0.6016465 0.7286035 observed_cells
-#>
-#> Results are averaged over the levels of: task
-#> Degrees-of-freedom method: kenward-roger
+#> 
+#> Results are averaged over the levels of: task 
+#> Degrees-of-freedom method: kenward-roger 
 #> Confidence level used: 0.95
 record$inference$tables$comparison
 #>  contrast         estimate         SE    df     lower.CL   upper.CL
 #>  week_8_minus_0 0.03730716 0.02038552 17.02 -0.005698678 0.08031299
-#>  support
+#>  support           
 #>  observed_endpoints
-#>
-#> Results are averaged over the levels of: task
-#> Degrees-of-freedom method: kenward-roger
+#> 
+#> Results are averaged over the levels of: task 
+#> Degrees-of-freedom method: kenward-roger 
 #> Confidence level used: 0.95
 ```
 
@@ -559,10 +560,7 @@ overwrite research files.
 ``` r
 output_dir <- tempfile("repeated-study-")
 dir.create(output_dir)
-helper_path <- system.file("examples", "study-table.R",
-  package = "ldfreq", mustWork = TRUE)
-record$helper_md5 <- unname(tools::md5sum(helper_path))
-record$helper_source <- readLines(helper_path, warn = FALSE)
+record$ldfreq_version <- as.character(packageVersion("ldfreq"))
 record$session <- sessionInfo()
 saveRDS(record, file.path(output_dir, "study.rds"))
 write.csv(study[c("observation_id", "writer_id", "task", "occasion",
@@ -580,21 +578,17 @@ if (!is.null(record$inference$tables)) {
 ```
 
 In a fresh R session, load the same package snapshot and set
-`output_dir` to the saved folder, then run the following. The recorded
-helper checksum checks the implementation used for joining; the full
-session record describes the package environment. Saved source is
-retained for inspection if versions differ.
+`output_dir` to the saved folder, then run the following. Keep the named
+package archive beside the study record when archiving a study; a
+version label alone does not preserve the software bytes. The full
+session record describes the package environment.
 
 ``` r
 saved <- readRDS(file.path(output_dir, "study.rds"))
-helper <- new.env(parent = baseenv())
-helper_path <- system.file("examples", "study-table.R", package = "ldfreq",
-  mustWork = TRUE)
-stopifnot(identical(unname(tools::md5sum(helper_path)), saved$helper_md5))
-sys.source(helper_path, helper)
-replayed <- helper$study_long_table(saved$planned, saved$submissions,
+stopifnot(identical(as.character(packageVersion("ldfreq")), saved$ldfreq_version))
+replayed <- lexdiv_study_table(saved$planned, saved$submissions,
   saved$results, saved$plan, saved$condition$id, saved$reporting)
-reselected <- do.call(helper$study_model_data,
+reselected <- do.call(lexdiv_study_model_data,
   c(list(study = replayed), saved$selection))
 stopifnot(identical(replayed, saved$study),
   identical(reselected, saved$selected),
@@ -609,6 +603,12 @@ its recorded formula, contrast settings, retained rows, lme4 version and
 numerical environment; its successful reload does not substitute for
 checking those conditions.
 
+Existing scripts may still source `examples/study-table.R` and use
+`study_long_table()` / `study_model_data()`; their arguments and
+ordinary table outputs remain supported. Existing saved tables do not
+need migration. New workflows can call the public functions directly,
+without sourcing a helper.
+
 When the inference section was run, the same RDS also holds its
 settings, reference grids, comparison, diagnostics and flat reporting
 tables. In a fresh session, the following displays those tables without
@@ -620,48 +620,48 @@ its inference method.
 saved$inference$settings
 #> $response
 #> [1] "MATTR10"
-#>
+#> 
 #> $unit
 #> [1] "original 0-1 scale"
-#>
+#> 
 #> $weeks
 #> [1] 0 4 8
-#>
+#> 
 #> $tasks
-#> [1] "description" "argument"
-#>
+#> [1] "description" "argument"   
+#> 
 #> $task_weights
-#> description    argument
-#>         0.5         0.5
-#>
+#> description    argument 
+#>         0.5         0.5 
+#> 
 #> $target
 #> [1] "Population mean under the fitted Gaussian identity-link model"
-#>
+#> 
 #> $contrast
 #> [1] "week 8 minus week 0, equal weights for the two named tasks"
-#>
+#> 
 #> $level
 #> [1] 0.95
-#>
+#> 
 #> $adjustment
 #> [1] "none"
-#>
+#> 
 #> $interval
 #> [1] "pointwise confidence intervals; one planned contrast"
-#>
+#> 
 #> $df_method
 #> [1] "kenward-roger"
-#>
+#> 
 #> $prediction_interval
 #> [1] FALSE
 saved$inference$tables$comparison
 #>  contrast         estimate         SE    df     lower.CL   upper.CL
 #>  week_8_minus_0 0.03730716 0.02038552 17.02 -0.005698678 0.08031299
-#>  support
+#>  support           
 #>  observed_endpoints
-#>
-#> Results are averaged over the levels of: task
-#> Degrees-of-freedom method: kenward-roger
+#> 
+#> Results are averaged over the levels of: task 
+#> Degrees-of-freedom method: kenward-roger 
 #> Confidence level used: 0.95
 stopifnot(identical(saved$inference$settings$df_method, "kenward-roger"),
   identical(saved$inference$observation_ids, saved$selected$data$observation_id))

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,13 @@
       <small>Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0.9006" id="ldfreq-0409006">ldfreq 0.4.0.9006<a class="anchor" aria-label="anchor" href="#ldfreq-0409006"></a></h2>
+<ul><li>Call <code><a href="../reference/lexdiv_study_table.html">lexdiv_study_table()</a></code> and <code><a href="../reference/lexdiv_study_table.html">lexdiv_study_model_data()</a></code> directly to retain planned observations, submitted documents, measurement specifications and model-row exclusions, without sourcing a helper or fitting a model.</li>
+<li>Use <code><a href="../reference/lexdiv_concordance.html">lexdiv_concordance()</a></code>, <code><a href="../reference/lexdiv_concordance.html">lexdiv_concordance_sort()</a></code> and <code><a href="../reference/lexdiv_concordance.html">lexdiv_concordance_dispersion()</a></code> for source-linked searches and saved within-document distributions. <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> on the new concordance result draws positions and invisibly returns the displayed occurrences, documents and counts.</li>
+<li>Add <code><a href="../reference/lexdiv_collocations.html">lexdiv_collocations()</a></code>, <code><a href="../reference/lexdiv_keyness.html">lexdiv_keyness()</a></code> and <code><a href="../reference/lexdiv_keyness.html">lexdiv_keyness_concordance()</a></code> with the existing opportunity/denominator rules, complete source records and missingness distinctions. No new dependencies or measurement formulas are introduced.</li>
+<li>Keep old sourced names, their return shapes and existing saved records usable. Public help and the main workflow guides now show the direct entry points. Other source-based recipes retain their scope. Stable 0.4.0 remains available.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0.9005" id="ldfreq-0409005">ldfreq 0.4.0.9005<a class="anchor" aria-label="anchor" href="#ldfreq-0409005"></a></h2>
 <ul><li>Extend the repeated-observations guide with an explicitly sourced reporting recipe for task-specific means, equally task-weighted means and one planned week-8 minus week-0 contrast. Optional emmeans and pbkrtest supply explicitly requested Kenward–Roger intervals; unavailable methods do not silently fall back to different inference.</li>

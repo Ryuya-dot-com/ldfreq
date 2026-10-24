@@ -1,5 +1,36 @@
 # Changelog
 
+## ldfreq 0.4.0.9006
+
+- Call
+  [`lexdiv_study_table()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+  and
+  [`lexdiv_study_model_data()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+  directly to retain planned observations, submitted documents,
+  measurement specifications and model-row exclusions, without sourcing
+  a helper or fitting a model.
+- Use
+  [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
+  [`lexdiv_concordance_sort()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+  and
+  [`lexdiv_concordance_dispersion()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+  for source-linked searches and saved within-document distributions.
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) on the new
+  concordance result draws positions and invisibly returns the displayed
+  occurrences, documents and counts.
+- Add
+  [`lexdiv_collocations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.md),
+  [`lexdiv_keyness()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+  and
+  [`lexdiv_keyness_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+  with the existing opportunity/denominator rules, complete source
+  records and missingness distinctions. No new dependencies or
+  measurement formulas are introduced.
+- Keep old sourced names, their return shapes and existing saved records
+  usable. Public help and the main workflow guides now show the direct
+  entry points. Other source-based recipes retain their scope. Stable
+  0.4.0 remains available.
+
 ## ldfreq 0.4.0.9005
 
 - Extend the repeated-observations guide with an explicitly sourced

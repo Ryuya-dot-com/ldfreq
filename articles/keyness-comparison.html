@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,14 +76,14 @@ another? The answer depends on the reference: its genres, topics,
 writers and collection conditions help determine what a difference
 means. Keyness describes that comparison; it does not by itself measure
 language proficiency or writing quality.</p>
-<p>This guide uses ldfreq <strong>0.3.0.9011 or later</strong>. The
-explicitly sourced helpers in <code>examples/keyness.R</code> retain
-both corpora, the tokens counted, the two-by-two tables, and links back
-to the original text. They are installed examples, not exported
-functions. Counting needs no optional package; returning to KWIC uses
-<strong>quanteda &gt;= 4.5.0</strong>. The inputs below are authored for
-checking calculations, not learner data or an evaluation of annotation
-accuracy.</p>
+<p>This guide uses ldfreq <strong>0.4.0.9006 or later</strong>. The
+public functions <code><a href="../reference/lexdiv_keyness.html">lexdiv_keyness()</a></code> and
+<code><a href="../reference/lexdiv_keyness.html">lexdiv_keyness_concordance()</a></code> retain both corpora, the
+tokens counted, the two-by-two tables, and links back to the original
+text. No helper sourcing is needed. Counting needs no optional package;
+returning to KWIC uses <strong>quanteda &gt;= 4.5.0</strong>. The inputs
+below are authored for checking calculations, not learner data or an
+evaluation of annotation accuracy.</p>
 <div class="section level2">
 <h2 id="declare-the-documents-and-inspect-the-coverage">Declare the documents and inspect the coverage<a class="anchor" aria-label="anchor" href="#declare-the-documents-and-inspect-the-coverage"></a>
 </h2>
@@ -93,7 +93,6 @@ accuracy.</p>
 <span><span class="va">demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"keyness-demo.R"</span>,</span>
 <span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">demo</span><span class="op">)</span></span>
-<span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">helper</span></span>
 <span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="va">demo</span><span class="op">$</span><span class="va">comparison</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">$</span><span class="va">totals</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"corpus"</span>, <span class="st">"documents"</span>, <span class="st">"source_tokens"</span>,</span>
 <span>  <span class="st">"missing_terms"</span>, <span class="st">"counted_tokens"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -118,13 +117,10 @@ denominator.</p>
 <span><span class="co">#&gt;      r_empty                               </span></span>
 <span><span class="co">#&gt;      outside              unlisted unlisted</span></span></code></pre></div>
 <p>For your own unchanged <code><a href="../reference/lexdiv_import_annotations.html">lexdiv_import_annotations()</a></code>
-result, source both helpers explicitly. The <a href="concordance-and-dispersion.html">concordance guide</a> explains
+result, call the public function directly. The <a href="concordance-and-dispersion.html">concordance guide</a> explains
 how to prepare complete, aligned annotations with original offsets.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">file</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"concordance.R"</span>, <span class="st">"keyness.R"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="va">file</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">helper</span><span class="op">)</span></span>
-<span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">keyness_compare</span><span class="op">(</span><span class="va">annotations</span>,</span>
+<code class="sourceCode R"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_keyness.html">lexdiv_keyness</a></span><span class="op">(</span><span class="va">annotations</span>,</span>
 <span>  target <span class="op">=</span> <span class="va">target_document_ids</span>, reference <span class="op">=</span> <span class="va">reference_document_ids</span>,</span>
 <span>  preprocessing_id <span class="op">=</span> <span class="st">"lemma-exclude-punctuation-v1"</span>,</span>
 <span>  term_col <span class="op">=</span> <span class="st">"lemma"</span>, keep <span class="op">=</span> <span class="va">keep</span><span class="op">)</span></span></code></pre></div>
@@ -242,7 +238,7 @@ workflow</a>.</p>
 <h2 id="select-rows-while-retaining-the-original-comparison">Select rows while retaining the original comparison<a class="anchor" aria-label="anchor" href="#select-rows-while-retaining-the-original-comparison"></a>
 </h2>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">selected</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">keyness_compare</span><span class="op">(</span><span class="va">comparison</span><span class="op">$</span><span class="va">source</span>,</span>
+<code class="sourceCode R"><span><span class="va">selected</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_keyness.html">lexdiv_keyness</a></span><span class="op">(</span><span class="va">comparison</span><span class="op">$</span><span class="va">source</span>,</span>
 <span>  target <span class="op">=</span> <span class="va">comparison</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">target</span>, reference <span class="op">=</span> <span class="va">comparison</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">reference</span>,</span>
 <span>  preprocessing_id <span class="op">=</span> <span class="va">comparison</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">preprocessing_id</span>,</span>
 <span>  term_col <span class="op">=</span> <span class="va">comparison</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">term_col</span>, keep <span class="op">=</span> <span class="va">comparison</span><span class="op">$</span><span class="va">settings</span><span class="op">$</span><span class="va">keep</span>,</span>
@@ -271,7 +267,7 @@ treating that as complete observation of the word’s absence.</p>
 <h2 id="return-to-exactly-the-counted-occurrences">Return to exactly the counted occurrences<a class="anchor" aria-label="anchor" href="#return-to-exactly-the-counted-occurrences"></a>
 </h2>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">context</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">keyness_concordance</span><span class="op">(</span><span class="va">comparison</span>, <span class="st">"learn"</span>, window <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">context</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_keyness.html">lexdiv_keyness_concordance</a></span><span class="op">(</span><span class="va">comparison</span>, <span class="st">"learn"</span>, window <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
 <span><span class="va">hits</span> <span class="op">&lt;-</span> <span class="va">context</span><span class="op">$</span><span class="va">search</span><span class="op">$</span><span class="va">occurrences</span></span>
 <span><span class="va">hits</span><span class="op">$</span><span class="va">corpus</span> <span class="op">&lt;-</span> <span class="va">comparison</span><span class="op">$</span><span class="va">documents</span><span class="op">$</span><span class="va">corpus</span><span class="op">[</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">hits</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">comparison</span><span class="op">$</span><span class="va">documents</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span><span class="op">]</span></span>
@@ -318,9 +314,9 @@ path such as <code>"keyness-record.rds"</code>. Relative paths start at
 <span><span class="va">file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span> <span class="co"># use a durable project path for your analysis</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">record</span>, <span class="va">file</span>, version <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">reopened</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">file</span><span class="op">)</span></span>
-<span><span class="va">helper</span><span class="op">$</span><span class="fu">keyness_validate</span><span class="op">(</span><span class="va">reopened</span><span class="op">$</span><span class="va">comparison</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">reopened</span>, <span class="va">record</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">s</span> <span class="op">&lt;-</span> <span class="va">reopened</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">settings</span></span>
-<span><span class="va">replayed</span> <span class="op">&lt;-</span> <span class="va">helper</span><span class="op">$</span><span class="fu">keyness_compare</span><span class="op">(</span><span class="va">reopened</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">source</span>,</span>
+<span><span class="va">replayed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_keyness.html">lexdiv_keyness</a></span><span class="op">(</span><span class="va">reopened</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">source</span>,</span>
 <span>  target <span class="op">=</span> <span class="va">s</span><span class="op">$</span><span class="va">target</span>, reference <span class="op">=</span> <span class="va">s</span><span class="op">$</span><span class="va">reference</span>, preprocessing_id <span class="op">=</span> <span class="va">s</span><span class="op">$</span><span class="va">preprocessing_id</span>,</span>
 <span>  term_col <span class="op">=</span> <span class="va">s</span><span class="op">$</span><span class="va">term_col</span>, keep <span class="op">=</span> <span class="va">s</span><span class="op">$</span><span class="va">keep</span>, min_count <span class="op">=</span> <span class="va">s</span><span class="op">$</span><span class="va">min_count</span>, max_tokens <span class="op">=</span> <span class="va">s</span><span class="op">$</span><span class="va">max_tokens</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">replayed</span>, <span class="va">reopened</span><span class="op">$</span><span class="va">comparison</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -328,11 +324,7 @@ path such as <code>"keyness-record.rds"</code>. Relative paths start at
 path:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
-<span><span class="va">helper</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">globalenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">script</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"concordance.R"</span>, <span class="st">"keyness.R"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="va">script</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">helper</span><span class="op">)</span></span>
 <span><span class="va">reopened</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"keyness-record.rds"</span><span class="op">)</span></span>
-<span><span class="va">helper</span><span class="op">$</span><span class="fu">keyness_validate</span><span class="op">(</span><span class="va">reopened</span><span class="op">$</span><span class="va">comparison</span><span class="op">)</span></span>
 <span><span class="va">reopened</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">results</span></span>
 <span><span class="va">reopened</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">segments</span></span></code></pre></div>
 <p>This reads the stored comparison without recomputing scores or
@@ -341,10 +333,14 @@ running KWIC.</p>
 their collection and overlap checks. A different reference is a
 different comparison: repeat the calculation, keep both records, and
 explain the change. A selected CSV alone cannot reconstruct the
-background denominator. Validation detects accidental edits, not the
-authenticity or quality of supplied annotations. Exact whole-object
-replay requires the same package/helper version; after an upgrade,
-compare counts and settings explicitly.</p>
+background denominator. Reading a list component does not revalidate the
+record; operations such as <code><a href="../reference/lexdiv_keyness.html">lexdiv_keyness_concordance()</a></code>
+validate the complete input before use. Legacy scripts may still source
+<code>examples/keyness.R</code> to use their existing names, including
+<code>keyness_validate()</code>. These integrity checks detect
+accidental edits, not annotation authenticity or quality. Exact
+whole-object replay requires the same package/helper version; after an
+upgrade, compare counts and settings explicitly.</p>
 </div>
 <div class="section level2">
 <h2 id="numerical-checks-and-their-scope">Numerical checks and their scope<a class="anchor" aria-label="anchor" href="#numerical-checks-and-their-scope"></a>

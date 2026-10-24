@@ -6,13 +6,15 @@ collection conditions help determine what a difference means. Keyness
 describes that comparison; it does not by itself measure language
 proficiency or writing quality.
 
-This guide uses ldfreq **0.3.0.9011 or later**. The explicitly sourced
-helpers in `examples/keyness.R` retain both corpora, the tokens counted,
-the two-by-two tables, and links back to the original text. They are
-installed examples, not exported functions. Counting needs no optional
-package; returning to KWIC uses **quanteda \>= 4.5.0**. The inputs below
-are authored for checking calculations, not learner data or an
-evaluation of annotation accuracy.
+This guide uses ldfreq **0.4.0.9006 or later**. The public functions
+[`lexdiv_keyness()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+and
+[`lexdiv_keyness_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+retain both corpora, the tokens counted, the two-by-two tables, and
+links back to the original text. No helper sourcing is needed. Counting
+needs no optional package; returning to KWIC uses **quanteda \>=
+4.5.0**. The inputs below are authored for checking calculations, not
+learner data or an evaluation of annotation accuracy.
 
 ## Declare the documents and inspect the coverage
 
@@ -22,7 +24,6 @@ library(ldfreq)
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "keyness-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
-helper <- demo$helper
 comparison <- demo$comparison
 print(comparison$totals[c("corpus", "documents", "source_tokens",
   "missing_terms", "counted_tokens")], row.names = FALSE)
@@ -51,16 +52,13 @@ print(demo$annotations$segments[c("document_id", "text")], row.names = FALSE)
 
 For your own unchanged
 [`lexdiv_import_annotations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md)
-result, source both helpers explicitly. The [concordance
+result, call the public function directly. The [concordance
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.md)
 explains how to prepare complete, aligned annotations with original
 offsets.
 
 ``` r
-helper <- new.env(parent = globalenv())
-for (file in c("concordance.R", "keyness.R"))
-  sys.source(system.file("examples", file, package = "ldfreq", mustWork = TRUE), helper)
-comparison <- helper$keyness_compare(annotations,
+comparison <- lexdiv_keyness(annotations,
   target = target_document_ids, reference = reference_document_ids,
   preprocessing_id = "lemma-exclude-punctuation-v1",
   term_col = "lemma", keep = keep)
@@ -180,7 +178,7 @@ workflow](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.
 ## Select rows while retaining the original comparison
 
 ``` r
-selected <- helper$keyness_compare(comparison$source,
+selected <- lexdiv_keyness(comparison$source,
   target = comparison$settings$target, reference = comparison$settings$reference,
   preprocessing_id = comparison$settings$preprocessing_id,
   term_col = comparison$settings$term_col, keep = comparison$settings$keep,
@@ -211,7 +209,7 @@ of the word’s absence.
 ## Return to exactly the counted occurrences
 
 ``` r
-context <- helper$keyness_concordance(comparison, "learn", window = 2L)
+context <- lexdiv_keyness_concordance(comparison, "learn", window = 2L)
 hits <- context$search$occurrences
 hits$corpus <- comparison$documents$corpus[
   match(hits$document_id, comparison$documents$document_id)]
@@ -260,9 +258,9 @@ record <- list(comparison = comparison,
 file <- tempfile(fileext = ".rds") # use a durable project path for your analysis
 saveRDS(record, file, version = 2)
 reopened <- readRDS(file)
-helper$keyness_validate(reopened$comparison)
+stopifnot(identical(reopened, record))
 s <- reopened$comparison$settings
-replayed <- helper$keyness_compare(reopened$comparison$source,
+replayed <- lexdiv_keyness(reopened$comparison$source,
   target = s$target, reference = s$reference, preprocessing_id = s$preprocessing_id,
   term_col = s$term_col, keep = s$keep, min_count = s$min_count, max_tokens = s$max_tokens)
 stopifnot(identical(replayed, reopened$comparison))
@@ -272,11 +270,7 @@ In a fresh R session, use the same package snapshot and your saved path:
 
 ``` r
 library(ldfreq)
-helper <- new.env(parent = globalenv())
-for (script in c("concordance.R", "keyness.R"))
-  sys.source(system.file("examples", script, package = "ldfreq", mustWork = TRUE), helper)
 reopened <- readRDS("keyness-record.rds")
-helper$keyness_validate(reopened$comparison)
 reopened$comparison$results
 reopened$comparison$source$segments
 ```
@@ -288,10 +282,15 @@ Record why the target and reference answer your question, including
 their collection and overlap checks. A different reference is a
 different comparison: repeat the calculation, keep both records, and
 explain the change. A selected CSV alone cannot reconstruct the
-background denominator. Validation detects accidental edits, not the
-authenticity or quality of supplied annotations. Exact whole-object
-replay requires the same package/helper version; after an upgrade,
-compare counts and settings explicitly.
+background denominator. Reading a list component does not revalidate the
+record; operations such as
+[`lexdiv_keyness_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+validate the complete input before use. Legacy scripts may still source
+`examples/keyness.R` to use their existing names, including
+`keyness_validate()`. These integrity checks detect accidental edits,
+not annotation authenticity or quality. Exact whole-object replay
+requires the same package/helper version; after an upgrade, compare
+counts and settings explicitly.
 
 ## Numerical checks and their scope
 

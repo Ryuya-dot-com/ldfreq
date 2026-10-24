@@ -62,6 +62,20 @@ to open the introduction.
 also explains how to find explicitly sourced example helpers, which have
 no individual `?function` entry.
 
+Development **0.4.0.9006** makes study tables, concordance/dispersion,
+collocations and keyness available as public functions, without helper
+sourcing. Install `Ryuya-dot-com/ldfreq@v0.4.0.9006` with `pak`, or the
+corresponding `ldfreq_0.4.0.9006.tar.gz` from the release list, to
+follow the updated guides. Use
+[`?lexdiv_study_table`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md),
+[`?lexdiv_concordance`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
+[`?lexdiv_collocations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.md)
+and
+[`?lexdiv_keyness`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+for arguments and complete return descriptions. The original sourced
+helper names and saved records remain supported. Stable 0.4.0 stays
+available as its own fixed release.
+
 The occurrence-level MCA example requires the separate development
 snapshot **0.4.0.9001 or later**. Install
 `Ryuya-dot-com/ldfreq@v0.4.0.9002` with `pak`, or its named source
@@ -94,8 +108,9 @@ helpers are explicitly sourced examples.
 
 The [mixed-model reporting
 recipe](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html#report-specified-means-and-one-planned-comparison)
-requires development **0.4.0.9005 or later**. Install
-`Ryuya-dot-com/ldfreq@v0.4.0.9005` with `pak`, or its named source
+was introduced in development 0.4.0.9005. Its updated guide uses the
+public study-table calls in **0.4.0.9006**; install
+`Ryuya-dot-com/ldfreq@v0.4.0.9006` with `pak`, or its named source
 archive. Optional `lme4`, `emmeans` and `pbkrtest` connect the saved
 study table to specified means, one planned contrast and Kenward–Roger
 confidence intervals. Diagnostics, exclusions and prediction support
@@ -285,12 +300,14 @@ analysis record.
 For repeated observations, the [mixed-model
 walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html)
 keeps scheduled writer/task/occasion rows, submitted documents and
-measurement results separate. Its explicitly sourced helpers retain
-absent submissions and exclusion reasons, then select one measurement
-specification for an ordinary
-[`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html) data frame. The
-optional model illustrates the connection using synthetic word
-sequences; it does not validate a developmental model. Development
+measurement results separate. In development 0.4.0.9006,
+[`lexdiv_study_table()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+retains absent submissions and
+[`lexdiv_study_model_data()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+selects one measurement specification with exclusion reasons for an
+ordinary [`lme4::lmer()`](https://rdrr.io/pkg/lme4/man/lmer.html) data
+frame. The optional model illustrates the connection using synthetic
+word sequences; it does not validate a developmental model. Development
 0.4.0.9005 extends this example with task-specific and equally
 task-weighted means, one planned time contrast, confidence intervals and
 original-scale plots, with full-record saving and table replay. An
@@ -580,9 +597,9 @@ word and phrase measures with coverage diagnostics. In ldfreq, the
 emphasis is a shared R workflow retaining document/segment locations,
 reference definitions, eligible-window denominators and missingness
 alongside other lexical measures. The n-gram functions provide
-frequencies. Separate explicitly sourced [collocation
-helpers](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html)
-add MI and t-score from complete token-pair opportunities. Neither
+frequencies. The public [collocation
+API](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html)
+adds MI and t-score from complete token-pair opportunities. Neither
 output is a validated phraseological-sophistication score.
 
 Phrase-list profiling and source-text overlap also have existing tools.
@@ -963,6 +980,24 @@ resources retain their own terms; see `LICENSE` and the installed
 - [`lexdiv_family_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_family_profile.md)
   : Count resource-defined word families while retaining source
   occurrences
+
+## Study tables and corpus exploration
+
+- [`lexdiv_study_table()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+  [`lexdiv_study_model_data()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+  : Join planned observations to saved measurements and select model
+  rows
+- [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+  [`lexdiv_concordance_sort()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+  [`lexdiv_concordance_dispersion()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+  [`plot(`*`<lexdiv_concordance>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+  : Search source-aligned words and phrases and inspect their
+  distribution
+- [`lexdiv_collocations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.md)
+  : Count collocation opportunities and descriptive association scores
+- [`lexdiv_keyness()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+  [`lexdiv_keyness_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+  : Compare word frequencies in explicit target and reference corpora
 
 ## Exact lexical overlap and coverage
 

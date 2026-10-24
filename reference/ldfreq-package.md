@@ -41,6 +41,23 @@ started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html).
 For your own files, see [TXT-folder and CSV
 input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
 
+## Study tables and corpus exploration
+
+Development 0.4.0.9006 provides
+[`lexdiv_study_table`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md),
+[`lexdiv_study_model_data`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md),
+[`lexdiv_concordance`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
+[`lexdiv_concordance_sort`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
+[`lexdiv_concordance_dispersion`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
+[`lexdiv_collocations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.md),
+[`lexdiv_keyness`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+and
+[`lexdiv_keyness_concordance`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+as public functions. Their operations need no helper sourcing. Use
+`plot(search, query_id)` for saved concordance positions. Old sourced
+names and saved records remain supported; other explicitly sourced
+examples retain their documented roles.
+
 ## Choose a research question
 
 Choose the route from your question, then inspect the counts and

@@ -6,11 +6,14 @@ expected number computed from an explicit population of possible pairs.
 Keep both counts: a high association score from one occurrence deserves
 different interpretation from a frequently repeated combination.
 
-This guide uses ldfreq 0.3.0.9010 or later and optional **quanteda \>=
-4.5.0**. It starts with adjacent words, then expands to a left/right
-span. The two helpers in `examples/collocation.R` use the saved searches
-from `examples/concordance.R`. These are explicitly sourced, installed
-examples, not exported functions. The examples below are authored for
+This guide uses **ldfreq 0.4.0.9006 or later** and optional **quanteda
+\>= 4.5.0** for the initial search. It starts with adjacent words, then
+expands to a left/right span. Call
+[`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+and
+[`lexdiv_collocations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.md)
+directly; no helper sourcing is needed. Computing collocations from a
+saved search does not load quanteda. The examples below are authored for
 hand checking; they are not learner data or an assessment of annotation
 accuracy.
 
@@ -22,7 +25,6 @@ library(ldfreq)
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "collocation-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
-helper <- demo$helper
 search <- demo$search
 print(demo$annotations$segments, row.names = FALSE)
 #>  document_id segment_id      text token_count
@@ -49,17 +51,15 @@ one; the helper does not split sentences automatically.
 
 For your own unchanged
 [`lexdiv_import_annotations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md)
-result, source both helpers and make a search. See the [concordance
+result, call the public functions to make a search and count its
+collocations. See the [concordance
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.md)
 for preparing aligned annotations from your text or parser output.
 
 ``` r
-helper <- new.env(parent = globalenv())
-for (file in c("concordance.R", "collocation.R"))
-  sys.source(system.file("examples", file, package = "ldfreq", mustWork = TRUE), helper)
-search <- helper$concordance_search(annotations, list(node = "learn"),
+search <- lexdiv_concordance(annotations, list(node = "learn"),
   term_col = "lemma", keep = keep, window = 5L)
-nearby <- helper$collocation_profile(search, "node", span = c(left = 3L, right = 3L))
+nearby <- lexdiv_collocations(search, "node", span = c(left = 3L, right = 3L))
 ```
 
 A node query must have one token pattern. Fixed, wildcard and
@@ -73,7 +73,7 @@ Specify and preserve any normalization in the annotations.
 ## Adjacent words: inspect the denominator first
 
 ``` r
-adjacent <- helper$collocation_profile(search, "a") # L0/R1
+adjacent <- lexdiv_collocations(search, "a") # L0/R1
 print(adjacent$results, digits = 4, row.names = FALSE)
 #>  context observed node_marginal context_marginal opportunities expected     MI
 #>        b        2             3                3             8    1.125 0.8301
@@ -146,7 +146,7 @@ external corpus, and a missing lemma is not a known zero.
 ## Expand the span without changing the meaning of a position
 
 ``` r
-span <- helper$collocation_profile(search, "a", span = c(left = 2L, right = 2L))
+span <- lexdiv_collocations(search, "a", span = c(left = 2L, right = 2L))
 print(span$results, digits = 4, row.names = FALSE)
 #>  context observed node_marginal context_marginal opportunities expected      MI
 #>        b        8            13               12            30    5.200  0.6215
@@ -217,7 +217,7 @@ or a streaming large-corpus engine.
 ## Select frequent combinations and return to their source
 
 ``` r
-selected <- helper$collocation_profile(search, "a", min_count = 2L)
+selected <- lexdiv_collocations(search, "a", min_count = 2L)
 shown <- subset(selected$results, meets_min_count)
 shown <- shown[order(-shown$MI, -shown$observed), ]
 print(shown, digits = 4, row.names = FALSE)
@@ -283,35 +283,33 @@ record <- list(adjacent = adjacent, span = span, session = sessionInfo())
 file <- tempfile(fileext = ".rds") # use a durable project path for your analysis
 saveRDS(record, file, version = 2)
 reopened <- readRDS(file)
-helper$collocation_validate(reopened$span)
-replayed <- helper$collocation_profile(reopened$span$search, "a",
+stopifnot(identical(reopened, record))
+replayed <- lexdiv_collocations(reopened$span$search, "a",
   span = reopened$span$settings$span)
 stopifnot(identical(replayed, reopened$span))
 ```
 
 In a fresh R session, use the same package snapshot and your saved path.
-The helpers below validate and inspect the stored analysis without a new
-search:
+The following reads the stored analysis without a new search or
+recalculation:
 
 ``` r
 library(ldfreq)
-helper <- new.env(parent = globalenv())
-for (script in c("concordance.R", "collocation.R"))
-  sys.source(system.file("examples", script, package = "ldfreq", mustWork = TRUE), helper)
 reopened <- readRDS("collocation-record.rds")
-helper$collocation_validate(reopened$adjacent)
-helper$collocation_validate(reopened$span)
 reopened$span$results
 reopened$span$search$source$segments
 ```
 
 Retain the full object, source annotations, helper/package versions and
 session information; a CSV of selected scores cannot reconstruct the
-denominator. `collocation_validate()` detects accidental changes to the
-saved record, including its search. It is not an authenticity check for
-supplied annotations. Exact whole-object replay requires the same
-package version; after an upgrade, compare counts and settings
-explicitly instead of assuming object identity.
+denominator. Reading a list component does not revalidate its contents.
+The public computation validates its saved search before use. Legacy
+scripts may still source `examples/collocation.R`, including
+`collocation_validate()` for a separate whole-record integrity check. It
+detects accidental changes, not annotation authenticity. Exact
+whole-object replay requires the same package version; after an upgrade,
+compare counts and settings explicitly instead of assuming object
+identity.
 
 ## What was checked, and what the scores do not establish
 

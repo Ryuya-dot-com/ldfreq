@@ -29,7 +29,7 @@ R CMD check --no-manual ldfreq_*.tar.gz
 
 This installs the package before running its tests. Some example recipes
 source other installed example files, so an uninstalled
-[`testthat::test_local()`](https://testthat.r-lib.org/reference/test_package.html)
+[`testthat::test_local()`](https://rdrr.io/pkg/testthat/man/test_package.html)
 run does not exercise the same file lookup and can fail to locate those
 files. Use the installed-package check for the complete suite. When only
 documentation or build records change, retain earlier test evidence for

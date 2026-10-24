@@ -37,6 +37,15 @@ prompts to learner HTML, a separate teacher CSV and a complete private
 record. Original sources and pending decisions remain intact; it does
 not conduct or evaluate a classroom lesson.
 
+Development **0.4.0.9006** adds eight public entry points for research
+tables, concordance/dispersion, collocations and keyness. These
+interfaces preserve the previous counting and missingness rules; they do
+not broaden the statistical claims or add an analyzer. A new concordance
+class supports [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
+Original sourced names and plain-list records remain supported. The
+updated specialist guides use these public calls; install the 9006
+archive to follow them.
+
 ## What is stable, experimental or an example?
 
 Stable means the documented computational and compatibility contract is
@@ -55,9 +64,11 @@ package version.
 | Family profiles; annotation import/alignment/evaluation; MASC/quanteda adapters; n-gram reference builder; ambiguity and contextual-model review/evaluation/baselines; adjective–noun dependencies | Experimental interfaces | Existing help and interface versions continue to apply. Models and human decisions remain distinct. Alignment and replay checks do not establish analyzer or model accuracy. |
 | Study tables, corpus search/dispersion, collocation, keyness, readability, traced syntax and CA/classical MDS | Documented, explicitly sourced examples | Installed helpers are not exported APIs. Pin the package archive and preserve complete records. Examples connect existing calculations to source occurrences and reporting; they do not automatically choose a model or justify an inferential claim. |
 
-The public API remains at 57 exports. Stable release status does not
-remove the experimental labels in help or change the `stability` column
-returned by
+Stable 0.4.0 has 57 exports; development 0.4.0.9006 has 65. The eight
+new entry points have a documented initial interface; their formulas and
+analysis scope are those of the earlier examples. Stable release status
+does not remove the experimental labels in help or change the
+`stability` column returned by
 [`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
 An example helper is located with
 [`system.file()`](https://rdrr.io/r/base/system.file.html) and loaded

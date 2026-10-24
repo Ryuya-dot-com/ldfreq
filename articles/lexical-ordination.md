@@ -132,16 +132,16 @@ if (has_ca) {
 #> 6    6 0.0008922818     0.0004812968
 #> $total_inertia
 #> [1] 1.853912
-#>
+#> 
 #> $requested_dimensions
 #> [1] 2
-#>
+#> 
 #> $effective_dimensions
 #> [1] 2
-#>
+#> 
 #> $eigenvalue_tolerance
 #> [1] 8.410747e-11
-#>
+#> 
 #>     id axis coordinate       mass contribution       cos2
 #>   rain    1 -1.6959986 0.08888889   0.30399319 0.79447114
 #>   tree    1 -1.1870903 0.15555556   0.26062645 0.75582475
@@ -231,55 +231,55 @@ coordinates.
 jaccard$diagnostics
 #> $requested_dimensions
 #> [1] 2
-#>
+#> 
 #> $effective_dimensions
 #> [1] 2
-#>
+#> 
 #> $negative_eigenvalues
 #> [1] 1
-#>
+#> 
 #> $negative_inertia_fraction
 #> [1] 0.001846276
-#>
+#> 
 #> $eigenvalue_tolerance
 #> [1] 1.095259e-10
-#>
+#> 
 #> $distance_rmse
 #> [1] 0.08992803
-#>
+#> 
 #> $relative_distance_error
 #> [1] 0.1128306
-#>
+#> 
 #> $GOF
 #> [1] 0.8834979 0.8851321
-#>
+#> 
 #> $engine_warnings
 #> character(0)
 hellinger$diagnostics
 #> $requested_dimensions
 #> [1] 2
-#>
+#> 
 #> $effective_dimensions
 #> [1] 2
-#>
+#> 
 #> $negative_eigenvalues
 #> [1] 0
-#>
+#> 
 #> $negative_inertia_fraction
 #> [1] 0
-#>
+#> 
 #> $eigenvalue_tolerance
 #> [1] 2.053396e-10
-#>
+#> 
 #> $distance_rmse
 #> [1] 0.2436704
-#>
+#> 
 #> $relative_distance_error
 #> [1] 0.2102844
-#>
+#> 
 #> $GOF
 #> [1] 0.776418 0.776418
-#>
+#> 
 #> $engine_warnings
 #> character(0)
 head(hellinger$pairs)
@@ -460,21 +460,21 @@ mca_table$variables
 #> 3         0             2
 mca_table$observations
 #>    occurrence_id active                  status missing_variables
-#> 1            u01   TRUE                  active
-#> 2            u02   TRUE                  active
-#> 3            u03   TRUE                  active
-#> 4            u04   TRUE                  active
-#> 5            u05   TRUE                  active
-#> 6            u06   TRUE                  active
-#> 7            u07   TRUE                  active
-#> 8            u08   TRUE                  active
-#> 9            u09   TRUE                  active
-#> 10           u10   TRUE                  active
-#> 11           u11   TRUE                  active
-#> 12           u12   TRUE                  active
-#> 13           u13   TRUE                  active
-#> 14           u14   TRUE                  active
-#> 15           u15   TRUE                  active
+#> 1            u01   TRUE                  active                  
+#> 2            u02   TRUE                  active                  
+#> 3            u03   TRUE                  active                  
+#> 4            u04   TRUE                  active                  
+#> 5            u05   TRUE                  active                  
+#> 6            u06   TRUE                  active                  
+#> 7            u07   TRUE                  active                  
+#> 8            u08   TRUE                  active                  
+#> 9            u09   TRUE                  active                  
+#> 10           u10   TRUE                  active                  
+#> 11           u11   TRUE                  active                  
+#> 12           u12   TRUE                  active                  
+#> 13           u13   TRUE                  active                  
+#> 14           u14   TRUE                  active                  
+#> 15           u15   TRUE                  active                  
 #> 16           u16  FALSE missing_active_category             sense
 #> 17           u17  FALSE missing_active_category              role
 mca_table$categories
@@ -546,28 +546,28 @@ if (has_ca) {
 #> 6    6 2.521422e-33     1.891067e-33    FALSE          FALSE
 #> $total_inertia
 #> [1] 1.333333
-#>
+#> 
 #> $indicator_inertia
 #> [1] 1.333333
-#>
+#> 
 #> $requested_dimensions
 #> [1] 2
-#>
+#> 
 #> $effective_dimensions
 #> [1] 2
-#>
+#> 
 #> $numerical_rank
 #> [1] 4
-#>
+#> 
 #> $eigenvalue_tolerance
 #> [1] 3.988996e-11
-#>
+#> 
 #> $retained_fraction
 #> [1] 0.5491747
-#>
+#> 
 #> $cut_through_tied_axes
 #> [1] TRUE
-#>
+#> 
 #>    id axis    coordinate      mass  distance contribution         cos2
 #>  v1l1    1 -7.235716e-01 0.1777778 0.9354143 2.333333e-01 5.983495e-01
 #>  v1l2    1  8.269389e-01 0.1555556 1.0690450 2.666667e-01 5.983495e-01

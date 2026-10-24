@@ -55,6 +55,24 @@
   : Count resource-defined word families while retaining source
   occurrences
 
+## Study tables and corpus exploration
+
+- [`lexdiv_study_table()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+  [`lexdiv_study_model_data()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+  : Join planned observations to saved measurements and select model
+  rows
+- [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+  [`lexdiv_concordance_sort()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+  [`lexdiv_concordance_dispersion()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+  [`plot(`*`<lexdiv_concordance>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+  : Search source-aligned words and phrases and inspect their
+  distribution
+- [`lexdiv_collocations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.md)
+  : Count collocation opportunities and descriptive association scores
+- [`lexdiv_keyness()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+  [`lexdiv_keyness_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+  : Compare word frequencies in explicit target and reference corpora
+
 ## Exact lexical overlap and coverage
 
 - [`lexdiv_overlap_ids()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_overlap.md)

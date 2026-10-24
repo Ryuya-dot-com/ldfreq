@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,6 +99,14 @@ selected, reviewed phrase occurrences and teacher-written prompts to
 learner HTML, a separate teacher CSV and a complete private record.
 Original sources and pending decisions remain intact; it does not
 conduct or evaluate a classroom lesson.</p>
+<p>Development <strong>0.4.0.9006</strong> adds eight public entry
+points for research tables, concordance/dispersion, collocations and
+keyness. These interfaces preserve the previous counting and missingness
+rules; they do not broaden the statistical claims or add an analyzer. A
+new concordance class supports <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. Original sourced
+names and plain-list records remain supported. The updated specialist
+guides use these public calls; install the 9006 archive to follow
+them.</p>
 <div class="section level2">
 <h2 id="what-is-stable-experimental-or-an-example">What is stable, experimental or an example?<a class="anchor" aria-label="anchor" href="#what-is-stable-experimental-or-an-example"></a>
 </h2>
@@ -182,8 +190,10 @@ model or justify an inferential claim.</td>
 </tr>
 </tbody>
 </table>
-<p>The public API remains at 57 exports. Stable release status does not
-remove the experimental labels in help or change the
+<p>Stable 0.4.0 has 57 exports; development 0.4.0.9006 has 65. The eight
+new entry points have a documented initial interface; their formulas and
+analysis scope are those of the earlier examples. Stable release status
+does not remove the experimental labels in help or change the
 <code>stability</code> column returned by <code><a href="../reference/lexdiv_profile.html">lexdiv_methods()</a></code>.
 An example helper is located with <code><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file()</a></code> and loaded
 with <code><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source()</a></code> as its guide shows; it has no separate
