@@ -24,6 +24,7 @@ jobs:
       check-matrix: ${{ steps.reuse.outputs.check-matrix }}
       builder-matrix: ${{ steps.reuse.outputs.builder-matrix }}
       linux-reuse: ${{ steps.reuse.outputs.linux-reuse }}
+      builder-recheck: ${{ steps.reuse.outputs.builder-recheck }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -292,7 +293,7 @@ jobs:
 
   tubelex-build-audit:
     needs: validation-scope
-    if: needs.validation-scope.outputs.reuse != 'true' && needs.validation-scope.outputs.builder-matrix != '[]'
+    if: (needs.validation-scope.outputs.reuse != 'true' && needs.validation-scope.outputs.builder-matrix != '[]') || needs.validation-scope.outputs.builder-recheck == 'true'
     name: ${{ matrix.os }} / TUBELEX builder
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
@@ -408,6 +409,11 @@ jobs:
       - name: Record reused numeric checks
         if: needs.validation-scope.outputs.reuse == 'true'
         run: echo "Numeric CI is reused only after source, workflow and completed-run identity checks. Release controls and PDF manual were checked in this run."
+      - name: Require the repaired resource builder on both platforms
+        if: needs.validation-scope.outputs.builder-recheck == 'true'
+        env:
+          TUBELEX_RESULT: ${{ needs.tubelex-build-audit.result }}
+        run: test "$TUBELEX_RESULT" = success
       - name: Require every matrix check to pass
         if: needs.validation-scope.outputs.reuse != 'true'
         env:

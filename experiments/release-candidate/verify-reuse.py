@@ -38,7 +38,7 @@ def verify_source(state):
     return changed
 
 
-def verify_ci(state, changed, old, new, run, repo):
+def verify_ci(state, changed, old, new, run, repo, jobs=None):
     # Changed release controls are checked afresh; other test inputs must match.
     allowed_files = {".github/workflows/R-CMD-check.yaml",
                      ".github/workflows/release-candidate.yaml",
@@ -50,6 +50,19 @@ def verify_ci(state, changed, old, new, run, repo):
                         "run-as-cran-check.R", "assemble-run-index.R", "validate-note-policy.R",
                         "check-note-policy.R"}
     allowed_files.update("experiments/release-candidate/" + name for name in allowed_controls)
+    builder_recheck = state.get("Recheck-TUBELEX-Builder") == "true"
+    if "Recheck-TUBELEX-Builder" in state and not builder_recheck:
+        raise ValueError("Invalid builder recheck declaration")
+    if builder_recheck:
+        # Only the separate resource builder changes; package checks must match.
+        allowed_files = {".github/workflows/R-CMD-check.yaml"}
+        allowed_files.update("experiments/release-candidate/" + name for name in (
+            "state.dcf", "verify-reuse.py", "validate-reuse.py", "README.md"))
+        allowed_files.update("experiments/tubelex-source-build/" + name for name in (
+            "NOTICE.md", "README.md", "promote-tubelex-release.R",
+            "validate-tubelex-release-unit.R"))
+        if set(changed) - allowed_files:
+            raise ValueError("Builder recheck requires identical package and test inputs")
     # These documentation repairs are exercised by the fresh exact-archive
     # matrix. Runtime code, resources, tests and numeric audit inputs still
     # have to be byte-identical to the successful baseline.
@@ -74,11 +87,20 @@ def verify_ci(state, changed, old, new, run, repo):
         if job_body(old, name) != job_body(new, name):
             raise ValueError("Reused numeric CI definition changed: " + name)
     if not (str(run["id"]) == state["Validation-Run"]
-            and run["conclusion"] == "success" and run["status"] == "completed"
+            and (builder_recheck or run["conclusion"] == "success") and run["status"] == "completed"
             and run["head_sha"] == state.get("Validation-Commit", state.get("Source-Archive-Commit"))
             and run["path"] == ".github/workflows/R-CMD-check.yaml"
             and run["repository"]["full_name"] == repo):
         raise ValueError("Declared baseline CI did not complete successfully on this source")
+    if builder_recheck:
+        required = {"ubuntu-24.04 / R release", "ubuntu-24.04 / R 4.1",
+                    "macos-latest / R release", "windows-latest / R release",
+                    "ubuntu-24.04 / R devel", "ubuntu-24.04 / C locale"}
+        for name in required:
+            matching = [job for job in (jobs or []) if job["name"] == name]
+            if len(matching) != 1 or matching[0]["status"] != "completed" or \
+                    matching[0]["conclusion"] != "success":
+                raise ValueError("Missing successful package job: " + name)
 
 
 def verify_platform_reuse(state, changed, old, new, run, repo, jobs, linux=False):
@@ -138,6 +160,9 @@ def main():
     if ci_mode:
         platform_reuse = "Platform-Validation-Run" in state
         linux_reuse = "Additional-Platform-Validation-Run" in state
+        builder_recheck = state.get("Recheck-TUBELEX-Builder") == "true"
+        if "Recheck-TUBELEX-Builder" in state and (not builder_recheck or not reuse):
+            raise ValueError("Builder recheck requires a valid numerical baseline")
         if linux_reuse and not platform_reuse:
             raise ValueError("Additional platform evidence needs the primary platform record")
         if platform_reuse and reuse:
@@ -175,6 +200,7 @@ def main():
                 stream.write("builder-matrix=" + json.dumps(builders) + "\n")
                 stream.write("platform-reuse=" + str(platform_reuse).lower() + "\n")
                 stream.write("linux-reuse=" + str(linux_reuse).lower() + "\n")
+                stream.write("builder-recheck=" + str(builder_recheck).lower() + "\n")
     if not reuse:
         if output:
             with open(output, "a") as stream:
@@ -193,7 +219,11 @@ def main():
         repo = os.environ["GITHUB_REPOSITORY"]
         run = json.loads(subprocess.check_output([
             "gh", "api", f"repos/{repo}/actions/runs/{state['Validation-Run']}"]))
-        verify_ci(state, changed, old, new, run, repo)
+        jobs = None
+        if builder_recheck:
+            jobs = json.loads(subprocess.check_output([
+                "gh", "api", f"repos/{repo}/actions/runs/{state['Validation-Run']}/jobs?per_page=100"]))["jobs"]
+        verify_ci(state, changed, old, new, run, repo, jobs)
         print(json.dumps({"reused_run": run["id"], "head": run["head_sha"], "changed": changed}))
     else:
         changed = verify_source(state)

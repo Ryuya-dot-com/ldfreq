@@ -27,7 +27,7 @@ builder_path <- normalizePath(
   mustWork = TRUE
 )
 notice_path <- normalizePath(
-  file.path(project_root, "legal", "tubelex", "NOTICE.md"),
+  file.path(script_directory, "NOTICE.md"),
   mustWork = TRUE
 )
 source_path <- normalizePath(args[[1L]], mustWork = TRUE)
@@ -53,8 +53,8 @@ if (file.access(release_parent, 2L) != 0L) {
   stop("The release parent is not writable.", call. = FALSE)
 }
 
-expected_notice_bytes <- 4175
-expected_notice_sha256 <- "a3ea8312a5bbf8e7178155259460f089d0377a8c99094f70875910c428cb4cb5"
+expected_notice_bytes <- 4163
+expected_notice_sha256 <- "6d3ae1f5b9ad51c4097a43995f019e940540e9fd98dc3ad4bacba7fafd2598ee"
 notice_bytes <- unname(file.info(notice_path)$size)
 notice_sha256 <- digest::digest(file = notice_path, algo = "sha256", serialize = FALSE)
 if (!identical(as.numeric(notice_bytes), as.numeric(expected_notice_bytes)) ||

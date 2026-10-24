@@ -42,7 +42,7 @@ builder_path <- normalizePath(
   mustWork = TRUE
 )
 notice_path <- normalizePath(
-  file.path(script_dir, "..", "..", "legal", "tubelex", "NOTICE.md"),
+  file.path(script_dir, "NOTICE.md"),
   mustWork = TRUE
 )
 
@@ -52,10 +52,10 @@ expected <- list(
   content_bytes = 8260448,
   content_sha256 = "423dd4631c9da2f7442705d2930126da4cba980e46b6a5c0dda98336dce74916",
   rows = 515292,
-  notice_bytes = 4175,
-  notice_sha256 = "a3ea8312a5bbf8e7178155259460f089d0377a8c99094f70875910c428cb4cb5",
+  notice_bytes = 4163,
+  notice_sha256 = "6d3ae1f5b9ad51c4097a43995f019e940540e9fd98dc3ad4bacba7fafd2598ee",
   builder_sha256 = "551855007f1d659ad16dc6ae8861eb5408d655a95d3270fc60a6ac68cffe6397",
-  wrapper_sha256 = "44ea7776173f99e72a904a9806c63d3cc88229d32fca99a2d2e8651dd97d3bea"
+  wrapper_sha256 = "fd02b3b2f0a2a1a8ba72a191639b17c7cc6ea3432ce889057fb879b0c968d0aa"
 )
 
 assertions <- 0L

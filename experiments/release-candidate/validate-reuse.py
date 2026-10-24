@@ -46,6 +46,34 @@ for changed in ("R/core.R", "man/core.Rd", ".Rbuildignore", "vignettes/example.R
         rejects(lambda: reuse.verify_source(state))
 print("Evidence reuse rejects changed payload/test inputs, workflows, identity and incomplete/failed runs.")
 
+builder_state = dict(separate, **{"Recheck-TUBELEX-Builder": "true"})
+builder_run = dict(run, conclusion="failure")
+builder_jobs = [{"name": name, "status": "completed", "conclusion": "success"}
+                for name in ("ubuntu-24.04 / R release", "ubuntu-24.04 / R 4.1",
+                             "macos-latest / R release", "windows-latest / R release",
+                             "ubuntu-24.04 / R devel", "ubuntu-24.04 / C locale")]
+builder_change = ["experiments/tubelex-source-build/promote-tubelex-release.R"]
+reuse.verify_ci(builder_state, builder_change, workflow, workflow,
+                builder_run, "owner/repo", builder_jobs)
+for changed in ("R/core.R", "DESCRIPTION", "README.md", "man/tubelex_profile.Rd",
+                "vignettes/release-scope.Rmd", "tests/testthat/test-example.R",
+                "inst/licenses/tubelex/NOTICE.md"):
+    rejects(lambda: reuse.verify_ci(builder_state, [changed], workflow, workflow,
+                                   builder_run, "owner/repo", builder_jobs))
+for i in range(len(builder_jobs)):
+    for field, value in (("conclusion", "failure"), ("status", "in_progress")):
+        bad = copy.deepcopy(builder_jobs); bad[i][field] = value
+        rejects(lambda: reuse.verify_ci(builder_state, builder_change, workflow,
+                                        workflow, builder_run, "owner/repo", bad))
+for bad in (None, builder_jobs[:-1], builder_jobs + builder_jobs[:1]):
+    rejects(lambda: reuse.verify_ci(builder_state, builder_change, workflow,
+                                    workflow, builder_run, "owner/repo", bad))
+rejects(lambda: reuse.verify_ci(builder_state, builder_change, workflow, workflow,
+    dict(builder_run, status="in_progress"), "owner/repo", builder_jobs))
+rejects(lambda: reuse.verify_ci(dict(builder_state, **{"Recheck-TUBELEX-Builder": "yes"}),
+    builder_change, workflow, workflow, builder_run, "owner/repo", builder_jobs))
+print("Builder-only repairs retain six completed package jobs only with identical package inputs.")
+
 report_before = 'stopifnot(identical(saved$inference$tables, record$inference$tables),'
 report_after = 'stopifnot(identical(saved$inference$settings$df_method, "kenward-roger"),'
 with patch.object(reuse, "git", return_value=report_before):

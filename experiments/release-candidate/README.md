@@ -32,6 +32,15 @@ are checked afresh, and all five exact-archive checks remain required. Remove
 `Source-Archive-*` whenever package content changes: numerical-evidence reuse
 does not permit reuse of an archive containing superseded documentation.
 
+For a repair confined to the separate TUBELEX builder,
+`Recheck-TUBELEX-Builder: true` can accompany `Validation-Run` and
+`Validation-Commit`. All five package environments and the C-locale job must
+have completed successfully, even if that run's builder jobs failed. Package
+sources, tests, help and vignettes must be unchanged, as must the reused job
+definitions. Both builder platforms and the release-control checks then run
+afresh; the required check rejects either builder's failure. This preserves
+completed numerical evidence without treating the earlier workflow as successful.
+
 `build-manual.R` uses R's documented `texi2dvi` emulation, retains TeX diagnostics,
 and requires a nonempty function index. A PDF returned by the no-index fallback
 is rejected. Both manual jobs explicitly install TeX Live's `makeindex`, refresh
