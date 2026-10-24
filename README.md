@@ -97,5 +97,5 @@ Komuro, R. (2026). *ldfreq: Reproducible Lexical Diversity and Frequency Profile
 [Fixed release](https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.5.0.9001).
 
 Also cite the selected measurement methods and any reference data you use.
-See [CITATION.cff](CITATION.cff), [license](LICENSE.md), and
+See [CITATION.cff](https://github.com/Ryuya-dot-com/ldfreq/blob/v0.5.0.9001/CITATION.cff), [license](https://github.com/Ryuya-dot-com/ldfreq/blob/v0.5.0.9001/LICENSE.md), and
 [release notes](https://ryuya-dot-com.github.io/ldfreq/news/index.html).

@@ -1,6 +1,6 @@
 The original ldfreq code, documentation and authored examples are MIT licensed.
 The adapted TUBELEX tokenizer example retains BSD-3-Clause attribution in
-[its notice](inst/licenses/tubelex/NOTICE.md).
+[its notice](https://github.com/Ryuya-dot-com/ldfreq/blob/v0.5.0.9001/inst/licenses/tubelex/NOTICE.md).
 
 Third-party reference datasets are not included in this package. Optional
 downloads retain their separate source terms; see the
