@@ -4,10 +4,9 @@ root <- normalizePath(args[[1]]); cache <- normalizePath(args[[2]])
 pkgload::load_all(root, quiet = TRUE)
 x <- readRDS(file.path(cache, "prepared-private.rds"))
 metrics <- setdiff(lexdiv_metric_ids(), "expected_ttr_d")
-source_files <- c("api.R", "metric-mtld.R", "metric-basic.R", "metric-hdd.R", "metric-yule.R")
-source_files <- unique(c(source_files[file.exists(file.path(root, "R", source_files))],
-  list.files(file.path(root, "R"), "^metric-.*[.]R$")))
-identity <- list(inputs = x$input_sha256, preparation = digest::digest(
+source_files <- list.files(file.path(root, "R"), "[.]R$")
+identity <- list(inputs = x$input_sha256,
+  prepared_sha256 = digest::digest(file=file.path(cache,"prepared-private.rds"),algo="sha256"), preparation = digest::digest(
   file = file.path(root,"experiments/corpus-stability/prepare.R"), algo = "sha256"),
   source = setNames(vapply(file.path(root,"R",source_files), function(f)
     digest::digest(file=f,algo="sha256"), character(1)), source_files),

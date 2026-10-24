@@ -67,9 +67,10 @@ write.csv(do.call(rbind,quantiles),file.path(out,"block-quantiles.csv"),row.name
 provenance<-jsonlite::read_json(file.path(out,"provenance.json"),simplifyVector=FALSE)
 provenance$identity$inputs<-as.list(saved$identity$inputs)
 provenance$identity$source<-as.list(saved$identity$source)
-provenance$checks<-list(complete_nonoverlapping_blocks=length(cohort),
+provenance$checks<-list(prepared_sha256=digest::digest(file=file.path(cache,"prepared-private.rds"),algo="sha256"),
+  complete_nonoverlapping_blocks=length(cohort),
   independent_anova_iccs=nrow(expected),final_implementation_documents=length(selected),
-  final_source_sha256=as.list(setNames(vapply(names(saved$identity$source),function(f)
-    digest::digest(file=file.path(root,"R",f),algo="sha256"),character(1)),names(saved$identity$source))))
+  final_source_sha256=as.list(setNames(vapply(list.files(file.path(root,"R"),"[.]R$"),function(f)
+    digest::digest(file=file.path(root,"R",f),algo="sha256"),character(1)),list.files(file.path(root,"R"),"[.]R$"))))
 jsonlite::write_json(provenance,file.path(out,"provenance.json"),pretty=TRUE,auto_unbox=TRUE)
 cat("PASS: block sampling, 48 independent ANOVA ICC checks, 20 final-code score comparisons; original-scale distributions saved\n")

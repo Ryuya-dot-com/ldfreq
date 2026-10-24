@@ -63,8 +63,11 @@ code. It derives distribution summaries without repeating the metric runs or
 - `provenance.json` and `external-provenance.json`: data/code identities,
   versions, settings and sample counts for the recorded computations.
 
-The original metric-source hashes are retained even if documentation comments
-change later. Final-code comparison hashes are recorded separately. Reproduction
+The original run recorded hashes for API dispatch, MTLD and expected-TTR D.
+Those original identities are retained. Final-code comparison hashes cover all
+R sources and the prepared token cache separately; new runs bind checkpoints
+to this complete source set. The core basic/HD-D/Yule implementations did not
+change from the preceding release. Reproduction
 from a different version creates a new run; it does not rewrite the identity of
 these saved results. Agreement of implementations and score stability answer
 different questions, both discussed in the selection guide.
