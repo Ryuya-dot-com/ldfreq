@@ -1,12 +1,17 @@
 \name{lexdiv_ngram_reference_build}
 \alias{lexdiv_ngram_reference_build}
+\alias{lexdiv_build_ngram_reference}
 \title{Build an N-gram Reference from Whole-document Chunks}
 \description{
+\code{lexdiv_build_ngram_reference()} is the canonical name; \code{lexdiv_ngram_reference_build()} remains a compatibility alias.
+
 Reads successive extractions and accumulates exact frequency and document
 frequency without retaining every chunk's occurrence table. Reuses the
 existing adjacent bigram/trigram extraction and reference contracts.
 }
 \usage{
+lexdiv_build_ngram_reference(sources, read_chunk, resource, max_types = 1e6)
+
 lexdiv_ngram_reference_build(sources, read_chunk, resource, max_types = 1e6)
 }
 \arguments{

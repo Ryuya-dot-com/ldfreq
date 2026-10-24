@@ -1,50 +1,15 @@
-# TUBELEX release-admission gate
+# Optional reference-resource inventory
 
-Status: repository-only maintainer approval for the resource and public API;
-this is not the package's publication-status record. Published development
-artifacts have their own completed checks; a future formal candidate must be
-identified and checked separately.
+The installed catalog identifies five separately downloaded snapshots. None
+of their data files or data licenses are part of the code archive. The package
+retains the BSD notice and license for its adapted TUBELEX tokenizer example.
 
-The records in this directory contain the package maintainer's explicit license
-and distribution decision plus the complete admitted, deferred, and excluded
-resource inventory. They are release evidence and are excluded from source and
-binary packages. The decision records:
+`validate-tubelex-admission.R` retains its historical command name, but now
+compares all five optional resource identities across the R download catalog,
+installed manifest and release inventory. It checks fixed URLs, hashes, safe
+member paths and the absence of implicit downloads. Resource attribution and
+license texts remain in each separately distributed archive.
 
-- the pinned upstream repository, commit, source file, and hashes;
-- the upstream BSD-3-Clause license and the official README distinction between
-  distributable frequency lists and non-distributable full corpus text;
-- the installed NOTICE, attribution, disclaimer, and transformation statement;
-- the absence of raw subtitles and source identifiers;
-- the no-network and no-fallback runtime boundary; and
-- the approved bundled-resource and public-profile scopes.
-
-The TUBELEX decision remains resource-specific. The release inventory also
-records the authorized NJ8, MorphoLex, Nation BNC/COCA and MorphyNet excerpt
-components with their own terms. The validator compares identities, approval,
-scope, license and member records for all five components, not just TUBELEX.
-`example-only` identifies the MorphyNet excerpt; it does not make the complete
-external table a bundled resource or a public reference inventory.
-
-CRAN makes the package maintainer accountable for ensuring that third-party
-material is used under the license granted by its author. It does not require an
-independent reviewer. Independent legal or provenance review remains welcome,
-but is not a release prerequisite and does not replace upstream clarification
-where clarification is needed.
-
-From the candidate checkout, verify the decision, release inventory, and their
-agreement with the installed resource manifest with:
-
-```sh
-Rscript experiments/resource-admission/validate-tubelex-admission.R .
-```
-
-The command must report `maintainer_decision_valid`,
-`admission_gate_passed: true`, and `installed_manifest_consistent: true`. The
-package-level decision is separate from this resource approval. The stored
-admission record retains the conditions of its original decision; its remaining
-gate fields must not be read as evidence that later published development
-artifacts were never checked. Use the named artifact's preserved inventory and
-CI results to determine completion.
-
-See [`OPTIONAL-REVIEW.md`](OPTIONAL-REVIEW.md) for a compact advisory review
-checklist.
+Run `Rscript experiments/resource-admission/validate-tubelex-admission.R .`.
+Use `experiments/prepare-resources.R` only after reviewing the resource terms;
+it explicitly prepares a cache for reference-dependent integration checks.

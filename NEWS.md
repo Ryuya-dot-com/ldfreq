@@ -1,3 +1,43 @@
+# ldfreq 0.5.0.9001
+
+- Separate optional TUBELEX, NJ8, MorphoLex, BNC/COCA and MorphyNet reference
+  data from the MIT package code. Review terms with `lexdiv_resource_info()`
+  and explicitly obtain selected, versioned resources with
+  `lexdiv_download_resources(..., accept_license = TRUE)`. Downloads and
+  cached files are SHA-256 verified; installation and calculations never
+  download data implicitly. Existing resource-based calls need this one-time
+  setup. Core lexical-diversity calculations need no reference download.
+- Add opt-in `mtld_ma`: forward moving-average MTLD with strict threshold
+  crossing, complete factors of at least ten tokens, and no fractional tail.
+  The eleven default metrics and existing MTLD definition are unchanged.
+- Add a metric-selection guide with a 2,786-essay PELIC analysis, controlled
+  50–200-token comparisons, writer-cluster bootstrap intervals, and sampling
+  reliability from disjoint blocks. Compare five measures against actual
+  koRpus calls on 202 essays. Publish aggregate results and reproduction code.
+- Extend the evidence to ICNALE, OANC and BAWE: 16,730 documents in the
+  50/100-token comparison, 2,833 in the 200/500/1,000-token comparison, and
+  2,556 ICNALE writers in the two-task comparison. Report linked-cluster
+  uncertainty, missingness and genre/discipline strata. Add 182 real-block
+  koRpus comparisons and document its MATTR N-equals-window boundary difference.
+- Use the consistent names `lexdiv_compare_ngrams()`,
+  `lexdiv_build_ngram_reference()`, `lexdiv_screen_lengths()` and
+  `lexdiv_sort_concordance()`. The previous names remain exact aliases;
+  arguments and saved results are unchanged.
+- Reject classed and dimensional inputs that could previously pass scalar
+  or plain-column checks in MTLD options, concordance, collocation,
+  study tables and MorphoLex selection. Preserve structured `invalid_input`
+  results for invalid core token vectors and intended categorical metadata.
+- Reject ambiguous selected columns in `lexdiv_as_documents()` and return
+  named empty documents that both metric and profile batches accept. Validate
+  raw-text batch arguments even when there are no documents; `plan` and
+  `max_rows` remain unsupported on this path. TUBELEX now returns structured
+  `resource_error` results for missing or damaged cache manifests as well as
+  data files, including in batch calls.
+- Shorten the README, align all guides to one fixed installation version,
+  and add version-specific R and GitHub citation records. The metric-selection
+  guide distinguishes the evaluated English sampling conditions, length-effect
+  intervals, and computational minimum lengths from individual-score precision.
+
 # ldfreq 0.4.0.9006
 
 - Call `lexdiv_study_table()` and `lexdiv_study_model_data()` directly to retain

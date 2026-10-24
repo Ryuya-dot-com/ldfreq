@@ -6,5 +6,5 @@ bibentry(
   author = person(given = "Ryuya", family = "Komuro"),
   year = "2026",
   note = paste("R package version", meta$Version),
-  url = "https://github.com/Ryuya-dot-com/ldfreq"
+  url = paste0("https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v", meta$Version)
 )

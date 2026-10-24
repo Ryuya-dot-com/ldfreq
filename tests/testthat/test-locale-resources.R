@@ -1,4 +1,5 @@
-test_that("bundled TUBELEX retains UTF-8 words under C LC_CTYPE", {
+test_that("cached TUBELEX retains UTF-8 words under C LC_CTYPE", {
+  skip_optional_resources(c("tubelex"))
   previous <- Sys.getlocale("LC_CTYPE")
   on.exit(Sys.setlocale("LC_CTYPE", previous), add = TRUE)
   selected <- suppressWarnings(Sys.setlocale("LC_CTYPE", "C"))

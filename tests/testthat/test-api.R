@@ -5,7 +5,7 @@ test_that("the public API emits the complete result contract", {
   result <- api_function(c("a", "a", "b", "c"))
 
   expect_s3_class(result, "lexdiv_results")
-  expect_identical(result$metric_id, setdiff(metric_ids_function(), "expected_ttr_d"))
+  expect_identical(result$metric_id, setdiff(metric_ids_function(), c("expected_ttr_d", "mtld_ma")))
   expect_identical(
     names(result),
     c(

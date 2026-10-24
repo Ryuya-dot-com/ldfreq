@@ -2,7 +2,7 @@
 
 Created: 2026-07-25
 Scope: reproducible builder and historical transformation evidence for the
-bundled TUBELEX resource. Resource approval is distinct from package publication
+separately distributed TUBELEX resource. Resource approval is distinct from package publication
 and from selecting a future formal release candidate.
 
 ## Result
@@ -31,9 +31,11 @@ the cross-platform semantic gate. The compressed hash is only a toolchain check,
 because gzip OS bytes and deflate output may differ across zlib versions.
 
 Full evidence is in [measurement.json](measurement.json). The upstream source is
-deliberately not retained in this repository. The 2.55 MB output is installed as
-a bundled resource together with its manifest, build provenance, reviewed
-notice, and package copyright declaration.
+deliberately not retained in this repository. The output is distributed separately from the R package, together with its
+manifest, build provenance and attribution notice. The wrapper uses the
+[NOTICE.md](NOTICE.md) beside the build scripts; the historical notice and
+wrapper hashes in `measurement.json` describe the original run.
+The current validator pins the updated notice and wrapper identities.
 
 ## Unicode audit finding
 

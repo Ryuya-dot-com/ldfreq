@@ -63,7 +63,7 @@ explicit, offline CPU call to a separately cached, commit-pinned Hugging Face
 model with a fast tokenizer. It requires exact target subword coverage, skips
 unknown targets and overlong segments, and computes last-layer target means.
 It does not implement the complete sentence-transformers pipeline or WSD.
-See \code{vignette("contextual-models", package = "ldfreq")} for the JSON
+See \href{https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.html}{contextual models guide} for the JSON
 exchange and validation boundaries. R never invokes it implicitly. No model
 weights, text corpora or new dependencies are bundled.
 }

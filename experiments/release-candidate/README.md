@@ -4,7 +4,7 @@ These repository-only tools generate and verify evidence for the immutable
 `ldfreq` source tarball used by the `Release candidate` GitHub Actions workflow.
 They are excluded from the R source package by `.Rbuildignore`.
 
-The current [state.dcf](state.dcf) identifies the 0.4.0 formal candidate.
+The current [state.dcf](state.dcf) identifies the development snapshot.
 Published development snapshots do not use this artifact workflow.
 Ordinary pull-request checks still exercise the development matrix. A formal
 candidate requires a separately selected three-component version, an exact
@@ -13,7 +13,7 @@ justify changing the classification. CRAN submission is outside the current
 project scope; the `--as-cran` command below performs checks, not submission.
 A private-repository 404 is not an allowed incoming NOTE and must not be hidden
 by weakening the strict result policy.
-The [release-scope guide](../../vignettes/release-scope.Rmd) defines the 0.4.0
+The [release-scope guide](../../vignettes/release-scope.Rmd) defines the current
 compatibility boundary. The exact PR-head artifact is checked once; merging
 the same tree does not start another artifact build. A deliberate environment
 recheck can use workflow dispatch. The build signs the source, manual and
@@ -31,6 +31,19 @@ documentation repairs. Changed controls, API documentation and the PDF manual
 are checked afresh, and all five exact-archive checks remain required. Remove
 `Source-Archive-*` whenever package content changes: numerical-evidence reuse
 does not permit reuse of an archive containing superseded documentation.
+
+For a repair confined to the separate TUBELEX builder,
+`Recheck-TUBELEX-Builder: true` can accompany `Validation-Run` and
+`Validation-Commit`. All five package environments and the C-locale job must
+have completed successfully, even if that run's builder jobs failed. Package
+sources, tests, help and vignettes must be unchanged, as must the reused job
+definitions. Both builder platforms and the release-control checks then run
+afresh; the required check rejects either builder's failure. This preserves
+completed numerical evidence without treating the earlier workflow as successful.
+`Recheck-Windows: true` additionally permits only the exact `.gitattributes`
+repair that protects the byte-pinned TUBELEX LICENSE from CRLF conversion.
+The Windows package job then runs afresh; the other four package environments
+and C-locale job still require completed successful evidence.
 
 `build-manual.R` uses R's documented `texi2dvi` emulation, retains TeX diagnostics,
 and requires a nonempty function index. A PDF returned by the no-index fallback
@@ -52,8 +65,8 @@ The evidence environment explicitly includes cpp11, progress and RcppEigen:
 binary dependency installation can omit these transitive LinkingTo packages,
 but the SBOM records the complete installed hard/build dependency closure.
 
-The SPDX root uses a LicenseRef with the source LICENSE text, preserving the
-component-specific terms instead of labeling the complete collection MIT.
+The SPDX root records MIT code and the BSD-3-Clause tokenizer example.
+Optional reference datasets are distributed separately with their own terms.
 The resource BOM embeds both the installed manifest and repository admission
 inventory. The run index compares resource IDs and counts against this exact
 BOM, not a historical hard-coded count.
@@ -72,9 +85,10 @@ named tarball. The default `new-submission-only` policy remains strict. The
 workflow selects `release-resource-notes`: `Status: OK`, or individually
 recognized NOTES for CRAN's `New submission` (with only the exact optional
 `Non-FOSS package license (file LICENSE)` line) and installed package size.
-The non-FOSS disposition preserves the declared component terms, including
-MorphoLex's CC BY-NC-SA restriction; it does not grant any extra rights.
-The latter must list only R/doc/extdata, include doc and extdata, and total
+The non-FOSS disposition is retained to classify historical archives that
+bundled MorphoLex; it does not describe the current package's MIT code or
+extend the separately downloaded data's rights. The size disposition must
+list only R/doc/extdata, include doc and extdata, and total
 at most 15 MiB (the 9019 Linux baseline was 10.9 MiB). The attributed resources
 and rendered guides explain that size; the exact file BOM and independent
 resource inventories still have to pass. Unexpected payload areas, duplicate

@@ -1,6 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Ryuya-dot-com/ldfreq/raw/main/inst/spec/ldfreq-installed-resource-manifest.schema.json",
   "title": "ldfreq installed resource manifest",
   "type": "object",
   "additionalProperties": false,
@@ -12,83 +11,64 @@
     "resources"
   ],
   "properties": {
-    "$schema": {"const": "ldfreq-installed-resource-manifest.schema.json"},
-    "schema_version": {"const": "1.2.0"},
-    "package_scope": {"const": "installed-lexical-resources"},
+    "$schema": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.0.0"
+    },
+    "package_scope": {
+      "const": "optional-reference-resources"
+    },
     "runtime_policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["network_access", "implicit_download_or_fallback"],
+      "required": [
+        "network_access",
+        "implicit_download_or_fallback",
+        "explicit_download_api"
+      ],
       "properties": {
-        "network_access": {"const": false},
-        "implicit_download_or_fallback": {"const": false}
+        "network_access": {
+          "const": false
+        },
+        "implicit_download_or_fallback": {
+          "const": false
+        },
+        "explicit_download_api": {
+          "const": "lexdiv_download_resources"
+        }
       }
     },
     "resources": {
       "type": "array",
-      "minItems": 1,
-      "items": {"$ref": "#/$defs/resource"}
-    }
-  },
-  "$defs": {
-    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "packageMember": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["path", "role", "bytes", "sha256"],
-      "properties": {
-        "path": {"type": "string", "minLength": 1},
-        "role": {"type": "string", "minLength": 1},
-        "bytes": {"type": "integer", "minimum": 0},
-        "sha256": {"$ref": "#/$defs/sha256"}
-      }
-    },
-    "resource": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "resource_id",
-        "resource_version",
-        "distribution",
-        "runtime_state",
-        "public_api",
-        "license_spdx",
-        "source_repository",
-        "source_commit",
-        "source_sha256",
-        "raw_source_bundled",
-        "raw_subtitles_or_identifiers_included",
-        "manifest_sha256",
-        "artifact_sha256",
-        "content_sha256",
-        "notice_path",
-        "provenance_path",
-        "package_members"
-      ],
-      "properties": {
-        "resource_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
-        "resource_version": {"type": "string", "minLength": 1},
-        "distribution": {"const": "bundled"},
-        "runtime_state": {"enum": ["non-exported", "public", "example-only"]},
-        "public_api": {"type": "boolean"},
-        "license_name": {"type": "string", "minLength": 1},
-        "source_url": {"type": "string", "format": "uri"},
-        "license_spdx": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
-        "source_repository": {"anyOf": [{"type": "string", "format": "uri"}, {"type": "null"}]},
-        "source_commit": {"anyOf": [{"type": "string", "pattern": "^[0-9a-f]{40}$"}, {"type": "null"}]},
-        "source_sha256": {"$ref": "#/$defs/sha256"},
-        "raw_source_bundled": {"type": "boolean"},
-        "raw_subtitles_or_identifiers_included": {"type": "boolean"},
-        "manifest_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}], "description": "Null when no separate resource manifest is shipped."},
-        "artifact_sha256": {"$ref": "#/$defs/sha256"},
-        "content_scope": {"type": "string", "minLength": 1},
-        "content_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}], "description": "Null when no separate decoded-content checksum is defined; package member bytes remain checked."},
-        "notice_path": {"type": "string", "minLength": 1},
-        "provenance_path": {"type": "string", "minLength": 1, "description": "Installed provenance file, or data container holding embedded provenance."},
-        "package_members": {
-          "type": "array",
-          "minItems": 1,
-          "items": {"$ref": "#/$defs/packageMember"}
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": [
+          "resource_id",
+          "resource_name",
+          "distribution",
+          "download",
+          "package_members"
+        ],
+        "properties": {
+          "distribution": {
+            "const": "explicit-download"
+          },
+          "download": {
+            "type": "object",
+            "required": [
+              "url",
+              "sha256",
+              "bytes",
+              "files"
+            ]
+          },
+          "package_members": {
+            "type": "array"
+          }
         }
       }
     }

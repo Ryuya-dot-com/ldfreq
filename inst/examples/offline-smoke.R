@@ -149,7 +149,7 @@ plan <- lexdiv_plan(presets = character(), specs = mattr_4)
 profile <- lexdiv_profile(tokens, plan)
 mattr_profile <- lexdiv_mattr_profile(tokens, plan)
 profile_batch <- lexdiv_profile_batch(documents, plan)
-screen <- lexdiv_screen(profile_batch, floors = c(tokens_4 = 4L))
+screen <- lexdiv_screen_lengths(profile_batch, floors = c(tokens_4 = 4L))
 
 check_print_contract <- function(value) {
   visibility <- NULL
@@ -248,10 +248,11 @@ stopifnot(
   all(screen$passes_screen)
 )
 
-# The real bundled NJ8 resource is available without a file path or network.
+# The verified cached NJ8 resource is available without a file path or network.
 bundled_levels <- nj8_profile(c("true", "false", "nan", "ldfreq_not_a_word"))
 stopifnot(
-  isTRUE(bundled_levels$provenance$resource_bundled),
+  isFALSE(bundled_levels$provenance$resource_bundled),
+  isTRUE(bundled_levels$provenance$resource_cached),
   identical(bundled_levels$lookup$rank, c(326L, 2382L, 6926L, NA_integer_)),
   bundled_levels$diagnostics$missing_rank_count == 0
 )
@@ -333,7 +334,7 @@ stopifnot(parts$documents$affix_occurrences[1] == 7,
   parts$documents$affixes_per_token[1] == 7/5,
   is.na(parts$documents$affix_occurrences[2]))
 
-# Bundled reference data remain available without Excel or a network request.
+# Explicitly downloaded reference data remain available without Excel or a network request.
 morpholex <- morpholex_data(c("0-1-1", "All roots"))
 stopifnot(nrow(morpholex$sheets[["All roots"]]) == 15471L,
   identical(morpholex$provenance$data_license, "CC BY-NC-SA 4.0"))
@@ -390,7 +391,7 @@ public_keyness <- lexdiv_keyness(public_source, "target", "reference", "surface-
 stopifnot(identical(public_keyness$results$log_ratio, c(1, -1)))
 if (requireNamespace("quanteda", quietly = TRUE)) {
   public_search <- lexdiv_concordance(public_source, list(a = "a"))
-  stopifnot(nrow(lexdiv_concordance_sort(public_search)) == 3L,
+  stopifnot(nrow(lexdiv_sort_concordance(public_search)) == 3L,
     nrow(lexdiv_concordance_dispersion(public_search, "a", 3)$documents) == 2L,
     nrow(lexdiv_collocations(public_search, "a")$pairs) == 4L,
     nrow(lexdiv_keyness_concordance(public_keyness, "a")$search$occurrences) == 3L)

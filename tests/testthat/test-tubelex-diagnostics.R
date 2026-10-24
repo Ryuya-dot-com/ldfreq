@@ -1,4 +1,5 @@
 test_that("TUBELEX diagnostic tables preserve documents and conditional summaries", {
+  skip_optional_resources(c("tubelex"))
   profiles <- tubelex_profile_batch(list(b = c("Apple", "apple", "zzunmatchedxyz", "zzunmatchedxyz"),
     a = c("the", "zzunmatchedxyz"), blank = character(), bad = c("the", NA_character_)))
   copy <- unserialize(serialize(profiles, NULL))
@@ -25,6 +26,7 @@ test_that("TUBELEX diagnostic tables preserve documents and conditional summarie
 })
 
 test_that("empty batches and all-unmatched documents retain typed results", {
+  skip_optional_resources(c("tubelex"))
   empty <- tubelex_diagnostics(stats::setNames(list(), character()))
   expect_identical(nrow(empty$summary), 0L)
   expect_identical(nrow(empty$documents), 0L)
@@ -54,6 +56,7 @@ test_that("unresolved lookups are distinct from confirmed non-matches", {
 })
 
 test_that("different preparation conditions never pool unmatched counts", {
+  skip_optional_resources(c("tubelex"))
   x <- tubelex_profile(c("Missingxyz", "<num>"), normalization = "identity")
   y <- tubelex_profile(c("Missingxyz", "<num>"), normalization = "tubelex")
   z <- tubelex_profile(lexdiv_tokenize("Missingxyz", tokenizer = "english"),
@@ -70,6 +73,7 @@ test_that("different preparation conditions never pool unmatched counts", {
 })
 
 test_that("invalid shapes, inconsistent summaries and excessive inputs fail", {
+  skip_optional_resources(c("tubelex"))
   x <- tubelex_profile(c("apple", "zzunmatchedxyz"))
   expect_error(tubelex_diagnostics(list(x)), "plain named list")
   expect_error(tubelex_diagnostics(list(a = x, a = x)), "unique")

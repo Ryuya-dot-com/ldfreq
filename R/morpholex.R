@@ -1,4 +1,4 @@
-#' Read the bundled MorphoLex English database
+#' Read the cached MorphoLex English database
 #'
 #' Returns original worksheet values with source and license metadata. This is
 #' a reference-data reader, not a morphological analyzer. See morpholex_data.Rd
@@ -8,12 +8,13 @@
 #' @return A list with sheets (named data frames) and provenance.
 #' @export
 morpholex_data <- function(sheets = NULL) {
-  if (!is.null(sheets) && (!is.character(sheets) || !length(sheets) ||
+  if (!is.null(sheets) && (!is.character(sheets) || is.object(sheets) ||
+      !is.null(dim(sheets)) || !length(sheets) ||
       anyNA(sheets) || any(!nzchar(sheets)) || anyDuplicated(sheets))) {
     stop("sheets must be NULL or a nonempty character vector of unique sheet names.", call. = FALSE)
   }
-  result <- readRDS(system.file("extdata", "morpholex", "5bc425fb",
-    "morpholex_en.rds", package = "ldfreq", mustWork = TRUE))
+  result <- readRDS(.lex_resource_file("morpholex", "extdata", "morpholex",
+    "5bc425fb", "morpholex_en.rds"))
   if (is.null(sheets)) sheets <- names(result$sheets)
   unknown <- setdiff(sheets, names(result$sheets))
   if (length(unknown)) {

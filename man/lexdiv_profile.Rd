@@ -7,6 +7,7 @@
 \alias{lexdiv_profile}
 \alias{lexdiv_profile_batch}
 \alias{lexdiv_screen}
+\alias{lexdiv_screen_lengths}
 \alias{print.lexdiv_spec}
 \alias{print.lexdiv_grid}
 \alias{print.lexdiv_plan}
@@ -14,6 +15,12 @@
 \alias{print.lexdiv_profile_batch_results}
 \title{Build and Evaluate Explicit Lexical-Diversity Method Plans}
 \usage{
+lexdiv_screen_lengths(
+  x,
+  floors = c(tokens_50 = 50L, tokens_100 = 100L),
+  max_rows = 2e+06
+)
+
 lexdiv_spec(method_id, parameters = list(), request_id = NULL)
 
 lexdiv_grid(
@@ -132,6 +139,8 @@ envelope and returns document-major, request-minor long form.
 row per source result and named floor. It deliberately has no metric-value column.
 }
 \description{
+\code{lexdiv_screen_lengths()} is the canonical name; \code{lexdiv_screen()} remains a compatibility alias.
+
 Builds bounded, reproducible plans for computing multiple parameter settings of
 the versioned lexical-diversity methods without changing the established canonical
 API. The identity hierarchy is metric family, versioned method, and normalized

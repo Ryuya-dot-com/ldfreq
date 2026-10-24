@@ -1,4 +1,5 @@
-test_that("the bundled snapshot retains all worksheets and original identifiers", {
+test_that("the cached snapshot retains all worksheets and original identifiers", {
+  skip_optional_resources(c("morpholex"))
   x <- morpholex_data()
   word_sheets <- x$sheets[grepl("^[0-9]+-[0-9]+-[0-9]+$", names(x$sheets))]
   expect_length(x$sheets, 34L)
@@ -28,6 +29,7 @@ test_that("the bundled snapshot retains all worksheets and original identifiers"
 })
 
 test_that("sheet selection is explicit, ordered and cannot alter subsequent reads", {
+  skip_optional_resources(c("morpholex"))
   x <- morpholex_data(c("All roots", "0-1-1"))
   expect_identical(names(x$sheets), c("All roots", "0-1-1"))
   expect_identical(x$provenance$selected_sheets, names(x$sheets))
@@ -39,7 +41,8 @@ test_that("sheet selection is explicit, ordered and cannot alter subsequent read
   expect_error(morpholex_data("not-a-sheet"), "Unknown MorphoLex sheets")
 })
 
-test_that("bundled parts preserve scope, original rows and unsupported contractions", {
+test_that("cached parts preserve scope, original rows and unsupported contractions", {
+  skip_optional_resources(c("morpholex"))
   e <- new.env(parent = baseenv())
   for (file in c("word-parts.R", "morpholex-word-parts.R"))
     sys.source(system.file("examples", file, package = "ldfreq", mustWork = TRUE), e)

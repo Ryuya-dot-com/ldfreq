@@ -25,12 +25,13 @@ study_long_table <- function(planned, submissions, results, plan, condition_id,
       !all(submissions$observation_id %in% planned$observation_id))
     fail("submissions needs observation_id, document_id and input_characters, with at most one document per known observation.")
   chars <- submissions$input_characters
-  if (!is.numeric(chars) || is.object(chars) || any(is.nan(chars)) ||
+  if (!is.numeric(chars) || is.object(chars) || !is.null(dim(chars)) || any(is.nan(chars)) ||
       any(!is.na(chars) & (!is.finite(chars) | chars < 0 | chars != floor(chars))))
     fail("input_characters must be nonnegative whole counts, or NA when unavailable.")
   if (!ids_ok(condition_id) || length(condition_id) != 1L)
     fail("condition_id must be one explicit nonblank character identifier.")
-  if (!is.numeric(max_rows) || length(max_rows) != 1L || is.na(max_rows) ||
+  if (!is.numeric(max_rows) || is.object(max_rows) || !is.null(dim(max_rows)) ||
+      length(max_rows) != 1L || is.na(max_rows) ||
       !is.finite(max_rows) || max_rows < 1 || max_rows != floor(max_rows))
     fail("max_rows must be one positive whole number.")
   if (!table_ok(results) || !inherits(results, "lexdiv_profile_batch_results"))
@@ -61,7 +62,8 @@ study_long_table <- function(planned, submissions, results, plan, condition_id,
   if (any(!vapply(static, function(name)
     identical(results[[name]], template[[name]][ri]), logical(1))))
     fail("Result methods, parameters or plan identity do not match plan.")
-  if (!is.numeric(results$value) || !is.numeric(results$N) || !is.numeric(results$V) ||
+  if (!all(vapply(results[c("value", "N", "V")], function(v)
+      is.numeric(v) && !is.object(v) && is.null(dim(v)), logical(1))) ||
       anyNA(results$N) || anyNA(results$V) ||
       any(!is.finite(results$N) | results$N < 0 | results$N != floor(results$N)) ||
       any(!is.finite(results$V) | results$V < 0 | results$V > results$N |

@@ -1,12 +1,13 @@
 # Authored contexts, unchanged resource relations, illustrative reviewer choices.
 # This nine-row excerpt is not a vocabulary coverage reference.
 morphynet_example <- local({
+  resource <- ldfreq::lexdiv_resource_info("morphynet")
+  if (!resource$available) stop("Review lexdiv_resource_info('morphynet'), then run lexdiv_download_resources('morphynet', accept_license = TRUE).")
   reference <- ldfreq::morphynet_read_derivations(
-    system.file("extdata", "morphynet-example", "eng.derivational.example.tsv",
-      package = "ldfreq", mustWork = TRUE), language = "en",
+    file.path(resource$path, "extdata", "morphynet-example", "eng.derivational.example.tsv"), language = "en",
     resource_version = "English v1; nine-row teaching excerpt")
-  source_rows <- utils::read.csv(system.file("extdata", "morphynet-example",
-    "source-rows.csv", package = "ldfreq", mustWork = TRUE), colClasses = "character")
+  source_rows <- utils::read.csv(file.path(resource$path, "extdata", "morphynet-example",
+    "source-rows.csv"), colClasses = "character")
   segments <- data.frame(document_id = c(rep("example", 4), "empty"),
     segment_id = c("s1", "s2", "s3", "s4", "s1"),
     text = c("We retransmit signals.", "A transmitter supports reusability.",

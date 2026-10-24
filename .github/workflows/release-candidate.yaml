@@ -128,6 +128,14 @@ jobs:
             any::RcppEigen
           needs: check
 
+      - name: Explicitly obtain optional reference snapshots for integration checks
+        shell: Rscript {0}
+        run: |
+          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
+            "experiments/prepare-resources.R",
+            shQuote(file.path(Sys.getenv("RUNNER_TEMP"), "ldfreq-resources")), "--accept-license"))
+          if (!identical(status, 0L)) quit(status = status)
+
       - name: Validate repository-only TUBELEX admission evidence
         shell: Rscript {0}
         run: |
@@ -193,7 +201,7 @@ jobs:
           } else {
             old <- setwd(output_root)
             build_status <- system2(file.path(R.home("bin"), "R"),
-              c("CMD", "build", shQuote(package_root)))
+              c("CMD", "build", "--no-build-vignettes", shQuote(package_root)))
             setwd(old)
             if (!identical(build_status, 0L)) quit(status = build_status)
           }
@@ -342,6 +350,14 @@ jobs:
           # Keep all ldfreq check dependencies; old Matrix Enhances are not used.
           dependencies: 'if (getRversion() < "4.2.0") c("Depends", "Imports", "LinkingTo", "Suggests") else "all"'
           needs: check
+
+      - name: Explicitly obtain optional reference snapshots for integration checks
+        shell: Rscript {0}
+        run: |
+          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
+            "experiments/prepare-resources.R",
+            shQuote(file.path(Sys.getenv("RUNNER_TEMP"), "ldfreq-resources")), "--accept-license"))
+          if (!identical(status, 0L)) quit(status = status)
 
       - name: Check or reclassify exact source evidence
         shell: Rscript {0}

@@ -100,6 +100,7 @@ test_that("stale, ambiguous and incomplete edit inputs fail explicitly", {
 })
 
 test_that("authored versions retain denominators, missingness and full coverage", {
+  skip_optional_resources("nj8")
   e <- new.env(parent = globalenv())
   invisible(capture.output(sys.source(system.file("examples", "reviewed-text-demo.R",
     package = "ldfreq", mustWork = TRUE), e)))

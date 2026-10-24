@@ -3,12 +3,13 @@
 collocation_profile <- function(search, query_id, span = c(left = 0L, right = 1L),
     min_count = 1L, max_pairs = 1e6) {
   .concordance_check(search)
-  if (!is.character(query_id) || length(query_id) != 1L || is.na(query_id) ||
+  if (!is.character(query_id) || is.object(query_id) || !is.null(dim(query_id)) ||
+      length(query_id) != 1L || is.na(query_id) ||
       !query_id %in% names(search$queries))
     stop("query_id must select one saved query.", call. = FALSE)
   if (length(search$queries[[query_id]]) != 1L)
     stop("Collocation nodes must be single-token queries.", call. = FALSE)
-  if (!is.numeric(span) || length(span) != 2L ||
+  if (!is.numeric(span) || is.object(span) || !is.null(dim(span)) || length(span) != 2L ||
       !identical(names(span), c("left", "right")))
     stop("span must be c(left = ..., right = ...) in original token slots.", call. = FALSE)
   span <- vapply(span, .concordance_whole, integer(1), name = "span", minimum = 0)

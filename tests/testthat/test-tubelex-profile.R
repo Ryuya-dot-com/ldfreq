@@ -123,6 +123,7 @@ test_that("apostrophe typography is opt-in and does not perform segmentation", {
 })
 
 test_that("TUBELEX batch retains full profiles and document-local failures", {
+  skip_optional_resources(c("tubelex"))
   documents <- list(b = c("Apple", "apple", "missing-word"),
     a = c("the", "book"), empty = character(), bad = c("the", NA_character_))
   batch <- tubelex_profile_batch(documents)

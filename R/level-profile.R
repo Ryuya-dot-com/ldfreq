@@ -1,4 +1,4 @@
-# Coverage-aware profiles from bundled or caller-supplied New JACET 8000.
+# Coverage-aware profiles from cached or caller-supplied New JACET 8000.
 
 .level_profile_contract_id <- "ldfreq-lexical-level-profile"
 .level_profile_contract_version <- "0.2.0"
@@ -115,20 +115,15 @@
 }
 
 .nj8_read_wordlist <- function(wordlist, sheet) {
-  bundled <- is.null(wordlist)
-  if (bundled) {
-    wordlist <- system.file("extdata", "nj8", "2016", "NJ8.csv", package = "ldfreq")
-    manifest_path <- system.file(
-      "extdata", "nj8", "2016", "resource.manifest.dcf", package = "ldfreq"
-    )
-    if (!nzchar(wordlist) || !nzchar(manifest_path)) {
-      stop("The bundled New JACET 8000 resource is missing; reinstall ldfreq.", call. = FALSE)
-    }
+  cached <- is.null(wordlist)
+  if (cached) {
+    wordlist <- .lex_resource_file("nj8", "extdata", "nj8", "2016", "NJ8.csv")
+    manifest_path <- .lex_resource_file("nj8", "extdata", "nj8", "2016", "resource.manifest.dcf")
     manifest <- read.dcf(manifest_path)
     if (nrow(manifest) != 1L ||
         !all(c("Resource-ID", "Resource-Version", "Artifact-SHA256", "Citation") %in% colnames(manifest)) ||
         manifest[1L, "Resource-ID"] != .nj8_resource_id) {
-      stop("The bundled New JACET 8000 manifest is invalid; reinstall ldfreq.", call. = FALSE)
+      stop("The cached New JACET 8000 manifest is invalid; download a fresh verified nj8 cache.", call. = FALSE)
     }
   }
   if (is.character(wordlist) && !is.object(wordlist) &&
@@ -145,8 +140,8 @@
     )
     bytes <- .nj8_read_file_bytes(path)
     source_sha256 <- digest::digest(bytes, algo = "sha256", serialize = FALSE)
-    if (bundled && !identical(source_sha256, unname(manifest[1L, "Artifact-SHA256"]))) {
-      stop("The bundled New JACET 8000 checksum does not match; reinstall ldfreq.", call. = FALSE)
+    if (cached && !identical(source_sha256, unname(manifest[1L, "Artifact-SHA256"]))) {
+      stop("The cached New JACET 8000 checksum does not match; download a fresh verified nj8 cache.", call. = FALSE)
     }
     extension <- tolower(tools::file_ext(path))
     if (identical(extension, "csv")) {
@@ -171,7 +166,7 @@
           )
         }
       )
-      source_type <- if (bundled) "bundled_csv" else "local_csv"
+      source_type <- if (cached) "cached_csv" else "local_csv"
       source_sheet <- NA_character_
     } else if (identical(extension, "xlsx")) {
       if (!requireNamespace("readxl", quietly = TRUE)) {
@@ -210,8 +205,8 @@
       source_file = basename(path),
       source_sheet = source_sheet,
       source_sha256 = source_sha256,
-      bundled_version = if (bundled) unname(manifest[1L, "Resource-Version"]) else NULL,
-      citation = if (bundled) unname(manifest[1L, "Citation"]) else NULL
+      cached_version = if (cached) unname(manifest[1L, "Resource-Version"]) else NULL,
+      citation = if (cached) unname(manifest[1L, "Citation"]) else NULL
     ))
   }
   if (!is.data.frame(wordlist)) {
@@ -307,9 +302,9 @@
   if (length(ranks) != length(words)) {
     stop("rank_column and word_column must have the same length.", call. = FALSE)
   }
-  if (identical(source$source_type, "bundled_csv") &&
+  if (identical(source$source_type, "cached_csv") &&
       !identical(sort(ranks), seq_len(.nj8_expected_ranks))) {
-    stop("The bundled New JACET 8000 ranks are incomplete; reinstall ldfreq.", call. = FALSE)
+    stop("The cached New JACET 8000 ranks are incomplete; download a fresh verified nj8 cache.", call. = FALSE)
   }
 
   aliases <- lapply(words, .nj8_aliases, expand_parenthetical = expand_parenthetical)
@@ -562,13 +557,13 @@
   )
   summary <- .level_profile_summary(lookup)
   coverage <- .level_profile_coverage(input, lookup)
-  bundled <- identical(prepared$source$source_type, "bundled_csv")
-  if (bundled && !is.null(options$resource_version) &&
-      !identical(options$resource_version, prepared$source$bundled_version)) {
-    stop("resource_version cannot relabel the bundled New JACET 8000 resource.", call. = FALSE)
+  cached <- identical(prepared$source$source_type, "cached_csv")
+  if (cached && !is.null(options$resource_version) &&
+      !identical(options$resource_version, prepared$source$cached_version)) {
+    stop("resource_version cannot relabel the cached New JACET 8000 resource.", call. = FALSE)
   }
-  version <- if (bundled) {
-    prepared$source$bundled_version
+  version <- if (cached) {
+    prepared$source$cached_version
   } else if (is.null(options$resource_version)) {
     paste0(
       "canonical-sha256-",
@@ -587,7 +582,8 @@
     resource_source_sheet = prepared$source$source_sheet,
     resource_source_sha256 = prepared$source$source_sha256,
     resource_canonical_sha256 = prepared$diagnostics$canonical_sha256,
-    resource_bundled = bundled,
+    resource_bundled = FALSE,
+    resource_cached = cached,
     resource_citation = prepared$source$citation,
     runtime_download = FALSE,
     input_source = input$input_source,
@@ -699,7 +695,7 @@
 #' Profile lexical coverage by New JACET 8000 frequency level
 #'
 #' Creates token- and type-weighted exact and cumulative lexical profiles from
-#' the bundled New JACET 8000 table, or an explicit caller-supplied copy.
+#' the cached New JACET 8000 table, or an explicit caller-supplied copy.
 #' The table is redistributed with permission from JACET and source attribution.
 #' No list is downloaded or copied in full into the returned object.
 #' Ranks 1--8000 are mapped to eight 1,000-rank levels. Off-list items retain a
@@ -710,7 +706,7 @@
 #'   select lemmas or flemmas. Each character-vector element is one complete
 #'   lexical unit; a single value containing whitespace triggers a warning
 #'   because it may be raw prose.
-#' @param wordlist `NULL` uses the bundled, versioned New JACET 8000 table.
+#' @param wordlist `NULL` uses the cached, versioned New JACET 8000 table.
 #'   Alternatively, a data frame containing ranks and entries, or the path to
 #'   a local XLSX or CSV file. No resource is downloaded.
 #' @param rank_column,word_column Optional names of the rank and entry columns.
@@ -732,7 +728,7 @@
 #' @param expand_parenthetical Whether an entry such as `"mom (mum, mummy)"`
 #'   contributes its parenthetical comma-separated aliases at the same rank.
 #' @param resource_version Optional version label for an external table. If
-#'   `NULL`, its canonical rank-entry SHA-256 supplies the label. The bundled
+#'   `NULL`, its canonical rank-entry SHA-256 supplies the label. The cached
 #'   table has a fixed version and cannot be relabelled.
 #'
 #' @return A `nj8_profile` object containing `summary`, lossless query

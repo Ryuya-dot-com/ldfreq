@@ -1,0 +1,19 @@
+{
+  "package": "koRpus",
+  "version": "0.13.9",
+  "language_package": "0.1.4",
+  "R": "4.6.1",
+  "selected_before_domain_check": 215,
+  "minimum_tokens": 50,
+  "token_identity_verified": true,
+  "settings": {
+    "window": 50,
+    "rand.sample": 42,
+    "factor.size": 0.72,
+    "min.tokens": 9,
+    "MTLDMA.steps": 1,
+    "case.sens": true
+  },
+  "inputs": ["8fc5b9dc8148f0330231d67efc2f855a6ee520aeabe2be4afdb442b3ce6e6f82", "d6b710cd284126383f96dd9fccc088ba3dcb28b5e80349cde531d565254c22c2", "0b789694740ffae6620bb3f3e65d3ed18dcde3278fa1de5d821fbcaf5873e5cf"],
+  "source_sha256": "85c2ee20a1ddc804029a86ef648a9520643910be544c8e206f52c38ea0a2dfc4"
+}

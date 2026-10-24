@@ -22,6 +22,8 @@ run_case <- function(name, mutate, pattern = NULL, admission = FALSE) {
   dir.create(file.path(fixture, "experiments"))
   stopifnot(file.copy(file.path(package_root, "experiments/resource-admission"),
     file.path(fixture, "experiments"), recursive = TRUE))
+  dir.create(file.path(fixture, "R"))
+  stopifnot(file.copy(file.path(package_root, "R/resource-catalog.R"), file.path(fixture, "R")))
   mutate(fixture)
   # A preflight regression must fail before attempting to read this sentinel.
   archive <- file.path(fixture, "ldfreq_0.2.0.tar.gz")
@@ -54,23 +56,23 @@ run_case("duplicate-resource", function(p) edit_record(p, installed, function(x)
   x$resources[[5L]] <- x$resources[[3L]]; x
 }), "identities are incomplete or duplicated", TRUE)
 run_case("wrong-component-license", function(p) edit_record(p, admitted, function(x) {
-  x$included_resources[[3L]]$license_spdx <- "MIT"; x
-}), "records disagree: morpholex-en", TRUE)
-run_case("unapproved-component", function(p) edit_record(p, admitted, function(x) {
-  x$included_resources[[4L]]$release_approved <- FALSE; x
-}), "records disagree: bnccoca-level6", TRUE)
+  x$optional_resources[[3L]]$license_spdx <- "MIT"; x
+}), "Resource records disagree: morpholex-en", TRUE)
+run_case("bundled-component", function(p) edit_record(p, admitted, function(x) {
+  x$optional_resources[[4L]]$distribution <- "bundled"; x
+}), "Resource records disagree: bnccoca-level6", TRUE)
 run_case("excerpt-scope-drift", function(p) edit_record(p, admitted, function(x) {
-  x$included_resources[[5L]]$content_scope <- "Complete database"; x
-}), "records disagree: morphynet-en-example", TRUE)
+  x$optional_resources[[5L]]$content_scope <- "Complete database"; x
+}), "Resource records disagree: morphynet-en-example", TRUE)
 run_case("admitted-member-drift", function(p) edit_record(p, admitted, function(x) {
-  x$included_resources[[4L]]$package_members[[1L]]$bytes <- 1; x
-}), "records disagree: bnccoca-level6", TRUE)
-run_case("missing-data", function(p) unlink(file.path(p,
-  "inst/extdata/bnccoca/ac81c7a6/bnccoca.rds")), "Required file is missing")
+  x$optional_resources[[4L]]$download$bytes <- 1; x
+}), "Resource records disagree: bnccoca-level6", TRUE)
+run_case("missing-example-code", function(p) unlink(file.path(p,
+  "inst/examples/tubelex-tokenize.py")), "Required file is missing")
 run_case("missing-license", function(p) unlink(file.path(p,
-  "inst/licenses/morpholex/CC-BY-NC-SA-4.0.md")), "Required file is missing")
+  "inst/licenses/tubelex/LICENSE")), "Required file is missing")
 run_case("same-size-tamper", function(p) {
-  path <- file.path(p, "inst/licenses/morphynet/CC-BY-SA-3.0.txt")
+  path <- file.path(p, "inst/licenses/tubelex/LICENSE")
   bytes <- readBin(path, "raw", file.info(path)$size)
   bytes[[1L]] <- as.raw(bitwXor(as.integer(bytes[[1L]]), 1L)); writeBin(bytes, path)
 }, "Source member SHA-256 differs")
@@ -84,10 +86,10 @@ run_case("undeclared-data", function(p) writeLines("extra", file.path(p,
 run_case("undeclared-license", function(p) writeLines("extra", file.path(p,
   "inst/licenses/unlisted.txt")), "undeclared or missing license")
 run_case("duplicate-member", function(p) edit_record(p, installed, function(x) {
-  x$resources[[3L]]$package_members[[2L]] <- x$resources[[3L]]$package_members[[1L]]; x
+  x$resources[[1L]]$package_members[[2L]] <- x$resources[[1L]]$package_members[[1L]]; x
 }), "duplicate paths")
 run_case("invalid-member-path", function(p) edit_record(p, installed, function(x) {
-  x$resources[[3L]]$package_members[[1L]]$path <- "../outside"; x
+  x$resources[[1L]]$package_members[[1L]]$path <- "../outside"; x
 }), "not a normalized relative path")
 
 # Exercise the actual record-generation expressions with local fixture values.
@@ -108,18 +110,16 @@ env$archive_record <- list(sha256 = paste(rep("0", 64), collapse = ""))
 env$created <- "2026-10-06T00:00:00Z"; env$relationships <- list()
 eval(expressions[[assignment("dependency_sbom")]], env)
 sbom <- env$dependency_sbom
-stopifnot(identical(sbom$packages[[1L]]$licenseDeclared, "LicenseRef-ldfreq-component-terms"),
-  identical(sbom$hasExtractedLicensingInfos[[1L]]$extractedText,
-    paste(readLines(file.path(package_root, "LICENSE")), collapse = "\n")),
-  grepl("CC BY-NC-SA 4.0", sbom$hasExtractedLicensingInfos[[1L]]$extractedText, fixed = TRUE))
-cat("PASS: generated SPDX preserves source component terms\n")
+stopifnot(identical(sbom$packages[[1L]]$licenseDeclared, "MIT AND BSD-3-Clause"),
+  !grepl("CC BY-NC-SA", paste(readLines(file.path(package_root, "LICENSE")), collapse="\n"), fixed=TRUE))
+cat("PASS: source SPDX excludes optional data licenses\n")
 
 for (i in seq.int(assignment("resource_manifest_path"), assignment("resource_bom"))) {
   eval(expressions[[i]], env)
 }
 stopifnot(length(env$resource_bom$installed_manifest$resources) == 5L,
-  length(env$resource_bom$release_inventory$included_resources) == 5L,
-  identical(env$resource_bom$admission_record$resource_id, "tubelex-en-treebank-slim"))
+  length(env$resource_bom$release_inventory$optional_resources) == 5L,
+  grepl("Explicit downloads", env$resource_bom$optional_resource_policy, fixed=TRUE))
 env$package_extract <- file.path(scratch, "missing-resource")
 result <- tryCatch({
   for (i in seq.int(assignment("resource_manifest_path"), assignment("resource_bom"))) {
@@ -128,7 +128,7 @@ result <- tryCatch({
   NULL
 }, error = conditionMessage)
 stopifnot(is.character(result), grepl("manifest differs from the checkout", result, fixed = TRUE))
-cat("PASS: resource BOM includes all admissions and rejects an older archive manifest\n")
+cat("PASS: resource BOM includes all optional resources and rejects an older archive manifest\n")
 
 # Exercise the production aggregation loop with explicitly synthetic OS records.
 expressions <- parse(file.path(package_root, "experiments/release-candidate/assemble-run-index.R"))

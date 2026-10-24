@@ -1,5 +1,10 @@
 library(ldfreq)
 
+if (!lexdiv_resource_info("tubelex")$available) {
+  cat("SKIP: optional TUBELEX snapshot has not been explicitly prepared.\n")
+  quit(status = 0L)
+}
+
 internal_names <- c(
   ".lexres_decode_gzip_bounded",
   ".lexres_load_resource_impl",
@@ -36,7 +41,7 @@ manifest_path <- paths$manifest_path
 artifact_path <- unname(paths$artifact_paths[[1L]])
 bundle_dir <- dirname(manifest_path)
 provenance_path <- file.path(bundle_dir, "build-provenance.json")
-notice_path <- system.file("licenses", "tubelex", "NOTICE.md", package = "ldfreq")
+notice_path <- file.path(lexdiv_resource_info("tubelex")$path, "licenses", "tubelex", "NOTICE.md")
 copyrights_path <- system.file("COPYRIGHTS", package = "ldfreq")
 inventory_path <- system.file(
   "spec", "ldfreq-installed-resource-manifest.json",
@@ -312,8 +317,8 @@ check(
   "The installed non-exported lookup-contract boundary changed."
 )
 check(
-  identical(inventory$schema_version, "1.2.0") &&
-    identical(inventory$package_scope, "installed-lexical-resources") &&
+  identical(inventory$schema_version, "2.0.0") &&
+    identical(inventory$package_scope, "optional-reference-resources") &&
     identical(inventory$runtime_policy$network_access, FALSE) &&
     identical(inventory$runtime_policy$implicit_download_or_fallback, FALSE),
   "The installed resource-manifest boundary changed."
@@ -322,12 +327,12 @@ inventory_ids <- vapply(inventory$resources, `[[`, character(1L), "resource_id")
 check(!anyDuplicated(inventory_ids) && setequal(inventory_ids,
   c("tubelex-en-treebank-slim", "new-jacet8000", "morpholex-en",
     "bnccoca-level6", "morphynet-en-example")),
-  "The installed manifest changed its bundled resource identities.")
+  "The installed manifest changed its optional resource identities.")
 inventory_resource <- inventory$resources[[match("tubelex-en-treebank-slim", inventory_ids)]]
 check(
   identical(inventory_resource$resource_id, "tubelex-en-treebank-slim") &&
-    identical(inventory_resource$distribution, "bundled") &&
-    identical(inventory_resource$runtime_state, "public") &&
+    identical(inventory_resource$distribution, "explicit-download") &&
+    identical(inventory_resource$runtime_state, "optional") &&
     identical(inventory_resource$public_api, TRUE) &&
     identical(inventory_resource$license_spdx, "BSD-3-Clause") &&
     identical(inventory_resource$raw_source_bundled, FALSE) &&

@@ -127,15 +127,15 @@ schema_source_path <- file.path(
 inventory <- jsonlite::read_json(inventory_source_path, simplifyVector = FALSE)
 inventory_schema <- jsonlite::read_json(schema_source_path, simplifyVector = FALSE)
 check(
-  identical(inventory$schema_version, "1.2.0") &&
-    identical(inventory$package_scope, "installed-lexical-resources") &&
+  identical(inventory$schema_version, "2.0.0") &&
+    identical(inventory$package_scope, "optional-reference-resources") &&
     identical(inventory$runtime_policy$network_access, FALSE) &&
     identical(inventory$runtime_policy$implicit_download_or_fallback, FALSE),
   "Installed resource-manifest boundary changed."
 )
 resource_ids <- vapply(inventory$resources, `[[`, character(1L), "resource_id")
 check(length(resource_ids) > 0L && !anyDuplicated(resource_ids),
-  "The installed manifest must declare distinct bundled resources.")
+  "The installed manifest must declare distinct optional resources.")
 check(
   identical(inventory_schema$title, "ldfreq installed resource manifest") &&
     identical(inventory_schema$additionalProperties, FALSE),
@@ -178,10 +178,17 @@ metadata_paths <- paste0(
   relative_files(file.path(package_root, "inst", "spec"))
 )
 check(length(metadata_paths) > 0L, "No installed specification files were found.")
-# Authored examples are not reference lexical resources. Enumerate them
-# explicitly so extra extdata still fails, and compare their exact bytes too.
+# Authored examples and aggregate evaluation results are not reference lexical
+# resources. Enumerate them so extra extdata still fails; compare exact bytes.
 example_paths <- paste0("extdata/masc-example/", c("README.txt", "example-penn.xml",
   "example-s.xml", "example-seg.xml", "example.anc", "example.txt"))
+example_paths <- c(example_paths, paste0("extdata/corpus-stability/", c(
+  "block-summaries.csv", "block-densities.csv", "block-quantiles.csv",
+  "external-comparison.csv", "full-length-associations.csv",
+  "paired-length-change.csv", "sampling-reliability.csv")))
+example_paths <- c(example_paths, paste0("extdata/corpus-extension/", c(
+  "README.txt", "bawe-reliability.csv", "block-densities.csv",
+  "icnale-reliability.csv", "oanc-reliability.csv")))
 all_audited_paths <- c(member_paths, metadata_paths, example_paths)
 check(!anyDuplicated(all_audited_paths), "Audited package paths overlap.")
 for (path in c(metadata_paths, example_paths)) {
@@ -265,7 +272,7 @@ if (is.null(provided_source_archive)) {
   source_work <- file.path(audit_root, "source-build")
   check(dir.create(source_work, mode = "0755"), "Could not create source build directory.")
   run_r_command(
-    c("CMD", "build", shQuote(package_root)),
+    c("CMD", "build", "--no-build-vignettes", shQuote(package_root)),
     source_work,
     "build"
   )

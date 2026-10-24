@@ -1,0 +1,29 @@
+{
+  "koRpus": "0.13.9",
+  "language": "0.1.4",
+  "blocks": 182,
+  "token_identity_verified": true,
+  "code": "d6bcf5be5edf025f14125a7438a24d80d4e12734e6864029eb2f0e99c953cd4c",
+  "boundary_audit": [
+    {
+      "N": 49
+    },
+    {
+      "N": 50,
+      "ours": 0.4
+    },
+    {
+      "N": 51,
+      "ours": 0.4,
+      "external": 0.4
+    },
+    {
+      "N": 52,
+      "ours": 0.4,
+      "external": 0.4
+    }
+  ],
+  "koRpus_MATTR_function_sha256": "c90ec94bdbc9db811cd54289335eeb753b56238aaab5984f11ebb07129bea9d0",
+  "report_code": "06d22bbef97324b0006556627e3337b4d782aa46271be81099e1783623504dcf",
+  "note": "Original 182-block calls retained; only reporting assertions updated after verifying the N == window boundary in installed koRpus and dedicated 49/50/51/52-token calls."
+}

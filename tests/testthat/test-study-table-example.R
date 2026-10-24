@@ -184,3 +184,20 @@ test_that("ordinary lmer input uses exactly the declared model rows", {
   expect_equal(length(unique(stats::model.frame(fit)$writer_id)), 18)
   expect_true(is.logical(lme4::isSingular(fit)))
 })
+
+test_that("study tables reject classed or matrix counts and numeric results", {
+  e <- study_example()
+  call <- function(submissions=e$submissions,results=e$results,max_rows=1e6)
+    lexdiv_study_table(e$planned,submissions,results,e$plan,e$condition$id,max_rows=max_rows)
+  for(bad in list(matrix(1e6),I(1e6),factor("1000000")))
+    expect_error(call(max_rows=bad),"max_rows")
+  submissions <- e$submissions
+  submissions$input_characters <- matrix(submissions$input_characters)
+  expect_error(call(submissions=submissions),"input_characters")
+  for(column in c("value","N","V")) {
+    results <- e$results; results[[column]] <- matrix(results[[column]])
+    expect_error(call(results=results),"inconsistent counts")
+    results <- e$results; results[[column]] <- I(results[[column]])
+    expect_error(call(results=results),"inconsistent counts")
+  }
+})

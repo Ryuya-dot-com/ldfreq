@@ -10,6 +10,7 @@ reference:
   - title: Core metrics
     contents:
       - lexdiv_metrics
+      - lexdiv_resources
       - lexdiv_metric_ids
       - lexdiv_metrics_batch
   - title: Raw text and lexical units
@@ -87,6 +88,8 @@ articles:
     navbar: ~
     contents:
       - getting-started
+      - choosing-metrics
+      - reference-data
       - release-scope
       - english-tokenization
       - japanese-annotations

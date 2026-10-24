@@ -232,13 +232,9 @@
 }
 
 .lexres_tubelex_paths <- function() {
-  bundle_dir <- system.file(
-    "extdata", "tubelex", "7cb5fb36",
-    package = "ldfreq"
-  )
-  if (!nzchar(bundle_dir)) {
-    .lexres_stop("The installed TUBELEX resource bundle is unavailable.")
-  }
+  # Let the structured loader report missing files and hash failures alike.
+  bundle_dir <- file.path(.lex_resource_cache(), "tubelex",
+    .lex_resource_catalog$tubelex$version, "extdata", "tubelex", "7cb5fb36")
   list(
     manifest_path = file.path(bundle_dir, "resource.manifest.dcf"),
     artifact_paths = c(

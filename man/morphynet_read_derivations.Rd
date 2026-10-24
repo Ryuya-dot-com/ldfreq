@@ -15,10 +15,12 @@ version and any subset or modification, e.g., \code{"English v1"}.}
 The reader stops if more rows are present. This is not a byte or total-memory limit.}
 }
 \description{
+Reference snapshots require a prior explicit download; see \code{\link{lexdiv_download_resources}} for terms and cache setup.
+
 Reads supplied source word, target word, source POS, target POS, morpheme and
 prefix/suffix fields. Preserves alternative relations and source identity for
 inspection and optional keyword-in-context review. The complete English v1
-file has been checked; the bundled nine-row excerpt is only a teaching example.
+file has been checked; the cached nine-row excerpt is only a teaching example.
 }
 \value{
 A plain list:
@@ -62,7 +64,7 @@ An absent target does not prove absence of morphology. This reader does not
 lemmatize, infer inflections, predict learner knowledge or compute productivity.
 
 The full English file is obtained separately. Only nine attributed example
-rows and their original line mapping are bundled, under
+rows and their original line mapping are downloaded separately, under
 \file{extdata/morphynet-example/}. Resource and conversion terms are recorded
 under \file{licenses/morphynet/}; the independent R code remains MIT.
 }
@@ -77,12 +79,15 @@ Proceedings of the 18th SIGMORPHON Workshop, 39--48.
 \code{\link{bnccoca_data}},
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html}{Word families, roots and affixes tutorial}}
 \examples{
-path <- system.file("extdata", "morphynet-example", "eng.derivational.example.tsv",
-  package = "ldfreq", mustWork = TRUE)
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("morphynet"))$available)) {
+path <- file.path(lexdiv_resource_info("morphynet")$path, "extdata", "morphynet-example",
+  "eng.derivational.example.tsv")
 reference <- morphynet_read_derivations(path, language = "en",
   resource_version = "English v1; nine-row teaching excerpt")
 reference$relations[reference$relations$target_word == "reusability", ]
 # Three incoming relations, not three counted affixes in one segmentation.
 # For a complete, separately obtained English v1 file:
 # reference <- morphynet_read_derivations("eng.derivational.v1.tsv", "en", "English v1")
+}
 }

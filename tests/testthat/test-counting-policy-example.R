@@ -1,4 +1,5 @@
 test_that("counting and lookup equivalence are independent source-linked choices", {
+  skip_optional_resources(c("nj8"))
   e <- new.env(parent = baseenv())
   sys.source(system.file("examples", "lexical-counting-policy.R", package = "ldfreq",
     mustWork = TRUE), e)

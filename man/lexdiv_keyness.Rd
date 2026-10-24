@@ -50,7 +50,7 @@ Counting requires no optional package. Returning to KWIC uses optional
 \pkg{quanteda} (>= 4.5.0) and restricts endpoints to the exact counted term before
 matching, preserving Unicode key distinctions. Source text is retained in the
 complete result. Legacy \code{examples/keyness.R} still defines its old names
-and output shapes. See \code{vignette("keyness-comparison")}.
+and output shapes. See \href{https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html}{keyness comparison guide}.
 }
 \value{
 \code{lexdiv_keyness()} returns a plain list with \code{results} (two-by-two

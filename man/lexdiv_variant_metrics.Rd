@@ -5,7 +5,7 @@
 \title{Explicit Maas and sequential-MTLD comparison variants}
 \description{
 List or compute a bounded set of formula and aggregation variants without
-changing the versioned twelve-method \code{lexdiv_metrics()} core.
+changing the versioned thirteen-method \code{lexdiv_metrics()} core.
 }
 \usage{
 lexdiv_variant_ids()

@@ -3,6 +3,8 @@
 \title{Read Nation's BNC/COCA Level 6 Word-Family Lists}
 \usage{bnccoca_data()}
 \description{
+Reference snapshots require a prior explicit download; see \code{\link{lexdiv_download_resources}} for terms and cache setup.
+
 Reads an offline snapshot of Nation's BNC/COCA Level 6 lists, Version 1.0.0,
 with original source membership, spelling and attribution. No model, download
 or additional package is needed. These data use CC BY-SA 4.0.
@@ -53,7 +55,7 @@ uses only \code{dictionary}.
 The data and this conversion are CC BY-SA 4.0; independent R code remains MIT.
 Retain attribution, changes and ShareAlike conditions when redistributing the
 data. The complete license and notice are installed under
-\file{licenses/bnccoca/}. Other bundled resources have separate terms.
+\file{licenses/bnccoca/}. Other cached resources have separate terms.
 }
 \references{
 Nation, I. S. P. (2017). The BNC/COCA Level 6 word family lists
@@ -68,6 +70,8 @@ International Journal of Lexicography, 6(4), 253--279.
 example, \code{\link{morpholex_data}},
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html}{Word families, roots and affixes tutorial}}
 \examples{
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("bnccoca"))$available)) {
 reference <- bnccoca_data()
 # The dictionary maps forms to families; it is not a table of corpus counts.
 reference$dictionary[reference$dictionary$form \%in\%
@@ -82,4 +86,5 @@ sys.source(system.file("examples", "bnccoca-families.R", package = "ldfreq",
 profile <- env$bnccoca_example$profile
 profile$documents[c("document_id", "selected_tokens", "matched_tokens",
   "unresolved_tokens", "family_types", "family_ttr", "status")]
+}
 }

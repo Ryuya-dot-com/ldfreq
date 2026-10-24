@@ -24,6 +24,8 @@ jobs:
       check-matrix: ${{ steps.reuse.outputs.check-matrix }}
       builder-matrix: ${{ steps.reuse.outputs.builder-matrix }}
       linux-reuse: ${{ steps.reuse.outputs.linux-reuse }}
+      builder-recheck: ${{ steps.reuse.outputs.builder-recheck }}
+      windows-recheck: ${{ steps.reuse.outputs.windows-recheck }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -56,7 +58,7 @@ jobs:
 
   check:
     needs: validation-scope
-    if: needs.validation-scope.outputs.reuse != 'true'
+    if: needs.validation-scope.outputs.reuse != 'true' || needs.validation-scope.outputs.windows-recheck == 'true'
     name: ${{ matrix.config.os }} / R ${{ matrix.config.r }}
     runs-on: ${{ matrix.config.os }}
     timeout-minutes: 30
@@ -102,6 +104,14 @@ jobs:
           # Keep all ldfreq check dependencies; old Matrix Enhances are not used.
           dependencies: 'if (getRversion() < "4.2.0") c("Depends", "Imports", "LinkingTo", "Suggests") else "all"'
           needs: check
+
+      - name: Explicitly obtain optional reference snapshots for integration checks
+        shell: Rscript {0}
+        run: |
+          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
+            "experiments/prepare-resources.R",
+            shQuote(file.path(Sys.getenv("RUNNER_TEMP"), "ldfreq-resources")), "--accept-license"))
+          if (!identical(status, 0L)) quit(status = status)
 
       - uses: r-lib/actions/check-r-package@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
@@ -231,6 +241,14 @@ jobs:
             gibasa=?ignore-before-r=4.2.0
           dependencies: '"all"'
           needs: check
+      - name: Explicitly obtain optional reference snapshots for integration checks
+        shell: Rscript {0}
+        run: |
+          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
+            "experiments/prepare-resources.R",
+            shQuote(file.path(Sys.getenv("RUNNER_TEMP"), "ldfreq-resources")), "--accept-license"))
+          if (!identical(status, 0L)) quit(status = status)
+
       - uses: r-lib/actions/check-r-package@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
           args: 'c("--no-manual")'
@@ -257,6 +275,14 @@ jobs:
         with:
           cache: always
           dependencies: 'c("Depends", "Imports", "LinkingTo", "Suggests")'
+      - name: Explicitly obtain optional reference snapshots for integration checks
+        shell: Rscript {0}
+        run: |
+          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
+            "experiments/prepare-resources.R",
+            shQuote(file.path(Sys.getenv("RUNNER_TEMP"), "ldfreq-resources")), "--accept-license"))
+          if (!identical(status, 0L)) quit(status = status)
+
       - name: Install and test in a genuine C locale
         shell: bash
         env:
@@ -268,7 +294,7 @@ jobs:
 
   tubelex-build-audit:
     needs: validation-scope
-    if: needs.validation-scope.outputs.reuse != 'true' && needs.validation-scope.outputs.builder-matrix != '[]'
+    if: (needs.validation-scope.outputs.reuse != 'true' && needs.validation-scope.outputs.builder-matrix != '[]') || needs.validation-scope.outputs.builder-recheck == 'true'
     name: ${{ matrix.os }} / TUBELEX builder
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
@@ -384,6 +410,16 @@ jobs:
       - name: Record reused numeric checks
         if: needs.validation-scope.outputs.reuse == 'true'
         run: echo "Numeric CI is reused only after source, workflow and completed-run identity checks. Release controls and PDF manual were checked in this run."
+      - name: Require the repaired resource builder on both platforms
+        if: needs.validation-scope.outputs.builder-recheck == 'true'
+        env:
+          TUBELEX_RESULT: ${{ needs.tubelex-build-audit.result }}
+        run: test "$TUBELEX_RESULT" = success
+      - name: Require the repaired Windows package check
+        if: needs.validation-scope.outputs.windows-recheck == 'true'
+        env:
+          CHECK_RESULT: ${{ needs.check.result }}
+        run: test "$CHECK_RESULT" = success
       - name: Require every matrix check to pass
         if: needs.validation-scope.outputs.reuse != 'true'
         env:

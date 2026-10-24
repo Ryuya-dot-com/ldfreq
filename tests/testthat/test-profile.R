@@ -21,10 +21,10 @@ test_that("the current method and preset registries are bounded and ordered", {
     methods$metric_id,
     c(
       "ttr", "rttr", "cttr", "herdan", "maas", "msttr", "mattr",
-      "mtld", "hdd", "expected_ttr_d", "yule_k", "yule_i"
+      "mtld", "mtld_ma", "hdd", "expected_ttr_d", "yule_k", "yule_i"
     )
   )
-  expect_equal(nrow(methods), 12L)
+  expect_equal(nrow(methods), 13L)
   expect_identical(anyDuplicated(methods$method_id), 0L)
   expect_identical(methods$label[[1L]], "Type-token ratio")
   expect_identical(methods$definition[methods$metric_id == "maas"],
@@ -36,12 +36,12 @@ test_that("the current method and preset registries are bounded and ordered", {
     methods$parameter,
     c(
       rep(NA_character_, 5L), "segment_length", "window_length",
-      "threshold", "sample_size", "sample_sizes", NA_character_, NA_character_
+      "threshold", "threshold", "sample_size", "sample_sizes", NA_character_, NA_character_
     )
   )
   expect_identical(
     methods$default_quality_floor_tokens,
-    c(1, 1, 1, 2, 2, 50, 50, 50, 42, 50, 100, 100)
+    c(1, 1, 1, 2, 2, 50, 50, 50, 50, 42, 50, 100, 100)
   )
   expect_true(all(vapply(methods$default_parameters, is.list, logical(1L))))
   expect_identical(presets$preset_id, c("canonical", "length_50_100"))
