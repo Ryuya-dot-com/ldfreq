@@ -1,3 +1,5 @@
+.morpholex_read_excel <- function(...) readxl::read_excel(...)
+
 # Adapter for bundled MorphoLex or a caller-obtained MorphoLEX_en.xlsx.
 # Only an external workbook requires readxl. Read the resource's
 # CC BY-NC-SA 4.0 conditions: https://github.com/hugomailhot/MorphoLex-en
@@ -16,7 +18,7 @@ read_morpholex_parts <- function(path = NULL, sheets, words) {
   fields <- c("ELP_ItemID", "Word", "Nmorph", "PRS_signature", "MorphoLexSegm")
   rows <- lapply(sheets, function(sheet) {
     x <- if (is.null(path)) bundled$sheets[[sheet]] else
-      as.data.frame(readxl::read_excel(path, sheet = sheet, col_types = "text",
+      as.data.frame(.morpholex_read_excel(path, sheet = sheet, col_types = "text",
         trim_ws = FALSE, .name_repair = "unique_quiet"))
     if (!all(fields %in% names(x))) stop("Missing required MorphoLex columns in ", sheet)
     x <- x[x$Word %in% words, , drop = FALSE]

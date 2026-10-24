@@ -187,3 +187,67 @@ for retained in ("false", "true"):
         bad = dict(valid, DEVEL_RESULT="skipped")
         assert subprocess.run(["/bin/bash", "-c", aggregate], env=bad, capture_output=True).returncode != 0
 print("The aggregate accepts only fresh success or explicitly verified retained jobs; failure cannot pass.")
+
+promotion = dict(separate, **{"Version": "0.5.1", "Status": "release-candidate",
+                             "Promotion-From-Version": "0.5.0.9001"})
+before = {
+    "DESCRIPTION": "Package: ldfreq\nVersion: 0.5.0.9001\nImports: digest\nLicense: MIT",
+    "NEWS.md": "# ldfreq (development)\n\n- Correct guide builds.",
+    "README.md": "The current development release is **0.5.0.9001**.",
+    "CITATION.cff": 'version: 0.5.0.9001\nurl: "https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.5.0.9001"',
+    "inst/CITATION": 'url = paste0("https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v", meta$Version)',
+    "development/API-SURFACE.md": "Current API inventory for 0.5.0.9001."
+}
+after = {name: value.replace("0.5.0.9001", "0.5.1").replace("/ldfreq/releases/tag/v", "/ldfreq/tree/v")
+         for name, value in before.items()}
+after["NEWS.md"] = before["NEWS.md"].replace("(development)", "0.5.1")
+after["README.md"] = after["README.md"].replace("current development release", "current release")
+with patch.object(reuse, "git", side_effect=lambda *args: before[args[-1].split(":", 1)[1]]):
+    with patch.object(Path, "read_text", autospec=True, side_effect=lambda path: after[str(path)]):
+        reuse.verify_ci(promotion, list(before), workflow, workflow, run, "owner/repo")
+        for key, value in (("Status", "development"), ("Version", "0.5.0"),
+                           ("Version", "0.5.1.9001"), ("Promotion-From-Version", "0.4.0"),
+                           ("Promotion-From-Version", "0.4.0.9001")):
+            rejects(lambda: reuse.verify_ci(dict(promotion, **{key: value}), list(before),
+                                            workflow, workflow, run, "owner/repo"))
+        for changed in ("R/core.R", "NAMESPACE", "tests/testthat/test-example.R", "inst/extdata/data.csv"):
+            rejects(lambda: reuse.verify_ci(promotion, list(before) + [changed],
+                                            workflow, workflow, run, "owner/repo"))
+        for path, alteration in (("DESCRIPTION", "\nSuggests: untested"),
+                                 ("DESCRIPTION", "\nLicense_restricts_use: yes"),
+                                 ("inst/CITATION", "\nstop('different code')"),
+                                 ("NEWS.md", "\nUnverified change"),
+                                 ("CITATION.cff", "\nrepository-code: https://unverified.example")):
+            original = after[path]; after[path] += alteration
+            rejects(lambda: reuse.verify_ci(promotion, list(before), workflow, workflow, run, "owner/repo"))
+            after[path] = original
+print("Formal promotion rejects changed dependencies, licenses, runtime, tests and unreviewed citation edits.")
+
+import tempfile
+import hashlib
+import json
+with tempfile.TemporaryDirectory() as directory:
+    root = Path(directory)
+    archive = root / 'ldfreq_0.5.1.tar.gz'
+    manual = root / 'ldfreq_0.5.1.pdf'
+    manual.write_bytes(b'completed PDF fixture')
+    index = root / 'ldfreq_0.5.1.pdf-build/Rd2.ind'
+    index.parent.mkdir(); index.write_text('function index')
+    digest = hashlib.sha256(manual.read_bytes()).hexdigest()
+    declared = {'Version': '0.5.1', 'Source-Manual-SHA256': digest}
+    result = reuse.verify_manual(declared, archive)
+    assert result['sha256'] == digest and result['file'] == manual.name
+    for invalid in ('0' * 64, 'not-a-sha256'):
+        rejects(lambda: reuse.verify_manual(dict(declared, **{'Source-Manual-SHA256': invalid}), archive))
+    index.write_text('')
+    rejects(lambda: reuse.verify_manual(declared, archive))
+    index.unlink()
+    rejects(lambda: reuse.verify_manual(declared, archive))
+    index.write_text('function index')
+    (root / 'evidence').mkdir()
+    provenance = root / 'evidence/release-provenance.json'
+    provenance.write_text(json.dumps({'manual': result}))
+    assert reuse.verify_manual({'Version': '0.5.1'}, archive) == result
+    provenance.write_text(json.dumps({'manual': dict(result, file='ldfreq_0.4.0.pdf')}))
+    rejects(lambda: reuse.verify_manual({'Version': '0.5.1'}, archive))
+print('Manual recovery requires the fixed version, exact hash and a nonempty index, including before provenance generation.')

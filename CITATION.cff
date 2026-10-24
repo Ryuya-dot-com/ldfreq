@@ -5,8 +5,8 @@ title: "ldfreq: Reproducible Lexical Diversity and Frequency Profiles"
 authors:
   - family-names: Komuro
     given-names: Ryuya
-version: 0.5.0.9001
+version: 0.5.1
 date-released: 2026-10-24
-url: "https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.5.0.9001"
+url: "https://github.com/Ryuya-dot-com/ldfreq/tree/v0.5.1"
 repository-code: "https://github.com/Ryuya-dot-com/ldfreq"
 license: MIT

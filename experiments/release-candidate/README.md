@@ -4,7 +4,7 @@ These repository-only tools generate and verify evidence for the immutable
 `ldfreq` source tarball used by the `Release candidate` GitHub Actions workflow.
 They are excluded from the R source package by `.Rbuildignore`.
 
-The current [state.dcf](state.dcf) identifies the development snapshot.
+The current [state.dcf](state.dcf) identifies the selected 0.5.1 candidate.
 Published development snapshots do not use this artifact workflow.
 Ordinary pull-request checks still exercise the development matrix. A formal
 candidate requires a separately selected three-component version, an exact
@@ -31,6 +31,14 @@ documentation repairs. Changed controls, API documentation and the PDF manual
 are checked afresh, and all five exact-archive checks remain required. Remove
 `Source-Archive-*` whenever package content changes: numerical-evidence reuse
 does not permit reuse of an archive containing superseded documentation.
+
+`Promotion-From-Version` permits a development-to-formal version transition
+only while `Status` is `release-candidate`. DESCRIPTION must differ only in
+its version, so dependency or license changes cannot reuse numerical evidence.
+NEWS, citation records, the installation README and API-inventory version accept
+only their exact version/tag substitutions. Runtime code, tests and resource
+inputs remain unchanged. The tag-based citation resolves to the frozen source;
+the release assets are attached only after the exact-archive checks succeed.
 
 For a repair confined to the separate TUBELEX builder,
 `Recheck-TUBELEX-Builder: true` can accompany `Validation-Run` and
@@ -83,19 +91,22 @@ the example does not select a future release version.
 `run-as-cran-check.R` runs `R CMD check --as-cran --no-manual` against one
 named tarball. The default `new-submission-only` policy remains strict. The
 workflow selects `release-resource-notes`: `Status: OK`, or individually
-recognized NOTES for CRAN's `New submission` (with only the exact optional
-`Non-FOSS package license (file LICENSE)` line) and installed package size.
-The non-FOSS disposition is retained to classify historical archives that
-bundled MorphoLex; it does not describe the current package's MIT code or
-extend the separately downloaded data's rights. The size disposition must
-list only R/doc/extdata, include doc and extdata, and total
-at most 15 MiB (the 9019 Linux baseline was 10.9 MiB). The attributed resources
-and rendered guides explain that size; the exact file BOM and independent
-resource inventories still have to pass. Unexpected payload areas, duplicate
-notes, size growth beyond that bound, warnings and errors remain blocking.
+recognized NOTES for CRAN's `New submission` and installed package size.
+The current MIT package no longer admits the historical non-FOSS license note
+or the URL exceptions recorded for 0.4.0. The size disposition allows only
+R/doc rows, requires doc, and bounds R at 2 MiB, doc at 5 MiB and the total
+at 10 MiB. This is a local regression bound, not a CRAN acceptance guarantee.
+Unexpected payload areas, duplicate notes, unexplained incoming results,
+warnings and errors remain blocking.
+
+The source is built with rendered vignettes using a fresh resource cache.
+Artifact checks include vignette rebuilding and do not download optional data.
+The ordinary R-CMD-check workflow separately exercises explicitly obtained
+reference snapshots. The exact file BOM and independent resource inventories
+still have to pass.
 
 The `minimum-r-optional-backends` policy is restricted to the
-`ubuntu-latest-r-4.1` job on R 4.1.x. It also requires the exact dependency NOTE
+`ubuntu-24.04-r-4.1` job on R 4.1.x. It also requires the exact dependency NOTE
 naming `gibasa` and `textstem`; no other unavailable package is accepted.
 Their current versions need R >= 4.2 and R >= 4.4,
 respectively. The workflow leaves both uninstalled in that one job,
@@ -161,10 +172,9 @@ responses need a narrow disposition, not another numerical run:
   could not be connected to. The provider page was inspected and the same
   reference passed the Linux/macOS checks of this archive.
 
-`check-note-policy.R` recognizes only these exact job/URL/source/status/detail
-combinations, including the recorded archive size for the DOI case. Altered
-URLs, other HTTP responses and additional lines fail. The raw failed responses
-remain unchanged; they are not reported as successful access by those runners.
+These dispositions are historical evidence for that archive only. The current
+NOTE classifier rejects them, including unchanged responses; each new artifact
+must establish its own incoming-check results.
 
 `Check-Evidence-Run` reuses the completed raw check records from the declared
 source-archive run. Its source commit and completed workflow identity are
@@ -174,9 +184,29 @@ the raw log. Original result JSON, its hash and original dates are retained.
 The run index verifies them again. Existing resource inventories are reused;
 a missing platform inventory is still run. `Reuse-Manual: true` requires the
 original manual hash and a nonempty index. This combines recorded stages and
+can use an explicit `Source-Manual-SHA256` when manual generation completed
+but the subsequent dependency inventory stopped before provenance was written.
+The PDF and index must still come from the declared source-build artifact. This
 does not claim that all numerical checks were rerun in the final workflow.
 An R-devel snapshot used only to classify the stored log may differ from the
 snapshot that executed the original check. The original execution version is
 retained in `environment`; `reused_check.classification_environment` records
 the classification host separately. This does not establish runtime behavior
 on the classification host's snapshot.
+
+The 0.5.1 exact-artifact run completed all tests, examples and vignette rebuilds.
+Its Windows incoming check recorded one Lancaster DNS resolution failure; R 4.1
+recorded one publisher DOI 403. Only these exact response blocks may be
+reclassified after a fresh HTTP 200 response with the expected page identity or
+Crossref DOI/title. Response hashes and timestamps accompany the unchanged raw
+logs. The aggregate also requires three current-R peer checks of the identical
+artifact with clean incoming URL/DOI results. Unknown URLs, status codes, extra
+findings, missing verification or failed peer checks remain blocking. This is
+combined evidence, not a claim that the original network responses disappeared.
+
+Lancaster DNS resolution also failed on a second Windows runner. Its page
+identity is therefore verified on the Linux build host and included in the
+signed source evidence. The record binds the exact archive and original
+Windows check-result hashes. Windows and the final aggregate verify that
+binding. This establishes the reference identity, not Windows DNS availability;
+the original failure and the verification host remain explicit.

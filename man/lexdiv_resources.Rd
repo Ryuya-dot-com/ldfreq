@@ -4,7 +4,10 @@
 \title{Inspect and explicitly download optional reference data}
 \description{Lists fixed reference-data versions and their separate terms, or downloads selected resources after an explicit acknowledgement. Installing the package and ordinary calculations never download reference data.}
 \usage{
-lexdiv_resource_info(resources = c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"), cache_dir = NULL)
+lexdiv_resource_info(
+  resources = c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"),
+  cache_dir = NULL
+)
 lexdiv_download_resources(resources, accept_license = FALSE, cache_dir = NULL)
 }
 \arguments{

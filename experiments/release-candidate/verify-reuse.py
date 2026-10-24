@@ -38,6 +38,58 @@ def verify_source(state):
     return changed
 
 
+def verify_manual(state, archive):
+    manual = archive.parent / f"ldfreq_{state['Version']}.pdf"
+    expected = state.get("Source-Manual-SHA256")
+    if expected is None:
+        prior = json.loads((archive.parent / "evidence/release-provenance.json").read_text())
+        if prior["manual"]["file"] != manual.name:
+            raise ValueError("Completed manual version mismatch")
+        expected = prior["manual"]["sha256"]
+    index = archive.parent / (manual.name + "-build/Rd2.ind")
+    if not (re.fullmatch(r"[0-9a-f]{64}", expected)
+            and hashlib.sha256(manual.read_bytes()).hexdigest() == expected
+            and index.is_file() and index.stat().st_size > 0):
+        raise ValueError("Completed indexed manual identity mismatch")
+    return {"file": manual.name, "sha256": expected, "bytes": manual.stat().st_size}
+
+
+def verify_promotion(state, changed):
+    """Admit only version/citation edits; the exact new artifact is checked afresh."""
+    previous_version = state.get("Promotion-From-Version")
+    if previous_version is None:
+        return set()
+    version = state["Version"]
+    if (state.get("Status") != "release-candidate"
+            or not re.fullmatch(r"[0-9]+[.][0-9]+[.][0-9]+[.]9[0-9]{3}", previous_version)
+            or not re.fullmatch(r"[0-9]+[.][0-9]+[.][0-9]+", version)
+            or tuple(map(int, version.split("."))) <= tuple(map(int, previous_version.split(".")))):
+        raise ValueError("Promotion requires a newer formal version and a development baseline")
+    commit = state["Validation-Commit"]
+    paths = {"DESCRIPTION", "NEWS.md", "README.md", "CITATION.cff",
+             "inst/CITATION", "development/API-SURFACE.md"}
+    for path in paths.intersection(changed):
+        previous = git("show", commit + ":" + path)
+        if path == "DESCRIPTION":
+            anchor = "Version: " + previous_version
+            if not re.search("^" + re.escape(anchor) + "$", previous, re.M):
+                raise ValueError("Promotion baseline version does not match DESCRIPTION")
+            expected = previous.replace(anchor, "Version: " + version)
+        elif path == "NEWS.md":
+            expected = previous.replace("# ldfreq (development)", "# ldfreq " + version, 1)
+        elif path == "inst/CITATION":
+            expected = previous.replace("/ldfreq/releases/tag/v", "/ldfreq/tree/v")
+        else:
+            expected = previous.replace(previous_version, version)
+            if path in {"CITATION.cff", "README.md"}:
+                expected = expected.replace("/ldfreq/releases/tag/v", "/ldfreq/tree/v")
+            if path == "README.md":
+                expected = expected.replace("The current development release is", "The current release is")
+        if Path(path).read_text().strip() != expected:
+            raise ValueError("Change exceeds the version/citation promotion: " + path)
+    return paths
+
+
 def verify_ci(state, changed, old, new, run, repo, jobs=None):
     # Changed release controls are checked afresh; other test inputs must match.
     allowed_files = {".github/workflows/R-CMD-check.yaml",
@@ -91,6 +143,7 @@ def verify_ci(state, changed, old, new, run, repo, jobs=None):
         if previous.count(before) != 1 or previous.replace(before, after) != Path(reporting).read_text().strip():
             raise ValueError("Repeated-study change exceeds the saved-report repair")
         allowed_files.add(reporting)
+    allowed_files.update(verify_promotion(state, changed))
     if set(changed) - allowed_files:
         raise ValueError("Numeric CI inputs changed outside the rechecked release controls")
     for name in ("check", "prepare-r-devel", "check-r-devel", "c-locale", "tubelex-build-audit"):
@@ -266,13 +319,7 @@ def main():
                 raise ValueError("Completed check evidence does not match the source run")
             evidence["check_evidence_run"] = run["id"]
         if state.get("Reuse-Manual") == "true":
-            prior = json.loads((archive.parent / "evidence/release-provenance.json").read_text())
-            manual = archive.parent / prior["manual"]["file"]
-            index = archive.parent / (manual.name + "-build/Rd2.ind")
-            if not (hashlib.sha256(manual.read_bytes()).hexdigest() == prior["manual"]["sha256"]
-                    and index.is_file() and index.stat().st_size > 0):
-                raise ValueError("Completed indexed manual identity mismatch")
-            evidence["reused_manual"] = prior["manual"]
+            evidence["reused_manual"] = verify_manual(state, archive)
         (archive.parent / "source-reuse.json").write_text(json.dumps(evidence, indent=2) + "\n")
     if output:
         with open(output, "a") as stream:

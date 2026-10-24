@@ -178,7 +178,7 @@ and averages retained lengths of at least 10. It stops when a start cannot
 complete a factor, uses no reverse pass and gives no fractional tail credit.
 This corresponds to koRpus `min.tokens = 9` and `MTLDMA.steps = 1`.
 A factor closing before ten tokens is excluded, not extended to ten.
-[koRpus definition](https://cran.r-project.org/web/packages/koRpus/refman/koRpus.html#lex.div).
+[koRpus `lex.div()` documentation](https://CRAN.R-project.org/package=koRpus).
 
 At 50 tokens, **1,987 of 2,660 blocks (74.7%) had no retained factor**.
 Only 105 essays had two usable blocks, compared with 1,329 at 200 tokens.

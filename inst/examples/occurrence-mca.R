@@ -183,6 +183,6 @@ ordination_mca_plot <- function(x, which = c("occurrences", "categories"), monoc
   location <- paste(round(plotted$x, 8), round(plotted$y, 8), sep = ":")
   selected <- !duplicated(location)
   text <- vapply(location[selected], function(z) paste(plotted$label[location == z], collapse = "/"), "")
-  graphics::text(plotted$x[selected], plotted$y[selected], labels = text, pos = 3, cex = .75)
+  .ordination_text(plotted$x[selected], plotted$y[selected], labels = text, pos = 3, cex = .75)
   invisible(plotted)
 }

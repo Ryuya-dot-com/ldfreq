@@ -33,12 +33,12 @@ if (!note_policy %in% allowed_note_policies) {
   stop("Unrecognized check NOTE policy: ", note_policy, call. = FALSE)
 }
 if (identical(note_policy, "minimum-r-optional-backends") &&
-    (!identical(job_label, "ubuntu-latest-r-4.1") ||
+    (!identical(job_label, "ubuntu-24.04-r-4.1") ||
       !grepl("^R version 4[.]1[.]", R.version.string))) {
   stop(
     paste(
       "The minimum-r-optional-backends NOTE policy is restricted to the",
-      "ubuntu-latest-r-4.1 job running R 4.1.x."
+      "ubuntu-24.04-r-4.1 job running R 4.1.x."
     ),
     call. = FALSE
   )
@@ -46,7 +46,7 @@ if (identical(note_policy, "minimum-r-optional-backends") &&
 remote_url_checks <- !tolower(Sys.getenv(
   "_R_CHECK_CRAN_INCOMING_SKIP_URL_CHECKS_IF_REMOTE_", "false"
 )) %in% c("true", "t", "1")
-if (!identical(remote_url_checks, job_label != "ubuntu-latest-r-4.1")) {
+if (!identical(remote_url_checks, job_label != "ubuntu-24.04-r-4.1")) {
   stop("Remote URL checks may be delegated only by the R 4.1 diagnostic.", call. = FALSE)
 }
 script_argument <- grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)
@@ -77,11 +77,11 @@ if (length(arguments) == 5L) {
   stopifnot(identical(prior$schema_version, "1.2.0"),
     identical(prior$job_label, job_label), identical(prior$note_policy, note_policy),
     identical(as.integer(prior$exit_code), 0L),
-    identical(prior$command, "R CMD check --as-cran --no-manual --ignore-vignettes <exact-source-archive>"),
+    identical(prior$command, "R CMD check --as-cran --no-manual <exact-source-archive>"),
     identical(prior$environment$os, unname(Sys.info()[["sysname"]])),
     identical(prior$environment$platform, R.version$platform),
     identical(prior$environment$r_version, R.version.string) ||
-      (identical(job_label, "ubuntu-latest-r-devel") &&
+      (identical(job_label, "ubuntu-24.04-r-devel") &&
         grepl("^R Under development ", prior$environment$r_version) &&
         grepl("^R Under development ", R.version.string)),
     identical(prior$environment$remote_url_checks, remote_url_checks),
@@ -104,7 +104,7 @@ if (length(arguments) == 5L) {
 } else {
   started <- format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
   status <- system2(file.path(R.home("bin"), "R"),
-    args = c("CMD", "check", "--as-cran", "--no-manual", "--ignore-vignettes", shQuote(source_archive)),
+    args = c("CMD", "check", "--as-cran", "--no-manual", shQuote(source_archive)),
     stdout = log_path, stderr = log_path)
   finished <- format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
 }
@@ -131,24 +131,37 @@ if (!is.null(reused_check)) {
     stopifnot(any(grepl(paste0("^\\* checking ", stage, " \\.\\.\\. .*OK$"), check_lines)))
   }
 }
+external_cases <- Filter(Negate(is.null), lapply(note_blocks, release_external_case, label = job_label))
+external_verifications <- lapply(external_cases, function(case) {
+  if (case$id == "lancaster-dns" && !is.null(reused_check)) {
+    link_record <- jsonlite::read_json(file.path(dirname(source_archive),
+      "evidence/external-link-verification.json"), simplifyVector = FALSE)
+    stopifnot(identical(link_record$artifact_sha256, prior$artifact$sha256),
+      identical(link_record$check_result_sha256, reused_check$original_result_sha256),
+      release_external_verified(case, list(link_record$verification)))
+    link_record$verification
+  } else release_recheck_external(case)
+})
 classification <- release_classify_notes(
   check_status,
   note_blocks,
   note_policy,
-  job_label
+  job_label,
+  external_verifications
 )
 effective_status <- classification$effective_status
 
 result <- list(
   schema_version = "1.2.0",
   job_label = job_label,
-  command = "R CMD check --as-cran --no-manual --ignore-vignettes <exact-source-archive>",
+  command = "R CMD check --as-cran --no-manual <exact-source-archive>",
   exit_code = as.integer(status),
   check_status = check_status,
   effective_status = effective_status,
   note_policy = note_policy,
   explained_notes = classification$explained_notes,
   note_blocks = note_blocks,
+  external_verifications = external_verifications,
   started_at_utc = started,
   finished_at_utc = finished,
   reused_check = reused_check,

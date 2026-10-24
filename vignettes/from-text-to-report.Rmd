@@ -67,6 +67,13 @@ lexdiv_resource_info(c("tubelex", "nj8"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
 ```
+```{r resource-availability}
+has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
+```
+
+Resource-dependent examples below run only when their verified data are already
+in the cache. The other examples run without downloading reference data.
+
 
 ## Compare analysis conditions from local files
 
@@ -581,7 +588,7 @@ metadata_connection <- textConnection(metadata_input$text, encoding = "UTF-8")
 study_metadata <- read.csv(metadata_connection, colClasses = "character",
   na.strings = "<MISSING>", check.names = FALSE, encoding = "UTF-8")
 close(metadata_connection)
-use_nj8 <- TRUE
+use_nj8 <- has_nj8
 ```
 
 For the Japanese teaching path, substitute the following block for the English
@@ -908,6 +915,7 @@ common window from the task and document-length distribution before comparing
 results. Keep writer and task IDs with document IDs in the study's own table.
 
 ```{r}
+levels <- NULL
 texts <- c(
   first = "The student reads a book and discusses the book with a friend.",
   second = "The student explores a story and shares several ideas with a friend."
@@ -940,7 +948,7 @@ explicitly annotate every document with the same lemma procedure, report its
 coverage, and select `unit = "lemma"`. Do not switch units only for documents
 with poor matching.
 
-```{r}
+```{r, eval=has_nj8}
 levels <- nj8_profile_batch(prepared, unit = "surface")
 print(levels$coverage[, c(
   "document_id", "eligible_tokens", "matched_tokens", "token_coverage", "type_coverage"
@@ -960,7 +968,7 @@ For each document, the cumulative Level 8 token proportion equals its total
 token coverage. Lower cumulative levels describe the fraction found at or below
 that level, not a learner's vocabulary knowledge.
 
-```{r}
+```{r, eval=has_nj8}
 level8 <- subset(levels$summary, weighting == "token" & level == 8)
 stopifnot(isTRUE(all.equal(
   level8$cumulative_proportion, levels$coverage$token_coverage
@@ -1027,15 +1035,13 @@ IDs, preserving document order.
 
 ```{r}
 analysis <- lexdiv_widen(metrics)
-coverage <- levels$coverage[match(analysis$document_id, levels$coverage$document_id), ]
-stopifnot(identical(analysis$document_id, coverage$document_id))
-analysis$nj8_surface_token_coverage <- coverage$token_coverage
-analysis$nj8_surface_type_coverage <- coverage$type_coverage
-print(analysis[, c(
-  "document_id", "ttr__value", "mattr__value",
-  "nj8_surface_token_coverage", "nj8_surface_type_coverage"
-)],
-digits = 3)
+if (!is.null(levels)) {
+  coverage <- levels$coverage[match(analysis$document_id, levels$coverage$document_id), ]
+  stopifnot(identical(analysis$document_id, coverage$document_id))
+  analysis$nj8_surface_token_coverage <- coverage$token_coverage
+  analysis$nj8_surface_type_coverage <- coverage$type_coverage
+}
+print(analysis, digits = 3)
 plot(metrics, metric_id = "mattr")
 ```
 

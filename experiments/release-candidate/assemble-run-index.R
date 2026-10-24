@@ -99,9 +99,9 @@ check(length(result_paths) == 5L, "Exactly five check-result.json files are requ
 results <- lapply(result_paths, jsonlite::read_json, simplifyVector = FALSE)
 labels <- vapply(results, function(value) value$job_label, character(1L))
 expected_labels <- c(
-  "ubuntu-latest-r-release",
-  "ubuntu-latest-r-devel",
-  "ubuntu-latest-r-4.1",
+  "ubuntu-24.04-r-release",
+  "ubuntu-24.04-r-devel",
+  "ubuntu-24.04-r-4.1",
   "macos-latest-r-release",
   "windows-latest-r-release"
 )
@@ -111,9 +111,9 @@ check(length(script_argument) == 1L, "Could not identify the run-index script.")
 script_path <- normalizePath(sub("^--file=", "", script_argument), mustWork = TRUE)
 source(file.path(dirname(script_path), "check-note-policy.R"), local = TRUE)
 expected_environments <- list(
-  "ubuntu-latest-r-release" = c("Linux", "linux"),
-  "ubuntu-latest-r-devel" = c("Linux", "linux"),
-  "ubuntu-latest-r-4.1" = c("Linux", "linux"),
+  "ubuntu-24.04-r-release" = c("Linux", "linux"),
+  "ubuntu-24.04-r-devel" = c("Linux", "linux"),
+  "ubuntu-24.04-r-4.1" = c("Linux", "linux"),
   "macos-latest-r-release" = c("Darwin", "apple-darwin"),
   "windows-latest-r-release" = c("Windows", "mingw32")
 )
@@ -133,7 +133,7 @@ for (result in results) {
   )
   expected_environment <- expected_environments[[result$job_label]]
   check(identical(result$environment$remote_url_checks,
-    result$job_label != "ubuntu-latest-r-4.1"),
+    result$job_label != "ubuntu-24.04-r-4.1"),
     paste("Remote URL-check scope does not match its label:", result$job_label))
   check(
     identical(result$environment$os, expected_environment[[1L]]) &&
@@ -142,12 +142,12 @@ for (result in results) {
       grepl(expected_environment[[2L]], result$environment$platform),
     paste("Check environment does not match its label:", result$job_label)
   )
-  if (identical(result$job_label, "ubuntu-latest-r-devel")) {
+  if (identical(result$job_label, "ubuntu-24.04-r-devel")) {
     check(
       grepl("^R Under development ", result$environment$r_version),
       "The R-devel check did not use R Under development."
     )
-  } else if (identical(result$job_label, "ubuntu-latest-r-4.1")) {
+  } else if (identical(result$job_label, "ubuntu-24.04-r-4.1")) {
     check(
       grepl("^R version 4[.]1[.]", result$environment$r_version),
       "The minimum-R check did not use R 4.1.x."
@@ -170,7 +170,7 @@ for (result in results) {
   )
   expected_note_policy <- if (identical(
     result$job_label,
-    "ubuntu-latest-r-4.1"
+    "ubuntu-24.04-r-4.1"
   )) {
     "minimum-r-optional-backends"
   } else {
@@ -187,7 +187,25 @@ for (result in results) {
   raw_lines <- readLines(check_logs[[1L]], warn = FALSE)
   raw_status <- tail(grep("^Status:", raw_lines, value = TRUE), 1L)
   raw_blocks <- release_note_blocks(raw_lines)
-  classified <- release_classify_notes(raw_status, raw_blocks, expected_note_policy, result$job_label)
+  classified <- release_classify_notes(raw_status, raw_blocks, expected_note_policy, result$job_label,
+    result$external_verifications)
+  if (length(result$external_verifications)) {
+    if (identical(result$external_verifications[[1L]]$id, "lancaster-dns")) {
+      link_record <- jsonlite::read_json(file.path(source_root,
+        "evidence/external-link-verification.json"), simplifyVector = FALSE)
+      check(identical(link_record$artifact_sha256, result$artifact$sha256) &&
+        identical(link_record$check_result_sha256, result$reused_check$original_result_sha256) &&
+        identical(link_record$verification, result$external_verifications[[1L]]),
+        "Delegated link verification does not match the signed source and original check.")
+    }
+    peers <- Filter(function(x) x$job_label %in% c("ubuntu-24.04-r-release",
+      "ubuntu-24.04-r-devel", "macos-latest-r-release"), results)
+    check(length(peers) == 3L && all(vapply(peers, function(x)
+      identical(x$artifact$sha256, result$artifact$sha256) &&
+      isTRUE(x$environment$remote_url_checks) &&
+      all(vapply(x$note_blocks, release_new_submission_note, logical(1L))), logical(1L))),
+      "External-response disposition requires three clean current-R peer checks of the same artifact.")
+  }
   if (!is.null(result$reused_check)) {
     original_path <- file.path(dirname(result_path), "check-result-before-reclassification.json")
     check(file.exists(original_path) && identical(sha256_file(original_path),
@@ -249,7 +267,7 @@ check(length(expected_resource_ids) > 0L && !anyDuplicated(expected_resource_ids
 inventory_labels <- sub("/.*$", "", inventory_relative_paths)
 inventory_labels <- sub("^release-check-", "", inventory_labels)
 expected_inventory_labels <- c(
-  "ubuntu-latest-r-release",
+  "ubuntu-24.04-r-release",
   "macos-latest-r-release",
   "windows-latest-r-release"
 )

@@ -23,6 +23,13 @@ lexdiv_resource_info(c("nj8"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("nj8"), accept_license = TRUE)
 ```
+```{r resource-availability}
+has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
+```
+
+Resource-dependent examples below run only when their verified data are already
+in the cache. The other examples run without downloading reference data.
+
 
 ## Begin with the question
 
@@ -39,6 +46,9 @@ library(ldfreq)
 
 texts <- c(a = "Students have jobs.", b = "Students enjoy jobs.", blank = "")
 prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
+```
+
+```{r, eval=has_nj8}
 surface <- nj8_profile_batch(prepared, unit = "surface")
 audit <- nj8_diagnostics(surface)
 audit$unmatched_terms
@@ -62,6 +72,9 @@ lemmas <- list(a = c("student", "have", "job"),
                b = c("student", "enjoy", "job"), blank = character())
 annotated <- Map(function(x, lemma) lexdiv_lemmatize(x, lemmas = lemma,
   backend_id = "authored-example", backend_version = "1"), prepared, lemmas)
+```
+
+```{r, eval=has_nj8}
 lemma <- nj8_profile_batch(annotated, unit = "lemma")
 comparison <- data.frame(document_id = surface$coverage$document_id,
   surface_coverage = surface$coverage$token_coverage,
@@ -205,7 +218,7 @@ authored documents, including missing annotations, an invented off-list form,
 all-excluded content words, and an empty text. It performs no inference,
 downloads or automatic file writes. Source it into its own environment:
 
-```{r}
+```{r, eval=has_nj8}
 sensitivity <- new.env()
 invisible(capture.output(sys.source(system.file("examples",
   "annotation-sensitivity-demo.R", package = "ldfreq", mustWork = TRUE),
@@ -230,7 +243,7 @@ illustrative three-token MATTR change from 1 to 2/3. Surface-based scores and
 exact surface-phrase matches remain unchanged. A label's change alone is not
 evidence that the new label is correct.
 
-```{r}
+```{r, eval=has_nj8}
 subset(effects$differences, document_id %in% c("lemma", "pos") &
   condition_id == "lemma_content", select = c(document_id, metric_id,
     N_before, N_after, value_before, value_after, delta, difference_status))
@@ -250,7 +263,7 @@ This small example shows both TTR values for each document on their original
 circle and smaller triangle remain visible when values coincide. Four documents
 are too few to motivate a smooth distribution estimate.
 
-```{r annotation-changes, fig.width=6.5, fig.height=3.5}
+```{r annotation-changes, fig.width=6.5, fig.height=3.5, eval=has_nj8}
 document_changes <- subset(effects$differences,
   condition_id == "lemma_content" & metric_id == "ttr")
 document_changes[, c("document_id", "difference_status", "missing_reason_before",
@@ -327,7 +340,7 @@ the full roster and pairing metadata even when displaying marginal densities.
 
 ### Keep selection coverage separate from reference coverage
 
-```{r}
+```{r, eval=has_nj8}
 subset(effects$coverage, document_id %in% c("missing", "unknown", "empty") &
   condition_id == "lemma_content", select = c(document_id, version,
     source_tokens, selected_tokens, reference_eligible_tokens,
@@ -460,7 +473,7 @@ establish strict lemma comparability in `lexdiv_content_overlap()`.
 
 ## Inspect surprising transformations
 
-```{r}
+```{r, eval=has_nj8}
 example <- lexdiv_tokenize("second compound missing", case = "lower")
 example <- lexdiv_lemmatize(example, lemmas = c("2", "two words", NA),
   backend_id = "authored-transformations", backend_version = "1")
@@ -534,14 +547,14 @@ The six documents and review decisions are authored demonstrations, not learner
 data or independently validated gold corrections. No corpus or model download
 is needed.
 
-```{r reviewed-text-demo, results='hide'}
+```{r reviewed-text-demo, results='hide', eval=has_nj8}
 review_example <- new.env(parent = environment())
 sys.source(system.file("examples", "reviewed-text-demo.R", package = "ldfreq",
   mustWork = TRUE), envir = review_example)
 text_review <- review_example$result
 ```
 
-```{r}
+```{r, eval=has_nj8}
 subset(text_review$metrics, metric_id == "ttr" &
   document_id %in% c("spelling", "grammar", "boundary"),
   select = c(document_id, version, N, V, value, status))
@@ -605,7 +618,7 @@ anchored before normalization. `lexdiv_compare_annotations()` and
 reject rewritten text. Do not disguise text correction as a lemma change or
 reuse original dependency heads after a word insertion.
 
-```{r}
+```{r, eval=has_nj8}
 review_path <- tempfile(fileext = ".rds")
 saveRDS(list(result = text_review, session = sessionInfo()), review_path)
 saved_review <- readRDS(review_path)$result

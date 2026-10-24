@@ -23,6 +23,13 @@ lexdiv_resource_info(c("tubelex"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex"), accept_license = TRUE)
 ```
+```{r resource-availability}
+has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
+```
+
+Resource-dependent examples below run only when their verified data are already
+in the cache. The other examples run without downloading reference data.
+
 
 ## Match the resource's word units
 
@@ -118,7 +125,7 @@ source-token shapes are also outside the slim table's lexical filter. Inspect
 silently removing them to improve the match rate. Any extra exclusion changes
 the analysis denominator and must be applied consistently and reported.
 
-```{r}
+```{r, eval=has_tubelex}
 library(ldfreq)
 terms <- c("i", "do", "n't", "think", "it", "'s", "john", "'s", "book")
 profile <- tubelex_profile(terms, normalization = "identity")
