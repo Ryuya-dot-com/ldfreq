@@ -132,7 +132,16 @@ if (!is.null(reused_check)) {
   }
 }
 external_cases <- Filter(Negate(is.null), lapply(note_blocks, release_external_case, label = job_label))
-external_verifications <- lapply(external_cases, release_recheck_external)
+external_verifications <- lapply(external_cases, function(case) {
+  if (case$id == "lancaster-dns" && !is.null(reused_check)) {
+    link_record <- jsonlite::read_json(file.path(dirname(source_archive),
+      "evidence/external-link-verification.json"), simplifyVector = FALSE)
+    stopifnot(identical(link_record$artifact_sha256, prior$artifact$sha256),
+      identical(link_record$check_result_sha256, reused_check$original_result_sha256),
+      release_external_verified(case, list(link_record$verification)))
+    link_record$verification
+  } else release_recheck_external(case)
+})
 classification <- release_classify_notes(
   check_status,
   note_blocks,

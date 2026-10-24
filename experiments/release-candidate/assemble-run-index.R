@@ -190,6 +190,14 @@ for (result in results) {
   classified <- release_classify_notes(raw_status, raw_blocks, expected_note_policy, result$job_label,
     result$external_verifications)
   if (length(result$external_verifications)) {
+    if (identical(result$external_verifications[[1L]]$id, "lancaster-dns")) {
+      link_record <- jsonlite::read_json(file.path(source_root,
+        "evidence/external-link-verification.json"), simplifyVector = FALSE)
+      check(identical(link_record$artifact_sha256, result$artifact$sha256) &&
+        identical(link_record$check_result_sha256, result$reused_check$original_result_sha256) &&
+        identical(link_record$verification, result$external_verifications[[1L]]),
+        "Delegated link verification does not match the signed source and original check.")
+    }
     peers <- Filter(function(x) x$job_label %in% c("ubuntu-24.04-r-release",
       "ubuntu-24.04-r-devel", "macos-latest-r-release"), results)
     check(length(peers) == 3L && all(vapply(peers, function(x)

@@ -206,5 +206,22 @@ local({
     failed <- tryCatch({eval(peer_check); FALSE}, error=function(e) TRUE)
     stopifnot(failed)
   }
+  results <- original
+  source_root <- tempfile('signed-link-fixture-'); dir.create(file.path(source_root, 'evidence'), recursive=TRUE)
+  on.exit(unlink(source_root, recursive=TRUE), add=TRUE)
+  result$external_verifications <- list(list(id='lancaster-dns', identity='page'))
+  result$reused_check <- list(original_result_sha256='original')
+  signed <- list(artifact_sha256='same',check_result_sha256='original',
+    verification=result$external_verifications[[1L]])
+  path <- file.path(source_root,'evidence/external-link-verification.json')
+  jsonlite::write_json(signed,path,auto_unbox=TRUE)
+  record <- function() TRUE
+  eval(peer_check)
+  stopifnot(is.function(record))
+  for (field in c('artifact_sha256','check_result_sha256','verification')) {
+    altered <- signed; altered[[field]] <- 'mismatch'
+    jsonlite::write_json(altered,path,auto_unbox=TRUE)
+    stopifnot(tryCatch({eval(peer_check);FALSE},error=function(e) TRUE))
+  }
   cat('External-response aggregation requires all three clean current-R peers with the identical artifact.\n')
 })

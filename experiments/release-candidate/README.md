@@ -203,3 +203,10 @@ logs. The aggregate also requires three current-R peer checks of the identical
 artifact with clean incoming URL/DOI results. Unknown URLs, status codes, extra
 findings, missing verification or failed peer checks remain blocking. This is
 combined evidence, not a claim that the original network responses disappeared.
+
+Lancaster DNS resolution also failed on a second Windows runner. Its page
+identity is therefore verified on the Linux build host and included in the
+signed source evidence. The record binds the exact archive and original
+Windows check-result hashes. Windows and the final aggregate verify that
+binding. This establishes the reference identity, not Windows DNS availability;
+the original failure and the verification host remain explicit.

@@ -116,6 +116,8 @@ release_recheck_external <- function(case) {
   }
   list(id = case$id, url = case$url, verification_url = case$verification_url,
     status = as.integer(response$status_code), identity = case$identity,
+    verification_environment = list(os = unname(Sys.info()[["sysname"]]),
+      platform = R.version$platform, r_version = R.version.string),
     body_sha256 = digest::digest(response$content, algo = "sha256", serialize = FALSE),
     checked_at_utc = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"))
 }
