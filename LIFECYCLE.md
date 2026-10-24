@@ -9,7 +9,7 @@ cite that exact version. New releases do not replace earlier fixed archives.
 
 The [release-scope guide](https://ryuya-dot-com.github.io/ldfreq/articles/release-scope.html)
 explains supported inputs, optional integrations and compatibility. The
-[NEWS](NEWS.md) records changes by version.
+[NEWS](https://ryuya-dot-com.github.io/ldfreq/news/index.html) records changes by version.
 
 ## Reference data in 0.5.0.9001
 
