@@ -47,17 +47,18 @@ and sample sizes fixed when comparing documents.
 
 ## Choose a measure for your question
 
-For a first analysis of texts of unequal length, start with **MATTR at a fixed
-window size**, then check its consistency for your material. Use **HD-D at a
+For local lexical variety, start with **MATTR at a fixed window size**. Our
+evidence covers English surface words at window 50; check its consistency for
+your material, especially short texts. Use **HD-D at a
 fixed sample size** when the distribution of word frequencies, rather than
 local sequence, is the target. MTLD and MTLD-MA measure factor lengths and need
 particular care with short texts. TTR is useful at a controlled length; it is
 strongly affected by length otherwise.
 
 The [metric-selection guide](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html)
-explains these choices using published research and results from 2,786 PELIC
-essays, including length sensitivity, sampling reliability, and actual
-external-tool comparisons. No single measure answers every research question.
+explains these choices using published research and PELIC, ICNALE, OANC and
+BAWE results, including length sensitivity, sampling agreement, missing scores
+and actual external-tool comparisons. No single measure answers every research question.
 
 ## Follow a workflow
 

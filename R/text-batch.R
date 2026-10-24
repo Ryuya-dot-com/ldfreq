@@ -96,7 +96,8 @@ lexdiv_tokenize_batch <- function(
 #'   list of `lexdiv_tokenization` objects. Mixed raw/prepared lists are errors.
 #' @inheritParams lexdiv_tokenize_batch
 #' @inheritParams lexdiv_metrics_text
-#' @param ... Metric requests forwarded to [lexdiv_metrics_text()].
+#' @param ... Metric requests forwarded to [lexdiv_metrics_text()], validated
+#'   even with zero documents. `plan` and `max_rows` are not supported.
 #' @param metadata Optional data frame with a unique plain character
 #'   `document_id` for every input document and atomic study-information columns.
 #'   Rows are matched by ID and retained separately in `$metadata`. Specify by name.
@@ -136,6 +137,10 @@ lexdiv_metrics_text_batch <- function(
   metadata <- .lextext_metadata(metadata, names(prepared))
   unit <- .lexprep_scalar_choice(unit, c("surface", "lemma", "flemma"), "unit")
   word_inclusion <- .lexprep_scalar_choice(word_inclusion, c("all", "content"), "word_inclusion")
+  # Check the actual callee's arguments even when no document is evaluated.
+  match.call(lexdiv_metrics_text,
+    quote(lexdiv_metrics_text(NULL, unit = unit, word_inclusion = word_inclusion, ...)),
+    envir = environment())
   prototype <- lexdiv_metrics_batch(stats::setNames(list(), character()), ...)
   pieces <- lapply(seq_along(prepared), function(i) {
     tryCatch(lexdiv_metrics_text(prepared[[i]], unit = unit,

@@ -12,16 +12,27 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(ldfreq)
 read_result <- function(name) read.csv(system.file("extdata", "corpus-stability",
   name, package = "ldfreq", mustWork = TRUE))
+read_extension <- function(name) read.csv(system.file("extdata", "corpus-extension",
+  name, package = "ldfreq", mustWork = TRUE))
 ```
 
 ## Choose the property you want to measure
 
-**Start with MATTR at a fixed window size when comparing local lexical variety
-in texts of different lengths.** Use HD-D at a fixed sample size when you want
+**For local lexical variety, start with MATTR at a fixed window size.**
+The evidence below supports this starting choice for English surface-word
+analyses at window 50; other languages, word units and windows need their own
+checks. Use HD-D at a fixed sample size when you want
 a summary of the whole text's frequency distribution that ignores word order.
 Use MTLD when sequential factor lengths answer your question or a study you
 are extending used the same definition. None of these choices, by itself,
 turns word counts into a measure of vocabulary knowledge or writing quality.
+
+Being able to compute a score is a separate question from having enough text
+for the intended comparison. At window 50, a 50-token MATTR score is just one
+window's TTR. Even at 100 tokens, the corpus results below do not support
+precise individual ranking. Group comparisons should retain writer/task
+structure and sampling uncertainty; averaging does not remove systematic
+differences in topics or text coverage.
 
 | Question or constraint | Choice | Conditions that matter |
 |---|---|---|
@@ -53,7 +64,7 @@ not a universal ranking for learner writing or other languages.
 [Study](https://doi.org/10.1044/2015_JSLHR-L-14-0280).
 
 Our package evaluation adds direct evidence for the implemented definitions in
-English learner essays. It asks two separate questions: does a score shift as
+learner essays, academic assignments, general writing and conversation. It asks two separate questions: does a score shift as
 more of the same text is included, and does it agree across different sampled
 parts of that text? The second question matters even when the average score
 has little length dependence.
@@ -77,9 +88,11 @@ Selection and analysis were specified before examining metric outcomes.
 
 ### Length sensitivity
 
-These are means across the two blocks per essay, with unavailable blocks
-excluded. MTLD-MA therefore has a changing observed subset; its missing counts
-must be read alongside its means.
+These are means of all available block scores, with two sampled blocks per
+essay. An essay with only one computable block contributes only that block.
+MTLD-MA therefore has a changing observed subset; its missing counts must be
+read alongside its means. Paired length changes below instead require both
+blocks at both lengths to be computable and weight eligible essays equally.
 
 ```{r length-summary, echo=FALSE}
 s <- read_result("block-summaries.csv")
@@ -180,6 +193,141 @@ lexdiv_metrics(tokens, metrics = c("mtld", "mtld_ma"))[
   c("metric_id", "value", "status", "diagnostics")]
 ```
 
+## Evidence across ICNALE, OANC and BAWE
+
+The extension uses **5,600 ICNALE WE 2.6 essays, 8,824 OANC documents and
+2,761 BAWE assignments** as its starting inventory. BAWE's primary analysis
+requires a recorded single author; multiple/unknown authors are excluded.
+Complete duplicate token sequences are removed after this eligibility rule.
+ICNALE L2 essays and L1 reference essays are analyzed separately. OANC
+conversations contain multiple speakers and are not treated as individual writers.
+The [protocol and reproduction scripts](https://github.com/Ryuya-dot-com/ldfreq/tree/v0.5.0.9001/experiments/corpus-extension)
+record source hashes, extraction, exclusions and all twelve measures' results.
+
+The short-text cohort supplies two disjoint 100-token blocks per document,
+evaluated at nested lengths 50 and 100. The long-text cohort supplies two
+disjoint 1,000-token blocks, evaluated at 200, 500 and 1,000. Each comparison
+keeps the same documents across its lengths. **The two cohorts are different;
+their curves must not be joined into a single length trajectory.** Parameters
+and English tokenization match the PELIC experiment. BAWE uses body text,
+excluding notes, front/back matter, tables, figures and formula placeholders;
+quotations remain. No spelling corrections or token shuffling are performed.
+
+| Population | Short-text documents (N ≥ 200) | Long-text documents (N ≥ 2,000) |
+|---|---:|---:|
+| ICNALE L2 | 4,933 | — |
+| ICNALE L1 reference | 395 | — |
+| OANC written | 6,369 | 1,216 |
+| OANC spoken | 2,397 | 278 |
+| BAWE single-author assignments | 2,636 | 1,339 |
+
+### What changes the choice of measure?
+
+**MATTR at window 50 remains a useful starting choice for local lexical variety
+under these English tokenization and sampling conditions.**
+Its mean shifts were comparatively small in both cohorts. From 200 to 1,000
+tokens, the paired mean change was −.00219 in OANC writing and +.00225 in BAWE,
+with 95% cluster-bootstrap intervals [−.00355, −.00092] and [.00108, .00346].
+These correspond to −.070 and +.071 SD, where the denominator is the SD of
+documents' two-block mean scores at 1,000 tokens in the complete-case comparison.
+The shifts are small relative to that variation but are detectably nonzero
+and have opposite directions; the result is not exact length invariance.
+
+HD-D increased by .01757 [.01636, .01878] in OANC writing and .01392
+[.01276, .01502] in BAWE over the same lengths, corresponding to .771 and
+.566 SD on the same standardization rule. Fixing its sample size at 42 does
+not eliminate the effects of adding different stretches of text to the
+frequency distribution. Choose HD-D for that distributional target; do not
+choose it solely to remove text-length effects.
+
+MTLD's standardized 200-to-1,000 change was −.079 in OANC writing and .029
+in BAWE, but its 50-to-100 change was much larger in writing (.547 in OANC,
+.346 in BAWE, .172 in ICNALE L2). A result for long documents does not justify
+the same interpretation for short responses. MTLD-MA still had 71.0% missing
+50-token blocks in ICNALE L2, 77.3% in BAWE and 91.1% in OANC writing.
+Its short-text means describe a strongly selected subset.
+
+These experiments vary contiguous sample length within eligible documents.
+They do not establish that scores from arbitrary whole documents are
+interchangeable across lengths, genres or populations. Retain full document
+lengths and test sensitivity within the comparison you intend to make, rather
+than applying the observed changes as universal correction factors.
+
+The BAWE curves below show the distributions at each long-cohort length,
+using a common bandwidth and evaluation range within each measure. Missing
+blocks are omitted from density estimation, not replaced with zero.
+
+```{r extension-distributions, echo=FALSE, fig.width=7, fig.height=5}
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  d <- read_extension("block-densities.csv")
+  d <- d[d$corpus == "bawe" & d$scope == "long" & d$group == "all", ]
+  d$length <- factor(d$length)
+  d$metric <- factor(d$metric, c("mattr", "hdd", "mtld", "mtld_ma"),
+    c("MATTR", "HD-D", "MTLD", "MTLD-MA"))
+  ggplot2::ggplot(d, ggplot2::aes(value, density, colour = length, linetype = length)) +
+    ggplot2::geom_line(linewidth = .6) + ggplot2::facet_wrap(~metric, scales = "free", ncol = 2) +
+    ggplot2::scale_colour_manual(values = c("#0072B2", "#D55E00", "#009E73")) +
+    ggplot2::labs(x = "Score", y = "Density", colour = "Tokens", linetype = "Tokens") +
+    ggplot2::theme_classic(base_size = 11) + ggplot2::theme(legend.position = "bottom")
+}
+```
+
+### Mean stability and individual-score stability differ
+
+The following MATTR ICCs concern one sampled block at window 50. Intervals
+use 2,000 bootstrap replicates of linked writers/source units, preserving all
+documents and blocks in a sampled cluster.
+
+```{r extension-reliability, echo=FALSE}
+r <- do.call(rbind, lapply(c("icnale", "oanc", "bawe"), function(corpus)
+  read_extension(paste0(corpus, "-reliability.csv"))))
+show <- r[r$metric == "mattr" & (r$length == 100 | r$scope == "long") &
+  ((r$corpus == "icnale" & r$group == "L2") |
+   (r$corpus == "oanc" & r$group == "written") |
+   (r$corpus == "bawe" & r$group == "all")), ]
+knitr::kable(show[c("corpus", "length", "complete_pairs", "icc", "icc_lower", "icc_upper")],
+  digits = 3, row.names = FALSE,
+  col.names = c("Corpus", "Tokens", "Documents", "ICC", "95% lower", "95% upper"))
+```
+
+At 100 tokens, MATTR's ICC was .404 in ICNALE L2, .258 in OANC writing and
+.354 in BAWE. Its small mean length effect therefore does not justify precise
+individual ranking from 100 words. At 1,000 tokens the point estimates rose
+to .608 in OANC writing and .729 in BAWE, in different, longer-document cohorts.
+This comparison is not a within-cohort estimate of the gain from 100 to 1,000.
+Within the same long-text cohorts, the 200/500/1,000-token ICCs were
+.296/.485/.608 for OANC writing and .429/.599/.729 for BAWE. This directly
+shows the improvement with more representative text within the evaluated range;
+it does not establish a universal minimum number of words.
+
+The pooled BAWE value also reflects disciplinary/genre differences. At 1,000
+tokens its discipline-specific MATTR ICCs were .625–.710; the OANC technical
+stratum was .512. Some small genre strata had negative estimates or too few
+independent clusters for intervals. All strata are retained in the result tables.
+
+OANC uncertainty requires particular care. Shared Switchboard speakers link
+its conversations into one connected component. In the pooled short spoken
+cohort that component accounts for 96.1% of documents; a nominal cluster
+interval there is fragile despite the count of 2,397 conversations. Long spoken
+data have only 17 components, so intervals are withheld under the predeclared
+minimum of 20. These data provide descriptive sampling evidence, not a precise
+population reliability estimate for speech.
+
+### Agreement across ICNALE tasks
+
+For writers with both eligible essays, independently sampled 200-token segments
+compare the part-time-job and smoking prompts. The L2 subset contains 2,361
+writers. MATTR's Lin concordance coefficient was **.494 [.460, .527]**, with
+Spearman correlation .461. HD-D, MTLD and MTLD-MA had concordance .490, .436
+and .430, respectively. In the smaller L1 reference subset, MATTR concordance
+was .179 [.047, .309]. Agreement depends on the population's variability and
+the prompts; a coefficient is not a property of the formula alone.
+
+These are agreement estimates for two fixed tasks, including possible mean
+differences, not the within-essay ICC or a general reliability of vocabulary
+ability. A study making claims about writers needs repeated tasks/occasions
+and a measurement design appropriate to those claims.
+
 ## Does the implementation agree with external tools?
 
 Actual koRpus 0.13-9 calls were run on **202 real essays**, selected across
@@ -198,6 +346,31 @@ terminal two-token difference in ordinary MTLD that did not occur in this
 real-text subset. The external comparison tests computational correspondence;
 the length and sampling analyses above provide different evidence for choosing
 a measure. Neither comparison establishes proficiency validity.
+
+The three-corpus extension adds **182 real blocks at 50–1,000 tokens**. All
+jointly computable values of the same five measures agreed within 1e-10.
+There were 40 documented MATTR availability differences: with window 50,
+koRpus 0.13-9 returns NA at exactly 50 tokens, whereas ldfreq returns the TTR
+of the single valid window. Inspection of the installed implementation and
+49/50/51/52-token checks confirmed this boundary rule. The result tables
+preserve these disagreements; they are not reported as complete agreement.
+
+## Data acknowledgements
+
+ICNALE: Ishikawa, S. (2023). *The ICNALE Guide: An Introduction to a Learner
+Corpus Study on Asian Learners' L2 English*. Routledge.
+[Corpus documentation and citation requirements](https://language.sakura.ne.jp/icnale/index.html).
+OANC data and documentation are provided by the
+[Open American National Corpus project](https://anc.org/data/oanc/).
+
+The data in this study come from the British Academic Written English (BAWE)
+corpus, which was developed at the Universities of Warwick, Reading and Oxford
+Brookes under the directorship of Hilary Nesi and Sheena Gardner (formerly of
+the Centre for Applied Linguistics [previously called CELTE], Warwick), Paul
+Thompson (Department of Applied Linguistics, Reading) and Paul Wickens
+(Westminster Institute of Education, Oxford Brookes), with funding from the
+ESRC (RES-000-23-0800).
+[BAWE project and conditions](https://www.coventry.ac.uk/research/research-directories/current-projects/2015/british-academic-written-english-corpus-bawe/).
 
 ## Specify and report your decision
 

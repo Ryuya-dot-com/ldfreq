@@ -69,6 +69,17 @@ test_that("Unicode defaults and saved 0.2.0 objects remain usable", {
   expect_error(lexdiv_metrics_text(english, metrics = "ttr"), "provenance")
 })
 
+test_that("raw-text batches reject unsupported arguments even without documents", {
+  plan <- lexdiv_plan(presets = character(), specs = list(lexdiv_spec("ttr_v_over_n_v1")))
+  inputs <- list(stats::setNames(character(), character()), c(doc = "a a b"),
+    stats::setNames(list(), character()), list(doc = lexdiv_tokenize("a a b")))
+  for (input in inputs) {
+    expect_error(lexdiv_metrics_text_batch(input, plan = plan), "unused argument.*plan")
+    expect_error(lexdiv_metrics_text_batch(input, max_rows = 10), "unused argument.*max_rows")
+    expect_error(lexdiv_metrics_text_batch(input, tokens_col = "tokens"), "unused argument.*tokens_col")
+  }
+})
+
 test_that("Raw-text batch calls retain IDs, empty documents and complete results", {
   docs <- data.frame(id = c("second", "first", "empty"),
     essay = c("The cat can\u2019t run. 3.14", "Cat cat.", ""))

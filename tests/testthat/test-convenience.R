@@ -25,6 +25,43 @@ test_that("named lists retain document boundaries and reject invalid inputs", {
   )
 })
 
+test_that("tidy adapters reject ambiguous selected columns and invalid selectors", {
+  tidy <- data.frame(document_id = c("a", "a"), token = c("x", "x"),
+    other = c("x", "y"))
+  for (selected in c("document_id", "token")) {
+    ambiguous <- tidy
+    names(ambiguous)[3L] <- selected
+    swapped <- ambiguous[c(3L, 2L, 1L)]
+    names(swapped) <- names(ambiguous)[c(3L, 2L, 1L)]
+    empty <- ambiguous[FALSE, ]
+    names(empty) <- names(ambiguous)
+    expect_error(lexdiv_as_documents(ambiguous), "exactly one selected")
+    expect_error(lexdiv_as_documents(swapped), "exactly one selected")
+    expect_error(lexdiv_as_documents(empty), "exactly one selected")
+  }
+  expect_error(lexdiv_as_documents(tidy["document_id"]), "exactly one selected")
+  for (bad in list(factor("token"), matrix("token"), I("token"),
+    setNames("token", "name"))) {
+    expect_error(lexdiv_as_documents(tidy, token_col = bad), "token_col")
+    expect_error(lexdiv_as_documents(tidy, document_col = bad), "document_col")
+  }
+  expect_equal(lexdiv_metrics_batch(lexdiv_as_documents(tidy), metrics = "ttr")$value, 0.5)
+})
+
+test_that("empty document adapters compose with both batch interfaces", {
+  empty <- stats::setNames(list(), character())
+  tidy <- data.frame(document_id = character(), token = character())
+  plan <- lexdiv_plan(presets = character(), specs = list(lexdiv_spec("ttr_v_over_n_v1")))
+  for (input in list(list(), empty, tidy)) {
+    documents <- lexdiv_as_documents(input)
+    expect_identical(documents, empty)
+    expect_identical(lexdiv_metrics_batch(documents, metrics = "ttr"),
+      lexdiv_metrics_batch(empty, metrics = "ttr"))
+    expect_identical(lexdiv_profile_batch(documents, plan),
+      lexdiv_profile_batch(empty, plan))
+  }
+})
+
 test_that("real quanteda tokens retain document boundaries", {
   skip_if_not_installed("quanteda")
   documents <- list(a = c("a", "a"), b = c("b", "c"), empty = character())

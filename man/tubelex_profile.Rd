@@ -139,6 +139,13 @@ separately from the measurement contract.
 integrity check. \code{failure_reason} is missing for \code{"ok"} and
 \code{"empty"}, and otherwise gives the specific failure reason. Coverage is
 missing when its denominator is zero or the lookup could not be completed.
+Missing cache files return \code{failure_reason = "resource_unavailable"};
+changed manifest or data bytes return \code{"hash_mismatch"}. This applies to
+both single-document and batch calls. Inspect \code{lexdiv_resource_info("tubelex")}
+and its license before explicitly calling
+\code{lexdiv_download_resources("tubelex", accept_license = TRUE)}.
+An incomplete or modified version directory must be removed explicitly before
+downloading it again. Profile calls never download or repair files implicitly.
 }
 \references{
 Nohejl et al. (2025). Beyond Film Subtitles: Is YouTube the Best Approximation

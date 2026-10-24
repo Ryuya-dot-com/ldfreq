@@ -112,6 +112,8 @@ Input order is retained. Short and zero-token documents remain in the metric
 table with their computability status, requested parameters, and counts.
 A document does not change another document's requested window or sample size.
 Settings and metric requests are validated even with zero documents.
+Only metric arguments supported by \code{lexdiv_metrics_text()} can be
+forwarded through \code{...}; \code{plan} and \code{max_rows} are not supported.
 
 Prepared objects retain their recorded settings. A batch call does not assert
 that differently prepared documents are comparable: inspect preprocessing and

@@ -36,6 +36,56 @@ test_that("explicit resource downloads verify archives, files and reuse", {
   expect_identical(readLines(file),"modified")
 })
 
+test_that("TUBELEX cache failures retain structured single and batch results", {
+  cache <- tempfile("tubelex-cache-")
+  withr::local_options(ldfreq.resource_dir = cache)
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+  check_failure <- function(reason) {
+    single <- tubelex_profile("apple")
+    expect_identical(single$status, "resource_error")
+    expect_identical(single$failure_reason, reason)
+    expect_false(single$diagnostics$download_attempted)
+    expect_true(all(is.na(single$summary$mean_zipf)))
+    batch <- tubelex_profile_batch(list(doc = "apple", empty = character()))
+    expect_identical(batch$doc, single)
+    expect_identical(batch$empty$status, "resource_error")
+    expect_identical(batch$empty$failure_reason, reason)
+  }
+  check_failure("resource_unavailable")
+  expect_false(dir.exists(cache))
+  item <- getFromNamespace(".lex_resource_catalog", "ldfreq")$tubelex
+  manifest <- file.path(cache, "tubelex", item$version,
+    "extdata", "tubelex", "7cb5fb36", "resource.manifest.dcf")
+  dir.create(dirname(manifest), recursive = TRUE)
+  writeLines("damaged manifest", manifest)
+  check_failure("hash_mismatch")
+  expect_identical(readLines(manifest), "damaged manifest")
+  expect_false(lexdiv_resource_info("tubelex")$available)
+})
+
+test_that("TUBELEX data-file failures use the same contract as manifest failures", {
+  skip_optional_resources("tubelex")
+  info <- lexdiv_resource_info("tubelex")
+  baseline <- tubelex_profile("apple")
+  cache <- tempfile("tubelex-data-")
+  dir.create(file.path(cache, "tubelex"), recursive = TRUE)
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+  expect_true(file.copy(info$path, file.path(cache, "tubelex"), recursive = TRUE))
+  withr::local_options(ldfreq.resource_dir = cache)
+  expect_identical(tubelex_profile("apple"), baseline)
+  paths <- getFromNamespace(".lexres_tubelex_paths", "ldfreq")()
+  payload <- unname(paths$artifact_paths[[1L]])
+  unlink(payload)
+  for (reason in c("resource_unavailable", "hash_mismatch")) {
+    if (reason == "hash_mismatch") writeLines("damaged data", payload)
+    single <- tubelex_profile("apple")
+    expect_identical(single$status, "resource_error")
+    expect_identical(single$failure_reason, reason)
+    expect_false(single$diagnostics$download_attempted)
+    expect_identical(tubelex_profile_batch(list(doc = "apple"))$doc, single)
+  }
+})
+
 test_that("wrong types and implicit acceptance are rejected before networking", {
   for(bad in list(factor("tubelex"),data.frame(x="tubelex"),matrix("tubelex"),
     I("tubelex"),c("tubelex","tubelex"),NA_character_,character()))

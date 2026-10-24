@@ -1,0 +1,15 @@
+{
+  "identity": {
+    "metrics": "346bb3797aad23301fdf9a5552f5ee5ac72a897c88d105eca7199d4469944a04",
+    "plan": "fa7f546a34cd98acdae49a11aba19a1f2526b78529bedb513ab7c49a1a30aa09",
+    "code": "82450f1d9eac1fe96ab547ad784c66d913afd22d16196dcb31d548ea4ba20d1c",
+    "statistics": "44035c21542c968d7259479ab2bd17d940cfeb1163337eb25582b068894c452b"
+  },
+  "bootstrap": {
+    "replicates": 2000,
+    "unit": "record-linked component",
+    "minimum_clusters": 20,
+    "minimum_finite_replicates": 1900
+  },
+  "R": "4.6.1"
+}

@@ -27,6 +27,7 @@
   if (!is.list(documents) || is.object(documents) || !is.null(dim(documents))) {
     stop("x must resolve to a plain list of token vectors.", call. = FALSE)
   }
+  if (!length(documents)) return(stats::setNames(list(), character()))
   document_ids <- names(documents)
   if (length(documents) > 0L && (
     is.null(document_ids) || anyNA(document_ids) ||
@@ -49,6 +50,8 @@
 #' is grouped in first-document-appearance and row order. A `quanteda` tokens
 #' object is converted through its registered `as.list()` method; no `quanteda`
 #' runtime dependency is added to `ldfreq`.
+#' Each selected column must occur exactly once. Empty lists and zero-row
+#' token tables return the same named empty list accepted by both batch APIs.
 #'
 #' @param x A named list of token vectors, a data frame with one token per row,
 #'   or a `quanteda` tokens object.
@@ -62,8 +65,8 @@ lexdiv_as_documents <- function(
     x,
     document_col = "document_id",
     token_col = "token") {
-  document_col <- .lex_convenience_name(document_col, "document_col")
-  token_col <- .lex_convenience_name(token_col, "token_col")
+  document_col <- .lex_batch_scalar_name(document_col, "document_col")
+  token_col <- .lex_batch_scalar_name(token_col, "token_col")
   if (identical(document_col, token_col)) {
     stop("document_col and token_col must differ.", call. = FALSE)
   }
@@ -83,15 +86,15 @@ lexdiv_as_documents <- function(
   }
 
   if (is.data.frame(x)) {
-    missing_columns <- setdiff(c(document_col, token_col), names(x))
-    if (length(missing_columns) > 0L) {
+    columns <- .lex_batch_column_names(names(x))
+    if (sum(columns == document_col) != 1L || sum(columns == token_col) != 1L) {
       stop(
-        sprintf("Data-frame input is missing column(s): %s.", paste(missing_columns, collapse = ", ")),
+        "A data-frame input must contain exactly one selected ID column and one selected token column.",
         call. = FALSE
       )
     }
-    ids <- .lex_document_ids(x[[document_col]], document_col)
-    tokens <- x[[token_col]]
+    ids <- .lex_document_ids(x[[which(columns == document_col)]], document_col)
+    tokens <- x[[which(columns == token_col)]]
     if (!is.character(tokens) || is.object(tokens) || !is.null(dim(tokens))) {
       stop(sprintf("%s must be a plain character token column.", token_col), call. = FALSE)
     }

@@ -72,9 +72,10 @@ named tarball. The default `new-submission-only` policy remains strict. The
 workflow selects `release-resource-notes`: `Status: OK`, or individually
 recognized NOTES for CRAN's `New submission` (with only the exact optional
 `Non-FOSS package license (file LICENSE)` line) and installed package size.
-The non-FOSS disposition preserves the declared component terms, including
-MorphoLex's CC BY-NC-SA restriction; it does not grant any extra rights.
-The latter must list only R/doc/extdata, include doc and extdata, and total
+The non-FOSS disposition is retained to classify historical archives that
+bundled MorphoLex; it does not describe the current package's MIT code or
+extend the separately downloaded data's rights. The size disposition must
+list only R/doc/extdata, include doc and extdata, and total
 at most 15 MiB (the 9019 Linux baseline was 10.9 MiB). The attributed resources
 and rendered guides explain that size; the exact file BOM and independent
 resource inventories still have to pass. Unexpected payload areas, duplicate

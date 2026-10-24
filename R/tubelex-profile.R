@@ -243,6 +243,10 @@
 #' printing retains the machine-readable reason and suggests checking the
 #' resource and encoding; a non-UTF-8 locale is a possible cause in older loaders,
 #' not proof of the cause of every schema failure.
+#' Missing cache files return `resource_error` with `resource_unavailable`;
+#' manifest or data hash failures return `resource_error` with `hash_mismatch`.
+#' Inspect [lexdiv_resource_info()] and explicitly download the resource after
+#' reviewing its license. Profile calls never download or repair cache files.
 #'
 #' @return A `tubelex_profile` list containing matched-only token- and
 #'   type-weighted summaries, the lossless lookup table, token/type coverage,

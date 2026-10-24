@@ -145,6 +145,9 @@ appearance while preserving row order within each document. A \pkg{quanteda}
 tokens object is converted through its registered \code{as.list()} method, so
 \pkg{ldfreq} does not add a runtime dependency on \pkg{quanteda}. Raw text is
 not tokenized by this adapter.
+Each selected ID or token column must occur exactly once. Empty lists and
+zero-row token tables return the same named empty list, accepted by both
+\code{lexdiv_metrics_batch()} and \code{lexdiv_profile_batch()}.
 
 \code{lexdiv_widen()} uses profile \code{request_id} values when available,
 and checks that every output column has one contract, method, and requested
