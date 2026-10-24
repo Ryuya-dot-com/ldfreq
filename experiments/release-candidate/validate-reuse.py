@@ -74,6 +74,24 @@ rejects(lambda: reuse.verify_ci(dict(builder_state, **{"Recheck-TUBELEX-Builder"
     builder_change, workflow, workflow, builder_run, "owner/repo", builder_jobs))
 print("Builder-only repairs retain six completed package jobs only with identical package inputs.")
 
+windows_state = dict(builder_state, **{"Recheck-Windows": "true"})
+windows_jobs = [j for j in builder_jobs if j["name"] != "windows-latest / R release"]
+attributes = "inst/licenses/tubelex/NOTICE.md -text"
+repaired = attributes + "\ninst/licenses/tubelex/LICENSE -text"
+with patch.object(reuse, "git", return_value=attributes):
+    with patch.object(Path, "read_text", return_value=repaired):
+        reuse.verify_ci(windows_state, [".gitattributes"], workflow, workflow,
+                        builder_run, "owner/repo", windows_jobs)
+    for bad in (attributes, repaired + "\nR/* -text"):
+        with patch.object(Path, "read_text", return_value=bad):
+            rejects(lambda: reuse.verify_ci(windows_state, [".gitattributes"], workflow,
+                                            workflow, builder_run, "owner/repo", windows_jobs))
+rejects(lambda: reuse.verify_ci(builder_state, [".gitattributes"], workflow,
+                                workflow, builder_run, "owner/repo", builder_jobs))
+rejects(lambda: reuse.verify_ci(windows_state, [], workflow, workflow,
+                                builder_run, "owner/repo", windows_jobs[:-1]))
+print("Windows recheck permits only the exact LICENSE attribute repair and retains five successful jobs.")
+
 report_before = 'stopifnot(identical(saved$inference$tables, record$inference$tables),'
 report_after = 'stopifnot(identical(saved$inference$settings$df_method, "kenward-roger"),'
 with patch.object(reuse, "git", return_value=report_before):

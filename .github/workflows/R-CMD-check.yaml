@@ -25,6 +25,7 @@ jobs:
       builder-matrix: ${{ steps.reuse.outputs.builder-matrix }}
       linux-reuse: ${{ steps.reuse.outputs.linux-reuse }}
       builder-recheck: ${{ steps.reuse.outputs.builder-recheck }}
+      windows-recheck: ${{ steps.reuse.outputs.windows-recheck }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -57,7 +58,7 @@ jobs:
 
   check:
     needs: validation-scope
-    if: needs.validation-scope.outputs.reuse != 'true'
+    if: needs.validation-scope.outputs.reuse != 'true' || needs.validation-scope.outputs.windows-recheck == 'true'
     name: ${{ matrix.config.os }} / R ${{ matrix.config.r }}
     runs-on: ${{ matrix.config.os }}
     timeout-minutes: 30
@@ -414,6 +415,11 @@ jobs:
         env:
           TUBELEX_RESULT: ${{ needs.tubelex-build-audit.result }}
         run: test "$TUBELEX_RESULT" = success
+      - name: Require the repaired Windows package check
+        if: needs.validation-scope.outputs.windows-recheck == 'true'
+        env:
+          CHECK_RESULT: ${{ needs.check.result }}
+        run: test "$CHECK_RESULT" = success
       - name: Require every matrix check to pass
         if: needs.validation-scope.outputs.reuse != 'true'
         env:

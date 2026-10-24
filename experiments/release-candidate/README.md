@@ -40,6 +40,10 @@ sources, tests, help and vignettes must be unchanged, as must the reused job
 definitions. Both builder platforms and the release-control checks then run
 afresh; the required check rejects either builder's failure. This preserves
 completed numerical evidence without treating the earlier workflow as successful.
+`Recheck-Windows: true` additionally permits only the exact `.gitattributes`
+repair that protects the byte-pinned TUBELEX LICENSE from CRLF conversion.
+The Windows package job then runs afresh; the other four package environments
+and C-locale job still require completed successful evidence.
 
 `build-manual.R` uses R's documented `texi2dvi` emulation, retains TeX diagnostics,
 and requires a nonempty function index. A PDF returned by the no-index fallback

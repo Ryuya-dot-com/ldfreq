@@ -13,6 +13,7 @@ inst/COPYRIGHTS -text
 inst/extdata/tubelex/7cb5fb36/* -text
 inst/extdata/tubelex/7cb5fb36/build-provenance.json whitespace=-blank-at-eof
 inst/licenses/tubelex/NOTICE.md -text
+inst/licenses/tubelex/LICENSE -text
 inst/extdata/nj8/2016/* -text
 inst/licenses/nj8/NOTICE.md -text
 inst/extdata/morpholex/** -text
