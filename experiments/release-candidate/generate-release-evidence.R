@@ -486,16 +486,14 @@ provenance <- list(
     installed_resource_count = length(resource_manifest$resources),
     installed_resource_ids = unname(resource_ids),
     release_inventory_sha256 = sha256_file(release_inventory_path),
-    public_resource_api_candidate = TRUE,
-    candidate_resources_are_release_admitted = TRUE,
-    decision_authority = "package-maintainer",
-    admission_record_scope = admission_record$record_scope,
-    admission_decision_id = admission_record$maintainer_decision$decision_id
+    count_scope = "Optional resources declared by the installed manifest; dataset payloads are absent",
+    explicit_download_required = TRUE,
+    license_acknowledgement_required = TRUE,
+    release_inventory_scope = release_inventory$package_scope
   ),
   go_no_go = list(
     decision = "PENDING_MAINTAINER_RELEASE_DECISION",
     decision_authority = "package-maintainer",
-    resource_decision_recorded_on = admission_record$maintainer_decision$decided_on,
     known_limitations = c(
       "Raw-text preprocessing is governed by a separate versioned public contract.",
       paste(
