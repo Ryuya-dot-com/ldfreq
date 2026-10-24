@@ -2,7 +2,7 @@
 
 Count the word families represented in each document using an explicit
 form-to-family inventory. The example below imports a small token table
-and uses the bundled Nation inventory from
+and uses the cached Nation inventory from
 [`bnccoca_data`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md).
 Original word occurrences and unresolved matches remain available for
 inspection. This experimental function requires prepared tokens; it does
@@ -242,6 +242,8 @@ tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affi
 ## Examples
 
 ``` r
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("bnccoca"))$available)) {
 library(ldfreq)
 
 # 1. Complete authored texts and their tokens. Empty documents have no
@@ -265,7 +267,7 @@ annotations <- lexdiv_import_annotations(tokens, segments, list(
   unit = "word", normalization = "none"
 ))
 
-# 2. Load Nation's bundled inventory. It does not include REUSABILITY.
+# 2. Load Nation's cached inventory. It does not include REUSABILITY.
 reference <- bnccoca_data()
 profile <- lexdiv_family_profile(
   annotations, reference$dictionary, reference$resource,
@@ -276,62 +278,17 @@ profile <- lexdiv_family_profile(
 profile$documents[c("document_id", "selected_tokens", "matched_tokens",
   "token_coverage", "observed_family_types", "family_types",
   "family_ttr", "status")]
-#>   document_id selected_tokens matched_tokens token_coverage
-#> 1      listed               4              4            1.0
-#> 2    unlisted               2              1            0.5
-#> 3       empty               0              0             NA
-#>   observed_family_types family_types family_ttr     status
-#> 1                     2            2        0.5   complete
-#> 2                     1           NA         NA incomplete
-#> 3                     0            0         NA      empty
 # listed: 4 tokens, 2 families, TTR 0.5, coverage 1, complete
 # unlisted: 2 tokens, coverage 0.5; whole-document family count/TTR are NA
 # empty: 0 tokens, 0 families; TTR and coverage are NA
 profile$members
-#>   document_id        family_id surface  query n
-#> 1      listed bnccoca:01:06348     use    use 1
-#> 2      listed bnccoca:01:06348    uses   uses 1
-#> 3      listed bnccoca:01:00998  colour colour 1
-#> 4      listed bnccoca:01:00998   color  color 1
-#> 5    unlisted bnccoca:01:06348     use    use 1
 profile$occurrences[c("document_id", "keyword", "status", "family_id")]
-#>   document_id     keyword   status        family_id
-#> 1      listed         use  matched bnccoca:01:06348
-#> 2      listed        uses  matched bnccoca:01:06348
-#> 3      listed      colour  matched bnccoca:01:00998
-#> 4      listed       color  matched bnccoca:01:00998
-#> 5    unlisted         use  matched bnccoca:01:06348
-#> 6    unlisted reusability unlisted             <NA>
 
 # Save all inputs and choices, not only the displayed document table.
 path <- tempfile(fileext = ".rds")
 saveRDS(profile, path)
 restored <- readRDS(path)
 restored$documents
-#>   document_id tokens excluded_tokens known_selected_tokens
-#> 1      listed      4               0                     4
-#> 2    unlisted      2               0                     2
-#> 3       empty      0               0                     0
-#>   unknown_selection_tokens selected_tokens matched_tokens unlisted_tokens
-#> 1                        0               4              4               0
-#> 2                        0               2              1               1
-#> 3                        0               0              0               0
-#>   ambiguous_tokens missing_unit_tokens missing_pos_tokens withheld_tokens
-#> 1                0                   0                  0               0
-#> 2                0                   0                  0               0
-#> 3                0                   0                  0               0
-#>   unresolved_tokens review_selected_tokens review_unresolved_tokens
-#> 1                 0                      0                        0
-#> 2                 1                      0                        0
-#> 3                 0                      0                        0
-#>   conditional_token_coverage token_coverage observed_family_types family_types
-#> 1                        1.0            1.0                     2            2
-#> 2                        0.5            0.5                     1           NA
-#> 3                         NA             NA                     0            0
-#>   family_ttr     status
-#> 1        0.5   complete
-#> 2         NA incomplete
-#> 3         NA      empty
 unlink(path)
 
 # Advanced, separate authored review example; inspect the script before
@@ -343,22 +300,5 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
     mustWork = TRUE), env)
   env$word_family_review_example$reviewed$documents
 }
-#>   document_id tokens excluded_tokens known_selected_tokens
-#> 1     example     10               2                     8
-#> 2       empty      0               0                     0
-#>   unknown_selection_tokens selected_tokens matched_tokens unlisted_tokens
-#> 1                        0               8              8               0
-#> 2                        0               0              0               0
-#>   ambiguous_tokens missing_unit_tokens missing_pos_tokens withheld_tokens
-#> 1                0                   0                  0               0
-#> 2                0                   0                  0               0
-#>   unresolved_tokens review_selected_tokens review_unresolved_tokens
-#> 1                 0                      2                        0
-#> 2                 0                      0                        0
-#>   conditional_token_coverage token_coverage observed_family_types family_types
-#> 1                          1              1                     7            7
-#> 2                         NA             NA                     0            0
-#>   family_ttr   status
-#> 1      0.875 complete
-#> 2         NA    empty
+}
 ```

@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -194,7 +196,7 @@ counts.</p>
 </h2>
 <p>When the reference has many documents, retaining all n-gram
 occurrences can be unnecessary.
-<code><a href="../reference/lexdiv_ngram_reference_build.html">lexdiv_ngram_reference_build()</a></code> calls your reader once for
+<code><a href="../reference/lexdiv_ngram_reference_build.html">lexdiv_build_ngram_reference()</a></code> calls your reader once for
 each source ID and adds its counts and denominators. Each callback
 returns an ordinary <code><a href="../reference/lexdiv_ngrams.html">lexdiv_ngrams()</a></code> result. The corpus
 itself remains outside the package, and no new dependency is needed.</p>
@@ -204,7 +206,7 @@ itself remains outside the package, and no new dependency is needed.</p>
 <span>  <span class="va">rows</span> <span class="op">&lt;-</span> <span class="va">reference_tokens</span><span class="op">[</span><span class="va">reference_tokens</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="va">id</span>, <span class="op">]</span></span>
 <span>  <span class="fu"><a href="../reference/lexdiv_ngrams.html">lexdiv_ngrams</a></span><span class="op">(</span><span class="va">rows</span>, <span class="va">preparation</span>, documents <span class="op">=</span> <span class="va">id</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="va">built</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ngram_reference_build.html">lexdiv_ngram_reference_build</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"r1"</span>, <span class="st">"r2"</span><span class="op">)</span>, <span class="va">read_document</span>, <span class="va">resource</span><span class="op">)</span></span>
+<span><span class="va">built</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ngram_reference_build.html">lexdiv_build_ngram_reference</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"r1"</span>, <span class="st">"r2"</span><span class="op">)</span>, <span class="va">read_document</span>, <span class="va">resource</span><span class="op">)</span></span>
 <span><span class="va">built</span><span class="op">$</span><span class="va">reference</span><span class="op">$</span><span class="va">totals</span></span>
 <span><span class="co">#&gt;   n opportunities documents</span></span>
 <span><span class="co">#&gt; 1 2             9         2</span></span>
@@ -231,7 +233,7 @@ time:</p>
 <span>  <span class="fu"><a href="../reference/lexdiv_ngrams.html">lexdiv_ngrams</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">row</span><span class="op">$</span><span class="va">file</span><span class="op">)</span>, <span class="va">preparation</span>,</span>
 <span>    documents <span class="op">=</span> <span class="va">row</span><span class="op">$</span><span class="va">document_id</span>, max_ngrams <span class="op">=</span> <span class="fl">200000</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="va">built</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ngram_reference_build.html">lexdiv_ngram_reference_build</a></span><span class="op">(</span><span class="va">manifest</span><span class="op">$</span><span class="va">source_id</span>, <span class="va">read_local</span>, <span class="va">resource</span>,</span>
+<span><span class="va">built</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ngram_reference_build.html">lexdiv_build_ngram_reference</a></span><span class="op">(</span><span class="va">manifest</span><span class="op">$</span><span class="va">source_id</span>, <span class="va">read_local</span>, <span class="va">resource</span>,</span>
 <span>                                     max_types <span class="op">=</span> <span class="fl">1000000</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">built</span>, <span class="st">"local-reference-build.rds"</span><span class="op">)</span></span></code></pre></div>
 <p>A chunk may contain several whole documents, but <strong>never split
@@ -325,7 +327,7 @@ denominator. These deliberately tiny reference totals are unsuitable for
 estimating stable population frequencies.</p>
 <p>Rates do not divide by all word tokens. A published table normalized
 by word tokens therefore has a different definition, even if it uses the
-same “per million” label. A unigram reference such as bundled TUBELEX
+same “per million” label. A unigram reference such as cached TUBELEX
 lacks the observed co-occurrence counts needed here.</p>
 <p><code>lookup</code> keeps each phrase’s document, segment and
 start/end positions beside the reference count and document count.
@@ -396,7 +398,7 @@ explicitly.</p>
 <div class="section level2">
 <h2 id="compare-references-on-the-same-target-items">Compare references on the same target items<a class="anchor" aria-label="anchor" href="#compare-references-on-the-same-target-items"></a>
 </h2>
-<p><code><a href="../reference/lexdiv_ngram_compare.html">lexdiv_ngram_compare()</a></code> keeps both the available-value
+<p><code><a href="../reference/lexdiv_ngram_compare.html">lexdiv_compare_ngrams()</a></code> keeps both the available-value
 summaries above and an additional comparison on the <strong>same items
 with defined rates in every reference</strong>. This distinction matters
 when missing rows change the apparent mean. The first named reference is
@@ -404,7 +406,7 @@ the default baseline; choose another with <code>baseline</code> when the
 research question requires it.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">references</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>complete <span class="op">=</span> <span class="va">reference</span>, pruned <span class="op">=</span> <span class="va">partial</span><span class="op">)</span></span>
-<span><span class="va">compared</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ngram_compare.html">lexdiv_ngram_compare</a></span><span class="op">(</span><span class="va">target</span>, <span class="va">references</span>, baseline <span class="op">=</span> <span class="st">"complete"</span><span class="op">)</span></span>
+<span><span class="va">compared</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ngram_compare.html">lexdiv_compare_ngrams</a></span><span class="op">(</span><span class="va">target</span>, <span class="va">references</span>, baseline <span class="op">=</span> <span class="st">"complete"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">compared</span><span class="op">$</span><span class="va">summary</span>, <span class="va">document_id</span> <span class="op">==</span> <span class="st">"choice_item"</span> <span class="op">&amp;</span> <span class="va">n</span> <span class="op">==</span> <span class="fl">2</span> <span class="op">&amp;</span> <span class="va">weighting</span> <span class="op">==</span> <span class="st">"token"</span>,</span>
 <span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">reference_id</span>, <span class="va">mean_frequency_per_million</span>, <span class="va">value_coverage</span>,</span>
 <span>    <span class="va">common_items</span>, <span class="va">common_coverage</span>, <span class="va">common_mean_frequency_per_million</span>,</span>
@@ -457,7 +459,7 @@ employability scores.</p>
 <code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>target <span class="op">=</span> <span class="va">target</span>, references <span class="op">=</span> <span class="va">references</span>, comparison <span class="op">=</span> <span class="va">compared</span><span class="op">)</span>, <span class="va">path</span><span class="op">)</span></span>
 <span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/lexdiv_ngram_compare.html">lexdiv_ngram_compare</a></span><span class="op">(</span><span class="va">saved</span><span class="op">$</span><span class="va">target</span>, <span class="va">saved</span><span class="op">$</span><span class="va">references</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/lexdiv_ngram_compare.html">lexdiv_compare_ngrams</a></span><span class="op">(</span><span class="va">saved</span><span class="op">$</span><span class="va">target</span>, <span class="va">saved</span><span class="op">$</span><span class="va">references</span>,</span>
 <span>  baseline <span class="op">=</span> <span class="va">saved</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">baseline</span><span class="op">)</span>, <span class="va">saved</span><span class="op">$</span><span class="va">comparison</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span></code></pre></div>
 <p>Save the reference inputs too: comparison output contains their

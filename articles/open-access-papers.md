@@ -1,5 +1,20 @@
 # Analyze open-access academic papers
 
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+lexdiv_resource_info(c("tubelex", "nj8"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
+```
+
 ## Start with a question and an accessible text sample
 
 You can use ldfreq on your own collection of documents; a named research
@@ -175,6 +190,6 @@ citation("ldfreq")
 Cite the articles as source texts, ldfreq and the selected diversity
 methods, and JACET for NJ8. Cite Nohejl et al. (2025) and the recorded
 NLTK implementation if adding TUBELEX. These three papers demonstrate a
-reproducible workflow; independent usability testing and validity
-studies across registers or language backgrounds remain separate
-research questions.
+reproducible workflow. Generalizing measurement interpretations across
+registers or language backgrounds requires evidence for those
+populations.

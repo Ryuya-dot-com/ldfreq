@@ -15,10 +15,9 @@ requires the optional `ca` package (`install.packages("ca")`). No new
 tokenizer or model is needed. The example uses authored counts to make
 the calculations checkable, not empirical learner differences.
 
-The [occurrence-MCA example](#occurrence-mca) requires **0.4.0.9001 or
-later**, not stable 0.4.0. It describes several nominal variables coded
-for each original occurrence, rather than a document-by-term frequency
-table.
+The [occurrence-MCA example](#occurrence-mca) requires **0.5.0.9001**,
+not stable 0.4.0. It describes several nominal variables coded for each
+original occurrence, rather than a document-by-term frequency table.
 
 ## Begin with the counted documents
 
@@ -641,15 +640,15 @@ if (has_ca) {
 
 ![](lexical-ordination_files/figure-html/mca-maps-2.png)
 
-The optional `labels` argument requires **0.4.0.9002 or later**. Review
-tools can return long occurrence IDs that overlap or are clipped in a
-plot. Supply a character vector whose names are exactly the displayed
-occurrence IDs (or category IDs on a category map); its order need not
-match the result table. Choose short, distinguishable display names. The
-returned `mca_display` table keeps `id`, `label`, `x` and `y` for every
-point, including co-located points. Use its original `id` to look up
-source text; a display name is not a replacement identifier. Without
-`labels`, the existing ID/category labels are used.
+The optional `labels` argument requires **0.5.0.9001**. Review tools can
+return long occurrence IDs that overlap or are clipped in a plot. Supply
+a character vector whose names are exactly the displayed occurrence IDs
+(or category IDs on a category map); its order need not match the result
+table. Choose short, distinguishable display names. The returned
+`mca_display` table keeps `id`, `label`, `x` and `y` for every point,
+including co-located points. Use its original `id` to look up source
+text; a display name is not a replacement identifier. Without `labels`,
+the existing ID/category labels are used.
 
 The warning about repeated eigenvalues is intentional. These maps show
 the first two retained axes (one axis for rank-one inputs). Occurrence

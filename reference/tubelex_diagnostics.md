@@ -1,5 +1,9 @@
 # Tabulate TUBELEX profiles while retaining coverage and input conditions
 
+Reference snapshots require a prior explicit download; see
+[`lexdiv_download_resources`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_resources.md)
+for terms and cache setup.
+
 Combine existing profiles into document and summary tables, count
 confirmed unmatched terms, and inspect term normalization. No resource
 lookup, tokenization, annotation, model download, or learner scoring is
@@ -21,7 +25,7 @@ tubelex_diagnostics(x, max_rows = 1e6)
   [`tubelex_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md).
   IDs must be unique, non-empty valid-UTF-8 strings. A single profile
   uses `document_1`. An empty named list is allowed. Profiles must use
-  profile contract 0.2.0 and the currently bundled resource; unsupported
+  profile contract 0.2.0 and the currently cached resource; unsupported
   records must be recreated from their inputs.
 
 - max_rows:
@@ -105,12 +109,15 @@ lookup values.
 
 [`tubelex_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md),
 [`nj8_diagnostics`](https://ryuya-dot-com.github.io/ldfreq/reference/nj8_diagnostics.md);
-[`vignette("vocabulary-knowledge-and-use", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/vocabulary-knowledge-and-use.md)
+[vocabulary knowledge and use
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/vocabulary-knowledge-and-use.html)
 for a worked separation of learner responses and corpus features.
 
 ## Examples
 
 ``` r
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("tubelex"))$available)) {
 profiles <- tubelex_profile_batch(list(
   first = c("Apple", "apple", "zzunmatchedxyz"),
   second = c("the", "zzunmatchedxyz"), blank = character(),
@@ -118,27 +125,7 @@ profiles <- tubelex_profile_batch(list(
 ))
 audit <- tubelex_diagnostics(profiles)
 audit$summary[, c("document_id", "status", "weighting", "coverage", "mean_zipf")]
-#>   document_id        status weighting  coverage mean_zipf
-#> 1       first            ok     token 0.6666667  4.632881
-#> 2       first            ok      type 0.5000000  4.632881
-#> 3      second            ok     token 0.5000000  7.635489
-#> 4      second            ok      type 0.5000000  7.635489
-#> 5       blank         empty     token        NA        NA
-#> 6       blank         empty      type        NA        NA
-#> 7     invalid invalid_input     token        NA        NA
-#> 8     invalid invalid_input      type        NA        NA
 audit$unmatched_terms
-#>   condition_id    lookup_term token_count document_count
-#> 1  condition_1 zzunmatchedxyz           2              2
 audit$normalization_mappings
-#>   condition_id           term    lookup_term matched token_count document_count
-#> 1  condition_1 zzunmatchedxyz zzunmatchedxyz   FALSE           2              2
-#> 2  condition_1          Apple          apple    TRUE           1              1
-#> 3  condition_1          apple          apple    TRUE           1              1
-#> 4  condition_1            the            the    TRUE           1              1
-#>   lookup_changed number_marker
-#> 1          FALSE         FALSE
-#> 2           TRUE         FALSE
-#> 3          FALSE         FALSE
-#> 4          FALSE         FALSE
+}
 ```

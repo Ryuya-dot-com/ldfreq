@@ -4,6 +4,10 @@
 
 - [Getting started with
   ldfreq](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.md):
+- [Choosing a lexical-diversity
+  measure](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.md):
+- [Optional reference data and
+  licenses](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md):
 - [Release scope and
   compatibility](https://ryuya-dot-com.github.io/ldfreq/articles/release-scope.md):
 - [English tokenization and document

@@ -86,8 +86,8 @@ explicit, offline CPU call to a separately cached, commit-pinned Hugging
 Face model with a fast tokenizer. It requires exact target subword
 coverage, skips unknown targets and overlong segments, and computes
 last-layer target means. It does not implement the complete
-sentence-transformers pipeline or WSD. See
-[`vignette("contextual-models", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.md)
+sentence-transformers pipeline or WSD. See [contextual models
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.html)
 for the JSON exchange and validation boundaries. R never invokes it
 implicitly. No model weights, text corpora or new dependencies are
 bundled.
@@ -142,6 +142,4 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
   imported$summary
   imported$occurrences[c("status", "model_status", "has_embedding")]
 }
-#>       status model_status has_embedding
-#> 1 unreviewed    processed          TRUE
 ```

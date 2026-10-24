@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -71,6 +73,19 @@
 
     
     
+<div class="section level2">
+<h2 id="optional-reference-data-setup">Optional reference-data setup<a class="anchor" aria-label="anchor" href="#optional-reference-data-setup"></a>
+</h2>
+<p>The reference-dependent sections use separately licensed data. Review
+<a href="reference-data.html">the resource terms and cache
+instructions</a>, then obtain only the resources needed for the sections
+you will run. Core calculations and examples using your own tables do
+not require these downloads.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># After reviewing each resource's license and notice:</span></span>
+<span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_download_resources</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span><span class="op">)</span>, accept_license <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level2">
 <h2 id="start-with-a-question-and-a-comparison-unit">Start with a question and a comparison unit<a class="anchor" aria-label="anchor" href="#start-with-a-question-and-a-comparison-unit"></a>
 </h2>
@@ -178,7 +193,7 @@ addresses that separate question using paired response data.</p>
 windows of a specified size. A common window makes its local denominator
 explicit. Global TTR supplies a useful contrast: it depends on the full
 document length.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">vocabulary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"river"</span>, <span class="st">"stone"</span>, <span class="st">"tree"</span>, <span class="st">"cloud"</span><span class="op">)</span></span>
@@ -220,7 +235,7 @@ only for documents with poor coverage.</p>
 value. A second common window asks whether the conclusion is sensitive
 to the local scale. Do not pool the scores as interchangeable
 measurements.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mattr_method</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_methods</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">method_id</span><span class="op">[</span></span>
 <span>  <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_methods</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">metric_id</span> <span class="op">==</span> <span class="st">"mattr"</span><span class="op">]</span></span>
 <span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_plan</a></span><span class="op">(</span>presets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, grids <span class="op">=</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_grid</a></span><span class="op">(</span></span>
@@ -258,7 +273,7 @@ perform that inferential analysis.</p>
 strictly below the threshold, without a minimum factor length. It checks
 every token, including the last. The earlier min10 method is preserved
 for reproduction.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mtld_boundary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50L</span>, <span class="fl">51L</span>, <span class="fl">52L</span>, <span class="fl">59L</span>, <span class="fl">60L</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">mtld_boundary</span><span class="op">$</span><span class="va">MTLD</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">mtld_boundary</span><span class="op">$</span><span class="va">N</span>, <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="va">n</span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"mtld"</span><span class="op">)</span><span class="op">$</span><span class="va">value</span></span>
@@ -294,7 +309,7 @@ for remaining differences.</p>
 the 30 authored teaching essays and the empty file distributed with the
 package; replace <code>folder</code> with your own input directory to
 check a study’s documents.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">folder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"text-input"</span>, <span class="st">"texts"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span></span>
 <span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">folder</span>, pattern <span class="op">=</span> <span class="st">"[.]txt$"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">texts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">files</span>, <span class="kw">function</span><span class="op">(</span><span class="va">path</span><span class="op">)</span> <span class="op">{</span></span>
@@ -341,7 +356,7 @@ that MTLD be bounded by <code>N</code>.</p>
 min10 results. It reads the existing diagnostics, so it also works with
 saved results from earlier versions. Other MTLD variants have different
 diagnostics.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mtld_support_table</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">fields</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"forward_score"</span>, <span class="st">"reverse_score"</span>, <span class="st">"forward_complete_factors"</span>,</span>
 <span>    <span class="st">"reverse_complete_factors"</span>, <span class="st">"forward_tail_credit"</span>, <span class="st">"reverse_tail_credit"</span><span class="op">)</span></span>
@@ -464,7 +479,7 @@ criterion.</p>
 metric. Replace <code>tokens</code> with your own prepared documents.
 Keep non-computable values missing and report their count rather than
 treating them as zero.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">length_associations</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">results</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span>, <span class="va">results</span><span class="op">$</span><span class="va">metric_id</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span><span class="op">)</span> <span class="co"># one setting per document/metric</span></span>
@@ -573,7 +588,7 @@ segmentation without changing the final directional mean.</p>
 used for MTLD. Use the same threshold as in the metric calculation. It
 is tutorial code; it does not add fields to package results or change
 the MTLD definition.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mtld_factor_screen</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">threshold</span> <span class="op">=</span> <span class="fl">0.72</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">is.character</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="va">threshold</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">threshold</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1L</span>,</span>
@@ -607,7 +622,7 @@ that direction has no complete factor. Fewer than ten tokens are
 classified separately because the legacy method cannot return a score. A
 screen classification does not replace the metric’s status or establish
 that a text is long enough for a study’s purposes.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">factor_screen</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">tokens</span>, <span class="va">mtld_factor_screen</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">factor_screen</span><span class="op">$</span><span class="va">document_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">tokens</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">factor_screen</span><span class="op">$</span><span class="va">screen</span><span class="op">)</span></span>
@@ -682,7 +697,7 @@ YouTube subtitles, use TUBELEX as a separate corpus-relative measure.
 Its Treebank segmentation is not supplied by the general Unicode
 tokenizer in this package. Prepare and record a compatible external
 pipeline; these hand-prepared terms illustrate only one sentence.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"I"</span>, <span class="st">"do"</span>, <span class="st">"n't"</span>, <span class="st">"think"</span>, <span class="st">"it"</span>, <span class="st">"'s"</span>, <span class="st">"a"</span>, <span class="st">"book"</span><span class="op">)</span></span>
 <span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="va">terms</span><span class="op">)</span></span>
 <span><span class="va">frequency</span><span class="op">$</span><span class="va">summary</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weighting"</span>, <span class="st">"coverage"</span>, <span class="st">"mean_zipf"</span><span class="op">)</span><span class="op">]</span></span>

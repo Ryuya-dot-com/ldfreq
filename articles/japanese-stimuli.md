@@ -19,6 +19,21 @@ values are embedded in this guide. Each real-data chunk below requires
 the specified local files and is not executed during package
 installation.
 
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+lexdiv_resource_info(c("tubelex"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex"), accept_license = TRUE)
+```
+
 ## Fix the frequency table and lexical unit
 
 Use [TUBELEX (Nohejl et al.,
@@ -39,7 +54,7 @@ as `<num>`; the denominator is not recomputed after selecting study
 items or POS. The helper returns `count / total_count * 1e6`,
 `videos / total_videos` and `channels / total_channels`, without
 smoothing. These last two are proportions, unlike the log scores of the
-bundled **English**
+cached **English**
 [`tubelex_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md).
 
 Acquire the frequency file explicitly, once:

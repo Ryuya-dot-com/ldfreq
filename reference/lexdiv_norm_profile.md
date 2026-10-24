@@ -104,7 +104,8 @@ compare unlike scales, form composite scores, or approve a data license.
 
 ## See also
 
-[`vignette("japanese-norms", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.md)
+[japanese norms
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.html)
 for stimulus-item tables, local Japanese norm files, scale
 interpretation and data terms.
 
@@ -149,53 +150,7 @@ profile <- lexdiv_norm_profile(
   resource
 )
 profile$summary
-#>   result_order   resource_id resource_version  measure_id
-#> 1            1 example_norms          2025-01 familiarity
-#> 2            2 example_norms          2025-01 familiarity
-#>             construct_id         value_unit direction language     variety
-#> 1 subjective_familiarity seven_point_rating    higher  English unspecified
-#> 2 subjective_familiarity seven_point_rating    higher  English unspecified
-#>    population_id collection_year                             statistic_id
-#> 1 example_adults            2025 arithmetic_mean_observed_matched_only_v1
-#> 2 example_adults            2025 arithmetic_mean_observed_matched_only_v1
-#>   weighting     type_identity estimate status missing_reason input_units
-#> 1     token              <NA>        6     ok           <NA>           4
-#> 2      type exact_lookup_term        6     ok           <NA>           3
-#>   matched_units unmatched_units observed_value_units
-#> 1             3               1                    2
-#> 2             2               1                    1
-#>   matched_missing_value_units resource_coverage value_coverage
-#> 1                           1         0.7500000      0.5000000
-#> 2                           1         0.6666667      0.3333333
-#>   annotation_coverage
-#> 1           0.6666667
-#> 2           0.5000000
 profile$coverage
-#>   result_order   resource_id resource_version  measure_id weighting input_units
-#> 1            1 example_norms          2025-01 familiarity     token           4
-#> 2            2 example_norms          2025-01 familiarity      type           3
-#>   matched_units unmatched_units observed_value_units
-#> 1             3               1                    2
-#> 2             2               1                    1
-#>   matched_missing_value_units resource_coverage value_coverage
-#> 1                           1         0.7500000      0.5000000
-#> 2                           1         0.6666667      0.3333333
-#>   annotation_coverage
-#> 1           0.6666667
-#> 2           0.5000000
 profile$lookup
-#>   input_index    term  measure_id       lookup_status value       value_status
-#> 1           1    book familiarity    matched_resource     6           observed
-#> 2           2    book familiarity    matched_resource     6           observed
-#> 3           3    rare familiarity    matched_resource    NA missing_annotation
-#> 4           4 unknown familiarity unknown_to_resource    NA not_applicable_oov
 print(profile)
-#> <lexdiv_norm_profile: ok; example_norms@2025-01; 1 measure; 4 lookup rows; schema 0.1.0>
-#>   measure_id weighting estimate status missing_reason resource_coverage
-#>  familiarity     token        6     ok           <NA>         0.7500000
-#>  familiarity      type        6     ok           <NA>         0.6666667
-#>  annotation_coverage
-#>            0.6666667
-#>            0.5000000
-#> Means are conditional on observed matched values; inspect $coverage.
 ```

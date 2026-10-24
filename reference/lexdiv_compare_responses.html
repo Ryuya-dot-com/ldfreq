@@ -13,7 +13,7 @@ automatic response scorer, or validation of the chosen criterion."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,8 @@ automatic response scorer, or validation of the chosen criterion."></head><body>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -161,63 +163,20 @@ Language Assessment Quarterly, 13(4), 377–392.
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Authored demonstration, not learner observations.</span></span></span>
-<span class="r-in"><span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>learner_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"example"</span>, <span class="fl">5</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  item_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>, recognition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  recall <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_compare_responses</span><span class="op">(</span><span class="va">responses</span>,</span></span>
-<span class="r-in"><span>  test <span class="op">=</span> <span class="st">"recognition"</span>, criterion <span class="op">=</span> <span class="st">"recall"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">comparison</span><span class="op">$</span><span class="va">counts</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             outcome n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1      both_correct 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2         test_only 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    criterion_only 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    both_incorrect 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5      missing_test 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 missing_criterion 0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7      missing_both 0</span>
-<span class="r-in"><span><span class="va">comparison</span><span class="op">$</span><span class="va">summary</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                              quantity denominator numerator</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                      agreement_among_complete_pairs           4         2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                      test_only_among_complete_pairs           4         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                 criterion_only_among_complete_pairs           4         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 criterion_failure_among_test_correct_complete_pairs           2         1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                              complete_pair_fraction           5         4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   proportion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       0.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       0.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       0.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5       0.80</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">repeated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">responses</span>, occasion_id <span class="op">=</span> <span class="st">"pre"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">responses</span>, occasion_id <span class="op">=</span> <span class="st">"post"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">lexdiv_compare_responses</span><span class="op">(</span><span class="va">repeated</span>, <span class="st">"recognition"</span>, <span class="st">"recall"</span>,</span></span>
-<span class="r-in"><span>  keys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"learner_id"</span>, <span class="st">"item_id"</span>, <span class="st">"occasion_id"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  by <span class="op">=</span> <span class="st">"occasion_id"</span><span class="op">)</span><span class="op">$</span><span class="va">summary</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    occasion_id                                            quantity denominator</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1          pre                      agreement_among_complete_pairs           4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2          pre                      test_only_among_complete_pairs           4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3          pre                 criterion_only_among_complete_pairs           4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4          pre criterion_failure_among_test_correct_complete_pairs           2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5          pre                              complete_pair_fraction           5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6         post                      agreement_among_complete_pairs           4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7         post                      test_only_among_complete_pairs           4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8         post                 criterion_only_among_complete_pairs           4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9         post criterion_failure_among_test_correct_complete_pairs           2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10        post                              complete_pair_fraction           5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    numerator proportion</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1          2       0.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2          1       0.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3          1       0.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4          1       0.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5          4       0.80</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6          2       0.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7          1       0.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8          1       0.25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9          1       0.50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10         4       0.80</span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Authored demonstration, not learner observations.</span></span>
+<span><span class="va">responses</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>learner_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"example"</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>  item_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"i"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>, recognition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
+<span>  recall <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_compare_responses</span><span class="op">(</span><span class="va">responses</span>,</span>
+<span>  test <span class="op">=</span> <span class="st">"recognition"</span>, criterion <span class="op">=</span> <span class="st">"recall"</span><span class="op">)</span></span>
+<span><span class="va">comparison</span><span class="op">$</span><span class="va">counts</span></span>
+<span><span class="va">comparison</span><span class="op">$</span><span class="va">summary</span></span>
+<span></span>
+<span><span class="va">repeated</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">responses</span>, occasion_id <span class="op">=</span> <span class="st">"pre"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">responses</span>, occasion_id <span class="op">=</span> <span class="st">"post"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">lexdiv_compare_responses</span><span class="op">(</span><span class="va">repeated</span>, <span class="st">"recognition"</span>, <span class="st">"recall"</span>,</span>
+<span>  keys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"learner_id"</span>, <span class="st">"item_id"</span>, <span class="st">"occasion_id"</span><span class="op">)</span>,</span>
+<span>  by <span class="op">=</span> <span class="st">"occasion_id"</span><span class="op">)</span><span class="op">$</span><span class="va">summary</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

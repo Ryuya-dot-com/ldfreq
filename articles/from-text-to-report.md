@@ -62,6 +62,21 @@ Choose the task you need:
 - [Plot local vocabulary diversity](#plot-local-vocabulary-diversity): a
   separate complete example includes its own input text and setup.
 
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+lexdiv_resource_info(c("tubelex", "nj8"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
+```
+
 ## Compare analysis conditions from local files
 
 Start here to turn your own files into a table you can inspect, save and
@@ -657,7 +672,7 @@ stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 #> 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.
 #> 
-#> Calculations used ldfreq 0.4.0.9006: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
+#> Calculations used ldfreq 0.5.0.9001: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
 ```
 
 The CSV is a flat inspection table; **the RDS is the complete analysis
@@ -997,8 +1012,7 @@ block on this restored record to recalculate the original metrics. Keep
 original source files and a recorded software environment as well. CSV
 readers should keep IDs as character strings and reserve `<MISSING>` for
 missing values. The methods text above describes this table step;
-combine it with your actual sampling and calculation methods. This
-executable example has not been tested for usability with novice users.
+combine it with your actual sampling and calculation methods.
 
 ### Return from a study row to its counted occurrences
 
@@ -1111,8 +1125,6 @@ columns to logical. For your own data, replace the input and metadata in
 the earlier file paths, rather than substituting texts into the
 sample-specific PELIC verification script. The missing/withheld and
 repeated-writer cases remain illustrated by the authored examples above.
-Real-data integration and novice usability are separate questions; the
-latter has not yet been evaluated.
 
 ## Question and unit of analysis
 
@@ -1169,7 +1181,7 @@ documents’ windows.
 
 ## Add level coverage without changing the word unit
 
-The bundled NJ8 resource is a representative-lemma list. We deliberately
+The cached NJ8 resource is a representative-lemma list. We deliberately
 request surface-form coverage, so `reads` is looked up as `reads`, not
 silently converted to `read`. This answers a surface-matching question.
 For lemma-based research, explicitly annotate every document with the
@@ -1318,8 +1330,8 @@ design and an appropriate analysis of independent and repeated
 observations.
 
 If the research question also concerns frequency in YouTube subtitles,
-follow
-[`vignette("tubelex-input", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.md).
+follow [tubelex input
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.md).
 Keep that segmentation and its frequency results distinct from the
 surface units selected above.
 
@@ -1417,7 +1429,7 @@ within model building and checking. For this workflow, we keep
 descriptive output separate from inference: these figures do not fit a
 model or generate confidence intervals. Choose the estimand, sampling
 units and dependence structure before using an existing modelling
-package for intervals or predictions. Development 0.4.0.9005 adds a
+package for intervals or predictions. This version includes a
 [mixed-model reporting
 example](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html#report-specified-means-and-one-planned-comparison)
 with explicitly specified means, one contrast, interval method and
@@ -1610,11 +1622,11 @@ path <- tempfile(fileext = ".rds")
 saveRDS(record, path)
 stopifnot(identical(readRDS(path), record))
 unlink(path)
-levels$provenance[c("resource_version", "resource_bundled", "resource_citation")]
+levels$provenance[c("resource_version", "resource_cached", "resource_citation")]
 #> $resource_version
 #> [1] "jacet2016-8000-v1"
 #> 
-#> $resource_bundled
+#> $resource_cached
 #> [1] TRUE
 #> 
 #> $resource_citation
@@ -1626,11 +1638,11 @@ A methods statement for this example could read:
 > We tokenized both texts with the ldfreq English word tokenizer
 > (0.1.0), using NFC normalization and lowercase surface forms. We
 > calculated TTR over each full text and MATTR with a common 10-token
-> window. New JACET 8000 coverage used the bundled jacet2016-8000-v1
-> table with the default NFKC/lowercase lookup normalization and
-> parenthetical aliases. Off-list forms remained in the coverage
-> denominator. We retained the full results, preprocessing records, and
-> R/package session information.
+> window. New JACET 8000 coverage used the explicitly downloaded
+> jacet2016-8000-v1 table with the default NFKC/lowercase lookup
+> normalization and parenthetical aliases. Off-list forms remained in
+> the coverage denominator. We retained the full results, preprocessing
+> records, and R/package session information.
 
 In a real report, include the actual package version, selected
 `method_id`, parameters, document counts, exclusions, task/writer
@@ -1674,9 +1686,7 @@ identifies the software release; `contract_version` identifies the
 metric definitions; `batch_schema_version` identifies the layout of a
 batch result. They are not three interchangeable software versions. Use
 the package version, exact method and settings in the methods section;
-retain contract/schema metadata in the saved RDS for reanalysis. The
-examples are checked as software examples; their usability has not been
-established in a study of novice users.
+retain contract/schema metadata in the saved RDS for reanalysis.
 
 Replace the version placeholder with
 `as.character(packageVersion("ldfreq"))` and describe the actual

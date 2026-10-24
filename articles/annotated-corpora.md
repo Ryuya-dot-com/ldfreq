@@ -629,10 +629,10 @@ or alter TTR, MATTR or MTLD.
 
 For teacher preparation, the [DDL material
 example](https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.md)
-(development 0.4.0.9004 or later) uses an explicit subset of accepted
-occurrences to create learner HTML, a separate teacher table and a
-complete private record. It retains pending candidates and does not
-change this review’s criterion.
+(development 0.5.0.9001) uses an explicit subset of accepted occurrences
+to create learner HTML, a separate teacher table and a complete private
+record. It retains pending candidates and does not change this review’s
+criterion.
 
 ``` r
 phrase_record <- list(before = phrase_saved, after = phrase_after,
@@ -1079,7 +1079,7 @@ Follow the **Adjacent n-gram frequency profiles** guide to build a local
 reference with explicit source metadata and denominators. A
 preprocessing ID is a declaration of comparable rules, not proof that an
 unrelated tokenizer is compatible. MASC Penn tokens, quanteda word4
-tokens and the bundled TUBELEX tokenization must not be silently treated
+tokens and the cached TUBELEX tokenization must not be silently treated
 as the same tokenization.
 
 Save source evidence with the analysis:
@@ -1160,7 +1160,7 @@ file import. These functions do not yet provide a validated standard
 MASC/OANC frequency resource.
 
 Once inputs have been validated,
-[`lexdiv_ngram_reference_build()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md)
+[`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md)
 can accumulate references in whole-document chunks. This avoids
 retaining every occurrence table, while counts and the document roster
 remain in memory. See the [n-gram

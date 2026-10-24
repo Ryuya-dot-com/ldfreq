@@ -25,7 +25,7 @@ units.
 
 Work through the examples in order in a fresh R session. Use the
 [documented
-installation](https://ryuya-dot-com.github.io/ldfreq/index.html#installation).
+installation](https://ryuya-dot-com.github.io/ldfreq/index.html#install).
 The counting examples run offline in R; their displayed tables use
 `knitr` (install it once with `install.packages("knitr")` if needed).
 The final KWIC exercise also requires the optional `quanteda` package
@@ -53,6 +53,21 @@ The functions loaded into `recipes` are explicitly sourced example
 helpers, not exported package APIs. They reuse complete imported
 annotations and declared reference tables; they do not run a
 morphological analyzer.
+
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+lexdiv_resource_info(c("morpholex", "bnccoca", "morphynet"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("morpholex", "bnccoca", "morphynet"), accept_license = TRUE)
+```
 
 ## What changes when words are counted as families?
 
@@ -103,11 +118,11 @@ source occurrences. A family can contain derivational relatives; a lemma
 or flemma is a different counting unit. An inventory specifies which
 relatives are included.
 
-The bundled Nation BNC/COCA Level 6, Version 1.0.0 inventory does
-**not** list `REUSABILITY`. Therefore, the second document has an
-unavailable whole-document family total and TTR, even though a
-researcher could define another inventory that includes it in USE. Empty
-documents have zero types and undefined TTR.
+The cached Nation BNC/COCA Level 6, Version 1.0.0 inventory does **not**
+list `REUSABILITY`. Therefore, the second document has an unavailable
+whole-document family total and TTR, even though a researcher could
+define another inventory that includes it in USE. Empty documents have
+zero types and undefined TTR.
 
 ### Check coverage before interpreting a smaller count
 
@@ -159,7 +174,7 @@ Nation’s inclusion **Level 6** is not frequency **band 6**. Nor does
 family membership establish that a learner knows every member. The
 inventory and its CC BY-SA 4.0 attribution/ShareAlike terms are retained
 in `nation`; see the [resource
-details](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#use-nations-bundled-bnccoca-inventory).
+details](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#use-nations-cached-bnccoca-inventory).
 
 ## Which roots and affixes occur in the text?
 
@@ -330,18 +345,17 @@ analysis is complete only within its declared scope. The MorphoLex
 adapter preserves unsupported entries as unanalysed and records
 requested forms missing from the selected sheets.
 
-The bundled MorphoLex-en data use **CC BY-NC-SA 4.0**. Retain their
+The cached MorphoLex-en data use **CC BY-NC-SA 4.0**. Retain their
 citation and noncommercial/ShareAlike conditions when using or adapting
 them. See the [MorphoLex
-guide](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#use-the-bundled-morpholex-reference)
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/preprocessing-and-frequency.html#use-the-cached-morpholex-reference)
 for source variables, provenance and an optional local-workbook route.
 
 ### Keep alternative formation relations separate
 
 ``` r
-morphynet <- morphynet_read_derivations(system.file("extdata",
-  "morphynet-example", "eng.derivational.example.tsv", package = "ldfreq",
-  mustWork = TRUE), language = "en", resource_version = "Nine-row teaching excerpt")
+morphynet <- morphynet_read_derivations(file.path(lexdiv_resource_info("morphynet")$path,
+  "extdata", "morphynet-example", "eng.derivational.example.tsv"), language = "en", resource_version = "Nine-row teaching excerpt")
 r <- morphynet$relations
 knitr::kable(r[r$target_word == "reusability",
   c("source_word", "target_word", "morpheme", "affix_position")], row.names = FALSE)

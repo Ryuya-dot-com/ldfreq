@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,6 +19,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -42,6 +44,17 @@
       <small>Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.0.9001" id="ldfreq-0509001">ldfreq 0.5.0.9001<a class="anchor" aria-label="anchor" href="#ldfreq-0509001"></a></h2>
+<ul><li>Separate optional TUBELEX, NJ8, MorphoLex, BNC/COCA and MorphyNet reference data from the MIT package code. Review terms with <code><a href="../reference/lexdiv_resources.html">lexdiv_resource_info()</a></code> and explicitly obtain selected, versioned resources with <code>lexdiv_download_resources(..., accept_license = TRUE)</code>. Downloads and cached files are SHA-256 verified; installation and calculations never download data implicitly. Existing resource-based calls need this one-time setup. Core lexical-diversity calculations need no reference download.</li>
+<li>Add opt-in <code>mtld_ma</code>: forward moving-average MTLD with strict threshold crossing, complete factors of at least ten tokens, and no fractional tail. The eleven default metrics and existing MTLD definition are unchanged.</li>
+<li>Add a metric-selection guide with a 2,786-essay PELIC analysis, controlled 50–200-token comparisons, writer-cluster bootstrap intervals, and sampling reliability from disjoint blocks. Compare five measures against actual koRpus calls on 202 essays. Publish aggregate results and reproduction code.</li>
+<li>Extend the evidence to ICNALE, OANC and BAWE: 16,730 documents in the 50/100-token comparison, 2,833 in the 200/500/1,000-token comparison, and 2,556 ICNALE writers in the two-task comparison. Report linked-cluster uncertainty, missingness and genre/discipline strata. Add 182 real-block koRpus comparisons and document its MATTR N-equals-window boundary difference.</li>
+<li>Use the consistent names <code><a href="../reference/lexdiv_ngram_compare.html">lexdiv_compare_ngrams()</a></code>, <code><a href="../reference/lexdiv_ngram_reference_build.html">lexdiv_build_ngram_reference()</a></code>, <code><a href="../reference/lexdiv_profile.html">lexdiv_screen_lengths()</a></code> and <code><a href="../reference/lexdiv_concordance.html">lexdiv_sort_concordance()</a></code>. The previous names remain exact aliases; arguments and saved results are unchanged.</li>
+<li>Reject classed and dimensional inputs that could previously pass scalar or plain-column checks in MTLD options, concordance, collocation, study tables and MorphoLex selection. Preserve structured <code>invalid_input</code> results for invalid core token vectors and intended categorical metadata.</li>
+<li>Reject ambiguous selected columns in <code><a href="../reference/lexdiv_convenience.html">lexdiv_as_documents()</a></code> and return named empty documents that both metric and profile batches accept. Validate raw-text batch arguments even when there are no documents; <code>plan</code> and <code>max_rows</code> remain unsupported on this path. TUBELEX now returns structured <code>resource_error</code> results for missing or damaged cache manifests as well as data files, including in batch calls.</li>
+<li>Shorten the README, align all guides to one fixed installation version, and add version-specific R and GitHub citation records. The metric-selection guide distinguishes the evaluated English sampling conditions, length-effect intervals, and computational minimum lengths from individual-score precision.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0.9006" id="ldfreq-0409006">ldfreq 0.4.0.9006<a class="anchor" aria-label="anchor" href="#ldfreq-0409006"></a></h2>
 <ul><li>Call <code><a href="../reference/lexdiv_study_table.html">lexdiv_study_table()</a></code> and <code><a href="../reference/lexdiv_study_table.html">lexdiv_study_model_data()</a></code> directly to retain planned observations, submitted documents, measurement specifications and model-row exclusions, without sourcing a helper or fitting a model.</li>

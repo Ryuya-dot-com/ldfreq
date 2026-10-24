@@ -1,7 +1,12 @@
 # Coverage-aware TUBELEX frequency and prevalence profile
 
+Reference snapshots require a prior explicit download; see
+[`lexdiv_download_resources`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_resources.md)
+for terms and cache setup.
+
 Look up surface-form frequency, video prevalence, and channel prevalence
-in the byte-pinned TUBELEX-EN Treebank aggregate bundled with ldfreq.
+in the byte-pinned TUBELEX-EN Treebank aggregate downloaded separately
+for ldfreq.
 
 ## Usage
 
@@ -79,7 +84,7 @@ print(x, ...)
 
 The general-purpose
 [`lexdiv_tokenize()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md)
-tokenizer retains contractions such as `don't`, whereas the bundled
+tokenizer retains contractions such as `don't`, whereas the cached
 resource uses Treebank units such as `do` and `n't`. A spelling can
 match a resource entry even when segmentation is inappropriate: 100
 percent coverage does not verify alignment. Do not extract the surface
@@ -107,7 +112,7 @@ processing speed or appropriate contextual use.
 
 ## Locales and resource failures
 
-The bundled CSV is decoded as UTF-8 independently of `LC_CTYPE`. C/POSIX
+The cached CSV is decoded as UTF-8 independently of `LC_CTYPE`. C/POSIX
 sessions can use ASCII or explicitly UTF-8-encoded query terms. An
 accented character may be displayed with a Unicode escape in a C console
 even though its bytes and lookup result are correct.
@@ -184,11 +189,19 @@ contract.
 `status = "ok"` means a non-empty valid input was looked up
 successfully; `"empty"` means a valid zero-term input produced typed
 empty output; `"invalid_input"` means the supplied terms failed
-validation; and `"resource_error"` means the bundled resource failed an
+validation; and `"resource_error"` means the cached resource failed an
 availability or integrity check. `failure_reason` is missing for `"ok"`
 and `"empty"`, and otherwise gives the specific failure reason. Coverage
 is missing when its denominator is zero or the lookup could not be
-completed.
+completed. Missing cache files return
+`failure_reason = "resource_unavailable"`; changed manifest or data
+bytes return `"hash_mismatch"`. This applies to both single-document and
+batch calls. Inspect `lexdiv_resource_info("tubelex")` and its license
+before explicitly calling
+`lexdiv_download_resources("tubelex", accept_license = TRUE)`. An
+incomplete or modified version directory must be removed explicitly
+before downloading it again. Profile calls never download or repair
+files implicitly.
 
 ## References
 
@@ -216,90 +229,25 @@ returns a named empty list.
 [`lexdiv_tokenize`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md),
 [`lexdiv_metrics_text`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md),
 [`tubelex_diagnostics`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_diagnostics.md);
-[`vignette("getting-started", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.md)
-for batch profiles;
-[`vignette("tubelex-input", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.md)
+[getting started
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html)
+for batch profiles; [tubelex input
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.html)
 for the optional external tokenization recipe and its reproducibility
 boundaries.
 
 ## Examples
 
 ``` r
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("tubelex"))$available)) {
 # Explicit illustrative Treebank units; no automatic tokenization is implied.
 tokens <- c("I", "do", "n't", "think", "it", "'s", "John", "'s", "book")
 profile <- tubelex_profile(tokens)
 profile$summary
-#>   weighting eligible_items matched_items coverage mean_zipf   sd_zipf
-#> 1     token              9             9        1  6.601118 0.7946027
-#> 2      type              8             8        1  6.533295 0.8211448
-#>   mean_video_prevalence mean_channel_prevalence
-#> 1            -0.3360080               -0.345417
-#> 2            -0.3712797               -0.376663
 profile$coverage
-#> $input_tokens
-#> [1] 9
-#> 
-#> $input_types
-#> [1] 8
-#> 
-#> $eligible_tokens
-#> [1] 9
-#> 
-#> $eligible_types
-#> [1] 8
-#> 
-#> $matched_tokens
-#> [1] 9
-#> 
-#> $unmatched_tokens
-#> [1] 0
-#> 
-#> $matched_types
-#> [1] 8
-#> 
-#> $unmatched_types
-#> [1] 0
-#> 
-#> $token_coverage
-#> [1] 1
-#> 
-#> $type_coverage
-#> [1] 1
-#> 
 profile$lookup
-#>   query_index  term lookup_term matched resource_word   count videos channels
-#> 1           1     I           i    TRUE             i 3794340  83952    50926
-#> 2           2    do          do    TRUE            do 1105372  78492    48095
-#> 3           3   n't         n't    TRUE           n't  909491  72651    44756
-#> 4           4 think       think    TRUE         think  438105  51625    32474
-#> 5           5    it          it    TRUE            it 2917104  95070    56204
-#> 6           6    's          's    TRUE            's 2400420  93407    54909
-#> 7           7  John        john    TRUE          john   21926   6320     4743
-#> 8           8    's          's    TRUE            's 2400420  93407    54909
-#> 9           9  book        book    TRUE          book   56208  12058     8921
-#>       zipf video_prevalence channel_prevalence
-#> 1 7.342551      -0.10018255        -0.12815245
-#> 2 6.806923      -0.12938784        -0.15299159
-#> 3 6.722213      -0.16297120        -0.18423958
-#> 4 6.404994      -0.31135029        -0.32355139
-#> 5 7.228367      -0.04617071        -0.08532559
-#> 6 7.143702      -0.05383470        -0.09544910
-#> 7 5.104394      -1.22343298        -1.15895586
-#> 8 7.143702      -0.05383470        -0.09544910
-#> 9 5.513220      -0.94290747        -0.88463833
 profile$provenance$formula_parameters
-#> $token_total
-#> [1] 171805865
-#> 
-#> $source_vocabulary_size
-#> [1] 613309
-#> 
-#> $video_total
-#> [1] 105733
-#> 
-#> $channel_total
-#> [1] 68405
-#> 
 
 contract_files <- c(
   "tubelex-frequency-profile-contract.json",
@@ -308,6 +256,5 @@ contract_files <- c(
 contract_paths <- system.file("spec", contract_files, package = "ldfreq")
 stopifnot(all(nzchar(contract_paths)))
 basename(contract_paths)
-#> [1] "tubelex-frequency-profile-contract.json"
-#> [2] "lexical-resource-lookup-contract.json"  
+}
 ```

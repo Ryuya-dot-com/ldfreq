@@ -45,7 +45,7 @@ transcripts. Select speaker/turn boundaries and handle transcription
 markup before tokenization. Do not join unrelated documents to make them
 long enough for a metric. For other languages, supply an appropriate
 external segmentation and prepared lookup terms; this English tokenizer
-and the bundled English resources are not evidence of multilingual
+and the cached English resources are not evidence of multilingual
 validation.
 
 ## Describe the reference table, variables and population
@@ -112,7 +112,7 @@ interface can use documented frequency measures, but record their units,
 reference corpus, denominator and transformations. A per-million
 frequency, a log frequency and a Zipf value are not interchangeable. For
 another source, make a separate call with its own resource record. The
-bundled TUBELEX adapter additionally verifies its fixed resource; this
+cached TUBELEX adapter additionally verifies its fixed resource; this
 generic function records caller assertions and does not fingerprint or
 authenticate the supplied table.
 

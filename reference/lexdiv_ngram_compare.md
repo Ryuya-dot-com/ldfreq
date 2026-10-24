@@ -1,5 +1,8 @@
 # Compare N-gram References on the Same Target Items
 
+`lexdiv_compare_ngrams()` is the canonical name;
+`lexdiv_ngram_compare()` remains a compatibility alias.
+
 Applies multiple reference frequency tables to one unchanged target
 extraction. Reports each reference's coverage and available-value mean,
 then compares rates on the items with defined values in every reference.
@@ -10,6 +13,8 @@ arithmetic without re-extracting target tokens.
 ## Usage
 
 ``` r
+lexdiv_compare_ngrams(x, references, baseline = NULL, max_rows = 1e6)
+
 lexdiv_ngram_compare(x, references, baseline = NULL, max_rows = 1e6)
 ```
 
@@ -149,14 +154,4 @@ partial <- lexdiv_ngram_reference(counts[1, ], resource, totals, "authored-v1", 
 compared <- lexdiv_ngram_compare(target, list(full = full, partial = partial))
 compared$summary[c("reference_id", "weighting", "value_coverage",
   "mean_frequency_per_million", "common_coverage", "difference_from_baseline")]
-#>   reference_id weighting value_coverage mean_frequency_per_million
-#> 1         full     token            1.0                      3e+05
-#> 2         full      type            1.0                      3e+05
-#> 3      partial     token            0.5                      6e+05
-#> 4      partial      type            0.5                      6e+05
-#>   common_coverage difference_from_baseline
-#> 1             0.5                        0
-#> 2             0.5                        0
-#> 3             0.5                        0
-#> 4             0.5                        0
 ```

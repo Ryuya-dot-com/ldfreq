@@ -13,7 +13,7 @@ are not silently compared."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,8 @@ are not silently compared."></head><body>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -222,7 +224,10 @@ are not silently compared.</p>
 appearance while preserving row order within each document. A <span class="pkg">quanteda</span>
 tokens object is converted through its registered <code><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list()</a></code> method, so
 <span class="pkg">ldfreq</span> does not add a runtime dependency on <span class="pkg">quanteda</span>. Raw text is
-not tokenized by this adapter.</p>
+not tokenized by this adapter.
+Each selected ID or token column must occur exactly once. Empty lists and
+zero-row token tables return the same named empty list, accepted by both
+<code><a href="lexdiv_metrics.html">lexdiv_metrics_batch()</a></code> and <code><a href="lexdiv_profile.html">lexdiv_profile_batch()</a></code>.</p>
 <p><code>lexdiv_widen()</code> uses profile <code>request_id</code> values when available,
 and checks that every output column has one contract, method, and requested
 parameter identity. A request ID is only a plan-local label; combining plans
@@ -282,44 +287,34 @@ invisibly.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">tidy_tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"b"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"one"</span>, <span class="st">"two"</span>, <span class="st">"three"</span>, <span class="st">"three"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_as_documents</span><span class="op">(</span><span class="va">tidy_tokens</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">long</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span><span class="va">documents</span>, metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"maas"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">lexdiv_widen</span><span class="op">(</span><span class="va">long</span>, values_from <span class="op">=</span> <span class="st">"value"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_wide_results: 2 rows; 3 columns&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id ttr     maas</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1           a 1.0 0.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2           b 0.5 1.442695</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># A short constructed example exposes support; it is not a reliability example.</span></span></span>
-<span class="r-in"><span><span class="va">supported</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  one_tail <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span>, <span class="st">"a"</span>, <span class="st">"a"</span><span class="op">)</span>, empty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"mtld"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">wide</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_widen</span><span class="op">(</span><span class="va">supported</span>, values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"N"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  mtld_diagnostics <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">wide</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"mtld__value"</span>, <span class="st">"mtld__status"</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"mtld__tail_only"</span>, <span class="st">"mtld__gap_pct"</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_wide_results: 2 rows; 5 columns&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   document_id mtld__value mtld__status mtld__tail_only mtld__gap_pct</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    one_tail          12           ok            TRUE      33.33333</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       empty          NA      missing              NA            NA</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">long</span>, metric_id <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="lexdiv_convenience-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">long</span>, metric_id <span class="op">=</span> <span class="st">"ttr"</span>, monochrome <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="lexdiv_convenience-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">text_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_metrics_text</a></span><span class="op">(</span><span class="st">"Words repeat words."</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">text_result</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="lexdiv_convenience-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"the"</span>, <span class="st">"not-in-resource"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="lexdiv_convenience-4.png" alt="" width="700" height="433"></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Optional data: review and explicitly download these resources first.</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">available</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">tidy_tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"b"</span><span class="op">)</span>,</span>
+<span>  token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"one"</span>, <span class="st">"two"</span>, <span class="st">"three"</span>, <span class="st">"three"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_as_documents</span><span class="op">(</span><span class="va">tidy_tokens</span><span class="op">)</span></span>
+<span><span class="va">long</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span><span class="va">documents</span>, metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"maas"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">lexdiv_widen</span><span class="op">(</span><span class="va">long</span>, values_from <span class="op">=</span> <span class="st">"value"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># A short constructed example exposes support; it is not a reliability example.</span></span>
+<span><span class="va">supported</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  one_tail <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span>, <span class="st">"a"</span>, <span class="st">"a"</span><span class="op">)</span>, empty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span>, metrics <span class="op">=</span> <span class="st">"mtld"</span><span class="op">)</span></span>
+<span><span class="va">wide</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_widen</span><span class="op">(</span><span class="va">supported</span>, values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
+<span>  mtld_diagnostics <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">wide</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"mtld__value"</span>, <span class="st">"mtld__status"</span>,</span>
+<span>  <span class="st">"mtld__tail_only"</span>, <span class="st">"mtld__gap_pct"</span><span class="op">)</span><span class="op">]</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">long</span>, metric_id <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">long</span>, metric_id <span class="op">=</span> <span class="st">"ttr"</span>, monochrome <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">text_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="lexdiv_preprocessing.html">lexdiv_metrics_text</a></span><span class="op">(</span><span class="st">"Words repeat words."</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">text_result</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"the"</span>, <span class="st">"not-in-resource"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

@@ -1,18 +1,15 @@
 # NA
 
-The MIT license below applies to the original ldfreq code and
-documentation. Bundled third-party materials retain their own terms:
-TUBELEX data and adapted example code use BSD-3-Clause; the New JACET
-8000 table is redistributed with JACET’s permission and source
-attribution. MorphoLex-en data and its data dictionary use CC BY-NC-SA
-4.0: noncommercial use, attribution and applicable ShareAlike
-conditions. The complete package therefore includes material with use
-restrictions, while the independent R code remains MIT licensed.
-Nation’s BNC/COCA Level 6 word-family lists and their conversion use CC
-BY-SA 4.0, with attribution and ShareAlike conditions. The nine-row
-MorphyNet example and source mapping use CC BY-SA 3.0. See
-[COPYRIGHTS](https://github.com/Ryuya-dot-com/ldfreq/blob/main/inst/COPYRIGHTS)
-and the notices under `inst/licenses/` for their sources and terms.
+The original ldfreq code, documentation and authored examples are MIT
+licensed. The adapted TUBELEX tokenizer example retains BSD-3-Clause
+attribution in [its
+notice](https://github.com/Ryuya-dot-com/ldfreq/blob/v0.5.0.9001/inst/licenses/tubelex/NOTICE.md).
+
+Third-party reference datasets are not included in this package.
+Optional downloads retain their separate source terms; see the
+[reference-data
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.html).
+The package’s MIT license does not license those datasets.
 
 MIT License
 

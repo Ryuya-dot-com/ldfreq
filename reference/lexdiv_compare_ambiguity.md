@@ -106,7 +106,8 @@ A plain list with:
 ## See also
 
 [`lexdiv_ambiguity_review`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ambiguity_review.md),
-[`vignette("ambiguity-review", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.md)
+[ambiguity review
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.html)
 
 ## Examples
 
@@ -135,6 +136,4 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
   comparison$summary # No pair has two selections: agreement is undefined.
   comparison$review_queue[c("surface", "a_status", "b_status", "outcome")]
 }
-#>   surface a_status   b_status         outcome
-#> 1    bank selected unresolved selected_a_only
 ```

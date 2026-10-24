@@ -1,5 +1,20 @@
 # Understanding unmatched words and lexical-unit choices
 
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+lexdiv_resource_info(c("nj8"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("nj8"), accept_license = TRUE)
+```
+
 ## Begin with the question
 
 A teacher wants to describe how much vocabulary in student essays
@@ -9,7 +24,7 @@ compared with the list. NJ8 contains representative headwords; surface
 forms and dictionary lemmas can produce different coverage. These
 authored sentences make that choice visible. Run the examples in order
 after the [documented
-installation](https://ryuya-dot-com.github.io/ldfreq/index.html#installation).
+installation](https://ryuya-dot-com.github.io/ldfreq/index.html#install).
 The authored annotation examples need no optional package or external
 model.
 
@@ -488,7 +503,7 @@ Flemma-based scores and changed segmentation require a separate
 extension.
 
 The fixed conditions are surface/all, lemma/all and lemma/content, with
-TTR and MATTR and the bundled NJ8 table. Inspect `settings` before
+TTR and MATTR and the cached NJ8 table. Inspect `settings` before
 adapting these choices. No general-purpose public function is added.
 Keep participant/task metadata separately and join by unique document
 ID. `before` and `after` are versions, not independent raters or

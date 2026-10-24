@@ -1,0 +1,93 @@
+# Optional reference data and licenses
+
+## Install the code, then choose the data
+
+**ldfreq’s code is MIT licensed and its installation contains no
+third-party reference datasets.** Core lexical-diversity measures, your
+own reference tables, concordances and study tables work without
+downloading these resources. The adapted TUBELEX tokenizer example
+retains its BSD-3-Clause code notice.
+
+| Resource name | Use | Separate terms | Download |
+|----|----|----|----|
+| `tubelex` | English frequency/prevalence profiles | BSD-3-Clause | 2.56 MB |
+| `nj8` | New JACET 8000 rank/level profiles | JACET permission and attribution | 0.05 MB |
+| `morpholex` | English morphological worksheets | CC BY-NC-SA 4.0 | 1.34 MB |
+| `bnccoca` | Nation’s Level 6 word families | CC BY-SA 4.0 | 0.52 MB |
+| `morphynet` | Nine example derivational relations | CC BY-SA 3.0 | 0.01 MB |
+
+The terms apply to the corresponding data. For example, obtaining
+MorphoLex through a separate download does not remove its noncommercial
+restriction. Installing or using the independent MIT code does not
+require MorphoLex.
+
+## Inspect first, download explicitly
+
+``` r
+lexdiv_resource_info("morpholex")[c("resource", "version", "license",
+  "license_url", "notice_url", "download_bytes")]
+#>    resource  version         license
+#> 1 morpholex 5bc425fb CC-BY-NC-SA-4.0
+#>                                          license_url
+#> 1 https://creativecommons.org/licenses/by-nc-sa/4.0/
+#>                                                                                   notice_url
+#> 1 https://github.com/Ryuya-dot-com/ldfreq/blob/v0.4.0.9006/inst/licenses/morpholex/NOTICE.md
+#>   download_bytes
+#> 1        1336656
+```
+
+Open the license and notice links and confirm that the terms fit your
+intended use. Select only the resources you need. No download happens
+unless you make this call with `accept_license = TRUE`:
+
+``` r
+lexdiv_download_resources("tubelex", accept_license = TRUE)
+# Or select several resources after reviewing each one's terms:
+lexdiv_download_resources(c("nj8", "bnccoca"), accept_license = TRUE)
+```
+
+The downloader verifies the fixed archive and every member before making
+the cache available. Normal reads verify the required file and do not
+contact the network. A previously verified resource is reused.
+
+``` r
+tubelex_profile(c("student", "learn", "unfamiliar"))
+nj8_profile(c("student", "learn", "unfamiliar"))
+morpholex_data(sheets = "All roots")  # requires the separate morpholex resource
+bnccoca_data()
+```
+
+## Choose a cache location or work offline
+
+``` r
+options(ldfreq.resource_dir = "/path/to/my/reference-cache")
+lexdiv_download_resources("tubelex", accept_license = TRUE)
+lexdiv_resource_info("tubelex")
+```
+
+Alternatively set `LDFREQ_RESOURCE_DIR` before starting R. Without
+either setting, the cache is under
+`tools::R_user_dir("ldfreq", "cache")`. It sits outside the package
+library, so reinstalling the package does not erase it. A different
+pinned resource version gets a different subdirectory.
+
+For an offline computer, copy the complete cache from a machine where
+you explicitly obtained it under the applicable terms, then select that
+cache location. Include the license and provenance files. A partial or
+modified cache is rejected. Inspect the returned `path`, remove that
+specific version directory if you intend to replace it, and explicitly
+download again.
+
+## Update from 0.4.x
+
+Earlier versions bundled these snapshots. In 0.5.0.9001 their data bytes
+and resource identities are unchanged, but they are stored separately.
+Calls such as
+[`nj8_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/nj8_profile.md)
+without a supplied word list now require the explicit cache setup above.
+Existing saved results remain readable. Caller-supplied word lists and
+reference tables continue to work without downloads.
+
+Record the resource version, source hash, coverage and citation with
+your results. `citation("ldfreq")` cites the package; it does not
+replace citations for the data and measurement methods.

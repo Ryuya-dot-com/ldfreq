@@ -10,13 +10,13 @@ Source:
 [`inst/CITATION`](https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/inst/CITATION)
 
 Komuro R (2026). *ldfreq: Reproducible Lexical Diversity and Frequency
-Profiles*. R package version 0.4.0.9006,
-<https://github.com/Ryuya-dot-com/ldfreq>.
+Profiles*. R package version 0.5.0.9001,
+<https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.5.0.9001>.
 
     @Manual{,
       title = {ldfreq: Reproducible Lexical Diversity and Frequency Profiles},
       author = {Ryuya Komuro},
       year = {2026},
-      note = {R package version 0.4.0.9006},
-      url = {https://github.com/Ryuya-dot-com/ldfreq},
+      note = {R package version 0.5.0.9001},
+      url = {https://github.com/Ryuya-dot-com/ldfreq/releases/tag/v0.5.0.9001},
     }

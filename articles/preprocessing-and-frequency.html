@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -73,6 +75,19 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="optional-reference-data-setup">Optional reference-data setup<a class="anchor" aria-label="anchor" href="#optional-reference-data-setup"></a>
+</h2>
+<p>The reference-dependent sections use separately licensed data. Review
+<a href="reference-data.html">the resource terms and cache
+instructions</a>, then obtain only the resources needed for the sections
+you will run. Core calculations and examples using your own tables do
+not require these downloads.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span>, <span class="st">"nj8"</span>, <span class="st">"morpholex"</span>, <span class="st">"bnccoca"</span>, <span class="st">"morphynet"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># After reviewing each resource's license and notice:</span></span>
+<span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_download_resources</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span>, <span class="st">"nj8"</span>, <span class="st">"morpholex"</span>, <span class="st">"bnccoca"</span>, <span class="st">"morphynet"</span><span class="op">)</span>, accept_license <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level2">
 <h2 id="what-ldfreq-adds-to-the-r-ecosystem">What <code>ldfreq</code> adds to the R ecosystem<a class="anchor" aria-label="anchor" href="#what-ldfreq-adds-to-the-r-ecosystem"></a>
 </h2>
@@ -140,7 +155,7 @@ Their empirical best-performing choice in one English/French study
 should not be converted into a universal software default.
 <code>ldfreq</code> therefore exposes the alternatives and their
 coverage.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tokenization</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span><span class="st">"Cats and cat ran run."</span><span class="op">)</span></span>
 <span><span class="va">annotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_preprocessing.html">lexdiv_lemmatize</a></span><span class="op">(</span></span>
 <span>  <span class="va">tokenization</span>,</span>
@@ -188,7 +203,7 @@ diversity formula is selected.</p>
 <p>The same annotation boundary supports type-set overlap. A second text
 must be tokenized and annotated explicitly; <code>ldfreq</code> does not
 guess its UPOS tags or lemmas.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_preprocessing.html">lexdiv_lemmatize</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span><span class="st">"Cats and birds ran."</span><span class="op">)</span>,</span>
 <span>  lemmas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cat"</span>, <span class="st">"and"</span>, <span class="st">"bird"</span>, <span class="st">"run"</span><span class="op">)</span>,</span>
@@ -267,7 +282,7 @@ to one reference vocabulary, pairwise Jaccard or Dice values introduce
 the wrong denominator. <code><a href="../reference/lexdiv_reference_coverage.html">lexdiv_reference_coverage()</a></code> instead
 retains both the number of matched document items and the full document
 denominator.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">coverage_documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  essay_a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cat"</span>, <span class="st">"cat"</span>, <span class="st">"run"</span>, <span class="st">"rare"</span><span class="op">)</span>,</span>
 <span>  essay_b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bird"</span>, <span class="st">"run"</span>, <span class="st">"unknown"</span><span class="op">)</span></span>
@@ -317,7 +332,7 @@ supplied by the analyst. The payload is never bundled or downloaded.
 Unknown forms use normalized-surface identity fallback so they remain
 visible as off-list items, and explicit overrides take precedence over
 the raw AntBNC mapping.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">antbnc_fixture</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".txt"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/writeLines.html" class="external-link">writeLines</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -386,7 +401,7 @@ form–family table and complete <code><a href="../reference/lexdiv_import_annot
 output. It needs no corpus download, Python, model or additional
 dependency. This offline example contains <strong>authored
 decisions</strong>, not verified entries from Nation’s lists:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">family_env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"word-families.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
 <span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">family_env</span><span class="op">)</span></span>
@@ -429,7 +444,7 @@ illustration, not a recommended setting for research.</p>
 has two candidate families and <code>quux</code> is unlisted. Neither is
 silently assigned a family, and complete family types/TTR are
 <code>NA</code>. Inspect original context and both candidates:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">families</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="va">families</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">status</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ambiguous"</span>, <span class="st">"unlisted"</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"token_index"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;   document_id segment_id token_index   pre keyword   post    status</span></span>
@@ -445,7 +460,7 @@ silently assigned a family, and complete family types/TTR are
 <span><span class="co">#&gt; 2    complete       USE        uses        uses 1</span></span>
 <span><span class="co">#&gt; 3    complete       USE reusability reusability 1</span></span></code></pre></div>
 <div class="section level4">
-<h4 id="use-nations-bundled-bnccoca-inventory">Use Nation’s bundled BNC/COCA inventory<a class="anchor" aria-label="anchor" href="#use-nations-bundled-bnccoca-inventory"></a>
+<h4 id="use-nations-cached-bnccoca-inventory">Use Nation’s cached BNC/COCA inventory<a class="anchor" aria-label="anchor" href="#use-nations-cached-bnccoca-inventory"></a>
 </h4>
 <p><code><a href="../reference/bnccoca_data.html">bnccoca_data()</a></code> returns Nation’s <strong>Level 6, Version
 1.0.0</strong> family lists under <strong>CC BY-SA 4.0</strong>,
@@ -455,7 +470,7 @@ families; each of the 25 frequency/range bands contains 1,000 families.
 The source is <a href="https://www.wgtn.ac.nz/lals/resources/paul-nations-resources/vocabulary-analysis-programs" class="external-link">Nation’s
 official resource page</a>. The source spellings and memberships are
 preserved, including uppercase keys.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"bnccoca-families.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
 <span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">family_env</span><span class="op">)</span></span>
 <span><span class="va">nation</span> <span class="op">&lt;-</span> <span class="va">family_env</span><span class="op">$</span><span class="va">bnccoca_example</span></span>
@@ -483,7 +498,7 @@ though the earlier authored example assigns it to USE. Complete family
 types and TTR therefore remain <code>NA</code>. Inspect the original
 KWIC, rather than inventing a family or interpreting noncoverage as an
 error:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nation</span><span class="op">$</span><span class="va">profile</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="va">nation</span><span class="op">$</span><span class="va">profile</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="st">"unlisted"</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;   document_id  pre     keyword post   status</span></span>
@@ -508,7 +523,7 @@ frequency bands. Membership in a proper-name list does not label the use
 of that string in context. Placeholder slots 26–30 and Range software
 are excluded. Any explicit combination with the core dictionary needs
 its own declared scope and candidate checks. See
-<code><a href="../reference/bnccoca_data.html">?bnccoca_data</a></code> and the installed
+<code><a href="../reference/bnccoca_data.html">?bnccoca_data</a></code> and the cached
 <code>licenses/bnccoca/NOTICE.md</code>.</p>
 </div>
 <div class="section level4">
@@ -524,7 +539,7 @@ the example above. It runs no analyzer and adds no exported API. Surface
 and lemma types use the supplied strings verbatim; case/spelling
 decisions should be made explicitly upstream. Family lookup retains its
 declared <code>nfkc_lower</code> normalization.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"family-count-comparison.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
 <span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">family_env</span><span class="op">)</span></span>
 <span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="va">family_env</span><span class="op">$</span><span class="fu">compare_family_counts</span><span class="op">(</span><span class="va">nation</span><span class="op">$</span><span class="va">profile</span><span class="op">)</span></span>
@@ -570,7 +585,7 @@ the profile’s known-selected rows; its returned <code>selection</code>
 keeps document/segment/token IDs. Do not reuse a vector after reordering
 rows.</p>
 <p>Keep unresolved occurrences available for inspection:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">o</span> <span class="op">&lt;-</span> <span class="va">counts</span><span class="op">$</span><span class="va">profile</span><span class="op">$</span><span class="va">occurrences</span></span>
 <span><span class="va">o</span><span class="op">[</span><span class="va">counts</span><span class="op">$</span><span class="va">selection</span><span class="op">$</span><span class="va">selected</span> <span class="op">&amp;</span> <span class="va">o</span><span class="op">$</span><span class="va">status</span> <span class="op">!=</span> <span class="st">"matched"</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"token_index"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
@@ -581,7 +596,7 @@ occurrences does not justify closing gaps for moving-window measures or
 n-grams. A string match is not an accuracy score, and supplementary-list
 membership does not establish a proper noun in context. Save the full
 result and the reference:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">counts</span>, reference <span class="op">=</span> <span class="va">nation</span><span class="op">$</span><span class="va">reference</span>,</span>
 <span>  session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="st">"family-comparison.rds"</span><span class="op">)</span></span>
 <span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"family-comparison.rds"</span><span class="op">)</span></span>
@@ -610,7 +625,7 @@ alternative definitions, select the intended rows explicitly
 <strong>before</strong> lookup and record that rule in
 <code>family_definition</code>. Preserve extra level/band columns for
 inspection.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dictionary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"my-family-table.csv"</span>, colClasses <span class="op">=</span> <span class="st">"character"</span>,</span>
 <span>  fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span></span>
 <span><span class="va">resource</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>resource_id <span class="op">=</span> <span class="st">"my-family-table"</span>, resource_version <span class="op">=</span> <span class="st">"1"</span>,</span>
@@ -655,7 +670,7 @@ spelling, <code>review_input</code> prepares the existing
 profile. This optional review preparation uses quanteda; basic family
 lookup and replay of saved judgments do not require loading quanteda or
 running a language model.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"quanteda"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"word-family-review.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
 <span>    mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">family_env</span><span class="op">)</span></span>
@@ -686,7 +701,7 @@ same operation.</p>
 <p>For your own profile, use its prepared inputs without editing their
 candidate set or resource snapshot. Decisions identify <strong>record
 IDs</strong>, not family IDs:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">families</span><span class="op">$</span><span class="va">review_input</span><span class="op">$</span><span class="va">targets</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">review</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">lexdiv_ambiguity_review</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">families</span><span class="op">$</span><span class="va">annotations</span><span class="op">)</span>, <span class="va">families</span><span class="op">$</span><span class="va">review_input</span><span class="op">)</span><span class="op">)</span></span>
@@ -740,7 +755,7 @@ judgment or linguistic correctness by itself.</p>
 explicitly sourced example helper, not an exported API or an automatic
 morphology analyzer. It needs no Python, model, network or quanteda.
 Family membership remains a separate input and is not inferred.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parts_env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"word-parts.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
 <span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">parts_env</span><span class="op">)</span></span>
@@ -885,7 +900,7 @@ silent normalization. Missing POS makes exclusion unknown, and
 whole-selection coverage is then unavailable. Row ceilings apply to each
 reference table, source tokens and candidate/part expansion, not total
 memory. Keep inputs scoped to the analysis at hand.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Full tables remain available beside aggregate results.</span></span>
 <span><span class="va">word_parts</span><span class="op">$</span><span class="va">part_occurrences</span></span>
 <span><span class="co">#&gt;    document_id segment_id token_index      surface completeness analysis_id</span></span>
@@ -957,7 +972,7 @@ Read it with <code>documents</code>. Alternative candidates do not
 contribute to frequency until an analysis is uniquely eligible. This
 recipe supports inspection, but does not yet apply occurrence-specific
 reviewer decisions or automatically choose a candidate.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">word_parts</span>, <span class="st">"word-parts.rds"</span><span class="op">)</span></span>
 <span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"word-parts.rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">parts_env</span><span class="op">$</span><span class="va">word_parts_profile</span>, <span class="va">restored</span><span class="op">$</span><span class="va">inputs</span><span class="op">)</span>, <span class="va">restored</span><span class="op">)</span><span class="op">)</span></span>
@@ -979,8 +994,8 @@ relations. Its English derivational table records <code>transmit</code>
 <code>er</code>. A relation is not a complete word segmentation; graph
 connectivity does not establish a Nation family. MorphyNet’s 15
 languages do not include Japanese. It uses CC BY-SA 3.0. A nine-row
-teaching excerpt is bundled; the full file is read from a separately
-obtained local copy as shown below.</p>
+teaching excerpt is available by explicit download; the full file is
+read from a separately obtained local copy as shown below.</p>
 <p>For Japanese, <a href="https://github.com/cl-tohoku/J-UniMorph" class="external-link">J-UniMorph</a> is a CC BY
 4.0 candidate for <strong>inflectional features</strong>, not an
 English-style educational family inventory. Its filtered
@@ -1008,7 +1023,7 @@ affixes and line IDs. It needs no Python, model or extra package. For
 the complete English v1 reference, obtain <a href="https://github.com/kbatsuren/MorphyNet/blob/main/eng/eng.derivational.v1.tsv" class="external-link"><code>eng.derivational.v1.tsv</code></a>
 from the official repository, retain its CC BY-SA 3.0 terms, and read
 it:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/morphynet_read_derivations.html">morphynet_read_derivations</a></span><span class="op">(</span><span class="st">"eng.derivational.v1.tsv"</span>,</span>
 <span>  language <span class="op">=</span> <span class="st">"en"</span>, resource_version <span class="op">=</span> <span class="st">"English v1"</span><span class="op">)</span></span>
 <span><span class="va">reference</span><span class="op">$</span><span class="va">resource</span><span class="op">$</span><span class="va">source_sha256</span></span>
@@ -1027,7 +1042,7 @@ selected for six words, with a mapping to their original source lines.
 This small excerpt is not a reference for estimating vocabulary
 coverage. The contexts and reviewer decisions are authored
 illustrations:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">morphynet_env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"morphynet-relations.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
 <span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">morphynet_env</span><span class="op">)</span></span>
@@ -1051,7 +1066,7 @@ existing review API when quanteda is available. Source/target words and
 POS remain visible beside the relation ID. A study must declare what
 selecting one relation means; context alone does not guarantee a unique
 morphological derivation.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">morphynet</span><span class="op">$</span><span class="va">reviewed</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">morphynet</span><span class="op">$</span><span class="va">reviewed</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"segment_id"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>,</span>
 <span>    <span class="st">"candidate_count"</span>, <span class="st">"status"</span>, <span class="st">"reason"</span><span class="op">)</span><span class="op">]</span></span>
@@ -1070,7 +1085,7 @@ affix count of zero, a lack of inflection or evidence that a learner
 made an error. The complete source token/segment roster, including the
 empty document, is retained. Review summaries describe the declared
 targets, not all corpus tokens.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">morphynet</span>, <span class="st">"morphynet-review.rds"</span><span class="op">)</span></span>
 <span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"morphynet-review.rds"</span><span class="op">)</span></span>
 <span><span class="va">replayed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_ambiguity_review.html">lexdiv_ambiguity_review</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">annotations</span>, <span class="va">restored</span><span class="op">$</span><span class="va">targets</span>,</span>
@@ -1087,7 +1102,7 @@ or redistribution, retain source attribution and applicable ShareAlike
 terms; see <code>licenses/morphynet/NOTICE.md</code>.</p>
 </div>
 <div class="section level4">
-<h4 id="use-the-bundled-morpholex-reference">Use the bundled MorphoLex reference<a class="anchor" aria-label="anchor" href="#use-the-bundled-morpholex-reference"></a>
+<h4 id="use-the-cached-morpholex-reference">Use the cached MorphoLex reference<a class="anchor" aria-label="anchor" href="#use-the-cached-morpholex-reference"></a>
 </h4>
 <p>MorphoLex-en supplies canonical segmentation and root/affix variables
 (Sánchez-Gutiérrez et al., 2018, <a href="https://doi.org/10.3758/s13428-017-0981-8" class="external-link uri">https://doi.org/10.3758/s13428-017-0981-8</a>). The package
@@ -1096,9 +1111,9 @@ prefix/suffix/root tables), plus the original data dictionary, from <a href="htt
 <strong>These data use CC BY-NC-SA 4.0, not the MIT license of the R
 code.</strong> Noncommercial sharing and adaptation require attribution
 and the applicable ShareAlike conditions; commercial use is not granted
-by that license. See the installed
+by that license. See the cached
 <code>licenses/morpholex/NOTICE.md</code>.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">morpholex</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/morpholex_data.html">morpholex_data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0-1-1"</span>, <span class="st">"All roots"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">word_rows</span> <span class="op">&lt;-</span> <span class="va">morpholex</span><span class="op">$</span><span class="va">sheets</span><span class="op">[[</span><span class="st">"0-1-1"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">word_rows</span><span class="op">[</span><span class="va">word_rows</span><span class="op">$</span><span class="va">Word</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"teacher"</span>, <span class="st">"teachers"</span><span class="op">)</span>,</span>
@@ -1116,10 +1131,11 @@ cells. Convert a numeric measure explicitly when needed, for example
 Two source <code>Word</code> cells (ELP IDs 42162 and 65908) are logical
 values and appear as <code>TRUE</code> and <code>FALSE</code>; an exact
 lowercase query will not match them. The source values are preserved, so
-any case normalization should be an explicit decision. No
-<code>readxl</code>, Python, model, or internet connection is needed for
-bundled data. The word-parts recipe can use the same snapshot:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+any case normalization should be an explicit decision. After the
+explicit download, reading the cached data needs no <code>readxl</code>,
+Python, model or internet connection. The word-parts recipe can use the
+same snapshot:</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"morpholex-word-parts.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span>,</span>
 <span>  mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">parts_env</span><span class="op">)</span></span>
 <span><span class="va">forms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"transmit"</span>, <span class="st">"transport"</span>, <span class="st">"transmission"</span>, <span class="st">"teacher"</span>, <span class="st">"teachers"</span><span class="op">)</span></span>
@@ -1150,7 +1166,7 @@ bundled data. The word-parts recipe can use the same snapshot:</p>
 <p>These five source entries give five root occurrences and four affix
 occurrences. Save the complete reference/profile pair to keep both
 inputs and results:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>reference <span class="op">=</span> <span class="va">reference</span>, profile <span class="op">=</span> <span class="va">profile</span><span class="op">)</span>, <span class="st">"morpholex-profile.rds"</span><span class="op">)</span></span>
 <span><span class="co"># Optional: read an explicitly obtained workbook instead; requires readxl.</span></span>
 <span><span class="va">local_reference</span> <span class="op">&lt;-</span> <span class="va">parts_env</span><span class="op">$</span><span class="fu">read_morpholex_parts</span><span class="op">(</span>path <span class="op">=</span> <span class="st">"MorphoLEX_en.xlsx"</span>,</span>
@@ -1185,9 +1201,9 @@ source occurrence</strong>. The explicitly sourced recipe below reuses
 <code><a href="../reference/lexdiv_family_profile.html">lexdiv_family_profile()</a></code>, the word-parts recipe and
 <code><a href="../reference/lexdiv_ambiguity_review.html">lexdiv_ambiguity_review()</a></code>. It requires optional quanteda in
 a UTF-8 R session. Text and decisions are authored; references are the
-bundled Nation/MorphoLex snapshots and the nine-row MorphyNet teaching
+cached Nation/MorphoLex snapshots and the nine-row MorphyNet teaching
 excerpt.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"morphology-link.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"morphology-link-demo.R"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">linked</span> <span class="op">&lt;-</span> <span class="va">morphology_link_example</span><span class="op">$</span><span class="va">reviewed</span></span>
@@ -1275,7 +1291,7 @@ annotations record any earlier case/spelling transformation; attaching
 morphology does not change that processing. An explicitly selected
 reference analysis is still not independently verified linguistic truth,
 and MorphoLex’s derivational scope still excludes inflection.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">linked</span>, <span class="st">"linked-morphology.rds"</span><span class="op">)</span></span>
 <span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"linked-morphology.rds"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">link_morphology_candidates</span>, <span class="va">restored</span><span class="op">$</span><span class="va">inputs</span><span class="op">)</span>, <span class="va">restored</span><span class="op">)</span><span class="op">)</span></span>
@@ -1311,7 +1327,7 @@ treated as a parameter-free universal score.</p>
 requests. Run them through
 <code>lexdiv_metrics(..., plan = plan)</code>;
 <code><a href="../reference/lexdiv_profile.html">lexdiv_profile()</a></code> remains supported:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">long_tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"one"</span>, <span class="st">"two"</span>, <span class="st">"three"</span>, <span class="st">"one"</span>, <span class="st">"four"</span>, <span class="st">"five"</span>, <span class="st">"one"</span>, <span class="st">"six"</span><span class="op">)</span>,</span>
 <span>  <span class="fl">20</span></span>
@@ -1331,7 +1347,7 @@ requests. Run them through
 that endpoint positions occur in fewer complete windows.
 <code><a href="../reference/lexdiv_mattr_profile.html">lexdiv_mattr_profile()</a></code> reuses the same MATTR specifications
 and exposes both quantities without retaining token strings:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_methods</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">mattr_method</span> <span class="op">&lt;-</span> <span class="va">methods</span><span class="op">$</span><span class="va">method_id</span><span class="op">[</span><span class="va">methods</span><span class="op">$</span><span class="va">metric_id</span> <span class="op">==</span> <span class="st">"mattr"</span><span class="op">]</span></span>
 <span><span class="va">mattr_plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_plan</a></span><span class="op">(</span></span>
@@ -1438,7 +1454,7 @@ such as <code>MTLD</code> therefore does not identify a method on its
 own.</p>
 <p><code><a href="../reference/lexdiv_variant_metrics.html">lexdiv_variant_metrics()</a></code> expands these choices in a
 separate contract:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">variant_tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"one"</span>, <span class="st">"two"</span>, <span class="st">"three"</span>, <span class="st">"one"</span>, <span class="st">"four"</span>, <span class="st">"five"</span><span class="op">)</span>,</span>
 <span>  <span class="fl">12</span></span>
@@ -1505,7 +1521,7 @@ mean-frequency measures can be influenced more by the reference corpus’s
 mode and register than by learner proficiency. The TUBELEX output is
 therefore named as frequency and prevalence, not as an unqualified
 sophistication score.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Resource-compatible segmentation must be prepared separately.</span></span>
 <span><span class="co"># This manually prepared sequence illustrates only the sentence shown.</span></span>
 <span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"I"</span>, <span class="st">"do"</span>, <span class="st">"n't"</span>, <span class="st">"think"</span>, <span class="st">"it"</span>, <span class="st">"'s"</span>, <span class="st">"a"</span>, <span class="st">"book"</span><span class="op">)</span><span class="op">)</span></span>
@@ -1562,7 +1578,7 @@ sophistication score.</p>
 resource, what is their average frequency or prevalence?” Coverage
 answers the separate question: “How much of this text did the resource
 measure?” Neither should be reported without the other.</p>
-<p>The Unicode tokenizer preserves contractions; the bundled TUBELEX
+<p>The Unicode tokenizer preserves contractions; the cached TUBELEX
 resource uses Treebank segmentation. A <code>lexdiv_tokenization</code>
 object therefore requires an explicit
 <code>tokenization_mismatch = "allow"</code> override and is marked as
@@ -1597,11 +1613,11 @@ workbook and explains that compilation used BNC and COCA evidence plus
 Japanese educational materials. The workbook labels the entries as
 representative lemmas. This is a ranked pedagogical list, not the same
 estimand as a TUBELEX mean frequency.</p>
-<p><code><a href="../reference/nj8_profile.html">nj8_profile()</a></code> uses the bundled
+<p><code><a href="../reference/nj8_profile.html">nj8_profile()</a></code> uses the cached
 <code>jacet2016-8000-v1</code> table by default. JACET has permitted
 redistribution with source attribution. Cite: JACET Basic Word Revision
 Committee (Ed.). (2016). <em>The New JACET List of 8000 Basic
-Words</em>. Tokyo: Kirihara Shoten. The installed
+Words</em>. Tokyo: Kirihara Shoten. The cached
 <code>licenses/nj8/NOTICE.md</code> contains the full attribution and
 the three verified corrections to the supplied snapshot. All 8,000 pairs
 match the official workbook. The permission does not relicense the table
@@ -1610,7 +1626,7 @@ as MIT.</p>
 <code>nj8_profile(annotated, "j8_2016.xlsx", unit = "lemma")</code> with
 <code>readxl</code> installed. The example below uses a small synthetic
 table for hand-checkable results.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">synthetic_nj8</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  NJ8 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">1001L</span>, <span class="fl">6001L</span>, <span class="fl">8000L</span><span class="op">)</span>,</span>
 <span>  Word <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"the"</span>, <span class="st">"develop"</span>, <span class="st">"rare"</span>, <span class="st">"extreme"</span><span class="op">)</span></span>
@@ -1696,7 +1712,7 @@ table for hand-checkable results.</p>
 external list once. The following synthetic example uses surface units
 so both documents share the same input contract without inventing lemma
 annotations.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">level_batch</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nj8_profile.html">nj8_profile_batch</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    document_a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"The"</span>, <span class="st">"develop"</span>, <span class="st">"rare"</span><span class="op">)</span>,</span>
@@ -1724,7 +1740,7 @@ a <code>document_id</code>. <code>max_rows</code> bounds the combined
 lookup and summary size before the list is processed. Shared list
 provenance is stored once; document-specific preprocessing provenance
 remains separate.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">level_profile</span>, weighting <span class="op">=</span> <span class="st">"token"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="preprocessing-and-frequency_files/figure-html/unnamed-chunk-33-1.png" class="r-plt" alt="" width="672"></p>
 <p>The bars are the proportions occurring in each band. The line is the

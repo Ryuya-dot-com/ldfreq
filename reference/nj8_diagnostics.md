@@ -101,6 +101,8 @@ of all annotation failures.
 ## Examples
 
 ``` r
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("nj8"))$available)) {
 prepared <- lexdiv_tokenize_batch(c(
   essay_a = "Students have part-time jobs.",
   essay_b = "Students learn from jobs."
@@ -108,20 +110,7 @@ prepared <- lexdiv_tokenize_batch(c(
 profile <- nj8_profile_batch(prepared, unit = "surface")
 audit <- nj8_diagnostics(profile)
 audit$unmatched_terms
-#>   lookup_term token_count document_count
-#> 1    students           2              2
-#> 2        jobs           2              2
-#> 3   part-time           1              1
 audit$coverage
-#>   document_id input_tokens eligible_tokens excluded_tokens selection_coverage
-#> 1     essay_a            4               4               0                  1
-#> 2     essay_b            4               4               0                  1
-#>   matched_tokens off_list_tokens token_coverage eligible_types matched_types
-#> 1              1               3           0.25              4             1
-#> 2              2               2           0.50              4             2
-#>   off_list_types type_coverage
-#> 1              3          0.25
-#> 2              2          0.50
 
 # Authored annotation example: flags record a change, not its correctness.
 text <- lexdiv_tokenize("Students second", case = "lower")
@@ -129,8 +118,5 @@ annotated <- lexdiv_lemmatize(text, lemmas = c("student", "2"),
   backend_id = "authored-example", backend_version = "1")
 audit <- nj8_diagnostics(nj8_profile(annotated, unit = "lemma"))
 audit$unit_mappings[audit$unit_mappings$numeric_introduced, ]
-#>   surface_term term lookup_term matched token_count document_count unit_changed
-#> 2       second    2           2   FALSE           1              1         TRUE
-#>   lookup_changed numeric_introduced whitespace_introduced
-#> 2          FALSE               TRUE                 FALSE
+}
 ```

@@ -188,7 +188,12 @@ appearance while preserving row order within each document. A quanteda
 tokens object is converted through its registered
 [`as.list()`](https://rdrr.io/r/base/list.html) method, so ldfreq does
 not add a runtime dependency on quanteda. Raw text is not tokenized by
-this adapter.
+this adapter. Each selected ID or token column must occur exactly once.
+Empty lists and zero-row token tables return the same named empty list,
+accepted by both
+[`lexdiv_metrics_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
+and
+[`lexdiv_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
 
 `lexdiv_widen()` uses profile `request_id` values when available, and
 checks that every output column has one contract, method, and requested
@@ -252,6 +257,8 @@ frame invisibly.
 ## Examples
 
 ``` r
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("tubelex"))$available)) {
 tidy_tokens <- data.frame(
   document_id = c("a", "a", "b", "b"),
   token = c("one", "two", "three", "three")
@@ -259,10 +266,6 @@ tidy_tokens <- data.frame(
 documents <- lexdiv_as_documents(tidy_tokens)
 long <- lexdiv_metrics_batch(documents, metrics = c("ttr", "maas"))
 lexdiv_widen(long, values_from = "value")
-#> <lexdiv_wide_results: 2 rows; 3 columns>
-#>   document_id ttr     maas
-#> 1           a 1.0 0.000000
-#> 2           b 0.5 1.442695
 
 # A short constructed example exposes support; it is not a reliability example.
 supported <- lexdiv_metrics_batch(list(
@@ -272,20 +275,14 @@ wide <- lexdiv_widen(supported, values_from = c("value", "status", "N"),
   mtld_diagnostics = TRUE)
 wide[c("document_id", "mtld__value", "mtld__status",
   "mtld__tail_only", "mtld__gap_pct")]
-#> <lexdiv_wide_results: 2 rows; 5 columns>
-#>   document_id mtld__value mtld__status mtld__tail_only mtld__gap_pct
-#> 1    one_tail          12           ok            TRUE      33.33333
-#> 2       empty          NA      missing              NA            NA
 
 plot(long, metric_id = "ttr")
-
 plot(long, metric_id = "ttr", monochrome = TRUE)
-
 
 text_result <- lexdiv_metrics_text("Words repeat words.", metrics = "ttr")
 plot(text_result)
 
-
 profile <- tubelex_profile(c("the", "not-in-resource"))
 plot(profile)
+}
 ```

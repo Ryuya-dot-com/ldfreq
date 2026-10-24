@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -71,134 +73,65 @@
 
     
     
-<p><code>ldfreq</code> 0.4.0 is a fixed stable GitHub distribution for
-tracing lexical descriptions from original texts and counting conditions
-to research tables and reports. It is not a CRAN release. Install the
-named archive or fixed tag in the <a href="https://ryuya-dot-com.github.io/ldfreq/index.html#installation">installation
-instructions</a>; keep that archive, original inputs and complete saved
-results for later reuse.</p>
-<p>Development <strong>0.4.0.9001</strong> adds a separately sourced <a href="lexical-ordination.html#occurrence-mca">occurrence-MCA
-example</a>, absent from stable 0.4.0. It uses the existing optional
-<code>ca</code> package, with complete indicator rows, equal occurrence
-weights, unadjusted inertia and original source links. Category coding
-and inference remain the researcher’s responsibility. It adds no
-exported API, required dependency, core calculation or bundled resource.
-The stable-release tables below continue to describe the fixed 0.4.0
-archive.</p>
-<p>Development <strong>0.4.0.9002</strong> lets that MCA plot use
-separately named display labels for long occurrence IDs. The original
-IDs, saved fits and numerical results are unchanged; save the display
-mapping with the complete analysis record.</p>
-<p>Development <strong>0.4.0.9003</strong> adds a separately sourced <a href="textbook-progression.html">textbook progression example</a>. It
-joins saved concordance matches to ordered pages, Units and selected
-sections, retaining missing material and the scope available after a
-declared teaching introduction. It is a descriptive example, not an
-automatic learning-effect assessment.</p>
-<p>Development <strong>0.4.0.9004</strong> adds a separately sourced <a href="ddl-materials.html">DDL preparation example</a>. It writes
-selected, reviewed phrase occurrences and teacher-written prompts to
-learner HTML, a separate teacher CSV and a complete private record.
-Original sources and pending decisions remain intact; it does not
-conduct or evaluate a classroom lesson.</p>
-<p>Development <strong>0.4.0.9006</strong> adds eight public entry
-points for research tables, concordance/dispersion, collocations and
-keyness. These interfaces preserve the previous counting and missingness
-rules; they do not broaden the statistical claims or add an analyzer. A
-new concordance class supports <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. Original sourced
-names and plain-list records remain supported. The updated specialist
-guides use these public calls; install the 9006 archive to follow
-them.</p>
+<p><strong>The current guides use ldfreq 0.5.0.9001.</strong> Install
+the single archive in the <a href="https://ryuya-dot-com.github.io/ldfreq/index.html#install">README</a>.
+It includes all workflows linked here; you do not need separate
+development versions for different guides. Earlier releases are retained
+for reproducing earlier analyses.</p>
 <div class="section level2">
-<h2 id="what-is-stable-experimental-or-an-example">What is stable, experimental or an example?<a class="anchor" aria-label="anchor" href="#what-is-stable-experimental-or-an-example"></a>
+<h2 id="what-is-available">What is available?<a class="anchor" aria-label="anchor" href="#what-is-available"></a>
 </h2>
-<p>Stable means the documented computational and compatibility contract
-is maintained. It does not mean that a measure is valid for every
-population, text length, language or research claim. Method, schema,
-preprocessing and resource contract versions are separate from the
-package version.</p>
 <table class="table">
 <colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
+<col width="50%">
+<col width="50%">
 </colgroup>
 <thead><tr class="header">
 <th>Surface</th>
-<th>Status in 0.4.0</th>
-<th>Boundary</th>
+<th>Interface and interpretation</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>Eleven default lexical-diversity metrics; explicit Maas/MTLD
-variants; local MATTR; specifications, plans, batches, tables and
-plots</td>
-<td>Stable computational contracts</td>
-<td>Ordered tokens and explicit parameters determine the result.
-Short-input failures remain <code>NA</code> with reasons; advisory
-length guidance is not a precision guarantee.</td>
+<td>Diversity metrics, method plans, batches and plots</td>
+<td>Eleven default measures plus opt-in MTLD-MA and experimental
+expected-TTR D. Definitions and parameters are explicit; see <a href="choosing-metrics.html">metric selection</a> for length and
+reliability evidence.</td>
 </tr>
 <tr class="even">
-<td>English/Unicode tokenization, supplied lemma/POS/flemma annotations,
-exact overlap and reference coverage</td>
-<td>Stable documented contracts</td>
-<td>English rules are explicit options. Unicode tokenization is not a
-Japanese morphological analyzer. Supplied labels and dictionaries
-require their own justification.</td>
+<td>English text and caller-supplied annotations</td>
+<td>Explicit tokenization and lexical units. Unicode splitting does not
+replace a Japanese morphological analyzer.</td>
 </tr>
 <tr class="odd">
-<td>NJ8 levels, TUBELEX frequency, supplied lexical norms, adjacent
-n-gram frequencies/comparisons and paired scored responses</td>
-<td>Stable documented contracts</td>
-<td>Preserve the declared resource, units, denominator and coverage.
-Neither high coverage nor frequency establishes vocabulary knowledge or
-proficiency. The n-gram reference <em>builder</em> remains
-experimental.</td>
+<td>Reference-vocabulary and morphology profiles</td>
+<td>Optional fixed downloads under separate terms. See <a href="reference-data.html">reference data</a>. User-supplied reference
+tables are also supported.</td>
 </tr>
 <tr class="even">
-<td>Bundled NJ8, TUBELEX, MorphoLex and BNC/COCA resources; MorphyNet
-reader/example excerpt</td>
-<td>Fixed attributed resource versions</td>
-<td>The release does not change the resource bytes or rights. MorphoLex
-includes noncommercial restrictions. Consult the installed notices and
-resource manifest before redistribution. A fixed resource does not make
-every downstream analysis stable.</td>
+<td>Research tables, concordances, dispersion, collocations and
+keyness</td>
+<td>Public functions with documented input, denominator and
+missing-value contracts.</td>
 </tr>
 <tr class="odd">
-<td>Expected-TTR D</td>
-<td>Experimental estimator, explicit opt-in</td>
-<td>Excluded from default metrics and presets. It fits an exact
-expectation curve; it is not CLAN VOCD, and CLAN equivalence is not
-established.</td>
+<td>Readability, traced L2SCA syntax, CA/MDS/MCA, textbook progression
+and DDL preparation</td>
+<td>Installed example workflows loaded as shown in their guides. They
+connect specialized external tools or researcher/teacher decisions to
+the saved analysis.</td>
 </tr>
 <tr class="even">
-<td>Family profiles; annotation import/alignment/evaluation;
-MASC/quanteda adapters; n-gram reference builder; ambiguity and
-contextual-model review/evaluation/baselines; adjective–noun
-dependencies</td>
-<td>Experimental interfaces</td>
-<td>Existing help and interface versions continue to apply. Models and
-human decisions remain distinct. Alignment and replay checks do not
-establish analyzer or model accuracy.</td>
-</tr>
-<tr class="odd">
-<td>Study tables, corpus search/dispersion, collocation, keyness,
-readability, traced syntax and CA/classical MDS</td>
-<td>Documented, explicitly sourced examples</td>
-<td>Installed helpers are not exported APIs. Pin the package archive and
-preserve complete records. Examples connect existing calculations to
-source occurrences and reporting; they do not automatically choose a
-model or justify an inferential claim.</td>
+<td>Annotation alignment/evaluation, contextual review, family profiles
+and n-gram reference construction</td>
+<td>Interfaces carrying experimental labels retain those labels; see the
+individual help topics.</td>
 </tr>
 </tbody>
 </table>
-<p>Stable 0.4.0 has 57 exports; development 0.4.0.9006 has 65. The eight
-new entry points have a documented initial interface; their formulas and
-analysis scope are those of the earlier examples. Stable release status
-does not remove the experimental labels in help or change the
-<code>stability</code> column returned by <code><a href="../reference/lexdiv_profile.html">lexdiv_methods()</a></code>.
-An example helper is located with <code><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file()</a></code> and loaded
-with <code><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source()</a></code> as its guide shows; it has no separate
-<code>?function</code> help entry. See <code><a href="../reference/ldfreq-package.html">?ldfreq</a></code> for the
-input and guide map.</p>
+<p>A stable computational contract means a documented calculation is
+maintained; it does not establish validity for every population or task.
+Core method, preprocessing, resource and result-schema versions identify
+different parts of the analysis. Keep them in saved records.</p>
 </div>
 <div class="section level2">
 <h2 id="languages-and-external-tools">Languages and external tools<a class="anchor" aria-label="anchor" href="#languages-and-external-tools"></a>
@@ -221,8 +154,8 @@ input and guide map.</p>
 input/batch/missingness checks and saved-record replay; required
 packages are <code>digest</code> and <code>stringi</code>.</td>
 <td>A tokenizer/lexical unit must suit the research question. NJ8 and
-bundled TUBELEX target English; generic tokens do not establish Treebank
-alignment.</td>
+optional TUBELEX target English; generic tokens do not establish
+Treebank alignment.</td>
 </tr>
 <tr class="even">
 <td>Japanese</td>
@@ -295,19 +228,24 @@ dictionaries and trained models are not required for the core R
 calculations. Their specific guide checks are separate from the R/OS
 matrix; the matrix does not execute every externally supplied model or
 corpus.</p>
-<p>MCA, nonmetric MDS, Japanese readability, a universal ability scale
-and a new model-fitting API are not included. Their absence does not
-leave an unfinished step in the documented CA/classical-MDS or reporting
-workflows.</p>
 </div>
 <div class="section level2">
 <h2 id="moving-from-an-earlier-version">Moving from an earlier version<a class="anchor" aria-label="anchor" href="#moving-from-an-earlier-version"></a>
 </h2>
-<p><strong>From 0.3.0.9019:</strong> calculations, exports, schemas,
-helpers and resources are unchanged. New calculations record package
-version 0.4.0. Reopening an older RDS must preserve its original
-calculation version and session information; do not replace those fields
-with the currently installed version.</p>
+<p><strong>From 0.4.x:</strong> first download only the optional
+reference resources you need. The data bytes are unchanged, but default
+NJ8/TUBELEX and morphology readers now use the explicit cache. No
+resource is downloaded during installation or ordinary calculations.
+Existing saved results remain readable.</p>
+<p>The canonical action names are <code><a href="../reference/lexdiv_ngram_compare.html">lexdiv_compare_ngrams()</a></code>,
+<code><a href="../reference/lexdiv_ngram_reference_build.html">lexdiv_build_ngram_reference()</a></code>,
+<code><a href="../reference/lexdiv_concordance.html">lexdiv_sort_concordance()</a></code> and
+<code><a href="../reference/lexdiv_profile.html">lexdiv_screen_lengths()</a></code>. The previous names remain exact
+compatibility aliases. Use
+<code>lexdiv_methods(scope = "variants")</code> for the variant catalog
+and <code>lexdiv_metrics(tokens, plan = plan)</code> to execute a plan;
+earlier calls remain supported. MTLD-MA is opt-in and does not change
+the eleven default metrics.</p>
 <p><strong>From 0.1.0 or 0.2.0:</strong> the intervening changes below
 affect interpretation or compatibility. Retain the old archive and
 results before computing again.</p>
@@ -321,9 +259,9 @@ unlabeled MTLD column. See the migration section of
 help</a>.</li>
 <li>Default metric results have eleven rows. Canonical and
 length-comparison presets contain eleven and thirteen requests.
-<code><a href="../reference/lexdiv_metrics.html">lexdiv_metric_ids()</a></code> still lists twelve supported metrics,
-including experimental expected-TTR D. Select that estimator explicitly
-when it is part of the study design.</li>
+<code><a href="../reference/lexdiv_metrics.html">lexdiv_metric_ids()</a></code> still lists thirteen supported metrics,
+including experimental expected-TTR D and MTLD-MA. Select these
+explicitly when they are part of the study design.</li>
 <li>Recreate old specifications and plans with current
 <code><a href="../reference/lexdiv_profile.html">lexdiv_spec()</a></code> and <code><a href="../reference/lexdiv_profile.html">lexdiv_plan()</a></code> before new
 calculations. Specification hashes include the core contract version,
@@ -339,9 +277,9 @@ validation.</li>
 <li>TUBELEX contract 0.2.0 rejects known tokenizer mismatch by default.
 Prepare compatible terms, or explicitly record a sensitivity analysis
 with <code>tokenization_mismatch = "allow"</code>. Character-vector
-alignment remains unverified. NJ8 contract 0.2.0 defaults to the bundled
-list when <code>wordlist</code> is omitted or <code>NULL</code>;
-explicit external lists retain their own identity.</li>
+alignment remains unverified. NJ8 uses the fixed cached list when
+<code>wordlist</code> is omitted or <code>NULL</code>; explicit external
+lists retain their own identity.</li>
 <li>Version 0.2.0 corrected cancellation in near-saturated expected-TTR
 D without changing its estimator or method ID. Keep the package version
 as well as the method ID when comparing historical calculations. Details
@@ -371,12 +309,10 @@ reporting session does not change the identity of the stored
 measurements. Calculation versions shown in saved example output
 identify the original run; they are not replaced by the version used to
 reopen or report that record.</p>
-<p>The release evidence distinguishes successful computation/replay,
-agreement with independent numerical or software references, and
-empirical measurement validity. The first two do not prove the third.
-The documentation checks use independent development sessions; they are
-not a usability study with novice researchers. Population-level claims
-still need an appropriate research design.</p>
+<p>For guidance on selecting a measure, see the <a href="choosing-metrics.html">metric-selection guide</a>, which reports
+real-corpus length sensitivity, sampling reliability and external
+implementation comparisons. Population-level claims require a
+corresponding research design.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

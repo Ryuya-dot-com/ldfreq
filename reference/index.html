@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,6 +19,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -73,6 +75,13 @@
 
         </dt>
         <dd>Compute Versioned Lexical-Diversity Metric Variants</dd>
+
+        <dt>
+
+          <code><a href="lexdiv_resources.html">lexdiv_resource_info()</a></code> <code><a href="lexdiv_resources.html">lexdiv_download_resources()</a></code>
+
+        </dt>
+        <dd>Inspect and explicitly download optional reference data</dd>
       </dl></div><div class="section level2">
       <h2 id="raw-text-and-lexical-units">Raw text and lexical units<a class="anchor" aria-label="anchor" href="#raw-text-and-lexical-units"></a></h2>
 
@@ -199,7 +208,7 @@
 
         <dt>
 
-          <code><a href="lexdiv_concordance.html">lexdiv_concordance()</a></code> <code><a href="lexdiv_concordance.html">lexdiv_concordance_sort()</a></code> <code><a href="lexdiv_concordance.html">lexdiv_concordance_dispersion()</a></code> <code><a href="lexdiv_concordance.html">plot(<i>&lt;lexdiv_concordance&gt;</i>)</a></code>
+          <code><a href="lexdiv_concordance.html">lexdiv_sort_concordance()</a></code> <code><a href="lexdiv_concordance.html">lexdiv_concordance()</a></code> <code><a href="lexdiv_concordance.html">lexdiv_concordance_sort()</a></code> <code><a href="lexdiv_concordance.html">lexdiv_concordance_dispersion()</a></code> <code><a href="lexdiv_concordance.html">plot(<i>&lt;lexdiv_concordance&gt;</i>)</a></code>
 
         </dt>
         <dd>Search source-aligned words and phrases and inspect their distribution</dd>
@@ -268,7 +277,7 @@
 
       <dl><dt>
 
-          <code><a href="lexdiv_profile.html">lexdiv_spec()</a></code> <code><a href="lexdiv_profile.html">lexdiv_grid()</a></code> <code><a href="lexdiv_profile.html">lexdiv_plan()</a></code> <code><a href="lexdiv_profile.html">print(<i>&lt;lexdiv_spec&gt;</i>)</a></code> <code><a href="lexdiv_profile.html">print(<i>&lt;lexdiv_grid&gt;</i>)</a></code> <code><a href="lexdiv_profile.html">print(<i>&lt;lexdiv_plan&gt;</i>)</a></code> <code><a href="lexdiv_profile.html">lexdiv_methods()</a></code> <code><a href="lexdiv_profile.html">lexdiv_presets()</a></code> <code><a href="lexdiv_profile.html">lexdiv_profile()</a></code> <code><a href="lexdiv_profile.html">lexdiv_profile_batch()</a></code> <code><a href="lexdiv_profile.html">lexdiv_screen()</a></code>
+          <code><a href="lexdiv_profile.html">lexdiv_screen_lengths()</a></code> <code><a href="lexdiv_profile.html">lexdiv_spec()</a></code> <code><a href="lexdiv_profile.html">lexdiv_grid()</a></code> <code><a href="lexdiv_profile.html">lexdiv_plan()</a></code> <code><a href="lexdiv_profile.html">print(<i>&lt;lexdiv_spec&gt;</i>)</a></code> <code><a href="lexdiv_profile.html">print(<i>&lt;lexdiv_grid&gt;</i>)</a></code> <code><a href="lexdiv_profile.html">print(<i>&lt;lexdiv_plan&gt;</i>)</a></code> <code><a href="lexdiv_profile.html">lexdiv_methods()</a></code> <code><a href="lexdiv_profile.html">lexdiv_presets()</a></code> <code><a href="lexdiv_profile.html">lexdiv_profile()</a></code> <code><a href="lexdiv_profile.html">lexdiv_profile_batch()</a></code> <code><a href="lexdiv_profile.html">lexdiv_screen()</a></code>
 
         </dt>
         <dd>Build and Evaluate Explicit Lexical-Diversity Method Plans</dd>
@@ -344,14 +353,14 @@
 
         <dt>
 
-          <code><a href="lexdiv_ngram_reference_build.html">lexdiv_ngram_reference_build()</a></code>
+          <code><a href="lexdiv_ngram_reference_build.html">lexdiv_build_ngram_reference()</a></code> <code><a href="lexdiv_ngram_reference_build.html">lexdiv_ngram_reference_build()</a></code>
 
         </dt>
         <dd>Build an N-gram Reference from Whole-document Chunks</dd>
 
         <dt>
 
-          <code><a href="lexdiv_ngram_compare.html">lexdiv_ngram_compare()</a></code>
+          <code><a href="lexdiv_ngram_compare.html">lexdiv_compare_ngrams()</a></code> <code><a href="lexdiv_ngram_compare.html">lexdiv_ngram_compare()</a></code>
 
         </dt>
         <dd>Compare N-gram References on the Same Target Items</dd>
@@ -377,7 +386,7 @@
           <code><a href="morpholex_data.html">morpholex_data()</a></code>
 
         </dt>
-        <dd>Read the Bundled MorphoLex English Database</dd>
+        <dd>Read the Cached MorphoLex English Database</dd>
 
         <dt>
 

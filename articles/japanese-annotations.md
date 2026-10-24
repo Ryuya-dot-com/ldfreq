@@ -15,6 +15,21 @@ lexical analyses. This is an integration and audit contribution, not a
 new Japanese segmentation algorithm or a validated Japanese proficiency
 scale.
 
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+lexdiv_resource_info(c("tubelex", "nj8"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
+```
+
 ## Choose a Japanese analysis route
 
 | Your starting point | Route | What it requires |
@@ -56,10 +71,10 @@ accepts the complete annotation import and source-linked occurrence
 rows. Retain the review’s full candidate inventory, resource version and
 decisions with that analysis; leave unselected candidate codes as `NA`.
 Long review occurrence IDs can use separate, ID-matched display labels
-in **0.4.0.9002 or later**. Do not replace the original IDs, turn
-unresolved judgments into known senses, or discretize normative scores
-merely to run MCA. Two-variable questions may be answered by a
-cross-tabulation without an ordination.
+in **0.5.0.9001**. Do not replace the original IDs, turn unresolved
+judgments into known senses, or discretize normative scores merely to
+run MCA. Two-variable questions may be answered by a cross-tabulation
+without an ordination.
 
 ## Will the results agree with other tools?
 
@@ -1668,7 +1683,7 @@ workflow.
 
 ## Frequency resources and interpretation
 
-The bundled
+The cached
 [`tubelex_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md)
 and
 [`nj8_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/nj8_profile.md)

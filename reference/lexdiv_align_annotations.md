@@ -198,19 +198,5 @@ x <- lexdiv_align_annotations(
   lexdiv_import_annotations(pred, segments, metadata),
   lexdiv_import_annotations(ref, segments, metadata))
 x$groups
-#>   alignment_id document_id segment_id start end reference_n predicted_n
-#> 1            1           d          s     1   5           1           2
-#> 2            2           d          s     7  10           1           1
-#> 3            3           d          s    11  11           1           1
-#>   relation        pre keyword   post
-#> 1    split              can't  read.
-#> 2    exact     can't     read      .
-#> 3    exact can't read       .       
 x$summary
-#>             measure reference_n predicted_n matched fp fn precision    recall
-#> 1        token_span           3           4       2  2  1 0.5000000 0.6666667
-#> 2 internal_boundary           2           3       2  1  0 0.6666667 1.0000000
-#>          f1
-#> 1 0.5714286
-#> 2 0.8000000
 ```

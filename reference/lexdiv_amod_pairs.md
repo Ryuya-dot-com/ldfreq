@@ -116,55 +116,6 @@ sys.source(system.file("examples", "amod-pairs.R", package = "ldfreq",
   mustWork = TRUE), env)
 x <- env$amod_pairs_example
 x$reference$occurrences[c("document_id", "dependent_term", "head_term", "keyword")]
-#>   document_id dependent_term head_term          keyword
-#> 1     english            big   balloon Big red balloons
-#> 2     english            red   balloon     red balloons
-#> 3  wrong_head          small      bird      Small birds
-#> 4  wrong_head          large      fish       large fish
-#> 5    japanese           赤い        鳥           赤い鳥
-#> 6 unavailable          quiet      bird      Quiet birds
-#> 7     partial            red      bird        Red birds
-#> 8     partial           blue      bird       Blue birds
 x$predicted$documents
-#>   document_id segments nonempty_segments complete_segments incomplete_segments
-#> 1     english        1                 1                 1                   0
-#> 2  wrong_head        1                 1                 1                   0
-#> 3    japanese        1                 1                 1                   0
-#> 4        zero        1                 1                 1                   0
-#> 5 unavailable        1                 1                 0                   1
-#> 6     partial        2                 2                 1                   1
-#> 7       empty        1                 0                 0                   0
-#>   tokens analyzed_tokens token_coverage observed_pairs pairs pairs_with_unit
-#> 1      5               5            1.0              1     1               1
-#> 2      6               6            1.0              2     2               2
-#> 3      5               5            1.0              0     0               0
-#> 4      3               3            1.0              0     0               0
-#> 5      4               0            0.0              0    NA               0
-#> 6      8               4            0.5              1    NA               1
-#> 7      0               0             NA              0     0               0
-#>   observed_types types                status
-#> 1              1     1              complete
-#> 2              2     2              complete
-#> 3              0     0              complete
-#> 4              0     0              complete
-#> 5              0    NA incomplete_annotation
-#> 6              1    NA incomplete_annotation
-#> 7              0     0                 empty
 x$differences
-#>   document_id reference_pairs predicted_pairs delta_pairs reference_types
-#> 1     english               2               1          -1               2
-#> 2  wrong_head               2               2           0               2
-#> 3    japanese               1               0          -1               1
-#> 4        zero               0               0           0               0
-#> 5 unavailable               1              NA          NA               1
-#> 6     partial               2              NA          NA               2
-#> 7       empty               0               0           0               0
-#>   predicted_types reference_coverage predicted_coverage evaluated tp fp fn
-#> 1               1                  1                1.0      TRUE  1  0  1
-#> 2               2                  1                1.0      TRUE  1  1  1
-#> 3               0                  1                1.0      TRUE  0  0  1
-#> 4               0                  1                1.0      TRUE  0  0  0
-#> 5              NA                  1                0.0     FALSE NA NA NA
-#> 6              NA                  1                0.5     FALSE NA NA NA
-#> 7               0                 NA                 NA      TRUE  0  0  0
 ```

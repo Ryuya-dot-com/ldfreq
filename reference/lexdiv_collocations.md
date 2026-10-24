@@ -58,8 +58,8 @@ semantic unity.
 
 The computations and layout preserve the previous installed example.
 `examples/collocation.R` remains a compatibility entry for
-`collocation_profile()`. See
-[`vignette("collocation-association")`](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.md).
+`collocation_profile()`. See [collocation association
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html).
 
 ## Value
 

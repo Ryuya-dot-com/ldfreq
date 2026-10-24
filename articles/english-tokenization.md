@@ -1,5 +1,20 @@
 # English tokenization and document input
 
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+lexdiv_resource_info(c("tubelex", "nj8"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
+```
+
 ## Choose what counts as a word
 
 An essay can include contractions, web addresses and dates. Counting
@@ -110,8 +125,8 @@ settings along with the metric definition and parameters. For NJ8, a
 retained surface form such as `John's`, `can't` or `U.S.A.` can still be
 off-list. Lemma analyses require an explicit annotation step, and the
 coverage report must remain with the scores. Both R tokenizers differ
-from the bundled TUBELEX Treebank segmentation; see the separate
-[TUBELEX input
+from the cached TUBELEX Treebank segmentation; see the separate [TUBELEX
+input
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.md)
 when source-aligned segmentation is required.
 
@@ -137,7 +152,7 @@ alternatives are:
 `colour` and `color` are accepted variety spellings (see the
 British/American examples in the [Journal of Hellenic Studies style
 guide](https://www.cambridge.org/core/services/aop-file-manager/file/63dbd4c9778e83d75bdea726/JHS-style-guide2019-2023-revision-final.pdf),
-p. 1). The bundled NJ8 snapshot matches `color`, `center` and `theater`,
+p. 1). The cached NJ8 snapshot matches `color`, `center` and `theater`,
 but does not match the surface queries `colour`, `centre` and `theatre`.
 This is a lookup boundary, not evidence that the British spellings are
 errors or more advanced words. NJ8’s `expand_parenthetical` only expands

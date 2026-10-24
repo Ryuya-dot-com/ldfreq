@@ -1,87 +1,33 @@
 # Release scope and compatibility
 
-`ldfreq` 0.4.0 is a fixed stable GitHub distribution for tracing lexical
-descriptions from original texts and counting conditions to research
-tables and reports. It is not a CRAN release. Install the named archive
-or fixed tag in the [installation
-instructions](https://ryuya-dot-com.github.io/ldfreq/index.html#installation);
-keep that archive, original inputs and complete saved results for later
-reuse.
+**The current guides use ldfreq 0.5.0.9001.** Install the single archive
+in the
+[README](https://ryuya-dot-com.github.io/ldfreq/index.html#install). It
+includes all workflows linked here; you do not need separate development
+versions for different guides. Earlier releases are retained for
+reproducing earlier analyses.
 
-Development **0.4.0.9001** adds a separately sourced [occurrence-MCA
-example](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca),
-absent from stable 0.4.0. It uses the existing optional `ca` package,
-with complete indicator rows, equal occurrence weights, unadjusted
-inertia and original source links. Category coding and inference remain
-the researcher’s responsibility. It adds no exported API, required
-dependency, core calculation or bundled resource. The stable-release
-tables below continue to describe the fixed 0.4.0 archive.
+## What is available?
 
-Development **0.4.0.9002** lets that MCA plot use separately named
-display labels for long occurrence IDs. The original IDs, saved fits and
-numerical results are unchanged; save the display mapping with the
-complete analysis record.
+| Surface | Interface and interpretation |
+|----|----|
+| Diversity metrics, method plans, batches and plots | Eleven default measures plus opt-in MTLD-MA and experimental expected-TTR D. Definitions and parameters are explicit; see [metric selection](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.md) for length and reliability evidence. |
+| English text and caller-supplied annotations | Explicit tokenization and lexical units. Unicode splitting does not replace a Japanese morphological analyzer. |
+| Reference-vocabulary and morphology profiles | Optional fixed downloads under separate terms. See [reference data](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md). User-supplied reference tables are also supported. |
+| Research tables, concordances, dispersion, collocations and keyness | Public functions with documented input, denominator and missing-value contracts. |
+| Readability, traced L2SCA syntax, CA/MDS/MCA, textbook progression and DDL preparation | Installed example workflows loaded as shown in their guides. They connect specialized external tools or researcher/teacher decisions to the saved analysis. |
+| Annotation alignment/evaluation, contextual review, family profiles and n-gram reference construction | Interfaces carrying experimental labels retain those labels; see the individual help topics. |
 
-Development **0.4.0.9003** adds a separately sourced [textbook
-progression
-example](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.md).
-It joins saved concordance matches to ordered pages, Units and selected
-sections, retaining missing material and the scope available after a
-declared teaching introduction. It is a descriptive example, not an
-automatic learning-effect assessment.
-
-Development **0.4.0.9004** adds a separately sourced [DDL preparation
-example](https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.md).
-It writes selected, reviewed phrase occurrences and teacher-written
-prompts to learner HTML, a separate teacher CSV and a complete private
-record. Original sources and pending decisions remain intact; it does
-not conduct or evaluate a classroom lesson.
-
-Development **0.4.0.9006** adds eight public entry points for research
-tables, concordance/dispersion, collocations and keyness. These
-interfaces preserve the previous counting and missingness rules; they do
-not broaden the statistical claims or add an analyzer. A new concordance
-class supports [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
-Original sourced names and plain-list records remain supported. The
-updated specialist guides use these public calls; install the 9006
-archive to follow them.
-
-## What is stable, experimental or an example?
-
-Stable means the documented computational and compatibility contract is
-maintained. It does not mean that a measure is valid for every
-population, text length, language or research claim. Method, schema,
-preprocessing and resource contract versions are separate from the
-package version.
-
-| Surface | Status in 0.4.0 | Boundary |
-|----|----|----|
-| Eleven default lexical-diversity metrics; explicit Maas/MTLD variants; local MATTR; specifications, plans, batches, tables and plots | Stable computational contracts | Ordered tokens and explicit parameters determine the result. Short-input failures remain `NA` with reasons; advisory length guidance is not a precision guarantee. |
-| English/Unicode tokenization, supplied lemma/POS/flemma annotations, exact overlap and reference coverage | Stable documented contracts | English rules are explicit options. Unicode tokenization is not a Japanese morphological analyzer. Supplied labels and dictionaries require their own justification. |
-| NJ8 levels, TUBELEX frequency, supplied lexical norms, adjacent n-gram frequencies/comparisons and paired scored responses | Stable documented contracts | Preserve the declared resource, units, denominator and coverage. Neither high coverage nor frequency establishes vocabulary knowledge or proficiency. The n-gram reference *builder* remains experimental. |
-| Bundled NJ8, TUBELEX, MorphoLex and BNC/COCA resources; MorphyNet reader/example excerpt | Fixed attributed resource versions | The release does not change the resource bytes or rights. MorphoLex includes noncommercial restrictions. Consult the installed notices and resource manifest before redistribution. A fixed resource does not make every downstream analysis stable. |
-| Expected-TTR D | Experimental estimator, explicit opt-in | Excluded from default metrics and presets. It fits an exact expectation curve; it is not CLAN VOCD, and CLAN equivalence is not established. |
-| Family profiles; annotation import/alignment/evaluation; MASC/quanteda adapters; n-gram reference builder; ambiguity and contextual-model review/evaluation/baselines; adjective–noun dependencies | Experimental interfaces | Existing help and interface versions continue to apply. Models and human decisions remain distinct. Alignment and replay checks do not establish analyzer or model accuracy. |
-| Study tables, corpus search/dispersion, collocation, keyness, readability, traced syntax and CA/classical MDS | Documented, explicitly sourced examples | Installed helpers are not exported APIs. Pin the package archive and preserve complete records. Examples connect existing calculations to source occurrences and reporting; they do not automatically choose a model or justify an inferential claim. |
-
-Stable 0.4.0 has 57 exports; development 0.4.0.9006 has 65. The eight
-new entry points have a documented initial interface; their formulas and
-analysis scope are those of the earlier examples. Stable release status
-does not remove the experimental labels in help or change the
-`stability` column returned by
-[`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
-An example helper is located with
-[`system.file()`](https://rdrr.io/r/base/system.file.html) and loaded
-with [`sys.source()`](https://rdrr.io/r/base/sys.source.html) as its
-guide shows; it has no separate `?function` help entry. See
-[`?ldfreq`](https://ryuya-dot-com.github.io/ldfreq/reference/ldfreq-package.md)
-for the input and guide map.
+A stable computational contract means a documented calculation is
+maintained; it does not establish validity for every population or task.
+Core method, preprocessing, resource and result-schema versions identify
+different parts of the analysis. Keep them in saved records.
 
 ## Languages and external tools
 
 | Route | Verified scope and requirements | Limits |
 |----|----|----|
-| English core and profiles | Authored counts, numerical reference fixtures, input/batch/missingness checks and saved-record replay; required packages are `digest` and `stringi`. | A tokenizer/lexical unit must suit the research question. NJ8 and bundled TUBELEX target English; generic tokens do not establish Treebank alignment. |
+| English core and profiles | Authored counts, numerical reference fixtures, input/batch/missingness checks and saved-record replay; required packages are `digest` and `stringi`. | A tokenizer/lexical unit must suit the research question. NJ8 and optional TUBELEX target English; generic tokens do not establish Treebank alignment. |
 | Japanese | Complete caller-supplied, source-aligned annotations; the guide names the optional gibasa/MeCab, dictionary and external Sudachi routes used in comparisons. | Specific pinned analyses support those examples. The package does not bundle a general Japanese parser, promise agreement between all dictionaries, or implement a Japanese readability score. |
 | English readability | Flesch Reading Ease and Flesch–Kincaid Grade Level with visible sentence, word and syllable counts; an optional `nsyllable` route distinguishes dictionary matches and fallback estimates. | Unresolved pronunciation and exclusions stay explicit. Agreement with the formulas does not validate comprehension or grade placement in a new population. |
 | English syntactic complexity | MLC, MLT and DC/C from traced original L2SCA outputs, with pinned Stanford tools/models, trees, query matches and original text. The authored offline example requires no parser. | The external runner requires the documented local Python/Java tools and separately acquired software/models. It is not a generic parser adapter or a parser-accuracy validation. |
@@ -106,18 +52,25 @@ required for the core R calculations. Their specific guide checks are
 separate from the R/OS matrix; the matrix does not execute every
 externally supplied model or corpus.
 
-MCA, nonmetric MDS, Japanese readability, a universal ability scale and
-a new model-fitting API are not included. Their absence does not leave
-an unfinished step in the documented CA/classical-MDS or reporting
-workflows.
-
 ## Moving from an earlier version
 
-**From 0.3.0.9019:** calculations, exports, schemas, helpers and
-resources are unchanged. New calculations record package version 0.4.0.
-Reopening an older RDS must preserve its original calculation version
-and session information; do not replace those fields with the currently
-installed version.
+**From 0.4.x:** first download only the optional reference resources you
+need. The data bytes are unchanged, but default NJ8/TUBELEX and
+morphology readers now use the explicit cache. No resource is downloaded
+during installation or ordinary calculations. Existing saved results
+remain readable.
+
+The canonical action names are
+[`lexdiv_compare_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md),
+[`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md),
+[`lexdiv_sort_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+and
+[`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
+The previous names remain exact compatibility aliases. Use
+`lexdiv_methods(scope = "variants")` for the variant catalog and
+`lexdiv_metrics(tokens, plan = plan)` to execute a plan; earlier calls
+remain supported. MTLD-MA is opt-in and does not change the eleven
+default metrics.
 
 **From 0.1.0 or 0.2.0:** the intervening changes below affect
 interpretation or compatibility. Retain the old archive and results
@@ -135,9 +88,9 @@ before computing again.
 2.  Default metric results have eleven rows. Canonical and
     length-comparison presets contain eleven and thirteen requests.
     [`lexdiv_metric_ids()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
-    still lists twelve supported metrics, including experimental
-    expected-TTR D. Select that estimator explicitly when it is part of
-    the study design.
+    still lists thirteen supported metrics, including experimental
+    expected-TTR D and MTLD-MA. Select these explicitly when they are
+    part of the study design.
 3.  Recreate old specifications and plans with current
     [`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
     and
@@ -155,9 +108,9 @@ before computing again.
 5.  TUBELEX contract 0.2.0 rejects known tokenizer mismatch by default.
     Prepare compatible terms, or explicitly record a sensitivity
     analysis with `tokenization_mismatch = "allow"`. Character-vector
-    alignment remains unverified. NJ8 contract 0.2.0 defaults to the
-    bundled list when `wordlist` is omitted or `NULL`; explicit external
-    lists retain their own identity.
+    alignment remains unverified. NJ8 uses the fixed cached list when
+    `wordlist` is omitted or `NULL`; explicit external lists retain
+    their own identity.
 6.  Version 0.2.0 corrected cancellation in near-saturated expected-TTR
     D without changing its estimator or method ID. Keep the package
     version as well as the method ID when comparing historical
@@ -190,9 +143,8 @@ measurements. Calculation versions shown in saved example output
 identify the original run; they are not replaced by the version used to
 reopen or report that record.
 
-The release evidence distinguishes successful computation/replay,
-agreement with independent numerical or software references, and
-empirical measurement validity. The first two do not prove the third.
-The documentation checks use independent development sessions; they are
-not a usability study with novice researchers. Population-level claims
-still need an appropriate research design.
+For guidance on selecting a measure, see the [metric-selection
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.md),
+which reports real-corpus length sensitivity, sampling reliability and
+external implementation comparisons. Population-level claims require a
+corresponding research design.

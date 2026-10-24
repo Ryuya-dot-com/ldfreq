@@ -1,6 +1,10 @@
-# Read the Bundled MorphoLex English Database
+# Read the Cached MorphoLex English Database
 
-Reads the bundled MorphoLex-en worksheet values without downloading data
+Reference snapshots require a prior explicit download; see
+[`lexdiv_download_resources`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_resources.md)
+for terms and cache setup.
+
+Reads the cached MorphoLex-en worksheet values without downloading data
 or requiring Excel, readxl, Python, or a model. This is a reference-data
 reader, not a morphological analyzer.
 
@@ -65,7 +69,7 @@ formulas are not retained. Blank exterior margins are omitted. Numeric
 and logical cells use R text representation; the source `Word` cells for
 ELP IDs 42162 and 65908 are logical values and read as `TRUE` and
 `FALSE`. Exact lowercase queries do not match these uppercase values. No
-linguistic corrections or inferred parts are added. The bundled original
+linguistic corrections or inferred parts are added. The cached original
 data dictionary describes the variables, including PFMF, family size,
 HAL frequency, P, and P\*. Its path is shown in the examples. The
 explicitly sourced `examples/morpholex-word-parts.R` recipe selects word
@@ -107,19 +111,18 @@ helpers are not exported package functions.
 ## Examples
 
 ``` r
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("morpholex"))$available)) {
 # "0-1-1" is a source worksheet: zero prefixes, one root, one suffix.
 reference <- morpholex_data(c("0-1-1", "All roots"))
 words <- reference$sheets[["0-1-1"]]
 words[words$Word %in% c("teacher", "teachers"),
       c("Word", "MorphoLexSegm", "ROOT1_FamSize", "ROOT1_Freq_HAL")]
-#>          Word MorphoLexSegm ROOT1_FamSize ROOT1_Freq_HAL
-#> 6247  teacher {(teach)}>er>             4          84480
-#> 6248 teachers {(teach)}>er>             4          84480
 # Both records contain teach and -er. Plural -s is outside this resource's scope.
 roots <- reference$sheets[["All roots"]]
 roots$HAL_freq <- as.numeric(roots$HAL_freq)
 reference$provenance$data_license
-#> [1] "CC BY-NC-SA 4.0"
-dictionary_path <- system.file("extdata", "morpholex", "5bc425fb",
-                               "MorphoLEX_en-Data_Dictionary.pdf", package = "ldfreq")
+dictionary_path <- file.path(lexdiv_resource_info("morpholex")$path, "extdata", "morpholex", "5bc425fb",
+                               "MorphoLEX_en-Data_Dictionary.pdf")
+}
 ```

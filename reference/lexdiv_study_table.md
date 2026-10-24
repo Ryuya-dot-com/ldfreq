@@ -101,7 +101,8 @@ Introduced as public interfaces in 0.4.0.9006 with the computations and
 table layout of the previous installed example. Sourcing
 `examples/study-table.R` still defines `study_long_table()` and
 `study_model_data()` with the same arguments and return values. See
-[`vignette("repeated-observations")`](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.md).
+[repeated observations
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html).
 
 ## Value
 

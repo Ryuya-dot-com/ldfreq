@@ -1,312 +1,97 @@
 # API and measurement lifecycle
 
-The resource-independent, pre-tokenized twelve-method core introduced in
-`0.1.0` is retained as a historical contract. Package 0.3.0 advances the
-core to contract 0.2.0: MTLD has no minimum factor length and a new
-method ID, and experimental expected-TTR D is excluded from defaults.
-The explicit legacy min10 method remains available through
-[`lexdiv_variant_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md).
-This is a documented breaking change with a minor package-version
-increment. Raw-text preprocessing, exact lexical overlap, many-document
-reference coverage, caller-supplied generic lexical-norm profiles, and
-resource-backed profiles are separate public surfaces with their own
-contract versions. The Maas/MTLD sensitivity surface also has a separate
-variant contract and does not add methods to the core registry. Bundled
-and external lexical-level profiles have a separate contract for
-resource input, rank bands, denominator, off-list handling, and plot
-data. Package version, metric-contract version, result-schema version,
-preprocessing-contract version, and resource-profile contract version
-are independent identities and are recorded separately.
+## Current distributions
 
-## Stable distribution 0.4.0
+The current development release is **0.5.0.9001**. It includes all
+current guide workflows. Stable **0.4.0** remains available as a
+separate fixed release. Pin the package archive used in an analysis and
+use `citation("ldfreq")` to cite that exact version. New releases do not
+replace earlier fixed archives.
 
-Version 0.4.0 consolidates the 0.3.0 development series without changing
-the calculations, public signatures, result schemas, installed example
-helpers or resource bytes of 0.3.0.9019. A stable package release does
-not promote every experimental interface or example helper to a stable
-API. The installed [release-scope
+The [release-scope
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/release-scope.html)
-defines the supported routes, remaining experimental interfaces,
-migration from older versions and interpretation limits. Existing
-contract versions and method identities remain authoritative; package
-and contract versions differ.
+explains supported inputs, optional integrations and compatibility. The
+[NEWS](https://ryuya-dot-com.github.io/ldfreq/news/index.html) records
+changes by version.
 
-The 57 exports and their documented arguments remain available.
-Explicitly sourced helpers are versioned by the package archive and
-retain their example status; pin the archive when using them. Their
-presence does not create new exports. Future changes follow the
-deprecation and measurement rules below.
+## Reference data in 0.5.0.9001
 
-## Development versions
+Third-party reference data are optional downloads with their own
+licenses. Use
+[`lexdiv_resource_info()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_resources.md)
+to inspect the terms, source, version and hash, then explicitly use
+`lexdiv_download_resources(..., accept_license = TRUE)`. Ordinary
+computation and installation never download resources. The MIT code can
+be installed and used without obtaining MorphoLex or any other reference
+snapshot. Existing resource-based analyses need this one-time setup; the
+reference data bytes and measurement definitions are unchanged.
 
-The 0.3.0 development builds use a fourth component, starting with
-0.3.0.9001.
-[`packageVersion()`](https://rdrr.io/r/utils/packageDescription.html)
-and [`citation()`](https://rdrr.io/r/utils/citation.html) therefore
-distinguish them from formal releases. The earlier `v0.3.0-dev.1` tag
-contains DESCRIPTION version 0.3.0; retain that exact tag/commit when
-identifying that historical snapshot. It is not rewritten or relabeled.
-Since 0.3.0 has already been distributed, subsequent versions must sort
-after it; a future formal version must also sort after its development
-predecessors (for example, 0.3.1 after 0.3.0.9001). The stable 0.4.0
-version sorts after 0.3.0.9019. The citation takes its version from
-installed DESCRIPTION metadata.
+Rendered guides are published on the website. The compact package
+archive contains guide sources and installed example scripts; it does
+not include rendered outputs from the separately licensed reference
+data.
 
-The next development series starts at 0.4.0.9001. It adds the explicitly
-sourced occurrence-MCA example without changing the 0.4.0 core, resource
-or public API contracts. Stable v0.4.0 remains a separate fixed
-distribution; install a named development archive to use the new
-example.
+## Metric identities and saved results
 
-Development 0.4.0.9002 adds optional display labels to its plotting
-helper. This display-only choice leaves original IDs, saved analyses and
-geometry intact.
+Package version, metric method ID, metric-contract version, result
+schema, preprocessing and reference-resource identity are separate.
+Preserve them with the original inputs and complete results. Changes in
+a package version do not relabel the methods or values inside an earlier
+saved result.
 
-Development 0.4.0.9003 adds an explicitly sourced textbook-progression
-example. It joins unchanged concordance records to a separate section
-roster and teaching introductions. It does not change existing saved
-records, core/resource contracts, exported functions or required
-dependencies.
+The current catalog has thirteen metrics: eleven defaults, opt-in
+`mtld_ma`, and experimental `expected_ttr_d`. MTLD-MA adds a separate
+method definition; it does not change ordinary MTLD or existing presets.
+Core contract 0.2.0 continues to describe the unchanged existing
+definitions and result schema. Adding an opt-in method does not
+invalidate plans for unchanged definitions.
 
-Development 0.4.0.9004 adds an explicitly sourced teaching-material
-example. It uses the existing exact phrase review to prepare learner
-HTML, teacher CSV and a complete private record. It adds no exported
-function or dependency and does not change source annotations, review
-semantics or numerical contracts.
+For historical analyses, package 0.3.0 changed ordinary MTLD from a
+minimum-ten factor rule to no minimum and advanced the core contract
+from 0.1.0 to 0.2.0. The old rule remains an explicit variant. Do not
+mix old and new MTLD values under one method label. Plans from the old
+contract must be recreated; reading old RDS results does not require
+rewriting their identities or values.
 
-Development 0.4.0.9005 extends the repeated-observations guide with an
-explicitly sourced inference recipe. Optional emmeans and pbkrtest
-provide specified means, a planned contrast and Kenward–Roger confidence
-intervals. Existing exports, measurement contracts and saved records are
-unchanged.
+Expected-TTR D remains an experimental curve estimator, not CLAN VOCD.
+Formula agreement, length sensitivity, sampling reliability and
+proficiency validity are distinct claims. The [selection
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html)
+provides evidence and conditions for choosing among the implemented
+measures.
 
-## Public study and corpus interfaces in 0.4.0.9006
+## Naming and compatibility
 
-Eight public entry points cover study-table construction/selection,
-concordance search/sorting/within-document dispersion, collocations and
-keyness with a concordance handoff. Their initial interface preserves
-the existing example computations, units, missingness and component
-layouts. The new search facade adds a `lexdiv_concordance` class and a
-registered [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
-method. Full source records and checksums remain in the results. The
-formula and resource contracts are unchanged; a public interface is not
-a claim of universal validity.
+General analysis functions use `lexdiv_`; resource-specific operations
+retain resource prefixes. Operation names put the action before its
+object. `_text` identifies raw text and `_batch` identifies separately
+named documents.
 
-The four installed helper files remain compatibility entry points,
-delegating to the same package implementations. Old named and positional
-calls retain plain lists, ordinary tables and the legacy ggplot return.
-Saved old concordance records are accepted by sorting, dispersion and
-collocations; old keyness records can feed the public concordance
-handoff. No saved object is silently rewritten. Save the full record and
-retain the package archive; checksums of a compatibility script alone no
-longer identify its underlying computation.
+| Current name | Earlier compatible name |
+|----|----|
+| [`lexdiv_compare_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md) | [`lexdiv_ngram_compare()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md) |
+| [`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md) | [`lexdiv_ngram_reference_build()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md) |
+| [`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md) | [`lexdiv_screen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md) |
+| [`lexdiv_sort_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md) | [`lexdiv_concordance_sort()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md) |
 
-## Method identity
+These four pairs are exact aliases, with the same arguments and results.
+Study-table, concordance, collocation and keyness functions are public
+APIs; their earlier installed source helpers remain compatibility
+wrappers. Saved old records remain accepted by the corresponding
+operations. No implicit migration overwrites a saved record.
 
-A `method_id` fixes the formula, scale, boundary and tail rules,
-operation semantics, aggregation, and canonical defaults. A substantive
-change receives a new method ID; an existing method ID is never silently
-redefined.
+Ordination, readability, L2SCA import and teaching workflows remain
+explicitly sourced recipes. Their guides define the required inputs and
+external tools. Pin the package archive when using these scripts. Their
+availability does not imply automatic linguistic annotation or
+educational interpretation.
 
-A numerical bug fix must name the affected method, add an independent
-regression fixture, and state explicitly whether the corrected behavior
-needs a new method ID. Compatibility is never inferred from a shared
-metric label.
+## Change policy
 
-Package 0.2.0 corrects cancellation in
-`expected_ttr_d_hypergeom_fit_v1`. Its finite-population expectation, D
-model, unweighted least-squares objective, parameter domain, and
-100-step log-D fit are unchanged. Direct duplicate-draw probabilities
-and stable residuals replace cancellation-prone arithmetic. This is an
-explicit numerical-correction exception to frozen evaluation order, not
-a new estimator: the method and core contract IDs remain unchanged, and
-the specification records the corrected evaluation. An independently
-generated 80-digit fixture covers the failure. Record the package
-version as well as the method ID when reproducing results.
-
-## Result and orchestration schemas
-
-A schema version fixes ordered fields, storage types, meanings, status
-and missingness vocabulary, and identity behavior. Public columns are
-not removed, reordered, or repurposed in a patch release. New
-diagnostics or fields require a new schema version.
-
-Default parameters, short-input behavior, token/type identity,
-normalization, and tokenization are measurement semantics. They are not
-changed in a patch release.
-
-Plan and specification hashes are reproducibility labels rather than
-security signatures. Any change to the identity field set or
-serialization receives a new schema version and new pinned fixtures. A
-new metric-contract version changes the identity values and hashes
-without changing their serialization or result schema. Saved results
-retain their old IDs and values; old plans must be explicitly recreated
-before new computation. See
-[`?lexdiv_metrics`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
-for migration.
-
-## Annotated corpus interfaces
-
-The experimental external-annotation importer starts at interface 0.1.0.
-It requires complete, ordered surface annotations before exclusions,
-permits only whitespace gaps, and reports segment-local inclusive
-Unicode codepoint positions without normalization. Feature columns and
-declared dictionary metadata remain explicit. It returns plain tables,
-not a sealed `lexdiv_tokenization`; the existing one-to-one annotation
-comparator is unchanged. The Japanese gibasa recipe does not define
-Japanese frequency resource compatibility or change any core metric
-contract.
-
-The experimental MASC Penn reader is at interface 0.2.0 and the quanteda
-adapter at 0.1.0 in package 0.2.0. Their source-coordinate rules,
-supported GrAF layout, gap preservation, segment mappings and output
-fields are public semantics. Unsupported annotations fail explicitly.
-They do not redefine the existing tokenizer, core metrics or adjacent
-n-gram contract. Reader coverage is verified for Mini-MASC 1.0’s Penn
-layer. Reader 0.2.0 adds the modern MASC 3.0.0 documentHeader layout
-without changing output fields or boundary rules. Only 122 of that
-archive’s 392 documents passed those rules in the local audit.
-Whole-corpus MASC and OANC support is not claimed.
-
-The experimental n-gram reference builder starts at version 0.1.0. It
-retains exact counts, denominators, source extraction fingerprints and a
-whole-document roster while dropping chunk occurrence tables. Its
-reference output uses the unchanged adjacent n-gram contract. Chunk
-boundaries can change row order and fingerprints without changing count
-or profile values. No pruning or silent document exclusions are
-permitted by the builder.
-
-## Deprecation
-
-An exported function, argument, method, or schema must be documented as
-deprecated in help and `NEWS.md` for at least one minor development
-cycle before removal. A replacement and migration path must be named.
-During the pre-1.0 period, an unavoidable breaking change increments the
-minor package version and is called out prominently.
-
-The canonical function and result-class names are established by the
-initial version 0.1.0 release. Compatibility aliases and a public
-deprecation cycle are unnecessary because no earlier CRAN version
-exposed alternative names. This initial-release exception does not waive
-the deprecation policy after publication.
-
-## Separate preprocessing and resource surfaces
-
-Raw-text tokenization and resource-backed lookup/results use separate
-functions and contracts. They do not overload or silently preprocess
-[`lexdiv_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md).
-[`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md)
-calls that unchanged core and keeps its token audit outside the metric
-schema. Adding or changing a tokenizer, normalization, content-word set,
-lemma backend contract, query transform, coverage denominator, or
-matched-only summary requires a new corresponding contract version.
-
-Flemma is a distinct lexical unit. Changing the fixed AntBNC
-adapter/parser, unknown-form fallback, override precedence, declared
-resource/override version semantics, label-disclosure boundary,
-path-provenance boundary, or public result semantics requires a new
-preprocessing contract version. Declared versions are caller labels, not
-inferred content identities. Performance caching must remain
-result-invariant; its source-byte digest must remain limited to caching
-and must not become public provenance or an overlap-comparability key.
-
-Preprocessing objects are validated against their recorded contract
-version. Objects serialized under the current `0.4.0` contract are
-revalidated whenever they are consumed. If provenance is incomplete,
-unsupported, or manually altered, recreate the object from the original
-text and reapply current annotations and explicit backend labels; do not
-edit provenance in place. Objects from preprocessing contract 0.1.0 must
-be recreated; there is no automatic migration. Tokenizer rules remain at
-tokenizer version 0.1.0. The new contract requires text hashes, the
-token pattern, character counts, and a fingerprint of the token rows
-before annotation. It detects accidental inconsistency, not intentional
-forgery or the correctness of supplied lemmas.
-
-TUBELEX profile contract 0.2.0 rejects known generic-tokenizer inputs
-unless the caller explicitly allows a mismatch, records alignment
-status, adds an opt-in apostrophe transform, and specifies batch
-snapshot reuse. The resource bytes and default character-term
-normalization have not changed. Convenience wide output retains
-specification metadata by default; reshaping and plotting reject
-comparison groups with unlike method, contract, or parameter identities.
-
-For lexical-level profiles, changing rank-to-level mapping, entry
-normalization, alias collision policy, default lexical unit, type
-identity, cumulative denominator, or off-list handling requires a new
-level-profile contract version. Public availability of a caller-supplied
-list does not admit its bytes to the package resource inventory.
-Changing AntBNC-versus-wordlist conflict detection, its default policy,
-or the reported alternative rank/level also requires a new level-profile
-contract version.
-
-For exact lexical overlap, changing set identity, normalization,
-formulas, denominators, empty-set behavior, content-word membership, the
-default comparability policy, or term-detail disclosure requires a new
-overlap contract version. Exact term details remain opt-in and must be
-visibly disclosed in the returned provenance and print output.
-
-For many-document reference coverage, changing exact reference
-membership, token/type formulas, document or reference empty-input
-rules, document-local invalidity, ID disclosure, summary shape,
-term-detail disclosure, or the scope of the whole-result row bound
-requires a new reference-coverage contract version. Adding
-normalization, annotation, or multiple-reference inference to the
-existing method IDs is not a compatible extension.
-
-For caller-supplied lexical-norm profiles, changing exact-key matching,
-measure/resource metadata fields, token/type identity, observed
-matched-only arithmetic means, any of the three coverage denominators,
-OOV versus missing- annotation states, fixed table columns or ordering,
-structural-error boundary, or whole-result row budget requires a new
-norm-profile contract or result schema version. Adding implicit
-normalization, fuzzy matching, imputation, automatic thresholds,
-composite scores, or a default cross-measure plot is not a compatible
-extension.
-
-The adjacent n-gram contract starts at 0.1.0, separately from core
-metrics. Document/segment boundaries, original-position adjacency,
-overlapping windows, component-wise exact identity, n-specific
-opportunity totals, completeness, sample-zero versus unlisted-key
-handling, token/type means and coverage, typed empty tables, field order
-and content fingerprints are public semantics. Changing these requires a
-new corresponding contract version. The occurrence ceiling is not a
-whole-result memory bound. Preparation and source metadata are caller
-assertions; fingerprints detect accidental changes, not authenticity.
-Association scores or new segmentation rules must not silently change
-these frequency definitions.
-
-The n-gram reference-comparison interface starts at contract 0.1.0. It
-reuses the existing per-reference profiles and fixes an all-reference
-intersection of defined rates, including defined sample zeros, for
-common-item means and baseline differences. Common coverage,
-per-document token/type weighting, empty/no-common-value states,
-reference order and pre-allocation row bound are public semantics. It
-does not change the adjacent n-gram 0.1.0 contract.
-
-The generic norm batch contract starts at 0.1.0. It preserves the
-unchanged single-document 0.1.0 tables behind a document-ID column and
-shared provenance. Its global row bound, document order, typed empty
-outputs and document-local missingness are public semantics. Pooling
-documents or changing its error boundary requires a separate contract
-decision.
-
-Likewise, adding a variant formula, threshold boundary, minimum factor
-length, tail rule, directional aggregation, or compatibility claim
-requires a new variant method or contract identity. Shared labels never
-imply equivalence with a third-party implementation.
-
-A normative measurement contract does not by itself establish
-redistribution rights for its reference data. Resource rights, artifact
-identity, coverage/failure behavior, installed notices, and package
-inventory are reviewed and recorded separately from the public API
-contract.
-
-## Bundled NJ8 in 0.2.0
-
-The level-profile and batch contracts advance to 0.2.0. An omitted or
-NULL `wordlist` selects the bundled `jacet2016-8000-v1` table. Explicit
-external inputs retain their previous matching, denominator, and
-conflict rules. Results now distinguish bundled and external resource
-identity and record the bundled source citation. The bundled version
-cannot be relabelled by a caller. No core metric formula or numerical
-value changes as part of this addition.
+A change to a formula, threshold rule, token selection or missingness
+meaning requires an identifiable method or contract change and migration
+documentation. An added optional operation should preserve existing
+defaults and result shapes. Document public renamings with compatibility
+aliases before removing old names. Errors in input types must be
+reported rather than silently coerced to scores; intended categorical
+metadata and legitimate missing results retain their roles.

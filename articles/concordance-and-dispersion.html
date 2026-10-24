@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -78,11 +80,11 @@ contexts, then uses the same saved occurrences for context sorting,
 position plots and a within-document dispersion measure. It keeps the
 search unit, excluded positions and denominators visible so that a
 changed search can be explained.</p>
-<p>Use ldfreq <strong>0.4.0.9006 or later</strong> and optional
-<strong>quanteda &gt;= 4.5.0</strong>; plotting also needs
-<strong>ggplot2</strong>. Install these packages before running the
-guide. Search with <code><a href="../reference/lexdiv_concordance.html">lexdiv_concordance()</a></code>, sort with
-<code><a href="../reference/lexdiv_concordance.html">lexdiv_concordance_sort()</a></code>, calculate DP with
+<p>Use ldfreq <strong>0.5.0.9001</strong> and optional <strong>quanteda
+&gt;= 4.5.0</strong>; plotting also needs <strong>ggplot2</strong>.
+Install these packages before running the guide. Search with
+<code><a href="../reference/lexdiv_concordance.html">lexdiv_concordance()</a></code>, sort with
+<code><a href="../reference/lexdiv_concordance.html">lexdiv_sort_concordance()</a></code>, calculate DP with
 <code><a href="../reference/lexdiv_concordance.html">lexdiv_concordance_dispersion()</a></code>, and draw saved positions
 with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. These operations need no helper sourcing. The
 example inputs and lemmas are authored for hand checking; they are not
@@ -329,8 +331,8 @@ intended searches before raising it for a larger input.</p>
 <h2 id="sort-by-the-nearest-context-words">Sort by the nearest context words<a class="anchor" aria-label="anchor" href="#sort-by-the-nearest-context-words"></a>
 </h2>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">right_sorted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_concordance.html">lexdiv_concordance_sort</a></span><span class="op">(</span><span class="va">search</span>, side <span class="op">=</span> <span class="st">"right"</span>, depth <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
-<span><span class="va">left_sorted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_concordance.html">lexdiv_concordance_sort</a></span><span class="op">(</span><span class="va">search</span>, side <span class="op">=</span> <span class="st">"left"</span>, depth <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">right_sorted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_concordance.html">lexdiv_sort_concordance</a></span><span class="op">(</span><span class="va">search</span>, side <span class="op">=</span> <span class="st">"right"</span>, depth <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
+<span><span class="va">left_sorted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_concordance.html">lexdiv_sort_concordance</a></span><span class="op">(</span><span class="va">search</span>, side <span class="op">=</span> <span class="st">"left"</span>, depth <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">right_sorted</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"query_id"</span>, <span class="st">"document_id"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  query_id document_id          pre     keyword         post</span></span>
 <span><span class="co">#&gt;      word      spread                    learn          a b</span></span>
@@ -377,8 +379,8 @@ is an occurrence plot, not a density estimate or a dispersion
 statistic.</p>
 <p>For page- or Unit-based counts and recurrence after a teaching
 introduction, see <a href="textbook-progression.html">textbook
-progression</a>, available in development 0.4.0.9003 or later. It joins
-these saved occurrences to a separate ordered section roster; the
+progression</a>, available in development 0.5.0.9001. It joins these
+saved occurrences to a separate ordered section roster; the
 token-position and DP definitions here remain unchanged.</p>
 <p>Relative coordinates are
 <code>(position - 0.5) / source_tokens</code>, the centers of the
@@ -477,7 +479,7 @@ when R closes. Keep the original session record.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">record</span>, <span class="va">saved</span><span class="op">)</span></span>
 <span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">saved</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">restored</span>, <span class="va">record</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/lexdiv_concordance.html">lexdiv_concordance_sort</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">search</span>, <span class="st">"right"</span>, <span class="fl">2L</span><span class="op">)</span>, <span class="va">restored</span><span class="op">$</span><span class="va">sorted</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/lexdiv_concordance.html">lexdiv_sort_concordance</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">search</span>, <span class="st">"right"</span>, <span class="fl">2L</span><span class="op">)</span>, <span class="va">restored</span><span class="op">$</span><span class="va">sorted</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/lexdiv_concordance.html">lexdiv_concordance_dispersion</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">search</span>, <span class="st">"word"</span>, <span class="fl">3L</span><span class="op">)</span>, <span class="va">restored</span><span class="op">$</span><span class="va">dispersion</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">restored</span><span class="op">$</span><span class="va">dispersion</span><span class="op">$</span><span class="va">occurrence_ids</span>,</span>
 <span>    <span class="va">restored</span><span class="op">$</span><span class="va">search</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">occurrence_id</span><span class="op">[</span><span class="va">restored</span><span class="op">$</span><span class="va">search</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">query_id</span> <span class="op">==</span> <span class="st">"word"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -486,7 +488,7 @@ path:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
 <span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"concordance-record.rds"</span><span class="op">)</span></span>
-<span><span class="va">sorted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">lexdiv_concordance_sort</span>,</span>
+<span><span class="va">sorted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">lexdiv_sort_concordance</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">restored</span><span class="op">$</span><span class="va">search</span><span class="op">)</span>, <span class="va">restored</span><span class="op">$</span><span class="va">sort</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">sorted</span>, <span class="va">restored</span><span class="op">$</span><span class="va">sorted</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">sorted</span></span></code></pre></div>

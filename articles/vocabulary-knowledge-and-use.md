@@ -9,6 +9,21 @@ response-comparison function can also describe scored L1 participant
 data: supply the appropriate ID columns through `keys`, such as
 `c("participant_id", "item_id")`.
 
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+lexdiv_resource_info(c("tubelex"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex"), accept_license = TRUE)
+```
+
 ## Begin with what a learner can do
 
 A learner selects the right definition in a vocabulary test. Can that

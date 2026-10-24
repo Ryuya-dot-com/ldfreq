@@ -1,5 +1,8 @@
 # Search source-aligned words and phrases and inspect their distribution
 
+`lexdiv_sort_concordance()` is the canonical name;
+`lexdiv_concordance_sort()` remains a compatibility alias.
+
 Search complete annotations, preserving original text, token positions,
 selection masks and zero-match documents. Sort saved contexts, draw
 positions, or compute single-token within-document dispersion without
@@ -8,6 +11,9 @@ searching again.
 ## Usage
 
 ``` r
+lexdiv_sort_concordance(x, side = c("right", "left"), depth = 1L,
+                        ignore_case = FALSE)
+
 lexdiv_concordance(x, queries, term_col = "surface",
     valuetype = c("fixed", "glob", "regex"), case_insensitive = FALSE,
     keep = rep(TRUE, nrow(x$tokens)), window = 5L, max_cells = 1e6)
@@ -128,8 +134,8 @@ plain lists; `concordance_positions()` still returns a ggplot object.
 Existing saved records remain accepted by the applicable operations. Do
 not change classes or integrity hashes by hand; to obtain the new plot
 interface for an old search, recreate it from its saved source and
-settings. See
-[`vignette("concordance-and-dispersion")`](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.md).
+settings. See [concordance and dispersion
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html).
 
 ## Value
 

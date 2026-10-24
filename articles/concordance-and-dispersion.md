@@ -8,12 +8,12 @@ a within-document dispersion measure. It keeps the search unit, excluded
 positions and denominators visible so that a changed search can be
 explained.
 
-Use ldfreq **0.4.0.9006 or later** and optional **quanteda \>= 4.5.0**;
-plotting also needs **ggplot2**. Install these packages before running
-the guide. Search with
+Use ldfreq **0.5.0.9001** and optional **quanteda \>= 4.5.0**; plotting
+also needs **ggplot2**. Install these packages before running the guide.
+Search with
 [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
 sort with
-[`lexdiv_concordance_sort()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
+[`lexdiv_sort_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
 calculate DP with
 [`lexdiv_concordance_dispersion()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
 and draw saved positions with
@@ -232,8 +232,8 @@ searches before raising it for a larger input.
 ## Sort by the nearest context words
 
 ``` r
-right_sorted <- lexdiv_concordance_sort(search, side = "right", depth = 2L)
-left_sorted <- lexdiv_concordance_sort(search, side = "left", depth = 2L)
+right_sorted <- lexdiv_sort_concordance(search, side = "right", depth = 2L)
+left_sorted <- lexdiv_sort_concordance(search, side = "left", depth = 2L)
 print(right_sorted[c("query_id", "document_id", "pre", "keyword", "post")], row.names = FALSE)
 #>  query_id document_id          pre     keyword         post
 #>      word      spread                    learn          a b
@@ -283,9 +283,9 @@ is an occurrence plot, not a density estimate or a dispersion statistic.
 For page- or Unit-based counts and recurrence after a teaching
 introduction, see [textbook
 progression](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.md),
-available in development 0.4.0.9003 or later. It joins these saved
-occurrences to a separate ordered section roster; the token-position and
-DP definitions here remain unchanged.
+available in development 0.5.0.9001. It joins these saved occurrences to
+a separate ordered section roster; the token-position and DP definitions
+here remain unchanged.
 
 Relative coordinates are `(position - 0.5) / source_tokens`, the centers
 of the original token slots on a common 0–1 scale. Exclusions do not
@@ -392,7 +392,7 @@ saved <- tempfile(fileext = ".rds") # Choose a persistent filename for research 
 saveRDS(record, saved)
 restored <- readRDS(saved)
 stopifnot(identical(restored, record),
-  identical(lexdiv_concordance_sort(restored$search, "right", 2L), restored$sorted),
+  identical(lexdiv_sort_concordance(restored$search, "right", 2L), restored$sorted),
   identical(lexdiv_concordance_dispersion(restored$search, "word", 3L), restored$dispersion),
   identical(restored$dispersion$occurrence_ids,
     restored$search$occurrences$occurrence_id[restored$search$occurrences$query_id == "word"]))
@@ -403,7 +403,7 @@ In a fresh R session, use the same package snapshot and your saved path:
 ``` r
 library(ldfreq)
 restored <- readRDS("concordance-record.rds")
-sorted <- do.call(lexdiv_concordance_sort,
+sorted <- do.call(lexdiv_sort_concordance,
   c(list(x = restored$search), restored$sort))
 stopifnot(identical(sorted, restored$sorted))
 sorted

@@ -1,8 +1,12 @@
 # Profile lexical coverage by New JACET 8000 frequency level
 
+Reference snapshots require a prior explicit download; see
+[`lexdiv_download_resources`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_resources.md)
+for terms and cache setup.
+
 Creates exact and cumulative token- and type-weighted lexical profiles
-from a bundled New JACET 8000 table or an explicit caller-supplied copy.
-The bundled table is redistributed with permission from JACET and source
+from a cached New JACET 8000 table or an explicit caller-supplied copy.
+The cached table is redistributed with permission from JACET and source
 attribution. No resource is downloaded at runtime.
 
 ## Usage
@@ -80,7 +84,7 @@ plot(
 
 - wordlist:
 
-  `NULL` selects the bundled, versioned table. Alternatively, a data
+  `NULL` selects the cached, versioned table. Alternatively, a data
   frame containing New JACET 8000 ranks and entries, or a path to the
   official local XLSX file or a local CSV file. Direct XLSX input
   requires the suggested readxl package.
@@ -125,7 +129,7 @@ plot(
 - resource_version:
 
   An optional version label for an external table. If `NULL`, its
-  canonical rank-entry SHA-256 supplies the identity. The bundled table
+  canonical rank-entry SHA-256 supplies the identity. The cached table
   has a fixed version and cannot be relabelled.
 
 - id_col, terms_col:
@@ -279,15 +283,15 @@ canonical rank-entry SHA-256. The absolute directory is not stored,
 printed, or repeated in package-generated error messages. A data-frame
 input has a canonical hash but no file hash.
 
-The bundled table is redistributed with permission from JACET and source
+The cached table is redistributed with permission from JACET and source
 attribution. Cite JACET Basic Word Revision Committee (Ed.). (2016).
 *The New JACET List of 8000 Basic Words*. Tokyo: Kirihara Shoten. The
-installed `licenses/nj8/NOTICE.md` records the permission and changes.
-All 8,000 rank/entry pairs match the official workbook. The bundled
-edition restores the missing word `nan` at rank 6926 and lowercase
+cached `licenses/nj8/NOTICE.md` records the permission and changes. All
+8,000 rank/entry pairs match the official workbook. The cached edition
+restores the missing word `nan` at rank 6926 and lowercase
 `true`/`false` at ranks 326/2382 in the supplied snapshot. External
 copies retain their applicable terms; supplying a table does not verify
-that it is the official edition. Provenance distinguishes bundled from
+that it is the official edition. Provenance distinguishes cached from
 external input and records the source hash and selected version.
 
 ## Batch output
@@ -308,7 +312,7 @@ The exact denominator, normalization, alias, flemma-conflict, batch,
 plot, and resource-boundary rules are installed in
 `lexical-level-profile-contract.json`. Locate it with
 `system.file("spec", "lexical-level-profile-contract.json", package = "ldfreq")`.
-The contract distinguishes the bundled default from external input. The
+The contract distinguishes the cached default from external input. The
 adapter's measurement contract is normative for version 0.2.0.
 
 ## Value
@@ -362,28 +366,9 @@ once.
 ## Examples
 
 ``` r
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("nj8"))$available)) {
 nj8_profile(c("the", "true", "false", "nan"))
-#> <nj8_profile> status=ok | token coverage=100.0% | unit=lemma
-#>  weighting level level_label items proportion cumulative_items
-#>      token     1     Level 1     2       0.50                2
-#>      token     2     Level 2     0       0.00                2
-#>      token     3     Level 3     1       0.25                3
-#>      token     4     Level 4     0       0.00                3
-#>      token     5     Level 5     0       0.00                3
-#>      token     6     Level 6     0       0.00                3
-#>      token     7     Level 7     1       0.25                4
-#>      token     8     Level 8     0       0.00                4
-#>      token    NA    Off-list     0       0.00               NA
-#>  cumulative_proportion
-#>                   0.50
-#>                   0.50
-#>                   0.75
-#>                   0.75
-#>                   0.75
-#>                   0.75
-#>                   1.00
-#>                   1.00
-#>                     NA
 
 wordlist <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
@@ -395,78 +380,7 @@ profile <- nj8_profile(
   unit = "surface"
 )
 profile$summary
-#>    weighting level level_label items proportion cumulative_items
-#> 1      token     1     Level 1     3  0.7500000                3
-#> 2      token     2     Level 2     0  0.0000000                3
-#> 3      token     3     Level 3     1  0.2500000                4
-#> 4      token     4     Level 4     0  0.0000000                4
-#> 5      token     5     Level 5     0  0.0000000                4
-#> 6      token     6     Level 6     0  0.0000000                4
-#> 7      token     7     Level 7     0  0.0000000                4
-#> 8      token     8     Level 8     0  0.0000000                4
-#> 9      token    NA    Off-list     0  0.0000000               NA
-#> 10      type     1     Level 1     2  0.6666667                2
-#> 11      type     2     Level 2     0  0.0000000                2
-#> 12      type     3     Level 3     1  0.3333333                3
-#> 13      type     4     Level 4     0  0.0000000                3
-#> 14      type     5     Level 5     0  0.0000000                3
-#> 15      type     6     Level 6     0  0.0000000                3
-#> 16      type     7     Level 7     0  0.0000000                3
-#> 17      type     8     Level 8     0  0.0000000                3
-#> 18      type    NA    Off-list     0  0.0000000               NA
-#>    cumulative_proportion
-#> 1              0.7500000
-#> 2              0.7500000
-#> 3              1.0000000
-#> 4              1.0000000
-#> 5              1.0000000
-#> 6              1.0000000
-#> 7              1.0000000
-#> 8              1.0000000
-#> 9                     NA
-#> 10             0.6666667
-#> 11             0.6666667
-#> 12             1.0000000
-#> 13             1.0000000
-#> 14             1.0000000
-#> 15             1.0000000
-#> 16             1.0000000
-#> 17             1.0000000
-#> 18                    NA
 profile$coverage
-#> $input_tokens
-#> [1] 4
-#> 
-#> $eligible_tokens
-#> [1] 4
-#> 
-#> $excluded_tokens
-#> [1] 0
-#> 
-#> $selection_coverage
-#> [1] 1
-#> 
-#> $matched_tokens
-#> [1] 4
-#> 
-#> $off_list_tokens
-#> [1] 0
-#> 
-#> $token_coverage
-#> [1] 1
-#> 
-#> $eligible_types
-#> [1] 3
-#> 
-#> $matched_types
-#> [1] 3
-#> 
-#> $off_list_types
-#> [1] 0
-#> 
-#> $type_coverage
-#> [1] 1
-#> 
 
 batch <- nj8_profile_batch(
   list(doc_a = c("The", "develop"), doc_b = c("rare", "outside")),
@@ -474,22 +388,12 @@ batch <- nj8_profile_batch(
   unit = "surface"
 )
 batch$coverage
-#>   document_id input_tokens eligible_tokens excluded_tokens selection_coverage
-#> 1       doc_a            2               2               0                  1
-#> 2       doc_b            2               2               0                  1
-#>   matched_tokens off_list_tokens token_coverage eligible_types matched_types
-#> 1              2               0              1              2             2
-#> 2              2               0              1              2             2
-#>   off_list_types type_coverage
-#> 1              0             1
-#> 2              0             1
 
 contract_path <- system.file(
   "spec", "lexical-level-profile-contract.json", package = "ldfreq"
 )
 stopifnot(nzchar(contract_path))
 basename(contract_path)
-#> [1] "lexical-level-profile-contract.json"
 
 if (FALSE) { # \dontrun{
 # A legitimately obtained official workbook can be used directly.
@@ -502,5 +406,6 @@ official <- nj8_profile(
 if (interactive()) {
   plot(profile)
   plot(profile, weighting = "type", include_off_list = FALSE)
+}
 }
 ```

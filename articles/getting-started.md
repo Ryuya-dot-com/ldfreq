@@ -3,10 +3,25 @@
 This guide takes a small English document table through analysis,
 reading results, making a table and plot, and saving and reopening the
 complete record. The first workflow uses the [documented
-installation](https://ryuya-dot-com.github.io/ldfreq/index.html#installation)
+installation](https://ryuya-dot-com.github.io/ldfreq/index.html#install)
 and requires no optional package, model or download. Run the examples in
 order through **Save and resume**; the later sections cover optional
 analysis choices.
+
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+lexdiv_resource_info(c("tubelex", "nj8"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
+```
 
 ## Your first document table
 
@@ -721,19 +736,20 @@ High coverage alone cannot validate segmentation. For multiple
 documents,
 [`tubelex_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md)
 returns a named list of complete profiles while loading one verified
-resource snapshot per call. See
-[`vignette("designing-comparisons", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.md)
+resource snapshot per call. See [designing comparisons
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.md)
 for a worked design.
 
 ## New JACET 8000 lexical levels
 
 [`nj8_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/nj8_profile.md)
-maps New JACET 8000 ranks to eight 1,000-rank levels. Omit `wordlist` to
-use the bundled table, redistributed with JACET permission and source
-attribution. Exact and cumulative token/type rates keep off-list items
-in the denominator. An explicit data frame, CSV, or official-layout XLSX
-remains supported. The next example deliberately supplies a small
-synthetic table so that each level can be checked by hand.
+maps New JACET 8000 ranks to eight 1,000-rank levels. After downloading
+`nj8`, omit `wordlist` to use the cached table, redistributed with JACET
+permission and source attribution. Exact and cumulative token/type rates
+keep off-list items in the denominator. An explicit data frame, CSV, or
+official-layout XLSX remains supported. The next example deliberately
+supplies a small synthetic table so that each level can be checked by
+hand.
 
 ``` r
 synthetic_nj8 <- data.frame(
@@ -961,7 +977,7 @@ head(profile)
 #> 5               FALSE
 #> 6                TRUE
 
-screen <- lexdiv_screen(profile)
+screen <- lexdiv_screen_lengths(profile)
 head(screen)
 #>         screen_schema_id screen_schema_version       profile_schema_id
 #> 1 lexdiv-r-screen-result                 0.1.0 lexdiv-r-profile-result
@@ -1160,12 +1176,12 @@ tokens. They are not direct measures of language proficiency, writing
 quality, reader response, or communicative effectiveness. A separate
 validated study design is needed to make claims about those constructs.
 
-The presets contain eleven methods; experimental expected-TTR D requires
-explicit selection. Use
+The canonical preset contains eleven methods; moving-average MTLD and
+experimental expected-TTR D require explicit selection. Use
 [`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
 and
 [`lexdiv_presets()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-to inspect the twelve supported methods and their bounded presets.
+to inspect the thirteen supported methods and their bounded presets.
 
 Expected-TTR D fits an explicit D curve to exact finite-population
 expected TTR values. It uses no random sampling or arbitrary D cap and

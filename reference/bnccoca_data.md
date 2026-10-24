@@ -1,5 +1,9 @@
 # Read Nation's BNC/COCA Level 6 Word-Family Lists
 
+Reference snapshots require a prior explicit download; see
+[`lexdiv_download_resources`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_resources.md)
+for terms and cache setup.
+
 Reads an offline snapshot of Nation's BNC/COCA Level 6 lists, Version
 1.0.0, with original source membership, spelling and attribution. No
 model, download or additional package is needed. These data use CC BY-SA
@@ -75,7 +79,7 @@ conflicting candidates. The default example uses only `dictionary`.
 The data and this conversion are CC BY-SA 4.0; independent R code
 remains MIT. Retain attribution, changes and ShareAlike conditions when
 redistributing the data. The complete license and notice are installed
-under `licenses/bnccoca/`. Other bundled resources have separate terms.
+under `licenses/bnccoca/`. Other cached resources have separate terms.
 
 ## References
 
@@ -98,16 +102,13 @@ tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affi
 ## Examples
 
 ``` r
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("bnccoca"))$available)) {
 reference <- bnccoca_data()
 # The dictionary maps forms to families; it is not a table of corpus counts.
 reference$dictionary[reference$dictionary$form %in%
   c("USE", "USES", "REUSABILITY", "COLOUR", "COLOR"),
   c("form", "headword", "frequency_band")]
-#>        form headword frequency_band
-#> 998  COLOUR   COLOUR              1
-#> 999   COLOR   COLOUR              1
-#> 6348    USE      USE              1
-#> 6374   USES      USE              1
 # USE/USES share a headword; COLOUR/COLOR share another. REUSABILITY has no row.
 
 # A longer installed workflow; the direct API example is in ?lexdiv_family_profile.
@@ -117,10 +118,5 @@ sys.source(system.file("examples", "bnccoca-families.R", package = "ldfreq",
 profile <- env$bnccoca_example$profile
 profile$documents[c("document_id", "selected_tokens", "matched_tokens",
   "unresolved_tokens", "family_types", "family_ttr", "status")]
-#>   document_id selected_tokens matched_tokens unresolved_tokens family_types
-#> 1      listed               4              4                 0            2
-#> 2    unlisted               2              1                 1           NA
-#>   family_ttr     status
-#> 1        0.5   complete
-#> 2         NA incomplete
+}
 ```

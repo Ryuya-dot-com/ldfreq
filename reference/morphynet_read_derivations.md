@@ -1,9 +1,13 @@
 # Read MorphyNet Derivational Relations from a Local File
 
+Reference snapshots require a prior explicit download; see
+[`lexdiv_download_resources`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_resources.md)
+for terms and cache setup.
+
 Reads supplied source word, target word, source POS, target POS,
 morpheme and prefix/suffix fields. Preserves alternative relations and
 source identity for inspection and optional keyword-in-context review.
-The complete English v1 file has been checked; the bundled nine-row
+The complete English v1 file has been checked; the cached nine-row
 excerpt is only a teaching example.
 
 ## Usage
@@ -91,9 +95,10 @@ lemmatize, infer inflections, predict learner knowledge or compute
 productivity.
 
 The full English file is obtained separately. Only nine attributed
-example rows and their original line mapping are bundled, under
-`extdata/morphynet-example/`. Resource and conversion terms are recorded
-under `licenses/morphynet/`; the independent R code remains MIT.
+example rows and their original line mapping are downloaded separately,
+under `extdata/morphynet-example/`. Resource and conversion terms are
+recorded under `licenses/morphynet/`; the independent R code remains
+MIT.
 
 ## References
 
@@ -114,20 +119,15 @@ tutorial](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affi
 ## Examples
 
 ``` r
-path <- system.file("extdata", "morphynet-example", "eng.derivational.example.tsv",
-  package = "ldfreq", mustWork = TRUE)
+# Optional data: review and explicitly download these resources first.
+if (all(lexdiv_resource_info(c("morphynet"))$available)) {
+path <- file.path(lexdiv_resource_info("morphynet")$path, "extdata", "morphynet-example",
+  "eng.derivational.example.tsv")
 reference <- morphynet_read_derivations(path, language = "en",
   resource_version = "English v1; nine-row teaching excerpt")
 reference$relations[reference$relations$target_word == "reusability", ]
-#>                      relation_id source_line source_word target_word source_pos
-#> 4 morphynet:d6aae849b1a0:0000004           4       reuse reusability          N
-#> 6 morphynet:d6aae849b1a0:0000006           6    reusable reusability          J
-#> 7 morphynet:d6aae849b1a0:0000007           7   usability reusability          N
-#>   target_pos morpheme affix_position
-#> 4          N  ability         suffix
-#> 6          N      ity         suffix
-#> 7          N       re         prefix
 # Three incoming relations, not three counted affixes in one segmentation.
 # For a complete, separately obtained English v1 file:
 # reference <- morphynet_read_derivations("eng.derivational.v1.tsv", "en", "English v1")
+}
 ```

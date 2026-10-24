@@ -170,24 +170,16 @@ results, not only displayed tables.
 
 ## Open a guide or installed example
 
-The built source archive includes guides that can be opened locally:
+Use the online guide links above. The compact source archive includes
+guide sources; rendered guides are published on the website separately.
 
-    vignette("getting-started", package = "ldfreq")
-    vignette("repeated-observations", package = "ldfreq")
-
-Use `vignette(package = "ldfreq")` to list the installed guides. A
-GitHub source installation may omit rendered guides; use the online
-links above in that case.
-
-Study-table, concordance, collocation, keyness, ordination, readability
-and syntax helpers are installed example code, not exported functions.
-They do not have individual `?function` or `example("function")`
-entries. Each guide shows the
+Study-table, concordance, collocation and keyness functions are exported
+and have ordinary help entries. Ordination, readability, syntax and
+teaching recipes remain installed example code. Their guides show the
 [`system.file()`](https://rdrr.io/r/base/system.file.html) and
 [`sys.source()`](https://rdrr.io/r/base/sys.source.html) calls needed to
-load its helpers, which are then called as `helper$function(...)`.
-Follow the guide's input requirements when replacing its authored data
-with your own.
+load the helpers. Follow the guide's input requirements when replacing
+its authored data with your own.
 
 ## Choose your input
 
@@ -308,14 +300,14 @@ Choose the entry point from the form of data you already have:
   [`lexdiv_import_annotations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md)
   to verify complete supplied surfaces against original segment text and
   retain source positions and dictionary declarations. See the Japanese
-  annotations guide for an optional gibasa/UniDic recipe; bundled
+  annotations guide for an optional gibasa/UniDic recipe; optional
   frequency resources remain English.
 
 - A corpus-relative reference profile:
 
   Use
   [`tubelex_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md)
-  for bundled TUBELEX frequency/prevalence, or
+  for cached TUBELEX frequency/prevalence, or
   [`nj8_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/nj8_profile.md)
   for New JACET 8000 levels.
 
@@ -339,8 +331,8 @@ frequency-profile surfaces. It also provides local MATTR window and
 positional-exposure diagnostics, exact term and annotated-content-word
 type overlap, many-document coverage by one explicit reference term set,
 caller-supplied lexical-norm profiles with separate resource and
-annotation coverage, plus New JACET 8000 level profiles using the
-bundled table or an external copy.
+annotation coverage, plus New JACET 8000 level profiles using the cached
+table or an external copy.
 [`bnccoca_data`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md)
 supplies Nation's BNC/COCA Level 6 family membership and separate
 supplementary lists under CC BY-SA 4.0, for use with
@@ -348,9 +340,9 @@ supplementary lists under CC BY-SA 4.0, for use with
 [`morphynet_read_derivations`](https://ryuya-dot-com.github.io/ldfreq/reference/morphynet_read_derivations.md)
 reads local MorphyNet formation relations, preserving source and target
 POS, affixes and alternatives. Only a nine-row CC BY-SA 3.0 teaching
-excerpt is bundled, not the full database.
+excerpt is an optional download, not the full database.
 [`morpholex_data`](https://ryuya-dot-com.github.io/ldfreq/reference/morpholex_data.md)
-provides the bundled MorphoLex English worksheet tables and provenance.
+provides the cached MorphoLex English worksheet tables and provenance.
 Those data and their dictionary use CC BY-NC-SA 4.0 (noncommercial use,
 attribution and applicable ShareAlike conditions), separately from the
 MIT license of the independent R code. Adjacent bigram/trigram
@@ -375,7 +367,7 @@ conventions. Document repeated speakers and turn boundaries when
 preparing spoken data.
 
 Native-speaker status does not establish a universal proficiency or
-quality norm. The bundled TUBELEX resource describes YouTube subtitle
+quality norm. The cached TUBELEX resource describes YouTube subtitle
 word forms; it does not certify the first-language background or ability
 of each speaker.
 
@@ -509,11 +501,11 @@ context-independent lexical sophistication.
 ## Lexical frequency levels
 
 [`nj8_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/nj8_profile.md)
-maps bundled or caller-supplied ranks to Levels 1–8 and reports exact
-and cumulative token/type proportions beside off-list coverage. The
-Level 8 cumulative proportion equals matched coverage because off-list
-items remain in the denominator. The package bundles the versioned New
-JACET 8000 table with JACET permission and source attribution; an
+maps cached or caller-supplied ranks to Levels 1–8 and reports exact and
+cumulative token/type proportions beside off-list coverage. The Level 8
+cumulative proportion equals matched coverage because off-list items
+remain in the denominator. The optional download supplies the versioned
+New JACET 8000 table with JACET permission and source attribution; an
 external list can be supplied explicitly. Flemma input exposes conflicts
 between AntBNC families and New JACET headwords instead of silently
 choosing one mapping.

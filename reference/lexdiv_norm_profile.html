@@ -15,7 +15,7 @@ separately and should accompany every interpretation of an estimate."></head><bo
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,6 +27,8 @@ separately and should accompany every interpretation of an estimate."></head><bo
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -158,100 +160,53 @@ compare unlike scales, form composite scores, or approve a data license.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="../articles/japanese-norms.html">vignette("japanese-norms", package = "ldfreq")</a></code> for stimulus-item
+    <div class="dont-index"><p><a href="https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.html">japanese norms guide</a> for stimulus-item
 tables, local Japanese norm files, scale interpretation and data terms.</p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">norms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"book"</span>, <span class="st">"read"</span>, <span class="st">"rare"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  familiarity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">5</span>, <span class="cn">NA_real_</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  measure_id <span class="op">=</span> <span class="st">"familiarity"</span>,</span></span>
-<span class="r-in"><span>  value_column <span class="op">=</span> <span class="st">"familiarity"</span>,</span></span>
-<span class="r-in"><span>  construct_id <span class="op">=</span> <span class="st">"subjective_familiarity"</span>,</span></span>
-<span class="r-in"><span>  value_unit <span class="op">=</span> <span class="st">"seven_point_rating"</span>,</span></span>
-<span class="r-in"><span>  direction <span class="op">=</span> <span class="st">"higher"</span>,</span></span>
-<span class="r-in"><span>  language <span class="op">=</span> <span class="st">"English"</span>,</span></span>
-<span class="r-in"><span>  variety <span class="op">=</span> <span class="st">"unspecified"</span>,</span></span>
-<span class="r-in"><span>  population_id <span class="op">=</span> <span class="st">"example_adults"</span>,</span></span>
-<span class="r-in"><span>  collection_year <span class="op">=</span> <span class="st">"2025"</span>,</span></span>
-<span class="r-in"><span>  valid_min <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>  valid_max <span class="op">=</span> <span class="fl">7</span>,</span></span>
-<span class="r-in"><span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">resource</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  resource_id <span class="op">=</span> <span class="st">"example_norms"</span>,</span></span>
-<span class="r-in"><span>  resource_version <span class="op">=</span> <span class="st">"2025-01"</span>,</span></span>
-<span class="r-in"><span>  creator <span class="op">=</span> <span class="st">"Example creator"</span>,</span></span>
-<span class="r-in"><span>  source_reference <span class="op">=</span> <span class="st">"Example citation"</span>,</span></span>
-<span class="r-in"><span>  data_license <span class="op">=</span> <span class="st">"Example terms; verify before redistribution"</span>,</span></span>
-<span class="r-in"><span>  transformation_id <span class="op">=</span> <span class="st">"none"</span>,</span></span>
-<span class="r-in"><span>  lookup_unit <span class="op">=</span> <span class="st">"lowercase_lemma"</span>,</span></span>
-<span class="r-in"><span>  resource_key_normalization_id <span class="op">=</span> <span class="st">"caller-prepared-v1"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_norm_profile</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"book"</span>, <span class="st">"book"</span>, <span class="st">"rare"</span>, <span class="st">"unknown"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  <span class="va">norms</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"term"</span>,</span></span>
-<span class="r-in"><span>  <span class="va">specs</span>,</span></span>
-<span class="r-in"><span>  <span class="va">resource</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">profile</span><span class="op">$</span><span class="va">summary</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   result_order   resource_id resource_version  measure_id</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1            1 example_norms          2025-01 familiarity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2            2 example_norms          2025-01 familiarity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             construct_id         value_unit direction language     variety</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 subjective_familiarity seven_point_rating    higher  English unspecified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 subjective_familiarity seven_point_rating    higher  English unspecified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    population_id collection_year                             statistic_id</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 example_adults            2025 arithmetic_mean_observed_matched_only_v1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 example_adults            2025 arithmetic_mean_observed_matched_only_v1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   weighting     type_identity estimate status missing_reason input_units</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     token              &lt;NA&gt;        6     ok           &lt;NA&gt;           4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      type exact_lookup_term        6     ok           &lt;NA&gt;           3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   matched_units unmatched_units observed_value_units</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1             3               1                    2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2             2               1                    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   matched_missing_value_units resource_coverage value_coverage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                           1         0.7500000      0.5000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                           1         0.6666667      0.3333333</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   annotation_coverage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1           0.6666667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2           0.5000000</span>
-<span class="r-in"><span><span class="va">profile</span><span class="op">$</span><span class="va">coverage</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   result_order   resource_id resource_version  measure_id weighting input_units</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1            1 example_norms          2025-01 familiarity     token           4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2            2 example_norms          2025-01 familiarity      type           3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   matched_units unmatched_units observed_value_units</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1             3               1                    2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2             2               1                    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   matched_missing_value_units resource_coverage value_coverage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                           1         0.7500000      0.5000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                           1         0.6666667      0.3333333</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   annotation_coverage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1           0.6666667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2           0.5000000</span>
-<span class="r-in"><span><span class="va">profile</span><span class="op">$</span><span class="va">lookup</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   input_index    term  measure_id       lookup_status value       value_status</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1           1    book familiarity    matched_resource     6           observed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2           2    book familiarity    matched_resource     6           observed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3           3    rare familiarity    matched_resource    NA missing_annotation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4           4 unknown familiarity unknown_to_resource    NA not_applicable_oov</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;lexdiv_norm_profile: ok; example_norms@2025-01; 1 measure; 4 lookup rows; schema 0.1.0&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   measure_id weighting estimate status missing_reason resource_coverage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  familiarity     token        6     ok           &lt;NA&gt;         0.7500000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  familiarity      type        6     ok           &lt;NA&gt;         0.6666667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  annotation_coverage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            0.6666667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            0.5000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Means are conditional on observed matched values; inspect $coverage.</span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">norms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"book"</span>, <span class="st">"read"</span>, <span class="st">"rare"</span><span class="op">)</span>,</span>
+<span>  familiarity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">5</span>, <span class="cn">NA_real_</span><span class="op">)</span>,</span>
+<span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  measure_id <span class="op">=</span> <span class="st">"familiarity"</span>,</span>
+<span>  value_column <span class="op">=</span> <span class="st">"familiarity"</span>,</span>
+<span>  construct_id <span class="op">=</span> <span class="st">"subjective_familiarity"</span>,</span>
+<span>  value_unit <span class="op">=</span> <span class="st">"seven_point_rating"</span>,</span>
+<span>  direction <span class="op">=</span> <span class="st">"higher"</span>,</span>
+<span>  language <span class="op">=</span> <span class="st">"English"</span>,</span>
+<span>  variety <span class="op">=</span> <span class="st">"unspecified"</span>,</span>
+<span>  population_id <span class="op">=</span> <span class="st">"example_adults"</span>,</span>
+<span>  collection_year <span class="op">=</span> <span class="st">"2025"</span>,</span>
+<span>  valid_min <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  valid_max <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">resource</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  resource_id <span class="op">=</span> <span class="st">"example_norms"</span>,</span>
+<span>  resource_version <span class="op">=</span> <span class="st">"2025-01"</span>,</span>
+<span>  creator <span class="op">=</span> <span class="st">"Example creator"</span>,</span>
+<span>  source_reference <span class="op">=</span> <span class="st">"Example citation"</span>,</span>
+<span>  data_license <span class="op">=</span> <span class="st">"Example terms; verify before redistribution"</span>,</span>
+<span>  transformation_id <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  lookup_unit <span class="op">=</span> <span class="st">"lowercase_lemma"</span>,</span>
+<span>  resource_key_normalization_id <span class="op">=</span> <span class="st">"caller-prepared-v1"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_norm_profile</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"book"</span>, <span class="st">"book"</span>, <span class="st">"rare"</span>, <span class="st">"unknown"</span><span class="op">)</span>,</span>
+<span>  <span class="va">norms</span>,</span>
+<span>  <span class="st">"term"</span>,</span>
+<span>  <span class="va">specs</span>,</span>
+<span>  <span class="va">resource</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">profile</span><span class="op">$</span><span class="va">summary</span></span>
+<span><span class="va">profile</span><span class="op">$</span><span class="va">coverage</span></span>
+<span><span class="va">profile</span><span class="op">$</span><span class="va">lookup</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

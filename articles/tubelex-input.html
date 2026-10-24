@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -72,10 +74,23 @@
     
     
 <div class="section level2">
+<h2 id="optional-reference-data-setup">Optional reference-data setup<a class="anchor" aria-label="anchor" href="#optional-reference-data-setup"></a>
+</h2>
+<p>The reference-dependent sections use separately licensed data. Review
+<a href="reference-data.html">the resource terms and cache
+instructions</a>, then obtain only the resources needed for the sections
+you will run. Core calculations and examples using your own tables do
+not require these downloads.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># After reviewing each resource's license and notice:</span></span>
+<span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_download_resources</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span><span class="op">)</span>, accept_license <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="match-the-resources-word-units">Match the resource’s word units<a class="anchor" aria-label="anchor" href="#match-the-resources-word-units"></a>
 </h2>
 <p>The question is the frequency and video/channel prevalence of a
-text’s word forms in the bundled TUBELEX reference corpus. Its English
+text’s word forms in the cached TUBELEX reference corpus. Its English
 Treebank table uses NLTK’s sentence-aware <code>word_tokenize()</code>.
 The general R tokenizer in ldfreq retains contractions; looking up its
 unsplit <code>don't</code> is a different operation from looking up
@@ -99,8 +114,8 @@ input as automatically aligned.</p>
 <p>Use an existing Python environment with NLTK. This recipe was checked
 with NLTK 3.9.3. Install the English sentence model explicitly before an
 offline run:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> pip install nltk==3.9.3</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> nltk.downloader punkt_tab</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> pip install nltk==3.9.3</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> nltk.downloader punkt_tab</span></code></pre></div>
 <p>Skip these commands if that environment and model are already
 available. The model is needed because <code>word_tokenize()</code>
 first segments sentences. Calling <code>TreebankWordTokenizer</code> on
@@ -116,17 +131,17 @@ package; install it with <code>install.packages("jsonlite")</code> if
 needed. Run them in your analysis directory after the Python setup. The
 script refuses to overwrite an existing output, does no runtime
 downloading, and processes the supplied text locally.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
 <span><span class="va">texts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  first <span class="op">=</span> <span class="st">"I don't think it's John's book."</span>,</span>
 <span>  second <span class="op">=</span> <span class="st">"I don’t think it’s John’s book. She bought 12 books."</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/read_json.html" class="external-link">write_json</a></span><span class="op">(</span><span class="va">texts</span>, <span class="st">"texts.json"</span>, auto_unbox <span class="op">=</span> <span class="cn">TRUE</span>, pretty <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/read_json.html" class="external-link">write_json</a></span><span class="op">(</span><span class="va">texts</span>, <span class="st">"texts.json"</span>, auto_unbox <span class="op">=</span> <span class="cn">TRUE</span>, pretty <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">script</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"tubelex-tokenize.py"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span></span>
 <span><span class="va">status</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system2.html" class="external-link">system2</a></span><span class="op">(</span><span class="st">"python3"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/shQuote.html" class="external-link">shQuote</a></span><span class="op">(</span><span class="va">script</span><span class="op">)</span>, <span class="st">"texts.json"</span>, <span class="st">"tubelex-tokens.json"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="va">status</span> <span class="op">==</span> <span class="fl">0L</span><span class="op">)</span></span>
-<span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/read_json.html" class="external-link">read_json</a></span><span class="op">(</span><span class="st">"tubelex-tokens.json"</span>, simplifyVector <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/read_json.html" class="external-link">read_json</a></span><span class="op">(</span><span class="st">"tubelex-tokens.json"</span>, simplifyVector <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co"># Preserve empty token arrays as character(0), rather than an R list.</span></span>
 <span><span class="va">prepared</span><span class="op">$</span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">prepared</span><span class="op">$</span><span class="va">documents</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">x</span>, use.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
@@ -142,7 +157,7 @@ downloading, and processes the supplied text locally.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>profiles <span class="op">=</span> <span class="va">profiles</span>, preprocessing <span class="op">=</span> <span class="va">prepared</span><span class="op">$</span><span class="va">preprocessing</span><span class="op">)</span>,</span>
 <span>        <span class="st">"tubelex-analysis.rds"</span><span class="op">)</span></span></code></pre></div>
 <p>The first sentence yields:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"i"</span>, <span class="st">"do"</span>, <span class="st">"n't"</span>, <span class="st">"think"</span>, <span class="st">"it"</span>, <span class="st">"'s"</span>, <span class="st">"john"</span>, <span class="st">"'s"</span>, <span class="st">"book"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "i"     "do"    "n't"   "think" "it"    "'s"    "john"  "'s"    "book"</span></span></code></pre></div>
 <p>The curly-apostrophe spelling yields the same words for that
@@ -163,7 +178,7 @@ slim table’s lexical filter. Inspect <code>lookup</code> and coverage
 rather than assigning missing terms frequency zero or silently removing
 them to improve the match rate. Any extra exclusion changes the analysis
 denominator and must be applied consistently and reported.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
 <span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"i"</span>, <span class="st">"do"</span>, <span class="st">"n't"</span>, <span class="st">"think"</span>, <span class="st">"it"</span>, <span class="st">"'s"</span>, <span class="st">"john"</span>, <span class="st">"'s"</span>, <span class="st">"book"</span><span class="op">)</span></span>
 <span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="va">terms</span>, normalization <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span></span>

@@ -87,8 +87,8 @@ determine what research claims these scores can support.
 
 Audit column names such as `n_selected`, `prototype_status`, and
 `centroid_status` are reserved. Conflicting input columns are rejected.
-See
-[`vignette("contextual-models", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.md)
+See [contextual models
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.html)
 for a complete English/Japanese scoring, baseline comparison and KWIC
 example.
 
@@ -159,7 +159,4 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
   scored$centroid$suggestions[c("surface", "candidate_id", "score")]
   scored$candidates[c("term", "candidate_id", "n_selected", "n_vectors")]
 }
-#>   term candidate_id n_selected n_vectors
-#> 1 bank            a          1         1
-#> 2 bank            b          1         1
 ```

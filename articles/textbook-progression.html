@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -63,23 +65,23 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Trace target vocabulary through textbook pages and units</h1>
-
-
+            
+      
       <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/vignettes/textbook-progression.Rmd" class="external-link"><code>vignettes/textbook-progression.Rmd</code></a></small>
       <div class="d-none name"><code>textbook-progression.Rmd</code></div>
     </div>
 
-
-
+    
+    
 <p>A word can occur six times in one opening unit or return in three
 different units. Total frequency cannot distinguish those arrangements.
 This guide asks <strong>where selected words occur, and whether they
 return after their declared teaching unit</strong>. It connects saved
 concordance matches to a book’s section roster, then displays counts
 without losing absent targets or unobserved parts.</p>
-<p>Use development <strong>ldfreq 0.4.0.9003 or later</strong>, optional
+<p>Use development <strong>ldfreq 0.5.0.9001</strong>, optional
 <strong>quanteda &gt;= 4.5.0</strong> for searching, and
-<strong>ggplot2</strong> for drawing. See the <a href="https://ryuya-dot-com.github.io/ldfreq/index.html#installation">installation
+<strong>ggplot2</strong> for drawing. See the <a href="https://ryuya-dot-com.github.io/ldfreq/index.html#install">installation
 instructions</a>. Stable 0.4.0 does not include this example. The two
 helpers in <code>examples/textbook-progression.R</code> are explicitly
 sourced installed examples, not exported functions. The script also
@@ -313,10 +315,10 @@ boundaries, and is not a substitute for the progression display.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">occurrences</span>, <span class="va">query_id</span> <span class="op">==</span> <span class="st">"river"</span> <span class="op">&amp;</span> <span class="va">included</span> <span class="op">&amp;</span> <span class="va">unit</span> <span class="op">&gt;</span> <span class="fl">1</span>,</span>
 <span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">occurrence_id</span>, <span class="va">page</span>, <span class="va">unit</span>, <span class="va">role</span>, <span class="va">pre</span>, <span class="va">keyword</span>, <span class="va">post</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                                      occurrence_id page unit</span></span>
-<span><span class="co">#&gt; 3 1b3e7c307fa6d1bf8aa97ac6073bcd4dbea8aea0bb80baf58bb3385f9b8091c0    5    3</span></span>
-<span><span class="co">#&gt; 4 ff1800721debbcbe3ba6099c0e1579d4fd8e9e23281f3b54cda1370d56efb422    5    3</span></span>
-<span><span class="co">#&gt; 5 6b125932446a7cd88cd1380e03ded6fabdbafebd74beac7625678075c3fb266f    9    5</span></span>
-<span><span class="co">#&gt; 6 e21b689218fc6ab7433bb59984b9933ba543593b443bbe1cd30fa0eebf944bb2    9    5</span></span>
+<span><span class="co">#&gt; 3 ef2e4be9fd08c67d352c77c2c28ff5b06a9dbcef31d2d6153153d80644c7ccc6    5    3</span></span>
+<span><span class="co">#&gt; 4 57853e4216a59bc8ce5e472f1bd3a1e8db9422160e81ba1792e150e8ffaebb3a    5    3</span></span>
+<span><span class="co">#&gt; 5 f70c273d3c0158cf258715b8f91822805af10960f8a67b91d0dc9dc5d0bd43a0    9    5</span></span>
+<span><span class="co">#&gt; 6 02aa75c75c39a1ebf5ea43e7a52fc18cc2b8ace57d30e56fc5b2a2509105497c    9    5</span></span>
 <span><span class="co">#&gt;   role                  pre keyword              post</span></span>
 <span><span class="co">#&gt; 3 body                 The    river      is clean. We</span></span>
 <span><span class="co">#&gt; 4 body      . We cross the    river                 .</span></span>

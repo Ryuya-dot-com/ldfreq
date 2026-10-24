@@ -13,7 +13,7 @@ the words counted, analysis settings and reasons for unavailable scores."></head
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,8 @@ the words counted, analysis settings and reasons for unavailable scores."></head
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -185,16 +187,13 @@ Save original inputs and complete results, not only displayed tables.</p>
     </div>
     <div class="section level2">
     <h2 id="open-a-guide-or-installed-example">Open a guide or installed example<a class="anchor" aria-label="anchor" href="#open-a-guide-or-installed-example"></a></h2>
-    <p>The built source archive includes guides that can be opened locally:</p><div class="sourceCode"><pre><code><span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"getting-started"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"repeated-observations"</span>, package <span class="op">=</span> <span class="st">"ldfreq"</span><span class="op">)</span></span></code></pre></div><p>Use <code>vignette(package = "ldfreq")</code> to list the installed guides.
-A GitHub source installation may omit rendered guides; use the online links
-above in that case.</p>
-<p>Study-table, concordance, collocation, keyness, ordination, readability and syntax helpers
-are installed example code, not exported functions. They do not have individual
-<code>?function</code> or <code>example("function")</code> entries. Each guide shows the
-<code><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file()</a></code> and <code><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source()</a></code> calls needed to load its helpers,
-which are then called as <code>helper$function(...)</code>. Follow the guide's input
+    <p>Use the online guide links above. The compact source archive includes guide
+sources; rendered guides are published on the website separately.</p>
+<p>Study-table, concordance, collocation and keyness functions are exported and
+have ordinary help entries. Ordination, readability, syntax and teaching
+recipes remain installed example code. Their guides show the
+<code><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file()</a></code> and <code><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source()</a></code> calls needed to load the helpers.
+Follow the guide's input
 requirements when replacing its authored data with your own.</p>
     </div>
     <div class="section level2">
@@ -273,11 +272,11 @@ requirements when replacing its authored data with your own.</p>
   <code><a href="lexdiv_import_annotations.html">lexdiv_import_annotations</a></code> to verify complete supplied surfaces
   against original segment text and retain source positions and dictionary
   declarations. See the Japanese annotations guide for an optional gibasa/UniDic
-  recipe; bundled frequency resources remain English.</p></dd>
+  recipe; optional frequency resources remain English.</p></dd>
 
   <dt>A corpus-relative reference profile</dt>
 <dd><p>Use
-  <code><a href="tubelex_profile.html">tubelex_profile()</a></code> for bundled TUBELEX frequency/prevalence,
+  <code><a href="tubelex_profile.html">tubelex_profile()</a></code> for cached TUBELEX frequency/prevalence,
   or <code><a href="nj8_profile.html">nj8_profile()</a></code> for New JACET 8000 levels.</p></dd>
 
 
@@ -300,14 +299,14 @@ surfaces. It also provides local MATTR window and positional-exposure
 diagnostics, exact term and annotated-content-word type overlap,
 many-document coverage by one explicit reference term set, caller-supplied
 lexical-norm profiles with separate resource and annotation coverage, plus
-New JACET 8000 level profiles using the bundled table or an external copy.
+New JACET 8000 level profiles using the cached table or an external copy.
 <code><a href="bnccoca_data.html">bnccoca_data</a></code> supplies Nation's BNC/COCA Level 6 family
 membership and separate supplementary lists under CC BY-SA 4.0, for use with
 <code><a href="lexdiv_family_profile.html">lexdiv_family_profile</a></code>.
 <code><a href="morphynet_read_derivations.html">morphynet_read_derivations</a></code> reads local MorphyNet formation
 relations, preserving source and target POS, affixes and alternatives. Only a
-nine-row CC BY-SA 3.0 teaching excerpt is bundled, not the full database.
-<code><a href="morpholex_data.html">morpholex_data</a></code> provides the bundled MorphoLex English worksheet
+nine-row CC BY-SA 3.0 teaching excerpt is an optional download, not the full database.
+<code><a href="morpholex_data.html">morpholex_data</a></code> provides the cached MorphoLex English worksheet
 tables and provenance. Those data and their dictionary use CC BY-NC-SA 4.0
 (noncommercial use, attribution and applicable ShareAlike conditions),
 separately from the MIT license of the independent R code.
@@ -330,7 +329,7 @@ The raw-text helpers do not infer these attributes or parse corpus XML and
 transcription conventions. Document repeated speakers and turn boundaries
 when preparing spoken data.</p>
 <p>Native-speaker status does not establish a universal proficiency or quality
-norm. The bundled TUBELEX resource describes YouTube subtitle word forms; it
+norm. The cached TUBELEX resource describes YouTube subtitle word forms; it
 does not certify the first-language background or ability of each speaker.</p>
     </div>
     <div class="section level2">
@@ -441,10 +440,10 @@ register, or context-independent lexical sophistication.</p>
     </div>
     <div class="section level2">
     <h2 id="lexical-frequency-levels">Lexical frequency levels<a class="anchor" aria-label="anchor" href="#lexical-frequency-levels"></a></h2>
-    <p><code><a href="nj8_profile.html">nj8_profile()</a></code> maps bundled or caller-supplied ranks to Levels 1–8 and
+    <p><code><a href="nj8_profile.html">nj8_profile()</a></code> maps cached or caller-supplied ranks to Levels 1–8 and
 reports exact and cumulative token/type proportions beside off-list coverage.
 The Level 8 cumulative proportion equals matched coverage because off-list
-items remain in the denominator. The package bundles the versioned New JACET 8000 table with JACET
+items remain in the denominator. The optional download supplies the versioned New JACET 8000 table with JACET
 permission and source attribution; an external list can be supplied explicitly. Flemma input exposes conflicts between AntBNC families and
 New JACET headwords instead of silently choosing one mapping.</p>
     </div>

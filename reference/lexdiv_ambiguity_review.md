@@ -74,8 +74,8 @@ lexdiv_ambiguity_review(x, targets, candidates, resource,
 
 The function reuses
 [`lexdiv_as_quanteda`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_read_masc.md)
-and [`quanteda::kwic()`](https://quanteda.io/reference/kwic.html) with
-fixed, case-sensitive matching, then verifies exact source/query
+and [`quanteda::kwic()`](https://rdrr.io/pkg/quanteda/man/kwic.html)
+with fixed, case-sensitive matching, then verifies exact source/query
 equality to distinguish canonically equivalent Unicode spellings. It
 never retokenizes. A token containing both whitespace and non-whitespace
 characters is not supported by this adapter. Non-ASCII tokens require a
@@ -140,7 +140,8 @@ data's sharing restrictions.
 [`lexdiv_import_contextual`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_contextual.md),
 [`lexdiv_import_annotations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md),
 [`lexdiv_as_quanteda`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_read_masc.md),
-[`vignette("ambiguity-review", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.md)
+[ambiguity review
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/ambiguity-review.html)
 
 ## Examples
 
@@ -168,6 +169,4 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
   reviewed <- lexdiv_ambiguity_review(x, "bank", candidates, resource, decisions)
   reviewed$summary
 }
-#>   term candidate_count occurrences unreviewed selected unresolved no_candidates
-#> 1 bank               2           1          0        1          0             0
 ```

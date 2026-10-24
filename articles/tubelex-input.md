@@ -1,9 +1,24 @@
 # Preparing English input for TUBELEX
 
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+lexdiv_resource_info(c("tubelex"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex"), accept_license = TRUE)
+```
+
 ## Match the resource’s word units
 
 The question is the frequency and video/channel prevalence of a text’s
-word forms in the bundled TUBELEX reference corpus. Its English Treebank
+word forms in the cached TUBELEX reference corpus. Its English Treebank
 table uses NLTK’s sentence-aware `word_tokenize()`. The general R
 tokenizer in ldfreq retains contractions; looking up its unsplit `don't`
 is a different operation from looking up `do` and `n't`. Even if both

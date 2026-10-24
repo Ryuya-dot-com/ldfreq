@@ -1,5 +1,20 @@
 # Designing comparable lexical-diversity analyses
 
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+lexdiv_resource_info(c("tubelex"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex"), accept_license = TRUE)
+```
+
 ## Start with a question and a comparison unit
 
 Suppose the question is whether writers use a greater variety of word

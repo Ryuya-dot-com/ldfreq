@@ -135,53 +135,11 @@ responses <- data.frame(learner_id = rep("example", 5),
 comparison <- lexdiv_compare_responses(responses,
   test = "recognition", criterion = "recall")
 comparison$counts
-#>             outcome n
-#> 1      both_correct 1
-#> 2         test_only 1
-#> 3    criterion_only 1
-#> 4    both_incorrect 1
-#> 5      missing_test 1
-#> 6 missing_criterion 0
-#> 7      missing_both 0
 comparison$summary
-#>                                              quantity denominator numerator
-#> 1                      agreement_among_complete_pairs           4         2
-#> 2                      test_only_among_complete_pairs           4         1
-#> 3                 criterion_only_among_complete_pairs           4         1
-#> 4 criterion_failure_among_test_correct_complete_pairs           2         1
-#> 5                              complete_pair_fraction           5         4
-#>   proportion
-#> 1       0.50
-#> 2       0.25
-#> 3       0.25
-#> 4       0.50
-#> 5       0.80
 
 repeated <- rbind(transform(responses, occasion_id = "pre"),
   transform(responses, occasion_id = "post"))
 lexdiv_compare_responses(repeated, "recognition", "recall",
   keys = c("learner_id", "item_id", "occasion_id"),
   by = "occasion_id")$summary
-#>    occasion_id                                            quantity denominator
-#> 1          pre                      agreement_among_complete_pairs           4
-#> 2          pre                      test_only_among_complete_pairs           4
-#> 3          pre                 criterion_only_among_complete_pairs           4
-#> 4          pre criterion_failure_among_test_correct_complete_pairs           2
-#> 5          pre                              complete_pair_fraction           5
-#> 6         post                      agreement_among_complete_pairs           4
-#> 7         post                      test_only_among_complete_pairs           4
-#> 8         post                 criterion_only_among_complete_pairs           4
-#> 9         post criterion_failure_among_test_correct_complete_pairs           2
-#> 10        post                              complete_pair_fraction           5
-#>    numerator proportion
-#> 1          2       0.50
-#> 2          1       0.25
-#> 3          1       0.25
-#> 4          1       0.50
-#> 5          4       0.80
-#> 6          2       0.50
-#> 7          1       0.25
-#> 8          1       0.25
-#> 9          1       0.50
-#> 10         4       0.80
 ```

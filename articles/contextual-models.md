@@ -769,11 +769,9 @@ occurrences across sets. Report candidate coverage,
 processed/all-occurrence coverage, conditional accuracy on independently
 resolved cases and unresolved cases separately. Inspect errors by
 language, reading, frequency, genre and segmentation. Abstentions must
-remain visible. For usability, compare existing tools and this joined
-workflow on the same task: erroneous joins, missed cases, correction
-time and reproducibility. Human review time, semantic accuracy, norm
-validity and learner knowledge require evidence beyond a software round
-trip; the authored examples supply none of it.
+remain visible. Evaluate semantic accuracy against independent
+annotations, and collect separate evidence when interpreting a norm or
+inferring learner knowledge.
 
 ``` r
 saved <- tempfile(fileext = ".rds")

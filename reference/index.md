@@ -14,6 +14,9 @@
   [`print(`*`<lexdiv_batch_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
   [`print(`*`<lexdiv_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
   : Compute Versioned Lexical-Diversity Metric Variants
+- [`lexdiv_resource_info()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_resources.md)
+  [`lexdiv_download_resources()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_resources.md)
+  : Inspect and explicitly download optional reference data
 
 ## Raw text and lexical units
 
@@ -61,7 +64,8 @@
   [`lexdiv_study_model_data()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
   : Join planned observations to saved measurements and select model
   rows
-- [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+- [`lexdiv_sort_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+  [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
   [`lexdiv_concordance_sort()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
   [`lexdiv_concordance_dispersion()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
   [`plot(`*`<lexdiv_concordance>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
@@ -94,7 +98,8 @@
 
 ## Profiles and screens
 
-- [`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+- [`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+  [`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
   [`lexdiv_grid()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
   [`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
   [`print(`*`<lexdiv_spec>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
@@ -136,9 +141,11 @@
   [`print(`*`<lexdiv_ngram_reference>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngrams.md)
   [`print(`*`<lexdiv_ngram_profile>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngrams.md)
   : Adjacent Bigrams and Trigrams with Local Reference Frequencies
-- [`lexdiv_ngram_reference_build()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md)
+- [`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md)
+  [`lexdiv_ngram_reference_build()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md)
   : Build an N-gram Reference from Whole-document Chunks
-- [`lexdiv_ngram_compare()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md)
+- [`lexdiv_compare_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md)
+  [`lexdiv_ngram_compare()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md)
   : Compare N-gram References on the Same Target Items
 - [`lexdiv_read_masc()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_read_masc.md)
   [`lexdiv_as_quanteda()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_read_masc.md)
@@ -147,7 +154,7 @@
 ## Reference-resource profiles
 
 - [`morpholex_data()`](https://ryuya-dot-com.github.io/ldfreq/reference/morpholex_data.md)
-  : Read the Bundled MorphoLex English Database
+  : Read the Cached MorphoLex English Database
 - [`bnccoca_data()`](https://ryuya-dot-com.github.io/ldfreq/reference/bnccoca_data.md)
   : Read Nation's BNC/COCA Level 6 Word-Family Lists
 - [`morphynet_read_derivations()`](https://ryuya-dot-com.github.io/ldfreq/reference/morphynet_read_derivations.md)

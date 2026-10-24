@@ -11,7 +11,7 @@ domains, suppress values, or claim universal validity cutoffs."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,6 +23,8 @@ domains, suppress values, or claim universal validity cutoffs."></head><body>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -79,41 +81,8 @@ MTLD implementation is numerically identical to the defined target method.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">evidence</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_length_evidence</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">evidence</span><span class="op">[</span><span class="va">evidence</span><span class="op">$</span><span class="va">metric_id</span> <span class="op">==</span> <span class="st">"mtld"</span>, <span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                    evidence_id                 source_id</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1              koizumi_2012_mtld_spoken_l2_100              koizumi_2012</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 zenker_kyle_2021_mtld_original_written_l2_50          zenker_kyle_2021</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5        taaled_0_32_mtld_original_guidance_50 taaled_0_32_documentation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               source_kind metric_id</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1         empirical_study      mtld</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2         empirical_study      mtld</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 versioned_tool_guidance      mtld</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                             method_scope</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Gramulator 5.0 raw bidirectional MTLD; target equivalence not asserted</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                         MTLD Original; target equivalence not asserted</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                              TAALED 0.32 MTLD Original</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   floor_tokens                     evidence_role</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1          100   context_specific_recommendation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2           50    minimum_observed_stable_length</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5           50 use_with_confidence_tool_guidance</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                      population</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 20 lower-intermediate Japanese adolescent L2 English learners</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                  4,542 ICNALE L2 English argumentative essays</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                 not one validation population</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                      modality_genre target_method_equivalence</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 tape-mediated spoken responses on familiar topics              not_asserted</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                      written argumentative essays              not_asserted</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                             general tool guidance              not_asserted</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   universal_cutoff                       doi</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1            FALSE 10.7820/vli.v01.1.koizumi</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2            FALSE 10.1016/j.asw.2020.100505</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5            FALSE                      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                              url</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 https://www.castledown.com/journals/vli/article/download/vli.v01.1.koizumi/213</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2            https://www.sciencedirect.com/science/article/pii/S1075293520300660</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                          https://pypi.org/project/taaled/0.32/</span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">evidence</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_length_evidence</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">evidence</span><span class="op">[</span><span class="va">evidence</span><span class="op">$</span><span class="va">metric_id</span> <span class="op">==</span> <span class="st">"mtld"</span>, <span class="op">]</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

@@ -7,10 +7,9 @@ after their declared teaching unit**. It connects saved concordance
 matches to a book’s section roster, then displays counts without losing
 absent targets or unobserved parts.
 
-Use development **ldfreq 0.4.0.9003 or later**, optional **quanteda \>=
-4.5.0** for searching, and **ggplot2** for drawing. See the
-[installation
-instructions](https://ryuya-dot-com.github.io/ldfreq/index.html#installation).
+Use development **ldfreq 0.5.0.9001**, optional **quanteda \>= 4.5.0**
+for searching, and **ggplot2** for drawing. See the [installation
+instructions](https://ryuya-dot-com.github.io/ldfreq/index.html#install).
 Stable 0.4.0 does not include this example. The two helpers in
 `examples/textbook-progression.R` are explicitly sourced installed
 examples, not exported functions. The script also loads the unchanged
@@ -231,10 +230,10 @@ is not a substitute for the progression display.
 subset(x$occurrences, query_id == "river" & included & unit > 1,
   select = c(occurrence_id, page, unit, role, pre, keyword, post))
 #>                                                      occurrence_id page unit
-#> 3 1b3e7c307fa6d1bf8aa97ac6073bcd4dbea8aea0bb80baf58bb3385f9b8091c0    5    3
-#> 4 ff1800721debbcbe3ba6099c0e1579d4fd8e9e23281f3b54cda1370d56efb422    5    3
-#> 5 6b125932446a7cd88cd1380e03ded6fabdbafebd74beac7625678075c3fb266f    9    5
-#> 6 e21b689218fc6ab7433bb59984b9933ba543593b443bbe1cd30fa0eebf944bb2    9    5
+#> 3 ef2e4be9fd08c67d352c77c2c28ff5b06a9dbcef31d2d6153153d80644c7ccc6    5    3
+#> 4 57853e4216a59bc8ce5e472f1bd3a1e8db9422160e81ba1792e150e8ffaebb3a    5    3
+#> 5 f70c273d3c0158cf258715b8f91822805af10960f8a67b91d0dc9dc5d0bd43a0    9    5
+#> 6 02aa75c75c39a1ebf5ea43e7a52fc18cc2b8ace57d30e56fc5b2a2509105497c    9    5
 #>   role                  pre keyword              post
 #> 3 body                 The    river      is clean. We
 #> 4 body      . We cross the    river                 .

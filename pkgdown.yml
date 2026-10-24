@@ -7,6 +7,7 @@ articles:
   annotation-alignment: annotation-alignment.html
   annotation-evaluation: annotation-evaluation.html
   auditing-vocabulary-profiles: auditing-vocabulary-profiles.html
+  choosing-metrics: choosing-metrics.html
   collocation-association: collocation-association.html
   concordance-and-dispersion: concordance-and-dispersion.html
   contextual-models: contextual-models.html
@@ -27,6 +28,7 @@ articles:
   ngram-profiles: ngram-profiles.html
   open-access-papers: open-access-papers.html
   preprocessing-and-frequency: preprocessing-and-frequency.html
+  reference-data: reference-data.html
   release-scope: release-scope.html
   repeated-observations: repeated-observations.html
   syntactic-complexity: syntactic-complexity.html
@@ -34,7 +36,7 @@ articles:
   tubelex-input: tubelex-input.html
   vocabulary-knowledge-and-use: vocabulary-knowledge-and-use.html
   word-families-and-affixes: word-families-and-affixes.html
-last_built: 2026-10-24T05:45Z
+last_built: 2026-10-24T10:41Z
 urls:
   reference: https://ryuya-dot-com.github.io/ldfreq/reference
   article: https://ryuya-dot-com.github.io/ldfreq/articles

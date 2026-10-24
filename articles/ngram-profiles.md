@@ -131,7 +131,7 @@ counts.
 
 When the reference has many documents, retaining all n-gram occurrences
 can be unnecessary.
-[`lexdiv_ngram_reference_build()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md)
+[`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md)
 calls your reader once for each source ID and adds its counts and
 denominators. Each callback returns an ordinary
 [`lexdiv_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngrams.md)
@@ -145,7 +145,7 @@ read_document <- function(id) {
   rows <- reference_tokens[reference_tokens$document_id == id, ]
   lexdiv_ngrams(rows, preparation, documents = id)
 }
-built <- lexdiv_ngram_reference_build(c("r1", "r2"), read_document, resource)
+built <- lexdiv_build_ngram_reference(c("r1", "r2"), read_document, resource)
 built$reference$totals
 #>   n opportunities documents
 #> 1 2             9         2
@@ -176,7 +176,7 @@ read_local <- function(id) {
   lexdiv_ngrams(readRDS(row$file), preparation,
     documents = row$document_id, max_ngrams = 200000)
 }
-built <- lexdiv_ngram_reference_build(manifest$source_id, read_local, resource,
+built <- lexdiv_build_ngram_reference(manifest$source_id, read_local, resource,
                                      max_types = 1000000)
 saveRDS(built, "local-reference-build.rds")
 ```
@@ -276,7 +276,7 @@ frequencies.
 
 Rates do not divide by all word tokens. A published table normalized by
 word tokens therefore has a different definition, even if it uses the
-same “per million” label. A unigram reference such as bundled TUBELEX
+same “per million” label. A unigram reference such as cached TUBELEX
 lacks the observed co-occurrence counts needed here.
 
 `lookup` keeps each phrase’s document, segment and start/end positions
@@ -348,7 +348,7 @@ sample-zero counts. The result retains that reason explicitly.
 
 ## Compare references on the same target items
 
-[`lexdiv_ngram_compare()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md)
+[`lexdiv_compare_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md)
 keeps both the available-value summaries above and an additional
 comparison on the **same items with defined rates in every reference**.
 This distinction matters when missing rows change the apparent mean. The
@@ -357,7 +357,7 @@ first named reference is the default baseline; choose another with
 
 ``` r
 references <- list(complete = reference, pruned = partial)
-compared <- lexdiv_ngram_compare(target, references, baseline = "complete")
+compared <- lexdiv_compare_ngrams(target, references, baseline = "complete")
 subset(compared$summary, document_id == "choice_item" & n == 2 & weighting == "token",
   select = c(reference_id, mean_frequency_per_million, value_coverage,
     common_items, common_coverage, common_mean_frequency_per_million,
@@ -412,7 +412,7 @@ convert frequency differences into proficiency or employability scores.
 path <- tempfile(fileext = ".rds")
 saveRDS(list(target = target, references = references, comparison = compared), path)
 saved <- readRDS(path)
-stopifnot(identical(lexdiv_ngram_compare(saved$target, saved$references,
+stopifnot(identical(lexdiv_compare_ngrams(saved$target, saved$references,
   baseline = saved$comparison$provenance$baseline), saved$comparison))
 unlink(path)
 ```

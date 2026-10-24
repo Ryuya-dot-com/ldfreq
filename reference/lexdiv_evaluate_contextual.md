@@ -91,8 +91,8 @@ Model-assisted reference judgments are not independent validation. Even
 a declared blinded held-out reference requires external checks of the
 annotation protocol, candidate inventory, sampling and split. These
 outputs describe agreement, not automatically gold-standard accuracy or
-learner knowledge. See
-[`vignette("contextual-models", package = "ldfreq")`](https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.md).
+learner knowledge. See [contextual models
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/contextual-models.html).
 
 ## Value
 
@@ -148,6 +148,4 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
     model_exposure = "unknown", evaluation_role = "development"))
   evaluated$summary[c("agreement", "paired", "agreement_among_paired", "prediction_coverage")]
 }
-#>   agreement paired agreement_among_paired prediction_coverage
-#> 1         1      1                      1                   1
 ```

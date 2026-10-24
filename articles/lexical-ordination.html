@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+    <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
     <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
@@ -85,9 +87,9 @@ optional <code>ca</code> package (<code>install.packages("ca")</code>).
 No new tokenizer or model is needed. The example uses authored counts to
 make the calculations checkable, not empirical learner differences.</p>
 <p>The <a href="#occurrence-mca">occurrence-MCA example</a> requires
-<strong>0.4.0.9001 or later</strong>, not stable 0.4.0. It describes
-several nominal variables coded for each original occurrence, rather
-than a document-by-term frequency table.</p>
+<strong>0.5.0.9001</strong>, not stable 0.4.0. It describes several
+nominal variables coded for each original occurrence, rather than a
+document-by-term frequency table.</p>
 <div class="section level2">
 <h2 id="begin-with-the-counted-documents">Begin with the counted documents<a class="anchor" aria-label="anchor" href="#begin-with-the-counted-documents"></a>
 </h2>
@@ -665,11 +667,11 @@ independent linguistic meanings.</p>
 <pre><code><span><span class="co">#&gt; Warning: Displayed axes touch a repeated eigenvalue; their orientation is not</span></span>
 <span><span class="co">#&gt; unique. Inspect axes and diagnostics.</span></span></code></pre>
 <p><img src="lexical-ordination_files/figure-html/mca-maps-2.png" class="r-plt" alt="" width="576"></p>
-<p>The optional <code>labels</code> argument requires <strong>0.4.0.9002
-or later</strong>. Review tools can return long occurrence IDs that
-overlap or are clipped in a plot. Supply a character vector whose names
-are exactly the displayed occurrence IDs (or category IDs on a category
-map); its order need not match the result table. Choose short,
+<p>The optional <code>labels</code> argument requires
+<strong>0.5.0.9001</strong>. Review tools can return long occurrence IDs
+that overlap or are clipped in a plot. Supply a character vector whose
+names are exactly the displayed occurrence IDs (or category IDs on a
+category map); its order need not match the result table. Choose short,
 distinguishable display names. The returned <code>mca_display</code>
 table keeps <code>id</code>, <code>label</code>, <code>x</code> and
 <code>y</code> for every point, including co-located points. Use its

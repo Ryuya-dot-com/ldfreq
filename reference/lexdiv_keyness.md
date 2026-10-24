@@ -82,8 +82,8 @@ Counting requires no optional package. Returning to KWIC uses optional
 quanteda (\>= 4.5.0) and restricts endpoints to the exact counted term
 before matching, preserving Unicode key distinctions. Source text is
 retained in the complete result. Legacy `examples/keyness.R` still
-defines its old names and output shapes. See
-[`vignette("keyness-comparison")`](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.md).
+defines its old names and output shapes. See [keyness comparison
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html).
 
 ## Value
 
