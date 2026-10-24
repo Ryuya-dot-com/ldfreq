@@ -1,3 +1,14 @@
+# ldfreq (development)
+
+- Build the guides without downloaded reference data. Resource-dependent
+  examples run only with a verified cache; core workflows remain executable.
+  Include rendered vignettes in the source artifact and check their rebuilding.
+- Keep plot-test replacements inside ldfreq and its sourced recipes instead
+  of changing standard-package bindings or S3 registrations. Retain actual
+  device checks for color, monochrome, labels and graphics-state restoration.
+- Declare the test dependency on withr and require testthat >= 3.1.8.
+  Correct cached-license locations and wrap long help usage and examples.
+
 # ldfreq 0.5.0.9001
 
 - Separate optional TUBELEX, NJ8, MorphoLex, BNC/COCA and MorphyNet reference

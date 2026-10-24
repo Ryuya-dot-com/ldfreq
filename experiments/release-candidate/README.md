@@ -83,16 +83,19 @@ the example does not select a future release version.
 `run-as-cran-check.R` runs `R CMD check --as-cran --no-manual` against one
 named tarball. The default `new-submission-only` policy remains strict. The
 workflow selects `release-resource-notes`: `Status: OK`, or individually
-recognized NOTES for CRAN's `New submission` (with only the exact optional
-`Non-FOSS package license (file LICENSE)` line) and installed package size.
-The non-FOSS disposition is retained to classify historical archives that
-bundled MorphoLex; it does not describe the current package's MIT code or
-extend the separately downloaded data's rights. The size disposition must
-list only R/doc/extdata, include doc and extdata, and total
-at most 15 MiB (the 9019 Linux baseline was 10.9 MiB). The attributed resources
-and rendered guides explain that size; the exact file BOM and independent
-resource inventories still have to pass. Unexpected payload areas, duplicate
-notes, size growth beyond that bound, warnings and errors remain blocking.
+recognized NOTES for CRAN's `New submission` and installed package size.
+The current MIT package no longer admits the historical non-FOSS license note
+or the URL exceptions recorded for 0.4.0. The size disposition allows only
+R/doc rows, requires doc, and bounds R at 2 MiB, doc at 5 MiB and the total
+at 10 MiB. This is a local regression bound, not a CRAN acceptance guarantee.
+Unexpected payload areas, duplicate notes, unexplained incoming results,
+warnings and errors remain blocking.
+
+The source is built with rendered vignettes using a fresh resource cache.
+Artifact checks include vignette rebuilding and do not download optional data.
+The ordinary R-CMD-check workflow separately exercises explicitly obtained
+reference snapshots. The exact file BOM and independent resource inventories
+still have to pass.
 
 The `minimum-r-optional-backends` policy is restricted to the
 `ubuntu-latest-r-4.1` job on R 4.1.x. It also requires the exact dependency NOTE
@@ -161,10 +164,9 @@ responses need a narrow disposition, not another numerical run:
   could not be connected to. The provider page was inspected and the same
   reference passed the Linux/macOS checks of this archive.
 
-`check-note-policy.R` recognizes only these exact job/URL/source/status/detail
-combinations, including the recorded archive size for the DOI case. Altered
-URLs, other HTTP responses and additional lines fail. The raw failed responses
-remain unchanged; they are not reported as successful access by those runners.
+These dispositions are historical evidence for that archive only. The current
+NOTE classifier rejects them, including unchanged responses; each new artifact
+must establish its own incoming-check results.
 
 `Check-Evidence-Run` reuses the completed raw check records from the declared
 source-archive run. Its source commit and completed workflow identity are

@@ -19,7 +19,7 @@ cat("Minimum-R note policy accepts only the two declared optional backends.\n")
 non_foss <- incoming
 non_foss$detail[[3L]] <- "Non-FOSS package license (file LICENSE)"
 stopifnot(release_classify_notes("Status: 1 NOTE", list(non_foss),
-  "release-resource-notes")$effective_status == "PASS_WITH_EXPLAINED_NOTE",
+  "release-resource-notes")$effective_status == "FAIL",
   release_classify_notes("Status: 1 NOTE", list(non_foss),
     "new-submission-only")$effective_status == "FAIL",
   release_classify_notes("Status: 2 NOTEs", list(incoming, non_foss),
@@ -29,20 +29,25 @@ stopifnot(release_classify_notes("Status: 1 NOTE", list(unknown),
   "release-resource-notes")$effective_status == "FAIL")
 
 size <- list(stage = "* checking installed package size ... NOTE",
-  detail = as.list(c("installed size is 10.9Mb", "sub-directories of 1Mb or more:",
-    "R         1.1Mb", "doc       3.8Mb", "extdata   4.4Mb")))
+  detail = as.list(c("installed size is 8.1Mb", "sub-directories of 1Mb or more:",
+    "R         1.4Mb", "doc       4.4Mb")))
 stopifnot(classify(size, "release-resource-notes") == "PASS_WITH_EXPLAINED_NOTES",
   classify(size, "new-submission-only") == "FAIL",
   release_classify_notes("Status: 3 NOTEs", list(incoming, dependency, size),
     "minimum-r-optional-backends")$effective_status == "PASS_WITH_EXPLAINED_NOTES",
   release_classify_notes("Status: OK", list(), "release-resource-notes")$effective_status == "PASS",
   release_classify_notes("Status: OK", list(), "minimum-r-optional-backends")$effective_status == "FAIL")
+doc_only <- size
+doc_only$detail <- as.list(c("installed size is 6.0Mb", "sub-directories of 1Mb or more:", "doc 4.4Mb"))
+stopifnot(classify(doc_only, "release-resource-notes") == "PASS_WITH_EXPLAINED_NOTES")
 for (detail in list(
-  c("installed size is 15.1Mb", unlist(size$detail)[-1L]),
+  c("installed size is 10.1Mb", unlist(size$detail)[-1L]),
   c(unlist(size$detail), "cache 1.2Mb"),
   c(unlist(size$detail), "doc 1.2Mb"),
   c(unlist(size$detail), "Extra unexplained note"),
-  c("installed size is 10.9Mb", "sub-directories of 1Mb or more:", "R 1.1Mb", "doc 3.8Mb")
+  c("installed size is 8.1Mb", "sub-directories of 1Mb or more:", "R 1.4Mb", "doc 5.1Mb"),
+  c("installed size is 8.1Mb", "sub-directories of 1Mb or more:", "R 2.1Mb", "doc 4.4Mb"),
+  c(unlist(size$detail), "extdata 1.2Mb")
 )) {
   invalid <- size; invalid$detail <- as.list(detail)
   stopifnot(classify(invalid, "release-resource-notes") == "FAIL")
@@ -62,7 +67,7 @@ cat("Release notes reject unknown payload areas, unbounded size, duplicates, war
 local({
   directory <- tempfile("release-note-record-"); dir.create(directory)
   on.exit(unlink(directory, recursive = TRUE), add = TRUE)
-  raw <- c(non_foss$stage, unlist(non_foss$detail), dependency$stage,
+  raw <- c(incoming$stage, unlist(incoming$detail), dependency$stage,
     unlist(dependency$detail), size$stage, unlist(size$detail),
     "* checking package directory ... OK", "Status: 3 NOTEs")
   log <- file.path(directory, "00check.log"); writeLines(raw, log)
@@ -94,13 +99,13 @@ local({
   failure <- tryCatch({ eval(loops[[1L]]); NULL }, error = conditionMessage)
   stopifnot(grepl("disposition disagree", failure, fixed = TRUE))
   results <- original
-  writeLines(sub("extdata", "cache", raw, fixed = TRUE), log)
+  writeLines(sub("doc", "cache", raw, fixed = TRUE), log)
   failure <- tryCatch({ eval(loops[[1L]]); NULL }, error = conditionMessage)
   stopifnot(grepl("disposition disagree", failure, fixed = TRUE))
   cat("Run-index aggregation rejects edited dispositions and divergent raw logs.\n")
 })
 
-# Recorded raw external responses: reject altered targets, added findings and wrong jobs.
+# Historical exceptions must not admit old non-FOSS or URL findings for the current package.
 external_cases <- list(
   "ubuntu-latest-r-4.1" = c(
     "Found the following (possibly) invalid DOIs:",
@@ -130,7 +135,7 @@ for (label in names(external_cases)) {
   notes <- if (minimum) list(block, dependency) else list(block)
   policy <- if (minimum) "minimum-r-optional-backends" else "release-resource-notes"
   status <- if (minimum) "Status: 2 NOTEs" else "Status: 1 NOTE"
-  stopifnot(release_classify_notes(status, notes, policy, label)$effective_status != "FAIL",
+  stopifnot(release_classify_notes(status, notes, policy, label)$effective_status == "FAIL",
     release_classify_notes(status, notes, policy, "unverified-job")$effective_status == "FAIL")
   original <- notes
   notes[[1L]]$detail[[5L]] <- "URL: https://unverified.example/"
@@ -138,4 +143,4 @@ for (label in names(external_cases)) {
   notes <- original; notes[[1L]]$detail <- c(notes[[1L]]$detail, "Another unexplained finding")
   stopifnot(release_classify_notes(status, notes, policy, label)$effective_status == "FAIL")
 }
-cat("Recorded external responses reject altered targets, additional findings and wrong job labels.\n")
+cat("Historical external-response exceptions are no longer accepted.\n")

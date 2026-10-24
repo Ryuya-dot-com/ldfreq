@@ -54,8 +54,9 @@ uses only \code{dictionary}.
 
 The data and this conversion are CC BY-SA 4.0; independent R code remains MIT.
 Retain attribution, changes and ShareAlike conditions when redistributing the
-data. The complete license and notice are installed under
-\file{licenses/bnccoca/}. Other cached resources have separate terms.
+data. The complete license and notice are under \file{licenses/bnccoca/}
+inside the version directory returned by \code{lexdiv_resource_info("bnccoca")$path}.
+Other cached resources have separate terms.
 }
 \references{
 Nation, I. S. P. (2017). The BNC/COCA Level 6 word family lists

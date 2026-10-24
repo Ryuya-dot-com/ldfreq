@@ -1,3 +1,6 @@
+# Keep the drawing boundary local to these sourced recipes.
+.ordination_text <- graphics::text
+
 # Source concordance.R into the same environment first. These are example helpers.
 .ordination_seal <- function(x) {
   x$integrity_sha256 <- .concordance_hash(x)
@@ -232,6 +235,6 @@ ordination_plot <- function(x, which = c("documents", "terms"), monochrome = FAL
   location <- paste(round(plotted$x, 8), round(plotted$y, 8), sep = ":")
   first <- !duplicated(location)
   labels <- vapply(location[first], function(z) paste(plotted$id[location == z], collapse = "/"), "")
-  graphics::text(plotted$x[first], plotted$y[first], labels = labels, pos = 3, cex = .8)
+  .ordination_text(plotted$x[first], plotted$y[first], labels = labels, pos = 3, cex = .8)
   invisible(plotted)
 }

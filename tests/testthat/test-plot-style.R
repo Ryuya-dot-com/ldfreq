@@ -54,12 +54,8 @@ test_that("graphics receive color defaults and distinguish monochrome series", {
       style = graphics::par(c("bty", "las", "family"))), args)
     invisible(NULL)
   }
-  original_default <- getS3method("plot", "default")
-  registerS3method("plot", "default", function(...) capture("plot", list(...)),
-    envir = asNamespace("base"))
-  on.exit(registerS3method("plot", "default", original_default,
-    envir = asNamespace("base")), add = TRUE)
   local_mocked_bindings(
+    .lex_plot = function(...) capture("plot", list(...)),
     barplot = function(height, ...) {
       capture("barplot", c(list(height = height), list(...)))
       seq_along(height)
@@ -68,7 +64,7 @@ test_that("graphics receive color defaults and distinguish monochrome series", {
     abline = function(...) capture("abline", list(...)),
     legend = function(...) capture("legend", list(...)),
     axis = function(...) invisible(NULL),
-    .package = "graphics"
+    .package = "ldfreq"
   )
   examples <- plot_style_examples()
   for (x in examples) {
@@ -148,7 +144,7 @@ test_that("narrow NJ8 plots retain every category label without shrinking text",
   local_mocked_bindings(axis = function(side, at = NULL, labels = TRUE, ...) {
     if (side == 1) seen <<- c(list(at = at, labels = labels), list(...))
     original_axis(side = side, at = at, labels = labels, ...)
-  }, .package = "graphics")
+  }, .package = "ldfreq")
   x <- nj8_profile(c("a", "unknown"), wordlist = data.frame(NJ8 = 1, Word = "a"))
   plot(x)
   expect_identical(seen$labels, c(as.character(1:8), "Off-\nlist"))

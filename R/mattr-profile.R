@@ -408,7 +408,7 @@ plot.lexdiv_mattr_profile <- function(
   }
   old_par <- .lex_plot_style(list(...))
   on.exit(graphics::par(old_par), add = TRUE)
-  graphics::plot(
+  .lex_plot(
     selected$window_midpoint,
     selected$value,
     type = type,
@@ -421,7 +421,7 @@ plot.lexdiv_mattr_profile <- function(
     ...
   )
   if (isTRUE(add_global_mean)) {
-    graphics::abline(
+    abline(
       h = x$summary$value[[index]], col = mean_col, lty = mean_lty
     )
   }

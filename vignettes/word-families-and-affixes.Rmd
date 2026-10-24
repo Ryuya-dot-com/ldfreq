@@ -52,7 +52,7 @@ sys.source(system.file("examples", "morpholex-word-parts.R",
   package = "ldfreq", mustWork = TRUE), recipes)
 has_review <- requireNamespace("quanteda", quietly = TRUE) &&
   isTRUE(l10n_info()[["UTF-8"]])
-linked <- NULL
+families <- counts <- nation <- morpholex <- morphynet <- linked <- NULL
 ```
 
 The functions loaded into `recipes` are explicitly sourced example helpers,
@@ -71,6 +71,15 @@ lexdiv_resource_info(c("morpholex", "bnccoca", "morphynet"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("morpholex", "bnccoca", "morphynet"), accept_license = TRUE)
 ```
+```{r resource-availability}
+has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
+has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
+has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
+```
+
+Resource-dependent examples below run only when their verified data are already
+in the cache. The other examples run without downloading reference data.
+
 
 ## What changes when words are counted as families?
 
@@ -79,7 +88,7 @@ the counting units easy to compare. The second includes a word absent from
 the chosen family inventory. The supplied lemmas leave `colour` and `color`
 distinct so that spelling normalization is not silently mixed with lemmatization.
 
-```{r family-input}
+```{r family-input, eval=has_bnccoca}
 segments <- data.frame(
   document_id = c("listed", "unlisted", "empty"), segment_id = "s1",
   text = c("use uses colour color", "use reusability", ""))
@@ -114,7 +123,7 @@ that includes it in USE. Empty documents have zero types and undefined TTR.
 
 ### Check coverage before interpreting a smaller count
 
-```{r family-coverage}
+```{r family-coverage, eval=has_bnccoca}
 knitr::kable(counts$documents[c("document_id", "selected_tokens",
   "matched_tokens", "unlisted_tokens", "common_tokens", "token_coverage")],
   digits = 2, row.names = FALSE,
@@ -224,7 +233,7 @@ texts. Preserve the source analysis, coverage and contextual judgments separatel
 
 ### Inspect recorded segmentation before counting it
 
-```{r morpholex-reference}
+```{r morpholex-reference, eval=has_morpholex}
 forms <- c("transmit", "transport", "transmission", "teacher", "teachers")
 morpholex <- recipes$read_morpholex_parts(
   sheets = c("0-1-0", "0-1-1", "1-1-0"), words = forms)
@@ -251,7 +260,7 @@ for source variables, provenance and an optional local-workbook route.
 
 ### Keep alternative formation relations separate
 
-```{r morphynet-reference}
+```{r morphynet-reference, eval=has_morphynet}
 morphynet <- morphynet_read_derivations(file.path(lexdiv_resource_info("morphynet")$path,
   "extdata", "morphynet-example", "eng.derivational.example.tsv"), language = "en", resource_version = "Nine-row teaching excerpt")
 r <- morphynet$relations
@@ -274,12 +283,13 @@ document. Their lowercase spelling is intentional. Original surfaces are
 retained: the morphology recipe uses exact surface matching, while Nation
 lookup has its separately declared normalization. No POS or lemma is inferred.
 
-The following three chunks require `quanteda` in a UTF-8 session. The core
+The following three chunks require the three cached references and `quanteda`
+in a UTF-8 session. The core
 counting and resource inspection above do not. If `has_review` is false,
 install the optional package as needed and check `l10n_info()` before this
 exercise; there is no automatic environment change.
 
-```{r link-input, eval=has_review}
+```{r link-input, eval=(has_review) && has_bnccoca && has_morpholex && has_morphynet}
 sys.source(system.file("examples", "morphology-link.R",
   package = "ldfreq", mustWork = TRUE), recipes)
 review_segments <- data.frame(document_id = c("a", "b", "unlisted", "empty"),
@@ -312,7 +322,7 @@ Here selection is an **authored reporting convention**, not a claim that
 the sentence proves a unique derivation. Candidate IDs come from the reference;
 occurrence IDs distinguish the two uses of the same spelling.
 
-```{r link-decisions, eval=has_review}
+```{r link-decisions, eval=(has_review) && has_bnccoca && has_morpholex && has_morphynet}
 review <- initial$reviews$morphynet
 decisions <- review$occurrences[review$occurrences$surface == "reusability",
   c("review_id", "occurrence_id")]
@@ -355,7 +365,7 @@ the corresponding `morphynet_decisions` (or `morpholex_decisions`) argument.
 Decisions replace the supplied decision set; resume from the latest saved set
 to retain earlier choices. Changed sources or references require a new review.
 
-```{r link-identity, eval=has_review}
+```{r link-identity, eval=(has_review) && has_bnccoca && has_morpholex && has_morphynet}
 stopifnot(identical(initial$occurrences[c("document_id", "segment_id",
   "token_index", "surface", "family_id")],
   linked$occurrences[c("document_id", "segment_id", "token_index", "surface", "family_id")]))
@@ -413,10 +423,12 @@ bundle <- list(families = families, counts = counts, nation = nation,
   authored_parts = parts, morpholex = morpholex, morphynet = morphynet,
   linked = linked, session = sessionInfo())
 saveRDS(bundle, file.path(output_dir, "analysis.rds"))
-write.csv(counts$comparison, file.path(output_dir, "family-counts.csv"),
+if (!is.null(counts)) write.csv(counts$comparison, file.path(output_dir, "family-counts.csv"),
   row.names = FALSE, na = "", fileEncoding = "UTF-8")
 saved <- readRDS(file.path(output_dir, "analysis.rds"))
-stopifnot(identical(recipes$compare_family_counts(saved$families), saved$counts))
+if (!is.null(saved$families)) {
+  stopifnot(identical(recipes$compare_family_counts(saved$families), saved$counts))
+}
 stopifnot(identical(do.call(recipes$word_parts_profile,
   saved$authored_parts$inputs), saved$authored_parts))
 if (!is.null(saved$linked)) {

@@ -140,8 +140,7 @@ test_that("ordination labels combine numerical zeroes without moving points", {
     coordinate = as.vector(coordinates))
   axes <- data.frame(inertia_fraction = c(.6, .4), tied_with_next = FALSE)
   drawn <- NULL
-  local_mocked_bindings(text = function(x, y, labels, ...) drawn <<- unname(labels),
-    .package = "graphics")
+  h$.ordination_text <- function(x, y, labels, ...) drawn <<- unname(labels)
   path <- tempfile(fileext = ".pdf"); grDevices::pdf(path)
   on.exit({grDevices::dev.off(); unlink(path)})
   for (kind in c("mca", "ca", "mds")) {

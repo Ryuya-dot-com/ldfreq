@@ -27,6 +27,16 @@ lexdiv_resource_info(c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"), accept_license = TRUE)
 ```
+```{r resource-availability}
+has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
+has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
+has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
+has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
+```
+
+Resource-dependent examples below run only when their verified data are already
+in the cache. The other examples run without downloading reference data.
+
 
 ## What `ldfreq` adds to the R ecosystem
 
@@ -295,7 +305,7 @@ each of the 25 frequency/range bands contains 1,000 families.
 The source is [Nation's official resource page](https://www.wgtn.ac.nz/lals/resources/paul-nations-resources/vocabulary-analysis-programs).
 The source spellings and memberships are preserved, including uppercase keys.
 
-```{r}
+```{r, eval=has_bnccoca}
 sys.source(system.file("examples", "bnccoca-families.R", package = "ldfreq",
   mustWork = TRUE), family_env)
 nation <- family_env$bnccoca_example
@@ -311,7 +321,7 @@ from this snapshot**, even though the earlier authored example assigns it to
 USE. Complete family types and TTR therefore remain `NA`. Inspect the original
 KWIC, rather than inventing a family or interpreting noncoverage as an error:
 
-```{r}
+```{r, eval=has_bnccoca}
 nation$profile$occurrences[nation$profile$occurrences$status == "unlisted",
   c("document_id", "pre", "keyword", "post", "status")]
 ```
@@ -348,7 +358,7 @@ above. It runs no analyzer and adds no exported API. Surface and lemma types use
 the supplied strings verbatim; case/spelling decisions should be made explicitly
 upstream. Family lookup retains its declared `nfkc_lower` normalization.
 
-```{r}
+```{r, eval=has_bnccoca}
 sys.source(system.file("examples", "family-count-comparison.R", package = "ldfreq",
   mustWork = TRUE), family_env)
 counts <- family_env$compare_family_counts(nation$profile)
@@ -375,7 +385,7 @@ keeps document/segment/token IDs. Do not reuse a vector after reordering rows.
 
 Keep unresolved occurrences available for inspection:
 
-```{r}
+```{r, eval=has_bnccoca}
 o <- counts$profile$occurrences
 o[counts$selection$selected & o$status != "matched",
   c("document_id", "token_index", "pre", "keyword", "post", "status")]
@@ -680,7 +690,7 @@ with a mapping to their original source lines. This small excerpt is not a
 reference for estimating vocabulary coverage. The contexts and reviewer
 decisions are authored illustrations:
 
-```{r}
+```{r, eval=has_morphynet}
 morphynet_env <- new.env(parent = baseenv())
 sys.source(system.file("examples", "morphynet-relations.R", package = "ldfreq",
   mustWork = TRUE), morphynet_env)
@@ -701,7 +711,7 @@ available. Source/target words and POS remain visible beside the relation ID.
 A study must declare what selecting one relation means; context alone does
 not guarantee a unique morphological derivation.
 
-```{r}
+```{r, eval=has_morphynet}
 if (!is.null(morphynet$reviewed)) {
   morphynet$reviewed$occurrences[c("segment_id", "pre", "keyword", "post",
     "candidate_count", "status", "reason")]
@@ -740,14 +750,14 @@ ShareAlike terms; see `licenses/morphynet/NOTICE.md`.
 
 MorphoLex-en supplies canonical segmentation and root/affix variables
 (Sánchez-Gutiérrez et al., 2018, <https://doi.org/10.3758/s13428-017-0981-8>).
-The package includes all 34 worksheets (68,624 word records and the aggregate
+The optional download includes all 34 worksheets (68,624 word records and the aggregate
 prefix/suffix/root tables), plus the original data dictionary, from
 <https://github.com/hugomailhot/MorphoLex-en>. **These data use CC BY-NC-SA 4.0,
 not the MIT license of the R code.** Noncommercial sharing and adaptation
 require attribution and the applicable ShareAlike conditions; commercial use
 is not granted by that license. See the cached `licenses/morpholex/NOTICE.md`.
 
-```{r}
+```{r, eval=has_morpholex}
 morpholex <- morpholex_data(c("0-1-1", "All roots"))
 word_rows <- morpholex$sheets[["0-1-1"]]
 word_rows[word_rows$Word %in% c("teacher", "teachers"),
@@ -765,7 +775,7 @@ values are preserved, so any case normalization should be an explicit decision.
 After the explicit download, reading the cached data needs no `readxl`, Python, model or internet connection.
 The word-parts recipe can use the same snapshot:
 
-```{r}
+```{r, eval=has_morpholex}
 sys.source(system.file("examples", "morpholex-word-parts.R", package = "ldfreq",
   mustWork = TRUE), parts_env)
 forms <- c("transmit", "transport", "transmission", "teacher", "teachers")
@@ -822,7 +832,7 @@ word-parts recipe and `lexdiv_ambiguity_review()`. It requires optional quanteda
 in a UTF-8 R session. Text and decisions are authored; references are the
 cached Nation/MorphoLex snapshots and the nine-row MorphyNet teaching excerpt.
 
-```{r morphology-link-example, eval=requireNamespace("quanteda", quietly=TRUE) && isTRUE(l10n_info()[["UTF-8"]])}
+```{r morphology-link-example, eval=has_bnccoca && has_morpholex && has_morphynet && requireNamespace("quanteda", quietly=TRUE) && isTRUE(l10n_info()[["UTF-8"]])}
 source(system.file("examples", "morphology-link.R", package = "ldfreq"))
 source(system.file("examples", "morphology-link-demo.R", package = "ldfreq"))
 linked <- morphology_link_example$reviewed
@@ -1000,7 +1010,7 @@ mean-frequency measures can be influenced more by the reference corpus's mode
 and register than by learner proficiency. The TUBELEX output is therefore named
 as frequency and prevalence, not as an unqualified sophistication score.
 
-```{r}
+```{r, eval=has_tubelex}
 # Resource-compatible segmentation must be prepared separately.
 # This manually prepared sequence illustrates only the sentence shown.
 frequency <- tubelex_profile(c("I", "do", "n't", "think", "it", "'s", "a", "book"))

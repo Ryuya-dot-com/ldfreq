@@ -128,13 +128,13 @@ jobs:
             any::RcppEigen
           needs: check
 
-      - name: Explicitly obtain optional reference snapshots for integration checks
+      - name: Use a fresh cache without reference downloads
         shell: Rscript {0}
         run: |
-          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
-            "experiments/prepare-resources.R",
-            shQuote(file.path(Sys.getenv("RUNNER_TEMP"), "ldfreq-resources")), "--accept-license"))
-          if (!identical(status, 0L)) quit(status = status)
+          cache <- tempfile("ldfreq-empty-cache-", tmpdir = Sys.getenv("RUNNER_TEMP"))
+          dir.create(cache)
+          cat(paste0("LDFREQ_RESOURCE_DIR=", cache, "\n"),
+            file = Sys.getenv("GITHUB_ENV"), append = TRUE)
 
       - name: Validate repository-only TUBELEX admission evidence
         shell: Rscript {0}
@@ -201,7 +201,7 @@ jobs:
           } else {
             old <- setwd(output_root)
             build_status <- system2(file.path(R.home("bin"), "R"),
-              c("CMD", "build", "--no-build-vignettes", shQuote(package_root)))
+              c("CMD", "build", shQuote(package_root)))
             setwd(old)
             if (!identical(build_status, 0L)) quit(status = build_status)
           }
@@ -346,18 +346,18 @@ jobs:
             any::jsonlite
             textstem=?ignore-before-r=4.4.0
             gibasa=?ignore-before-r=4.2.0
-            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5 MASS@7.3-60 readxl@1.4.5' || '' }}
+            ${{ matrix.config.r == '4.1' && 'Matrix@1.6-5 MASS@7.3-60 readxl@1.4.5 pbkrtest@0.5.2' || '' }}
           # Keep all ldfreq check dependencies; old Matrix Enhances are not used.
           dependencies: 'if (getRversion() < "4.2.0") c("Depends", "Imports", "LinkingTo", "Suggests") else "all"'
           needs: check
 
-      - name: Explicitly obtain optional reference snapshots for integration checks
+      - name: Use a fresh cache without reference downloads
         shell: Rscript {0}
         run: |
-          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
-            "experiments/prepare-resources.R",
-            shQuote(file.path(Sys.getenv("RUNNER_TEMP"), "ldfreq-resources")), "--accept-license"))
-          if (!identical(status, 0L)) quit(status = status)
+          cache <- tempfile("ldfreq-empty-cache-", tmpdir = Sys.getenv("RUNNER_TEMP"))
+          dir.create(cache)
+          cat(paste0("LDFREQ_RESOURCE_DIR=", cache, "\n"),
+            file = Sys.getenv("GITHUB_ENV"), append = TRUE)
 
       - name: Check or reclassify exact source evidence
         shell: Rscript {0}

@@ -1,3 +1,6 @@
+# Keep the drawing primitive separate from public S3 plot dispatch.
+.lex_plot <- graphics::plot
+
 # Explicit convenience adapters, wide transformation, and base-R plots.
 
 .lex_convenience_name <- function(value, argument) {
@@ -403,12 +406,12 @@ print.lexdiv_wide_results <- function(x, ...) {
   positions <- seq_len(nrow(frame))
   old_par <- .lex_plot_style(list(...))
   on.exit(graphics::par(old_par), add = TRUE)
-  graphics::plot(
+  .lex_plot(
     positions, frame$value,
     xaxt = "n", xlab = xlab, ylab = ylab, main = main,
     col = col, pch = pch, ...
   )
-  graphics::axis(1, at = positions, labels = labels)
+  axis(1, at = positions, labels = labels)
   invisible(data.frame(label = labels, as.data.frame(frame), check.names = FALSE))
 }
 
@@ -492,12 +495,12 @@ plot.lexdiv_screen_results <- function(
   positions <- seq_len(nrow(frame))
   old_par <- .lex_plot_style(list(...))
   on.exit(graphics::par(old_par), add = TRUE)
-  graphics::plot(
+  .lex_plot(
     positions, frame$N, xaxt = "n", xlab = xlab, ylab = ylab,
     main = main, col = col, pch = pch, ...
   )
-  graphics::axis(1, at = positions, labels = labels)
-  graphics::abline(h = unique(frame$minimum_tokens), lty = 2, col = "grey40")
+  axis(1, at = positions, labels = labels)
+  abline(h = unique(frame$minimum_tokens), lty = 2, col = "grey40")
   invisible(frame)
 }
 
@@ -520,7 +523,7 @@ plot.tubelex_profile <- function(
   }
   old_par <- .lex_plot_style(list(...))
   on.exit(graphics::par(old_par), add = TRUE)
-  positions <- graphics::barplot(
+  positions <- barplot(
     frame$coverage,
     names.arg = frame$weighting,
     ylim = c(0, 1),

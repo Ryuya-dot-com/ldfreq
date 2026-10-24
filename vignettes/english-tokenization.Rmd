@@ -23,6 +23,13 @@ lexdiv_resource_info(c("tubelex", "nj8"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
 ```
+```{r resource-availability}
+has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
+```
+
+Resource-dependent examples below run only when their verified data are already
+in the cache. The other examples run without downloading reference data.
+
 
 ## Choose what counts as a word
 
@@ -138,7 +145,7 @@ boundary, not evidence that the British spellings are errors or more advanced
 words. NJ8's `expand_parenthetical` only expands alternatives actually present
 in the resource; it is not a comprehensive British/American conversion table.
 
-```{r}
+```{r, eval=has_nj8}
 spelling_lookup <- nj8_profile(c("colour", "color", "centre", "center",
   "theatre", "theater"), unit = "surface")
 spelling_lookup$lookup[, c("surface_term", "lookup_term", "matched", "level")]
@@ -231,7 +238,7 @@ compares name/numeral selections and spelling equivalence through existing
 functions. Three illustrative noun aliases are explicitly reviewed; this is
 not an automatically validated or comprehensive spelling dictionary.
 
-```{r}
+```{r, eval=has_nj8}
 policy_example <- new.env(parent = environment())
 sys.source(system.file("examples", "lexical-counting-policy.R", package = "ldfreq",
   mustWork = TRUE), envir = policy_example)
@@ -259,7 +266,7 @@ with known POS. If a selection cannot be resolved because POS is missing,
 silently treated as a complete case. Reference coverage is explicitly conditional
 on selected known tokens. The three-token MATTR window is illustrative only.
 
-```{r}
+```{r, eval=has_nj8}
 policy_path <- tempfile(fileext = ".rds")
 saveRDS(list(result = counting, session = sessionInfo()), policy_path)
 stopifnot(identical(readRDS(policy_path)$result, counting))
@@ -295,6 +302,9 @@ analysis <- lexdiv_metrics_text_batch(
   tokens, metrics = c("ttr", "mattr"), window_length = 5
 )
 analysis$results
+```
+
+```{r, eval=has_nj8}
 levels <- nj8_profile_batch(tokens, unit = "surface")
 levels$coverage
 ```

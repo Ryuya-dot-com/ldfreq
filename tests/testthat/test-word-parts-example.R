@@ -160,7 +160,7 @@ test_that("the optional reader preserves unsupported and absent entries", {
     PRS_signature = c("0,1,0", "0,1,1", "0,1,0", "0,1,1", "1,0,0"),
     MorphoLexSegm = c("{(cat)}", "{(cat)}>s>", "}(bad){", "{(wrong)}>ly>", "<un<"),
     ROOT1_Freq_HAL = "12")
-  testthat::local_mocked_bindings(read_excel = function(...) rows, .package = "readxl")
+  e$.morpholex_read_excel <- function(...) rows
   p <- tempfile(); on.exit(unlink(p)); writeLines("authored workbook stand-in", p)
   x <- e$read_morpholex_parts(p, "0-1-0", c(rows$Word, "absent"))
   expect_identical(x$analyses$analysis_id[1:2], c("01", "NA"))

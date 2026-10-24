@@ -29,6 +29,17 @@ lexdiv_resource_info(c("tubelex", "nj8"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
 ```
+```{r resource-availability}
+has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
+has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
+has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
+has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
+has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
+```
+
+Resource-dependent examples below run only when their verified data are already
+in the cache. The other examples run without downloading reference data.
+
 
 ## Your first document table
 
@@ -393,7 +404,7 @@ The resource uses Treebank segmentation, which differs from
 It returns original terms, lookup terms,
 unmatched rows, token/type coverage, and matched-only conditional summaries.
 
-```{r}
+```{r, eval=has_tubelex}
 # Manually prepared terms illustrate this sentence, not a general tokenizer.
 frequency <- tubelex_profile(c("I", "do", "n't", "think", "it", "'s", "a", "book"))
 frequency$summary
@@ -669,9 +680,11 @@ download a resource, or expose caller file paths.
 ## Offline installed-package check
 
 An installed smoke script exercises the public workflows without network access
-or an external runtime:
+or an external runtime. This integration example requires all five reference
+resources to have been explicitly downloaded beforehand. The core examples
+earlier in this guide do not require them:
 
-```{r}
+```{r, eval=has_tubelex && has_nj8 && has_morpholex && has_bnccoca && has_morphynet}
 smoke_path <- system.file("examples", "offline-smoke.R", package = "ldfreq")
 stopifnot(nzchar(smoke_path))
 source(smoke_path, local = TRUE)

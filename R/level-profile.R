@@ -1089,20 +1089,20 @@ plot.lexical_level_profile <- function(
     xlab = xlab,
     ylab = ylab
   )
-  positions <- do.call(graphics::barplot,
+  positions <- do.call(barplot,
     c(bar_args[!names(bar_args) %in% names(dots)], dots))
   if (draw_names && !is.null(axis_labels)) {
-    graphics::axis(1, at = positions, labels = axis_labels, lty = 0,
+    axis(1, at = positions, labels = axis_labels, lty = 0,
       cex.axis = label_cex, gap.axis = 0,
       padj = ifelse(grepl("\n", axis_labels, fixed = TRUE), 1, NA_real_))
   }
   if (proportion_axis) {
-    graphics::axis(2, at = c(0, .25, .5, .75, 1),
+    axis(2, at = c(0, .25, .5, .75, 1),
       labels = c("0", ".25", ".50", ".75", "1.00"))
   }
   cumulative_rows <- which(!is.na(rows$level) & is.finite(cumulative))
   if (show_cumulative && length(cumulative_rows)) {
-    graphics::lines(
+    lines(
       positions[cumulative_rows],
       cumulative[cumulative_rows],
       col = cumulative_col,
@@ -1126,7 +1126,7 @@ plot.lexical_level_profile <- function(
       line_widths <- c(line_widths, 2)
       point_sizes <- c(point_sizes, 1)
     }
-    graphics::legend(
+    legend(
       "topright",
       legend = labels,
       lty = line_types,

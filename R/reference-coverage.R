@@ -498,7 +498,7 @@ plot.lexdiv_reference_coverage <- function(
   positions <- seq_len(nrow(frame))
   old_par <- .lex_plot_style(list(...))
   on.exit(graphics::par(old_par), add = TRUE)
-  graphics::plot(
+  .lex_plot(
     positions,
     frame$value,
     xaxt = "n",
@@ -510,7 +510,7 @@ plot.lexdiv_reference_coverage <- function(
     pch = pch,
     ...
   )
-  graphics::axis(1, at = positions, labels = frame$document_id)
+  axis(1, at = positions, labels = frame$document_id)
   frame$position <- as.double(positions)
   row.names(frame) <- NULL
   invisible(frame)

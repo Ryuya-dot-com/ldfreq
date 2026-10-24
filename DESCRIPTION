@@ -43,6 +43,7 @@ Depends:
     R (>= 4.1.0)
 Imports:
     digest,
+    graphics,
     stringi
 Encoding: UTF-8
 Suggests:
@@ -61,8 +62,9 @@ Suggests:
     readxl,
     rmarkdown,
     textstem,
-    testthat (>= 3.0.0),
+    testthat (>= 3.1.8),
     udpipe (>= 0.8.16),
+    withr,
     xml2
 VignetteBuilder: knitr
 Config/testthat/edition: 3
