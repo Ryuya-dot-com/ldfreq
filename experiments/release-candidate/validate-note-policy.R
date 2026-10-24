@@ -38,7 +38,7 @@ stopifnot(classify(size, "release-resource-notes") == "PASS_WITH_EXPLAINED_NOTES
   release_classify_notes("Status: OK", list(), "release-resource-notes")$effective_status == "PASS",
   release_classify_notes("Status: OK", list(), "minimum-r-optional-backends")$effective_status == "FAIL")
 doc_only <- size
-doc_only$detail <- as.list(c("installed size is 6.0Mb", "sub-directories of 1Mb or more:", "doc 4.4Mb"))
+doc_only$detail <- as.list(c("installed size is  7.8Mb", "sub-directories of 1Mb or more:", "doc 4.4Mb"))
 stopifnot(classify(doc_only, "release-resource-notes") == "PASS_WITH_EXPLAINED_NOTES")
 for (detail in list(
   c("installed size is 10.1Mb", unlist(size$detail)[-1L]),

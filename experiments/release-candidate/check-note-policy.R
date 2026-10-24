@@ -49,9 +49,9 @@ release_resource_size_note <- function(note_block) {
   stage <- "^\\* checking installed package size \\.\\.\\. (\\[[^]]+\\] )?NOTE$"
   detail <- unlist(note_block$detail, use.names = FALSE)
   if (!grepl(stage, note_block$stage) || length(detail) < 3L ||
-      !grepl("^installed size is [0-9]+[.][0-9]+Mb$", detail[[1L]]) ||
+      !grepl("^installed size is +[0-9]+[.][0-9]+Mb$", detail[[1L]]) ||
       !identical(detail[[2L]], "sub-directories of 1Mb or more:")) return(FALSE)
-  total <- as.numeric(sub("^installed size is ([0-9.]+)Mb$", "\\1", detail[[1L]]))
+  total <- as.numeric(sub("^installed size is +([0-9.]+)Mb$", "\\1", detail[[1L]]))
   rows <- detail[-c(1L, 2L)]
   if (!all(grepl("^(R|doc) +[0-9]+[.][0-9]+Mb$", rows))) return(FALSE)
   directories <- sub(" +.*$", "", rows)
