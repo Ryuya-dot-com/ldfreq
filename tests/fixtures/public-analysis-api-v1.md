@@ -9,3 +9,5 @@ The fixture tests migration of saved plain-list objects, input/result shapes,
 IDs, missingness, positional calls and the new plotting class. Existing example
 tests independently enumerate counts and opportunities and check numerical
 references; equality to this fixture does not substitute for those checks.
+Derived floating-point metrics use a 1e-14 tolerance across platforms. Counts,
+IDs, missingness, types and other saved metadata are still compared exactly.

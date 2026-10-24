@@ -2,6 +2,21 @@ public_analysis_fixture <- function() {
   readRDS(test_path("..", "fixtures", "public-analysis-api-v1.rds"))
 }
 
+# Frozen macOS arithmetic can differ by one ULP on other platforms. Keep
+# counts, IDs, missingness and metadata exact; tolerate only derived metrics.
+expect_legacy_metrics <- function(actual, expected, metrics) {
+  expect_identical(lapply(actual[metrics], typeof), lapply(expected[metrics], typeof))
+  expect_equal(actual[metrics], expected[metrics], tolerance = 1e-14)
+  actual[metrics] <- expected[metrics]
+  expect_identical(actual, expected)
+}
+
+expect_legacy_dispersion <- function(actual, expected) {
+  expect_legacy_metrics(actual$documents, expected$documents, "DP")
+  actual$documents <- expected$documents
+  expect_identical(actual, expected)
+}
+
 test_that("public study calls retain the frozen 9005 table and selection", {
   old <- public_analysis_fixture()$study
   before <- serialize(old, NULL)
@@ -21,9 +36,11 @@ test_that("saved legacy concordances support public operations without rewriting
   x <- old$concordance$search
   before <- serialize(x, NULL)
   expect_identical(lexdiv_concordance_sort(x, "right", 2L), old$concordance$sorted)
-  expect_identical(lexdiv_concordance_dispersion(x, "word", 3L), old$concordance$dispersion)
+  expect_legacy_dispersion(lexdiv_concordance_dispersion(x, "word", 3L), old$concordance$dispersion)
   current <- lexdiv_collocations(old$collocation$search, "a")
-  for (name in c("results", "pairs", "documents", "search", "settings"))
+  expect_legacy_metrics(current$results, old$collocation$adjacent$results,
+    c("expected", "MI", "t_score"))
+  for (name in c("pairs", "documents", "search", "settings"))
     expect_identical(current[[name]], old$collocation$adjacent[[name]])
   expect_identical(serialize(x, NULL), before)
   altered <- x
@@ -39,7 +56,10 @@ test_that("public keyness retains old count populations and empty groups", {
   args <- c(list(x = old$source), s[c("target", "reference", "preprocessing_id",
     "term_col", "keep", "min_count", "max_tokens")])
   current <- do.call(lexdiv_keyness, args)
-  for (name in c("results", "totals", "documents", "document_counts", "occurrences",
+  expect_legacy_metrics(current$results, old$results, c("expected_target",
+    "expected_target_other", "expected_reference", "expected_reference_other",
+    "target_per_1000", "reference_per_1000", "log_ratio", "G2", "signed_G2"))
+  for (name in c("totals", "documents", "document_counts", "occurrences",
                  "token_audit", "source", "settings"))
     expect_identical(current[[name]], old[[name]])
   expect_identical(do.call(lexdiv_keyness, unname(args)), current)
@@ -62,7 +82,7 @@ test_that("new concordance class adds dispatch without changing occurrences", {
     expect_identical(current[[name]], x[[name]])
   expect_identical(do.call(lexdiv_concordance, unname(args)), current)
   expect_identical(lexdiv_concordance_sort(current, "right", 2), old$concordance$sorted)
-  expect_identical(lexdiv_concordance_dispersion(current, "word", 3), old$concordance$dispersion)
+  expect_legacy_dispersion(lexdiv_concordance_dispersion(current, "word", 3), old$concordance$dispersion)
   legacy <- new.env(parent = baseenv())
   sys.source(system.file("examples", "concordance.R", package = "ldfreq", mustWork = TRUE), legacy)
   legacy_search <- do.call(legacy$concordance_search, args)
