@@ -4,7 +4,7 @@ These repository-only tools generate and verify evidence for the immutable
 `ldfreq` source tarball used by the `Release candidate` GitHub Actions workflow.
 They are excluded from the R source package by `.Rbuildignore`.
 
-The current [state.dcf](state.dcf) identifies the development snapshot.
+The current [state.dcf](state.dcf) identifies the selected 0.5.1 candidate.
 Published development snapshots do not use this artifact workflow.
 Ordinary pull-request checks still exercise the development matrix. A formal
 candidate requires a separately selected three-component version, an exact
@@ -31,6 +31,14 @@ documentation repairs. Changed controls, API documentation and the PDF manual
 are checked afresh, and all five exact-archive checks remain required. Remove
 `Source-Archive-*` whenever package content changes: numerical-evidence reuse
 does not permit reuse of an archive containing superseded documentation.
+
+`Promotion-From-Version` permits a development-to-formal version transition
+only while `Status` is `release-candidate`. DESCRIPTION must differ only in
+its version, so dependency or license changes cannot reuse numerical evidence.
+NEWS, citation records, the installation README and API-inventory version accept
+only their exact version/tag substitutions. Runtime code, tests and resource
+inputs remain unchanged. The tag-based citation resolves to the frozen source;
+the release assets are attached only after the exact-archive checks succeed.
 
 For a repair confined to the separate TUBELEX builder,
 `Recheck-TUBELEX-Builder: true` can accompany `Validation-Run` and

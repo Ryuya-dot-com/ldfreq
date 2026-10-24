@@ -1,6 +1,6 @@
 # Public API surface
 
-Current API inventory for 0.5.0.9001. Names, help and navigation are checked by
+Current API inventory for 0.5.1. Names, help and navigation are checked by
 `Rscript development/audit-public-api.R .`. Scientific definitions are in the
 installed method contracts; return columns and examples are in each help topic.
 

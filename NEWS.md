@@ -1,4 +1,4 @@
-# ldfreq (development)
+# ldfreq 0.5.1
 
 - Build the guides without downloaded reference data. Resource-dependent
   examples run only with a verified cache; core workflows remain executable.
