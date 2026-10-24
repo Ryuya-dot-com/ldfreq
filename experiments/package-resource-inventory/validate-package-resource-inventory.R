@@ -178,14 +178,17 @@ metadata_paths <- paste0(
   relative_files(file.path(package_root, "inst", "spec"))
 )
 check(length(metadata_paths) > 0L, "No installed specification files were found.")
-# Authored examples are not reference lexical resources. Enumerate them
-# explicitly so extra extdata still fails, and compare their exact bytes too.
+# Authored examples and aggregate evaluation results are not reference lexical
+# resources. Enumerate them so extra extdata still fails; compare exact bytes.
 example_paths <- paste0("extdata/masc-example/", c("README.txt", "example-penn.xml",
   "example-s.xml", "example-seg.xml", "example.anc", "example.txt"))
 example_paths <- c(example_paths, paste0("extdata/corpus-stability/", c(
   "block-summaries.csv", "block-densities.csv", "block-quantiles.csv",
   "external-comparison.csv", "full-length-associations.csv",
   "paired-length-change.csv", "sampling-reliability.csv")))
+example_paths <- c(example_paths, paste0("extdata/corpus-extension/", c(
+  "README.txt", "bawe-reliability.csv", "block-densities.csv",
+  "icnale-reliability.csv", "oanc-reliability.csv")))
 all_audited_paths <- c(member_paths, metadata_paths, example_paths)
 check(!anyDuplicated(all_audited_paths), "Audited package paths overlap.")
 for (path in c(metadata_paths, example_paths)) {

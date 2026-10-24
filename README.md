@@ -9,6 +9,8 @@ connected to the results you report.
 [Metric selection](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html) ·
 [Issues](https://github.com/Ryuya-dot-com/ldfreq/issues)
 
+<a id="installation"></a>
+
 ## Install
 
 The current development release is **0.5.0.9001**. This single version contains
@@ -59,6 +61,8 @@ The [metric-selection guide](https://ryuya-dot-com.github.io/ldfreq/articles/cho
 explains these choices using published research and PELIC, ICNALE, OANC and
 BAWE results, including length sensitivity, sampling agreement, missing scores
 and actual external-tool comparisons. No single measure answers every research question.
+
+<a id="choose-a-research-question"></a>
 
 ## Follow a workflow
 
