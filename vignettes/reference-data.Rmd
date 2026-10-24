@@ -31,6 +31,19 @@ The terms apply to the corresponding data. For example, obtaining MorphoLex
 through a separate download does not remove its noncommercial restriction.
 Installing or using the independent MIT code does not require MorphoLex.
 
+MorphoLex's noncommercial condition concerns the intended use, not simply
+whether a user works for a company or a university. Review that use against
+the terms; commercial use may require separate permission from the rights
+holder. Setting `accept_license = TRUE` does not grant additional rights.
+See the [Creative Commons explanation](https://creativecommons.org/faq/#does-my-use-violate-the-noncommercial-clause-of-the-licenses).
+
+The package also includes authored examples and numerical summaries of its
+corpus studies. The small MASC-format example was written for ldfreq; it is
+not an extract from MASC. The research summaries contain aggregate estimates
+and distributions, not corpus text, token sequences, participant identifiers
+or document-level score tables. The metric-selection guide identifies the
+corpora and the conditions under which those summaries were calculated.
+
 ## Inspect first, download explicitly
 
 ```{r inspect}

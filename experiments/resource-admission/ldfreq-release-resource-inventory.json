@@ -23,8 +23,8 @@
         {
           "path": "COPYRIGHTS",
           "role": "code attribution",
-          "bytes": 684,
-          "sha256": "1330f71a24fd2762babd56d1e3bd248f687743095ec88ba3083e44a079606bb1"
+          "bytes": 1129,
+          "sha256": "8ff5b4750bf9aaae9fd5044a48de8f4c03898694943ee45a23b20ca20b467533"
         },
         {
           "path": "licenses/tubelex/NOTICE.md",

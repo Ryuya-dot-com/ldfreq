@@ -28,6 +28,9 @@ MorphoLex is CC BY-NC-SA 4.0 (noncommercial); BNC/COCA is CC BY-SA 4.0;
 MorphyNet is CC BY-SA 3.0; TUBELEX is BSD-3-Clause; NJ8 has its own permission
 and attribution terms. These datasets are not included in the MIT package.
 The MorphyNet resource is a nine-row example, not the full database.
+Accepting the terms does not grant additional rights. MorphoLex's
+noncommercial condition depends on the intended use, not simply on the
+user's institution; see \code{\link{morpholex_data}}.
 
 No resource is needed for the core diversity metrics. Resource-specific readers
 explain the required download if a cache is missing. Copying a verified cache to

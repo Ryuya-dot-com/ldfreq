@@ -218,7 +218,7 @@ tokens <- rep(c("a", "b", "a", "c", "d"), 25)
 profile <- lexdiv_metrics(tokens, plan = plan)
 profile[, c("request_id", "metric_id", "value", "status")]
 
-screens <- lexdiv_screen(profile)
+screens <- lexdiv_screen_lengths(profile)
 screens[, c("request_id", "screen_id", "minimum_tokens", "passes_screen")]
 
 documents <- list(document_a = tokens, document_b = rev(tokens))

@@ -1,6 +1,6 @@
 # Public API surface
 
-Current API inventory for 0.5.1. Names, help and navigation are checked by
+Current API inventory for the 1.0.0 changes. Names, help and navigation are checked by
 `Rscript development/audit-public-api.R .`. Scientific definitions are in the
 installed method contracts; return columns and examples are in each help topic.
 
@@ -25,7 +25,7 @@ readers/profiles retain their resource prefix. No implicit token/text guessing.
 | `lexdiv_keyness()` | Explicit disjoint target/reference counts, G-squared and unsmoothed log-ratio; no tests | Pooled token totals with document counts and coverage | Base list | No | `$results`, `$totals`, `$documents`, `$document_counts`, `$occurrences`, `$token_audit`, full `$source` |
 | `lexdiv_keyness_concordance()` | Exact counted-term return to original contexts | Same retained source; no new comparison | Base list | `plot($search)` | Comparison ID, term and classed `$search` |
 | `morphynet_read_derivations()` | Local six-field derivational TSV reader; preserves source/target/POS, affix position, alternatives and file identity | Reference resource; not a document profiler | Base list | No | `$relations`, scalar `$resource` for candidate review, `$provenance`; example preserves source row mapping and occurrence decisions |
-| `bnccoca_data()` | Bundled Nation BNC/COCA Level 6 membership, Version 1.0.0; no inferred members | Reference resource, not document data | Base list | No | `$dictionary`, separate `$supplementary`, `$catalog`, `$resource` for family lookup, `$provenance` for source/conversion identity |
+| `bnccoca_data()` | Cached Nation BNC/COCA Level 6 membership, Version 1.0.0; no inferred members | Reference resource, not document data | Base list | No | `$dictionary`, separate `$supplementary`, `$catalog`, `$resource` for family lookup, `$provenance` for source/conversion identity |
 | `morpholex_data()` | Cached MorphoLex-en worksheet values and provenance; all sheets or an explicit ordered subset | Reference resource, not document data | Base list | No | `$sheets` (character-valued original data frames), `$provenance` including source identity, license and complete sheet catalog |
 | `lexdiv_family_profile()` | Experimental exact form/POS lookup against a caller-defined family table; optional source/policy-bound occurrence review; retains original lookup, ambiguity and missingness | Complete imported annotations with document IDs; pooled summary explicitly separate from document metrics | Base list | No | `$occurrences`, `$candidates`, `$members`, `$documents`, `$summary`, complete `$annotations`, `$dictionary`, `$review_input`, `$review`, `$provenance` |
 | `lexdiv_amod_pairs()` | Experimental basic-UD ADJ–amod–NOUN extraction from complete source-checked annotations; validates trees and distinguishes missing sentences from zero pairs | Explicit document/sentence IDs; observed counts beside complete totals and coverage | Base list | No: select counts, types or coverage explicitly; guide overlays original count distributions | `$occurrences`, `$counts`, `$segments`, `$documents`, `$summary`, complete `$annotations` and `$provenance` |
@@ -87,3 +87,12 @@ readers/profiles retain their resource prefix. No implicit token/text guessing.
 | `lexdiv_build_ngram_reference()` | Canonical name for `lexdiv_ngram_reference_build()` | Same signature and result | Compatibility alias retained |
 | `lexdiv_screen_lengths()` | Canonical name for `lexdiv_screen()` | Same signature and result | Compatibility alias retained |
 | `lexdiv_sort_concordance()` | Canonical name for `lexdiv_concordance_sort()` | Same signature and result | Compatibility alias retained |
+
+## Plot and help changes for 1.0.0
+
+The primary color argument is `col`, including NJ8 bars; `bar_col` is no
+longer accepted. Fixed-coordinate bar plots reject incompatible structural
+arguments. Axis switches and text settings apply to manually drawn axes too.
+Token-container conversion, wide results and plots have separate help topics;
+`lexdiv_convenience` remains an overview for existing links. Canonical examples
+retain old function aliases and unchanged saved measurement results.

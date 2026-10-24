@@ -74,6 +74,13 @@ contains \file{licenses/morpholex/NOTICE.md} and \file{CC-BY-NC-SA-4.0.md};
 \code{lexdiv_resource_info("morpholex")$path} gives its version directory.
 Cite the resource paper when using these data; package citation alone is not
 resource attribution. Original authors do not endorse this R conversion.
+
+Noncommercial status depends on the intended use, not only on whether the
+user works at a company, university or nonprofit organization. Confirm that
+your use is covered; commercial use may require separate permission from the
+rights holder. Setting \code{accept_license = TRUE} acknowledges the terms
+before downloading and does not grant additional rights. The independent
+MIT code can be used without obtaining MorphoLex.
 }
 \references{
 Sánchez-Gutiérrez, C. H., Mailhot, H., Deacon, S. H., and Wilson, M. A. (2018).

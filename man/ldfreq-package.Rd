@@ -120,8 +120,9 @@ statistics must not be copied into writer rows as independent observations.
 Save original inputs and complete results, not only displayed tables.
 }
 \section{Open a guide or installed example}{
-Use the online guide links above. The compact source archive includes guide
-sources; rendered guides are published on the website separately.
+The installed package includes rendered guides. Open their local index with
+\code{browseVignettes("ldfreq")}, or use the online guide links above.
+The source archive also includes the guide sources.
 
 Study-table, concordance, collocation and keyness functions are exported and
 have ordinary help entries. Ordination, readability, syntax and teaching
@@ -379,7 +380,7 @@ unit and annotation. It is not a plagiarism detector or a direct measure of
 semantic similarity, coherence, proficiency, or writing quality.
 }
 \section{Quality screens}{
-\code{below_quality_floor} and \code{lexdiv_screen()} are advisory token-count
+\code{below_quality_floor} and \code{lexdiv_screen_lengths()} are advisory token-count
 evidence screens. Here, quality is a field name retained for compatibility; it does not mean writing
 quality, measurement validity, or reliability. The screens never change a value,
 effective parameter, status, or document membership. Passing a screen does not

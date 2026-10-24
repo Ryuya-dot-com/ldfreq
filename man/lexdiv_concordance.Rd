@@ -105,7 +105,7 @@ source <- lexdiv_import_annotations(tokens, segments, list(language = "en",
   dictionary_version = "none", unit = "supplied tokens", normalization = "none"))
 if (requireNamespace("quanteda", quietly = TRUE)) {
   search <- lexdiv_concordance(source, list(word = "a", phrase = c("a", "b")))
-  lexdiv_concordance_sort(search)
+  lexdiv_sort_concordance(search)
   lexdiv_concordance_dispersion(search, "word", parts = 3)$documents
   if (requireNamespace("ggplot2", quietly = TRUE)) plot(search, "word")
 }

@@ -1,3 +1,22 @@
+# ldfreq 1.0.0 (unreleased)
+
+- Use `col` for NJ8 bars, matching the other plot methods. This replaces
+  `bar_col`; update calls to `plot(profile, col = ...)`. One bar color and
+  one cumulative-curve color keep the legend and off-list shade unambiguous.
+  Monochrome mode overrides those colors and the bar outline consistently.
+- Reject bar-plot arguments that change the fixed orientation, baseline or
+  coordinate system instead of drawing misleading axes and overlays. TUBELEX
+  coverage retains its fixed zero-to-one scale and category labels.
+- Honor `axes`, `xaxt`, `cex.axis`, `col.axis` and `font.axis` on manually
+  drawn axes, and restore graphics settings after plotting or an error.
+- Separate help for token-container conversion, wide tables and plotting.
+  Basic examples now run with no downloaded reference data. Use canonical
+  function names in examples and show how to open the installed guides.
+- Credit the author of the adapted BSD-licensed TUBELEX example in the
+  package metadata. Clarify the authored examples, aggregate research results
+  and independently licensed downloads. MorphoLex remains optional and
+  separately licensed; download acknowledgement does not extend its rights.
+
 # ldfreq 0.5.1
 
 - Build the guides without downloaded reference data. Resource-dependent

@@ -331,7 +331,8 @@ print.lexdiv_wide_results <- function(x, ...) {
 .lex_plot_style <- function(dots) {
   settings <- list(bty = "l", las = 1, family = "sans", tcl = -.25,
     mgp = c(2.6, .7, 0))
-  supplied <- intersect(names(settings), names(dots))
+  supplied <- intersect(c(names(settings), "cex.axis", "col.axis", "font.axis"),
+    names(dots))
   settings[supplied] <- dots[supplied]
   previous <- graphics::par(names(settings))
   tryCatch(graphics::par(settings), error = function(e) {
@@ -339,6 +340,17 @@ print.lexdiv_wide_results <- function(x, ...) {
     stop(e)
   })
   previous
+}
+
+.lex_plot_bar_dots <- function(dots, reserved = character()) {
+  unsupported <- intersect(names(dots),
+    c("height", "horiz", "offset", "add", "log", "plot", reserved))
+  if (length(unsupported)) {
+    stop("Unsupported bar-plot argument(s): ", paste(unsupported, collapse = ", "),
+      ". These plots use a new, vertical plot with a linear, zero-based scale.",
+      call. = FALSE)
+  }
+  dots
 }
 
 .lex_plot_metric_frame <- function(
@@ -404,14 +416,17 @@ print.lexdiv_wide_results <- function(x, ...) {
   if (is.null(pch)) pch <- ifelse(frame$below_quality_floor %in% TRUE, 17, 19)
   if (is.null(ylab)) ylab <- toupper(metric_id)
   positions <- seq_len(nrow(frame))
-  old_par <- .lex_plot_style(list(...))
+  dots <- list(...)
+  old_par <- .lex_plot_style(dots)
   on.exit(graphics::par(old_par), add = TRUE)
   .lex_plot(
     positions, frame$value,
     xaxt = "n", xlab = xlab, ylab = ylab, main = main,
     col = col, pch = pch, ...
   )
-  axis(1, at = positions, labels = labels)
+  if (!identical(dots$axes, FALSE) && !identical(dots$xaxt, "n")) {
+    axis(1, at = positions, labels = labels)
+  }
   invisible(data.frame(label = labels, as.data.frame(frame), check.names = FALSE))
 }
 
@@ -493,13 +508,16 @@ plot.lexdiv_screen_results <- function(
   if (monochrome) col <- "black"
   if (missing(pch)) pch <- ifelse(frame$N >= frame$minimum_tokens, 19, 17)
   positions <- seq_len(nrow(frame))
-  old_par <- .lex_plot_style(list(...))
+  dots <- list(...)
+  old_par <- .lex_plot_style(dots)
   on.exit(graphics::par(old_par), add = TRUE)
   .lex_plot(
     positions, frame$N, xaxt = "n", xlab = xlab, ylab = ylab,
     main = main, col = col, pch = pch, ...
   )
-  axis(1, at = positions, labels = labels)
+  if (!identical(dots$axes, FALSE) && !identical(dots$xaxt, "n")) {
+    axis(1, at = positions, labels = labels)
+  }
   abline(h = unique(frame$minimum_tokens), lty = 2, col = "grey40")
   invisible(frame)
 }
@@ -521,17 +539,20 @@ plot.tubelex_profile <- function(
   if (any(!is.finite(frame$coverage))) {
     stop("The TUBELEX profile has no finite coverage to plot.", call. = FALSE)
   }
-  old_par <- .lex_plot_style(list(...))
+  dots <- .lex_plot_bar_dots(list(...), reserved = c("ylim", "names.arg"))
+  old_par <- .lex_plot_style(dots)
   on.exit(graphics::par(old_par), add = TRUE)
-  positions <- barplot(
-    frame$coverage,
+  if (identical(dots$axes, FALSE) || identical(dots$xaxt, "n")) {
+    dots$axisnames <- FALSE
+  }
+  positions <- do.call(barplot, c(list(
+    height = frame$coverage,
     names.arg = frame$weighting,
     ylim = c(0, 1),
     col = col,
     main = main,
-    ylab = ylab,
-    ...
-  )
+    ylab = ylab
+  ), dots))
   invisible(data.frame(
     weighting = frame$weighting,
     coverage = frame$coverage,

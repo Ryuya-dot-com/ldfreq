@@ -78,6 +78,9 @@ reference:
       - tubelex_diagnostics
   - title: Output and visualization
     contents:
+      - lexdiv_as_documents
+      - lexdiv_widen
+      - plot.lexdiv_results
       - lexdiv_convenience
   - title: Evidence
     contents:

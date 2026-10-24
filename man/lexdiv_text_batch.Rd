@@ -54,7 +54,7 @@ these arguments for a prepared-tokenization list is an error.}
 the corresponding annotations on every input tokenization; raw texts do not
 acquire annotations automatically.}
 \item{x}{A \code{lexdiv_text_batch_results} object.}
-\item{monochrome}{One \code{TRUE} or \code{FALSE} value passed to the metric plot method; specify by name. Defaults to color; \code{TRUE} uses black and distinguishes points below the advisory floor by shape unless \code{pch} is supplied. No title is added automatically. See \code{\link{lexdiv_convenience}}.}
+\item{monochrome}{One \code{TRUE} or \code{FALSE} value passed to the metric plot method; specify by name. Defaults to color; \code{TRUE} uses black and distinguishes points below the advisory floor by shape unless \code{pch} is supplied. No title is added automatically. See \code{\link{plot.lexdiv_results}}.}
 \item{...}{For the metric function, named metric requests passed to
 \code{lexdiv_metrics_text}, such as \code{metrics} and \code{window_length}.
 For print and plot methods, arguments passed to the corresponding method for
@@ -150,8 +150,6 @@ metric rows invisibly, with the same selection rules as
 create a metric table; save the complete object to retain its audits.
 }
 \examples{
-# Optional data: review and explicitly download these resources first.
-if (all(lexdiv_resource_info(c("nj8"))$available)) {
 library(ldfreq)
 
 # 1. One row per text; keep the empty document in the input.
@@ -185,7 +183,10 @@ prepared$essay_a$tokens
 # A 4-token window illustrates MATTR here; it is not a research
 # recommendation.
 lexdiv_metrics_text_batch(prepared, metrics = "mattr", window_length = 4)$results
-nj8_profile_batch(prepared, unit = "surface")$coverage
+# Only this optional profile needs the NJ8 resource.
+if (lexdiv_resource_info("nj8")$available) {
+  nj8_profile_batch(prepared, unit = "surface")$coverage
+}
 
 # 5. Keep study information with the same analysis, matched by ID.
 # Labels are fictional; the empty response has an unknown writer.
@@ -196,7 +197,6 @@ with_study <- lexdiv_metrics_text_batch(prepared, metrics = "ttr", metadata = st
 with_study$metadata
 stopifnot(identical(with_study$results,
   lexdiv_metrics_text_batch(prepared, metrics = "ttr")$results))
-}
 }
 \seealso{\href{https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html}{Getting started: read, plot and save document results},
 \code{\link{lexdiv_metrics_text}}, \code{\link{lexdiv_convenience}},
