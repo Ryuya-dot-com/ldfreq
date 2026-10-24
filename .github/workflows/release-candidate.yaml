@@ -127,6 +127,7 @@ jobs:
             any::cpp11
             any::progress
             any::RcppEigen
+            any::RcppArmadillo
           needs: check
 
       - name: Use a fresh cache without reference downloads

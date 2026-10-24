@@ -184,6 +184,9 @@ the raw log. Original result JSON, its hash and original dates are retained.
 The run index verifies them again. Existing resource inventories are reused;
 a missing platform inventory is still run. `Reuse-Manual: true` requires the
 original manual hash and a nonempty index. This combines recorded stages and
+can use an explicit `Source-Manual-SHA256` when manual generation completed
+but the subsequent dependency inventory stopped before provenance was written.
+The PDF and index must still come from the declared source-build artifact. This
 does not claim that all numerical checks were rerun in the final workflow.
 An R-devel snapshot used only to classify the stored log may differ from the
 snapshot that executed the original check. The original execution version is

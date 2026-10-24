@@ -38,6 +38,22 @@ def verify_source(state):
     return changed
 
 
+def verify_manual(state, archive):
+    manual = archive.parent / f"ldfreq_{state['Version']}.pdf"
+    expected = state.get("Source-Manual-SHA256")
+    if expected is None:
+        prior = json.loads((archive.parent / "evidence/release-provenance.json").read_text())
+        if prior["manual"]["file"] != manual.name:
+            raise ValueError("Completed manual version mismatch")
+        expected = prior["manual"]["sha256"]
+    index = archive.parent / (manual.name + "-build/Rd2.ind")
+    if not (re.fullmatch(r"[0-9a-f]{64}", expected)
+            and hashlib.sha256(manual.read_bytes()).hexdigest() == expected
+            and index.is_file() and index.stat().st_size > 0):
+        raise ValueError("Completed indexed manual identity mismatch")
+    return {"file": manual.name, "sha256": expected, "bytes": manual.stat().st_size}
+
+
 def verify_promotion(state, changed):
     """Admit only version/citation edits; the exact new artifact is checked afresh."""
     previous_version = state.get("Promotion-From-Version")
@@ -303,13 +319,7 @@ def main():
                 raise ValueError("Completed check evidence does not match the source run")
             evidence["check_evidence_run"] = run["id"]
         if state.get("Reuse-Manual") == "true":
-            prior = json.loads((archive.parent / "evidence/release-provenance.json").read_text())
-            manual = archive.parent / prior["manual"]["file"]
-            index = archive.parent / (manual.name + "-build/Rd2.ind")
-            if not (hashlib.sha256(manual.read_bytes()).hexdigest() == prior["manual"]["sha256"]
-                    and index.is_file() and index.stat().st_size > 0):
-                raise ValueError("Completed indexed manual identity mismatch")
-            evidence["reused_manual"] = prior["manual"]
+            evidence["reused_manual"] = verify_manual(state, archive)
         (archive.parent / "source-reuse.json").write_text(json.dumps(evidence, indent=2) + "\n")
     if output:
         with open(output, "a") as stream:

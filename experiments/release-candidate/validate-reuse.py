@@ -222,3 +222,32 @@ with patch.object(reuse, "git", side_effect=lambda *args: before[args[-1].split(
             rejects(lambda: reuse.verify_ci(promotion, list(before), workflow, workflow, run, "owner/repo"))
             after[path] = original
 print("Formal promotion rejects changed dependencies, licenses, runtime, tests and unreviewed citation edits.")
+
+import tempfile
+import hashlib
+import json
+with tempfile.TemporaryDirectory() as directory:
+    root = Path(directory)
+    archive = root / 'ldfreq_0.5.1.tar.gz'
+    manual = root / 'ldfreq_0.5.1.pdf'
+    manual.write_bytes(b'completed PDF fixture')
+    index = root / 'ldfreq_0.5.1.pdf-build/Rd2.ind'
+    index.parent.mkdir(); index.write_text('function index')
+    digest = hashlib.sha256(manual.read_bytes()).hexdigest()
+    declared = {'Version': '0.5.1', 'Source-Manual-SHA256': digest}
+    result = reuse.verify_manual(declared, archive)
+    assert result['sha256'] == digest and result['file'] == manual.name
+    for invalid in ('0' * 64, 'not-a-sha256'):
+        rejects(lambda: reuse.verify_manual(dict(declared, **{'Source-Manual-SHA256': invalid}), archive))
+    index.write_text('')
+    rejects(lambda: reuse.verify_manual(declared, archive))
+    index.unlink()
+    rejects(lambda: reuse.verify_manual(declared, archive))
+    index.write_text('function index')
+    (root / 'evidence').mkdir()
+    provenance = root / 'evidence/release-provenance.json'
+    provenance.write_text(json.dumps({'manual': result}))
+    assert reuse.verify_manual({'Version': '0.5.1'}, archive) == result
+    provenance.write_text(json.dumps({'manual': dict(result, file='ldfreq_0.4.0.pdf')}))
+    rejects(lambda: reuse.verify_manual({'Version': '0.5.1'}, archive))
+print('Manual recovery requires the fixed version, exact hash and a nonempty index, including before provenance generation.')
