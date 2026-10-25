@@ -223,5 +223,44 @@ local({
     jsonlite::write_json(altered,path,auto_unbox=TRUE)
     stopifnot(tryCatch({eval(peer_check);FALSE},error=function(e) TRUE))
   }
+  result$reused_check <- NULL
+  signed$check_result_sha256 <- NULL
+  jsonlite::write_json(signed,path,auto_unbox=TRUE)
+  eval(peer_check)
+  signed$check_result_sha256 <- 'unrelated-old-check'
+  jsonlite::write_json(signed,path,auto_unbox=TRUE)
+  stopifnot(tryCatch({eval(peer_check);FALSE},error=function(e) TRUE))
   cat('External-response aggregation requires all three clean current-R peers with the identical artifact.\n')
+})
+
+local({
+  expressions <- as.list(parse('experiments/release-candidate/run-as-cran-check.R'))
+  collect <- Filter(function(x) is.call(x) && identical(x[[1L]], as.name('<-')) &&
+    identical(x[[2L]], as.name('external_verifications')), expressions)[[1L]]
+  root <- tempfile('link-check-'); dir.create(file.path(root, 'evidence'), recursive=TRUE)
+  on.exit(unlink(root, recursive=TRUE), add=TRUE)
+  source_archive <- file.path(root, 'source.tar.gz'); writeLines('fixture', source_archive)
+  case <- release_external_case_spec('windows-latest-r-release')
+  proof <- list(id=case$id, url=case$url, verification_url=case$verification_url,
+    status=200L, identity=case$identity, body_sha256=paste(rep('a',64),collapse=''),
+    checked_at_utc='2026-10-25T14:00:00Z')
+  path <- file.path(root, 'evidence/external-link-verification.json')
+  signed <- list(artifact_sha256=digest::digest(file=source_archive,algo='sha256'),
+    check_result_sha256=NULL, verification=proof)
+  jsonlite::write_json(signed,path,auto_unbox=TRUE,null='null')
+  external_cases <- list(case); reused_check <- NULL
+  external_verification_errors <- list()
+  eval(collect)
+  stopifnot(identical(external_verifications,list(proof)), !length(external_verification_errors))
+  signed$artifact_sha256 <- 'other'
+  jsonlite::write_json(signed,path,auto_unbox=TRUE,null='null')
+  eval(collect)
+  stopifnot(!length(external_verifications), length(external_verification_errors)==1L)
+  external_cases <- list(release_external_case_spec('ubuntu-24.04-r-4.1'))
+  release_recheck_external <- function(case) stop('simulated network failure')
+  external_verification_errors <- list()
+  eval(collect)
+  stopifnot(!length(external_verifications), length(external_verification_errors)==1L,
+    identical(external_verification_errors[[1L]]$message,'simulated network failure'))
+  cat('Fresh checks bind delegated verification to the exact archive; failed verification remains recorded and unaccepted.\n')
 })

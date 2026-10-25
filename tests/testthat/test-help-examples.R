@@ -17,7 +17,8 @@ test_that("basic help examples compute and save results without reference data",
       expect_equal(env$text_result$results$value, 1)
       expect_false(exists("profile", envir = env, inherits = FALSE))
     } else {
-      expect_identical(env$restored, env$result)
+      expect_identical(env$restored$texts, env$texts)
+      expect_identical(env$restored$analysis, env$result)
       expect_equal(env$result$results$value, c(.8, 1, NA_real_))
       expect_identical(env$with_study$metadata$document_id, c("essay_a", "essay_b", "empty"))
     }

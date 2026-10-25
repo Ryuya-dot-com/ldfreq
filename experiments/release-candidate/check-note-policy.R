@@ -64,9 +64,7 @@ release_resource_size_note <- function(note_block) {
 }
 
 # These two observed responses require a fresh successful identity check.
-release_external_case <- function(block, label) {
-  prefix <- block; prefix$detail <- head(block$detail, 2L)
-  if (!release_new_submission_note(prefix)) return(NULL)
+release_external_case_spec <- function(label) {
   lancaster <- paste0("https://www.lancaster.ac.uk/news/articles/2017/",
     "researchers-release-largest-ever-public-collection-of-british-conversations/")
   cases <- list(
@@ -84,7 +82,13 @@ release_external_case <- function(block, label) {
         "DOI: 10.1080/09296171003643098", "From: DESCRIPTION",
         "Status: Forbidden", "Message: 403")))
   if (is.null(label) || length(label) != 1L) return(NULL)
-  case <- cases[[label]]
+  cases[[label]]
+}
+
+release_external_case <- function(block, label) {
+  prefix <- block; prefix$detail <- head(block$detail, 2L)
+  if (!release_new_submission_note(prefix)) return(NULL)
+  case <- release_external_case_spec(label)
   if (is.null(case) || !identical(unlist(block$detail[-c(1L, 2L)], use.names = FALSE),
       case$detail)) return(NULL)
   case

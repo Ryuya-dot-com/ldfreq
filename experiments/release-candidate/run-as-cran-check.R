@@ -132,16 +132,22 @@ if (!is.null(reused_check)) {
   }
 }
 external_cases <- Filter(Negate(is.null), lapply(note_blocks, release_external_case, label = job_label))
-external_verifications <- lapply(external_cases, function(case) {
-  if (case$id == "lancaster-dns" && !is.null(reused_check)) {
+external_verification_errors <- list()
+external_verifications <- Filter(Negate(is.null), lapply(external_cases, function(case) tryCatch({
+  if (case$id == "lancaster-dns") {
     link_record <- jsonlite::read_json(file.path(dirname(source_archive),
       "evidence/external-link-verification.json"), simplifyVector = FALSE)
-    stopifnot(identical(link_record$artifact_sha256, prior$artifact$sha256),
+    stopifnot(identical(link_record$artifact_sha256,
+        digest::digest(file = source_archive, algo = "sha256", serialize = FALSE)),
       identical(link_record$check_result_sha256, reused_check$original_result_sha256),
       release_external_verified(case, list(link_record$verification)))
     link_record$verification
   } else release_recheck_external(case)
-})
+}, error = function(e) {
+  external_verification_errors[[length(external_verification_errors) + 1L]] <<-
+    list(id = case$id, message = conditionMessage(e))
+  NULL
+})))
 classification <- release_classify_notes(
   check_status,
   note_blocks,
@@ -162,6 +168,7 @@ result <- list(
   explained_notes = classification$explained_notes,
   note_blocks = note_blocks,
   external_verifications = external_verifications,
+  external_verification_errors = external_verification_errors,
   started_at_utc = started,
   finished_at_utc = finished,
   reused_check = reused_check,

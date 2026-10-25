@@ -208,6 +208,10 @@ combined evidence, not a claim that the original network responses disappeared.
 Lancaster DNS resolution also failed on a second Windows runner. Its page
 identity is therefore verified on the Linux build host and included in the
 signed source evidence. The record binds the exact archive and original
-Windows check-result hashes. Windows and the final aggregate verify that
-binding. This establishes the reference identity, not Windows DNS availability;
-the original failure and the verification host remain explicit.
+Windows check-result hashes when reclassifying a completed check. Fresh archives
+receive the same Linux verification before their Windows check, bound to the
+archive hash without a prior check-result hash. Windows and the final aggregate
+verify the applicable binding. A failed verification is recorded in the check
+result and leaves the note unaccepted. This establishes the reference identity,
+not Windows DNS availability; the original failure and verification host remain
+explicit.

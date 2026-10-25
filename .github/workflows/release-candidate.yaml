@@ -264,22 +264,29 @@ jobs:
           path: ${{ runner.temp }}/noted-windows-check
 
       - name: Verify the noted reference independently of Windows DNS
-        if: needs.candidate-state.outputs.check_evidence_run != ''
         shell: Rscript {0}
         run: |
           source("experiments/release-candidate/check-note-policy.R")
+          output <- file.path(Sys.getenv("RUNNER_TEMP"), "release-candidate-source")
           original <- file.path(Sys.getenv("RUNNER_TEMP"),
             "noted-windows-check/as-cran-check/check-result.json")
-          prior <- jsonlite::read_json(original, simplifyVector = FALSE)
-          case <- release_external_case(prior$note_blocks[[1L]], prior$job_label)
+          original_sha256 <- NULL
+          case <- release_external_case_spec("windows-latest-r-release")
+          if (file.exists(original)) {
+            prior <- jsonlite::read_json(original, simplifyVector = FALSE)
+            case <- release_external_case(prior$note_blocks[[1L]], prior$job_label)
+            original_sha256 <- digest::digest(file = original, algo = "sha256")
+          }
           if (!is.null(case) && case$id == "lancaster-dns") {
             verification <- release_recheck_external(case)
-            record <- list(artifact_sha256 = prior$artifact$sha256,
-              check_result_sha256 = digest::digest(file = original, algo = "sha256"),
+            archive <- list.files(output, pattern = "[.]tar[.]gz$", full.names = TRUE)
+            stopifnot(length(archive) == 1L)
+            record <- list(artifact_sha256 = digest::digest(file = archive, algo = "sha256"),
+              check_result_sha256 = original_sha256,
               verification = verification)
-            jsonlite::write_json(record, file.path(Sys.getenv("RUNNER_TEMP"),
-              "release-candidate-source/evidence/external-link-verification.json"),
-              auto_unbox = TRUE, pretty = TRUE)
+            jsonlite::write_json(record, file.path(output,
+              "evidence/external-link-verification.json"),
+              auto_unbox = TRUE, pretty = TRUE, null = "null")
           }
 
       - name: Attest the exact source, manual and evidence
