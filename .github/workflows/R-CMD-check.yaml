@@ -84,15 +84,6 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
 
-      - name: Audit the documented public API surface
-        if: ${{ matrix.config.os == 'ubuntu-24.04' && matrix.config.r == 'release' }}
-        shell: bash
-        run: |
-          Rscript --vanilla development/audit-public-api.R .
-          Rscript --vanilla experiments/release-candidate/validate-note-policy.R
-          python3 experiments/validate-contextual-spans.py
-          python3 experiments/validate-l2sca-runner.py
-
       - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
         with:
           cache: always
@@ -104,6 +95,15 @@ jobs:
           # Keep all ldfreq check dependencies; old Matrix Enhances are not used.
           dependencies: 'if (getRversion() < "4.2.0") c("Depends", "Imports", "LinkingTo", "Suggests") else "all"'
           needs: check
+
+      - name: Audit the documented public API surface
+        if: ${{ matrix.config.os == 'ubuntu-24.04' && matrix.config.r == 'release' }}
+        shell: bash
+        run: |
+          Rscript --vanilla development/audit-public-api.R .
+          Rscript --vanilla experiments/release-candidate/validate-note-policy.R
+          python3 experiments/validate-contextual-spans.py
+          python3 experiments/validate-l2sca-runner.py
 
       - name: Explicitly obtain optional reference snapshots for integration checks
         shell: Rscript {0}

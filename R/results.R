@@ -262,7 +262,9 @@
     stop("Internal error: at least one metric record is required.", call. = FALSE)
   }
 
-  output <- data.frame(
+  # Every column has a fixed type and one entry per validated record. Assemble
+  # once instead of repeating data.frame coercion for each document's columns.
+  output <- list(
     metric_id = vapply(records, `[[`, character(1L), "metric_id"),
     method_id = vapply(records, `[[`, character(1L), "method_id"),
     metric_contract_id = rep.int(.lex_contract_id, length(records)),
@@ -278,9 +280,7 @@
       records,
       function(record) as.logical(record$below_quality_floor),
       logical(1L)
-    ),
-    stringsAsFactors = FALSE,
-    check.names = FALSE
+    )
   )
   output$requested_parameters <- I(lapply(records, `[[`, "requested_parameters"))
   output$effective_parameters <- I(lapply(records, `[[`, "effective_parameters"))
@@ -293,6 +293,7 @@
     "requested_parameters", "effective_parameters", "N", "V",
     "below_quality_floor", "diagnostics"
   )]
+  attr(output, "row.names") <- .set_row_names(length(records))
   class(output) <- c("lexdiv_results", "data.frame")
   attr(output, "contract_id") <- .lex_contract_id
   attr(output, "contract_version") <- .lex_contract_version

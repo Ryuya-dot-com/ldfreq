@@ -996,14 +996,16 @@ print.lexical_level_profile <- function(x, ...) {
 #'   values.
 #' @param show_cumulative Whether to overlay the cumulative series.
 #' @param include_off_list Whether to include the separate off-list bar.
-#' @param bar_col,cumulative_col Colors for the bars and cumulative curve.
+#' @param col,cumulative_col One color each for the bars and cumulative curve.
 #' @param main,xlab,ylab Optional plot labels.
 #' @param show_legend Whether to draw a compact legend.
 #' @param monochrome One `TRUE` or `FALSE` value. Defaults to color; `TRUE`
 #'   overrides bar and curve colors with gray and black. The off-list bar
 #'   remains a separate shade. No title is added automatically; place figure
 #'   titles and notes outside the image.
-#' @param ... Additional arguments passed to [graphics::barplot()].
+#' @param ... Cosmetic arguments passed to [graphics::barplot()]. The plot
+#'   uses a new, vertical, linear coordinate system; `height`, `horiz`,
+#'   `offset`, `add`, `log` and `plot` are not supported.
 #'
 #' @return Invisibly, the rows and plotting values used to draw the figure.
 #' @export
@@ -1013,7 +1015,7 @@ plot.lexical_level_profile <- function(
     scale = "proportion",
     show_cumulative = TRUE,
     include_off_list = TRUE,
-    bar_col = "#0072B2",
+    col = "#0072B2",
     cumulative_col = "#D55E00",
     main = NULL,
     xlab = "New JACET 8000 frequency level",
@@ -1022,9 +1024,18 @@ plot.lexical_level_profile <- function(
     ...,
     monochrome = FALSE) {
   monochrome <- .lexprep_scalar_flag(monochrome, "monochrome")
+  dots <- list(...)
+  if ("bar_col" %in% names(dots)) {
+    stop("bar_col has been replaced by col; use plot(x, col = ...).", call. = FALSE)
+  }
+  dots <- .lex_plot_bar_dots(dots)
   if (monochrome) {
-    bar_col <- "grey70"
+    col <- "grey70"
     cumulative_col <- "black"
+    dots$border <- "black"
+  }
+  if (length(col) != 1L || length(cumulative_col) != 1L) {
+    stop("col and cumulative_col must each specify one color.", call. = FALSE)
   }
   if (!inherits(x, "lexical_level_profile") || !is.data.frame(x$summary)) {
     stop("x must be a lexical level profile.", call. = FALSE)
@@ -1061,8 +1072,7 @@ plot.lexical_level_profile <- function(
     if (show_cumulative) cumulative[is.finite(cumulative)])
   maximum <- if (identical(scale, "proportion")) 1 else max(1, finite_values)
   upper <- maximum * if (show_legend) 1.35 else 1.08
-  bar_colors <- ifelse(is.na(rows$level), if (monochrome) "grey90" else "#B8B8B8", bar_col)
-  dots <- list(...)
+  bar_colors <- ifelse(is.na(rows$level), if (monochrome) "grey90" else "#B8B8B8", col)
   old_par <- .lex_plot_style(dots)
   on.exit(graphics::par(old_par), add = TRUE)
   proportion_axis <- identical(scale, "proportion") &&
@@ -1076,7 +1086,8 @@ plot.lexical_level_profile <- function(
       units = "inches", cex = label_cex)) > graphics::par("pin")[[1L]] / (nrow(rows) + 1)) {
     level_labels[is.na(rows$level)] <- "Off-\nlist"
   }
-  draw_names <- !identical(dots$axisnames, FALSE) && !identical(dots$xaxt, "n")
+  draw_names <- !identical(dots$axes, FALSE) &&
+    !identical(dots$axisnames, FALSE) && !identical(dots$xaxt, "n")
   axis_labels <- if ("names.arg" %in% names(dots)) dots$names.arg else level_labels
   dots$axisnames <- FALSE
   bar_args <- list(
@@ -1115,7 +1126,7 @@ plot.lexical_level_profile <- function(
     labels <- "Exact Level"
     line_types <- NA_integer_
     points <- 15L
-    colors <- bar_col
+    colors <- col
     line_widths <- NA_real_
     point_sizes <- 1.4
     if (show_cumulative && length(cumulative_rows)) {

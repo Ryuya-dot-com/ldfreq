@@ -38,3 +38,13 @@ in local-window, reference-lookup and compatibility contexts.
 For an added API, check the operation, input contract, result type, resource
 identity and compatibility route, then keep NAMESPACE, help, examples,
 API-SURFACE.md, tests, NEWS and pkgdown navigation consistent.
+
+## Plot arguments for 1.0.0
+
+Use `col` for the primary point, line or bar series. Distinct overlays retain
+their meaningful names (`mean_col`, `cumulative_col`). NJ8's former `bar_col`
+is replaced by `col`; callers get an explicit migration error. A monochrome
+request overrides series colors. Manually drawn axes honor the same axis
+switches and text settings as the underlying base plot. Bar plots reject
+arguments that change their fixed vertical, linear coordinate system rather
+than applying them to only part of a composite figure.

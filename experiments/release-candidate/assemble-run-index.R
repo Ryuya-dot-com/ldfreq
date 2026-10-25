@@ -196,7 +196,7 @@ for (result in results) {
       check(identical(link_record$artifact_sha256, result$artifact$sha256) &&
         identical(link_record$check_result_sha256, result$reused_check$original_result_sha256) &&
         identical(link_record$verification, result$external_verifications[[1L]]),
-        "Delegated link verification does not match the signed source and original check.")
+        "Delegated link verification does not match the signed source and check provenance.")
     }
     peers <- Filter(function(x) x$job_label %in% c("ubuntu-24.04-r-release",
       "ubuntu-24.04-r-devel", "macos-latest-r-release"), results)

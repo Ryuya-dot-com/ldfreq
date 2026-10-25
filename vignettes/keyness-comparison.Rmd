@@ -18,7 +18,7 @@ answer depends on the reference: its genres, topics, writers and collection
 conditions help determine what a difference means. Keyness describes that
 comparison; it does not by itself measure language proficiency or writing quality.
 
-This guide uses ldfreq **0.5.0.9001**. The public functions
+The public functions
 `lexdiv_keyness()` and `lexdiv_keyness_concordance()` retain both corpora, the
 tokens counted, the two-by-two tables, and links back to the original text.
 No helper sourcing is needed. Counting needs no optional package; returning to KWIC uses

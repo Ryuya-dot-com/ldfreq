@@ -6,3 +6,4 @@
 *.tar.gz
 docs/
 __pycache__/
+.DS_Store

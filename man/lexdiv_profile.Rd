@@ -14,6 +14,22 @@
 \alias{print.lexdiv_profile_results}
 \alias{print.lexdiv_profile_batch_results}
 \title{Build and Evaluate Explicit Lexical-Diversity Method Plans}
+\section{Where plans fit}{
+Use \code{lexdiv_methods()} to choose a method, \code{lexdiv_spec()} or
+\code{lexdiv_grid()} to declare its settings, and \code{lexdiv_plan()} to
+assemble the requests. Execute the plan with
+\code{\link{lexdiv_metrics}(tokens, plan = plan)} or
+\code{\link{lexdiv_metrics_batch}(documents, plan = plan)}.
+The plan-based batch output connects to \code{\link{lexdiv_study_table}};
+\code{\link{lexdiv_widen}} retains selected values and status fields in columns.
+For a local curve, pass a MATTR-only plan and the tokens to
+\code{\link{lexdiv_mattr_profile}}.
+
+\code{lexdiv_screen_lengths()} describes which rows meet declared length
+floors without removing results. Inspect \code{\link{lexdiv_length_evidence}}
+and the \href{https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html}{metric-selection guide}
+when deciding whether those screens suit the study.
+}
 \usage{
 lexdiv_screen_lengths(
   x,
@@ -218,7 +234,7 @@ tokens <- rep(c("a", "b", "a", "c", "d"), 25)
 profile <- lexdiv_metrics(tokens, plan = plan)
 profile[, c("request_id", "metric_id", "value", "status")]
 
-screens <- lexdiv_screen(profile)
+screens <- lexdiv_screen_lengths(profile)
 screens[, c("request_id", "screen_id", "minimum_tokens", "passes_screen")]
 
 documents <- list(document_a = tokens, document_b = rev(tokens))

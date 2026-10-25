@@ -7,10 +7,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-**The current guides use ldfreq 0.5.0.9001.** Install the single archive in the
-[README](https://ryuya-dot-com.github.io/ldfreq/index.html#install). It includes
-all workflows linked here; you do not need separate development versions for
-different guides. Earlier releases are retained for reproducing earlier analyses.
+Install the fixed release linked in the
+[README](https://ryuya-dot-com.github.io/ldfreq/index.html#install). Open guides
+matching that installation with `browseVignettes("ldfreq")`; individual workflows
+do not require separate development releases. NEWS labels unreleased changes
+separately. Earlier releases are retained for reproducing earlier analyses.
 
 ## What is available?
 

@@ -29,6 +29,26 @@ test_that("the public API emits the complete result contract", {
   expect_true(all(vapply(result$diagnostics, is.list, logical(1L))))
 })
 
+test_that("metric tables retain automatic rows, typed columns and saved metadata", {
+  tokens <- c(first = "a", second = "b", third = "a")
+  result <- lexdiv_metrics(tokens, metrics = c(t = "ttr", m = "mattr"),
+    window_length = 4)
+  expected <- data.frame(metric_id = c("ttr", "mattr"), value = c(2 / 3, NA_real_),
+    status = c("ok", "missing"), N = c(3, 3), V = c(2, 2))
+  expect_identical(as.data.frame(result)[names(expected)], expected)
+  expect_identical(.row_names_info(result, type = 1L), -2L)
+  expect_null(rownames(as.matrix(result[c("N", "V")])))
+  expect_identical(result$requested_parameters, I(list(list(), list(window_length = 4))))
+  expect_identical(result$effective_parameters, I(list(list(), list())))
+  expect_identical(result$diagnostics, I(list(list(), list())))
+  path <- tempfile(fileext = ".rds")
+  on.exit(unlink(path), add = TRUE)
+  saveRDS(result, path)
+  expect_identical(readRDS(path), result)
+  one <- lexdiv_metrics(tokens, metrics = "ttr")
+  expect_identical(.row_names_info(one, type = 1L), -1L)
+})
+
 test_that("a likely raw sentence is not silently counted as one token", {
   expect_warning(
     result <- lexdiv_metrics("The cat sat on the mat.", metrics = "ttr"),

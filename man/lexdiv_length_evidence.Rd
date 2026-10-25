@@ -25,6 +25,15 @@ as versioned tool guidance rather than primary empirical evidence.
 Method equivalence is not inferred from a shared metric label. In particular,
 the evidence table does not assert that Gramulator, TAALED, or another package's
 MTLD implementation is numerically identical to the defined target method.
+
+Use these records to interpret advisory flags and
+\code{\link{lexdiv_screen_lengths}}, not to choose a measure from a token
+cutoff alone. The
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html}{metric-selection guide}
+also reports the package's corpus comparisons, length sensitivity and sampling
+agreement. Those aggregate results are not all contained in this small evidence
+table. Compute the chosen measure with \code{\link{lexdiv_metrics}} using
+settings justified for the question and material.
 }
 \examples{
 evidence <- lexdiv_length_evidence()

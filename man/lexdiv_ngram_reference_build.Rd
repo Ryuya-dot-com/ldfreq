@@ -36,7 +36,7 @@ This is not a limit on total memory or callback allocations.}
 A plain list under experimental builder version 0.1.0:
 \describe{
 \item{reference}{A standard, complete \code{lexdiv_ngram_reference} object
-usable by \code{lexdiv_ngram_profile()} and \code{lexdiv_ngram_compare()}.
+usable by \code{lexdiv_ngram_profile()} and \code{lexdiv_compare_ngrams()}.
 Count rows follow first appearance across chunks; totals follow the first
 chunk's \code{n} order. Different chunkings can change row order and hashes
 while retaining the same counts and profile values.}
@@ -88,11 +88,12 @@ resource <- list(resource_id = "authored_chunks", resource_version = "1",
   creator = "Example author", source_reference = "Two authored sequences",
   data_license = "Project-authored example", transformation_id = "none",
   lookup_unit = "adjacent_surface_ngram", resource_key_normalization_id = "identity")
-built <- lexdiv_ngram_reference_build(names(documents), read, resource)
+built <- lexdiv_build_ngram_reference(names(documents), read, resource)
 built$reference$counts
 built$reference$totals
 built$documents
 }
-\seealso{\code{\link{lexdiv_ngrams}}, \code{\link{lexdiv_ngram_compare}},
-\code{\link{lexdiv_read_masc}}}
+\seealso{\code{\link{lexdiv_ngrams}}, \code{\link{lexdiv_compare_ngrams}},
+\code{\link{lexdiv_read_masc}},
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html}{build, inspect and use an n-gram reference}.}
 \keyword{text}

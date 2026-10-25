@@ -19,8 +19,7 @@ computed from an explicit population of possible pairs. Keep both counts:
 a high association score from one occurrence deserves different interpretation
 from a frequently repeated combination.
 
-This guide uses **ldfreq 0.5.0.9001** and optional **quanteda >= 4.5.0**
-for the initial search. It starts with adjacent words, then expands to a
+This workflow uses optional **quanteda >= 4.5.0** for the initial search. It starts with adjacent words, then expands to a
 left/right span. Call `lexdiv_concordance()` and `lexdiv_collocations()` directly;
 no helper sourcing is needed. Computing collocations from a saved search does
 not load quanteda. The examples below are authored for hand checking;

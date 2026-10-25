@@ -81,6 +81,17 @@ operations. Do not change classes or integrity hashes by hand; to obtain the new
 plot interface for an old search, recreate it from its saved source and settings.
 See \href{https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html}{concordance and dispersion guide}.
 }
+\section{Continue from a search}{
+Pass the complete search and one single-token \code{query_id} to
+\code{\link{lexdiv_collocations}} to inspect nearby-word counts and association.
+Keep the search object: the occurrence table returned by sorting is a display
+view, not the input to the subsequent operations.
+
+To compare word use between two corpora, use the original complete annotations
+with \code{\link{lexdiv_keyness}} and explicit target/reference document IDs.
+Then \code{\link{lexdiv_keyness_concordance}} returns the selected term's source
+contexts. The query hits alone do not supply the corpus denominators.
+}
 \value{
 \code{lexdiv_concordance()} returns a classed list with \code{occurrences}
 (query/document/segment IDs, token and character positions, contexts, matched
@@ -105,7 +116,7 @@ source <- lexdiv_import_annotations(tokens, segments, list(language = "en",
   dictionary_version = "none", unit = "supplied tokens", normalization = "none"))
 if (requireNamespace("quanteda", quietly = TRUE)) {
   search <- lexdiv_concordance(source, list(word = "a", phrase = c("a", "b")))
-  lexdiv_concordance_sort(search)
+  lexdiv_sort_concordance(search)
   lexdiv_concordance_dispersion(search, "word", parts = 3)$documents
   if (requireNamespace("ggplot2", quietly = TRUE)) plot(search, "word")
 }

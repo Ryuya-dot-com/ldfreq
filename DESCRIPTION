@@ -1,14 +1,20 @@
 Package: ldfreq
 Type: Package
 Title: Reproducible Lexical Diversity and Frequency Profiles
-Version: 0.5.1
+Version: 1.0.0
 Authors@R:
-    person(
+    c(person(
         given = "Ryuya",
         family = "Komuro",
         email = "komuro.4121@gmail.com",
         role = c("aut", "cre")
-    )
+    ),
+    person(
+        given = "Adam",
+        family = "Nohejl",
+        role = c("ctb", "cph"),
+        comment = "Author of the BSD-3-Clause TUBELEX tokenizer code adapted in an optional example"
+    ))
 Description: Compares lexical diversity and reference-vocabulary profiles while
     retaining the formula, parameters, preprocessing choices, and match coverage
     used in each analysis. Supports eleven default lexical-diversity measures

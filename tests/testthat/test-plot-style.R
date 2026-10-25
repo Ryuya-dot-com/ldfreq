@@ -43,6 +43,52 @@ test_that("every plot mode preserves selected data and validates its switch", {
   }
 })
 
+test_that("TTR shows its denominator and metric plots retain missing positions", {
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  drawn <- drawn_axis <- NULL
+  local_mocked_bindings(
+    .lex_plot = function(x, y, ...) drawn <<- c(list(x = x, y = y), list(...)),
+    axis = function(side, at, labels, ...) {
+      drawn_axis <<- list(at = at, text = labels)
+    }, .package = "ldfreq"
+  )
+  docs <- list(short = rep(letters[1:4], 5), empty = character(),
+    invalid = factor("a"), long = rep(letters[1:4], 20))
+  result <- lexdiv_metrics_batch(docs, metrics = "ttr")
+  original <- result
+  returned <- withVisible(plot(result))
+  expect_false(returned$visible)
+  expect_identical(returned$value$document_id, names(docs))
+  expect_identical(returned$value$label, names(docs))
+  expect_identical(returned$value$status, result$status)
+  expect_identical(returned$value$missing_reason, result$missing_reason)
+  expect_identical(result, original)
+  expect_identical(drawn$x, 1:4)
+  expect_equal(drawn$y, c(.2, NA, NA, .05))
+  expect_identical(drawn$ylim, c(0, 1))
+  expect_identical(drawn$ylab, "TTR (V/N)")
+  expect_identical(drawn_axis$at, 1:4)
+  expect_identical(drawn_axis$text, c("short\nN = 20", "empty\nN = 0\nnot computed",
+    "invalid\nN = unknown\nnot computed", "long\nN = 80"))
+  plot(result, ylim = c(0, .4), ylab = "Custom")
+  expect_identical(drawn$ylim, c(0, .4))
+  expect_identical(drawn$ylab, "Custom")
+  drawn_axis <- NULL
+  plot(result, xaxt = "n")
+  expect_null(drawn_axis)
+  expect_error(plot(result[2:3, ]), "no finite ok values")
+
+  other <- lexdiv_metrics_batch(docs[c(1, 2, 4)], metrics = "mattr",
+    window_length = 50)
+  plot(other)
+  expect_identical(drawn$x, 1:3)
+  expect_true(all(is.na(drawn$y[1:2])))
+  expect_identical(drawn_axis$text, c("short\nnot computed", "empty\nnot computed", "long"))
+  expect_null(drawn$ylim)
+  expect_identical(drawn$ylab, "MATTR")
+})
+
 test_that("graphics receive color defaults and distinguish monochrome series", {
   # Capture the actual graphics calls, including overlays and legends, without
   # making output depend on a platform's rasterizer or font metrics.
@@ -104,7 +150,7 @@ test_that("graphics receive color defaults and distinguish monochrome series", {
   expect_identical(calls[[2L]]$col, "black")
   expect_equal(calls[[2L]]$lty, 2)
   calls <- list()
-  plot(examples$levels, monochrome = TRUE, bar_col = "red", cumulative_col = "blue")
+  plot(examples$levels, monochrome = TRUE, col = "red", cumulative_col = "blue")
   expect_false(calls[[1L]]$col[[1L]] == tail(calls[[1L]]$col, 1L))
   expect_identical(calls[[1L]]$border, "black")
   expect_identical(calls[[2L]]$col, "black")
@@ -153,4 +199,75 @@ test_that("narrow NJ8 plots retain every category label without shrinking text",
   seen <- NULL
   plot(x, axisnames = FALSE)
   expect_null(seen)
+})
+
+test_that("manual axes honor switches and text settings without changing results", {
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  original_axis <- graphics::axis
+  seen <- list()
+  local_mocked_bindings(axis = function(...) {
+    seen[[length(seen) + 1L]] <<- graphics::par(c("cex.axis", "col.axis", "font.axis"))
+    original_axis(...)
+  }, .package = "ldfreq")
+  examples <- plot_style_examples()
+  for (x in examples[c("metric", "batch", "profile", "profile_batch",
+                      "text", "text_batch", "screen", "reference", "levels")]) {
+    original <- plot(x)
+    seen <- list()
+    expect_identical(plot(x, axes = FALSE), original)
+    expect_length(seen, 0L)
+    seen <- list()
+    # Suppress both axes so NJ8's proportion axis is also excluded here.
+    expect_identical(plot(x, xaxt = "n", yaxt = "n"), original)
+    expect_length(seen, 0L)
+    before <- graphics::par(c("cex.axis", "col.axis", "font.axis"))
+    seen <- list()
+    plot(x, cex.axis = .7, col.axis = "purple", font.axis = 2)
+    expect_true(length(seen) > 0L)
+    expect_identical(seen[[1L]], list(cex.axis = .7, col.axis = "purple", font.axis = 2L))
+    expect_identical(graphics::par(names(before)), before)
+  }
+})
+
+test_that("bar arguments cannot corrupt geometry and NJ8 colors match the legend", {
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  examples <- plot_style_examples()
+  before <- graphics::par(c("bty", "las", "family"))
+  for (x in examples[c("levels", "tubelex")]) {
+    invalid <- list(horiz = TRUE, height = 1, offset = 1, add = TRUE,
+      log = "y", plot = FALSE)
+    for (name in names(invalid)) {
+      expect_error(do.call(plot, c(list(x = x), invalid[name])),
+        paste0("Unsupported bar-plot argument.*", name))
+    }
+  }
+  expect_error(plot(examples$tubelex, ylim = c(0, .8)), "Unsupported.*ylim")
+  expect_error(plot(examples$tubelex, names.arg = c("a", "b")), "Unsupported.*names.arg")
+  expect_error(plot(examples$levels, bar_col = "red"), "bar_col has been replaced by col")
+  expect_error(plot(examples$levels, col = c("red", "blue")), "one color")
+  expect_identical(graphics::par(names(before)), before)
+  bars <- legend_colors <- NULL
+  original_barplot <- graphics::barplot
+  original_legend <- graphics::legend
+  local_mocked_bindings(
+    barplot = function(...) {
+      bars <<- list(...)
+      original_barplot(...)
+    },
+    legend = function(...) {
+      legend_colors <<- list(...)$col
+      original_legend(...)
+    }, .package = "ldfreq")
+  plot(examples$levels, col = "purple", cumulative_col = "orange")
+  expect_true(all(head(bars$col, -1) == "purple"))
+  expect_identical(tail(bars$col, 1), "#B8B8B8")
+  expect_identical(legend_colors, c("purple", "orange"))
+  plot(examples$levels, monochrome = TRUE, col = "red", border = "red",
+    cumulative_col = "blue")
+  expect_true(all(head(bars$col, -1) == "grey70"))
+  expect_identical(tail(bars$col, 1), "grey90")
+  expect_identical(bars$border, "black")
+  expect_identical(legend_colors, c("grey70", "black"))
 })

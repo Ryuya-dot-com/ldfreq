@@ -464,7 +464,6 @@ The 50-token window is common to all documents. The 30 nonempty teaching texts
 are 107–149 tokens long and can all use that window. For a research corpus,
 justify the window for your task and length distribution; keep it common across
 comparable texts rather than shrinking it for short documents.
-The `metadata` argument below requires **ldfreq 0.3.0.9005 or later**.
 
 ```{r file-input-analysis}
 file_tokens <- lexdiv_tokenize_batch(file_documents,

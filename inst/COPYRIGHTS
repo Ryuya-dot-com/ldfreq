@@ -13,3 +13,10 @@ No third-party reference datasets are included. Optional reference downloads
 are separately licensed and carry attribution and license texts in their own
 archives. Use lexdiv_resource_info() to inspect the resources and terms.
 The package's MIT license does not apply to those datasets.
+
+The MASC-format example text and annotations are authored examples, not an
+extract from MASC. The corpus-stability and corpus-extension directories
+contain ldfreq's numerical research summaries, not source corpus texts,
+token sequences, participant identifiers or document-level score tables.
+Their sources and analysis conditions are described in the metric-selection
+guide and the corresponding reproduction scripts in the source repository.

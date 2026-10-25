@@ -277,7 +277,7 @@ gap is 6.63%, with a maximum of 48.36%, using the mean of directional scores
 as the denominator. The four highest scores depend entirely on the tail in
 both directions. These counts describe the examples, not a learner population.
 
-From development version 0.3.0.9002, printing results shows `mtld_tail_only`
+Printing results shows `mtld_tail_only`
 and `mtld_gap_pct` automatically where these diagnostics are available. These
 are derived display columns; the saved result schema and values are unchanged.
 The table above retains the numeric components for analysis or export.
