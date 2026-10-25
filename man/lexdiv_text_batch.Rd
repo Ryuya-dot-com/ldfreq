@@ -75,8 +75,9 @@ example, \emph{essay_a} has five tokens and four types (TTR 0.8),
 has zero tokens with \code{missing_reason = "empty_input"}. These short
 authored texts explain the output, not a comparison of writing ability.
 \code{lexdiv_widen(result$results)} puts metrics into columns without
-recalculating them. Keep the complete \code{result} when saving: the wide
-table alone does not retain the token audit and preprocessing records.
+recalculating them. Save the original texts together with the complete
+\code{result}: the wide table omits the token audit and preprocessing records,
+and the audit and hashes do not preserve the original text.
 
 Use \code{lexdiv_tokenize_batch()} separately when you want to inspect or
 annotate the tokens before scoring or reuse them with a reference vocabulary.
@@ -114,6 +115,15 @@ A document does not change another document's requested window or sample size.
 Settings and metric requests are validated even with zero documents.
 Only metric arguments supported by \code{lexdiv_metrics_text()} can be
 forwarded through \code{...}; \code{plan} and \code{max_rows} are not supported.
+
+For a measurement plan or a scheduled-observation study, retain the complete
+\code{lexdiv_tokenize_batch()} output and explicitly extract the selected token
+vectors. The surface-form example below uses \code{x$tokens$surface}; other
+units and exclusions must be chosen explicitly. Pass the named vectors to
+\code{\link{lexdiv_metrics_batch}} with \code{plan = plan}, then use that
+complete result with \code{\link{lexdiv_study_table}}. The
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html}{planned-observation guide}
+adds the schedule, submission map and reporting decisions needed for model rows.
 
 Prepared objects retain their recorded settings. A batch call does not assert
 that differently prepared documents are comparable: inspect preprocessing and
@@ -164,17 +174,17 @@ result$results  # TTR: essay_a = 0.8, essay_b = 1; empty = NA
 result$token_audit
 lexdiv_widen(result$results)
 
-# 2. The plot displays the two computed scores; the empty row stays in
-# results.
+# 2. The plot displays two scores and a labelled position for the empty text.
 plot(result, metric_id = "ttr")
 plot(result, metric_id = "ttr", monochrome = TRUE)
 
-# 3. Save the whole analysis. Use your own output path for a research
-# project.
+# 3. Save original texts and the full analysis together.
+# Use your own output path for a research project.
 path <- tempfile(fileext = ".rds")
-saveRDS(result, path)
+saveRDS(list(texts = texts, analysis = result), path)
 restored <- readRDS(path)
-restored$results
+restored$texts
+restored$analysis$results
 unlink(path)  # Clean up only this temporary demonstration file.
 
 # 4. Optional workflow: prepare tokens once, then reuse them.
@@ -187,6 +197,15 @@ lexdiv_metrics_text_batch(prepared, metrics = "mattr", window_length = 4)$result
 if (lexdiv_resource_info("nj8")$available) {
   nj8_profile_batch(prepared, unit = "surface")$coverage
 }
+
+# A plan-based path from the same prepared surface tokens, keeping empty texts.
+documents <- lapply(prepared, function(x) x$tokens$surface)
+plan <- lexdiv_plan(presets = character(), specs = list(
+  lexdiv_spec("ttr_v_over_n_v1", request_id = "ttr")))
+planned_results <- lexdiv_metrics_batch(documents, plan = plan)
+planned_results[c("document_id", "request_id", "value", "status")]
+# Retain texts, prepared, documents, plan and planned_results together.
+# Continue in ?lexdiv_study_table with the actual observation schedule.
 
 # 5. Keep study information with the same analysis, matched by ID.
 # Labels are fictional; the empty response has an unknown writer.

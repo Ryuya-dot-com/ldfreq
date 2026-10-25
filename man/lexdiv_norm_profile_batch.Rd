@@ -76,6 +76,15 @@ For a different reference resource, make a separate call and retain that
 resource's identity and coverage. Metadata supplied by the caller are not a
 content fingerprint; save the actual table, measure specifications and result
 with the original preprocessing and corpus metadata for reproducibility.
+
+Start with \code{result$summary} for document estimates, inspect
+\code{result$coverage}, and return to \code{result$lookup} to explain matches
+or missing values. Join study metadata by \code{document_id} while keeping
+measure, resource and weighting identities separate. These tables describe
+lexical norms; they are not the plan-based diversity result required by
+\code{\link{lexdiv_study_table}}. The
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html}{reference-profile workflow}
+shows prepared inputs, document summaries, plotting and saving together.
 }
 \examples{
 # Project-authored numbers, not published familiarity norms.

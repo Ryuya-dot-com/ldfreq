@@ -93,6 +93,10 @@ readers/profiles retain their resource prefix. No implicit token/text guessing.
 The primary color argument is `col`, including NJ8 bars; `bar_col` is no
 longer accepted. Fixed-coordinate bar plots reject incompatible structural
 arguments. Axis switches and text settings apply to manually drawn axes too.
+Metric plots preserve the selected document roster, including missing rows in
+their invisible return. Missing rows have labelled positions without points.
+TTR adds token counts to labels and defaults to a zero-to-one scale; this is
+a descriptive display, not a length adjustment or a ranking of writers.
 Token-container conversion, wide results and plots have separate help topics;
 `lexdiv_convenience` remains an overview for existing links. Canonical examples
 retain old function aliases and unchanged saved measurement results.

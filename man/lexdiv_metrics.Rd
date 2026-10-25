@@ -106,6 +106,12 @@ short document. Missingness, method identity, sufficient counts, quality flags,
 parameters, and diagnostics are returned beside each value.
 }
 \details{
+Choose a measure for the research question before comparing values. The
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html}{metric-selection guide}
+connects definitions to length sensitivity, sampling agreement and the available
+corpus evidence. \code{\link{lexdiv_length_evidence}} gives the narrower evidence
+behind advisory length flags; those flags are not universal validity cutoffs.
+
 MTLD-MA is available as \code{metrics = "mtld_ma"}. It computes the mean of
 forward overlapping complete-factor lengths of at least ten tokens, with
 step-one starts and a strict TTR threshold. It stops at the first start that
@@ -338,6 +344,19 @@ contract_path <- system.file(
 )
 stopifnot(nzchar(contract_path))
 basename(contract_path)
+}
+\section{Continue from the results}{
+Pass an ordinary or plan-based result table to \code{\link{lexdiv_widen}} for
+one row per document, or to \code{\link{plot.lexdiv_results}} to display one
+metric and specification. Keep the original tokens and complete results with
+their preprocessing and parameter records when saving the analysis.
+
+To retain planned writer/task/occasion observations, pass the complete
+\code{lexdiv_metrics_batch(documents, plan = plan)} result and the same plan
+to \code{\link{lexdiv_study_table}}, together with the schedule, submissions
+and reporting decisions. An ordinary result without a plan is a different input.
+For variation within a document, use \code{\link{lexdiv_mattr_profile}} on the
+same ordered tokens and an explicitly chosen MATTR plan.
 }
 \seealso{\code{\link{lexdiv_metrics_text}}, \code{\link{lexdiv_text_batch}},
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html}{Getting started}}

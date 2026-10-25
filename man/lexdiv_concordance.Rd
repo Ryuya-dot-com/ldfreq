@@ -81,6 +81,17 @@ operations. Do not change classes or integrity hashes by hand; to obtain the new
 plot interface for an old search, recreate it from its saved source and settings.
 See \href{https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html}{concordance and dispersion guide}.
 }
+\section{Continue from a search}{
+Pass the complete search and one single-token \code{query_id} to
+\code{\link{lexdiv_collocations}} to inspect nearby-word counts and association.
+Keep the search object: the occurrence table returned by sorting is a display
+view, not the input to the subsequent operations.
+
+To compare word use between two corpora, use the original complete annotations
+with \code{\link{lexdiv_keyness}} and explicit target/reference document IDs.
+Then \code{\link{lexdiv_keyness_concordance}} returns the selected term's source
+contexts. The query hits alone do not supply the corpus denominators.
+}
 \value{
 \code{lexdiv_concordance()} returns a classed list with \code{occurrences}
 (query/document/segment IDs, token and character positions, contexts, matched

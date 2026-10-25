@@ -43,6 +43,52 @@ test_that("every plot mode preserves selected data and validates its switch", {
   }
 })
 
+test_that("TTR shows its denominator and metric plots retain missing positions", {
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  drawn <- drawn_axis <- NULL
+  local_mocked_bindings(
+    .lex_plot = function(x, y, ...) drawn <<- c(list(x = x, y = y), list(...)),
+    axis = function(side, at, labels, ...) {
+      drawn_axis <<- list(at = at, text = labels)
+    }, .package = "ldfreq"
+  )
+  docs <- list(short = rep(letters[1:4], 5), empty = character(),
+    invalid = factor("a"), long = rep(letters[1:4], 20))
+  result <- lexdiv_metrics_batch(docs, metrics = "ttr")
+  original <- result
+  returned <- withVisible(plot(result))
+  expect_false(returned$visible)
+  expect_identical(returned$value$document_id, names(docs))
+  expect_identical(returned$value$label, names(docs))
+  expect_identical(returned$value$status, result$status)
+  expect_identical(returned$value$missing_reason, result$missing_reason)
+  expect_identical(result, original)
+  expect_identical(drawn$x, 1:4)
+  expect_equal(drawn$y, c(.2, NA, NA, .05))
+  expect_identical(drawn$ylim, c(0, 1))
+  expect_identical(drawn$ylab, "TTR (V/N)")
+  expect_identical(drawn_axis$at, 1:4)
+  expect_identical(drawn_axis$text, c("short\nN = 20", "empty\nN = 0\nnot computed",
+    "invalid\nN = unknown\nnot computed", "long\nN = 80"))
+  plot(result, ylim = c(0, .4), ylab = "Custom")
+  expect_identical(drawn$ylim, c(0, .4))
+  expect_identical(drawn$ylab, "Custom")
+  drawn_axis <- NULL
+  plot(result, xaxt = "n")
+  expect_null(drawn_axis)
+  expect_error(plot(result[2:3, ]), "no finite ok values")
+
+  other <- lexdiv_metrics_batch(docs[c(1, 2, 4)], metrics = "mattr",
+    window_length = 50)
+  plot(other)
+  expect_identical(drawn$x, 1:3)
+  expect_true(all(is.na(drawn$y[1:2])))
+  expect_identical(drawn_axis$text, c("short\nnot computed", "empty\nnot computed", "long"))
+  expect_null(drawn$ylim)
+  expect_identical(drawn$ylab, "MATTR")
+})
+
 test_that("graphics receive color defaults and distinguish monochrome series", {
   # Capture the actual graphics calls, including overlays and legends, without
   # making output depend on a platform's rasterizer or font metrics.

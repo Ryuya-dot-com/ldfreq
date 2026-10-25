@@ -401,7 +401,6 @@ print.lexdiv_wide_results <- function(x, ...) {
   if (!any(ok)) {
     stop("The requested selection contains no finite ok values to plot.", call. = FALSE)
   }
-  frame <- frame[ok, , drop = FALSE]
   labels <- if ("document_id" %in% names(frame)) {
     frame$document_id
   } else if ("request_id" %in% names(frame)) {
@@ -414,18 +413,31 @@ print.lexdiv_wide_results <- function(x, ...) {
   }
   if (monochrome) col <- "black"
   if (is.null(pch)) pch <- ifelse(frame$below_quality_floor %in% TRUE, 17, 19)
-  if (is.null(ylab)) ylab <- toupper(metric_id)
+  axis_labels <- labels
+  if (identical(metric_id, "ttr")) {
+    axis_labels <- paste0(axis_labels, "\nN = ",
+      ifelse(is.na(frame$N), "unknown", frame$N))
+  }
+  axis_labels[!ok] <- paste0(axis_labels[!ok], "\nnot computed")
+  if (is.null(ylab)) {
+    ylab <- if (identical(metric_id, "ttr")) "TTR (V/N)" else toupper(metric_id)
+  }
   positions <- seq_len(nrow(frame))
   dots <- list(...)
+  if (identical(metric_id, "ttr") && is.null(dots$ylim)) dots$ylim <- c(0, 1)
   old_par <- .lex_plot_style(dots)
   on.exit(graphics::par(old_par), add = TRUE)
-  .lex_plot(
-    positions, frame$value,
+  values <- frame$value
+  values[!ok] <- NA_real_
+  plot_dots <- dots
+  plot_dots$xaxt <- NULL
+  do.call(.lex_plot, c(list(
+    positions, values,
     xaxt = "n", xlab = xlab, ylab = ylab, main = main,
-    col = col, pch = pch, ...
-  )
+    col = col, pch = pch), plot_dots))
   if (!identical(dots$axes, FALSE) && !identical(dots$xaxt, "n")) {
-    axis(1, at = positions, labels = labels)
+    axis(1, at = positions, labels = axis_labels,
+      padj = if (graphics::par("las") %in% c(0L, 1L)) 1 else NA_real_)
   }
   invisible(data.frame(label = labels, as.data.frame(frame), check.names = FALSE))
 }
@@ -436,7 +448,9 @@ print.lexdiv_wide_results <- function(x, ...) {
 #' visually compared. Points below the advisory token floor are orange; other
 #' finite `ok` results are blue. In both modes, default symbols are triangles
 #' below the floor and circles otherwise. No title is added automatically.
-#' The returned plot-data table is invisible.
+#' Missing results retain their labelled positions without a point. TTR shows
+#' token counts and defaults to a zero-to-one scale; it is length dependent.
+#' The invisible return retains all selected rows, including missing results.
 #'
 #' @param x A supported lexical-diversity result object.
 #' @param metric_id One metric to plot. It may be omitted only when the object

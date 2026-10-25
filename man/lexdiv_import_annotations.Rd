@@ -61,6 +61,25 @@ gaps instead of creating false neighbors. Core diversity measures accept the
 explicitly retained sequence; their interpretation depends on that selection.
 Keep selection settings and missingness counts with the imported object.
 
+The complete imported object feeds \code{\link{lexdiv_concordance}},
+\code{\link{lexdiv_keyness}} or \code{\link{lexdiv_family_profile}}.
+Supply each function's selection arguments while keeping all original token
+rows in the import. For diversity, extract the chosen word sequence and pass
+it to \code{\link{lexdiv_metrics}} or \code{\link{lexdiv_metrics_batch}}.
+Retain the imported document roster when forming those vectors, including
+\code{character()} for documents with no selected tokens. A filtered token
+table alone cannot represent those documents. The
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#counted-source-occurrences}{counting-to-search example}
+keeps the same occurrence selections and original text across these steps.
+
+To check annotations against a declared reference, use
+\code{\link{lexdiv_evaluate_annotations}} when token boundaries agree, or
+\code{\link{lexdiv_align_annotations}} to inspect different segmentations of
+the same source text. For adjective--noun dependencies, supply sentence-level
+basic UD trees to \code{\link{lexdiv_amod_pairs}}. Alignment alone does not
+establish annotation accuracy; these routes require their documented reference
+labels or dependency fields in addition to the imported surfaces.
+
 Surface, orthographic base and lexeme are different analytical choices. The
 importer does not translate source POS to UPOS, infer unknown-word status,
 merge Japanese homographs, or establish compatibility with a frequency table.
@@ -85,7 +104,7 @@ declarations. Hashes describe the imported snapshot, not later modifications;
 they are reproducibility labels, not authentication or license verification.}
 The list can be saved with \code{saveRDS()} and read with \code{readRDS()}.
 It is not a \code{lexdiv_tokenization} object and is not an input to
-\code{lexdiv_compare_annotations()}, whose one-to-one contract is unchanged.
+\code{\link{lexdiv_compare_annotations}}, whose one-to-one contract is unchanged.
 }
 \examples{
 # Authored illustration, not automatic morphological analysis.

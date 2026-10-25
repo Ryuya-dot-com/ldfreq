@@ -1,17 +1,46 @@
-# ldfreq 1.0.0 (unreleased)
+# ldfreq 1.0.0
 
-- Use `col` for NJ8 bars, matching the other plot methods. This replaces
-  `bar_col`; update calls to `plot(profile, col = ...)`. One bar color and
-  one cumulative-curve color keep the legend and off-list shade unambiguous.
-  Monochrome mode overrides those colors and the bar outline consistently.
-- Reject bar-plot arguments that change the fixed orientation, baseline or
-  coordinate system instead of drawing misleading axes and overlays. TUBELEX
-  coverage retains its fixed zero-to-one scale and category labels.
-- Honor `axes`, `xaxt`, `cex.axis`, `col.axis` and `font.axis` on manually
+## Updating existing analyses
+
+- In NJ8 plots, replace `bar_col` with `col`: use `plot(profile, col = ...)`,
+  as with the other plot methods. Use one bar color and one cumulative-curve
+  color; monochrome mode also controls the bar outline and off-list shade.
+- `lexdiv_study_table()` and `lexdiv_study_model_data()` now reject metadata
+  names that collide with selection-audit fields, including `included`.
+  Rename the identified source column, for example to `source_included`;
+  use the separate reporting table for decisions about reporting scores.
+- `lexdiv_study_model_data()` now rejects nonnumeric or dimensional responses,
+  malformed identity columns, unknown status labels and inconsistent saved
+  records. Correct the input rather than relying on silent exclusion. Valid
+  factor metadata and dates are retained; non-finite required dates are
+  recorded as missing metadata.
+- Bar plots now reject arguments that change their fixed orientation, baseline
+  or coordinate system. Remove those unsupported arguments. TUBELEX coverage
+  keeps its zero-to-one scale and category labels.
+
+## Reading and reporting results
+
+- Metric plots keep missing documents as labelled positions without a
+  point. The invisible plot-data return now includes those missing rows.
+  TTR labels include token counts and default to a zero-to-one scale; these
+  changes expose length and missingness without adjusting the measured scores.
+- Plots honor `axes`, `xaxt`, `cex.axis`, `col.axis` and `font.axis` on manually
   drawn axes, and restore graphics settings after plotting or an error.
-- Separate help for token-container conversion, wide tables and plotting.
-  Basic examples now run with no downloaded reference data. Use canonical
-  function names in examples and show how to open the installed guides.
+- Batch metric calculations avoid repeated table conversions across documents.
+  Scores, diagnostics, parameter records and saved result shapes are unchanged.
+- README and the report guide connect inputs, calculation, source checks,
+  tables, plots and saving. The article index groups workflows by task, and
+  the first-analysis guide postpones optional reference-data setup until it
+  is needed. Open version-matched guides with `browseVignettes("ldfreq")`.
+- Token-container conversion, wide tables and plotting have separate help
+  pages. Basic examples use no downloaded reference data and use the recommended
+  function names. Related help pages identify the complete objects to pass
+  between calculation, study tables, source searches and local plots, with
+  links to the corresponding worked guides. The multi-text example saves
+  original texts alongside the complete analysis for reopening.
+
+## Data and attribution
+
 - Credit the author of the adapted BSD-licensed TUBELEX example in the
   package metadata. Clarify the authored examples, aggregate research results
   and independently licensed downloads. MorphoLex remains optional and

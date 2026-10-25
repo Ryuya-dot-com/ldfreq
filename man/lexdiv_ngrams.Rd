@@ -191,6 +191,9 @@ partial <- lexdiv_ngram_reference(reference$counts[reference$counts$count > 1, ]
 lexdiv_ngram_profile(lexdiv_ngrams(target,
   "authored-sentences-surface-v1"), partial)$summary
 }
-\seealso{\code{\link{lexdiv_ngram_compare}}, \code{\link{lexdiv_norm_profile_batch}},
+\seealso{\code{\link{lexdiv_compare_ngrams}} for multiple references,
+\code{\link{lexdiv_build_ngram_reference}} to combine corpus chunks,
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html}{the extraction-to-reference-profile workflow},
+\code{\link{lexdiv_norm_profile_batch}},
 \code{\link{lexdiv_reference_coverage}}, \code{\link{tubelex_profile}}}
 \keyword{text}

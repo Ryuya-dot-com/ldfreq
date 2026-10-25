@@ -142,6 +142,103 @@ test_that("model selection rejects pooled identities and tracks missing covariat
   expect_identical(select(both), e$selected)
 })
 
+test_that("study metadata cannot reuse model-selection audit column names", {
+  e <- study_example()
+  reserved <- c("not_submitted", "not_computable", "not_reportable",
+    "missing_metadata", "included")
+  for (name in reserved) {
+    planned <- e$planned
+    planned[[name]] <- if (name == "missing_metadata") "source decision" else FALSE
+    expect_error(lexdiv_study_table(planned, e$submissions, e$results,
+      e$plan, e$condition$id, e$reporting), paste0("collide.*", name))
+    # Also protect tables saved before the constructor rejected these names.
+    study <- e$study
+    study[[name]] <- if (name == "missing_metadata") "source decision" else FALSE
+    expect_error(lexdiv_study_model_data(study, e$condition$id, "mattr10"),
+      paste0("collide.*", name))
+  }
+  planned <- e$planned
+  planned$source_included <- FALSE
+  study <- lexdiv_study_table(planned, e$submissions, e$results,
+    e$plan, e$condition$id, e$reporting)
+  selected <- lexdiv_study_model_data(study, e$condition$id, "mattr10")
+  expect_identical(selected$data$observation_id, e$selected$data$observation_id)
+  expect_true(all(!selected$data$source_included))
+  expect_identical(selected$audit, e$selected$audit)
+  expect_identical(study[setdiff(names(study), "source_included")], e$study)
+  expect_identical(e$helper$study_model_data(study, e$condition$id, "mattr10"), selected)
+})
+
+test_that("model inputs reject nonnumeric or dimensional response columns", {
+  e <- study_example()
+  for (value in list(factor(e$study$value), matrix(e$study$value), I(e$study$value),
+      as.character(e$study$value), as.logical(e$study$value),
+      as.complex(e$study$value), as.list(e$study$value))) {
+    study <- e$study; study$value <- value
+    expect_error(lexdiv_study_model_data(study, e$condition$id, "mattr10"),
+      "value must be a plain numeric vector")
+  }
+  study <- e$study
+  study$value <- as.integer(study$value)
+  selected <- lexdiv_study_model_data(study, e$condition$id, "mattr10")
+  expect_type(selected$data$value, "integer")
+  expect_identical(selected$data$observation_id, e$selected$data$observation_id)
+})
+
+test_that("malformed identifiers and unknown study states do not silently omit rows", {
+  e <- study_example()
+  select <- function(study = e$study, condition = e$condition$id, request = "mattr10", ...)
+    lexdiv_study_model_data(study, condition, request, ...)
+  for (name in c("observation_id", "document_id", "condition_id", "request_id",
+      "specification_id", "method_id", "plan_md5")) {
+    for (transform in list(factor, as.matrix)) {
+      study <- e$study; study[[name]] <- transform(study[[name]])
+      expect_error(select(study), "plain.*character")
+    }
+  }
+  expect_error(select(condition = matrix(e$condition$id)), "Supply a study table")
+  expect_error(select(request = I("mattr10")), "Supply a study table")
+  expect_error(select(required = matrix("writer_id")), "Supply a study table")
+  for (name in c("submission_status", "computation_status", "reporting_status")) {
+    for (value in list("misspelled_status", factor(e$study[[name]]),
+        matrix(e$study[[name]]), NA_character_)) {
+      study <- e$study; study[[name]] <- value
+      expect_error(select(study), paste0("Study ", name, " must be"))
+    }
+  }
+  for (mutation in list(
+      function(x) {x$value[14] <- NA_real_; x},
+      function(x) {x$value[14] <- Inf; x},
+      function(x) {x$value[2] <- 0; x},
+      function(x) {x$computation_status[14] <- "missing"; x},
+      function(x) {x$document_id[14] <- NA_character_; x},
+      function(x) {x$computation_status[2] <- "missing"; x}))
+    expect_error(select(mutation(e$study)), "inconsistent")
+})
+
+test_that("required metadata preserve factors and dates but reject dimensional columns", {
+  e <- study_example()
+  required <- c("writer_id", "task", "occasion", "scheduled_date")
+  select <- function(study) lexdiv_study_model_data(study, e$condition$id,
+    "mattr10", required = required)
+  normal <- select(e$study)
+  expect_identical(normal, e$selected)
+  for (value in list(matrix(e$study$occasion), cbind(e$study$occasion, e$study$occasion),
+      I(data.frame(value = e$study$occasion)), as.list(e$study$occasion))) {
+    study <- e$study; study$occasion <- value
+    expect_error(select(study), "Required metadata must be scalar columns")
+  }
+  study <- e$study
+  study$scheduled_date[14] <- as.Date(Inf, origin = "1970-01-01")
+  selected <- select(study)
+  expect_identical(selected$audit$missing_metadata[7], "scheduled_date")
+  expect_false(selected$audit$included[7])
+  expect_false(selected$audit$not_computable[7])
+  expect_identical(selected$data$observation_id, e$selected$data$observation_id[-1])
+  expect_identical(contrasts(selected$data$task), contrasts(e$planned$task))
+  expect_s3_class(selected$data$scheduled_date, "Date")
+})
+
 test_that("the saved record round-trips types, factors, provenance and selected IDs", {
   e <- study_example()
   path <- tempfile(fileext = ".rds"); on.exit(unlink(path))

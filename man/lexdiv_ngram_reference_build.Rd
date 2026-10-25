@@ -93,6 +93,7 @@ built$reference$counts
 built$reference$totals
 built$documents
 }
-\seealso{\code{\link{lexdiv_ngrams}}, \code{\link{lexdiv_ngram_compare}},
-\code{\link{lexdiv_read_masc}}}
+\seealso{\code{\link{lexdiv_ngrams}}, \code{\link{lexdiv_compare_ngrams}},
+\code{\link{lexdiv_read_masc}},
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html}{build, inspect and use an n-gram reference}.}
 \keyword{text}

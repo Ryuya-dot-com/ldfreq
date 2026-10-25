@@ -112,5 +112,7 @@ compared <- lexdiv_compare_ngrams(target, list(full = full, partial = partial))
 compared$summary[c("reference_id", "weighting", "value_coverage",
   "mean_frequency_per_million", "common_coverage", "difference_from_baseline")]
 }
-\seealso{\code{\link{lexdiv_ngrams}}, \code{\link{lexdiv_read_masc}}}
+\seealso{\code{\link{lexdiv_ngrams}}, \code{\link{lexdiv_build_ngram_reference}},
+\code{\link{lexdiv_read_masc}},
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html}{compare reference coverage and return to the target phrases}.}
 \keyword{text}

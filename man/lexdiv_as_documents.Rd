@@ -27,6 +27,12 @@ not tokenized by this adapter.
 Each selected ID or token column must occur exactly once. Empty lists and
 zero-row token tables return the same named empty list, accepted by both
 \code{lexdiv_metrics_batch()} and \code{lexdiv_profile_batch()}.
+
+A one-token-per-row table has no row for a document with zero selected tokens.
+Retain the original document roster and represent those documents explicitly
+as named \code{character()} vectors before batch calculation. The adapter
+cannot recover IDs absent from the supplied table. For raw text, including
+empty texts, \code{\link{lexdiv_metrics_text_batch}} retains the declared IDs.
 }
 \examples{
 tokens <- data.frame(document_id = c("a", "a", "b", "b"),

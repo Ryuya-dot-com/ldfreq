@@ -4,7 +4,8 @@ These repository-only tools generate and verify evidence for the immutable
 `ldfreq` source tarball used by the `Release candidate` GitHub Actions workflow.
 They are excluded from the R source package by `.Rbuildignore`.
 
-The current [state.dcf](state.dcf) identifies the selected 0.5.1 candidate.
+The current [state.dcf](state.dcf) records the selected version and whether it
+is in development or is a formal release candidate.
 Published development snapshots do not use this artifact workflow.
 Ordinary pull-request checks still exercise the development matrix. A formal
 candidate requires a separately selected three-component version, an exact

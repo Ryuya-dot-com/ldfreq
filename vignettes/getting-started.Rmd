@@ -17,30 +17,6 @@ The first workflow uses the [documented installation](https://ryuya-dot-com.gith
 and requires no optional package, model or download. Run the examples in order through
 **Save and resume**; the later sections cover optional analysis choices.
 
-## Optional reference-data setup
-
-The reference-dependent sections use separately licensed data. Review
-[the resource terms and cache instructions](reference-data.html), then obtain
-only the resources needed for the sections you will run. Core calculations
-and examples using your own tables do not require these downloads.
-
-```{r reference-setup, eval=FALSE}
-lexdiv_resource_info(c("tubelex", "nj8"))
-# After reviewing each resource's license and notice:
-lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
-```
-```{r resource-availability}
-has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
-has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
-has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
-has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
-has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
-```
-
-Resource-dependent examples below run only when their verified data are already
-in the cache. The other examples run without downloading reference data.
-
-
 ## Your first document table
 
 Use one row per document and a unique character ID. Here two short authored
@@ -221,7 +197,7 @@ writer knows. See [comparison design](designing-comparisons.html) and the
 
 Your first analysis is complete. Choose your next route from the
 [research-question map](https://ryuya-dot-com.github.io/ldfreq/index.html#choose-a-research-question), or the
-[report guide's task list](from-text-to-report.html). Both connect required
+[API connection map](from-text-to-report.html#connect-the-analysis-steps). Both connect required
 inputs to the result tables and source records you should inspect. In particular,
 reference-frequency profiles describe document words; keyness compares corpora,
 and a mixed-model table has one selected response per observation.
@@ -395,6 +371,30 @@ the estimate. Caller metadata is recorded as provenance; it is not a license
 decision or evidence that a measure is valid for a new population. The lookup
 table retains the supplied lexical terms, so apply the same data-handling care
 as for the input.
+
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache instructions](reference-data.html), then obtain
+only the resources needed for the sections you will run. Core calculations
+and examples using your own tables do not require these downloads.
+
+```{r reference-setup, eval=FALSE}
+lexdiv_resource_info(c("tubelex", "nj8"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
+```
+```{r resource-availability}
+has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
+has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
+has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
+has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
+has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
+```
+
+Resource-dependent examples below run only when their verified data are already
+in the cache. The other examples run without downloading reference data.
+
 
 ## Corpus-relative frequency with coverage
 

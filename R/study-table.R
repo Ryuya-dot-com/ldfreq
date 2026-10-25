@@ -45,9 +45,12 @@ study_long_table <- function(planned, submissions, results, plan, condition_id,
   if (nrow(planned) * n_requests > max_rows)
     fail("The planned observation-by-request table exceeds max_rows.")
   reserved <- c(names(results), "condition_id", "submission_status", "input_status",
-    "input_characters", "computation_status", "reporting_status", "reporting_reason")
-  if (any(names(planned) %in% reserved))
-    fail("Rename planned columns that collide with result or study-output columns.")
+    "input_characters", "computation_status", "reporting_status", "reporting_reason",
+    "not_submitted", "not_computable", "not_reportable", "missing_metadata", "included")
+  collisions <- intersect(names(planned), reserved)
+  if (length(collisions))
+    fail(paste0("Rename planned columns that collide with result or study-output columns: ",
+      paste(collisions, collapse = ", "), "."))
   if (!all(c("document_id", names(template)) %in% names(results)) ||
       !ids_ok(results$document_id) || !ids_ok(results$request_id))
     fail("results are missing required document/request fields.")
@@ -125,33 +128,60 @@ study_long_table <- function(planned, submissions, results, plan, condition_id,
 study_model_data <- function(study, condition_id, request_id,
                              required = c("writer_id", "task", "occasion")) {
   fail <- function(message) stop(message, call. = FALSE)
-  selector_ok <- function(x) is.character(x) && length(x) == 1L &&
-    !is.na(x) && nzchar(trimws(x))
+  strings_ok <- function(x, missing = FALSE) is.character(x) && !is.object(x) &&
+    is.null(dim(x)) && (missing || !anyNA(x)) &&
+    all(validUTF8(x[!is.na(x)])) && all(nzchar(trimws(x[!is.na(x)])))
+  selector_ok <- function(x) strings_ok(x) && length(x) == 1L
   needed <- c("observation_id", "document_id", "condition_id", "request_id",
     "specification_id", "method_id", "plan_md5", "value", "submission_status",
     "computation_status", "reporting_status")
-  if (!is.data.frame(study) || anyDuplicated(names(study)) ||
+  if (!is.data.frame(study) || anyNA(names(study)) || any(!nzchar(names(study))) ||
+      anyDuplicated(names(study)) ||
       !all(needed %in% names(study)) || !selector_ok(condition_id) ||
-      !selector_ok(request_id) || !is.character(required) || anyNA(required) ||
+      !selector_ok(request_id) || !strings_ok(required) ||
       anyDuplicated(required) || !all(required %in% names(study)))
     fail("Supply a study table, one condition_id/request_id and existing required metadata columns.")
-  if (anyNA(study$condition_id) || anyNA(study$request_id))
-    fail("Study condition/request identifiers cannot be missing.")
+  collisions <- intersect(names(study), c("not_submitted", "not_computable",
+    "not_reportable", "missing_metadata", "included"))
+  if (length(collisions))
+    fail(paste0("Rename study columns that collide with model-selection audit columns: ",
+      paste(collisions, collapse = ", "), "."))
+  if (!strings_ok(study$condition_id) || !strings_ok(study$request_id))
+    fail("Study condition/request identifiers must be nonmissing plain character vectors.")
+  if (!typeof(study$value) %in% c("integer", "double") ||
+      is.object(study$value) || !is.null(dim(study$value)))
+    fail("Study value must be a plain numeric vector, not a factor, classed value or matrix.")
   rows <- study[study$condition_id == condition_id & study$request_id == request_id, , drop = FALSE]
   if (!nrow(rows)) fail("No planned observations match the selected condition and request.")
+  id_columns <- c("observation_id", "specification_id", "method_id", "plan_md5")
+  if (!all(vapply(rows[id_columns], strings_ok, logical(1))) ||
+      !strings_ok(rows$document_id, missing = TRUE))
+    fail("Study identity columns must be plain nonblank character vectors; only document_id may be missing.")
   if (anyNA(rows$observation_id) || anyDuplicated(rows$observation_id) ||
       anyNA(rows$specification_id) || length(unique(rows$specification_id)) != 1L ||
       anyNA(rows$method_id) || length(unique(rows$method_id)) != 1L ||
       anyNA(rows$plan_md5) || length(unique(rows$plan_md5)) != 1L)
     fail("Select one specification and one row per observation; do not pool requests or windows.")
-  if (anyNA(rows$submission_status) || anyNA(rows$computation_status) ||
-      anyNA(rows$reporting_status))
-    fail("Study status columns cannot be missing.")
+  allowed <- list(submission_status = c("submitted", "not_submitted"),
+    computation_status = c("ok", "missing", "not_submitted"),
+    reporting_status = c("report", "withhold", "not_screened"))
+  for (name in names(allowed)) {
+    if (!strings_ok(rows[[name]]) || any(!rows[[name]] %in% allowed[[name]]))
+      fail(paste0("Study ", name, " must be a plain character vector with values: ",
+        paste(allowed[[name]], collapse = ", "), "."))
+  }
+  unsubmitted <- rows$submission_status == "not_submitted"
+  computed <- rows$computation_status == "ok"
+  if (any(unsubmitted != (rows$computation_status == "not_submitted")) ||
+      any(unsubmitted != is.na(rows$document_id)) ||
+      any(computed & !is.finite(rows$value)) || any(!computed & !is.na(rows$value)))
+    fail("Study submission/computation status, document_id and value are inconsistent.")
+  if (!all(vapply(rows[required], function(x) is.atomic(x) && is.null(dim(x)), logical(1))))
+    fail("Required metadata must be scalar columns, not matrices or nested tables.")
   missing_metadata <- vapply(seq_len(nrow(rows)), function(i) {
     bad <- vapply(required, function(name) {
       x <- rows[[name]][i]
-      if (length(x) != 1L || !is.atomic(x)) fail("Required metadata must be scalar columns.")
-      is.na(x) || (is.numeric(x) && !is.finite(x)) ||
+      is.na(x) || (typeof(x) %in% c("integer", "double", "complex") && !is.finite(x)) ||
         ((is.character(x) || is.factor(x)) && !nzchar(trimws(as.character(x))))
     }, logical(1))
     paste(required[bad], collapse = ",")

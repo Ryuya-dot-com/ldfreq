@@ -39,11 +39,15 @@ rows \code{"not_screened"}, so none enter model data yet.}
 \item{max_rows}{Positive whole-number limit on planned observations times
 requested specifications, checked before constructing the table.}
 \item{study}{The complete study table, optionally with multiple explicitly
-labelled conditions.}
+labelled conditions. Measurement values must be plain numeric vectors.
+Observation, document, condition, request, specification, method and plan IDs,
+and status columns, must be character vectors, not factors or matrices.}
 \item{request_id}{One request in the saved plan. A model selection must contain
 one method, specification and plan identity and one row per observation.}
 \item{required}{Unique existing metadata column names required for model rows.
-Missing, blank or non-finite values exclude the row and remain in the audit.}
+Required columns must contain one atomic value per row; factors and dates are
+retained, while matrices and nested tables are rejected. Missing, blank or
+non-finite values (including non-finite dates) exclude the row and remain in the audit.}
 }
 \details{
 Unsubmitted observations, empty submitted texts, no selected tokens, unavailable
@@ -51,6 +55,21 @@ scores, reporting decisions and missing metadata remain distinct. Missing values
 are never converted to zero. The table follows planned-row order, then plan
 request order. Empty tokens are passed to the public plan executor only to
 validate the plan and obtain request metadata; submitted values are not recomputed.
+
+The model-selection audit reserves \code{not_submitted}, \code{not_computable},
+\code{not_reportable}, \code{missing_metadata} and \code{included}. Both functions
+reject input metadata with these names so that a column cannot mean an external
+decision in the data and a computed decision in the audit. Rename such metadata
+explicitly, for example to \code{source_included}; its values are preserved and
+do not automatically control model selection.
+
+When selecting model rows, submission status must be \code{"submitted"} or
+\code{"not_submitted"}; computation status must be \code{"ok"}, \code{"missing"}
+or \code{"not_submitted"}; reporting status must be \code{"report"},
+\code{"withhold"} or \code{"not_screened"}. Unknown labels are errors, not
+exclusion decisions. Unsubmitted rows have missing document IDs and values;
+computed values are finite, and unavailable values are missing. Inconsistent
+records are rejected. These checks do not authenticate or recalculate saved scores.
 
 Model rows require submitted, computable, explicitly reportable values and
 complete required metadata. The output is not evidence of an ignorable missing
@@ -62,6 +81,12 @@ Introduced as public interfaces in 0.4.0.9006 with the computations and table
 layout of the previous installed example. Sourcing \code{examples/study-table.R}
 still defines \code{study_long_table()} and \code{study_model_data()} with the
 same arguments and return values. See \href{https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html}{repeated observations guide}.
+
+For raw text, start with \code{\link{lexdiv_tokenize_batch}}, retain the
+preparation records, and extract the selected token vectors as shown in its
+help. Compute them with the explicit plan before constructing this table.
+After selection, supply \code{selected$data} to the chosen modelling function
+and retain \code{selected$audit} to account for the original observations.
 }
 \value{
 \code{lexdiv_study_table()} returns a plain data frame with planned metadata,

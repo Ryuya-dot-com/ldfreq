@@ -123,6 +123,77 @@ documents for a group comparison. Group averages would require another explicit
 decision about equal-document versus token weighting, missing results and
 sampling dependencies. The batch function deliberately returns document rows.
 
+## Visualize values and coverage together
+
+Lexical sophistication is not one frequency scale. Kim, Crossley and Kyle
+(2018) studied several lexical and phrasal dimensions in L2 writing; Eguchi
+and Kyle (2020) extended this question to oral interviews and found that the
+role of frequency can depend on task. Neither result supplies universal
+weights for a combined sophistication score.
+[Writing study](https://doi.org/10.1111/modl.12447),
+[oral-interview study](https://doi.org/10.1111/modl.12637).
+
+The practical plotting choice here is to keep constructs in separate panels
+with their own units, and to show which observations contribute. This is a
+design recommendation based on those distinctions, not a validated scoring
+model. Frequency, contextual range, familiarity, age of acquisition and
+n-gram association should not be placed on a single common axis or an
+automatically standardized radar chart.
+
+The following example selects **familiarity and token weighting**. Each dot
+on the left represents one observed token value; repeated values are stacked.
+There are too few distinct observations to justify a smoothed density. The
+right panel uses the same documents and distinguishes a missing reference
+entry from an entry lacking a familiarity value. Empty input has no coverage
+rate and receives no point. All numbers are authored examples.
+
+```{r norm-values-and-coverage, fig.width=7, fig.height=3.6}
+selected <- profiles$summary[profiles$summary$measure_id == "familiarity" &
+  profiles$summary$weighting == "token", ]
+lookup <- profiles$lookup[profiles$lookup$measure_id == "familiarity", ]
+values <- lapply(selected$document_id, function(id) {
+  lookup$value[lookup$document_id == id & lookup$value_status == "observed"]
+})
+names(values) <- selected$document_id
+labels <- paste0(selected$document_id, "\nN = ", selected$input_units)
+local({
+  old <- par(mfrow = c(1, 2), mar = c(4.5, 6.2, 1, .5),
+    mgp = c(2.6, .7, 0), las = 1, bty = "l", family = "sans")
+  on.exit(par(old))
+  stripchart(values, method = "stack", pch = 19, col = "#0072B2",
+    xlim = c(1, 7), ylim = c(.5, length(values) + .7), axes = FALSE,
+    xlab = "Familiarity (1–7 rating)", ylab = "")
+  axis(1, at = c(1, 3, 5, 7))
+  axis(2, at = seq_along(values), labels = labels, tick = FALSE, cex.axis = .85)
+  box(bty = "l")
+  positions <- seq_len(nrow(selected))
+  plot(selected$resource_coverage, positions + .08, xlim = c(0, 1),
+    ylim = c(.5, length(values) + .7), pch = 19, col = "#0072B2",
+    xlab = "Proportion of input tokens", ylab = "", yaxt = "n")
+  points(selected$value_coverage, positions - .08, pch = 17, col = "#D55E00")
+  axis(2, at = positions, labels = labels, tick = FALSE, cex.axis = .85)
+  legend("topright", legend = c("Matched", "Observed value"),
+    pch = c(19, 17), col = c("#0072B2", "#D55E00"), bty = "n", cex = .85)
+})
+```
+
+Read the blank row as "no input", not zero familiarity or coverage. For type
+weighting, deduplicate lookup terms within each document and use the matching
+type-weighted summary; changing only the panel label would be incorrect.
+The same design applies to documented word-frequency values, using the
+reference's actual units and population. Unmatched words are not automatically
+rare, difficult or zero-frequency. Inspect them in `lookup` before interpreting
+the observed distribution. `plot(tubelex_profile(...))` shows match coverage
+only; it does not display frequency or provide a sophistication score.
+
+At corpus level, show per-document conditional estimates by task/register,
+alongside coverage and denominators. Do not pool all token rows and treat them
+as independent documents. For larger continuous samples, use common density
+bandwidths and evaluation ranges within each construct, and distinguish
+conditions by line type as well as color. For paired annotation/reference
+choices, overlay the original values or connect the same document's values;
+do not mistake sensitivity to a lookup policy for lexical development.
+
 ## Join metadata by ID and save the complete analysis
 
 Metric/profile tables are long: each document contributes multiple rows.

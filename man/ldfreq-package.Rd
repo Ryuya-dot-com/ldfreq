@@ -39,15 +39,30 @@ saving and reopening the complete record, see
 For your own files, see
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files}{TXT-folder and CSV input}.
 }
-\section{Study tables and corpus exploration}{
-Development 0.4.0.9006 provides \code{\link{lexdiv_study_table}},
-\code{\link{lexdiv_study_model_data}}, \code{\link{lexdiv_concordance}},
-\code{\link{lexdiv_concordance_sort}}, \code{\link{lexdiv_concordance_dispersion}},
-\code{\link{lexdiv_collocations}}, \code{\link{lexdiv_keyness}} and
-\code{\link{lexdiv_keyness_concordance}} as public functions. Their operations
-need no helper sourcing. Use \code{plot(search, query_id)} for saved concordance
-positions. Old sourced names and saved records remain supported; other explicitly
-sourced examples retain their documented roles.
+\section{Connect the analysis steps}{
+For ordinary text analyses, inspect \code{result$results} and
+\code{result$token_audit}, then pass the result table to
+\code{\link{lexdiv_widen}} or plot document values with \code{plot(result, metric_id = "ttr")}.
+Save the original text and complete result together as RDS.
+
+For planned observations, start with token vectors and a
+\code{\link{lexdiv_plan}}. Pass the complete output of
+\code{\link{lexdiv_metrics_batch}(tokens, plan = plan)}, together with the
+schedule, submissions and reporting decisions, to \code{\link{lexdiv_study_table}}.
+Then use \code{\link{lexdiv_study_model_data}} to select one response per
+observation for a modelling package. The raw-text convenience functions do
+not accept a plan; their result tables cannot replace this plan-based input.
+
+For source-linked exploration, prepare complete annotations using
+\code{\link{lexdiv_import_annotations}}. A saved \code{\link{lexdiv_concordance}}
+search feeds \code{\link{lexdiv_sort_concordance}},
+\code{\link{lexdiv_concordance_dispersion}}, \code{\link{lexdiv_collocations}}
+or \code{plot(search, query_id)}. A \code{\link{lexdiv_keyness}} comparison
+returns to source contexts with \code{\link{lexdiv_keyness_concordance}}.
+These operations use public functions without helper sourcing.
+
+See the \href{https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#connect-the-analysis-steps}{input-to-output connection map}
+for complete workflows and the tables to inspect at each step.
 }
 \section{Choose a research question}{
 Choose the route from your question, then inspect the counts and availability
@@ -75,14 +90,12 @@ beside its values. The guides specify the input tables and any optional tools.
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html}{keyness}.
   Inspect original occurrences, zero-match documents and the relevant search,
   pair-opportunity or target/reference denominators.}
-  \item{Where do target words recur in a textbook?}{Development 0.4.0.9003 adds
-  an explicitly sourced
+  \item{Where do target words recur in a textbook?}{Use the explicitly sourced
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.html}{textbook progression example}.
   Join one saved search to ordered pages, Units and selected sections.
   Inspect counts, cumulative counts and recurrence after declared teaching
   introductions, keeping missing material, follow-up scope and original uses.}
-  \item{How can teachers prepare materials from reviewed examples?}{Development
-  0.4.0.9004 adds an explicitly sourced
+  \item{How can teachers prepare materials from reviewed examples?}{Use the explicitly sourced
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.html}{DDL preparation example}.
   Select accepted phrase occurrences, supply activity prompts and source notices,
   and write learner HTML, a separate teacher CSV and a complete private record.
@@ -92,19 +105,18 @@ beside its values. The guides specify the input tables and any optional tools.
   Inspect document and feature selection, CA contributions and squared cosines, or the
   chosen dissimilarity, negative eigenvalues and distance reconstruction. Return
   to the original occurrences; a configuration does not test group differences.}
-  \item{Which categorical properties co-occur in individual uses?}{Development
-  0.4.0.9001 adds an explicitly sourced
+  \item{Which categorical properties co-occur in individual uses?}{Use the explicitly sourced
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca}{occurrence-MCA example}.
   Keep original token anchors, category definitions, incomplete-row exclusions,
   equal occurrence weights and unadjusted inertia diagnostics. These helpers
-  do not select meanings or test group effects. Version 0.4.0.9002 also accepts
-  separate display labels on its MCA maps, matched to the original point IDs.}
+  do not select meanings or test group effects. Separate display labels on MCA
+  maps are matched to the original point IDs.}
   \item{Which writer/task/occasion observations entered my analysis?}{Keep
   planned observations, submissions and metric results separate in
   \href{https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html}{From planned observations to a mixed model}.
   Inspect the submission, calculation and reporting states and model-row audit;
-  select one response specification for the model table. Development 0.4.0.9005
-  extends this guide with specified means, one planned time contrast,
+  select one response specification for the model table. The guide continues
+  with specified means, one planned time contrast,
   Kenward--Roger confidence intervals, diagnostics and saved-table replay.
   Optional \pkg{emmeans} and \pkg{pbkrtest} support this explicitly sourced
   reporting example; it is not an automatic model-selection API.}

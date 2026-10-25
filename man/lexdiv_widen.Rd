@@ -66,6 +66,11 @@ they do not reinterpret diagnostics from other MTLD variants. Zero-row inputs
 retain only the requested ID columns. Keep the original long result in RDS to
 preserve all diagnostics and provenance; selected scalar columns can be saved
 as CSV for analysis.
+
+For planned writer/task/occasion observations, first use the complete
+plan-based batch result with \code{\link{lexdiv_study_table}}, then select a
+response with \code{\link{lexdiv_study_model_data}}. The wide display table
+does not replace that function's full measurement input or observation roster.
 }
 \examples{
 long <- lexdiv_metrics_batch(list(a = c("one", "two", "one"),

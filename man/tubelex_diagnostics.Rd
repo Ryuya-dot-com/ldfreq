@@ -87,6 +87,8 @@ audit$normalization_mappings
 }
 \seealso{
 \code{\link{tubelex_profile}}, \code{\link{nj8_diagnostics}};
+\code{\link{lexdiv_compare_responses}} for separately collected, scored and
+paired binary responses. Frequency profiles do not supply those responses.
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/vocabulary-knowledge-and-use.html}{vocabulary knowledge and use guide} for a
 worked separation of learner responses and corpus features.
 }

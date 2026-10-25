@@ -82,6 +82,9 @@ key with an \code{NA} norm is \code{missing_annotation}; an unmatched key is
 compare unlike scales, form composite scores, or approve a data license.
 }
 \seealso{
+\code{\link{lexdiv_norm_profile_batch}} for separately identified documents;
+\href{https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html}{prepare a reference table, inspect coverage and save the analysis}.
+
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.html}{japanese norms guide} for stimulus-item
 tables, local Japanese norm files, scale interpretation and data terms.
 }

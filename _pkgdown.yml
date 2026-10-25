@@ -92,37 +92,45 @@ articles:
     contents:
       - getting-started
       - choosing-metrics
-      - reference-data
+      - from-text-to-report
       - release-scope
+  - title: Prepare and check your input
+    contents:
       - english-tokenization
       - japanese-annotations
-      - from-text-to-report
-  - title: Research design and reference resources
-    contents:
-      - designing-comparisons
-      - repeated-observations
-      - word-families-and-affixes
-      - corpus-reference-profiles
-      - japanese-norms
-      - japanese-polysemy
-      - japanese-stimuli
-      - ngram-profiles
       - annotated-corpora
-      - concordance-and-dispersion
-      - textbook-progression
-      - ddl-materials
-      - collocation-association
-      - keyness-comparison
-      - lexical-ordination
-      - english-readability
-      - syntactic-complexity
+      - annotation-evaluation
+      - annotation-alignment
       - ambiguity-review
       - contextual-models
       - open-access-papers
+  - title: Describe words and reference coverage
+    contents:
+      - reference-data
+      - corpus-reference-profiles
       - auditing-vocabulary-profiles
-      - annotation-evaluation
-      - annotation-alignment
-      - dependency-pairs
+      - word-families-and-affixes
       - preprocessing-and-frequency
       - tubelex-input
+      - ngram-profiles
+      - japanese-norms
+      - japanese-polysemy
+      - japanese-stimuli
+  - title: Explain patterns with source contexts
+    contents:
+      - concordance-and-dispersion
+      - collocation-association
+      - keyness-comparison
+      - lexical-ordination
+      - dependency-pairs
+  - title: Design comparisons and report results
+    contents:
+      - designing-comparisons
+      - repeated-observations
       - vocabulary-knowledge-and-use
+      - english-readability
+      - syntactic-complexity
+  - title: Prepare teaching materials
+    contents:
+      - textbook-progression
+      - ddl-materials
