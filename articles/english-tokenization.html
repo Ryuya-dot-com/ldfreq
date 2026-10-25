@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -332,14 +329,7 @@ comprehensive British/American conversion table.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spelling_lookup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nj8_profile.html">nj8_profile</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"colour"</span>, <span class="st">"color"</span>, <span class="st">"centre"</span>, <span class="st">"center"</span>,</span>
 <span>  <span class="st">"theatre"</span>, <span class="st">"theater"</span><span class="op">)</span>, unit <span class="op">=</span> <span class="st">"surface"</span><span class="op">)</span></span>
-<span><span class="va">spelling_lookup</span><span class="op">$</span><span class="va">lookup</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"surface_term"</span>, <span class="st">"lookup_term"</span>, <span class="st">"matched"</span>, <span class="st">"level"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   surface_term lookup_term matched level</span></span>
-<span><span class="co">#&gt; 1       colour      colour   FALSE    NA</span></span>
-<span><span class="co">#&gt; 2        color       color    TRUE     1</span></span>
-<span><span class="co">#&gt; 3       centre      centre   FALSE    NA</span></span>
-<span><span class="co">#&gt; 4       center      center    TRUE     1</span></span>
-<span><span class="co">#&gt; 5      theatre     theatre   FALSE    NA</span></span>
-<span><span class="co">#&gt; 6      theater     theater    TRUE     1</span></span></code></pre></div>
+<span><span class="va">spelling_lookup</span><span class="op">$</span><span class="va">lookup</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"surface_term"</span>, <span class="st">"lookup_term"</span>, <span class="st">"matched"</span>, <span class="st">"level"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>For surface-form research, keep the distinction. For a declared
 equivalence analysis, retain a versioned, reviewed mapping and show the
 original result alongside it. Mapping only the lookup key can improve
@@ -450,31 +440,7 @@ comprehensive spelling dictionary.</p>
 <span>  <span class="va">document_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"variants"</span>, <span class="st">"names"</span>, <span class="st">"numerals"</span><span class="op">)</span> <span class="op">&amp;</span></span>
 <span>  <span class="va">policy</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"words_and_numerals"</span>, <span class="st">"without_names_or_numerals"</span>, <span class="st">"spelling_equivalence"</span><span class="op">)</span>,</span>
 <span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">policy</span>, <span class="va">document_id</span>, <span class="va">selected_known</span>, <span class="va">types_known</span>, <span class="va">reportable_value</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                       policy document_id selected_known types_known</span></span>
-<span><span class="co">#&gt; 1         words_and_numerals    variants              4           4</span></span>
-<span><span class="co">#&gt; 3         words_and_numerals       names              4           3</span></span>
-<span><span class="co">#&gt; 5         words_and_numerals    numerals              7           6</span></span>
-<span><span class="co">#&gt; 49 without_names_or_numerals    variants              4           4</span></span>
-<span><span class="co">#&gt; 51 without_names_or_numerals       names              3           3</span></span>
-<span><span class="co">#&gt; 53 without_names_or_numerals    numerals              4           3</span></span>
-<span><span class="co">#&gt; 65      spelling_equivalence    variants              4           3</span></span>
-<span><span class="co">#&gt; 67      spelling_equivalence       names              4           3</span></span>
-<span><span class="co">#&gt; 69      spelling_equivalence    numerals              7           6</span></span>
-<span><span class="co">#&gt;    reportable_value</span></span>
-<span><span class="co">#&gt; 1         1.0000000</span></span>
-<span><span class="co">#&gt; 3         0.7500000</span></span>
-<span><span class="co">#&gt; 5         0.8571429</span></span>
-<span><span class="co">#&gt; 49        1.0000000</span></span>
-<span><span class="co">#&gt; 51        1.0000000</span></span>
-<span><span class="co">#&gt; 53        0.7500000</span></span>
-<span><span class="co">#&gt; 65        0.7500000</span></span>
-<span><span class="co">#&gt; 67        0.7500000</span></span>
-<span><span class="co">#&gt; 69        0.8571429</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">counting</span><span class="op">$</span><span class="va">coverage</span>, <span class="va">document_id</span> <span class="op">==</span> <span class="st">"variants"</span> <span class="op">&amp;</span> <span class="va">policy</span> <span class="op">==</span> <span class="st">"words_and_numerals"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;               policy document_id selected_known unknown_upos exact_matched</span></span>
-<span><span class="co">#&gt; 1 words_and_numerals    variants              4            0             2</span></span>
-<span><span class="co">#&gt;   alias_matched exact_coverage_conditional alias_coverage_conditional</span></span>
-<span><span class="co">#&gt; 1             3                        0.5                       0.75</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">counting</span><span class="op">$</span><span class="va">coverage</span>, <span class="va">document_id</span> <span class="op">==</span> <span class="st">"variants"</span> <span class="op">&amp;</span> <span class="va">policy</span> <span class="op">==</span> <span class="st">"words_and_numerals"</span><span class="op">)</span></span></code></pre></div>
 <p>For <code>The colour is color.</code>, surface TTR is 1 and TTR with
 declared spelling equivalence is 0.75. Exact NJ8 token coverage is 2/4;
 reviewed alias lookup is 3/4. The lookup comparison is also available
@@ -546,19 +512,7 @@ rather than silently replacing it with an empty string.</p>
 <span><span class="co">#&gt; 6                TRUE</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">levels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nj8_profile.html">nj8_profile_batch</a></span><span class="op">(</span><span class="va">tokens</span>, unit <span class="op">=</span> <span class="st">"surface"</span><span class="op">)</span></span>
-<span><span class="va">levels</span><span class="op">$</span><span class="va">coverage</span></span>
-<span><span class="co">#&gt;   document_id input_tokens eligible_tokens excluded_tokens selection_coverage</span></span>
-<span><span class="co">#&gt; 1    essay_02            9               9               0                  1</span></span>
-<span><span class="co">#&gt; 2    essay_01            8               8               0                  1</span></span>
-<span><span class="co">#&gt; 3       empty            0               0               0                 NA</span></span>
-<span><span class="co">#&gt;   matched_tokens off_list_tokens token_coverage eligible_types matched_types</span></span>
-<span><span class="co">#&gt; 1              7               2      0.7777778              7             5</span></span>
-<span><span class="co">#&gt; 2              7               1      0.8750000              6             5</span></span>
-<span><span class="co">#&gt; 3              0               0             NA              0             0</span></span>
-<span><span class="co">#&gt;   off_list_types type_coverage</span></span>
-<span><span class="co">#&gt; 1              2     0.7142857</span></span>
-<span><span class="co">#&gt; 2              1     0.8333333</span></span>
-<span><span class="co">#&gt; 3              0            NA</span></span></code></pre></div>
+<span><span class="va">levels</span><span class="op">$</span><span class="va">coverage</span></span></code></pre></div>
 <p>The output keeps the input document order. Empty documents retain
 metric rows with missing values and reasons, plus a preprocessing
 record. They have no token audit rows. Short documents never reduce
@@ -746,9 +700,8 @@ here as declared analysis choices, after file reading. The 50-token
 window is common to all documents. The 30 nonempty teaching texts are
 107–149 tokens long and can all use that window. For a research corpus,
 justify the window for your task and length distribution; keep it common
-across comparable texts rather than shrinking it for short documents.
-The <code>metadata</code> argument below requires <strong>ldfreq
-0.3.0.9005 or later</strong>.</p>
+across comparable texts rather than shrinking it for short
+documents.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">file_tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_tokenize_batch</a></span><span class="op">(</span><span class="va">file_documents</span>,</span>
 <span>  id_col <span class="op">=</span> <span class="st">"document_id"</span>, text_col <span class="op">=</span> <span class="st">"text"</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>,</span>
@@ -780,7 +733,7 @@ The <code>metadata</code> argument below requires <strong>ldfreq
 <span><span class="co">#&gt;     mattr       1 30</span></span>
 <span><span class="co">#&gt;     ttr         1 30</span></span>
 <span></span>
-<span><span class="va">file_report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">file_analysis</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span>
+<span><span class="va">file_report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_widen.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">file_analysis</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span>
 <span><span class="va">metadata_row</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">file_report</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">file_analysis</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">file_report</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">file_analysis</span><span class="op">$</span><span class="va">metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">[</span><span class="va">metadata_row</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">study_fields</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"writer_id"</span>, <span class="st">"task"</span><span class="op">)</span></span>
@@ -940,7 +893,7 @@ normalization.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">record</span>, <span class="va">path</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>, <span class="va">record</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
-<span><span class="va">wide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">wide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_widen.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
 <p>Use <code>wide</code> for a join or a CSV export, while keeping the
 RDS record for the tokenization and exclusion decisions. In methods,
 state that the English tokenizer preserves contractions and hyphenated

@@ -177,17 +177,21 @@
 
 ## Output and visualization
 
-- [`lexdiv_as_documents()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
-  [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
-  [`print(`*`<lexdiv_wide_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
-  [`plot(`*`<lexdiv_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
-  [`plot(`*`<lexdiv_batch_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
-  [`plot(`*`<lexdiv_profile_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
-  [`plot(`*`<lexdiv_profile_batch_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
-  [`plot(`*`<lexdiv_text_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
-  [`plot(`*`<lexdiv_screen_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
-  [`plot(`*`<tubelex_profile>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
-  : Adapt, Reshape, and Plot Lexical-Diversity Results
+- [`lexdiv_as_documents()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_as_documents.md)
+  : Convert token containers to named documents
+- [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md)
+  [`print(`*`<lexdiv_wide_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md)
+  : Reshape metric results without recomputing values
+- [`plot(`*`<lexdiv_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.md)
+  [`plot(`*`<lexdiv_batch_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.md)
+  [`plot(`*`<lexdiv_profile_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.md)
+  [`plot(`*`<lexdiv_profile_batch_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.md)
+  [`plot(`*`<lexdiv_text_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.md)
+  [`plot(`*`<lexdiv_screen_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.md)
+  [`plot(`*`<tubelex_profile>`*`)`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.md)
+  : Plot one metric, a length screen or TUBELEX coverage
+- [`lexdiv_convenience`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
+  : Prepare and display lexical-diversity results
 
 ## Evidence
 

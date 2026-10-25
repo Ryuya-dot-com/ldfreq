@@ -104,6 +104,11 @@ compare unlike scales, form composite scores, or approve a data license.
 
 ## See also
 
+[`lexdiv_norm_profile_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile_batch.md)
+for separately identified documents; [prepare a reference table, inspect
+coverage and save the
+analysis](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html).
+
 [japanese norms
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.html)
 for stimulus-item tables, local Japanese norm files, scale

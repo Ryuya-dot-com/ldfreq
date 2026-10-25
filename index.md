@@ -13,20 +13,20 @@ selection](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html
 
 ## Install
 
-The current release is **0.5.1**. This single version contains all
-features described in the current guides. Requires R 4.1 or later.
+Install the fixed release **1.0.0** below (R 4.1 or later).
 
 ``` r
 install.packages(c("digest", "stringi"))
 install.packages(
-  "https://github.com/Ryuya-dot-com/ldfreq/releases/download/v0.5.1/ldfreq_0.5.1.tar.gz",
+  "https://github.com/Ryuya-dot-com/ldfreq/releases/download/v1.0.0/ldfreq_1.0.0.tar.gz",
   repos = NULL, type = "source"
 )
 library(ldfreq)
 ```
 
 Optional integrations state their additional packages in the relevant
-guide. Earlier releases remain available in the [release
+guide. Use `browseVignettes("ldfreq")` for guides matching your
+installed version. Earlier releases remain available in the [release
 archive](https://github.com/Ryuya-dot-com/ldfreq/releases).
 
 ## Start with your text
@@ -39,9 +39,24 @@ text <- paste(
   "After reading the stories again, the students explained their choices and",
   "saved both the original texts and their revised versions for later comparison."
 )
-result <- lexdiv_metrics_text(text, metrics = c("mattr", "hdd", "mtld"))
+result <- lexdiv_metrics_text(text, tokenizer = "english", case = "lower",
+  metrics = c("mattr", "hdd", "mtld"))
 result$results[c("metric_id", "value", "N", "status", "missing_reason")]
+
+# Check counted words, make a report table, and retain the full analysis.
+head(result$token_audit)
+report <- lexdiv_widen(result$results,
+  values_from = c("value", "status", "missing_reason", "N"))
+report
+saveRDS(list(text = text, analysis = result, report = report), "analysis.rds")
 ```
+
+This connects **text → scores and counted words → report table → saved
+record**. Reopen it with `readRDS("analysis.rds")`; the full record
+retains information that a values-only table would lose. The
+[first-analysis
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html)
+extends this to several documents, missing scores and a plot.
 
 Use `lexdiv_metrics(tokens, ...)` for an already ordered character
 vector of words, and
@@ -69,14 +84,17 @@ answers every research question.
 
 ## Follow a workflow
 
-| Your task | Guide |
+Choose a question, then follow the linked example. The [connection
+map](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#connect-the-analysis-steps)
+shows the inputs, functions and outputs for each route.
+
+| Your question | Connected workflow |
 |----|----|
-| Go from text files to a reproducible report | [Text to report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html) |
-| Compare writers, tasks or occasions | [Study tables and models](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html) |
-| Inspect concordances and dispersion | [Concordances](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html) |
-| Examine collocations or keywords | [Collocations](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.html), [keyness](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html) |
-| Use vocabulary lists and morphology data | [Optional reference data](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.html) |
-| Work with Japanese annotations | [Japanese workflows](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html) |
+| How do scores vary across texts or counting choices? | [`lexdiv_metrics_text_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md) → inspect counts and status → [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md) / [`plot()`](https://rdrr.io/r/graphics/plot.default.html). [Text to report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html) |
+| How do writers, tasks or occasions compare? | Tokens + measurement plan → [`lexdiv_metrics_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md) → planned-observation table → one response per observation. [Study tables and models](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html) |
+| How frequent, familiar or morphologically varied are the words? | Terms + declared reference → word matches and coverage → document summary. [Lexical norms](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html), [families and affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html) |
+| Which words and contexts explain a corpus pattern? | Complete annotations → [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md) → positions / [`lexdiv_collocations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.md); [`lexdiv_keyness()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md) → source contexts. [Search](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html), [keyness](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html) |
+| How do I prepare Japanese text? | [`lexdiv_import_annotations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md) → explicit word selection → diversity or reference profiles. [Japanese workflows](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html) |
 
 ## Optional reference data
 
@@ -103,12 +121,12 @@ citation("ldfreq")
 ```
 
 Komuro, R. (2026). *ldfreq: Reproducible Lexical Diversity and Frequency
-Profiles* (Version 0.5.1) \[R package\]. [Fixed
-release](https://github.com/Ryuya-dot-com/ldfreq/tree/v0.5.1).
+Profiles* (Version 1.0.0) \[R package\]. [Fixed
+release](https://github.com/Ryuya-dot-com/ldfreq/tree/v1.0.0).
 
 Also cite the selected measurement methods and any reference data you
 use. See
-[CITATION.cff](https://github.com/Ryuya-dot-com/ldfreq/blob/v0.5.1/CITATION.cff),
-[license](https://github.com/Ryuya-dot-com/ldfreq/blob/v0.5.1/LICENSE.md),
+[CITATION.cff](https://github.com/Ryuya-dot-com/ldfreq/blob/v1.0.0/CITATION.cff),
+[license](https://github.com/Ryuya-dot-com/ldfreq/blob/v1.0.0/LICENSE.md),
 and [release
 notes](https://ryuya-dot-com.github.io/ldfreq/news/index.html).

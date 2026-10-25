@@ -13,7 +13,7 @@ the words counted, analysis settings and reasons for unavailable scores."></head
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,11 +26,8 @@ the words counted, analysis settings and reasons for unavailable scores."></head
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -86,15 +83,27 @@ For your own files, see
 <a href="https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files">TXT-folder and CSV input</a>.</p>
     </div>
     <div class="section level2">
-    <h2 id="study-tables-and-corpus-exploration">Study tables and corpus exploration<a class="anchor" aria-label="anchor" href="#study-tables-and-corpus-exploration"></a></h2>
-    <p>Development 0.4.0.9006 provides <code><a href="lexdiv_study_table.html">lexdiv_study_table</a></code>,
-<code><a href="lexdiv_study_table.html">lexdiv_study_model_data</a></code>, <code><a href="lexdiv_concordance.html">lexdiv_concordance</a></code>,
-<code><a href="lexdiv_concordance.html">lexdiv_concordance_sort</a></code>, <code><a href="lexdiv_concordance.html">lexdiv_concordance_dispersion</a></code>,
-<code><a href="lexdiv_collocations.html">lexdiv_collocations</a></code>, <code><a href="lexdiv_keyness.html">lexdiv_keyness</a></code> and
-<code><a href="lexdiv_keyness.html">lexdiv_keyness_concordance</a></code> as public functions. Their operations
-need no helper sourcing. Use <code>plot(search, query_id)</code> for saved concordance
-positions. Old sourced names and saved records remain supported; other explicitly
-sourced examples retain their documented roles.</p>
+    <h2 id="connect-the-analysis-steps">Connect the analysis steps<a class="anchor" aria-label="anchor" href="#connect-the-analysis-steps"></a></h2>
+    <p>For ordinary text analyses, inspect <code>result$results</code> and
+<code>result$token_audit</code>, then pass the result table to
+<code><a href="lexdiv_widen.html">lexdiv_widen</a></code> or plot document values with <code>plot(result, metric_id = "ttr")</code>.
+Save the original text and complete result together as RDS.</p>
+<p>For planned observations, start with token vectors and a
+<code><a href="lexdiv_profile.html">lexdiv_plan</a></code>. Pass the complete output of
+<code><a href="lexdiv_metrics.html">lexdiv_metrics_batch</a>(tokens, plan = plan)</code>, together with the
+schedule, submissions and reporting decisions, to <code><a href="lexdiv_study_table.html">lexdiv_study_table</a></code>.
+Then use <code><a href="lexdiv_study_table.html">lexdiv_study_model_data</a></code> to select one response per
+observation for a modelling package. The raw-text convenience functions do
+not accept a plan; their result tables cannot replace this plan-based input.</p>
+<p>For source-linked exploration, prepare complete annotations using
+<code><a href="lexdiv_import_annotations.html">lexdiv_import_annotations</a></code>. A saved <code><a href="lexdiv_concordance.html">lexdiv_concordance</a></code>
+search feeds <code><a href="lexdiv_concordance.html">lexdiv_sort_concordance</a></code>,
+<code><a href="lexdiv_concordance.html">lexdiv_concordance_dispersion</a></code>, <code><a href="lexdiv_collocations.html">lexdiv_collocations</a></code>
+or <code>plot(search, query_id)</code>. A <code><a href="lexdiv_keyness.html">lexdiv_keyness</a></code> comparison
+returns to source contexts with <code><a href="lexdiv_keyness.html">lexdiv_keyness_concordance</a></code>.
+These operations use public functions without helper sourcing.</p>
+<p>See the <a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#connect-the-analysis-steps">input-to-output connection map</a>
+for complete workflows and the tables to inspect at each step.</p>
     </div>
     <div class="section level2">
     <h2 id="choose-a-research-question">Choose a research question<a class="anchor" aria-label="anchor" href="#choose-a-research-question"></a></h2>
@@ -130,16 +139,14 @@ beside its values. The guides specify the input tables and any optional tools.</
   pair-opportunity or target/reference denominators.</p></dd>
 
   <dt>Where do target words recur in a textbook?</dt>
-<dd><p>Development 0.4.0.9003 adds
-  an explicitly sourced
+<dd><p>Use the explicitly sourced
   <a href="https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.html">textbook progression example</a>.
   Join one saved search to ordered pages, Units and selected sections.
   Inspect counts, cumulative counts and recurrence after declared teaching
   introductions, keeping missing material, follow-up scope and original uses.</p></dd>
 
   <dt>How can teachers prepare materials from reviewed examples?</dt>
-<dd><p>Development
-  0.4.0.9004 adds an explicitly sourced
+<dd><p>Use the explicitly sourced
   <a href="https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.html">DDL preparation example</a>.
   Select accepted phrase occurrences, supply activity prompts and source notices,
   and write learner HTML, a separate teacher CSV and a complete private record.
@@ -153,21 +160,20 @@ beside its values. The guides specify the input tables and any optional tools.</
   to the original occurrences; a configuration does not test group differences.</p></dd>
 
   <dt>Which categorical properties co-occur in individual uses?</dt>
-<dd><p>Development
-  0.4.0.9001 adds an explicitly sourced
+<dd><p>Use the explicitly sourced
   <a href="https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca">occurrence-MCA example</a>.
   Keep original token anchors, category definitions, incomplete-row exclusions,
   equal occurrence weights and unadjusted inertia diagnostics. These helpers
-  do not select meanings or test group effects. Version 0.4.0.9002 also accepts
-  separate display labels on its MCA maps, matched to the original point IDs.</p></dd>
+  do not select meanings or test group effects. Separate display labels on MCA
+  maps are matched to the original point IDs.</p></dd>
 
   <dt>Which writer/task/occasion observations entered my analysis?</dt>
 <dd><p>Keep
   planned observations, submissions and metric results separate in
   <a href="https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html">From planned observations to a mixed model</a>.
   Inspect the submission, calculation and reporting states and model-row audit;
-  select one response specification for the model table. Development 0.4.0.9005
-  extends this guide with specified means, one planned time contrast,
+  select one response specification for the model table. The guide continues
+  with specified means, one planned time contrast,
   Kenward–Roger confidence intervals, diagnostics and saved-table replay.
   Optional <span class="pkg">emmeans</span> and <span class="pkg">pbkrtest</span> support this explicitly sourced
   reporting example; it is not an automatic model-selection API.</p></dd>
@@ -187,8 +193,9 @@ Save original inputs and complete results, not only displayed tables.</p>
     </div>
     <div class="section level2">
     <h2 id="open-a-guide-or-installed-example">Open a guide or installed example<a class="anchor" aria-label="anchor" href="#open-a-guide-or-installed-example"></a></h2>
-    <p>Use the online guide links above. The compact source archive includes guide
-sources; rendered guides are published on the website separately.</p>
+    <p>The installed package includes rendered guides. Open their local index with
+<code>browseVignettes("ldfreq")</code>, or use the online guide links above.
+The source archive also includes the guide sources.</p>
 <p>Study-table, concordance, collocation and keyness functions are exported and
 have ordinary help entries. Ordination, readability, syntax and teaching
 recipes remain installed example code. Their guides show the
@@ -229,7 +236,7 @@ requirements when replacing its authored data with your own.</p>
 
   <dt>One-token-per-row or <span class="pkg">quanteda</span> input</dt>
 <dd><p>Use
-  <code><a href="lexdiv_convenience.html">lexdiv_as_documents()</a></code> to create the explicit named-list boundary.</p></dd>
+  <code><a href="lexdiv_as_documents.html">lexdiv_as_documents()</a></code> to create the explicit named-list boundary.</p></dd>
 
   <dt>A local MATTR trajectory</dt>
 <dd><p>Use <code><a href="lexdiv_mattr_profile.html">lexdiv_mattr_profile()</a></code> with a
@@ -468,7 +475,7 @@ semantic similarity, coherence, proficiency, or writing quality.</p>
     </div>
     <div class="section level2">
     <h2 id="quality-screens">Quality screens<a class="anchor" aria-label="anchor" href="#quality-screens"></a></h2>
-    <p><code>below_quality_floor</code> and <code><a href="lexdiv_profile.html">lexdiv_screen()</a></code> are advisory token-count
+    <p><code>below_quality_floor</code> and <code><a href="lexdiv_profile.html">lexdiv_screen_lengths()</a></code> are advisory token-count
 evidence screens. Here, quality is a field name retained for compatibility; it does not mean writing
 quality, measurement validity, or reliability. The screens never change a value,
 effective parameter, status, or document membership. Passing a screen does not

@@ -13,7 +13,7 @@ tokenization, annotation, model download, or learner scoring is performed."></he
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,11 +26,8 @@ tokenization, annotation, model download, or learner scoring is performed."></he
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -140,6 +137,8 @@ Keep the original profiles for occurrence positions and complete lookup values.<
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="tubelex_profile.html">tubelex_profile</a></code>, <code><a href="nj8_diagnostics.html">nj8_diagnostics</a></code>;
+<code><a href="lexdiv_compare_responses.html">lexdiv_compare_responses</a></code> for separately collected, scored and
+paired binary responses. Frequency profiles do not supply those responses.
 <a href="https://ryuya-dot-com.github.io/ldfreq/articles/vocabulary-knowledge-and-use.html">vocabulary knowledge and use guide</a> for a
 worked separation of learner responses and corpus features.</p></div>
     </div>
@@ -158,16 +157,6 @@ worked separation of learner responses and corpus features.</p></div>
 <span class="r-in"><span><span class="va">audit</span><span class="op">$</span><span class="va">unmatched_terms</span></span></span>
 <span class="r-in"><span><span class="va">audit</span><span class="op">$</span><span class="va">normalization_mappings</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   condition_id           term    lookup_term matched token_count document_count</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  condition_1 zzunmatchedxyz zzunmatchedxyz   FALSE           2              2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  condition_1          Apple          apple    TRUE           1              1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  condition_1          apple          apple    TRUE           1              1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  condition_1            the            the    TRUE           1              1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   lookup_changed number_marker</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1          FALSE         FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2           TRUE         FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3          FALSE         FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4          FALSE         FALSE</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

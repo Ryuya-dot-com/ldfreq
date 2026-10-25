@@ -13,7 +13,7 @@ or choose models, impute missing observations, or recalculate submitted results.
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,11 +26,8 @@ or choose models, impute missing observations, or recalculate submitted results.
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -109,7 +106,9 @@ requested specifications, checked before constructing the table.</p></dd>
 
 <dt id="arg-study">study<a class="anchor" aria-label="anchor" href="#arg-study"></a></dt>
 <dd><p>The complete study table, optionally with multiple explicitly
-labelled conditions.</p></dd>
+labelled conditions. Measurement values must be plain numeric vectors.
+Observation, document, condition, request, specification, method and plan IDs,
+and status columns, must be character vectors, not factors or matrices.</p></dd>
 
 <dt id="arg-request-id">request_id<a class="anchor" aria-label="anchor" href="#arg-request-id"></a></dt>
 <dd><p>One request in the saved plan. A model selection must contain
@@ -117,7 +116,9 @@ one method, specification and plan identity and one row per observation.</p></dd
 
 <dt id="arg-required">required<a class="anchor" aria-label="anchor" href="#arg-required"></a></dt>
 <dd><p>Unique existing metadata column names required for model rows.
-Missing, blank or non-finite values exclude the row and remain in the audit.</p></dd>
+Required columns must contain one atomic value per row; factors and dates are
+retained, while matrices and nested tables are rejected. Missing, blank or
+non-finite values (including non-finite dates) exclude the row and remain in the audit.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -127,6 +128,19 @@ scores, reporting decisions and missing metadata remain distinct. Missing values
 are never converted to zero. The table follows planned-row order, then plan
 request order. Empty tokens are passed to the public plan executor only to
 validate the plan and obtain request metadata; submitted values are not recomputed.</p>
+<p>The model-selection audit reserves <code>not_submitted</code>, <code>not_computable</code>,
+<code>not_reportable</code>, <code>missing_metadata</code> and <code>included</code>. Both functions
+reject input metadata with these names so that a column cannot mean an external
+decision in the data and a computed decision in the audit. Rename such metadata
+explicitly, for example to <code>source_included</code>; its values are preserved and
+do not automatically control model selection.</p>
+<p>When selecting model rows, submission status must be <code>"submitted"</code> or
+<code>"not_submitted"</code>; computation status must be <code>"ok"</code>, <code>"missing"</code>
+or <code>"not_submitted"</code>; reporting status must be <code>"report"</code>,
+<code>"withhold"</code> or <code>"not_screened"</code>. Unknown labels are errors, not
+exclusion decisions. Unsubmitted rows have missing document IDs and values;
+computed values are finite, and unavailable values are missing. Inconsistent
+records are rejected. These checks do not authenticate or recalculate saved scores.</p>
 <p>Model rows require submitted, computable, explicitly reportable values and
 complete required metadata. The output is not evidence of an ignorable missing
 data mechanism, model identifiability or a causal interpretation. Select and
@@ -136,6 +150,11 @@ inputs, plan, reporting decisions and the complete table in the study record.</p
 layout of the previous installed example. Sourcing <code>examples/study-table.R</code>
 still defines <code>study_long_table()</code> and <code>study_model_data()</code> with the
 same arguments and return values. See <a href="https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html">repeated observations guide</a>.</p>
+<p>For raw text, start with <code><a href="lexdiv_text_batch.html">lexdiv_tokenize_batch</a></code>, retain the
+preparation records, and extract the selected token vectors as shown in its
+help. Compute them with the explicit plan before constructing this table.
+After selection, supply <code>selected$data</code> to the chosen modelling function
+and retain <code>selected$audit</code> to account for the original observations.</p>
     </div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>

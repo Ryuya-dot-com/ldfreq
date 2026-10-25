@@ -74,8 +74,8 @@ lexdiv_ambiguity_review(x, targets, candidates, resource,
 
 The function reuses
 [`lexdiv_as_quanteda`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_read_masc.md)
-and [`quanteda::kwic()`](https://rdrr.io/pkg/quanteda/man/kwic.html)
-with fixed, case-sensitive matching, then verifies exact source/query
+and [`quanteda::kwic()`](https://quanteda.io/reference/kwic.html) with
+fixed, case-sensitive matching, then verifies exact source/query
 equality to distinguish canonically equivalent Unicode spellings. It
 never retokenizes. A token containing both whitespace and non-whitespace
 characters is not supported by this adapter. Non-ASCII tokens require a

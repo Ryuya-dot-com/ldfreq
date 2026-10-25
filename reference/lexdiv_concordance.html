@@ -13,7 +13,7 @@ or compute single-token within-document dispersion without searching again."></h
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,11 +26,8 @@ or compute single-token within-document dispersion without searching again."></h
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -165,6 +162,17 @@ plot interface for an old search, recreate it from its saved source and settings
 See <a href="https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html">concordance and dispersion guide</a>.</p>
     </div>
     <div class="section level2">
+    <h2 id="continue-from-a-search">Continue from a search<a class="anchor" aria-label="anchor" href="#continue-from-a-search"></a></h2>
+    <p>Pass the complete search and one single-token <code>query_id</code> to
+<code><a href="lexdiv_collocations.html">lexdiv_collocations</a></code> to inspect nearby-word counts and association.
+Keep the search object: the occurrence table returned by sorting is a display
+view, not the input to the subsequent operations.</p>
+<p>To compare word use between two corpora, use the original complete annotations
+with <code><a href="lexdiv_keyness.html">lexdiv_keyness</a></code> and explicit target/reference document IDs.
+Then <code><a href="lexdiv_keyness.html">lexdiv_keyness_concordance</a></code> returns the selected term's source
+contexts. The query hits alone do not supply the corpus denominators.</p>
+    </div>
+    <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p><code>lexdiv_concordance()</code> returns a classed list with <code>occurrences</code>
 (query/document/segment IDs, token and character positions, contexts, matched
@@ -190,7 +198,7 @@ saved positions and invisibly returns the displayed <code>occurrences</code>,
 <span class="r-in"><span>  dictionary_version <span class="op">=</span> <span class="st">"none"</span>, unit <span class="op">=</span> <span class="st">"supplied tokens"</span>, normalization <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"quanteda"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">search</span> <span class="op">&lt;-</span> <span class="fu">lexdiv_concordance</span><span class="op">(</span><span class="va">source</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>word <span class="op">=</span> <span class="st">"a"</span>, phrase <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu">lexdiv_concordance_sort</span><span class="op">(</span><span class="va">search</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">lexdiv_sort_concordance</span><span class="op">(</span><span class="va">search</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">lexdiv_concordance_dispersion</span><span class="op">(</span><span class="va">search</span>, <span class="st">"word"</span>, parts <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">$</span><span class="va">documents</span></span></span>
 <span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ggplot2"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">search</span>, <span class="st">"word"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>

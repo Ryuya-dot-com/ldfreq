@@ -1,5 +1,64 @@
 # Changelog
 
+## ldfreq 1.0.0
+
+### Updating existing analyses
+
+- In NJ8 plots, replace `bar_col` with `col`: use
+  `plot(profile, col = ...)`, as with the other plot methods. Use one
+  bar color and one cumulative-curve color; monochrome mode also
+  controls the bar outline and off-list shade.
+- [`lexdiv_study_table()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+  and
+  [`lexdiv_study_model_data()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+  now reject metadata names that collide with selection-audit fields,
+  including `included`. Rename the identified source column, for example
+  to `source_included`; use the separate reporting table for decisions
+  about reporting scores.
+- [`lexdiv_study_model_data()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+  now rejects nonnumeric or dimensional responses, malformed identity
+  columns, unknown status labels and inconsistent saved records. Correct
+  the input rather than relying on silent exclusion. Valid factor
+  metadata and dates are retained; non-finite required dates are
+  recorded as missing metadata.
+- Bar plots now reject arguments that change their fixed orientation,
+  baseline or coordinate system. Remove those unsupported arguments.
+  TUBELEX coverage keeps its zero-to-one scale and category labels.
+
+### Reading and reporting results
+
+- Metric plots keep missing documents as labelled positions without a
+  point. The invisible plot-data return now includes those missing rows.
+  TTR labels include token counts and default to a zero-to-one scale;
+  these changes expose length and missingness without adjusting the
+  measured scores.
+- Plots honor `axes`, `xaxt`, `cex.axis`, `col.axis` and `font.axis` on
+  manually drawn axes, and restore graphics settings after plotting or
+  an error.
+- Batch metric calculations avoid repeated table conversions across
+  documents. Scores, diagnostics, parameter records and saved result
+  shapes are unchanged.
+- README and the report guide connect inputs, calculation, source
+  checks, tables, plots and saving. The article index groups workflows
+  by task, and the first-analysis guide postpones optional
+  reference-data setup until it is needed. Open version-matched guides
+  with `browseVignettes("ldfreq")`.
+- Token-container conversion, wide tables and plotting have separate
+  help pages. Basic examples use no downloaded reference data and use
+  the recommended function names. Related help pages identify the
+  complete objects to pass between calculation, study tables, source
+  searches and local plots, with links to the corresponding worked
+  guides. The multi-text example saves original texts alongside the
+  complete analysis for reopening.
+
+### Data and attribution
+
+- Credit the author of the adapted BSD-licensed TUBELEX example in the
+  package metadata. Clarify the authored examples, aggregate research
+  results and independently licensed downloads. MorphoLex remains
+  optional and separately licensed; download acknowledgement does not
+  extend its rights.
+
 ## ldfreq 0.5.1
 
 - Build the guides without downloaded reference data. Resource-dependent
@@ -54,7 +113,7 @@
   `invalid_input` results for invalid core token vectors and intended
   categorical metadata.
 - Reject ambiguous selected columns in
-  [`lexdiv_as_documents()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
+  [`lexdiv_as_documents()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_as_documents.md)
   and return named empty documents that both metric and profile batches
   accept. Validate raw-text batch arguments even when there are no
   documents; `plan` and `max_rows` remain unsupported on this path.
@@ -382,7 +441,7 @@
 ## ldfreq 0.3.0.9004 (development)
 
 - Add optional `mtld_diagnostics = TRUE` to
-  [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md):
+  [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md):
   extract the existing core MTLD directional scores, complete-factor
   counts and tail credits, plus tail-only and directional-gap columns
   shared with compact printing. Defaults, metric values and stored
@@ -1346,7 +1405,7 @@
   normalization consistency. Recreate objects saved under 0.1.0 from
   their original text and reapply annotations. Tokenizer rules and
   tokenizer version 0.1.0 are unchanged.
-- [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
+- [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md)
   retains contract, requested/effective parameters, and N/V by default.
   It rejects column groups containing unlike specifications; plan-local
   request labels are not globally unique. Metric plots similarly require
@@ -1501,11 +1560,11 @@
   a-squared, MSTTR, MATTR, MTLD, HD-D, deterministic expected-TTR D,
   Yule’s K, and Yule’s I.
 - Added
-  [`lexdiv_as_documents()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
+  [`lexdiv_as_documents()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_as_documents.md)
   for named lists, tidy one-token-per-row data frames, and `quanteda`
   tokens objects without adding a runtime dependency on `quanteda`.
 - Added
-  [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
+  [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md)
   as a deterministic, computation-free long-to-wide transformation that
   keeps profile parameter requests distinct.
 - Added base-R plot methods for metric, batch, profile, screen, TUBELEX

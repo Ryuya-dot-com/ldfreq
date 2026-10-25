@@ -84,6 +84,36 @@ measures accept the explicitly retained sequence; their interpretation
 depends on that selection. Keep selection settings and missingness
 counts with the imported object.
 
+The complete imported object feeds
+[`lexdiv_concordance`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
+[`lexdiv_keyness`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+or
+[`lexdiv_family_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_family_profile.md).
+Supply each function's selection arguments while keeping all original
+token rows in the import. For diversity, extract the chosen word
+sequence and pass it to
+[`lexdiv_metrics`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
+or
+[`lexdiv_metrics_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md).
+Retain the imported document roster when forming those vectors,
+including [`character()`](https://rdrr.io/r/base/character.html) for
+documents with no selected tokens. A filtered token table alone cannot
+represent those documents. The [counting-to-search
+example](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#counted-source-occurrences)
+keeps the same occurrence selections and original text across these
+steps.
+
+To check annotations against a declared reference, use
+[`lexdiv_evaluate_annotations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_evaluate_annotations.md)
+when token boundaries agree, or
+[`lexdiv_align_annotations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_align_annotations.md)
+to inspect different segmentations of the same source text. For
+adjective–noun dependencies, supply sentence-level basic UD trees to
+[`lexdiv_amod_pairs`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_amod_pairs.md).
+Alignment alone does not establish annotation accuracy; these routes
+require their documented reference labels or dependency fields in
+addition to the imported surfaces.
+
 Surface, orthographic base and lexeme are different analytical choices.
 The importer does not translate source POS to UPOS, infer unknown-word
 status, merge Japanese homographs, or establish compatibility with a
@@ -125,7 +155,7 @@ The list can be saved with
 [`saveRDS()`](https://rdrr.io/r/base/readRDS.html) and read with
 [`readRDS()`](https://rdrr.io/r/base/readRDS.html). It is not a
 `lexdiv_tokenization` object and is not an input to
-[`lexdiv_compare_annotations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_annotations.md),
+[`lexdiv_compare_annotations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_annotations.md),
 whose one-to-one contract is unchanged.
 
 ## See also

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,11 +20,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -41,7 +38,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Plot one local MATTR trajectory</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/R/mattr-profile.R" class="external-link"><code>R/mattr-profile.R</code></a></small>
+
       <div class="d-none name"><code>plot.lexdiv_mattr_profile.Rd</code></div>
     </div>
 
@@ -75,7 +72,7 @@
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A <code>lexdiv_mattr_profile</code> object.</p></dd>
+<dd><p>The complete result of <code><a href="lexdiv_mattr_profile.html">lexdiv_mattr_profile</a></code>.</p></dd>
 
 
 <dt id="arg-request-id">request_id<a class="anchor" aria-label="anchor" href="#arg-request-id"></a></dt>
@@ -109,7 +106,12 @@ whether to add the canonical MATTR value as a horizontal line.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Plot defaults use a sans serif font, horizontal tick labels and an open frame.
+    <p>First calculate <code>lexdiv_mattr_profile(tokens, plan)</code> from ordered tokens
+and a MATTR-only <code><a href="lexdiv_profile.html">lexdiv_plan</a></code>. Then call
+<code>plot(profile, request_id = ...)</code>. For a comparison of whole-document
+metric values, use <code><a href="plot.lexdiv_results.html">plot.lexdiv_results</a></code> instead. These plots
+describe different units; overlapping windows are not independent documents.</p>
+<p>Plot defaults use a sans serif font, horizontal tick labels and an open frame.
 Override these with <code>family</code>, <code>las</code> or <code>bty</code> in the plot
 method's <code>...</code>. Cosmetic graphics parameters are restored after drawing.</p>
 <p>The x-axis uses each complete window's midpoint and the y-axis uses its local
@@ -117,6 +119,10 @@ TTR. By default, the canonical whole-profile MATTR value is drawn as a dashed
 horizontal line. When a plan contains several window lengths, select exactly
 one trajectory by its <code>request_id</code>. The returned rows can be reused in
 custom graphics without parsing the displayed plot.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity">From text to local curves and a saved analysis</a></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

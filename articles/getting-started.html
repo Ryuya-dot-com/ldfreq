@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -80,35 +77,13 @@ installation</a> and requires no optional package, model or download.
 Run the examples in order through <strong>Save and resume</strong>; the
 later sections cover optional analysis choices.</p>
 <div class="section level2">
-<h2 id="optional-reference-data-setup">Optional reference-data setup<a class="anchor" aria-label="anchor" href="#optional-reference-data-setup"></a>
-</h2>
-<p>The reference-dependent sections use separately licensed data. Review
-<a href="reference-data.html">the resource terms and cache
-instructions</a>, then obtain only the resources needed for the sections
-you will run. Core calculations and examples using your own tables do
-not require these downloads.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span>, <span class="st">"nj8"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co"># After reviewing each resource's license and notice:</span></span>
-<span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_download_resources</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span>, <span class="st">"nj8"</span><span class="op">)</span>, accept_license <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">has_tubelex</span> <span class="op">&lt;-</span> <span class="fu">ldfreq</span><span class="fu">::</span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"tubelex"</span><span class="op">)</span><span class="op">$</span><span class="va">available</span></span>
-<span><span class="va">has_nj8</span> <span class="op">&lt;-</span> <span class="fu">ldfreq</span><span class="fu">::</span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"nj8"</span><span class="op">)</span><span class="op">$</span><span class="va">available</span></span>
-<span><span class="va">has_morpholex</span> <span class="op">&lt;-</span> <span class="fu">ldfreq</span><span class="fu">::</span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"morpholex"</span><span class="op">)</span><span class="op">$</span><span class="va">available</span></span>
-<span><span class="va">has_bnccoca</span> <span class="op">&lt;-</span> <span class="fu">ldfreq</span><span class="fu">::</span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"bnccoca"</span><span class="op">)</span><span class="op">$</span><span class="va">available</span></span>
-<span><span class="va">has_morphynet</span> <span class="op">&lt;-</span> <span class="fu">ldfreq</span><span class="fu">::</span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"morphynet"</span><span class="op">)</span><span class="op">$</span><span class="va">available</span></span></code></pre></div>
-<p>Resource-dependent examples below run only when their verified data
-are already in the cache. The other examples run without downloading
-reference data.</p>
-</div>
-<div class="section level2">
 <h2 id="your-first-document-table">Your first document table<a class="anchor" aria-label="anchor" href="#your-first-document-table"></a>
 </h2>
 <p>Use one row per document and a unique character ID. Here two short
 authored sentences and an empty document make the counts easy to check.
 Replace <code>texts</code> with your own ID/text table when using this
 workflow for research.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">texts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -189,7 +164,7 @@ token table. Inspect the counted words when a result differs from what
 you expected. Select the position, form and inclusion columns for a
 compact view; the complete token audit also retains annotations and
 exclusion reasons:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">analysis</span><span class="op">$</span><span class="va">token_audit</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"token_index"</span>, <span class="st">"surface"</span>, <span class="st">"eligible"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;    document_id token_index surface eligible</span></span>
 <span><span class="co">#&gt; 1      essay_a           1    cats     TRUE</span></span>
@@ -238,7 +213,7 @@ factor. Malformed raw-text tables and unknown metric IDs stop the call
 rather than producing score rows.</p>
 <p>For example, neither five-word sentence has a complete 50-token MATTR
 window:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">short_window</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch</a></span><span class="op">(</span></span>
 <span>  <span class="va">texts</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>, normalization <span class="op">=</span> <span class="st">"NFC"</span>,</span>
 <span>  case <span class="op">=</span> <span class="st">"lower"</span>, metrics <span class="op">=</span> <span class="st">"mattr"</span>, window_length <span class="op">=</span> <span class="fl">50</span></span>
@@ -278,12 +253,12 @@ differences.</p>
 <div class="section level2">
 <h2 id="make-a-table-and-plot">Make a table and plot<a class="anchor" aria-label="anchor" href="#make-a-table-and-plot"></a>
 </h2>
-<p>Use <code><a href="../reference/lexdiv_convenience.html">lexdiv_widen()</a></code> to put metrics in columns without
+<p>Use <code><a href="../reference/lexdiv_widen.html">lexdiv_widen()</a></code> to put metrics in columns without
 recalculating them. Select scalar fields for CSV, keeping availability
 and word counts beside values. The complete <code>analysis</code> object
 still holds the settings and token audit.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">results</span>,</span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_widen.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">results</span>,</span>
 <span>  values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"missing_reason"</span>, <span class="st">"N"</span>, <span class="st">"V"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">report</span></span>
 <span><span class="co">#&gt; &lt;lexdiv_wide_results: 3 rows; 6 columns&gt;</span></span>
@@ -291,7 +266,7 @@ still holds the settings and token audit.</p>
 <span><span class="co">#&gt; 1     essay_a        0.8          ok                &lt;NA&gt;      5      4</span></span>
 <span><span class="co">#&gt; 2     essay_b        1.0          ok                &lt;NA&gt;      5      5</span></span>
 <span><span class="co">#&gt; 3       empty         NA     missing         empty_input      0      0</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">analysis</span>, metric_id <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="getting-started_files/figure-html/first-report-plot-1.png" class="r-plt" alt="" width="480"></p>
 <p>The plot shows the two available scores; the empty document remains
@@ -315,7 +290,7 @@ such as <code>file.path("results", "ldfreq")</code>, before running this
 block. Temporary files may disappear when R closes. Paths are relative
 to <code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code> unless you supply an absolute path; choose
 filenames that do not overwrite results you want to keep.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"ldfreq-start"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">output_dir</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">rds_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_dir</span>, <span class="st">"analysis.rds"</span><span class="op">)</span></span>
@@ -336,7 +311,7 @@ filenames that do not overwrite results you want to keep.</p>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In a later R session, read the saved RDS from the lasting path you
 chose. For example, if you used <code>results/ldfreq</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
 <span><span class="va">restored</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"results"</span>, <span class="st">"ldfreq"</span>, <span class="st">"analysis.rds"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">restored</span><span class="op">$</span><span class="va">report</span></span>
@@ -403,11 +378,12 @@ imported annotation tables have their own workflow</td>
 </tbody>
 </table>
 <p>Your first analysis is complete. Choose your next route from the <a href="https://ryuya-dot-com.github.io/ldfreq/index.html#choose-a-research-question">research-question
-map</a>, or the <a href="from-text-to-report.html">report guide’s task
-list</a>. Both connect required inputs to the result tables and source
-records you should inspect. In particular, reference-frequency profiles
-describe document words; keyness compares corpora, and a mixed-model
-table has one selected response per observation.</p>
+map</a>, or the <a href="from-text-to-report.html#connect-the-analysis-steps">API
+connection map</a>. Both connect required inputs to the result tables
+and source records you should inspect. In particular,
+reference-frequency profiles describe document words; keyness compares
+corpora, and a mixed-model table has one selected response per
+observation.</p>
 <p>The sections below describe optional lexical units, reference
 resources and method variants. Use them when those choices are part of
 your question; they are not prerequisites for the workflow above.</p>
@@ -418,7 +394,7 @@ your question; they are not prerequisites for the workflow above.</p>
 <p>The shortest raw-text workflow is a direct call to
 <code><a href="../reference/lexdiv_preprocessing.html">lexdiv_metrics_text()</a></code>. Normalization, case, and number
 handling are explicit arguments rather than global options.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">raw_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_preprocessing.html">lexdiv_metrics_text</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Cats and cat ran run."</span>,</span>
 <span>  tokenizer <span class="op">=</span> <span class="st">"english"</span>, normalization <span class="op">=</span> <span class="st">"NFC"</span>,</span>
@@ -434,7 +410,7 @@ handling are explicit arguments rather than global options.</p>
 inspect or annotate the tokens first. Its offsets refer to the processed
 text, and its provenance keeps source and processed text hashes without
 storing the source text itself.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tokenization</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Cats and cat ran run."</span>,</span>
 <span>  tokenizer <span class="op">=</span> <span class="st">"english"</span>, normalization <span class="op">=</span> <span class="st">"NFC"</span>,</span>
@@ -455,7 +431,7 @@ and counted in <code>unit_coverage</code> rather than imputed.</p>
 <p>UPOS backend ID and version are always explicit and separate from
 lemma backend ID and version, even if one documented pipeline generated
 both layers.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">annotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_preprocessing.html">lexdiv_lemmatize</a></span><span class="op">(</span></span>
 <span>  <span class="va">tokenization</span>,</span>
 <span>  lemmas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cat"</span>, <span class="st">"and"</span>, <span class="st">"cat"</span>, <span class="st">"run"</span>, <span class="st">"run"</span><span class="op">)</span>,</span>
@@ -603,7 +579,7 @@ both layers.</p>
 <code>textstem</code> backend can be selected explicitly. It supplies
 lemmas only; it does not infer UPOS tags, so a content-word analysis
 still needs tags from a separately identified source.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"textstem"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">automatic_lemmas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_preprocessing.html">lexdiv_lemmatize</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/lexdiv_preprocessing.html">lexdiv_tokenize</a></span><span class="op">(</span><span class="st">"The cats were running and studies."</span>,</span>
@@ -684,7 +660,7 @@ provenance and overlap comparability output, they must not contain
 paths, secrets, private hashes, or machine-specific details. Local file
 names and content hashes are not retained in public flemma
 provenance.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flemmas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_flemmatize.html">lexdiv_flemmatize</a></span><span class="op">(</span></span>
 <span>  <span class="va">tokenization</span>,</span>
 <span>  <span class="st">"/path/to/antbnc_lemmas_ver_004.txt"</span>,</span>
@@ -703,7 +679,7 @@ explicit upstream overrides.</p>
 terms against one caller-supplied table. It does not download a norm,
 transform lookup terms, or infer that measures with different units and
 directions are comparable.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">synthetic_norms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cat"</span>, <span class="st">"run"</span>, <span class="st">"other"</span><span class="op">)</span>,</span>
 <span>  familiarity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">5</span>, <span class="cn">NA_real_</span><span class="op">)</span>,</span>
@@ -776,6 +752,28 @@ supplied lexical terms, so apply the same data-handling care as for the
 input.</p>
 </div>
 <div class="section level2">
+<h2 id="optional-reference-data-setup">Optional reference-data setup<a class="anchor" aria-label="anchor" href="#optional-reference-data-setup"></a>
+</h2>
+<p>The reference-dependent sections use separately licensed data. Review
+<a href="reference-data.html">the resource terms and cache
+instructions</a>, then obtain only the resources needed for the sections
+you will run. Core calculations and examples using your own tables do
+not require these downloads.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span>, <span class="st">"nj8"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># After reviewing each resource's license and notice:</span></span>
+<span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_download_resources</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tubelex"</span>, <span class="st">"nj8"</span><span class="op">)</span>, accept_license <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">has_tubelex</span> <span class="op">&lt;-</span> <span class="fu">ldfreq</span><span class="fu">::</span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"tubelex"</span><span class="op">)</span><span class="op">$</span><span class="va">available</span></span>
+<span><span class="va">has_nj8</span> <span class="op">&lt;-</span> <span class="fu">ldfreq</span><span class="fu">::</span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"nj8"</span><span class="op">)</span><span class="op">$</span><span class="va">available</span></span>
+<span><span class="va">has_morpholex</span> <span class="op">&lt;-</span> <span class="fu">ldfreq</span><span class="fu">::</span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"morpholex"</span><span class="op">)</span><span class="op">$</span><span class="va">available</span></span>
+<span><span class="va">has_bnccoca</span> <span class="op">&lt;-</span> <span class="fu">ldfreq</span><span class="fu">::</span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"bnccoca"</span><span class="op">)</span><span class="op">$</span><span class="va">available</span></span>
+<span><span class="va">has_morphynet</span> <span class="op">&lt;-</span> <span class="fu">ldfreq</span><span class="fu">::</span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"morphynet"</span><span class="op">)</span><span class="op">$</span><span class="va">available</span></span></code></pre></div>
+<p>Resource-dependent examples below run only when their verified data
+are already in the cache. The other examples run without downloading
+reference data.</p>
+</div>
+<div class="section level2">
 <h2 id="corpus-relative-frequency-with-coverage">Corpus-relative frequency with coverage<a class="anchor" aria-label="anchor" href="#corpus-relative-frequency-with-coverage"></a>
 </h2>
 <p><code><a href="../reference/tubelex_profile.html">tubelex_profile()</a></code> applies explicit query normalization
@@ -788,61 +786,8 @@ summaries.</p>
 <code class="sourceCode R"><span><span class="co"># Manually prepared terms illustrate this sentence, not a general tokenizer.</span></span>
 <span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"I"</span>, <span class="st">"do"</span>, <span class="st">"n't"</span>, <span class="st">"think"</span>, <span class="st">"it"</span>, <span class="st">"'s"</span>, <span class="st">"a"</span>, <span class="st">"book"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">frequency</span><span class="op">$</span><span class="va">summary</span></span>
-<span><span class="co">#&gt;   weighting eligible_items matched_items coverage mean_zipf   sd_zipf</span></span>
-<span><span class="co">#&gt; 1     token              8             8        1  6.810781 0.6196608</span></span>
-<span><span class="co">#&gt; 2      type              8             8        1  6.810781 0.6196608</span></span>
-<span><span class="co">#&gt;   mean_video_prevalence mean_channel_prevalence</span></span>
-<span><span class="co">#&gt; 1            -0.2204532              -0.2396299</span></span>
-<span><span class="co">#&gt; 2            -0.2204532              -0.2396299</span></span>
 <span><span class="va">frequency</span><span class="op">$</span><span class="va">coverage</span></span>
-<span><span class="co">#&gt; $input_tokens</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $input_types</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $eligible_tokens</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $eligible_types</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $matched_tokens</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $unmatched_tokens</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $matched_types</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $unmatched_types</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $token_coverage</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $type_coverage</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="va">frequency</span><span class="op">$</span><span class="va">lookup</span></span>
-<span><span class="co">#&gt;   query_index  term lookup_term matched resource_word   count videos channels</span></span>
-<span><span class="co">#&gt; 1           1     I           i    TRUE             i 3794340  83952    50926</span></span>
-<span><span class="co">#&gt; 2           2    do          do    TRUE            do 1105372  78492    48095</span></span>
-<span><span class="co">#&gt; 3           3   n't         n't    TRUE           n't  909491  72651    44756</span></span>
-<span><span class="co">#&gt; 4           4 think       think    TRUE         think  438105  51625    32474</span></span>
-<span><span class="co">#&gt; 5           5    it          it    TRUE            it 2917104  95070    56204</span></span>
-<span><span class="co">#&gt; 6           6    's          's    TRUE            's 2400420  93407    54909</span></span>
-<span><span class="co">#&gt; 7           7     a           a    TRUE             a 3637988 101717    59211</span></span>
-<span><span class="co">#&gt; 8           8  book        book    TRUE          book   56208  12058     8921</span></span>
-<span><span class="co">#&gt;       zipf video_prevalence channel_prevalence</span></span>
-<span><span class="co">#&gt; 1 7.342551      -0.10018255        -0.12815245</span></span>
-<span><span class="co">#&gt; 2 6.806923      -0.12938784        -0.15299159</span></span>
-<span><span class="co">#&gt; 3 6.722213      -0.16297120        -0.18423958</span></span>
-<span><span class="co">#&gt; 4 6.404994      -0.31135029        -0.32355139</span></span>
-<span><span class="co">#&gt; 5 7.228367      -0.04617071        -0.08532559</span></span>
-<span><span class="co">#&gt; 6 7.143702      -0.05383470        -0.09544910</span></span>
-<span><span class="co">#&gt; 7 7.324276      -0.01682096        -0.06269081</span></span>
-<span><span class="co">#&gt; 8 5.513220      -0.94290747        -0.88463833</span></span></code></pre></div>
+<span><span class="va">frequency</span><span class="op">$</span><span class="va">lookup</span></span></code></pre></div>
 <p>TUBELEX is a general YouTube subtitle frequency space. Its values
 describe frequency and prevalence relative to that corpus; they are not
 direct measures of proficiency, writing quality, academic register, or
@@ -1020,12 +965,12 @@ explicit before calling the batch API. The same adapter accepts
 <span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"b"</span><span class="op">)</span>,</span>
 <span>  token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"one"</span>, <span class="st">"two"</span>, <span class="st">"three"</span>, <span class="st">"three"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">tidy_documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_as_documents</a></span><span class="op">(</span><span class="va">tidy_tokens</span><span class="op">)</span></span>
+<span><span class="va">tidy_documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_as_documents.html">lexdiv_as_documents</a></span><span class="op">(</span><span class="va">tidy_tokens</span><span class="op">)</span></span>
 <span><span class="va">tidy_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span></span>
 <span>  <span class="va">tidy_documents</span>,</span>
 <span>  metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"maas"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">tidy_long</span>, values_from <span class="op">=</span> <span class="st">"value"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/lexdiv_widen.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">tidy_long</span>, values_from <span class="op">=</span> <span class="st">"value"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;lexdiv_wide_results: 2 rows; 3 columns&gt;</span></span>
 <span><span class="co">#&gt;   document_id ttr     maas</span></span>
 <span><span class="co">#&gt; 1           a 1.0 0.000000</span></span>

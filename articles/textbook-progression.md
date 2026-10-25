@@ -7,13 +7,12 @@ after their declared teaching unit**. It connects saved concordance
 matches to a book’s section roster, then displays counts without losing
 absent targets or unobserved parts.
 
-Use development **ldfreq 0.5.0.9001**, optional **quanteda \>= 4.5.0**
-for searching, and **ggplot2** for drawing. See the [installation
+Use optional **quanteda \>= 4.5.0** for searching, and **ggplot2** for
+drawing. See the [installation
 instructions](https://ryuya-dot-com.github.io/ldfreq/index.html#install).
-Stable 0.4.0 does not include this example. The two helpers in
-`examples/textbook-progression.R` are explicitly sourced installed
-examples, not exported functions. The script also loads the unchanged
-concordance helpers.
+The two helpers in `examples/textbook-progression.R` are explicitly
+sourced installed examples, not exported functions. The script also
+loads the unchanged concordance helpers.
 
 ## Begin with an inspectable example
 

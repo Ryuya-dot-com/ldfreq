@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -255,7 +252,7 @@ measurements.</p>
 <span><span class="co">#&gt; 4      interleaved   window_2 0.10000000</span></span>
 <span><span class="co">#&gt; 5 interleaved_long   window_1 0.20000000</span></span>
 <span><span class="co">#&gt; 6 interleaved_long   window_2 0.10000000</span></span>
-<span><span class="va">wide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">sensitivity</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">wide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_widen.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">sensitivity</span><span class="op">)</span></span></code></pre></div>
 <p>Interleaved MATTR changes from 4/20 to 4/40 solely because its window
 changes. A plot must therefore select one request, for example
 <code>plot(sensitivity, request_id = "window_1")</code>. The default
@@ -452,11 +449,11 @@ at least one direction, including eight with none in either direction;
 48.36%, using the mean of directional scores as the denominator. The
 four highest scores depend entirely on the tail in both directions.
 These counts describe the examples, not a learner population.</p>
-<p>From development version 0.3.0.9002, printing results shows
-<code>mtld_tail_only</code> and <code>mtld_gap_pct</code> automatically
-where these diagnostics are available. These are derived display
-columns; the saved result schema and values are unchanged. The table
-above retains the numeric components for analysis or export.</p>
+<p>Printing results shows <code>mtld_tail_only</code> and
+<code>mtld_gap_pct</code> automatically where these diagnostics are
+available. These are derived display columns; the saved result schema
+and values are unchanged. The table above retains the numeric components
+for analysis or export.</p>
 <p><strong>The gap measures order sensitivity, not uncertainty.</strong>
 When both directions have zero complete factors, both tails have the
 same full-text TTR, hence the same score and a gap of zero. That is not
@@ -706,11 +703,7 @@ pipeline; these hand-prepared terms illustrate only one sentence.</p>
 <code class="sourceCode R"><span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"I"</span>, <span class="st">"do"</span>, <span class="st">"n't"</span>, <span class="st">"think"</span>, <span class="st">"it"</span>, <span class="st">"'s"</span>, <span class="st">"a"</span>, <span class="st">"book"</span><span class="op">)</span></span>
 <span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="va">terms</span><span class="op">)</span></span>
 <span><span class="va">frequency</span><span class="op">$</span><span class="va">summary</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weighting"</span>, <span class="st">"coverage"</span>, <span class="st">"mean_zipf"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   weighting coverage mean_zipf</span></span>
-<span><span class="co">#&gt; 1     token        1  6.810781</span></span>
-<span><span class="co">#&gt; 2      type        1  6.810781</span></span>
-<span><span class="va">frequency</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">tokenization_alignment</span></span>
-<span><span class="co">#&gt; [1] "caller_supplied_terms_unverified"</span></span></code></pre></div>
+<span><span class="va">frequency</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">tokenization_alignment</span></span></code></pre></div>
 <p>The mean describes matched terms, not all terms with unknown words
 assigned zero frequency. A change in mean can accompany a change in
 coverage, so inspect both and the unmatched terms. Character-vector

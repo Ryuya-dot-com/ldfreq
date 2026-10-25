@@ -82,6 +82,15 @@ criticizing unqualified whole-text interpretation because positional
 exposure is unequal. The function exposes those quantities but does not
 declare any window or text length universally valid.
 
+Pass the complete result to
+[`plot.lexdiv_mattr_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_mattr_profile.md)
+to draw one local trajectory, or read `windows` to construct a custom
+figure. Retain the original tokens and plan alongside the result: the
+output records positions but does not contain the source words. The
+[local-diversity
+walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity)
+connects text preparation, several window sizes, figures and saving.
+
 ## Formal contract
 
 The installed `mattr-profile-contract.json` file fixes the method reuse,

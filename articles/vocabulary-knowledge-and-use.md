@@ -106,11 +106,6 @@ if (has_tubelex) {
     "zipf", "video_prevalence", "channel_prevalence")])
   item_features[, c("item_id", "target_form", "sense_id", "matched", "zipf")]
 }
-#>   item_id target_form              sense_id matched     zipf
-#> 1      i1        bank financial-institution    TRUE 4.848312
-#> 2      i2        bank            river-edge    TRUE 4.848312
-#> 3      i3    accurate               precise    TRUE 4.454142
-#> 4      i4      ldfreq             R-package   FALSE       NA
 ```
 
 The two `bank` items receive the same corpus values. This resource does
@@ -348,33 +343,8 @@ profiles <- tubelex_profile_batch(list(
 audit <- tubelex_diagnostics(profiles)
 audit$summary[, c("document_id", "status", "weighting", "eligible_items",
                   "matched_items", "coverage", "mean_zipf")]
-#>   document_id        status weighting eligible_items matched_items  coverage
-#> 1           a            ok     token              4             3 0.7500000
-#> 2           a            ok      type              3             2 0.6666667
-#> 3           b            ok     token              3             3 1.0000000
-#> 4           b            ok      type              3             3 1.0000000
-#> 5       blank         empty     token              0             0        NA
-#> 6       blank         empty      type              0             0        NA
-#> 7     invalid invalid_input     token             NA            NA        NA
-#> 8     invalid invalid_input      type             NA            NA        NA
-#>   mean_zipf
-#> 1  5.777371
-#> 2  6.241901
-#> 3  5.261596
-#> 4  5.261596
-#> 5        NA
-#> 6        NA
-#> 7        NA
-#> 8        NA
 audit$unmatched_terms
-#>   condition_id lookup_term token_count document_count
-#> 1  condition_1      ldfreq           1              1
 audit$documents[, c("document_id", "tokenization_alignment", "query_normalization")]
-#>   document_id           tokenization_alignment query_normalization
-#> 1           a caller_supplied_terms_unverified             tubelex
-#> 2           b caller_supplied_terms_unverified             tubelex
-#> 3       blank caller_supplied_terms_unverified             tubelex
-#> 4     invalid caller_supplied_terms_unverified             tubelex
 ```
 
 The means remain conditional on matches. `unmatched_terms` contains

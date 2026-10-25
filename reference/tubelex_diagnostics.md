@@ -109,7 +109,9 @@ lookup values.
 
 [`tubelex_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md),
 [`nj8_diagnostics`](https://ryuya-dot-com.github.io/ldfreq/reference/nj8_diagnostics.md);
-[vocabulary knowledge and use
+[`lexdiv_compare_responses`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_responses.md)
+for separately collected, scored and paired binary responses. Frequency
+profiles do not supply those responses. [vocabulary knowledge and use
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/vocabulary-knowledge-and-use.html)
 for a worked separation of learner responses and corpus features.
 
@@ -128,14 +130,4 @@ audit$summary[, c("document_id", "status", "weighting", "coverage", "mean_zipf")
 audit$unmatched_terms
 audit$normalization_mappings
 }
-#>   condition_id           term    lookup_term matched token_count document_count
-#> 1  condition_1 zzunmatchedxyz zzunmatchedxyz   FALSE           2              2
-#> 2  condition_1          Apple          apple    TRUE           1              1
-#> 3  condition_1          apple          apple    TRUE           1              1
-#> 4  condition_1            the            the    TRUE           1              1
-#>   lookup_changed number_marker
-#> 1          FALSE         FALSE
-#> 2           TRUE         FALSE
-#> 3          FALSE         FALSE
-#> 4          FALSE         FALSE
 ```

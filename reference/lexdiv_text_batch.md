@@ -82,7 +82,7 @@ plot(x, ..., monochrome = FALSE)
   by name. Defaults to color; `TRUE` uses black and distinguishes points
   below the advisory floor by shape unless `pch` is supplied. No title
   is added automatically. See
-  [`lexdiv_convenience`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md).
+  [`plot.lexdiv_results`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.md).
 
 - ...:
 
@@ -107,8 +107,9 @@ has five tokens and five types (TTR 1), and *empty* has zero tokens with
 `missing_reason = "empty_input"`. These short authored texts explain the
 output, not a comparison of writing ability.
 `lexdiv_widen(result$results)` puts metrics into columns without
-recalculating them. Keep the complete `result` when saving: the wide
-table alone does not retain the token audit and preprocessing records.
+recalculating them. Save the original texts together with the complete
+`result`: the wide table omits the token audit and preprocessing
+records, and the audit and hashes do not preserve the original text.
 
 Use `lexdiv_tokenize_batch()` separately when you want to inspect or
 annotate the tokens before scoring or reuse them with a reference
@@ -151,6 +152,19 @@ or sample size. Settings and metric requests are validated even with
 zero documents. Only metric arguments supported by
 [`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md)
 can be forwarded through `...`; `plan` and `max_rows` are not supported.
+
+For a measurement plan or a scheduled-observation study, retain the
+complete `lexdiv_tokenize_batch()` output and explicitly extract the
+selected token vectors. The surface-form example below uses
+`x$tokens$surface`; other units and exclusions must be chosen
+explicitly. Pass the named vectors to
+[`lexdiv_metrics_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
+with `plan = plan`, then use that complete result with
+[`lexdiv_study_table`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md).
+The [planned-observation
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html)
+adds the schedule, submission map and reporting decisions needed for
+model rows.
 
 Prepared objects retain their recorded settings. A batch call does not
 assert that differently prepared documents are comparable: inspect
@@ -200,7 +214,7 @@ with three default components and optional study metadata:
 invisibly. [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 returns the plotted metric rows invisibly, with the same selection rules
 as
-[`plot.lexdiv_batch_results()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md).
+[`plot.lexdiv_batch_results()`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.md).
 Use `lexdiv_widen(x$results)` to create a metric table; save the
 complete object to retain its audits.
 
@@ -218,8 +232,6 @@ report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html
 ## Examples
 
 ``` r
-# Optional data: review and explicitly download these resources first.
-if (all(lexdiv_resource_info(c("nj8"))$available)) {
 library(ldfreq)
 
 # 1. One row per text; keep the empty document in the input.
@@ -231,29 +243,112 @@ result <- lexdiv_metrics_text_batch(
   texts, tokenizer = "english", case = "lower", metrics = "ttr"
 )
 result$results  # TTR: essay_a = 0.8, essay_b = 1; empty = NA
+#> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
+#>   document_id metric_id value  status missing_reason N V below_quality_floor
+#> 1     essay_a       ttr   0.8      ok           <NA> 5 4               FALSE
+#> 2     essay_b       ttr   1.0      ok           <NA> 5 5               FALSE
+#> 3       empty       ttr    NA missing    empty_input 0 0                TRUE
 result$token_audit
+#>    document_id token_index surface selected_unit unit_match_rule upos eligible
+#> 1      essay_a           1    cats          cats            <NA> <NA>     TRUE
+#> 2      essay_a           2   chase         chase            <NA> <NA>     TRUE
+#> 3      essay_a           3    cats          cats            <NA> <NA>     TRUE
+#> 4      essay_a           4     and           and            <NA> <NA>     TRUE
+#> 5      essay_a           5    dogs          dogs            <NA> <NA>     TRUE
+#> 6      essay_b           1     the           the            <NA> <NA>     TRUE
+#> 7      essay_b           2  reader        reader            <NA> <NA>     TRUE
+#> 8      essay_b           3   reads         reads            <NA> <NA>     TRUE
+#> 9      essay_b           4       a             a            <NA> <NA>     TRUE
+#> 10     essay_b           5   story         story            <NA> <NA>     TRUE
+#>    exclusion_reason
+#> 1              <NA>
+#> 2              <NA>
+#> 3              <NA>
+#> 4              <NA>
+#> 5              <NA>
+#> 6              <NA>
+#> 7              <NA>
+#> 8              <NA>
+#> 9              <NA>
+#> 10             <NA>
 lexdiv_widen(result$results)
+#> <lexdiv_wide_results: 3 rows; 12 columns>
+#>   document_id ttr__value ttr__status ttr__missing_reason  ttr__method_id
+#> 1     essay_a        0.8          ok                <NA> ttr_v_over_n_v1
+#> 2     essay_b        1.0          ok                <NA> ttr_v_over_n_v1
+#> 3       empty         NA     missing         empty_input ttr_v_over_n_v1
+#>   ttr__below_quality_floor       ttr__metric_contract_id
+#> 1                    FALSE ldfreq-lexical-diversity-core
+#> 2                    FALSE ldfreq-lexical-diversity-core
+#> 3                     TRUE ldfreq-lexical-diversity-core
+#>   ttr__metric_contract_version ttr__requested_parameters
+#> 1                        0.2.0                          
+#> 2                        0.2.0                          
+#> 3                        0.2.0                          
+#>   ttr__effective_parameters ttr__N ttr__V
+#> 1                                5      4
+#> 2                                5      5
+#> 3                                0      0
 
-# 2. The plot displays the two computed scores; the empty row stays in
-# results.
+# 2. The plot displays two scores and a labelled position for the empty text.
 plot(result, metric_id = "ttr")
+
 plot(result, metric_id = "ttr", monochrome = TRUE)
 
-# 3. Save the whole analysis. Use your own output path for a research
-# project.
+
+# 3. Save original texts and the full analysis together.
+# Use your own output path for a research project.
 path <- tempfile(fileext = ".rds")
-saveRDS(result, path)
+saveRDS(list(texts = texts, analysis = result), path)
 restored <- readRDS(path)
-restored$results
+restored$texts
+#>   document_id                      text
+#> 1     essay_a Cats chase cats and dogs.
+#> 2     essay_b The reader reads a story.
+#> 3       empty                          
+restored$analysis$results
+#> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
+#>   document_id metric_id value  status missing_reason N V below_quality_floor
+#> 1     essay_a       ttr   0.8      ok           <NA> 5 4               FALSE
+#> 2     essay_b       ttr   1.0      ok           <NA> 5 5               FALSE
+#> 3       empty       ttr    NA missing    empty_input 0 0                TRUE
 unlink(path)  # Clean up only this temporary demonstration file.
 
 # 4. Optional workflow: prepare tokens once, then reuse them.
 prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
 prepared$essay_a$tokens
+#>   token_index start end surface is_number
+#> 1           1     1   4    cats     FALSE
+#> 2           2     6  10   chase     FALSE
+#> 3           3    12  15    cats     FALSE
+#> 4           4    17  19     and     FALSE
+#> 5           5    21  24    dogs     FALSE
 # A 4-token window illustrates MATTR here; it is not a research
 # recommendation.
 lexdiv_metrics_text_batch(prepared, metrics = "mattr", window_length = 4)$results
-nj8_profile_batch(prepared, unit = "surface")$coverage
+#> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
+#>   document_id metric_id value  status missing_reason N V below_quality_floor
+#> 1     essay_a     mattr 0.875      ok           <NA> 5 4                TRUE
+#> 2     essay_b     mattr 1.000      ok           <NA> 5 5                TRUE
+#> 3       empty     mattr    NA missing    empty_input 0 0                TRUE
+# Only this optional profile needs the NJ8 resource.
+if (lexdiv_resource_info("nj8")$available) {
+  nj8_profile_batch(prepared, unit = "surface")$coverage
+}
+
+# A plan-based path from the same prepared surface tokens, keeping empty texts.
+documents <- lapply(prepared, function(x) x$tokens$surface)
+plan <- lexdiv_plan(presets = character(), specs = list(
+  lexdiv_spec("ttr_v_over_n_v1", request_id = "ttr")))
+planned_results <- lexdiv_metrics_batch(documents, plan = plan)
+planned_results[c("document_id", "request_id", "value", "status")]
+#> <lexdiv_profile_batch_results: 3 documents; 3 specification results; schema unknown>
+#>   document_id request_id value  status
+#> 1     essay_a        ttr   0.8      ok
+#> 2     essay_b        ttr   1.0      ok
+#> 3       empty        ttr    NA missing
+# Retain texts, prepared, documents, plan and planned_results together.
+# Continue in ?lexdiv_study_table with the actual observation schedule.
 
 # 5. Keep study information with the same analysis, matched by ID.
 # Labels are fictional; the empty response has an unknown writer.
@@ -262,8 +357,10 @@ study <- data.frame(document_id = c("empty", "essay_b", "essay_a"),
   occasion = c(1L, 2L, 1L))
 with_study <- lexdiv_metrics_text_batch(prepared, metrics = "ttr", metadata = study)
 with_study$metadata
+#>   document_id writer_id occasion
+#> 1     essay_a  writer_1        1
+#> 2     essay_b  writer_1        2
+#> 3       empty      <NA>        1
 stopifnot(identical(with_study$results,
   lexdiv_metrics_text_batch(prepared, metrics = "ttr")$results))
-}
-
 ```

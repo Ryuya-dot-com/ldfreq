@@ -6,9 +6,9 @@ expected number computed from an explicit population of possible pairs.
 Keep both counts: a high association score from one occurrence deserves
 different interpretation from a frequently repeated combination.
 
-This guide uses **ldfreq 0.5.0.9001** and optional **quanteda \>=
-4.5.0** for the initial search. It starts with adjacent words, then
-expands to a left/right span. Call
+This workflow uses optional **quanteda \>= 4.5.0** for the initial
+search. It starts with adjacent words, then expands to a left/right
+span. Call
 [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
 and
 [`lexdiv_collocations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.md)

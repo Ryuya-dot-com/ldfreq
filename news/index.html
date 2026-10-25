@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,11 +20,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -45,6 +42,30 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.0" id="ldfreq-100">ldfreq 1.0.0<a class="anchor" aria-label="anchor" href="#ldfreq-100"></a></h2>
+<div class="section level3">
+<h3 id="updating-existing-analyses-1-0-0">Updating existing analyses<a class="anchor" aria-label="anchor" href="#updating-existing-analyses-1-0-0"></a></h3>
+<ul><li>In NJ8 plots, replace <code>bar_col</code> with <code>col</code>: use <code>plot(profile, col = ...)</code>, as with the other plot methods. Use one bar color and one cumulative-curve color; monochrome mode also controls the bar outline and off-list shade.</li>
+<li>
+<code><a href="../reference/lexdiv_study_table.html">lexdiv_study_table()</a></code> and <code><a href="../reference/lexdiv_study_table.html">lexdiv_study_model_data()</a></code> now reject metadata names that collide with selection-audit fields, including <code>included</code>. Rename the identified source column, for example to <code>source_included</code>; use the separate reporting table for decisions about reporting scores.</li>
+<li>
+<code><a href="../reference/lexdiv_study_table.html">lexdiv_study_model_data()</a></code> now rejects nonnumeric or dimensional responses, malformed identity columns, unknown status labels and inconsistent saved records. Correct the input rather than relying on silent exclusion. Valid factor metadata and dates are retained; non-finite required dates are recorded as missing metadata.</li>
+<li>Bar plots now reject arguments that change their fixed orientation, baseline or coordinate system. Remove those unsupported arguments. TUBELEX coverage keeps its zero-to-one scale and category labels.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="reading-and-reporting-results-1-0-0">Reading and reporting results<a class="anchor" aria-label="anchor" href="#reading-and-reporting-results-1-0-0"></a></h3>
+<ul><li>Metric plots keep missing documents as labelled positions without a point. The invisible plot-data return now includes those missing rows. TTR labels include token counts and default to a zero-to-one scale; these changes expose length and missingness without adjusting the measured scores.</li>
+<li>Plots honor <code>axes</code>, <code>xaxt</code>, <code>cex.axis</code>, <code>col.axis</code> and <code>font.axis</code> on manually drawn axes, and restore graphics settings after plotting or an error.</li>
+<li>Batch metric calculations avoid repeated table conversions across documents. Scores, diagnostics, parameter records and saved result shapes are unchanged.</li>
+<li>README and the report guide connect inputs, calculation, source checks, tables, plots and saving. The article index groups workflows by task, and the first-analysis guide postpones optional reference-data setup until it is needed. Open version-matched guides with <code>browseVignettes("ldfreq")</code>.</li>
+<li>Token-container conversion, wide tables and plotting have separate help pages. Basic examples use no downloaded reference data and use the recommended function names. Related help pages identify the complete objects to pass between calculation, study tables, source searches and local plots, with links to the corresponding worked guides. The multi-text example saves original texts alongside the complete analysis for reopening.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="data-and-attribution-1-0-0">Data and attribution<a class="anchor" aria-label="anchor" href="#data-and-attribution-1-0-0"></a></h3>
+<ul><li>Credit the author of the adapted BSD-licensed TUBELEX example in the package metadata. Clarify the authored examples, aggregate research results and independently licensed downloads. MorphoLex remains optional and separately licensed; download acknowledgement does not extend its rights.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.1" id="ldfreq-051">ldfreq 0.5.1<a class="anchor" aria-label="anchor" href="#ldfreq-051"></a></h2>
 <ul><li>Build the guides without downloaded reference data. Resource-dependent examples run only with a verified cache; core workflows remain executable. Include rendered vignettes in the source artifact and check their rebuilding.</li>
 <li>Keep plot-test replacements inside ldfreq and its sourced recipes instead of changing standard-package bindings or S3 registrations. Retain actual device checks for color, monochrome, labels and graphics-state restoration.</li>
@@ -58,7 +79,7 @@
 <li>Extend the evidence to ICNALE, OANC and BAWE: 16,730 documents in the 50/100-token comparison, 2,833 in the 200/500/1,000-token comparison, and 2,556 ICNALE writers in the two-task comparison. Report linked-cluster uncertainty, missingness and genre/discipline strata. Add 182 real-block koRpus comparisons and document its MATTR N-equals-window boundary difference.</li>
 <li>Use the consistent names <code><a href="../reference/lexdiv_ngram_compare.html">lexdiv_compare_ngrams()</a></code>, <code><a href="../reference/lexdiv_ngram_reference_build.html">lexdiv_build_ngram_reference()</a></code>, <code><a href="../reference/lexdiv_profile.html">lexdiv_screen_lengths()</a></code> and <code><a href="../reference/lexdiv_concordance.html">lexdiv_sort_concordance()</a></code>. The previous names remain exact aliases; arguments and saved results are unchanged.</li>
 <li>Reject classed and dimensional inputs that could previously pass scalar or plain-column checks in MTLD options, concordance, collocation, study tables and MorphoLex selection. Preserve structured <code>invalid_input</code> results for invalid core token vectors and intended categorical metadata.</li>
-<li>Reject ambiguous selected columns in <code><a href="../reference/lexdiv_convenience.html">lexdiv_as_documents()</a></code> and return named empty documents that both metric and profile batches accept. Validate raw-text batch arguments even when there are no documents; <code>plan</code> and <code>max_rows</code> remain unsupported on this path. TUBELEX now returns structured <code>resource_error</code> results for missing or damaged cache manifests as well as data files, including in batch calls.</li>
+<li>Reject ambiguous selected columns in <code><a href="../reference/lexdiv_as_documents.html">lexdiv_as_documents()</a></code> and return named empty documents that both metric and profile batches accept. Validate raw-text batch arguments even when there are no documents; <code>plan</code> and <code>max_rows</code> remain unsupported on this path. TUBELEX now returns structured <code>resource_error</code> results for missing or damaged cache manifests as well as data files, including in batch calls.</li>
 <li>Shorten the README, align all guides to one fixed installation version, and add version-specific R and GitHub citation records. The metric-selection guide distinguishes the evaluated English sampling conditions, length-effect intervals, and computational minimum lengths from individual-score precision.</li>
 </ul></div>
     <div class="section level2">
@@ -175,7 +196,7 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0.9004" id="ldfreq-0309004-development">ldfreq 0.3.0.9004 (development)<a class="anchor" aria-label="anchor" href="#ldfreq-0309004-development"></a></h2>
-<ul><li>Add optional <code>mtld_diagnostics = TRUE</code> to <code><a href="../reference/lexdiv_convenience.html">lexdiv_widen()</a></code>: extract the existing core MTLD directional scores, complete-factor counts and tail credits, plus tail-only and directional-gap columns shared with compact printing. Defaults, metric values and stored result schemas are unchanged. Saved legacy min10 results retain their method identity; unavailable diagnostics stay missing and recorded zero counts stay zero. Request/specification and name-collision checks remain in force. No new export, dependency or automatic exclusion.</li>
+<ul><li>Add optional <code>mtld_diagnostics = TRUE</code> to <code><a href="../reference/lexdiv_widen.html">lexdiv_widen()</a></code>: extract the existing core MTLD directional scores, complete-factor counts and tail credits, plus tail-only and directional-gap columns shared with compact printing. Defaults, metric values and stored result schemas are unchanged. Saved legacy min10 results retain their method identity; unavailable diagnostics stay missing and recorded zero counts stay zero. Request/specification and name-collision checks remain in force. No new export, dependency or automatic exclusion.</li>
 <li>Show compact scalar tables and CSV/full-RDS use in the API help and report guide.</li>
 </ul></div>
     <div class="section level2">
@@ -503,7 +524,7 @@
 <ul><li>TUBELEX profiles now reject <code>lexdiv_tokenization</code> objects by default because their segmentation differs from the bundled Treebank resource. Prepare source-compatible term vectors externally; vector alignment remains unverified. The explicit <code>tokenization_mismatch = "allow"</code> override records a different-tokenizer sensitivity analysis. Coverage is not alignment evidence.</li>
 <li>Preprocessing contract 0.2.0 requires text hashes, token pattern, character counts, and a token-table fingerprint, and checks normalization consistency. Recreate objects saved under 0.1.0 from their original text and reapply annotations. Tokenizer rules and tokenizer version 0.1.0 are unchanged.</li>
 <li>
-<code><a href="../reference/lexdiv_convenience.html">lexdiv_widen()</a></code> retains contract, requested/effective parameters, and N/V by default. It rejects column groups containing unlike specifications; plan-local request labels are not globally unique. Metric plots similarly require one specification and invisibly return all selected result fields.</li>
+<code><a href="../reference/lexdiv_widen.html">lexdiv_widen()</a></code> retains contract, requested/effective parameters, and N/V by default. It rejects column groups containing unlike specifications; plan-local request labels are not globally unique. Metric plots similarly require one specification and invisibly return all selected result fields.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="corrections-and-additions-0-2-0">Corrections and additions<a class="anchor" aria-label="anchor" href="#corrections-and-additions-0-2-0"></a></h3>
@@ -557,8 +578,8 @@
 <div class="section level3">
 <h3 id="initial-release-0-1-0">Initial release<a class="anchor" aria-label="anchor" href="#initial-release-0-1-0"></a></h3>
 <ul><li>Added twelve versioned lexical-diversity metrics for ordered, pre-tokenized input: TTR, RTTR/Guiraud, CTTR, Herdan’s C, Maas a-squared, MSTTR, MATTR, MTLD, HD-D, deterministic expected-TTR D, Yule’s K, and Yule’s I.</li>
-<li>Added <code><a href="../reference/lexdiv_convenience.html">lexdiv_as_documents()</a></code> for named lists, tidy one-token-per-row data frames, and <code>quanteda</code> tokens objects without adding a runtime dependency on <code>quanteda</code>.</li>
-<li>Added <code><a href="../reference/lexdiv_convenience.html">lexdiv_widen()</a></code> as a deterministic, computation-free long-to-wide transformation that keeps profile parameter requests distinct.</li>
+<li>Added <code><a href="../reference/lexdiv_as_documents.html">lexdiv_as_documents()</a></code> for named lists, tidy one-token-per-row data frames, and <code>quanteda</code> tokens objects without adding a runtime dependency on <code>quanteda</code>.</li>
+<li>Added <code><a href="../reference/lexdiv_widen.html">lexdiv_widen()</a></code> as a deterministic, computation-free long-to-wide transformation that keeps profile parameter requests distinct.</li>
 <li>Added base-R plot methods for metric, batch, profile, screen, TUBELEX coverage, and existing New JACET 8000 results.</li>
 <li>Added <code><a href="../reference/lexdiv_preprocessing.html">lexdiv_tokenize()</a></code> and <code><a href="../reference/lexdiv_preprocessing.html">lexdiv_metrics_text()</a></code> for raw English text. Unicode normalization, case handling, number retention, token offsets, and lexical-unit selection are retained in preprocessing provenance.</li>
 <li>Added <code><a href="../reference/lexdiv_preprocessing.html">lexdiv_lemmatize()</a></code> for caller-supplied annotations and an optional <code>textstem</code> backend. Missing lemmas and UPOS tags remain explicit.</li>

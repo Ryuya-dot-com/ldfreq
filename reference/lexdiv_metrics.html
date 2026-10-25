@@ -15,7 +15,7 @@ parameters, and diagnostics are returned beside each value."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,11 +28,8 @@ parameters, and diagnostics are returned beside each value."></head><body>
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -189,7 +186,12 @@ schema columns, classes and attributes. No plan metadata is discarded.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>MTLD-MA is available as <code>metrics = "mtld_ma"</code>. It computes the mean of
+    <p>Choose a measure for the research question before comparing values. The
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html">metric-selection guide</a>
+connects definitions to length sensitivity, sampling agreement and the available
+corpus evidence. <code><a href="lexdiv_length_evidence.html">lexdiv_length_evidence</a></code> gives the narrower evidence
+behind advisory length flags; those flags are not universal validity cutoffs.</p>
+<p>MTLD-MA is available as <code>metrics = "mtld_ma"</code>. It computes the mean of
 forward overlapping complete-factor lengths of at least ten tokens, with
 step-one starts and a strict TTR threshold. It stops at the first start that
 cannot complete a factor. Short completed factors are excluded, not extended.
@@ -258,7 +260,7 @@ derived from existing <code>diagnostics</code>: <code>mtld_tail_only</code> is t
 either direction has zero complete factors, and <code>mtld_gap_pct</code> is
 <code>100 * abs(forward_score - reverse_score) / mean(c(forward_score,
 reverse_score))</code>. These are display columns, not additional stored result
-fields. Use <code><a href="lexdiv_convenience.html">lexdiv_widen</a>(x, mtld_diagnostics = TRUE)</code> to extract
+fields. Use <code><a href="lexdiv_widen.html">lexdiv_widen</a>(x, mtld_diagnostics = TRUE)</code> to extract
 them with the directional scores, factor counts and tail credits into ordinary
 columns. A tail-only direction extrapolates from its fractional tail; a zero
 gap is possible when both directions have no complete factors. The gap
@@ -363,6 +365,19 @@ Humanities</em>, 32, 323–352. <a href="https://doi.org/10.1023/A%3A10017493031
 <p>These references describe the method families. Use the exact formulas,
 variants and parameter values documented here when reporting ldfreq results.
 Expected-TTR D is a separately named exact-expectation curve fit, not CLAN VOCD.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="continue-from-the-results">Continue from the results<a class="anchor" aria-label="anchor" href="#continue-from-the-results"></a></h2>
+    <p>Pass an ordinary or plan-based result table to <code><a href="lexdiv_widen.html">lexdiv_widen</a></code> for
+one row per document, or to <code><a href="plot.lexdiv_results.html">plot.lexdiv_results</a></code> to display one
+metric and specification. Keep the original tokens and complete results with
+their preprocessing and parameter records when saving the analysis.</p>
+<p>To retain planned writer/task/occasion observations, pass the complete
+<code>lexdiv_metrics_batch(documents, plan = plan)</code> result and the same plan
+to <code><a href="lexdiv_study_table.html">lexdiv_study_table</a></code>, together with the schedule, submissions
+and reporting decisions. An ordinary result without a plan is a different input.
+For variation within a document, use <code><a href="lexdiv_mattr_profile.html">lexdiv_mattr_profile</a></code> on the
+same ordered tokens and an explicitly chosen MATTR plan.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

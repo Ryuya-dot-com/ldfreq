@@ -11,7 +11,7 @@ missingness. Documents are not pooled into a corpus score."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,11 +24,8 @@ missingness. Documents are not pooled into a corpus score."></head><body>
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -148,11 +145,19 @@ difficult, and a mean norm value does not establish proficiency.</p>
 resource's identity and coverage. Metadata supplied by the caller are not a
 content fingerprint; save the actual table, measure specifications and result
 with the original preprocessing and corpus metadata for reproducibility.</p>
+<p>Start with <code>result$summary</code> for document estimates, inspect
+<code>result$coverage</code>, and return to <code>result$lookup</code> to explain matches
+or missing values. Join study metadata by <code>document_id</code> while keeping
+measure, resource and weighting identities separate. These tables describe
+lexical norms; they are not the plan-based diversity result required by
+<code><a href="lexdiv_study_table.html">lexdiv_study_table</a></code>. The
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html">reference-profile workflow</a>
+shows prepared inputs, document summaries, plotting and saving together.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="lexdiv_norm_profile.html">lexdiv_norm_profile</a></code>,
-<code><a href="lexdiv_convenience.html">lexdiv_as_documents</a></code>, <code><a href="lexdiv_text_batch.html">lexdiv_tokenize_batch</a></code></p></div>
+<code><a href="lexdiv_as_documents.html">lexdiv_as_documents</a></code>, <code><a href="lexdiv_text_batch.html">lexdiv_tokenize_batch</a></code></p></div>
     </div>
 
     <div class="section level2">

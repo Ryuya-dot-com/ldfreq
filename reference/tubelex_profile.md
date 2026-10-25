@@ -257,6 +257,4 @@ contract_paths <- system.file("spec", contract_files, package = "ldfreq")
 stopifnot(all(nzchar(contract_paths)))
 basename(contract_paths)
 }
-#> [1] "tubelex-frequency-profile-contract.json"
-#> [2] "lexical-resource-lookup-contract.json"  
 ```

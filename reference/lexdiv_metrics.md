@@ -158,6 +158,15 @@ classes and attributes. No plan metadata is discarded.
 
 ## Details
 
+Choose a measure for the research question before comparing values. The
+[metric-selection
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html)
+connects definitions to length sensitivity, sampling agreement and the
+available corpus evidence.
+[`lexdiv_length_evidence`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_length_evidence.md)
+gives the narrower evidence behind advisory length flags; those flags
+are not universal validity cutoffs.
+
 MTLD-MA is available as `metrics = "mtld_ma"`. It computes the mean of
 forward overlapping complete-factor lengths of at least ten tokens, with
 step-one starts and a strict TTR threshold. It stops at the first start
@@ -238,7 +247,7 @@ derived from existing `diagnostics`: `mtld_tail_only` is true when
 either direction has zero complete factors, and `mtld_gap_pct` is
 `100 * abs(forward_score - reverse_score) / mean(c(forward_score, reverse_score))`.
 These are display columns, not additional stored result fields. Use
-[`lexdiv_widen`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)`(x, mtld_diagnostics = TRUE)`
+[`lexdiv_widen`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md)`(x, mtld_diagnostics = TRUE)`
 to extract them with the directional scores, factor counts and tail
 credits into ordinary columns. A tail-only direction extrapolates from
 its fractional tail; a zero gap is possible when both directions have no
@@ -368,6 +377,26 @@ These references describe the method families. Use the exact formulas,
 variants and parameter values documented here when reporting ldfreq
 results. Expected-TTR D is a separately named exact-expectation curve
 fit, not CLAN VOCD.
+
+## Continue from the results
+
+Pass an ordinary or plan-based result table to
+[`lexdiv_widen`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md)
+for one row per document, or to
+[`plot.lexdiv_results`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.md)
+to display one metric and specification. Keep the original tokens and
+complete results with their preprocessing and parameter records when
+saving the analysis.
+
+To retain planned writer/task/occasion observations, pass the complete
+`lexdiv_metrics_batch(documents, plan = plan)` result and the same plan
+to
+[`lexdiv_study_table`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md),
+together with the schedule, submissions and reporting decisions. An
+ordinary result without a plan is a different input. For variation
+within a document, use
+[`lexdiv_mattr_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_mattr_profile.md)
+on the same ordered tokens and an explicitly chosen MATTR plan.
 
 ## See also
 

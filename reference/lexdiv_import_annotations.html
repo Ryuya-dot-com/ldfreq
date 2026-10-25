@@ -13,7 +13,7 @@ or invoked. This is an experimental input interface."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,11 +26,8 @@ or invoked. This is an experimental input interface."></head><body>
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -123,6 +120,23 @@ words or missing lemmas. Keep <code>token_index</code> unchanged after exclusion
 gaps instead of creating false neighbors. Core diversity measures accept the
 explicitly retained sequence; their interpretation depends on that selection.
 Keep selection settings and missingness counts with the imported object.</p>
+<p>The complete imported object feeds <code><a href="lexdiv_concordance.html">lexdiv_concordance</a></code>,
+<code><a href="lexdiv_keyness.html">lexdiv_keyness</a></code> or <code><a href="lexdiv_family_profile.html">lexdiv_family_profile</a></code>.
+Supply each function's selection arguments while keeping all original token
+rows in the import. For diversity, extract the chosen word sequence and pass
+it to <code><a href="lexdiv_metrics.html">lexdiv_metrics</a></code> or <code><a href="lexdiv_metrics.html">lexdiv_metrics_batch</a></code>.
+Retain the imported document roster when forming those vectors, including
+<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code> for documents with no selected tokens. A filtered token
+table alone cannot represent those documents. The
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#counted-source-occurrences">counting-to-search example</a>
+keeps the same occurrence selections and original text across these steps.</p>
+<p>To check annotations against a declared reference, use
+<code><a href="lexdiv_evaluate_annotations.html">lexdiv_evaluate_annotations</a></code> when token boundaries agree, or
+<code><a href="lexdiv_align_annotations.html">lexdiv_align_annotations</a></code> to inspect different segmentations of
+the same source text. For adjective–noun dependencies, supply sentence-level
+basic UD trees to <code><a href="lexdiv_amod_pairs.html">lexdiv_amod_pairs</a></code>. Alignment alone does not
+establish annotation accuracy; these routes require their documented reference
+labels or dependency fields in addition to the imported surfaces.</p>
 <p>Surface, orthographic base and lexeme are different analytical choices. The
 importer does not translate source POS to UPOS, infer unknown-word status,
 merge Japanese homographs, or establish compatibility with a frequency table.
@@ -156,7 +170,7 @@ they are reproducibility labels, not authentication or license verification.</p>
 
 </dl><p>The list can be saved with <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS()</a></code> and read with <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code>.
 It is not a <code>lexdiv_tokenization</code> object and is not an input to
-<code><a href="lexdiv_compare_annotations.html">lexdiv_compare_annotations()</a></code>, whose one-to-one contract is unchanged.</p>
+<code><a href="lexdiv_compare_annotations.html">lexdiv_compare_annotations</a></code>, whose one-to-one contract is unchanged.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

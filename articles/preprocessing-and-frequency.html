@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -484,19 +481,7 @@ preserved, including uppercase keys.</p>
 <span><span class="va">nation</span> <span class="op">&lt;-</span> <span class="va">family_env</span><span class="op">$</span><span class="va">bnccoca_example</span></span>
 <span><span class="va">nation</span><span class="op">$</span><span class="va">profile</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"selected_tokens"</span>, <span class="st">"matched_tokens"</span>,</span>
 <span>  <span class="st">"unresolved_tokens"</span>, <span class="st">"family_types"</span>, <span class="st">"family_ttr"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   document_id selected_tokens matched_tokens unresolved_tokens family_types</span></span>
-<span><span class="co">#&gt; 1      listed               4              4                 0            2</span></span>
-<span><span class="co">#&gt; 2    unlisted               2              1                 1           NA</span></span>
-<span><span class="co">#&gt;   family_ttr     status</span></span>
-<span><span class="co">#&gt; 1        0.5   complete</span></span>
-<span><span class="co">#&gt; 2         NA incomplete</span></span>
-<span><span class="va">nation</span><span class="op">$</span><span class="va">candidates</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"headword"</span>, <span class="st">"frequency_band"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   document_id headword frequency_band</span></span>
-<span><span class="co">#&gt; 1      listed      USE              1</span></span>
-<span><span class="co">#&gt; 2      listed      USE              1</span></span>
-<span><span class="co">#&gt; 3      listed   COLOUR              1</span></span>
-<span><span class="co">#&gt; 4      listed   COLOUR              1</span></span>
-<span><span class="co">#&gt; 5    unlisted      USE              1</span></span></code></pre></div>
+<span><span class="va">nation</span><span class="op">$</span><span class="va">candidates</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"headword"</span>, <span class="st">"frequency_band"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>The example explicitly uses
 <code>normalization = "nfkc_lower"</code>. Its first text,
 <code>use uses colour color</code>, contains four tokens and two source
@@ -508,9 +493,7 @@ KWIC, rather than inventing a family or interpreting noncoverage as an
 error:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nation</span><span class="op">$</span><span class="va">profile</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="va">nation</span><span class="op">$</span><span class="va">profile</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="st">"unlisted"</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   document_id  pre     keyword post   status</span></span>
-<span><span class="co">#&gt; 6    unlisted use  reusability      unlisted</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p><code>reference &lt;- bnccoca_data()</code> exposes
 <code>reference$dictionary</code> and <code>reference$resource</code>
 directly for
@@ -554,26 +537,7 @@ declared <code>nfkc_lower</code> normalization.</p>
 <span><span class="va">counts</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"selected_tokens"</span>, <span class="st">"matched_tokens"</span>,</span>
 <span>  <span class="st">"unlisted_tokens"</span>, <span class="st">"ambiguous_tokens"</span>, <span class="st">"missing_lemma_tokens"</span>,</span>
 <span>  <span class="st">"common_tokens"</span>, <span class="st">"token_coverage"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   document_id selected_tokens matched_tokens unlisted_tokens ambiguous_tokens</span></span>
-<span><span class="co">#&gt; 1      listed               4              4               0                0</span></span>
-<span><span class="co">#&gt; 2    unlisted               2              1               1                0</span></span>
-<span><span class="co">#&gt;   missing_lemma_tokens common_tokens token_coverage</span></span>
-<span><span class="co">#&gt; 1                    0             4            1.0</span></span>
-<span><span class="co">#&gt; 2                    0             1            0.5</span></span>
-<span><span class="va">counts</span><span class="op">$</span><span class="va">comparison</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"scope"</span>, <span class="st">"unit"</span>, <span class="st">"N"</span>, <span class="st">"V"</span>, <span class="st">"ttr"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;    document_id           scope    unit N  V  ttr     status</span></span>
-<span><span class="co">#&gt; 1       listed    all_selected surface 4  4 1.00   complete</span></span>
-<span><span class="co">#&gt; 2       listed    all_selected   lemma 4  3 0.75   complete</span></span>
-<span><span class="co">#&gt; 3       listed    all_selected  family 4  2 0.50   complete</span></span>
-<span><span class="co">#&gt; 4       listed common_resolved surface 4  4 1.00   complete</span></span>
-<span><span class="co">#&gt; 5       listed common_resolved   lemma 4  3 0.75   complete</span></span>
-<span><span class="co">#&gt; 6       listed common_resolved  family 4  2 0.50   complete</span></span>
-<span><span class="co">#&gt; 7     unlisted    all_selected surface 2  2 1.00   complete</span></span>
-<span><span class="co">#&gt; 8     unlisted    all_selected   lemma 2  2 1.00   complete</span></span>
-<span><span class="co">#&gt; 9     unlisted    all_selected  family 2 NA   NA incomplete</span></span>
-<span><span class="co">#&gt; 10    unlisted common_resolved surface 1  1 1.00   complete</span></span>
-<span><span class="co">#&gt; 11    unlisted common_resolved   lemma 1  1 1.00   complete</span></span>
-<span><span class="co">#&gt; 12    unlisted common_resolved  family 1  1 1.00   complete</span></span></code></pre></div>
+<span><span class="va">counts</span><span class="op">$</span><span class="va">comparison</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"scope"</span>, <span class="st">"unit"</span>, <span class="st">"N"</span>, <span class="st">"V"</span>, <span class="st">"ttr"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>For <code>use uses colour color</code>, all four occurrences are
 covered: surface, lemma, and family types are 4, 3, and 2.
 <code>colour</code> and <code>color</code> remain distinct supplied
@@ -596,9 +560,7 @@ rows.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">o</span> <span class="op">&lt;-</span> <span class="va">counts</span><span class="op">$</span><span class="va">profile</span><span class="op">$</span><span class="va">occurrences</span></span>
 <span><span class="va">o</span><span class="op">[</span><span class="va">counts</span><span class="op">$</span><span class="va">selection</span><span class="op">$</span><span class="va">selected</span> <span class="op">&amp;</span> <span class="va">o</span><span class="op">$</span><span class="va">status</span> <span class="op">!=</span> <span class="st">"matched"</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"token_index"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   document_id token_index  pre     keyword post   status</span></span>
-<span><span class="co">#&gt; 6    unlisted           2 use  reusability      unlisted</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"token_index"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>Use this subset for type counts and TTR only. Removing unresolved
 occurrences does not justify closing gaps for moving-window measures or
 n-grams. A string match is not an accuracy score, and supplementary-list
@@ -1057,11 +1019,7 @@ illustrations:</p>
 <span><span class="va">morphynet</span> <span class="op">&lt;-</span> <span class="va">morphynet_env</span><span class="op">$</span><span class="va">morphynet_example</span></span>
 <span><span class="va">morphynet</span><span class="op">$</span><span class="va">reference</span><span class="op">$</span><span class="va">relations</span><span class="op">[</span></span>
 <span>  <span class="va">morphynet</span><span class="op">$</span><span class="va">reference</span><span class="op">$</span><span class="va">relations</span><span class="op">$</span><span class="va">target_word</span> <span class="op">==</span> <span class="st">"reusability"</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"source_word"</span>, <span class="st">"target_word"</span>, <span class="st">"source_pos"</span>, <span class="st">"target_pos"</span>, <span class="st">"morpheme"</span>, <span class="st">"affix_position"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   source_word target_word source_pos target_pos morpheme affix_position</span></span>
-<span><span class="co">#&gt; 4       reuse reusability          N          N  ability         suffix</span></span>
-<span><span class="co">#&gt; 6    reusable reusability          J          N      ity         suffix</span></span>
-<span><span class="co">#&gt; 7   usability reusability          N          N       re         prefix</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"source_word"</span>, <span class="st">"target_word"</span>, <span class="st">"source_pos"</span>, <span class="st">"target_pos"</span>, <span class="st">"morpheme"</span>, <span class="st">"affix_position"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>Reusability has incoming relations from <code>reuse</code> with
 <code>ability</code>, <code>reusable</code> with <code>ity</code>, and
 <code>usability</code> with <code>re</code>. <strong>Do not count these
@@ -1080,9 +1038,7 @@ morphological derivation.</p>
 <span>    <span class="st">"candidate_count"</span>, <span class="st">"status"</span>, <span class="st">"reason"</span><span class="op">)</span><span class="op">]</span></span>
 <span>  <span class="va">morphynet</span><span class="op">$</span><span class="va">selected</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"segment_id"</span>, <span class="st">"surface"</span>, <span class="st">"source_word"</span>, <span class="st">"target_word"</span>,</span>
 <span>    <span class="st">"morpheme"</span>, <span class="st">"affix_position"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="op">}</span></span>
-<span><span class="co">#&gt;   segment_id     surface source_word target_word morpheme affix_position</span></span>
-<span><span class="co">#&gt; 1         s2 reusability    reusable reusability      ity         suffix</span></span></code></pre></div>
+<span><span class="op">}</span></span></code></pre></div>
 <p>There are five targeted occurrences. The two instances of
 <code>reusability</code> retain all three relations; the illustration
 selects <code>reusable + ity</code> for one and withholds selection for
@@ -1127,11 +1083,7 @@ by that license. See the cached
 <span><span class="va">word_rows</span> <span class="op">&lt;-</span> <span class="va">morpholex</span><span class="op">$</span><span class="va">sheets</span><span class="op">[[</span><span class="st">"0-1-1"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">word_rows</span><span class="op">[</span><span class="va">word_rows</span><span class="op">$</span><span class="va">Word</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"teacher"</span>, <span class="st">"teachers"</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Word"</span>, <span class="st">"MorphoLexSegm"</span>, <span class="st">"ROOT1_FamSize"</span>, <span class="st">"ROOT1_Freq_HAL"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;          Word MorphoLexSegm ROOT1_FamSize ROOT1_Freq_HAL</span></span>
-<span><span class="co">#&gt; 6247  teacher {(teach)}&gt;er&gt;             4          84480</span></span>
-<span><span class="co">#&gt; 6248 teachers {(teach)}&gt;er&gt;             4          84480</span></span>
-<span><span class="va">morpholex</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">data_license</span></span>
-<span><span class="co">#&gt; [1] "CC BY-NC-SA 4.0"</span></span></code></pre></div>
+<span><span class="va">morpholex</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">data_license</span></span></code></pre></div>
 <p>Tables retain character values, including identifiers and missing
 cells. Convert a numeric measure explicitly when needed, for example
 <code>as.numeric(word_rows$ROOT1_FamSize)</code>.
@@ -1152,14 +1104,7 @@ same snapshot:</p>
 <span>  sheets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0-1-0"</span>, <span class="st">"0-1-1"</span>, <span class="st">"1-1-0"</span><span class="op">)</span>,</span>
 <span>  words <span class="op">=</span> <span class="va">forms</span><span class="op">)</span></span>
 <span><span class="va">reference</span><span class="op">$</span><span class="va">analyses</span></span>
-<span><span class="co">#&gt;   analysis_id         form completeness      segmentation source_sheet</span></span>
-<span><span class="co">#&gt; 1       41878     transmit     complete      {(transmit)}        0-1-0</span></span>
-<span><span class="co">#&gt; 2       41881 transmission     complete {(transmit)}&gt;ion&gt;        0-1-1</span></span>
-<span><span class="co">#&gt; 3       43741      teacher     complete     {(teach)}&gt;er&gt;        0-1-1</span></span>
-<span><span class="co">#&gt; 4       43742     teachers     complete     {(teach)}&gt;er&gt;        0-1-1</span></span>
-<span><span class="co">#&gt; 5       41903    transport     complete   {&lt;trans&lt;(port)}        1-1-0</span></span>
 <span><span class="va">reference</span><span class="op">$</span><span class="va">unlisted_words</span> <span class="co"># absent from the selected sheets, not necessarily the workbook</span></span>
-<span><span class="co">#&gt; character(0)</span></span>
 <span><span class="va">source</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="st">"example"</span>, segment_id <span class="op">=</span> <span class="st">"s"</span>,</span>
 <span>  text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">forms</span>, collapse <span class="op">=</span> <span class="st">" "</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="st">"example"</span>, segment_id <span class="op">=</span> <span class="st">"s"</span>,</span>
@@ -1169,9 +1114,7 @@ same snapshot:</p>
 <span>    dictionary <span class="op">=</span> <span class="st">"none"</span>, dictionary_version <span class="op">=</span> <span class="st">"1"</span>, unit <span class="op">=</span> <span class="st">"word"</span>, normalization <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="va">parts_env</span><span class="op">$</span><span class="fu">word_parts_profile</span><span class="op">(</span><span class="va">imported</span>, <span class="va">reference</span><span class="op">$</span><span class="va">analyses</span>,</span>
 <span>  <span class="va">reference</span><span class="op">$</span><span class="va">parts</span>, <span class="va">reference</span><span class="op">$</span><span class="va">resource</span><span class="op">)</span></span>
-<span><span class="va">profile</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"root_occurrences"</span>, <span class="st">"affix_occurrences"</span>, <span class="st">"complete_coverage"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   root_occurrences affix_occurrences complete_coverage</span></span>
-<span><span class="co">#&gt; 1                5                 4                 1</span></span></code></pre></div>
+<span><span class="va">profile</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"root_occurrences"</span>, <span class="st">"affix_occurrences"</span>, <span class="st">"complete_coverage"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>These five source entries give five root occurrences and four affix
 occurrences. Save the complete reference/profile pair to keep both
 inputs and results:</p>
@@ -1218,26 +1161,8 @@ excerpt.</p>
 <span><span class="va">linked</span> <span class="op">&lt;-</span> <span class="va">morphology_link_example</span><span class="op">$</span><span class="va">reviewed</span></span>
 <span><span class="va">linked</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"surface"</span>, <span class="st">"family_status"</span>, <span class="st">"morpholex_lookup_status"</span>,</span>
 <span>  <span class="st">"morpholex_review_status"</span>, <span class="st">"morphynet_candidate_count"</span>, <span class="st">"morphynet_review_status"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;       surface family_status morpholex_lookup_status morpholex_review_status</span></span>
-<span><span class="co">#&gt; 1     teacher      unlisted                complete                selected</span></span>
-<span><span class="co">#&gt; 2    teachers      unlisted                complete              unresolved</span></span>
-<span><span class="co">#&gt; 3 reusability      unlisted                unlisted           no_candidates</span></span>
-<span><span class="co">#&gt; 4 reusability      unlisted                unlisted           no_candidates</span></span>
-<span><span class="co">#&gt; 5        quux      unlisted                unlisted           no_candidates</span></span>
-<span><span class="co">#&gt;   morphynet_candidate_count morphynet_review_status</span></span>
-<span><span class="co">#&gt; 1                         1              unreviewed</span></span>
-<span><span class="co">#&gt; 2                         0           no_candidates</span></span>
-<span><span class="co">#&gt; 3                         3                selected</span></span>
-<span><span class="co">#&gt; 4                         3              unresolved</span></span>
-<span><span class="co">#&gt; 5                         0           no_candidates</span></span>
 <span><span class="va">linked</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"eligible_N"</span>, <span class="st">"morpholex_selected_complete_N"</span>,</span>
-<span>  <span class="st">"reviewed_suffix_instances"</span>, <span class="st">"full_suffix_instances"</span>, <span class="st">"selected_suffix_relations"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   document_id eligible_N morpholex_selected_complete_N</span></span>
-<span><span class="co">#&gt; 1     example          5                             1</span></span>
-<span><span class="co">#&gt; 2       empty          0                             0</span></span>
-<span><span class="co">#&gt;   reviewed_suffix_instances full_suffix_instances selected_suffix_relations</span></span>
-<span><span class="co">#&gt; 1                         1                    NA                         1</span></span>
-<span><span class="co">#&gt; 2                         0                     0                         0</span></span></code></pre></div>
+<span>  <span class="st">"reviewed_suffix_instances"</span>, <span class="st">"full_suffix_instances"</span>, <span class="st">"selected_suffix_relations"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>The five occurrences include two instances of
 <code>reusability</code>. Each has three MorphyNet candidates; the
 example selects <code>reusable + ity</code> for one occurrence and
@@ -1535,54 +1460,8 @@ sophistication score.</p>
 <span><span class="co"># This manually prepared sequence illustrates only the sentence shown.</span></span>
 <span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_profile.html">tubelex_profile</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"I"</span>, <span class="st">"do"</span>, <span class="st">"n't"</span>, <span class="st">"think"</span>, <span class="st">"it"</span>, <span class="st">"'s"</span>, <span class="st">"a"</span>, <span class="st">"book"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">frequency</span><span class="op">$</span><span class="va">summary</span></span>
-<span><span class="co">#&gt;   weighting eligible_items matched_items coverage mean_zipf   sd_zipf</span></span>
-<span><span class="co">#&gt; 1     token              8             8        1  6.810781 0.6196608</span></span>
-<span><span class="co">#&gt; 2      type              8             8        1  6.810781 0.6196608</span></span>
-<span><span class="co">#&gt;   mean_video_prevalence mean_channel_prevalence</span></span>
-<span><span class="co">#&gt; 1            -0.2204532              -0.2396299</span></span>
-<span><span class="co">#&gt; 2            -0.2204532              -0.2396299</span></span>
 <span><span class="va">frequency</span><span class="op">$</span><span class="va">coverage</span></span>
-<span><span class="co">#&gt; $input_tokens</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $input_types</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $eligible_tokens</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $eligible_types</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $matched_tokens</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $unmatched_tokens</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $matched_types</span></span>
-<span><span class="co">#&gt; [1] 8</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $unmatched_types</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $token_coverage</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $type_coverage</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="va">frequency</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">formula_parameters</span></span>
-<span><span class="co">#&gt; $token_total</span></span>
-<span><span class="co">#&gt; [1] 171805865</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $source_vocabulary_size</span></span>
-<span><span class="co">#&gt; [1] 613309</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $video_total</span></span>
-<span><span class="co">#&gt; [1] 105733</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $channel_total</span></span>
-<span><span class="co">#&gt; [1] 68405</span></span></code></pre></div>
+<span><span class="va">frequency</span><span class="op">$</span><span class="va">provenance</span><span class="op">$</span><span class="va">formula_parameters</span></span></code></pre></div>
 <p>The conditional means answer: “Among terms found in this TUBELEX
 resource, what is their average frequency or prevalence?” Coverage
 answers the separate question: “How much of this text did the resource

@@ -51,12 +51,73 @@ result is useful evidence, not a universal ranking for learner writing
 or other languages.
 [Study](https://doi.org/10.1044/2015_JSLHR-L-14-0280).
 
+Zenker and Kyle (2021) examined 4,542 L2 argumentative essays at lengths
+of 50–200 tokens. MATTR and versions of MTLD were relatively stable,
+whereas TTR did not stabilize in that range. Their comparison also
+considered prompt and proficiency. This supports inspecting length and
+task together; a minimum computational length is not a universal
+precision threshold. Its moving-average MTLD variants also differ from
+this package’s forward, non-wrapping `mtld_ma`; their results do not
+validate that implementation.
+[Study](https://doi.org/10.1016/j.asw.2020.100505).
+
 Our package evaluation adds direct evidence for the implemented
 definitions in learner essays, academic assignments, general writing and
 conversation. It asks two separate questions: does a score shift as more
 of the same text is included, and does it agree across different sampled
 parts of that text? The second question matters even when the average
 score has little length dependence.
+
+## Read a TTR plot as a length-dependent description
+
+TTR is `V/N`, not a score with an inherent “higher is better”
+interpretation. These authored sequences have the same four types;
+repeating the sequence four times changes TTR from .20 to .05. The blank
+document has no TTR. This illustrates the denominator, not a finding
+about writers.
+
+``` r
+documents <- list(short = rep(letters[1:4], 5), empty = character(),
+  long = rep(letters[1:4], 20))
+ttr <- lexdiv_metrics_batch(documents, metrics = "ttr")
+local({
+  old <- par(mfrow = c(1, 2), mar = c(4.5, 4.3, 1, .5))
+  on.exit(par(old))
+  plot(ttr, cex = 1.2)
+  ok <- ttr$status == "ok" & is.finite(ttr$value)
+  plot(ttr$N[ok], ttr$value[ok], xlab = "Tokens (N)", ylab = "TTR (V/N)",
+    ylim = c(0, 1), pch = 19, col = "#0072B2", bty = "l", las = 1)
+})
+```
+
+![](choosing-metrics_files/figure-html/ttr-length-diagnostic-1.png)
+
+The left plot retains the document roster and shows `N`; “not computed”
+is not a zero. Its invisible return includes the missing row and its
+reason. The right plot checks score against length. Neither plot adjusts
+for length. With real data, distinguish tasks/registers by panels or
+symbols and retain writer IDs. A pooled association can reflect
+differences between tasks, writers or sampling conditions; it is not an
+isolated estimate of length bias. Use a controlled-length design for
+that question, as below. A blue TTR point indicates a computed value,
+not adequate sampling precision.
+
+For many documents, replace the crowded document axis with
+individual-score distributions within comparable task/length strata. Use
+points for small samples or discrete values. With sufficient continuous
+observations, overlay densities using a common bandwidth and range
+within each measure, and report the observed and missing counts beside
+them. Different density heights or overlap alone do not establish a
+group effect. Keep paired writer trajectories when the question concerns
+change; connecting unrelated documents fabricates a longitudinal
+pattern.
+
+For local variation within one text, use
+`plot(lexdiv_mattr_profile(...))` with one explicit window request.
+Adjacent windows overlap; their spread is not a confidence interval and
+their count is not an independent sample size. For lexical frequency or
+norms, see the separate [value-distribution and coverage
+example](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html#visualize-values-and-coverage-together).
 
 ## Evidence from 2,786 PELIC essays
 
@@ -114,6 +175,17 @@ eligible essays equally.
 | hdd     |    150 |  0.8095 |            2660 |              0 |
 | hdd     |    200 |  0.8124 |            2660 |              0 |
 
+For TTR, the points show medians, thick ranges the 25th–75th
+percentiles, and thin ranges the 5th–95th percentiles of the saved block
+scores. All four lengths include the same 1,330 essays and 2,660 blocks,
+with no missing TTR. These ranges describe the distribution of original
+scores, **not confidence intervals**. The downward shift cannot be
+attributed to a changing essay cohort. The samples are prefixes of the
+same blocks, so this display is not four independent groups and does not
+estimate a writer’s development.
+
+![](choosing-metrics_files/figure-html/ttr-length-distribution-1.png)
+
 The curves show the original values at each length, using a common
 bandwidth and evaluation range within each measure. MTLD-MA curves
 include only computable blocks; the missing counts above identify the
@@ -161,6 +233,15 @@ blocks.
 | mtld_ma |    200 |           1329 |  0.387 |     0.319 |     0.453 |
 | hdd     |     50 |           1330 |  0.182 |     0.121 |     0.241 |
 | hdd     |    200 |           1330 |  0.470 |     0.407 |     0.532 |
+
+The following inferential display reuses the saved estimates and
+intervals; it does not treat the blocks or overlapping windows as
+independent bootstrap units. Each panel shows the original ICC at each
+length, on the same scale. TTR is included to distinguish its strong
+length effect from its within-length sampling agreement. MTLD-MA is kept
+in the table because its usable subset changes sharply across lengths.
+
+![](choosing-metrics_files/figure-html/reliability-intervals-1.png)
 
 MATTR at 200 tokens had ICC .444 \[.373, .508\]; HD-D .470 \[.407,
 .532\]; MTLD .464 \[.402, .521\]. At 50 tokens all three were around

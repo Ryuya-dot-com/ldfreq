@@ -15,7 +15,7 @@ No resource is downloaded at runtime."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,11 +28,8 @@ No resource is downloaded at runtime."></head><body>
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -105,7 +102,7 @@ No resource is downloaded at runtime.</p>
 <span>  scale <span class="op">=</span> <span class="st">"proportion"</span>,</span>
 <span>  show_cumulative <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  include_off_list <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  bar_col <span class="op">=</span> <span class="st">"#0072B2"</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"#0072B2"</span>,</span>
 <span>  cumulative_col <span class="op">=</span> <span class="st">"#D55E00"</span>,</span>
 <span>  main <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">"New JACET 8000 frequency level"</span>,</span>
@@ -199,8 +196,8 @@ No resource is downloaded at runtime.</p>
   <dt id="arg-include-off-list">include_off_list<a class="anchor" aria-label="anchor" href="#arg-include-off-list"></a></dt>
 <dd><p>Whether to include the separate off-list bar.</p></dd>
 
-  <dt id="arg-bar-col-cumulative-col">bar_col, cumulative_col<a class="anchor" aria-label="anchor" href="#arg-bar-col-cumulative-col"></a></dt>
-<dd><p>Colors for the bars and cumulative curve.</p></dd>
+  <dt id="arg-col-cumulative-col">col, cumulative_col<a class="anchor" aria-label="anchor" href="#arg-col-cumulative-col"></a></dt>
+<dd><p>One color each for the bars and cumulative curve. The off-list bar retains its own shade.</p></dd>
 
   <dt id="arg-main-xlab-ylab">main, xlab, ylab<a class="anchor" aria-label="anchor" href="#arg-main-xlab-ylab"></a></dt>
 <dd><p>Optional base-graphics labels.</p></dd>
@@ -212,8 +209,10 @@ No resource is downloaded at runtime.</p>
 <dd><p>One <code>TRUE</code> or <code>FALSE</code> value; specify by name. Defaults to color; <code>TRUE</code> overrides bar and curve colors with gray and black. The off-list bar has a separate shade, and bars have black outlines. No title is added automatically; place figure titles and notes outside the image.</p></dd>
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>For <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>, additional arguments passed to
-  <code><a href="https://rdrr.io/r/graphics/barplot.html" class="external-link">graphics::barplot()</a></code>; for <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, additional arguments passed
+<dd><p>For <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>, cosmetic arguments passed to
+  <code><a href="https://rdrr.io/r/graphics/barplot.html" class="external-link">graphics::barplot()</a></code>. The plot uses a new, vertical, linear coordinate
+  system: <code>height</code>, <code>horiz</code>, <code>offset</code>, <code>add</code>,
+  <code>log</code> and <code>plot</code> are rejected; for <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, additional arguments passed
   to the summary-table print method.</p></dd>
 
 </dl></div>
@@ -223,7 +222,10 @@ No resource is downloaded at runtime.</p>
 proportion axis is fixed at 0–1 across documents, with unlabelled space above
 for the legend. Count plots scale to the displayed series. An undefined
 proportion (for example, no eligible terms) is not drawn as zero; inspect
-<code>coverage</code> instead. Use <code>yaxt</code> or <code>axes</code> to control the axis.
+<code>coverage</code> instead. Use <code>xaxt</code>, <code>yaxt</code> or <code>axes</code> to control the axes.
+<code>cex.axis</code>, <code>col.axis</code> and <code>font.axis</code> also apply to the
+manually drawn axes. The earlier <code>bar_col</code> argument is replaced by
+<code>col</code>; old calls receive an error explaining the new name.
 Defaults use a sans serif font, horizontal tick labels, and an open frame;
 <code>family</code>, <code>las</code> and <code>bty</code> can be overridden in <code>...</code>.</p>
 <p>Ranks 1–8000 are assigned to eight 1,000-rank levels using

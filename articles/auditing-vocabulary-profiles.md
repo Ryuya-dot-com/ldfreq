@@ -47,14 +47,7 @@ prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
 surface <- nj8_profile_batch(prepared, unit = "surface")
 audit <- nj8_diagnostics(surface)
 audit$unmatched_terms
-#>   lookup_term token_count document_count
-#> 1    students           2              2
-#> 2        jobs           2              2
 audit$coverage[, c("document_id", "eligible_tokens", "off_list_tokens", "token_coverage")]
-#>   document_id eligible_tokens off_list_tokens token_coverage
-#> 1           a               3               2      0.3333333
-#> 2           b               3               2      0.3333333
-#> 3       blank               0               0             NA
 ```
 
 `token_count` counts occurrences; `document_count` counts distinct
@@ -84,18 +77,8 @@ comparison <- data.frame(document_id = surface$coverage$document_id,
   surface_coverage = surface$coverage$token_coverage,
   lemma_coverage = lemma$coverage$token_coverage)
 comparison
-#>   document_id surface_coverage lemma_coverage
-#> 1           a        0.3333333              1
-#> 2           b        0.3333333              1
-#> 3       blank               NA             NA
 audit_lemma <- nj8_diagnostics(lemma)
 subset(audit_lemma$unit_mappings, unit_changed)
-#>   surface_term    term lookup_term matched token_count document_count
-#> 1     students student     student    TRUE           2              2
-#> 2         jobs     job         job    TRUE           2              2
-#>   unit_changed lookup_changed numeric_introduced whitespace_introduced
-#> 1         TRUE          FALSE              FALSE                 FALSE
-#> 2         TRUE          FALSE              FALSE                 FALSE
 ```
 
 The change is an answer about matching different units to the same
@@ -308,16 +291,6 @@ invisible(capture.output(sys.source(system.file("examples",
 effects <- sensitivity$result
 effects$changes[, c("document_id", "token_index", "keyword",
   "before_lemma", "after_lemma", "before_upos", "after_upos")]
-#>   document_id token_index keyword before_lemma after_lemma before_upos
-#> 1       lemma           1    cats         cats         cat        NOUN
-#> 2       lemma           2     saw          saw         see        VERB
-#> 3         pos           2     can          can         can        VERB
-#> 4     missing           2     fly         <NA>         fly        VERB
-#>   after_upos
-#> 1       NOUN
-#> 2       VERB
-#> 3        AUX
-#> 4       <NA>
 ```
 
 `pre`, `keyword` and `post` retain up to 24 Unicode characters of source
@@ -341,16 +314,6 @@ A label’s change alone is not evidence that the new label is correct.
 subset(effects$differences, document_id %in% c("lemma", "pos") &
   condition_id == "lemma_content", select = c(document_id, metric_id,
     N_before, N_after, value_before, value_after, delta, difference_status))
-#>    document_id metric_id N_before N_after value_before value_after      delta
-#> 25       lemma       ttr        3       3            1   0.6666667 -0.3333333
-#> 26       lemma     mattr        3       3            1   0.6666667 -0.3333333
-#> 27         pos       ttr        3       2            1   1.0000000  0.0000000
-#> 28         pos     mattr        3       2            1          NA         NA
-#>    difference_status
-#> 25            paired
-#> 26            paired
-#> 27            paired
-#> 28    not_computable
 ```
 
 For `we can run and jump.`, changing `can` from VERB to AUX reduces the
@@ -374,13 +337,6 @@ document_changes <- subset(effects$differences,
   condition_id == "lemma_content" & metric_id == "ttr")
 document_changes[, c("document_id", "difference_status", "missing_reason_before",
   "missing_reason_after")]
-#>    document_id difference_status missing_reason_before missing_reason_after
-#> 25       lemma            paired                  <NA>                 <NA>
-#> 27         pos            paired                  <NA>                 <NA>
-#> 29     missing            paired                  <NA>                 <NA>
-#> 31     unknown            paired                  <NA>                 <NA>
-#> 33    excluded    not_computable           empty_input          empty_input
-#> 35       empty    not_computable           empty_input          empty_input
 paired <- subset(document_changes, difference_status == "paired")
 stopifnot(nrow(document_changes) == 6L, nrow(paired) == 4L)
 
@@ -401,8 +357,6 @@ draw_values <- function(paired, monochrome = FALSE) {
 }
 draw_values(paired)
 ```
-
-![](auditing-vocabulary-profiles_files/figure-html/annotation-changes-1.png)
 
 Four of six documents have paired TTR values; `excluded` and `empty`
 remain in the displayed status table and are not plotted as zero. The
@@ -464,20 +418,6 @@ subset(effects$coverage, document_id %in% c("missing", "unknown", "empty") &
   condition_id == "lemma_content", select = c(document_id, version,
     source_tokens, selected_tokens, reference_eligible_tokens,
     selection_coverage, nj8_coverage_of_eligible, matched_fraction_of_source))
-#>    document_id version source_tokens selected_tokens reference_eligible_tokens
-#> 27     missing  before             2               1                         1
-#> 28     unknown  before             1               1                         1
-#> 30       empty  before             0               0                         0
-#> 33     missing   after             2               1                         1
-#> 34     unknown   after             1               1                         1
-#> 36       empty   after             0               0                         0
-#>    selection_coverage nj8_coverage_of_eligible matched_fraction_of_source
-#> 27                0.5                        1                        0.5
-#> 28                1.0                        0                        0.0
-#> 30                 NA                       NA                         NA
-#> 33                0.5                        1                        0.5
-#> 34                1.0                        0                        0.0
-#> 36                 NA                       NA                         NA
 ```
 
 The missing-annotation document has one selected word out of two, and
@@ -653,15 +593,7 @@ example <- lexdiv_lemmatize(example, lemmas = c("2", "two words", NA),
 example_profile <- nj8_profile(example, unit = "lemma")
 diagnostic <- nj8_diagnostics(example_profile)
 diagnostic$unit_mappings
-#>   surface_term      term lookup_term matched token_count document_count
-#> 1       second         2           2   FALSE           1              1
-#> 2     compound two words   two words   FALSE           1              1
-#>   unit_changed lookup_changed numeric_introduced whitespace_introduced
-#> 1         TRUE          FALSE               TRUE                 FALSE
-#> 2         TRUE          FALSE              FALSE                  TRUE
 diagnostic$exclusion_reasons
-#>   document_id        reason tokens
-#> 1  document_1 missing_lemma      1
 ```
 
 The numeric and whitespace flags describe changes; they do not establish
@@ -746,32 +678,8 @@ text_review <- review_example$result
 subset(text_review$metrics, metric_id == "ttr" &
   document_id %in% c("spelling", "grammar", "boundary"),
   select = c(document_id, version, N, V, value, status))
-#>    document_id           version N V value status
-#> 1     spelling          original 5 4   0.8     ok
-#> 3      grammar          original 4 4   1.0     ok
-#> 5     boundary          original 3 3   1.0     ok
-#> 13    spelling spelling_reviewed 5 3   0.6     ok
-#> 15     grammar spelling_reviewed 4 4   1.0     ok
-#> 17    boundary spelling_reviewed 3 3   1.0     ok
-#> 25    spelling   expanded_review 5 3   0.6     ok
-#> 27     grammar   expanded_review 5 5   1.0     ok
-#> 29    boundary   expanded_review 4 4   1.0     ok
 text_review$versions$expanded_review$edits[, c("document_id", "pre", "original",
   "replacement", "post", "category", "decision", "applied")]
-#>   document_id               pre original replacement              post
-#> 1    spelling                A    freind      friend     met a friend.
-#> 2     grammar          She has                    a  beautiful garden.
-#> 3    boundary           I like      alot       a lot                 .
-#> 4   real_word           I went       too          to           school.
-#> 5   uncertain          I saw a     glorp       globe         in Kyoto.
-#> 6   uncertain I saw a glorp in     Kyoto       Tokyo                 .
-#>         category   decision applied
-#> 1       spelling   approved    TRUE
-#> 2        grammar   approved    TRUE
-#> 3  word_boundary   approved    TRUE
-#> 4      real_word   approved    TRUE
-#> 5 lexical_choice unresolved   FALSE
-#> 6    proper_name   rejected   FALSE
 ```
 
 `original` applies no edits; `spelling_reviewed` applies only approved

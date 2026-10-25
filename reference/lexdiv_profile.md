@@ -64,6 +64,28 @@ lexdiv_screen(
 )
 ```
 
+## Where plans fit
+
+Use `lexdiv_methods()` to choose a method, `lexdiv_spec()` or
+`lexdiv_grid()` to declare its settings, and `lexdiv_plan()` to assemble
+the requests. Execute the plan with
+[`lexdiv_metrics`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)`(tokens, plan = plan)`
+or
+[`lexdiv_metrics_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)`(documents, plan = plan)`.
+The plan-based batch output connects to
+[`lexdiv_study_table`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md);
+[`lexdiv_widen`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md)
+retains selected values and status fields in columns. For a local curve,
+pass a MATTR-only plan and the tokens to
+[`lexdiv_mattr_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_mattr_profile.md).
+
+`lexdiv_screen_lengths()` describes which rows meet declared length
+floors without removing results. Inspect
+[`lexdiv_length_evidence`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_length_evidence.md)
+and the [metric-selection
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html)
+when deciding whether those screens suit the study.
+
 ## Arguments
 
 - scope:
@@ -310,7 +332,7 @@ profile[, c("request_id", "metric_id", "value", "status")]
 #> 2    mattr_1     mattr  0.08     ok
 #> 3    mattr_2     mattr  0.04     ok
 
-screens <- lexdiv_screen(profile)
+screens <- lexdiv_screen_lengths(profile)
 screens[, c("request_id", "screen_id", "minimum_tokens", "passes_screen")]
 #>   request_id  screen_id minimum_tokens passes_screen
 #> 1   mattr_25  tokens_50             50          TRUE

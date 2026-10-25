@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -88,8 +85,7 @@ to have different starting values and linear time slopes. The inputs are
 <strong>authored synthetic word sequences</strong>, not learner texts.
 Fitting them checks the connection between tables and a model; it
 supplies no evidence of development, proficiency or causation.</p>
-<p>This guide requires <strong>ldfreq 0.5.0.9001</strong>. The public
-functions <code><a href="../reference/lexdiv_study_table.html">lexdiv_study_table()</a></code> and
+<p>The public functions <code><a href="../reference/lexdiv_study_table.html">lexdiv_study_table()</a></code> and
 <code><a href="../reference/lexdiv_study_table.html">lexdiv_study_model_data()</a></code> use saved results from
 <code>lexdiv_metrics_batch(..., plan = plan)</code> and do not fit or
 choose a model. The table workflow needs no additional package. Only the
@@ -483,10 +479,10 @@ interpret its fitted coefficients as research findings.</p>
 <div class="section level2">
 <h2 id="report-specified-means-and-one-planned-comparison">Report specified means and one planned comparison<a class="anchor" aria-label="anchor" href="#report-specified-means-and-one-planned-comparison"></a>
 </h2>
-<p>Development <strong>0.5.0.9001</strong> adds the following optional
-reporting recipe. It uses <code>emmeans</code> and <code>pbkrtest</code>
-in addition to lme4. Install these optional packages to run it; the
-earlier table workflow does not require them.</p>
+<p>The following optional reporting recipe uses <code>emmeans</code> and
+<code>pbkrtest</code> in addition to lme4. Install these optional
+packages to run it; the earlier table workflow does not require
+them.</p>
 <p>The target is the model’s population mean MATTR10 at weeks 0, 4 and 8
 for each of the two named tasks. We also average those tasks with
 <strong>equal weights</strong>, then estimate one planned comparison:

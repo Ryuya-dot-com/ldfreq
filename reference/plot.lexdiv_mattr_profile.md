@@ -28,7 +28,8 @@ plot(
 
 - x:
 
-  A `lexdiv_mattr_profile` object.
+  The complete result of
+  [`lexdiv_mattr_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_mattr_profile.md).
 
 - request_id:
 
@@ -66,6 +67,15 @@ Invisibly, the exact window rows displayed.
 
 ## Details
 
+First calculate `lexdiv_mattr_profile(tokens, plan)` from ordered tokens
+and a MATTR-only
+[`lexdiv_plan`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
+Then call `plot(profile, request_id = ...)`. For a comparison of
+whole-document metric values, use
+[`plot.lexdiv_results`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.md)
+instead. These plots describe different units; overlapping windows are
+not independent documents.
+
 Plot defaults use a sans serif font, horizontal tick labels and an open
 frame. Override these with `family`, `las` or `bty` in the plot method's
 `...`. Cosmetic graphics parameters are restored after drawing.
@@ -76,3 +86,8 @@ as a dashed horizontal line. When a plan contains several window
 lengths, select exactly one trajectory by its `request_id`. The returned
 rows can be reused in custom graphics without parsing the displayed
 plot.
+
+## See also
+
+[From text to local curves and a saved
+analysis](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity)

@@ -41,22 +41,43 @@ started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html).
 For your own files, see [TXT-folder and CSV
 input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
 
-## Study tables and corpus exploration
+## Connect the analysis steps
 
-Development 0.4.0.9006 provides
-[`lexdiv_study_table`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md),
-[`lexdiv_study_model_data`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md),
-[`lexdiv_concordance`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
-[`lexdiv_concordance_sort`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
+For ordinary text analyses, inspect `result$results` and
+`result$token_audit`, then pass the result table to
+[`lexdiv_widen`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md)
+or plot document values with `plot(result, metric_id = "ttr")`. Save the
+original text and complete result together as RDS.
+
+For planned observations, start with token vectors and a
+[`lexdiv_plan`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
+Pass the complete output of
+[`lexdiv_metrics_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)`(tokens, plan = plan)`,
+together with the schedule, submissions and reporting decisions, to
+[`lexdiv_study_table`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md).
+Then use
+[`lexdiv_study_model_data`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+to select one response per observation for a modelling package. The
+raw-text convenience functions do not accept a plan; their result tables
+cannot replace this plan-based input.
+
+For source-linked exploration, prepare complete annotations using
+[`lexdiv_import_annotations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md).
+A saved
+[`lexdiv_concordance`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
+search feeds
+[`lexdiv_sort_concordance`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
 [`lexdiv_concordance_dispersion`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
-[`lexdiv_collocations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.md),
+[`lexdiv_collocations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.md)
+or `plot(search, query_id)`. A
 [`lexdiv_keyness`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
-and
-[`lexdiv_keyness_concordance`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
-as public functions. Their operations need no helper sourcing. Use
-`plot(search, query_id)` for saved concordance positions. Old sourced
-names and saved records remain supported; other explicitly sourced
-examples retain their documented roles.
+comparison returns to source contexts with
+[`lexdiv_keyness_concordance`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md).
+These operations use public functions without helper sourcing.
+
+See the [input-to-output connection
+map](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#connect-the-analysis-steps)
+for complete workflows and the tables to inspect at each step.
 
 ## Choose a research question
 
@@ -104,8 +125,7 @@ any optional tools.
 
 - Where do target words recur in a textbook?:
 
-  Development 0.4.0.9003 adds an explicitly sourced [textbook
-  progression
+  Use the explicitly sourced [textbook progression
   example](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.html).
   Join one saved search to ordered pages, Units and selected sections.
   Inspect counts, cumulative counts and recurrence after declared
@@ -114,7 +134,7 @@ any optional tools.
 
 - How can teachers prepare materials from reviewed examples?:
 
-  Development 0.4.0.9004 adds an explicitly sourced [DDL preparation
+  Use the explicitly sourced [DDL preparation
   example](https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.html).
   Select accepted phrase occurrences, supply activity prompts and source
   notices, and write learner HTML, a separate teacher CSV and a complete
@@ -132,13 +152,13 @@ any optional tools.
 
 - Which categorical properties co-occur in individual uses?:
 
-  Development 0.4.0.9001 adds an explicitly sourced [occurrence-MCA
+  Use the explicitly sourced [occurrence-MCA
   example](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html#occurrence-mca).
   Keep original token anchors, category definitions, incomplete-row
   exclusions, equal occurrence weights and unadjusted inertia
   diagnostics. These helpers do not select meanings or test group
-  effects. Version 0.4.0.9002 also accepts separate display labels on
-  its MCA maps, matched to the original point IDs.
+  effects. Separate display labels on MCA maps are matched to the
+  original point IDs.
 
 - Which writer/task/occasion observations entered my analysis?:
 
@@ -146,12 +166,11 @@ any optional tools.
   [From planned observations to a mixed
   model](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html).
   Inspect the submission, calculation and reporting states and model-row
-  audit; select one response specification for the model table.
-  Development 0.4.0.9005 extends this guide with specified means, one
-  planned time contrast, Kenward–Roger confidence intervals, diagnostics
-  and saved-table replay. Optional emmeans and pbkrtest support this
-  explicitly sourced reporting example; it is not an automatic
-  model-selection API.
+  audit; select one response specification for the model table. The
+  guide continues with specified means, one planned time contrast,
+  Kenward–Roger confidence intervals, diagnostics and saved-table
+  replay. Optional emmeans and pbkrtest support this explicitly sourced
+  reporting example; it is not an automatic model-selection API.
 
 - How do lexical results relate to sentence or structural descriptions?:
 
@@ -170,8 +189,9 @@ results, not only displayed tables.
 
 ## Open a guide or installed example
 
-Use the online guide links above. The compact source archive includes
-guide sources; rendered guides are published on the website separately.
+The installed package includes rendered guides. Open their local index
+with `browseVignettes("ldfreq")`, or use the online guide links above.
+The source archive also includes the guide sources.
 
 Study-table, concordance, collocation and keyness functions are exported
 and have ordinary help entries. Ordination, readability, syntax and
@@ -230,7 +250,7 @@ Choose the entry point from the form of data you already have:
 - One-token-per-row or quanteda input:
 
   Use
-  [`lexdiv_as_documents()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
+  [`lexdiv_as_documents()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_as_documents.md)
   to create the explicit named-list boundary.
 
 - A local MATTR trajectory:
@@ -552,7 +572,7 @@ writing quality.
 ## Quality screens
 
 `below_quality_floor` and
-[`lexdiv_screen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+[`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
 are advisory token-count evidence screens. Here, quality is a field name
 retained for compatibility; it does not mean writing quality,
 measurement validity, or reliability. The screens never change a value,

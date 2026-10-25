@@ -129,9 +129,6 @@ library(ldfreq)
 terms <- c("i", "do", "n't", "think", "it", "'s", "john", "'s", "book")
 profile <- tubelex_profile(terms, normalization = "identity")
 profile$summary[, c("weighting", "eligible_items", "matched_items", "coverage", "mean_zipf")]
-#>   weighting eligible_items matched_items coverage mean_zipf
-#> 1     token              9             9        1  6.601118
-#> 2      type              8             8        1  6.533295
 ```
 
 The means are conditional on matched terms. Compare frequency alongside

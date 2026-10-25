@@ -8,9 +8,9 @@ a within-document dispersion measure. It keeps the search unit, excluded
 positions and denominators visible so that a changed search can be
 explained.
 
-Use ldfreq **0.5.0.9001** and optional **quanteda \>= 4.5.0**; plotting
-also needs **ggplot2**. Install these packages before running the guide.
-Search with
+This workflow uses optional **quanteda \>= 4.5.0**; plotting also needs
+**ggplot2**. Install these packages before running the guide. Search
+with
 [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
 sort with
 [`lexdiv_sort_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),

@@ -68,7 +68,10 @@ lexdiv_study_model_data(study, condition_id, request_id,
 - study:
 
   The complete study table, optionally with multiple explicitly labelled
-  conditions.
+  conditions. Measurement values must be plain numeric vectors.
+  Observation, document, condition, request, specification, method and
+  plan IDs, and status columns, must be character vectors, not factors
+  or matrices.
 
 - request_id:
 
@@ -78,8 +81,10 @@ lexdiv_study_model_data(study, condition_id, request_id,
 - required:
 
   Unique existing metadata column names required for model rows.
-  Missing, blank or non-finite values exclude the row and remain in the
-  audit.
+  Required columns must contain one atomic value per row; factors and
+  dates are retained, while matrices and nested tables are rejected.
+  Missing, blank or non-finite values (including non-finite dates)
+  exclude the row and remain in the audit.
 
 ## Details
 
@@ -89,6 +94,21 @@ distinct. Missing values are never converted to zero. The table follows
 planned-row order, then plan request order. Empty tokens are passed to
 the public plan executor only to validate the plan and obtain request
 metadata; submitted values are not recomputed.
+
+The model-selection audit reserves `not_submitted`, `not_computable`,
+`not_reportable`, `missing_metadata` and `included`. Both functions
+reject input metadata with these names so that a column cannot mean an
+external decision in the data and a computed decision in the audit.
+Rename such metadata explicitly, for example to `source_included`; its
+values are preserved and do not automatically control model selection.
+
+When selecting model rows, submission status must be `"submitted"` or
+`"not_submitted"`; computation status must be `"ok"`, `"missing"` or
+`"not_submitted"`; reporting status must be `"report"`, `"withhold"` or
+`"not_screened"`. Unknown labels are errors, not exclusion decisions.
+Unsubmitted rows have missing document IDs and values; computed values
+are finite, and unavailable values are missing. Inconsistent records are
+rejected. These checks do not authenticate or recalculate saved scores.
 
 Model rows require submitted, computable, explicitly reportable values
 and complete required metadata. The output is not evidence of an
@@ -103,6 +123,14 @@ table layout of the previous installed example. Sourcing
 `study_model_data()` with the same arguments and return values. See
 [repeated observations
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html).
+
+For raw text, start with
+[`lexdiv_tokenize_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md),
+retain the preparation records, and extract the selected token vectors
+as shown in its help. Compute them with the explicit plan before
+constructing this table. After selection, supply `selected$data` to the
+chosen modelling function and retain `selected$audit` to account for the
+original observations.
 
 ## Value
 

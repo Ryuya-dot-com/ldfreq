@@ -411,19 +411,7 @@ sys.source(system.file("examples", "bnccoca-families.R", package = "ldfreq",
 nation <- family_env$bnccoca_example
 nation$profile$documents[c("document_id", "selected_tokens", "matched_tokens",
   "unresolved_tokens", "family_types", "family_ttr", "status")]
-#>   document_id selected_tokens matched_tokens unresolved_tokens family_types
-#> 1      listed               4              4                 0            2
-#> 2    unlisted               2              1                 1           NA
-#>   family_ttr     status
-#> 1        0.5   complete
-#> 2         NA incomplete
 nation$candidates[c("document_id", "headword", "frequency_band")]
-#>   document_id headword frequency_band
-#> 1      listed      USE              1
-#> 2      listed      USE              1
-#> 3      listed   COLOUR              1
-#> 4      listed   COLOUR              1
-#> 5    unlisted      USE              1
 ```
 
 The example explicitly uses `normalization = "nfkc_lower"`. Its first
@@ -437,8 +425,6 @@ a family or interpreting noncoverage as an error:
 ``` r
 nation$profile$occurrences[nation$profile$occurrences$status == "unlisted",
   c("document_id", "pre", "keyword", "post", "status")]
-#>   document_id  pre     keyword post   status
-#> 6    unlisted use  reusability      unlisted
 ```
 
 `reference <- bnccoca_data()` exposes `reference$dictionary` and
@@ -486,26 +472,7 @@ counts <- family_env$compare_family_counts(nation$profile)
 counts$documents[c("document_id", "selected_tokens", "matched_tokens",
   "unlisted_tokens", "ambiguous_tokens", "missing_lemma_tokens",
   "common_tokens", "token_coverage")]
-#>   document_id selected_tokens matched_tokens unlisted_tokens ambiguous_tokens
-#> 1      listed               4              4               0                0
-#> 2    unlisted               2              1               1                0
-#>   missing_lemma_tokens common_tokens token_coverage
-#> 1                    0             4            1.0
-#> 2                    0             1            0.5
 counts$comparison[c("document_id", "scope", "unit", "N", "V", "ttr", "status")]
-#>    document_id           scope    unit N  V  ttr     status
-#> 1       listed    all_selected surface 4  4 1.00   complete
-#> 2       listed    all_selected   lemma 4  3 0.75   complete
-#> 3       listed    all_selected  family 4  2 0.50   complete
-#> 4       listed common_resolved surface 4  4 1.00   complete
-#> 5       listed common_resolved   lemma 4  3 0.75   complete
-#> 6       listed common_resolved  family 4  2 0.50   complete
-#> 7     unlisted    all_selected surface 2  2 1.00   complete
-#> 8     unlisted    all_selected   lemma 2  2 1.00   complete
-#> 9     unlisted    all_selected  family 2 NA   NA incomplete
-#> 10    unlisted common_resolved surface 1  1 1.00   complete
-#> 11    unlisted common_resolved   lemma 1  1 1.00   complete
-#> 12    unlisted common_resolved  family 1  1 1.00   complete
 ```
 
 For `use uses colour color`, all four occurrences are covered: surface,
@@ -532,8 +499,6 @@ Keep unresolved occurrences available for inspection:
 o <- counts$profile$occurrences
 o[counts$selection$selected & o$status != "matched",
   c("document_id", "token_index", "pre", "keyword", "post", "status")]
-#>   document_id token_index  pre     keyword post   status
-#> 6    unlisted           2 use  reusability      unlisted
 ```
 
 Use this subset for type counts and TTR only. Removing unresolved
@@ -981,10 +946,6 @@ morphynet <- morphynet_env$morphynet_example
 morphynet$reference$relations[
   morphynet$reference$relations$target_word == "reusability",
   c("source_word", "target_word", "source_pos", "target_pos", "morpheme", "affix_position")]
-#>   source_word target_word source_pos target_pos morpheme affix_position
-#> 4       reuse reusability          N          N  ability         suffix
-#> 6    reusable reusability          J          N      ity         suffix
-#> 7   usability reusability          N          N       re         prefix
 ```
 
 Reusability has incoming relations from `reuse` with `ability`,
@@ -1007,8 +968,6 @@ if (!is.null(morphynet$reviewed)) {
   morphynet$selected[c("segment_id", "surface", "source_word", "target_word",
     "morpheme", "affix_position")]
 }
-#>   segment_id     surface source_word target_word morpheme affix_position
-#> 1         s2 reusability    reusable reusability      ity         suffix
 ```
 
 There are five targeted occurrences. The two instances of `reusability`
@@ -1057,11 +1016,7 @@ morpholex <- morpholex_data(c("0-1-1", "All roots"))
 word_rows <- morpholex$sheets[["0-1-1"]]
 word_rows[word_rows$Word %in% c("teacher", "teachers"),
   c("Word", "MorphoLexSegm", "ROOT1_FamSize", "ROOT1_Freq_HAL")]
-#>          Word MorphoLexSegm ROOT1_FamSize ROOT1_Freq_HAL
-#> 6247  teacher {(teach)}>er>             4          84480
-#> 6248 teachers {(teach)}>er>             4          84480
 morpholex$provenance$data_license
-#> [1] "CC BY-NC-SA 4.0"
 ```
 
 Tables retain character values, including identifiers and missing cells.
@@ -1085,14 +1040,7 @@ reference <- parts_env$read_morpholex_parts(
   sheets = c("0-1-0", "0-1-1", "1-1-0"),
   words = forms)
 reference$analyses
-#>   analysis_id         form completeness      segmentation source_sheet
-#> 1       41878     transmit     complete      {(transmit)}        0-1-0
-#> 2       41881 transmission     complete {(transmit)}>ion>        0-1-1
-#> 3       43741      teacher     complete     {(teach)}>er>        0-1-1
-#> 4       43742     teachers     complete     {(teach)}>er>        0-1-1
-#> 5       41903    transport     complete   {<trans<(port)}        1-1-0
 reference$unlisted_words # absent from the selected sheets, not necessarily the workbook
-#> character(0)
 source <- data.frame(document_id = "example", segment_id = "s",
   text = paste(forms, collapse = " "))
 tokens <- data.frame(document_id = "example", segment_id = "s",
@@ -1103,8 +1051,6 @@ imported <- lexdiv_import_annotations(tokens, source,
 profile <- parts_env$word_parts_profile(imported, reference$analyses,
   reference$parts, reference$resource)
 profile$documents[c("root_occurrences", "affix_occurrences", "complete_coverage")]
-#>   root_occurrences affix_occurrences complete_coverage
-#> 1                5                 4                 1
 ```
 
 These five source entries give five root occurrences and four affix
@@ -1155,26 +1101,8 @@ source(system.file("examples", "morphology-link-demo.R", package = "ldfreq"))
 linked <- morphology_link_example$reviewed
 linked$occurrences[, c("surface", "family_status", "morpholex_lookup_status",
   "morpholex_review_status", "morphynet_candidate_count", "morphynet_review_status")]
-#>       surface family_status morpholex_lookup_status morpholex_review_status
-#> 1     teacher      unlisted                complete                selected
-#> 2    teachers      unlisted                complete              unresolved
-#> 3 reusability      unlisted                unlisted           no_candidates
-#> 4 reusability      unlisted                unlisted           no_candidates
-#> 5        quux      unlisted                unlisted           no_candidates
-#>   morphynet_candidate_count morphynet_review_status
-#> 1                         1              unreviewed
-#> 2                         0           no_candidates
-#> 3                         3                selected
-#> 4                         3              unresolved
-#> 5                         0           no_candidates
 linked$documents[, c("document_id", "eligible_N", "morpholex_selected_complete_N",
   "reviewed_suffix_instances", "full_suffix_instances", "selected_suffix_relations")]
-#>   document_id eligible_N morpholex_selected_complete_N
-#> 1     example          5                             1
-#> 2       empty          0                             0
-#>   reviewed_suffix_instances full_suffix_instances selected_suffix_relations
-#> 1                         1                    NA                         1
-#> 2                         0                     0                         0
 ```
 
 The five occurrences include two instances of `reusability`. Each has
@@ -1461,54 +1389,8 @@ unqualified sophistication score.
 # This manually prepared sequence illustrates only the sentence shown.
 frequency <- tubelex_profile(c("I", "do", "n't", "think", "it", "'s", "a", "book"))
 frequency$summary
-#>   weighting eligible_items matched_items coverage mean_zipf   sd_zipf
-#> 1     token              8             8        1  6.810781 0.6196608
-#> 2      type              8             8        1  6.810781 0.6196608
-#>   mean_video_prevalence mean_channel_prevalence
-#> 1            -0.2204532              -0.2396299
-#> 2            -0.2204532              -0.2396299
 frequency$coverage
-#> $input_tokens
-#> [1] 8
-#> 
-#> $input_types
-#> [1] 8
-#> 
-#> $eligible_tokens
-#> [1] 8
-#> 
-#> $eligible_types
-#> [1] 8
-#> 
-#> $matched_tokens
-#> [1] 8
-#> 
-#> $unmatched_tokens
-#> [1] 0
-#> 
-#> $matched_types
-#> [1] 8
-#> 
-#> $unmatched_types
-#> [1] 0
-#> 
-#> $token_coverage
-#> [1] 1
-#> 
-#> $type_coverage
-#> [1] 1
 frequency$provenance$formula_parameters
-#> $token_total
-#> [1] 171805865
-#> 
-#> $source_vocabulary_size
-#> [1] 613309
-#> 
-#> $video_total
-#> [1] 105733
-#> 
-#> $channel_total
-#> [1] 68405
 ```
 
 The conditional means answer: “Among terms found in this TUBELEX

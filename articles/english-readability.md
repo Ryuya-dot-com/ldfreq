@@ -6,10 +6,9 @@ Grade Level combine these components. Keeping the counts beside the
 score lets you inspect the result before interpreting a difference
 between texts.
 
-This guide uses **ldfreq 0.3.0.9012 or later**. The helpers in
-`examples/readability.R` are explicitly sourced installed examples, not
-exported functions. They calculate the published formulas under
-**recorded counting conditions**. Automatic syllables use optional
+The helpers in `examples/readability.R` are explicitly sourced installed
+examples, not exported functions. They calculate the published formulas
+under **recorded counting conditions**. Automatic syllables use optional
 **nsyllable \>= 1.0.1** and are estimates; hand-supplied counts need no
 optional package. These examples do not establish accuracy on learner
 writing or validate a reader’s ability, a school placement, or an L2

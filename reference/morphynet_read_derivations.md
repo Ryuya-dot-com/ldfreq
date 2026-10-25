@@ -130,12 +130,4 @@ reference$relations[reference$relations$target_word == "reusability", ]
 # For a complete, separately obtained English v1 file:
 # reference <- morphynet_read_derivations("eng.derivational.v1.tsv", "en", "English v1")
 }
-#>                      relation_id source_line source_word target_word source_pos
-#> 4 morphynet:d6aae849b1a0:0000004           4       reuse reusability          N
-#> 6 morphynet:d6aae849b1a0:0000006           6    reusable reusability          J
-#> 7 morphynet:d6aae849b1a0:0000007           7   usability reusability          N
-#>   target_pos morpheme affix_position
-#> 4          N  ability         suffix
-#> 6          N      ity         suffix
-#> 7          N       re         prefix
 ```

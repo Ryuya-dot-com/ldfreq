@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -299,13 +296,85 @@ versus token weighting, missing results and sampling dependencies. The
 batch function deliberately returns document rows.</p>
 </div>
 <div class="section level2">
+<h2 id="visualize-values-and-coverage-together">Visualize values and coverage together<a class="anchor" aria-label="anchor" href="#visualize-values-and-coverage-together"></a>
+</h2>
+<p>Lexical sophistication is not one frequency scale. Kim, Crossley and
+Kyle (2018) studied several lexical and phrasal dimensions in L2
+writing; Eguchi and Kyle (2020) extended this question to oral
+interviews and found that the role of frequency can depend on task.
+Neither result supplies universal weights for a combined sophistication
+score. <a href="https://doi.org/10.1111/modl.12447" class="external-link">Writing study</a>,
+<a href="https://doi.org/10.1111/modl.12637" class="external-link">oral-interview
+study</a>.</p>
+<p>The practical plotting choice here is to keep constructs in separate
+panels with their own units, and to show which observations contribute.
+This is a design recommendation based on those distinctions, not a
+validated scoring model. Frequency, contextual range, familiarity, age
+of acquisition and n-gram association should not be placed on a single
+common axis or an automatically standardized radar chart.</p>
+<p>The following example selects <strong>familiarity and token
+weighting</strong>. Each dot on the left represents one observed token
+value; repeated values are stacked. There are too few distinct
+observations to justify a smoothed density. The right panel uses the
+same documents and distinguishes a missing reference entry from an entry
+lacking a familiarity value. Empty input has no coverage rate and
+receives no point. All numbers are authored examples.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">selected</span> <span class="op">&lt;-</span> <span class="va">profiles</span><span class="op">$</span><span class="va">summary</span><span class="op">[</span><span class="va">profiles</span><span class="op">$</span><span class="va">summary</span><span class="op">$</span><span class="va">measure_id</span> <span class="op">==</span> <span class="st">"familiarity"</span> <span class="op">&amp;</span></span>
+<span>  <span class="va">profiles</span><span class="op">$</span><span class="va">summary</span><span class="op">$</span><span class="va">weighting</span> <span class="op">==</span> <span class="st">"token"</span>, <span class="op">]</span></span>
+<span><span class="va">lookup</span> <span class="op">&lt;-</span> <span class="va">profiles</span><span class="op">$</span><span class="va">lookup</span><span class="op">[</span><span class="va">profiles</span><span class="op">$</span><span class="va">lookup</span><span class="op">$</span><span class="va">measure_id</span> <span class="op">==</span> <span class="st">"familiarity"</span>, <span class="op">]</span></span>
+<span><span class="va">values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">selected</span><span class="op">$</span><span class="va">document_id</span>, <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">lookup</span><span class="op">$</span><span class="va">value</span><span class="op">[</span><span class="va">lookup</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="va">id</span> <span class="op">&amp;</span> <span class="va">lookup</span><span class="op">$</span><span class="va">value_status</span> <span class="op">==</span> <span class="st">"observed"</span><span class="op">]</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">values</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">selected</span><span class="op">$</span><span class="va">document_id</span></span>
+<span><span class="va">labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">selected</span><span class="op">$</span><span class="va">document_id</span>, <span class="st">"\nN = "</span>, <span class="va">selected</span><span class="op">$</span><span class="va">input_units</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>  <span class="va">old</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.5</span>, <span class="fl">6.2</span>, <span class="fl">1</span>, <span class="fl">.5</span><span class="op">)</span>,</span>
+<span>    mgp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.6</span>, <span class="fl">.7</span>, <span class="fl">0</span><span class="op">)</span>, las <span class="op">=</span> <span class="fl">1</span>, bty <span class="op">=</span> <span class="st">"l"</span>, family <span class="op">=</span> <span class="st">"sans"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">old</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/stripchart.html" class="external-link">stripchart</a></span><span class="op">(</span><span class="va">values</span>, method <span class="op">=</span> <span class="st">"stack"</span>, pch <span class="op">=</span> <span class="fl">19</span>, col <span class="op">=</span> <span class="st">"#0072B2"</span>,</span>
+<span>    xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">7</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.5</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">values</span><span class="op">)</span> <span class="op">+</span> <span class="fl">.7</span><span class="op">)</span>, axes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    xlab <span class="op">=</span> <span class="st">"Familiarity (1–7 rating)"</span>, ylab <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">1</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">7</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">2</span>, at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">values</span><span class="op">)</span>, labels <span class="op">=</span> <span class="va">labels</span>, tick <span class="op">=</span> <span class="cn">FALSE</span>, cex.axis <span class="op">=</span> <span class="fl">.85</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/box.html" class="external-link">box</a></span><span class="op">(</span>bty <span class="op">=</span> <span class="st">"l"</span><span class="op">)</span></span>
+<span>  <span class="va">positions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">selected</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">selected</span><span class="op">$</span><span class="va">resource_coverage</span>, <span class="va">positions</span> <span class="op">+</span> <span class="fl">.08</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.5</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">values</span><span class="op">)</span> <span class="op">+</span> <span class="fl">.7</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">19</span>, col <span class="op">=</span> <span class="st">"#0072B2"</span>,</span>
+<span>    xlab <span class="op">=</span> <span class="st">"Proportion of input tokens"</span>, ylab <span class="op">=</span> <span class="st">""</span>, yaxt <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">selected</span><span class="op">$</span><span class="va">value_coverage</span>, <span class="va">positions</span> <span class="op">-</span> <span class="fl">.08</span>, pch <span class="op">=</span> <span class="fl">17</span>, col <span class="op">=</span> <span class="st">"#D55E00"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">2</span>, at <span class="op">=</span> <span class="va">positions</span>, labels <span class="op">=</span> <span class="va">labels</span>, tick <span class="op">=</span> <span class="cn">FALSE</span>, cex.axis <span class="op">=</span> <span class="fl">.85</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Matched"</span>, <span class="st">"Observed value"</span><span class="op">)</span>,</span>
+<span>    pch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">19</span>, <span class="fl">17</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#0072B2"</span>, <span class="st">"#D55E00"</span><span class="op">)</span>, bty <span class="op">=</span> <span class="st">"n"</span>, cex <span class="op">=</span> <span class="fl">.85</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<p><img src="corpus-reference-profiles_files/figure-html/norm-values-and-coverage-1.png" class="r-plt" alt="" width="672"></p>
+<p>Read the blank row as “no input”, not zero familiarity or coverage.
+For type weighting, deduplicate lookup terms within each document and
+use the matching type-weighted summary; changing only the panel label
+would be incorrect. The same design applies to documented word-frequency
+values, using the reference’s actual units and population. Unmatched
+words are not automatically rare, difficult or zero-frequency. Inspect
+them in <code>lookup</code> before interpreting the observed
+distribution. <code>plot(tubelex_profile(...))</code> shows match
+coverage only; it does not display frequency or provide a sophistication
+score.</p>
+<p>At corpus level, show per-document conditional estimates by
+task/register, alongside coverage and denominators. Do not pool all
+token rows and treat them as independent documents. For larger
+continuous samples, use common density bandwidths and evaluation ranges
+within each construct, and distinguish conditions by line type as well
+as color. For paired annotation/reference choices, overlay the original
+values or connect the same document’s values; do not mistake sensitivity
+to a lookup policy for lexical development.</p>
+</div>
+<div class="section level2">
 <h2 id="join-metadata-by-id-and-save-the-complete-analysis">Join metadata by ID and save the complete analysis<a class="anchor" aria-label="anchor" href="#join-metadata-by-id-and-save-the-complete-analysis"></a>
 </h2>
 <p>Metric/profile tables are long: each document contributes multiple
 rows. Join metadata by unique document ID, preserving every result row
 and its order. Additional columns in an input data frame are not
 automatically copied into the batch output.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="va">texts</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"corpus_id"</span>, <span class="st">"register"</span>, <span class="st">"participant_id"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="va">row_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">profiles</span><span class="op">$</span><span class="va">summary</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">row_index</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">anyDuplicated</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span>,</span>

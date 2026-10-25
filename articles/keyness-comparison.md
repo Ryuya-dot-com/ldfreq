@@ -6,7 +6,7 @@ collection conditions help determine what a difference means. Keyness
 describes that comparison; it does not by itself measure language
 proficiency or writing quality.
 
-This guide uses ldfreq **0.5.0.9001**. The public functions
+The public functions
 [`lexdiv_keyness()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
 and
 [`lexdiv_keyness_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)

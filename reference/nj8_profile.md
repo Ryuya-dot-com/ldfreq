@@ -54,7 +54,7 @@ plot(
   scale = "proportion",
   show_cumulative = TRUE,
   include_off_list = TRUE,
-  bar_col = "#0072B2",
+  col = "#0072B2",
   cumulative_col = "#D55E00",
   main = NULL,
   xlab = "New JACET 8000 frequency level",
@@ -163,9 +163,10 @@ plot(
 
   Whether to include the separate off-list bar.
 
-- bar_col, cumulative_col:
+- col, cumulative_col:
 
-  Colors for the bars and cumulative curve.
+  One color each for the bars and cumulative curve. The off-list bar
+  retains its own shade.
 
 - main, xlab, ylab:
 
@@ -185,9 +186,11 @@ plot(
 
 - ...:
 
-  For [`plot()`](https://rdrr.io/r/graphics/plot.default.html),
-  additional arguments passed to
-  [`graphics::barplot()`](https://rdrr.io/r/graphics/barplot.html); for
+  For [`plot()`](https://rdrr.io/r/graphics/plot.default.html), cosmetic
+  arguments passed to
+  [`graphics::barplot()`](https://rdrr.io/r/graphics/barplot.html). The
+  plot uses a new, vertical, linear coordinate system: `height`,
+  `horiz`, `offset`, `add`, `log` and `plot` are rejected; for
   [`print()`](https://rdrr.io/r/base/print.html), additional arguments
   passed to the summary-table print method.
 
@@ -197,9 +200,12 @@ Plots label every level as 1–8 and keep Off-list separate. The default
 proportion axis is fixed at 0–1 across documents, with unlabelled space
 above for the legend. Count plots scale to the displayed series. An
 undefined proportion (for example, no eligible terms) is not drawn as
-zero; inspect `coverage` instead. Use `yaxt` or `axes` to control the
-axis. Defaults use a sans serif font, horizontal tick labels, and an
-open frame; `family`, `las` and `bty` can be overridden in `...`.
+zero; inspect `coverage` instead. Use `xaxt`, `yaxt` or `axes` to
+control the axes. `cex.axis`, `col.axis` and `font.axis` also apply to
+the manually drawn axes. The earlier `bar_col` argument is replaced by
+`col`; old calls receive an error explaining the new name. Defaults use
+a sans serif font, horizontal tick labels, and an open frame; `family`,
+`las` and `bty` can be overridden in `...`.
 
 Ranks 1–8000 are assigned to eight 1,000-rank levels using
 `ceiling(rank / 1000)`. The official XLSX labels its entries as

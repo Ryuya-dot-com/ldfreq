@@ -119,10 +119,21 @@ not a content fingerprint; save the actual table, measure specifications
 and result with the original preprocessing and corpus metadata for
 reproducibility.
 
+Start with `result$summary` for document estimates, inspect
+`result$coverage`, and return to `result$lookup` to explain matches or
+missing values. Join study metadata by `document_id` while keeping
+measure, resource and weighting identities separate. These tables
+describe lexical norms; they are not the plan-based diversity result
+required by
+[`lexdiv_study_table`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md).
+The [reference-profile
+workflow](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html)
+shows prepared inputs, document summaries, plotting and saving together.
+
 ## See also
 
 [`lexdiv_norm_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile.md),
-[`lexdiv_as_documents`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md),
+[`lexdiv_as_documents`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_as_documents.md),
 [`lexdiv_tokenize_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md)
 
 ## Examples

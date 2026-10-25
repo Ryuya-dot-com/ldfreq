@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -80,15 +77,14 @@ syntactic measures: <strong>MLC = W/C</strong>, <strong>MLT =
 W/T</strong>, and <strong>DC/C</strong>. It then connects these results
 to writer, task and occasion without dropping failed or absent
 submissions.</p>
-<p>Use <strong>ldfreq 0.3.0.9013 or later</strong>. The helpers in
-<code>examples/l2sca.R</code> are explicitly sourced installed examples.
-The separate Python runner calls a locally installed, version-pinned
-original <a href="https://sites.psu.edu/xxl13/l2sca/" class="external-link">L2 Syntactic
-Complexity Analyzer (L2SCA)</a>. The original software and models are
-not bundled or downloaded by ldfreq. The runnable example below uses
-authored trees and declared matches, so it requires neither Java nor a
-model. It demonstrates tracing and arithmetic, not accuracy on learner
-writing or validity as a proficiency measure.</p>
+<p>The helpers in <code>examples/l2sca.R</code> are explicitly sourced
+installed examples. The separate Python runner calls a locally
+installed, version-pinned original <a href="https://sites.psu.edu/xxl13/l2sca/" class="external-link">L2 Syntactic Complexity
+Analyzer (L2SCA)</a>. The original software and models are not bundled
+or downloaded by ldfreq. The runnable example below uses authored trees
+and declared matches, so it requires neither Java nor a model. It
+demonstrates tracing and arithmetic, not accuracy on learner writing or
+validity as a proficiency measure.</p>
 <div class="section level2">
 <h2 id="inspect-an-example-before-running-a-parser">Inspect an example before running a parser<a class="anchor" aria-label="anchor" href="#inspect-an-example-before-running-a-parser"></a>
 </h2>

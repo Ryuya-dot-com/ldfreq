@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,11 +20,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="articles/index.html">More articles...</a></li>
   </ul></li>
@@ -54,7 +51,7 @@
 <p>From the repository root, build and check the source package:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">R</span> CMD build .</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="ex">R</span> CMD check <span class="at">--no-manual</span> ldfreq_<span class="pp">*</span>.tar.gz</span></code></pre></div>
-<p>This installs the package before running its tests. Some example recipes source other installed example files, so an uninstalled <code><a href="https://rdrr.io/pkg/testthat/man/test_package.html" class="external-link">testthat::test_local()</a></code> run does not exercise the same file lookup and can fail to locate those files. Use the installed-package check for the complete suite. When only documentation or build records change, retain earlier test evidence for unchanged code and verify the affected documents or artifacts instead of repeating the full suite.</p>
+<p>This installs the package before running its tests. Some example recipes source other installed example files, so an uninstalled <code><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">testthat::test_local()</a></code> run does not exercise the same file lookup and can fail to locate those files. Use the installed-package check for the complete suite. When only documentation or build records change, retain earlier test evidence for unchanged code and verify the affected documents or artifacts instead of repeating the full suite.</p>
 <p>Do not add production lexical resources without a separate review of source identity, redistribution rights, installed notices, package size, and failure behavior. Tests and examples must run without network access.</p>
 </div>
 </div>

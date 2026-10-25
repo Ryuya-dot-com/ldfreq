@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -78,15 +75,14 @@ how much from counting syllables? Flesch Reading Ease and Flesch–Kincaid
 Grade Level combine these components. Keeping the counts beside the
 score lets you inspect the result before interpreting a difference
 between texts.</p>
-<p>This guide uses <strong>ldfreq 0.3.0.9012 or later</strong>. The
-helpers in <code>examples/readability.R</code> are explicitly sourced
-installed examples, not exported functions. They calculate the published
-formulas under <strong>recorded counting conditions</strong>. Automatic
-syllables use optional <strong>nsyllable &gt;= 1.0.1</strong> and are
-estimates; hand-supplied counts need no optional package. These examples
-do not establish accuracy on learner writing or validate a reader’s
-ability, a school placement, or an L2 proficiency level. Only declared
-English input is supported.</p>
+<p>The helpers in <code>examples/readability.R</code> are explicitly
+sourced installed examples, not exported functions. They calculate the
+published formulas under <strong>recorded counting conditions</strong>.
+Automatic syllables use optional <strong>nsyllable &gt;= 1.0.1</strong>
+and are estimates; hand-supplied counts need no optional package. These
+examples do not establish accuracy on learner writing or validate a
+reader’s ability, a school placement, or an L2 proficiency level. Only
+declared English input is supported.</p>
 <div class="section level2">
 <h2 id="start-from-sentences-and-inspect-what-was-counted">Start from sentences and inspect what was counted<a class="anchor" aria-label="anchor" href="#start-from-sentences-and-inspect-what-was-counted"></a>
 </h2>

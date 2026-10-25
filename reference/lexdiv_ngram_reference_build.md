@@ -56,7 +56,7 @@ A plain list under experimental builder version 0.1.0:
   A standard, complete `lexdiv_ngram_reference` object usable by
   [`lexdiv_ngram_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngrams.md)
   and
-  [`lexdiv_ngram_compare()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md).
+  [`lexdiv_compare_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md).
   Count rows follow first appearance across chunks; totals follow the
   first chunk's `n` order. Different chunkings can change row order and
   hashes while retaining the same counts and profile values.
@@ -114,8 +114,10 @@ when permitted.
 ## See also
 
 [`lexdiv_ngrams`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngrams.md),
-[`lexdiv_ngram_compare`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md),
-[`lexdiv_read_masc`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_read_masc.md)
+[`lexdiv_compare_ngrams`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md),
+[`lexdiv_read_masc`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_read_masc.md),
+[build, inspect and use an n-gram
+reference](https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html).
 
 ## Examples
 
@@ -131,7 +133,7 @@ resource <- list(resource_id = "authored_chunks", resource_version = "1",
   creator = "Example author", source_reference = "Two authored sequences",
   data_license = "Project-authored example", transformation_id = "none",
   lookup_unit = "adjacent_surface_ngram", resource_key_normalization_id = "identity")
-built <- lexdiv_ngram_reference_build(names(documents), read, resource)
+built <- lexdiv_build_ngram_reference(names(documents), read, resource)
 built$reference$counts
 #>   n term1  term2  term3 count document_count
 #> 1 2  make      a   <NA>     2              2

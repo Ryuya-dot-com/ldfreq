@@ -7,15 +7,14 @@ syntactic measures: **MLC = W/C**, **MLT = W/T**, and **DC/C**. It then
 connects these results to writer, task and occasion without dropping
 failed or absent submissions.
 
-Use **ldfreq 0.3.0.9013 or later**. The helpers in `examples/l2sca.R`
-are explicitly sourced installed examples. The separate Python runner
-calls a locally installed, version-pinned original [L2 Syntactic
-Complexity Analyzer (L2SCA)](https://sites.psu.edu/xxl13/l2sca/). The
-original software and models are not bundled or downloaded by ldfreq.
-The runnable example below uses authored trees and declared matches, so
-it requires neither Java nor a model. It demonstrates tracing and
-arithmetic, not accuracy on learner writing or validity as a proficiency
-measure.
+The helpers in `examples/l2sca.R` are explicitly sourced installed
+examples. The separate Python runner calls a locally installed,
+version-pinned original [L2 Syntactic Complexity Analyzer
+(L2SCA)](https://sites.psu.edu/xxl13/l2sca/). The original software and
+models are not bundled or downloaded by ldfreq. The runnable example
+below uses authored trees and declared matches, so it requires neither
+Java nor a model. It demonstrates tracing and arithmetic, not accuracy
+on learner writing or validity as a proficiency measure.
 
 ## Inspect an example before running a parser
 

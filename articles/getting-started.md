@@ -8,33 +8,6 @@ and requires no optional package, model or download. Run the examples in
 order through **Save and resume**; the later sections cover optional
 analysis choices.
 
-## Optional reference-data setup
-
-The reference-dependent sections use separately licensed data. Review
-[the resource terms and cache
-instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
-then obtain only the resources needed for the sections you will run.
-Core calculations and examples using your own tables do not require
-these downloads.
-
-``` r
-lexdiv_resource_info(c("tubelex", "nj8"))
-# After reviewing each resource's license and notice:
-lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
-```
-
-``` r
-has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
-has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
-has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
-has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
-has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
-```
-
-Resource-dependent examples below run only when their verified data are
-already in the cache. The other examples run without downloading
-reference data.
-
 ## Your first document table
 
 Use one row per document and a unique character ID. Here two short
@@ -166,7 +139,7 @@ before selecting measures or interpreting group differences.
 ## Make a table and plot
 
 Use
-[`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
+[`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md)
 to put metrics in columns without recalculating them. Select scalar
 fields for CSV, keeping availability and word counts beside values. The
 complete `analysis` object still holds the settings and token audit.
@@ -271,8 +244,8 @@ for the next steps.
 Your first analysis is complete. Choose your next route from the
 [research-question
 map](https://ryuya-dot-com.github.io/ldfreq/index.html#choose-a-research-question),
-or the [report guide’s task
-list](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.md).
+or the [API connection
+map](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#connect-the-analysis-steps).
 Both connect required inputs to the result tables and source records you
 should inspect. In particular, reference-frequency profiles describe
 document words; keyness compares corpora, and a mixed-model table has
@@ -666,6 +639,33 @@ measure is valid for a new population. The lookup table retains the
 supplied lexical terms, so apply the same data-handling care as for the
 input.
 
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+lexdiv_resource_info(c("tubelex", "nj8"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
+```
+
+``` r
+has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
+has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
+has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
+has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
+has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
+```
+
+Resource-dependent examples below run only when their verified data are
+already in the cache. The other examples run without downloading
+reference data.
+
 ## Corpus-relative frequency with coverage
 
 [`tubelex_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md)
@@ -680,61 +680,8 @@ matched-only conditional summaries.
 # Manually prepared terms illustrate this sentence, not a general tokenizer.
 frequency <- tubelex_profile(c("I", "do", "n't", "think", "it", "'s", "a", "book"))
 frequency$summary
-#>   weighting eligible_items matched_items coverage mean_zipf   sd_zipf
-#> 1     token              8             8        1  6.810781 0.6196608
-#> 2      type              8             8        1  6.810781 0.6196608
-#>   mean_video_prevalence mean_channel_prevalence
-#> 1            -0.2204532              -0.2396299
-#> 2            -0.2204532              -0.2396299
 frequency$coverage
-#> $input_tokens
-#> [1] 8
-#> 
-#> $input_types
-#> [1] 8
-#> 
-#> $eligible_tokens
-#> [1] 8
-#> 
-#> $eligible_types
-#> [1] 8
-#> 
-#> $matched_tokens
-#> [1] 8
-#> 
-#> $unmatched_tokens
-#> [1] 0
-#> 
-#> $matched_types
-#> [1] 8
-#> 
-#> $unmatched_types
-#> [1] 0
-#> 
-#> $token_coverage
-#> [1] 1
-#> 
-#> $type_coverage
-#> [1] 1
 frequency$lookup
-#>   query_index  term lookup_term matched resource_word   count videos channels
-#> 1           1     I           i    TRUE             i 3794340  83952    50926
-#> 2           2    do          do    TRUE            do 1105372  78492    48095
-#> 3           3   n't         n't    TRUE           n't  909491  72651    44756
-#> 4           4 think       think    TRUE         think  438105  51625    32474
-#> 5           5    it          it    TRUE            it 2917104  95070    56204
-#> 6           6    's          's    TRUE            's 2400420  93407    54909
-#> 7           7     a           a    TRUE             a 3637988 101717    59211
-#> 8           8  book        book    TRUE          book   56208  12058     8921
-#>       zipf video_prevalence channel_prevalence
-#> 1 7.342551      -0.10018255        -0.12815245
-#> 2 6.806923      -0.12938784        -0.15299159
-#> 3 6.722213      -0.16297120        -0.18423958
-#> 4 6.404994      -0.31135029        -0.32355139
-#> 5 7.228367      -0.04617071        -0.08532559
-#> 6 7.143702      -0.05383470        -0.09544910
-#> 7 7.324276      -0.01682096        -0.06269081
-#> 8 5.513220      -0.94290747        -0.88463833
 ```
 
 TUBELEX is a general YouTube subtitle frequency space. Its values

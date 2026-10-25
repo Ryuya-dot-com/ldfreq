@@ -8,7 +8,7 @@ printed handout, not R. An R user prepares the search and runs the
 input/output steps; a teacher can edit the selection and activity
 tables.
 
-Use development **ldfreq 0.5.0.9001**; see the [installation
+For package setup, see the [installation
 instructions](https://ryuya-dot-com.github.io/ldfreq/index.html#install).
 `ddl_material()` and `ddl_material_write()` are installed examples to
 source explicitly, not exported functions. Construction revalidates the

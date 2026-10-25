@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -196,90 +193,6 @@ normalization is not silently mixed with lemmatization.</p>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">counts</span><span class="op">$</span><span class="va">comparison</span><span class="op">[</span><span class="va">counts</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">scope</span> <span class="op">==</span> <span class="st">"all_selected"</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"unit"</span>, <span class="st">"N"</span>, <span class="st">"V"</span>, <span class="st">"ttr"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>, col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Document"</span>, <span class="st">"Unit"</span>, <span class="st">"N"</span>, <span class="st">"V"</span>, <span class="st">"TTR"</span>, <span class="st">"Status"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Document</th>
-<th align="left">Unit</th>
-<th align="right">N</th>
-<th align="right">V</th>
-<th align="right">TTR</th>
-<th align="left">Status</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">listed</td>
-<td align="left">surface</td>
-<td align="right">4</td>
-<td align="right">4</td>
-<td align="right">1.00</td>
-<td align="left">complete</td>
-</tr>
-<tr class="even">
-<td align="left">listed</td>
-<td align="left">lemma</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">0.75</td>
-<td align="left">complete</td>
-</tr>
-<tr class="odd">
-<td align="left">listed</td>
-<td align="left">family</td>
-<td align="right">4</td>
-<td align="right">2</td>
-<td align="right">0.50</td>
-<td align="left">complete</td>
-</tr>
-<tr class="even">
-<td align="left">unlisted</td>
-<td align="left">surface</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">1.00</td>
-<td align="left">complete</td>
-</tr>
-<tr class="odd">
-<td align="left">unlisted</td>
-<td align="left">lemma</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">1.00</td>
-<td align="left">complete</td>
-</tr>
-<tr class="even">
-<td align="left">unlisted</td>
-<td align="left">family</td>
-<td align="right">2</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="left">incomplete</td>
-</tr>
-<tr class="odd">
-<td align="left">empty</td>
-<td align="left">surface</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="left">empty</td>
-</tr>
-<tr class="even">
-<td align="left">empty</td>
-<td align="left">lemma</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="left">empty</td>
-</tr>
-<tr class="odd">
-<td align="left">empty</td>
-<td align="left">family</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="left">empty</td>
-</tr>
-</tbody>
-</table>
 <p>For <code>use uses colour color</code>, <strong>four occurrences
 remain four tokens</strong>. There are four surface types, three
 supplied lemma types and two Nation families. Grouping changes the type
@@ -298,96 +211,14 @@ in USE. Empty documents have zero types and undefined TTR.</p>
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">counts</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"selected_tokens"</span>,</span>
 <span>  <span class="st">"matched_tokens"</span>, <span class="st">"unlisted_tokens"</span>, <span class="st">"common_tokens"</span>, <span class="st">"token_coverage"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  digits <span class="op">=</span> <span class="fl">2</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Document"</span>, <span class="st">"Tokens"</span>, <span class="st">"Matched"</span>, <span class="st">"Unlisted"</span>, <span class="st">"Common subset"</span>, <span class="st">"Coverage"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Document</th>
-<th align="right">Tokens</th>
-<th align="right">Matched</th>
-<th align="right">Unlisted</th>
-<th align="right">Common subset</th>
-<th align="right">Coverage</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">listed</td>
-<td align="right">4</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">1.0</td>
-</tr>
-<tr class="even">
-<td align="left">unlisted</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0.5</td>
-</tr>
-<tr class="odd">
-<td align="left">empty</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">counts</span><span class="op">$</span><span class="va">comparison</span><span class="op">[</span></span>
+<span>  col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Document"</span>, <span class="st">"Tokens"</span>, <span class="st">"Matched"</span>, <span class="st">"Unlisted"</span>, <span class="st">"Common subset"</span>, <span class="st">"Coverage"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">counts</span><span class="op">$</span><span class="va">comparison</span><span class="op">[</span></span>
 <span>  <span class="va">counts</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"unlisted"</span> <span class="op">&amp;</span></span>
 <span>    <span class="va">counts</span><span class="op">$</span><span class="va">comparison</span><span class="op">$</span><span class="va">scope</span> <span class="op">==</span> <span class="st">"common_resolved"</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unit"</span>, <span class="st">"N"</span>, <span class="st">"V"</span>, <span class="st">"ttr"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">unit</th>
-<th align="right">N</th>
-<th align="right">V</th>
-<th align="right">ttr</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">surface</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">lemma</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">family</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">o</span> <span class="op">&lt;-</span> <span class="va">families</span><span class="op">$</span><span class="va">occurrences</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unit"</span>, <span class="st">"N"</span>, <span class="st">"V"</span>, <span class="st">"ttr"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">o</span> <span class="op">&lt;-</span> <span class="va">families</span><span class="op">$</span><span class="va">occurrences</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">o</span><span class="op">[</span><span class="va">o</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="st">"unlisted"</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>, <span class="st">"status"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">document_id</th>
-<th align="left">pre</th>
-<th align="left">keyword</th>
-<th align="left">post</th>
-<th align="left">status</th>
-</tr></thead>
-<tbody><tr class="odd">
-<td align="left">unlisted</td>
-<td align="left">use</td>
-<td align="left">reusability</td>
-<td align="left"></td>
-<td align="left">unlisted</td>
-</tr></tbody>
-</table>
 <p>The common resolved subset contains only <code>use</code>: all three
 units have N = 1, V = 1 and TTR = 1. That is a result
 <strong>conditional on one retained occurrence</strong>, not the family
@@ -411,7 +242,7 @@ details</a>.</p>
 work. Its five lexical tokens are
 <code>teachers smaller reuse transmit transmission</code>. Punctuation
 remains in the imported source and is excluded from the count.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"word-parts-demo.R"</span>,</span>
 <span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">recipes</span><span class="op">)</span></span>
 <span><span class="va">parts</span> <span class="op">&lt;-</span> <span class="va">recipes</span><span class="op">$</span><span class="va">word_parts_example</span><span class="op">$</span><span class="va">profile</span></span>
@@ -481,7 +312,7 @@ derivational suffix <code>-er</code> and inflectional suffix
 describes <strong>position</strong>; inflection/derivation describes
 <strong>process</strong>. They are two classifications of the same
 affix, not four counts to add together.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">parts</span><span class="op">$</span><span class="va">frequency</span><span class="op">[</span><span class="va">parts</span><span class="op">$</span><span class="va">frequency</span><span class="op">$</span><span class="va">document_id</span> <span class="op">==</span> <span class="st">"parts"</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"part_id"</span>, <span class="st">"canonical"</span>, <span class="st">"role"</span>, <span class="st">"process"</span>, <span class="st">"observed_occurrences"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Part ID"</span>, <span class="st">"Form"</span>, <span class="st">"Position"</span>, <span class="st">"Process"</span>, <span class="st">"Occurrences"</span><span class="op">)</span>,</span>
@@ -567,7 +398,7 @@ affix, not four counts to add together.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">parts</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"selected_tokens"</span>,</span>
 <span>  <span class="st">"complete_coverage"</span>, <span class="st">"observed_affix_occurrences"</span>, <span class="st">"affix_occurrences"</span>,</span>
 <span>  <span class="st">"affixes_per_token"</span><span class="op">)</span><span class="op">]</span>, digits <span class="op">=</span> <span class="fl">2</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -617,7 +448,7 @@ affix, not four counts to add together.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Follow a count back to its original token and supplied analysis.</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">parts</span><span class="op">$</span><span class="va">part_occurrences</span><span class="op">[</span></span>
 <span>  <span class="va">parts</span><span class="op">$</span><span class="va">part_occurrences</span><span class="op">$</span><span class="va">surface</span> <span class="op">==</span> <span class="st">"teachers"</span>,</span>
@@ -734,73 +565,16 @@ analysis, coverage and contextual judgments separately.</p>
 <div class="section level3">
 <h3 id="inspect-recorded-segmentation-before-counting-it">Inspect recorded segmentation before counting it<a class="anchor" aria-label="anchor" href="#inspect-recorded-segmentation-before-counting-it"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">forms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"transmit"</span>, <span class="st">"transport"</span>, <span class="st">"transmission"</span>, <span class="st">"teacher"</span>, <span class="st">"teachers"</span><span class="op">)</span></span>
 <span><span class="va">morpholex</span> <span class="op">&lt;-</span> <span class="va">recipes</span><span class="op">$</span><span class="fu">read_morpholex_parts</span><span class="op">(</span></span>
 <span>  sheets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0-1-0"</span>, <span class="st">"0-1-1"</span>, <span class="st">"1-1-0"</span><span class="op">)</span>, words <span class="op">=</span> <span class="va">forms</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">morpholex</span><span class="op">$</span><span class="va">analyses</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"form"</span>, <span class="st">"completeness"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">form</th>
-<th align="left">completeness</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">transmit</td>
-<td align="left">complete</td>
-</tr>
-<tr class="even">
-<td align="left">transmission</td>
-<td align="left">complete</td>
-</tr>
-<tr class="odd">
-<td align="left">teacher</td>
-<td align="left">complete</td>
-</tr>
-<tr class="even">
-<td align="left">teachers</td>
-<td align="left">complete</td>
-</tr>
-<tr class="odd">
-<td align="left">transport</td>
-<td align="left">complete</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">source_words</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/morpholex_data.html">morpholex_data</a></span><span class="op">(</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">morpholex</span><span class="op">$</span><span class="va">analyses</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"form"</span>, <span class="st">"completeness"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">source_words</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/morpholex_data.html">morpholex_data</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0-1-0"</span>, <span class="st">"0-1-1"</span>, <span class="st">"1-1-0"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">sheets</span>,</span>
 <span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Word"</span>, <span class="st">"MorphoLexSegm"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">source_words</span><span class="op">[</span><span class="va">source_words</span><span class="op">$</span><span class="va">Word</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">forms</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Word"</span>, <span class="st">"MorphoLexSegm"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Word</th>
-<th align="left">MorphoLexSegm</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">transmit</td>
-<td align="left">{(transmit)}</td>
-</tr>
-<tr class="even">
-<td align="left">transmission</td>
-<td align="left">{(transmit)}&gt;ion&gt;</td>
-</tr>
-<tr class="odd">
-<td align="left">teacher</td>
-<td align="left">{(teach)}&gt;er&gt;</td>
-</tr>
-<tr class="even">
-<td align="left">teachers</td>
-<td align="left">{(teach)}&gt;er&gt;</td>
-</tr>
-<tr class="odd">
-<td align="left">transport</td>
-<td align="left">{&lt;trans&lt;(port)}</td>
-</tr>
-</tbody>
-</table>
 <p>In this reference, <code>transmit</code> is undivided,
 <code>transport</code> is <code>trans- + port</code>, and
 <code>transmission</code> uses canonical <code>transmit + -ion</code>.
@@ -820,40 +594,12 @@ local-workbook route.</p>
 <div class="section level3">
 <h3 id="keep-alternative-formation-relations-separate">Keep alternative formation relations separate<a class="anchor" aria-label="anchor" href="#keep-alternative-formation-relations-separate"></a>
 </h3>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">morphynet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/morphynet_read_derivations.html">morphynet_read_derivations</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"morphynet"</span><span class="op">)</span><span class="op">$</span><span class="va">path</span>,</span>
 <span>  <span class="st">"extdata"</span>, <span class="st">"morphynet-example"</span>, <span class="st">"eng.derivational.example.tsv"</span><span class="op">)</span>, language <span class="op">=</span> <span class="st">"en"</span>, resource_version <span class="op">=</span> <span class="st">"Nine-row teaching excerpt"</span><span class="op">)</span></span>
 <span><span class="va">r</span> <span class="op">&lt;-</span> <span class="va">morphynet</span><span class="op">$</span><span class="va">relations</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">r</span><span class="op">[</span><span class="va">r</span><span class="op">$</span><span class="va">target_word</span> <span class="op">==</span> <span class="st">"reusability"</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"source_word"</span>, <span class="st">"target_word"</span>, <span class="st">"morpheme"</span>, <span class="st">"affix_position"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">source_word</th>
-<th align="left">target_word</th>
-<th align="left">morpheme</th>
-<th align="left">affix_position</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">reuse</td>
-<td align="left">reusability</td>
-<td align="left">ability</td>
-<td align="left">suffix</td>
-</tr>
-<tr class="even">
-<td align="left">reusable</td>
-<td align="left">reusability</td>
-<td align="left">ity</td>
-<td align="left">suffix</td>
-</tr>
-<tr class="odd">
-<td align="left">usability</td>
-<td align="left">reusability</td>
-<td align="left">re</td>
-<td align="left">prefix</td>
-</tr>
-</tbody>
-</table>
 <p>The incoming relations use <code>reuse + ability</code>,
 <code>reusable + ity</code>, and <code>usability + re</code>. Three
 relations are not three affixes to sum within one occurrence. Relations
@@ -877,7 +623,7 @@ No POS or lemma is inferred.</p>
 inspection above do not. If <code>has_review</code> is false, install
 the optional package as needed and check <code><a href="https://rdrr.io/r/base/l10n_info.html" class="external-link">l10n_info()</a></code> before
 this exercise; there is no automatic environment change.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sys.source.html" class="external-link">sys.source</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples"</span>, <span class="st">"morphology-link.R"</span>,</span>
 <span>  package <span class="op">=</span> <span class="st">"ldfreq"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="va">recipes</span><span class="op">)</span></span>
 <span><span class="va">review_segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"unlisted"</span>, <span class="st">"empty"</span><span class="op">)</span>,</span>
@@ -903,37 +649,12 @@ this exercise; there is no automatic environment change.</p>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">initial</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="va">initial</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">surface</span> <span class="op">==</span> <span class="st">"reusability"</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"pre"</span>, <span class="st">"keyword"</span>, <span class="st">"post"</span>, <span class="st">"morphynet_candidate_count"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>, col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Document"</span>, <span class="st">"Left"</span>, <span class="st">"Word"</span>, <span class="st">"Right"</span>, <span class="st">"Candidates"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Document</th>
-<th align="left">Left</th>
-<th align="left">Word</th>
-<th align="left">Right</th>
-<th align="right">Candidates</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">a</td>
-<td align="left">the teacher discussed</td>
-<td align="left">reusability</td>
-<td align="left">.</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="left">b</td>
-<td align="left">the teachers questioned</td>
-<td align="left">reusability</td>
-<td align="left">.</td>
-<td align="right">3</td>
-</tr>
-</tbody>
-</table>
 <p>Record one selected MorphyNet relation and one explicit unresolved
 decision. Here selection is an <strong>authored reporting
 convention</strong>, not a claim that the sentence proves a unique
 derivation. Candidate IDs come from the reference; occurrence IDs
 distinguish the two uses of the same spelling.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">review</span> <span class="op">&lt;-</span> <span class="va">initial</span><span class="op">$</span><span class="va">reviews</span><span class="op">$</span><span class="va">morphynet</span></span>
 <span><span class="va">decisions</span> <span class="op">&lt;-</span> <span class="va">review</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="va">review</span><span class="op">$</span><span class="va">occurrences</span><span class="op">$</span><span class="va">surface</span> <span class="op">==</span> <span class="st">"reusability"</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"review_id"</span>, <span class="st">"occurrence_id"</span><span class="op">)</span><span class="op">]</span></span>
@@ -953,69 +674,11 @@ distinguish the two uses of the same spelling.</p>
 <span>  <span class="va">review_morpholex</span>, <span class="va">morphynet</span>, morphynet_decisions <span class="op">=</span> <span class="va">submitted</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">linked</span><span class="op">$</span><span class="va">reviewed_relations</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"surface"</span>,</span>
 <span>  <span class="st">"source_word"</span>, <span class="st">"target_word"</span>, <span class="st">"morpheme"</span>, <span class="st">"affix_position"</span><span class="op">)</span><span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Document"</span>, <span class="st">"Word"</span>, <span class="st">"Source"</span>, <span class="st">"Target"</span>, <span class="st">"Morpheme"</span>, <span class="st">"Position"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Document</th>
-<th align="left">Word</th>
-<th align="left">Source</th>
-<th align="left">Target</th>
-<th align="left">Morpheme</th>
-<th align="left">Position</th>
-</tr></thead>
-<tbody><tr class="odd">
-<td align="left">a</td>
-<td align="left">reusability</td>
-<td align="left">reusable</td>
-<td align="left">reusability</td>
-<td align="left">ity</td>
-<td align="left">suffix</td>
-</tr></tbody>
-</table>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">linked</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"eligible_N"</span>,</span>
+<span>  col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Document"</span>, <span class="st">"Word"</span>, <span class="st">"Source"</span>, <span class="st">"Target"</span>, <span class="st">"Morpheme"</span>, <span class="st">"Position"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">linked</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"eligible_N"</span>,</span>
 <span>  <span class="st">"morphynet_selected_N"</span>, <span class="st">"morphynet_unresolved_N"</span>, <span class="st">"selected_suffix_relations"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  row.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Document"</span>, <span class="st">"Eligible tokens"</span>, <span class="st">"Selected"</span>, <span class="st">"Unresolved"</span>, <span class="st">"Suffix relations"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Document</th>
-<th align="right">Eligible tokens</th>
-<th align="right">Selected</th>
-<th align="right">Unresolved</th>
-<th align="right">Suffix relations</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">a</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">b</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">unlisted</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">empty</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-</tr>
-</tbody>
-</table>
 <p>Only the selected occurrence contributes one suffix
 <strong>relation</strong>. The second occurrence stays unresolved; all
 other candidates stay unreviewed. Nation membership is unchanged.
@@ -1033,7 +696,7 @@ and pass its returned decisions to the corresponding
 argument. Decisions replace the supplied decision set; resume from the
 latest saved set to retain earlier choices. Changed sources or
 references require a new review.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">initial</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>,</span>
 <span>  <span class="st">"token_index"</span>, <span class="st">"surface"</span>, <span class="st">"family_id"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  <span class="va">linked</span><span class="op">$</span><span class="va">occurrences</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"token_index"</span>, <span class="st">"surface"</span>, <span class="st">"family_id"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -1055,7 +718,7 @@ documents in the segment table. Check alignment with the <a href="annotation-ali
 the teaching example. Declare the actual analyzer/dictionary versions.
 Lemma-based comparisons require a supplied lemma column; missing values
 are not guessed.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"segments.csv"</span>, colClasses <span class="op">=</span> <span class="st">"character"</span>,</span>
 <span>  na.strings <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, fileEncoding <span class="op">=</span> <span class="st">"UTF-8"</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"tokens.csv"</span>, colClasses <span class="op">=</span> <span class="st">"character"</span>,</span>
@@ -1082,7 +745,7 @@ membership nor observed use establishes learner knowledge.</p>
 executable example uses a temporary directory; choose a persistent
 project directory for your research. If the optional review was skipped,
 <code>linked</code> is <code>NULL</code>.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"ldfreq-morphology-tutorial"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">output_dir</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">bundle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>families <span class="op">=</span> <span class="va">families</span>, counts <span class="op">=</span> <span class="va">counts</span>, nation <span class="op">=</span> <span class="va">nation</span>,</span>
@@ -1106,7 +769,7 @@ package version and replace the path below with the saved RDS path. This
 reloads the helpers from the installed package; it does not require the
 earlier example objects. Replaying a saved optional review also requires
 quanteda and UTF-8.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
 <span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"results"</span>, <span class="st">"morphology"</span>, <span class="st">"analysis.rds"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">recipes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">new.env</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">baseenv</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>

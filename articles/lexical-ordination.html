@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -80,16 +77,15 @@ also called principal coordinates analysis or PCoA) represents a chosen
 set of document dissimilarities. The choice of dissimilarity defines
 what “similar” means; a map does not establish semantic similarity,
 proficiency, a causal effect, or a statistically significant group.</p>
-<p>This guide uses <strong>ldfreq 0.3.0.9018 or later</strong>. Its
-helpers are explicitly sourced installed examples, not exported
-functions. MDS uses R’s <code><a href="https://rdrr.io/r/stats/cmdscale.html" class="external-link">stats::cmdscale()</a></code>; CA requires the
-optional <code>ca</code> package (<code>install.packages("ca")</code>).
-No new tokenizer or model is needed. The example uses authored counts to
-make the calculations checkable, not empirical learner differences.</p>
-<p>The <a href="#occurrence-mca">occurrence-MCA example</a> requires
-<strong>0.5.0.9001</strong>, not stable 0.4.0. It describes several
-nominal variables coded for each original occurrence, rather than a
-document-by-term frequency table.</p>
+<p>The helpers in this guide are explicitly sourced installed examples,
+not exported functions. MDS uses R’s <code><a href="https://rdrr.io/r/stats/cmdscale.html" class="external-link">stats::cmdscale()</a></code>; CA
+requires the optional <code>ca</code> package
+(<code>install.packages("ca")</code>). No new tokenizer or model is
+needed. The example uses authored counts to make the calculations
+checkable, not empirical learner differences.</p>
+<p>The <a href="#occurrence-mca">occurrence-MCA example</a> describes
+several nominal variables coded for each original occurrence, rather
+than a document-by-term frequency table.</p>
 <div class="section level2">
 <h2 id="begin-with-the-counted-documents">Begin with the counted documents<a class="anchor" aria-label="anchor" href="#begin-with-the-counted-documents"></a>
 </h2>

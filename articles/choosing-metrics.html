@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -175,12 +172,66 @@ strongly than D and Maas with respect to length-related method variance.
 These were monolingual adult spoken samples in four discourse tasks, so
 that result is useful evidence, not a universal ranking for learner
 writing or other languages. <a href="https://doi.org/10.1044/2015_JSLHR-L-14-0280" class="external-link">Study</a>.</p>
+<p>Zenker and Kyle (2021) examined 4,542 L2 argumentative essays at
+lengths of 50–200 tokens. MATTR and versions of MTLD were relatively
+stable, whereas TTR did not stabilize in that range. Their comparison
+also considered prompt and proficiency. This supports inspecting length
+and task together; a minimum computational length is not a universal
+precision threshold. Its moving-average MTLD variants also differ from
+this package’s forward, non-wrapping <code>mtld_ma</code>; their results
+do not validate that implementation. <a href="https://doi.org/10.1016/j.asw.2020.100505" class="external-link">Study</a>.</p>
 <p>Our package evaluation adds direct evidence for the implemented
 definitions in learner essays, academic assignments, general writing and
 conversation. It asks two separate questions: does a score shift as more
 of the same text is included, and does it agree across different sampled
 parts of that text? The second question matters even when the average
 score has little length dependence.</p>
+</div>
+<div class="section level2">
+<h2 id="read-a-ttr-plot-as-a-length-dependent-description">Read a TTR plot as a length-dependent description<a class="anchor" aria-label="anchor" href="#read-a-ttr-plot-as-a-length-dependent-description"></a>
+</h2>
+<p>TTR is <code>V/N</code>, not a score with an inherent “higher is
+better” interpretation. These authored sequences have the same four
+types; repeating the sequence four times changes TTR from .20 to .05.
+The blank document has no TTR. This illustrates the denominator, not a
+finding about writers.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>short <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span>, empty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  long <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ttr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics_batch</a></span><span class="op">(</span><span class="va">documents</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>  <span class="va">old</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4.5</span>, <span class="fl">4.3</span>, <span class="fl">1</span>, <span class="fl">.5</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">old</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ttr</span>, cex <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
+<span>  <span class="va">ok</span> <span class="op">&lt;-</span> <span class="va">ttr</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="st">"ok"</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">ttr</span><span class="op">$</span><span class="va">value</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ttr</span><span class="op">$</span><span class="va">N</span><span class="op">[</span><span class="va">ok</span><span class="op">]</span>, <span class="va">ttr</span><span class="op">$</span><span class="va">value</span><span class="op">[</span><span class="va">ok</span><span class="op">]</span>, xlab <span class="op">=</span> <span class="st">"Tokens (N)"</span>, ylab <span class="op">=</span> <span class="st">"TTR (V/N)"</span>,</span>
+<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">19</span>, col <span class="op">=</span> <span class="st">"#0072B2"</span>, bty <span class="op">=</span> <span class="st">"l"</span>, las <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<p><img src="choosing-metrics_files/figure-html/ttr-length-diagnostic-1.png" class="r-plt" alt="" width="672"></p>
+<p>The left plot retains the document roster and shows <code>N</code>;
+“not computed” is not a zero. Its invisible return includes the missing
+row and its reason. The right plot checks score against length. Neither
+plot adjusts for length. With real data, distinguish tasks/registers by
+panels or symbols and retain writer IDs. A pooled association can
+reflect differences between tasks, writers or sampling conditions; it is
+not an isolated estimate of length bias. Use a controlled-length design
+for that question, as below. A blue TTR point indicates a computed
+value, not adequate sampling precision.</p>
+<p>For many documents, replace the crowded document axis with
+individual-score distributions within comparable task/length strata. Use
+points for small samples or discrete values. With sufficient continuous
+observations, overlay densities using a common bandwidth and range
+within each measure, and report the observed and missing counts beside
+them. Different density heights or overlap alone do not establish a
+group effect. Keep paired writer trajectories when the question concerns
+change; connecting unrelated documents fabricates a longitudinal
+pattern.</p>
+<p>For local variation within one text, use
+<code>plot(lexdiv_mattr_profile(...))</code> with one explicit window
+request. Adjacent windows overlap; their spread is not a confidence
+interval and their count is not an independent sample size. For lexical
+frequency or norms, see the separate <a href="corpus-reference-profiles.html#visualize-values-and-coverage-together">value-distribution
+and coverage example</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="evidence-from-2786-pelic-essays">Evidence from 2,786 PELIC essays<a class="anchor" aria-label="anchor" href="#evidence-from-2786-pelic-essays"></a>
@@ -388,6 +439,15 @@ weight eligible essays equally.</p>
 </tr>
 </tbody>
 </table>
+<p>For TTR, the points show medians, thick ranges the 25th–75th
+percentiles, and thin ranges the 5th–95th percentiles of the saved block
+scores. All four lengths include the same 1,330 essays and 2,660 blocks,
+with no missing TTR. These ranges describe the distribution of original
+scores, <strong>not confidence intervals</strong>. The downward shift
+cannot be attributed to a changing essay cohort. The samples are
+prefixes of the same blocks, so this display is not four independent
+groups and does not estimate a writer’s development.</p>
+<p><img src="choosing-metrics_files/figure-html/ttr-length-distribution-1.png" class="r-plt" alt="" width="576"></p>
 <p>The curves show the original values at each length, using a common
 bandwidth and evaluation range within each measure. MTLD-MA curves
 include only computable blocks; the missing counts above identify the
@@ -511,6 +571,14 @@ writer’s ability, nor reliability of an average of two blocks.</p>
 </tr>
 </tbody>
 </table>
+<p>The following inferential display reuses the saved estimates and
+intervals; it does not treat the blocks or overlapping windows as
+independent bootstrap units. Each panel shows the original ICC at each
+length, on the same scale. TTR is included to distinguish its strong
+length effect from its within-length sampling agreement. MTLD-MA is kept
+in the table because its usable subset changes sharply across
+lengths.</p>
+<p><img src="choosing-metrics_files/figure-html/reliability-intervals-1.png" class="r-plt" alt="" width="672"></p>
 <p>MATTR at 200 tokens had ICC .444 [.373, .508]; HD-D .470 [.407,
 .532]; MTLD .464 [.402, .521]. At 50 tokens all three were around
 .14–.18. Thus, <strong>small mean length effects do not justify precise
@@ -544,7 +612,7 @@ selected subset. For this reason MTLD-MA is opt-in and is not
 recommended as the sole outcome for short responses. Reducing its
 minimum factor length to rescue missing values would change the
 method.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">]</span>, <span class="fl">8</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics</a></span><span class="op">(</span><span class="va">tokens</span>, metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mtld"</span>, <span class="st">"mtld_ma"</span><span class="op">)</span><span class="op">)</span><span class="op">[</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"metric_id"</span>, <span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"diagnostics"</span><span class="op">)</span><span class="op">]</span></span>

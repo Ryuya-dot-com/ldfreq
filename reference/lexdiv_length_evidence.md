@@ -32,6 +32,16 @@ particular, the evidence table does not assert that Gramulator, TAALED,
 or another package's MTLD implementation is numerically identical to the
 defined target method.
 
+Use these records to interpret advisory flags and
+[`lexdiv_screen_lengths`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md),
+not to choose a measure from a token cutoff alone. The [metric-selection
+guide](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html)
+also reports the package's corpus comparisons, length sensitivity and
+sampling agreement. Those aggregate results are not all contained in
+this small evidence table. Compute the chosen measure with
+[`lexdiv_metrics`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
+using settings justified for the question and material.
+
 ## Examples
 
 ``` r

@@ -48,6 +48,7 @@
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_align_annotations.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ambiguity_review.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_amod_pairs.html</loc></url>
+<url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_as_documents.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_ambiguity.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_annotations.html</loc></url>
@@ -79,11 +80,13 @@
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.html</loc></url>
+<url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/morpholex_data.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/morphynet_read_derivations.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/nj8_diagnostics.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/nj8_profile.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_mattr_profile.html</loc></url>
+<url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_diagnostics.html</loc></url>
 <url><loc>https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.html</loc></url>
 </urlset>

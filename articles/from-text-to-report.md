@@ -7,60 +7,60 @@ started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.md).
 For importing a single TXT file or CSV, use the [file-input
 walkthrough](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#import-text-files).
 
-Choose the task you need:
+## Connect the analysis steps
 
-- [Compare English case choices](#compare-english-case-from-files) or
-  [Japanese word selections](#compare-japanese-pos-from-files): run the
-  shared setup below, then the relevant language path and the saving
-  section. The Japanese path also [connects the same counted occurrences
-  to search](#counted-source-occurrences).
-- [Describe frequency or vocabulary
-  levels](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html#corpus-relative-frequency-with-coverage):
-  inspect resource matches and token/type coverage with each summary.
-  Use [the vocabulary
-  audit](https://ryuya-dot-com.github.io/ldfreq/articles/auditing-vocabulary-profiles.md)
-  to explain unmatched forms, or [corpus reference
-  profiles](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.md)
-  for your own norm table. A reference profile describes document words;
-  keyness below compares two declared corpora.
-- [Compare families, roots and
-  affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.md):
-  supply complete annotations and an inventory, then read shared
-  occurrences, unresolved words and coverage. Counts on the resolved
-  subset do not replace whole-document counts.
-- [Join study information and summarize documents](#study-metadata): use
-  the saved file-analysis results from those paths; the section names
-  its required objects.
-- [Retain scheduled observations and prepare a mixed
-  model](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.md):
-  distinguish absent submissions from unavailable scores, select one
-  specification, and save the model’s observation IDs and exclusion
-  reasons.
-- [Extract saved MTLD diagnostics into a wide
-  table](#wide-mtld-diagnostics): use
-  `lexdiv_widen(..., mtld_diagnostics = TRUE)` with ldfreq 0.3.0.9004 or
-  later. The earlier helper supports long diagnostic tables and older
-  installations; a custom function is not required just to inspect a
-  first result.
-- [Explain corpus differences with words and
-  contexts](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.md):
-  inspect counts and reference denominators, then return to the counted
-  occurrences.
-  [Collocation](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.md)
-  and [concordance and
-  dispersion](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.md)
-  answer related questions about nearby words and positions.
-  Corpus-level statistics are not independent writer-level observations.
-- [Inspect
-  readability](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.md)
-  or [syntactic
-  complexity](https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.md)
-  alongside lexical results: match the original texts and document IDs,
-  retaining each workflow’s word, sentence, syllable or structure counts
-  and review decisions separately. A shared document ID does not
-  establish a shared denominator.
-- [Plot local vocabulary diversity](#plot-local-vocabulary-diversity): a
-  separate complete example includes its own input text and setup.
+Start from the question and the input you actually have. For an English
+text table,
+`analysis <- lexdiv_metrics_text_batch(texts, tokenizer = "english", ...)`
+retains both calculated rows and the token audit. Inspect
+`analysis$results` and `analysis$token_audit`, use
+`lexdiv_widen(analysis$results)` for a report table or
+`plot(analysis, metric_id = "mattr")` for document values, then save the
+original texts and the complete `analysis` together. A wide table is a
+view of the results, not a replacement for the saved analysis.
+
+The related routes share document or occurrence IDs, but require
+different inputs. Follow the linked example for the complete arguments
+and any optional packages; the arrows below show which result feeds the
+next step.
+
+| Question and starting input | Function connection | Read before reporting |
+|----|----|----|
+| How do counting choices affect the same texts? Document IDs and source text | [`lexdiv_metrics_text_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md) → `$results` → [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md) / [`plot()`](https://rdrr.io/r/graphics/plot.default.html). [English file comparison](#compare-english-case-from-files); [Japanese selections](#compare-japanese-pos-from-files) start from annotations instead. | Counts, unavailable scores, token audit and original text. [Join study metadata](#study-metadata) without dropping documents. |
+| Which planned observations enter a model? Selected token vectors, measurement plan, schedule, submissions and reporting decisions | `lexdiv_metrics_batch(..., plan = plan)` → [`lexdiv_study_table()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md) → [`lexdiv_study_model_data()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md). [Study example](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.md). | One response specification per observation, plus included IDs and exclusion reasons. The selected data can go to an existing modelling package. |
+| How frequent or familiar are a document’s words? Prepared terms and an identified norm table | [`lexdiv_norm_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile_batch.md) → `$lookup`, `$coverage` and `$summary`. [Own reference table](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.md); [TUBELEX / NJ8](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html#corpus-relative-frequency-with-coverage). | Matching words, unmatched words, weighting and the population behind the reference. Coverage accompanies each summary. |
+| How does word formation change the counts? Complete annotations and a declared inventory | [`lexdiv_family_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_family_profile.md) → `$documents`, `$members` and `$occurrences`. [Families, roots and affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.md). | Resolved and unresolved occurrences; distinguish whole-document values from counts on the resolved subset. |
+| Where and with which words does a phrase occur? Complete source-aligned annotations | [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md) → [`lexdiv_sort_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md), [`lexdiv_concordance_dispersion()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md), [`plot()`](https://rdrr.io/r/graphics/plot.default.html) or [`lexdiv_collocations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.md). [Search and positions](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.md); [collocation](https://ryuya-dot-com.github.io/ldfreq/articles/collocation-association.md). | The same saved occurrences, zero-match documents and search or pair-opportunity denominators. |
+| Which words distinguish two corpora? Complete annotations and explicit target/reference document IDs | [`lexdiv_keyness()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md) → [`lexdiv_keyness_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md). [Corpus comparison](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.md). | Corpus counts and denominators, then the original uses of a selected word. |
+
+The model route specifically needs the complete **plan-based batch
+result**.
+[`lexdiv_metrics_text_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md)
+does not accept `plan`, and its `$results` is not a substitute for that
+input. Prepare the token vectors first and follow the study example.
+Norm summaries and corpus-level keyness statistics also have different
+meanings: do not copy a corpus score into writer rows as independent
+observations. A shared document ID does not establish a shared
+denominator.
+
+To explain a score using its source occurrences, the [Japanese
+comparison](#counted-source-occurrences) uses the same complete
+annotations and selection masks for calculation and search. For a local
+MATTR curve, use the [self-contained window
+example](#plot-local-vocabulary-diversity). For saved MTLD components,
+[widen the diagnostics](#wide-mtld-diagnostics) without recalculating
+the metric.
+
+[Readability](https://ryuya-dot-com.github.io/ldfreq/articles/english-readability.md),
+[syntactic
+complexity](https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.md)
+and
+[ordination](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.md)
+use explicitly sourced installed recipes, with preparation and
+dependencies described in their guides. Link their outputs by source and
+document ID while retaining their own counts and assumptions. They are
+separate branches, not additional inputs to
+[`lexdiv_study_table()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md).
 
 ## Optional reference-data setup
 
@@ -88,10 +88,10 @@ reference data.
 ## Compare analysis conditions from local files
 
 Start here to turn your own files into a table you can inspect, save and
-report. The two core file-analysis paths work with ldfreq 0.3.0.9002,
-without new packages, downloads or an API key. English text is tokenized
-in R. Japanese text uses prepared annotations: importing a file does not
-perform Japanese morphological analysis.
+report. The two core file-analysis paths need no optional packages,
+downloads or API key. English text is tokenized in R. Japanese text uses
+prepared annotations: importing a file does not perform Japanese
+morphological analysis.
 
 The question is **how a declared counting decision changes the same
 documents**. For English we preserve or lowercase spelling; for Japanese
@@ -680,7 +680,7 @@ stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 #> 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.
 #> 
-#> Calculations used ldfreq 0.5.1: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
+#> Calculations used ldfreq 1.0.0: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
 ```
 
 The CSV is a flat inspection table; **the RDS is the complete analysis
@@ -717,10 +717,9 @@ If an analysis was created with
 `lexdiv_metrics_text_batch(..., metadata = study)`, its `$metadata`
 component already contains the ID-checked, input-ordered study table.
 Use that table below; see the [metadata input
-example](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#retain-study-metadata)
-(0.3.0.9005 or later). The Japanese imported-token path above has a
-different input format and continues to use the explicit join shown
-here.
+example](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.html#retain-study-metadata).
+The Japanese imported-token path above has a different input format and
+continues to use the explicit join shown here.
 
 ``` r
 join_study_metadata <- function(rows, metadata) {
@@ -1202,16 +1201,7 @@ levels <- nj8_profile_batch(prepared, unit = "surface")
 print(levels$coverage[, c(
   "document_id", "eligible_tokens", "matched_tokens", "token_coverage", "type_coverage"
 )])
-#>   document_id eligible_tokens matched_tokens token_coverage type_coverage
-#> 1       first              12             10      0.8333333     0.7777778
-#> 2      second              12              9      0.7500000     0.7272727
 levels$lookup[!levels$lookup$matched, c("document_id", "term")]
-#>    document_id      term
-#> 3        first     reads
-#> 7        first discusses
-#> 15      second  explores
-#> 19      second    shares
-#> 21      second     ideas
 ```
 
 The unmatched rows show which surface forms contribute to off-list
@@ -1234,18 +1224,17 @@ stopifnot(isTRUE(all.equal(
 plot(nj8_profile(prepared[[1]], unit = "surface"), weighting = "token")
 ```
 
-![](from-text-to-report_files/figure-html/unnamed-chunk-4-1.png)
-
 ## Produce an analysis table and inspect it
 
 ### Extract MTLD diagnostics into ordinary columns
 
-With **ldfreq 0.3.0.9004 or later**, the English results already
-calculated above can be widened with their MTLD diagnostics. No
-tokenization or metric calculation is repeated. This is convenient for
-spreadsheets or statistical models that expect one scalar per cell. The
-guide’s earlier `diagnostic_rows()` helper remains useful for long
-tables and older installations.
+The English results already calculated above can be widened with their
+MTLD diagnostics using
+[`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md).
+No tokenization or metric calculation is repeated. This is convenient
+for spreadsheets or statistical models that expect one scalar per cell.
+The guide’s earlier `diagnostic_rows()` helper provides the
+corresponding long tables.
 
 ``` r
 en_wide <- lexdiv_widen(en_runs$lower,
@@ -1302,7 +1291,7 @@ support; they do not establish an automatic exclusion rule.
 
 ### Join vocabulary coverage by document ID
 
-[`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
+[`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_widen.md)
 retains each metric’s definition, parameters, and counts. Its checks
 prevent different MATTR windows from entering one metric column as if
 they were the same specification. Coverage is then joined by explicit
@@ -1317,7 +1306,7 @@ if (!is.null(levels)) {
   analysis$nj8_surface_type_coverage <- coverage$type_coverage
 }
 print(analysis, digits = 3)
-#> <lexdiv_wide_results: 2 rows; 25 columns>
+#> <lexdiv_wide_results: 2 rows; 23 columns>
 #>   document_id ttr__value ttr__status ttr__missing_reason  ttr__method_id
 #> 1       first      0.750          ok                <NA> ttr_v_over_n_v1
 #> 2      second      0.917          ok                <NA> ttr_v_over_n_v1
@@ -1339,9 +1328,6 @@ print(analysis, digits = 3)
 #>   mattr__requested_parameters mattr__effective_parameters mattr__N mattr__V
 #> 1                          10                          10       12        9
 #> 2                          10                          10       12       11
-#>   nj8_surface_token_coverage nj8_surface_type_coverage
-#> 1                      0.833                     0.778
-#> 2                      0.750                     0.727
 plot(metrics, metric_id = "mattr")
 ```
 
@@ -1648,14 +1634,7 @@ saveRDS(record, path)
 stopifnot(identical(readRDS(path), record))
 unlink(path)
 levels$provenance[c("resource_version", "resource_cached", "resource_citation")]
-#> $resource_version
-#> [1] "jacet2016-8000-v1"
-#> 
-#> $resource_cached
-#> [1] TRUE
-#> 
-#> $resource_citation
-#> [1] "JACET Basic Word Revision Committee (Ed.). (2016). The New JACET List of 8000 Basic Words. Tokyo: Kirihara Shoten."
+#> NULL
 ```
 
 A methods statement for this example could read:

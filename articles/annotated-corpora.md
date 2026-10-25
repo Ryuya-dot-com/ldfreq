@@ -382,11 +382,10 @@ and its context. Similarly, the authored Japanese examples distinguish
 hindering a plan from physically pulling a doll’s leg. The search finds
 both; it does not make that contextual judgment.
 
-From development version **0.3.0.9003**, the explicitly sourced
-`phrase_list_review()` helper connects the existing phrase search to a
-complete decision worksheet. It is not an exported package API. Install
-that version or later using the [installation
-instructions](https://ryuya-dot-com.github.io/ldfreq/#installation), and
+The explicitly sourced `phrase_list_review()` helper connects the
+existing phrase search to a complete decision worksheet. It is not an
+exported package API. Follow the [installation
+instructions](https://ryuya-dot-com.github.io/ldfreq/#installation) and
 use optional quanteda \>= 4.5.0 in a UTF-8 R session. The standalone
 example runs offline, without a corpus, model or API key:
 

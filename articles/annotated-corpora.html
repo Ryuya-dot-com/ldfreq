@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -136,11 +133,11 @@ punctuation policy for all corpora or tagsets.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $segment_2</span></span>
 <span><span class="co">#&gt; [1] "We" "go" ""</span></span>
-<span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/quanteda/man/docvars.html" class="external-link">docvars</a></span><span class="op">(</span><span class="va">q</span><span class="op">$</span><span class="va">tokens</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"token_count"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/docvars.html" class="external-link">docvars</a></span><span class="op">(</span><span class="va">q</span><span class="op">$</span><span class="va">tokens</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"segment_id"</span>, <span class="st">"token_count"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;   document_id segment_id token_count</span></span>
 <span><span class="co">#&gt; 1     example         s0           4</span></span>
 <span><span class="co">#&gt; 2     example         s1           3</span></span>
-<span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/quanteda/man/ntoken.html" class="external-link">ntoken</a></span><span class="op">(</span><span class="va">q</span><span class="op">$</span><span class="va">tokens</span>, remove_padding <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/ntoken.html" class="external-link">ntoken</a></span><span class="op">(</span><span class="va">q</span><span class="op">$</span><span class="va">tokens</span>, remove_padding <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; segment_1 segment_2 </span></span>
 <span><span class="co">#&gt;         3         2</span></span></code></pre></div>
 <p>Every quanteda document represents one original segment.
@@ -179,15 +176,15 @@ locale documentation</a>.</p>
 <h2 id="use-quanteda-for-n-grams-and-original-document-frequencies">Use quanteda for n-grams and original-document frequencies<a class="anchor" aria-label="anchor" href="#use-quanteda-for-n-grams-and-original-document-frequencies"></a>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ng</span> <span class="op">&lt;-</span> <span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/quanteda/man/tokens_ngrams.html" class="external-link">tokens_ngrams</a></span><span class="op">(</span><span class="va">q</span><span class="op">$</span><span class="va">tokens</span>, n <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span>
-<span><span class="va">segment_counts</span> <span class="op">&lt;-</span> <span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/quanteda/man/dfm.html" class="external-link">dfm</a></span><span class="op">(</span><span class="va">ng</span>, tolower <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">document_counts</span> <span class="op">&lt;-</span> <span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/quanteda/man/dfm_group.html" class="external-link">dfm_group</a></span><span class="op">(</span></span>
-<span>  <span class="va">segment_counts</span>, groups <span class="op">=</span> <span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/quanteda/man/docvars.html" class="external-link">docvars</a></span><span class="op">(</span><span class="va">ng</span>, <span class="st">"document_id"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ng</span> <span class="op">&lt;-</span> <span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/tokens_ngrams.html" class="external-link">tokens_ngrams</a></span><span class="op">(</span><span class="va">q</span><span class="op">$</span><span class="va">tokens</span>, n <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">segment_counts</span> <span class="op">&lt;-</span> <span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/dfm.html" class="external-link">dfm</a></span><span class="op">(</span><span class="va">ng</span>, tolower <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">document_counts</span> <span class="op">&lt;-</span> <span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/dfm_group.html" class="external-link">dfm_group</a></span><span class="op">(</span></span>
+<span>  <span class="va">segment_counts</span>, groups <span class="op">=</span> <span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/docvars.html" class="external-link">docvars</a></span><span class="op">(</span><span class="va">ng</span>, <span class="st">"document_id"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/quanteda/man/topfeatures.html" class="external-link">topfeatures</a></span><span class="op">(</span><span class="va">document_counts</span><span class="op">)</span></span>
+<span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/topfeatures.html" class="external-link">topfeatures</a></span><span class="op">(</span><span class="va">document_counts</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       We_re-use    re-use_words We_re-use_words           We_go </span></span>
 <span><span class="co">#&gt;               1               1               1               1</span></span>
-<span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/quanteda/man/docfreq.html" class="external-link">docfreq</a></span><span class="op">(</span><span class="va">document_counts</span><span class="op">)</span></span>
+<span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/docfreq.html" class="external-link">docfreq</a></span><span class="op">(</span><span class="va">document_counts</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       We_re-use    re-use_words We_re-use_words           We_go </span></span>
 <span><span class="co">#&gt;               1               1               1               1</span></span></code></pre></div>
 <p>Grouping matters: counting how many segments contain a phrase does
@@ -212,7 +209,7 @@ if a component already contains <code>_</code>.</p>
 <p>Search the original token object, not the n-gram token object whose
 positions refer to a transformed sequence.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">hits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/quanteda/man/kwic.html" class="external-link">kwic</a></span><span class="op">(</span><span class="va">q</span><span class="op">$</span><span class="va">tokens</span>, <span class="st">"re-use"</span>, valuetype <span class="op">=</span> <span class="st">"fixed"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">hits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/kwic.html" class="external-link">kwic</a></span><span class="op">(</span><span class="va">q</span><span class="op">$</span><span class="va">tokens</span>, <span class="st">"re-use"</span>, valuetype <span class="op">=</span> <span class="st">"fixed"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">locations</span> <span class="op">&lt;-</span> <span class="va">q</span><span class="op">$</span><span class="va">positions</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"quanteda_docname"</span>, <span class="st">"token_index"</span>, <span class="st">"document_id"</span>,</span>
 <span>                           <span class="st">"annotation_id"</span>, <span class="st">"start"</span>, <span class="st">"end"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="va">evidence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">hits</span>, <span class="va">locations</span>,</span>
@@ -450,11 +447,10 @@ declared question and its context. Similarly, the authored Japanese
 examples distinguish hindering a plan from physically pulling a doll’s
 leg. The search finds both; it does not make that contextual
 judgment.</p>
-<p>From development version <strong>0.3.0.9003</strong>, the explicitly
-sourced <code>phrase_list_review()</code> helper connects the existing
-phrase search to a complete decision worksheet. It is not an exported
-package API. Install that version or later using the <a href="https://ryuya-dot-com.github.io/ldfreq/#installation">installation
-instructions</a>, and use optional quanteda &gt;= 4.5.0 in a UTF-8 R
+<p>The explicitly sourced <code>phrase_list_review()</code> helper
+connects the existing phrase search to a complete decision worksheet. It
+is not an exported package API. Follow the <a href="https://ryuya-dot-com.github.io/ldfreq/#installation">installation
+instructions</a> and use optional quanteda &gt;= 4.5.0 in a UTF-8 R
 session. The standalone example runs offline, without a corpus, model or
 API key:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">

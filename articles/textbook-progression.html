@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -79,13 +76,12 @@ This guide asks <strong>where selected words occur, and whether they
 return after their declared teaching unit</strong>. It connects saved
 concordance matches to a book’s section roster, then displays counts
 without losing absent targets or unobserved parts.</p>
-<p>Use development <strong>ldfreq 0.5.0.9001</strong>, optional
-<strong>quanteda &gt;= 4.5.0</strong> for searching, and
+<p>Use optional <strong>quanteda &gt;= 4.5.0</strong> for searching, and
 <strong>ggplot2</strong> for drawing. See the <a href="https://ryuya-dot-com.github.io/ldfreq/index.html#install">installation
-instructions</a>. Stable 0.4.0 does not include this example. The two
-helpers in <code>examples/textbook-progression.R</code> are explicitly
-sourced installed examples, not exported functions. The script also
-loads the unchanged concordance helpers.</p>
+instructions</a>. The two helpers in
+<code>examples/textbook-progression.R</code> are explicitly sourced
+installed examples, not exported functions. The script also loads the
+unchanged concordance helpers.</p>
 <div class="section level2">
 <h2 id="begin-with-an-inspectable-example">Begin with an inspectable example<a class="anchor" aria-label="anchor" href="#begin-with-an-inspectable-example"></a>
 </h2>

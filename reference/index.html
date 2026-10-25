@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,11 +20,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -441,10 +438,31 @@
 
       <dl><dt>
 
-          <code><a href="lexdiv_convenience.html">lexdiv_as_documents()</a></code> <code><a href="lexdiv_convenience.html">lexdiv_widen()</a></code> <code><a href="lexdiv_convenience.html">print(<i>&lt;lexdiv_wide_results&gt;</i>)</a></code> <code><a href="lexdiv_convenience.html">plot(<i>&lt;lexdiv_results&gt;</i>)</a></code> <code><a href="lexdiv_convenience.html">plot(<i>&lt;lexdiv_batch_results&gt;</i>)</a></code> <code><a href="lexdiv_convenience.html">plot(<i>&lt;lexdiv_profile_results&gt;</i>)</a></code> <code><a href="lexdiv_convenience.html">plot(<i>&lt;lexdiv_profile_batch_results&gt;</i>)</a></code> <code><a href="lexdiv_convenience.html">plot(<i>&lt;lexdiv_text_results&gt;</i>)</a></code> <code><a href="lexdiv_convenience.html">plot(<i>&lt;lexdiv_screen_results&gt;</i>)</a></code> <code><a href="lexdiv_convenience.html">plot(<i>&lt;tubelex_profile&gt;</i>)</a></code>
+          <code><a href="lexdiv_as_documents.html">lexdiv_as_documents()</a></code>
 
         </dt>
-        <dd>Adapt, Reshape, and Plot Lexical-Diversity Results</dd>
+        <dd>Convert token containers to named documents</dd>
+
+        <dt>
+
+          <code><a href="lexdiv_widen.html">lexdiv_widen()</a></code> <code><a href="lexdiv_widen.html">print(<i>&lt;lexdiv_wide_results&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Reshape metric results without recomputing values</dd>
+
+        <dt>
+
+          <code><a href="plot.lexdiv_results.html">plot(<i>&lt;lexdiv_results&gt;</i>)</a></code> <code><a href="plot.lexdiv_results.html">plot(<i>&lt;lexdiv_batch_results&gt;</i>)</a></code> <code><a href="plot.lexdiv_results.html">plot(<i>&lt;lexdiv_profile_results&gt;</i>)</a></code> <code><a href="plot.lexdiv_results.html">plot(<i>&lt;lexdiv_profile_batch_results&gt;</i>)</a></code> <code><a href="plot.lexdiv_results.html">plot(<i>&lt;lexdiv_text_results&gt;</i>)</a></code> <code><a href="plot.lexdiv_results.html">plot(<i>&lt;lexdiv_screen_results&gt;</i>)</a></code> <code><a href="plot.lexdiv_results.html">plot(<i>&lt;tubelex_profile&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot one metric, a length screen or TUBELEX coverage</dd>
+
+        <dt>
+
+          <code><a href="lexdiv_convenience.html">lexdiv_convenience</a></code>
+
+        </dt>
+        <dd>Prepare and display lexical-diversity results</dd>
       </dl></div><div class="section level2">
       <h2 id="evidence">Evidence<a class="anchor" aria-label="anchor" href="#evidence"></a></h2>
 

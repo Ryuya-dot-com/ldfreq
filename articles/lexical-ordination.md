@@ -8,16 +8,16 @@ set of document dissimilarities. The choice of dissimilarity defines
 what “similar” means; a map does not establish semantic similarity,
 proficiency, a causal effect, or a statistically significant group.
 
-This guide uses **ldfreq 0.3.0.9018 or later**. Its helpers are
-explicitly sourced installed examples, not exported functions. MDS uses
-R’s [`stats::cmdscale()`](https://rdrr.io/r/stats/cmdscale.html); CA
+The helpers in this guide are explicitly sourced installed examples, not
+exported functions. MDS uses R’s
+[`stats::cmdscale()`](https://rdrr.io/r/stats/cmdscale.html); CA
 requires the optional `ca` package (`install.packages("ca")`). No new
 tokenizer or model is needed. The example uses authored counts to make
 the calculations checkable, not empirical learner differences.
 
-The [occurrence-MCA example](#occurrence-mca) requires **0.5.0.9001**,
-not stable 0.4.0. It describes several nominal variables coded for each
-original occurrence, rather than a document-by-term frequency table.
+The [occurrence-MCA example](#occurrence-mca) describes several nominal
+variables coded for each original occurrence, rather than a
+document-by-term frequency table.
 
 ## Begin with the counted documents
 

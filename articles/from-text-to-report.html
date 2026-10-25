@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -78,59 +75,117 @@ research reporting. If you have not yet read a result table or saved an
 analysis, start with <a href="getting-started.html">Getting started</a>.
 For importing a single TXT file or CSV, use the <a href="english-tokenization.html#import-text-files">file-input
 walkthrough</a>.</p>
-<p>Choose the task you need:</p>
-<ul>
-<li>
-<a href="#compare-english-case-from-files">Compare English case
-choices</a> or <a href="#compare-japanese-pos-from-files">Japanese word
-selections</a>: run the shared setup below, then the relevant language
-path and the saving section. The Japanese path also <a href="#counted-source-occurrences">connects the same counted occurrences
-to search</a>.</li>
-<li>
-<a href="getting-started.html#corpus-relative-frequency-with-coverage">Describe
-frequency or vocabulary levels</a>: inspect resource matches and
-token/type coverage with each summary. Use <a href="auditing-vocabulary-profiles.html">the vocabulary audit</a> to
-explain unmatched forms, or <a href="corpus-reference-profiles.html">corpus reference profiles</a> for
-your own norm table. A reference profile describes document words;
-keyness below compares two declared corpora.</li>
-<li>
-<a href="word-families-and-affixes.html">Compare families, roots and
-affixes</a>: supply complete annotations and an inventory, then read
-shared occurrences, unresolved words and coverage. Counts on the
-resolved subset do not replace whole-document counts.</li>
-<li>
-<a href="#study-metadata">Join study information and summarize
-documents</a>: use the saved file-analysis results from those paths; the
-section names its required objects.</li>
-<li>
-<a href="repeated-observations.html">Retain scheduled observations
-and prepare a mixed model</a>: distinguish absent submissions from
-unavailable scores, select one specification, and save the model’s
-observation IDs and exclusion reasons.</li>
-<li>
-<a href="#wide-mtld-diagnostics">Extract saved MTLD diagnostics into
-a wide table</a>: use
-<code>lexdiv_widen(..., mtld_diagnostics = TRUE)</code> with ldfreq
-0.3.0.9004 or later. The earlier helper supports long diagnostic tables
-and older installations; a custom function is not required just to
-inspect a first result.</li>
-<li>
-<a href="keyness-comparison.html">Explain corpus differences with
-words and contexts</a>: inspect counts and reference denominators, then
-return to the counted occurrences. <a href="collocation-association.html">Collocation</a> and <a href="concordance-and-dispersion.html">concordance and dispersion</a>
-answer related questions about nearby words and positions. Corpus-level
-statistics are not independent writer-level observations.</li>
-<li>
-<a href="english-readability.html">Inspect readability</a> or <a href="syntactic-complexity.html">syntactic complexity</a> alongside
-lexical results: match the original texts and document IDs, retaining
-each workflow’s word, sentence, syllable or structure counts and review
-decisions separately. A shared document ID does not establish a shared
-denominator.</li>
-<li>
-<a href="#plot-local-vocabulary-diversity">Plot local vocabulary
-diversity</a>: a separate complete example includes its own input text
-and setup.</li>
-</ul>
+<div class="section level2">
+<h2 id="connect-the-analysis-steps">Connect the analysis steps<a class="anchor" aria-label="anchor" href="#connect-the-analysis-steps"></a>
+</h2>
+<p>Start from the question and the input you actually have. For an
+English text table,
+<code>analysis &lt;- lexdiv_metrics_text_batch(texts, tokenizer = "english", ...)</code>
+retains both calculated rows and the token audit. Inspect
+<code>analysis$results</code> and <code>analysis$token_audit</code>, use
+<code>lexdiv_widen(analysis$results)</code> for a report table or
+<code>plot(analysis, metric_id = "mattr")</code> for document values,
+then save the original texts and the complete <code>analysis</code>
+together. A wide table is a view of the results, not a replacement for
+the saved analysis.</p>
+<p>The related routes share document or occurrence IDs, but require
+different inputs. Follow the linked example for the complete arguments
+and any optional packages; the arrows below show which result feeds the
+next step.</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Question and starting input</th>
+<th>Function connection</th>
+<th>Read before reporting</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>How do counting choices affect the same texts? Document IDs and
+source text</td>
+<td>
+<code><a href="../reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch()</a></code> → <code>$results</code> →
+<code><a href="../reference/lexdiv_widen.html">lexdiv_widen()</a></code> / <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. <a href="#compare-english-case-from-files">English file comparison</a>; <a href="#compare-japanese-pos-from-files">Japanese selections</a> start
+from annotations instead.</td>
+<td>Counts, unavailable scores, token audit and original text. <a href="#study-metadata">Join study metadata</a> without dropping
+documents.</td>
+</tr>
+<tr class="even">
+<td>Which planned observations enter a model? Selected token vectors,
+measurement plan, schedule, submissions and reporting decisions</td>
+<td>
+<code>lexdiv_metrics_batch(..., plan = plan)</code> →
+<code><a href="../reference/lexdiv_study_table.html">lexdiv_study_table()</a></code> →
+<code><a href="../reference/lexdiv_study_table.html">lexdiv_study_model_data()</a></code>. <a href="repeated-observations.html">Study example</a>.</td>
+<td>One response specification per observation, plus included IDs and
+exclusion reasons. The selected data can go to an existing modelling
+package.</td>
+</tr>
+<tr class="odd">
+<td>How frequent or familiar are a document’s words? Prepared terms and
+an identified norm table</td>
+<td>
+<code><a href="../reference/lexdiv_norm_profile_batch.html">lexdiv_norm_profile_batch()</a></code> → <code>$lookup</code>,
+<code>$coverage</code> and <code>$summary</code>. <a href="corpus-reference-profiles.html">Own reference table</a>; <a href="getting-started.html#corpus-relative-frequency-with-coverage">TUBELEX
+/ NJ8</a>.</td>
+<td>Matching words, unmatched words, weighting and the population behind
+the reference. Coverage accompanies each summary.</td>
+</tr>
+<tr class="even">
+<td>How does word formation change the counts? Complete annotations and
+a declared inventory</td>
+<td>
+<code><a href="../reference/lexdiv_family_profile.html">lexdiv_family_profile()</a></code> → <code>$documents</code>,
+<code>$members</code> and <code>$occurrences</code>. <a href="word-families-and-affixes.html">Families, roots and
+affixes</a>.</td>
+<td>Resolved and unresolved occurrences; distinguish whole-document
+values from counts on the resolved subset.</td>
+</tr>
+<tr class="odd">
+<td>Where and with which words does a phrase occur? Complete
+source-aligned annotations</td>
+<td>
+<code><a href="../reference/lexdiv_concordance.html">lexdiv_concordance()</a></code> →
+<code><a href="../reference/lexdiv_concordance.html">lexdiv_sort_concordance()</a></code>,
+<code><a href="../reference/lexdiv_concordance.html">lexdiv_concordance_dispersion()</a></code>, <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> or
+<code><a href="../reference/lexdiv_collocations.html">lexdiv_collocations()</a></code>. <a href="concordance-and-dispersion.html">Search and positions</a>; <a href="collocation-association.html">collocation</a>.</td>
+<td>The same saved occurrences, zero-match documents and search or
+pair-opportunity denominators.</td>
+</tr>
+<tr class="even">
+<td>Which words distinguish two corpora? Complete annotations and
+explicit target/reference document IDs</td>
+<td>
+<code><a href="../reference/lexdiv_keyness.html">lexdiv_keyness()</a></code> →
+<code><a href="../reference/lexdiv_keyness.html">lexdiv_keyness_concordance()</a></code>. <a href="keyness-comparison.html">Corpus comparison</a>.</td>
+<td>Corpus counts and denominators, then the original uses of a selected
+word.</td>
+</tr>
+</tbody>
+</table>
+<p>The model route specifically needs the complete <strong>plan-based
+batch result</strong>. <code><a href="../reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch()</a></code> does not
+accept <code>plan</code>, and its <code>$results</code> is not a
+substitute for that input. Prepare the token vectors first and follow
+the study example. Norm summaries and corpus-level keyness statistics
+also have different meanings: do not copy a corpus score into writer
+rows as independent observations. A shared document ID does not
+establish a shared denominator.</p>
+<p>To explain a score using its source occurrences, the <a href="#counted-source-occurrences">Japanese comparison</a> uses the same
+complete annotations and selection masks for calculation and search. For
+a local MATTR curve, use the <a href="#plot-local-vocabulary-diversity">self-contained window
+example</a>. For saved MTLD components, <a href="#wide-mtld-diagnostics">widen the diagnostics</a> without
+recalculating the metric.</p>
+<p><a href="english-readability.html">Readability</a>, <a href="syntactic-complexity.html">syntactic complexity</a> and <a href="lexical-ordination.html">ordination</a> use explicitly sourced
+installed recipes, with preparation and dependencies described in their
+guides. Link their outputs by source and document ID while retaining
+their own counts and assumptions. They are separate branches, not
+additional inputs to <code><a href="../reference/lexdiv_study_table.html">lexdiv_study_table()</a></code>.</p>
+</div>
 <div class="section level2">
 <h2 id="optional-reference-data-setup">Optional reference-data setup<a class="anchor" aria-label="anchor" href="#optional-reference-data-setup"></a>
 </h2>
@@ -153,10 +208,10 @@ reference data.</p>
 <h2 id="compare-analysis-conditions-from-local-files">Compare analysis conditions from local files<a class="anchor" aria-label="anchor" href="#compare-analysis-conditions-from-local-files"></a>
 </h2>
 <p>Start here to turn your own files into a table you can inspect, save
-and report. The two core file-analysis paths work with ldfreq
-0.3.0.9002, without new packages, downloads or an API key. English text
-is tokenized in R. Japanese text uses prepared annotations: importing a
-file does not perform Japanese morphological analysis.</p>
+and report. The two core file-analysis paths need no optional packages,
+downloads or API key. English text is tokenized in R. Japanese text uses
+prepared annotations: importing a file does not perform Japanese
+morphological analysis.</p>
 <p>The question is <strong>how a declared counting decision changes the
 same documents</strong>. For English we preserve or lowercase spelling;
 for Japanese we retain all body words or only words with a declared
@@ -716,7 +771,7 @@ different analyses.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">record</span><span class="op">$</span><span class="va">methods</span>, sep <span class="op">=</span> <span class="st">"\n\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Calculations used ldfreq 0.5.1: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict &lt;, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.</span></span></code></pre></div>
+<span><span class="co">#&gt; Calculations used ldfreq 1.0.0: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict &lt;, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.</span></span></code></pre></div>
 <p>The CSV is a flat inspection table; <strong>the RDS is the complete
 analysis record</strong>. It contains original text and selected words,
 so keep it under the same access rules as the input. Replay here
@@ -752,9 +807,8 @@ needs them.</p>
 <code>lexdiv_metrics_text_batch(..., metadata = study)</code>, its
 <code>$metadata</code> component already contains the ID-checked,
 input-ordered study table. Use that table below; see the <a href="english-tokenization.html#retain-study-metadata">metadata input
-example</a> (0.3.0.9005 or later). The Japanese imported-token path
-above has a different input format and continues to use the explicit
-join shown here.</p>
+example</a>. The Japanese imported-token path above has a different
+input format and continues to use the explicit join shown here.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">join_study_metadata</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">rows</span>, <span class="va">metadata</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">is.data.frame</a></span><span class="op">(</span><span class="va">rows</span><span class="op">)</span> <span class="op">||</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">is.data.frame</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">)</span> <span class="op">||</span></span>
@@ -1244,16 +1298,7 @@ poor matching.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">levels</span><span class="op">$</span><span class="va">coverage</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"document_id"</span>, <span class="st">"eligible_tokens"</span>, <span class="st">"matched_tokens"</span>, <span class="st">"token_coverage"</span>, <span class="st">"type_coverage"</span></span>
 <span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   document_id eligible_tokens matched_tokens token_coverage type_coverage</span></span>
-<span><span class="co">#&gt; 1       first              12             10      0.8333333     0.7777778</span></span>
-<span><span class="co">#&gt; 2      second              12              9      0.7500000     0.7272727</span></span>
-<span><span class="va">levels</span><span class="op">$</span><span class="va">lookup</span><span class="op">[</span><span class="op">!</span><span class="va">levels</span><span class="op">$</span><span class="va">lookup</span><span class="op">$</span><span class="va">matched</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"term"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;    document_id      term</span></span>
-<span><span class="co">#&gt; 3        first     reads</span></span>
-<span><span class="co">#&gt; 7        first discusses</span></span>
-<span><span class="co">#&gt; 15      second  explores</span></span>
-<span><span class="co">#&gt; 19      second    shares</span></span>
-<span><span class="co">#&gt; 21      second     ideas</span></span></code></pre></div>
+<span><span class="va">levels</span><span class="op">$</span><span class="va">lookup</span><span class="op">[</span><span class="op">!</span><span class="va">levels</span><span class="op">$</span><span class="va">lookup</span><span class="op">$</span><span class="va">matched</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"term"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>The unmatched rows show which surface forms contribute to off-list
 coverage. NJ8 token coverage is 83.3% (10/12) for the first text and
 75.0% (9/12) for the second. Thus, the text with greater local variety
@@ -1271,7 +1316,6 @@ found at or below that level, not a learner’s vocabulary knowledge.</p>
 <span>  <span class="va">level8</span><span class="op">$</span><span class="va">cumulative_proportion</span>, <span class="va">levels</span><span class="op">$</span><span class="va">coverage</span><span class="op">$</span><span class="va">token_coverage</span></span>
 <span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/nj8_profile.html">nj8_profile</a></span><span class="op">(</span><span class="va">prepared</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, unit <span class="op">=</span> <span class="st">"surface"</span><span class="op">)</span>, weighting <span class="op">=</span> <span class="st">"token"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="from-text-to-report_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="produce-an-analysis-table-and-inspect-it">Produce an analysis table and inspect it<a class="anchor" aria-label="anchor" href="#produce-an-analysis-table-and-inspect-it"></a>
@@ -1279,14 +1323,14 @@ found at or below that level, not a learner’s vocabulary knowledge.</p>
 <div class="section level3">
 <h3 id="wide-mtld-diagnostics">Extract MTLD diagnostics into ordinary columns<a class="anchor" aria-label="anchor" href="#wide-mtld-diagnostics"></a>
 </h3>
-<p>With <strong>ldfreq 0.3.0.9004 or later</strong>, the English results
-already calculated above can be widened with their MTLD diagnostics. No
+<p>The English results already calculated above can be widened with
+their MTLD diagnostics using <code><a href="../reference/lexdiv_widen.html">lexdiv_widen()</a></code>. No
 tokenization or metric calculation is repeated. This is convenient for
 spreadsheets or statistical models that expect one scalar per cell. The
-guide’s earlier <code>diagnostic_rows()</code> helper remains useful for
-long tables and older installations.</p>
+guide’s earlier <code>diagnostic_rows()</code> helper provides the
+corresponding long tables.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">en_wide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">en_runs</span><span class="op">$</span><span class="va">lower</span>,</span>
+<code class="sourceCode R"><span><span class="va">en_wide</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_widen.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">en_runs</span><span class="op">$</span><span class="va">lower</span>,</span>
 <span>  values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"missing_reason"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
 <span>  mtld_diagnostics <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">inspect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"mtld__value"</span>, <span class="st">"mtld__status"</span>,</span>
@@ -1336,12 +1380,12 @@ support; they do not establish an automatic exclusion rule.</p>
 <div class="section level3">
 <h3 id="join-vocabulary-coverage-by-document-id">Join vocabulary coverage by document ID<a class="anchor" aria-label="anchor" href="#join-vocabulary-coverage-by-document-id"></a>
 </h3>
-<p><code><a href="../reference/lexdiv_convenience.html">lexdiv_widen()</a></code> retains each metric’s definition,
+<p><code><a href="../reference/lexdiv_widen.html">lexdiv_widen()</a></code> retains each metric’s definition,
 parameters, and counts. Its checks prevent different MATTR windows from
 entering one metric column as if they were the same specification.
 Coverage is then joined by explicit IDs, preserving document order.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_convenience.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">metrics</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_widen.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">metrics</span><span class="op">)</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">levels</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">coverage</span> <span class="op">&lt;-</span> <span class="va">levels</span><span class="op">$</span><span class="va">coverage</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">levels</span><span class="op">$</span><span class="va">coverage</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span>, <span class="op">]</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">document_id</span>, <span class="va">coverage</span><span class="op">$</span><span class="va">document_id</span><span class="op">)</span><span class="op">)</span></span>
@@ -1349,7 +1393,7 @@ Coverage is then joined by explicit IDs, preserving document order.</p>
 <span>  <span class="va">analysis</span><span class="op">$</span><span class="va">nj8_surface_type_coverage</span> <span class="op">&lt;-</span> <span class="va">coverage</span><span class="op">$</span><span class="va">type_coverage</span></span>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">analysis</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;lexdiv_wide_results: 2 rows; 25 columns&gt;</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_wide_results: 2 rows; 23 columns&gt;</span></span>
 <span><span class="co">#&gt;   document_id ttr__value ttr__status ttr__missing_reason  ttr__method_id</span></span>
 <span><span class="co">#&gt; 1       first      0.750          ok                &lt;NA&gt; ttr_v_over_n_v1</span></span>
 <span><span class="co">#&gt; 2      second      0.917          ok                &lt;NA&gt; ttr_v_over_n_v1</span></span>
@@ -1371,9 +1415,6 @@ Coverage is then joined by explicit IDs, preserving document order.</p>
 <span><span class="co">#&gt;   mattr__requested_parameters mattr__effective_parameters mattr__N mattr__V</span></span>
 <span><span class="co">#&gt; 1                          10                          10       12        9</span></span>
 <span><span class="co">#&gt; 2                          10                          10       12       11</span></span>
-<span><span class="co">#&gt;   nj8_surface_token_coverage nj8_surface_type_coverage</span></span>
-<span><span class="co">#&gt; 1                      0.833                     0.778</span></span>
-<span><span class="co">#&gt; 2                      0.750                     0.727</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">metrics</span>, metric_id <span class="op">=</span> <span class="st">"mattr"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="from-text-to-report_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="700"></p>
 <p>Report differences in the selected metric and differences in coverage
@@ -1652,14 +1693,7 @@ public sharing.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>, <span class="va">record</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
 <span><span class="va">levels</span><span class="op">$</span><span class="va">provenance</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"resource_version"</span>, <span class="st">"resource_cached"</span>, <span class="st">"resource_citation"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; $resource_version</span></span>
-<span><span class="co">#&gt; [1] "jacet2016-8000-v1"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $resource_cached</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $resource_citation</span></span>
-<span><span class="co">#&gt; [1] "JACET Basic Word Revision Committee (Ed.). (2016). The New JACET List of 8000 Basic Words. Tokyo: Kirihara Shoten."</span></span></code></pre></div>
+<span><span class="co">#&gt; NULL</span></span></code></pre></div>
 <p>A methods statement for this example could read:</p>
 <blockquote>
 <p>We tokenized both texts with the ldfreq English word tokenizer

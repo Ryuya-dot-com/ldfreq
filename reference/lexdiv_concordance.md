@@ -137,6 +137,22 @@ interface for an old search, recreate it from its saved source and
 settings. See [concordance and dispersion
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html).
 
+## Continue from a search
+
+Pass the complete search and one single-token `query_id` to
+[`lexdiv_collocations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_collocations.md)
+to inspect nearby-word counts and association. Keep the search object:
+the occurrence table returned by sorting is a display view, not the
+input to the subsequent operations.
+
+To compare word use between two corpora, use the original complete
+annotations with
+[`lexdiv_keyness`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+and explicit target/reference document IDs. Then
+[`lexdiv_keyness_concordance`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_keyness.md)
+returns the selected term's source contexts. The query hits alone do not
+supply the corpus denominators.
+
 ## Value
 
 `lexdiv_concordance()` returns a classed list with `occurrences`
@@ -166,7 +182,7 @@ source <- lexdiv_import_annotations(tokens, segments, list(language = "en",
   dictionary_version = "none", unit = "supplied tokens", normalization = "none"))
 if (requireNamespace("quanteda", quietly = TRUE)) {
   search <- lexdiv_concordance(source, list(word = "a", phrase = c("a", "b")))
-  lexdiv_concordance_sort(search)
+  lexdiv_sort_concordance(search)
   lexdiv_concordance_dispersion(search, "word", parts = 3)$documents
   if (requireNamespace("ggplot2", quietly = TRUE)) plot(search, "word")
 }

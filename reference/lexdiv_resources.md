@@ -56,7 +56,10 @@ MorphoLex is CC BY-NC-SA 4.0 (noncommercial); BNC/COCA is CC BY-SA 4.0;
 MorphyNet is CC BY-SA 3.0; TUBELEX is BSD-3-Clause; NJ8 has its own
 permission and attribution terms. These datasets are not included in the
 MIT package. The MorphyNet resource is a nine-row example, not the full
-database.
+database. Accepting the terms does not grant additional rights.
+MorphoLex's noncommercial condition depends on the intended use, not
+simply on the user's institution; see
+[`morpholex_data`](https://ryuya-dot-com.github.io/ldfreq/reference/morpholex_data.md).
 
 No resource is needed for the core diversity metrics. Resource-specific
 readers explain the required download if a cache is missing. Copying a
@@ -68,11 +71,11 @@ setting there. Unused caches may be removed explicitly by the user.
 ``` r
 lexdiv_resource_info()[c("resource", "license", "available", "download_bytes")]
 #>    resource                                license available download_bytes
-#> 1   tubelex                           BSD-3-Clause      TRUE        2557276
-#> 2       nj8 JACET permission; attribution required      TRUE          53357
-#> 3 morpholex                        CC-BY-NC-SA-4.0      TRUE        1336656
-#> 4   bnccoca                           CC-BY-SA-4.0      TRUE         518734
-#> 5 morphynet                           CC-BY-SA-3.0      TRUE           9184
+#> 1   tubelex                           BSD-3-Clause     FALSE        2557276
+#> 2       nj8 JACET permission; attribution required     FALSE          53357
+#> 3 morpholex                        CC-BY-NC-SA-4.0     FALSE        1336656
+#> 4   bnccoca                           CC-BY-SA-4.0     FALSE         518734
+#> 5 morphynet                           CC-BY-SA-3.0     FALSE           9184
 if (FALSE) { # \dontrun{
 # Review the source, license_url and notice_url before downloading.
 lexdiv_download_resources("tubelex", accept_license = TRUE)

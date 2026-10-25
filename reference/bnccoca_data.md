@@ -121,10 +121,4 @@ profile <- env$bnccoca_example$profile
 profile$documents[c("document_id", "selected_tokens", "matched_tokens",
   "unresolved_tokens", "family_types", "family_ttr", "status")]
 }
-#>   document_id selected_tokens matched_tokens unresolved_tokens family_types
-#> 1      listed               4              4                 0            2
-#> 2    unlisted               2              1                 1           NA
-#>   family_ttr     status
-#> 1        0.5   complete
-#> 2         NA incomplete
 ```

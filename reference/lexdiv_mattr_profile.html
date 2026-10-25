@@ -15,7 +15,7 @@ the local profile into an inferential stability test."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,11 +28,8 @@ the local profile into an inferential stability test."></head><body>
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -49,7 +46,7 @@ the local profile into an inferential stability test."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Inspect the local MATTR trajectory and positional exposure</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/R/mattr-profile.R" class="external-link"><code>R/mattr-profile.R</code></a></small>
+
       <div class="d-none name"><code>lexdiv_mattr_profile.Rd</code></div>
     </div>
 
@@ -128,6 +125,12 @@ length from sensitivity to the reduction parameter. Bestgen (2025,
 fluctuation while criticizing unqualified whole-text interpretation because
 positional exposure is unequal. The function exposes those quantities but
 does not declare any window or text length universally valid.</p>
+<p>Pass the complete result to <code><a href="plot.lexdiv_mattr_profile.html">plot.lexdiv_mattr_profile</a></code> to draw one
+local trajectory, or read <code>windows</code> to construct a custom figure. Retain
+the original tokens and plan alongside the result: the output records positions
+but does not contain the source words. The
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#plot-local-vocabulary-diversity">local-diversity walkthrough</a>
+connects text preparation, several window sizes, figures and saving.</p>
     </div>
     <div class="section level2">
     <h2 id="formal-contract">Formal contract<a class="anchor" aria-label="anchor" href="#formal-contract"></a></h2>

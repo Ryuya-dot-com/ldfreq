@@ -378,11 +378,10 @@ mean of directional scores as the denominator. The four highest scores
 depend entirely on the tail in both directions. These counts describe
 the examples, not a learner population.
 
-From development version 0.3.0.9002, printing results shows
-`mtld_tail_only` and `mtld_gap_pct` automatically where these
-diagnostics are available. These are derived display columns; the saved
-result schema and values are unchanged. The table above retains the
-numeric components for analysis or export.
+Printing results shows `mtld_tail_only` and `mtld_gap_pct` automatically
+where these diagnostics are available. These are derived display
+columns; the saved result schema and values are unchanged. The table
+above retains the numeric components for analysis or export.
 
 **The gap measures order sensitivity, not uncertainty.** When both
 directions have zero complete factors, both tails have the same
@@ -624,11 +623,7 @@ pipeline; these hand-prepared terms illustrate only one sentence.
 terms <- c("I", "do", "n't", "think", "it", "'s", "a", "book")
 frequency <- tubelex_profile(terms)
 frequency$summary[, c("weighting", "coverage", "mean_zipf")]
-#>   weighting coverage mean_zipf
-#> 1     token        1  6.810781
-#> 2      type        1  6.810781
 frequency$provenance$tokenization_alignment
-#> [1] "caller_supplied_terms_unverified"
 ```
 
 The mean describes matched terms, not all terms with unknown words

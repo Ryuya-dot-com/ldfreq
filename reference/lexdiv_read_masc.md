@@ -145,7 +145,7 @@ source metadata absent from its input tables.
 ## See also
 
 [`lexdiv_ngrams`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngrams.md),
-[`lexdiv_as_documents`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_convenience.md)
+[`lexdiv_as_documents`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_as_documents.md)
 
 ## Examples
 

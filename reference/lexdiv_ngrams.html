@@ -13,7 +13,7 @@ implicit normalization is required or supplied by these functions."></head><body
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,11 +26,8 @@ implicit normalization is required or supplied by these functions."></head><body
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -260,7 +257,10 @@ Cached TUBELEX unigram counts cannot recover observed n-gram co-occurrences.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="lexdiv_ngram_compare.html">lexdiv_ngram_compare</a></code>, <code><a href="lexdiv_norm_profile_batch.html">lexdiv_norm_profile_batch</a></code>,
+    <div class="dont-index"><p><code><a href="lexdiv_ngram_compare.html">lexdiv_compare_ngrams</a></code> for multiple references,
+<code><a href="lexdiv_ngram_reference_build.html">lexdiv_build_ngram_reference</a></code> to combine corpus chunks,
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html">the extraction-to-reference-profile workflow</a>,
+<code><a href="lexdiv_norm_profile_batch.html">lexdiv_norm_profile_batch</a></code>,
 <code><a href="lexdiv_reference_coverage.html">lexdiv_reference_coverage</a></code>, <code><a href="tubelex_profile.html">tubelex_profile</a></code></p></div>
     </div>
 

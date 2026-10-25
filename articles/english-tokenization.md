@@ -171,13 +171,6 @@ British/American conversion table.
 spelling_lookup <- nj8_profile(c("colour", "color", "centre", "center",
   "theatre", "theater"), unit = "surface")
 spelling_lookup$lookup[, c("surface_term", "lookup_term", "matched", "level")]
-#>   surface_term lookup_term matched level
-#> 1       colour      colour   FALSE    NA
-#> 2        color       color    TRUE     1
-#> 3       centre      centre   FALSE    NA
-#> 4       center      center    TRUE     1
-#> 5      theatre     theatre   FALSE    NA
-#> 6      theater     theater    TRUE     1
 ```
 
 For surface-form research, keep the distinction. For a declared
@@ -294,31 +287,7 @@ subset(counting$metrics, metric_id == "ttr" &
   document_id %in% c("variants", "names", "numerals") &
   policy %in% c("words_and_numerals", "without_names_or_numerals", "spelling_equivalence"),
   select = c(policy, document_id, selected_known, types_known, reportable_value))
-#>                       policy document_id selected_known types_known
-#> 1         words_and_numerals    variants              4           4
-#> 3         words_and_numerals       names              4           3
-#> 5         words_and_numerals    numerals              7           6
-#> 49 without_names_or_numerals    variants              4           4
-#> 51 without_names_or_numerals       names              3           3
-#> 53 without_names_or_numerals    numerals              4           3
-#> 65      spelling_equivalence    variants              4           3
-#> 67      spelling_equivalence       names              4           3
-#> 69      spelling_equivalence    numerals              7           6
-#>    reportable_value
-#> 1         1.0000000
-#> 3         0.7500000
-#> 5         0.8571429
-#> 49        1.0000000
-#> 51        1.0000000
-#> 53        0.7500000
-#> 65        0.7500000
-#> 67        0.7500000
-#> 69        0.8571429
 subset(counting$coverage, document_id == "variants" & policy == "words_and_numerals")
-#>               policy document_id selected_known unknown_upos exact_matched
-#> 1 words_and_numerals    variants              4            0             2
-#>   alias_matched exact_coverage_conditional alias_coverage_conditional
-#> 1             3                        0.5                       0.75
 ```
 
 For `The colour is color.`, surface TTR is 1 and TTR with declared
@@ -397,18 +366,6 @@ analysis$results
 ``` r
 levels <- nj8_profile_batch(tokens, unit = "surface")
 levels$coverage
-#>   document_id input_tokens eligible_tokens excluded_tokens selection_coverage
-#> 1    essay_02            9               9               0                  1
-#> 2    essay_01            8               8               0                  1
-#> 3       empty            0               0               0                 NA
-#>   matched_tokens off_list_tokens token_coverage eligible_types matched_types
-#> 1              7               2      0.7777778              7             5
-#> 2              7               1      0.8750000              6             5
-#> 3              0               0             NA              0             0
-#>   off_list_types type_coverage
-#> 1              2     0.7142857
-#> 2              1     0.8333333
-#> 3              0            NA
 ```
 
 The output keeps the input document order. Empty documents retain metric
@@ -611,8 +568,7 @@ reading. The 50-token window is common to all documents. The 30 nonempty
 teaching texts are 107–149 tokens long and can all use that window. For
 a research corpus, justify the window for your task and length
 distribution; keep it common across comparable texts rather than
-shrinking it for short documents. The `metadata` argument below requires
-**ldfreq 0.3.0.9005 or later**.
+shrinking it for short documents.
 
 ``` r
 file_tokens <- lexdiv_tokenize_batch(file_documents,

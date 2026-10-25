@@ -133,7 +133,10 @@ locale change is needed by this comparison itself.
 ## See also
 
 [`lexdiv_ngrams`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngrams.md),
-[`lexdiv_read_masc`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_read_masc.md)
+[`lexdiv_build_ngram_reference`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md),
+[`lexdiv_read_masc`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_read_masc.md),
+[compare reference coverage and return to the target
+phrases](https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html).
 
 ## Examples
 
@@ -151,7 +154,7 @@ counts <- data.frame(n = 2L, term1 = c("make", "a"),
 totals <- data.frame(n = 2L, opportunities = 5, documents = 2)
 full <- lexdiv_ngram_reference(counts, resource, totals, "authored-v1", TRUE)
 partial <- lexdiv_ngram_reference(counts[1, ], resource, totals, "authored-v1", FALSE)
-compared <- lexdiv_ngram_compare(target, list(full = full, partial = partial))
+compared <- lexdiv_compare_ngrams(target, list(full = full, partial = partial))
 compared$summary[c("reference_id", "weighting", "value_coverage",
   "mean_frequency_per_million", "common_coverage", "difference_from_baseline")]
 #>   reference_id weighting value_coverage mean_frequency_per_million

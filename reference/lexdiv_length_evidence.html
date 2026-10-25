@@ -11,7 +11,7 @@ domains, suppress values, or claim universal validity cutoffs."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,11 +24,8 @@ domains, suppress values, or claim universal validity cutoffs."></head><body>
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -77,6 +74,14 @@ as versioned tool guidance rather than primary empirical evidence.</p>
 <p>Method equivalence is not inferred from a shared metric label. In particular,
 the evidence table does not assert that Gramulator, TAALED, or another package's
 MTLD implementation is numerically identical to the defined target method.</p>
+<p>Use these records to interpret advisory flags and
+<code><a href="lexdiv_profile.html">lexdiv_screen_lengths</a></code>, not to choose a measure from a token
+cutoff alone. The
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html">metric-selection guide</a>
+also reports the package's corpus comparisons, length sensitivity and sampling
+agreement. Those aggregate results are not all contained in this small evidence
+table. Compute the chosen measure with <code><a href="lexdiv_metrics.html">lexdiv_metrics</a></code> using
+settings justified for the question and material.</p>
     </div>
 
     <div class="section level2">

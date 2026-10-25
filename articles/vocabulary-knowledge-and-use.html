@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,11 +35,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
-    <li><a class="dropdown-item" href="../articles/reference-data.html">Optional reference data and licenses</a></li>
-    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
-    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
-    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -206,12 +203,7 @@ form is identical.</p>
 <span>    <span class="st">"lookup_term"</span>, <span class="st">"matched"</span>, <span class="st">"count"</span>, <span class="st">"videos"</span>, <span class="st">"channels"</span>,</span>
 <span>    <span class="st">"zipf"</span>, <span class="st">"video_prevalence"</span>, <span class="st">"channel_prevalence"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span>  <span class="va">item_features</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"item_id"</span>, <span class="st">"target_form"</span>, <span class="st">"sense_id"</span>, <span class="st">"matched"</span>, <span class="st">"zipf"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="op">}</span></span>
-<span><span class="co">#&gt;   item_id target_form              sense_id matched     zipf</span></span>
-<span><span class="co">#&gt; 1      i1        bank financial-institution    TRUE 4.848312</span></span>
-<span><span class="co">#&gt; 2      i2        bank            river-edge    TRUE 4.848312</span></span>
-<span><span class="co">#&gt; 3      i3    accurate               precise    TRUE 4.454142</span></span>
-<span><span class="co">#&gt; 4      i4      ldfreq             R-package   FALSE       NA</span></span></code></pre></div>
+<span><span class="op">}</span></span></code></pre></div>
 <p>The two <code>bank</code> items receive the same corpus values. This
 resource does not separate their senses. <code>ldfreq</code> has missing
 frequency, which means no match, not zero knowledge or maximal
@@ -441,33 +433,8 @@ text.</p>
 <span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tubelex_diagnostics.html">tubelex_diagnostics</a></span><span class="op">(</span><span class="va">profiles</span><span class="op">)</span></span>
 <span><span class="va">audit</span><span class="op">$</span><span class="va">summary</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"status"</span>, <span class="st">"weighting"</span>, <span class="st">"eligible_items"</span>,</span>
 <span>                  <span class="st">"matched_items"</span>, <span class="st">"coverage"</span>, <span class="st">"mean_zipf"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   document_id        status weighting eligible_items matched_items  coverage</span></span>
-<span><span class="co">#&gt; 1           a            ok     token              4             3 0.7500000</span></span>
-<span><span class="co">#&gt; 2           a            ok      type              3             2 0.6666667</span></span>
-<span><span class="co">#&gt; 3           b            ok     token              3             3 1.0000000</span></span>
-<span><span class="co">#&gt; 4           b            ok      type              3             3 1.0000000</span></span>
-<span><span class="co">#&gt; 5       blank         empty     token              0             0        NA</span></span>
-<span><span class="co">#&gt; 6       blank         empty      type              0             0        NA</span></span>
-<span><span class="co">#&gt; 7     invalid invalid_input     token             NA            NA        NA</span></span>
-<span><span class="co">#&gt; 8     invalid invalid_input      type             NA            NA        NA</span></span>
-<span><span class="co">#&gt;   mean_zipf</span></span>
-<span><span class="co">#&gt; 1  5.777371</span></span>
-<span><span class="co">#&gt; 2  6.241901</span></span>
-<span><span class="co">#&gt; 3  5.261596</span></span>
-<span><span class="co">#&gt; 4  5.261596</span></span>
-<span><span class="co">#&gt; 5        NA</span></span>
-<span><span class="co">#&gt; 6        NA</span></span>
-<span><span class="co">#&gt; 7        NA</span></span>
-<span><span class="co">#&gt; 8        NA</span></span>
 <span><span class="va">audit</span><span class="op">$</span><span class="va">unmatched_terms</span></span>
-<span><span class="co">#&gt;   condition_id lookup_term token_count document_count</span></span>
-<span><span class="co">#&gt; 1  condition_1      ldfreq           1              1</span></span>
-<span><span class="va">audit</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"tokenization_alignment"</span>, <span class="st">"query_normalization"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   document_id           tokenization_alignment query_normalization</span></span>
-<span><span class="co">#&gt; 1           a caller_supplied_terms_unverified             tubelex</span></span>
-<span><span class="co">#&gt; 2           b caller_supplied_terms_unverified             tubelex</span></span>
-<span><span class="co">#&gt; 3       blank caller_supplied_terms_unverified             tubelex</span></span>
-<span><span class="co">#&gt; 4     invalid caller_supplied_terms_unverified             tubelex</span></span></code></pre></div>
+<span><span class="va">audit</span><span class="op">$</span><span class="va">documents</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"document_id"</span>, <span class="st">"tokenization_alignment"</span>, <span class="st">"query_normalization"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>The means remain conditional on matches. <code>unmatched_terms</code>
 contains confirmed non-matches only; a resource failure is unresolved,
 not evidence of absence. Token and type weighting remain separate. When

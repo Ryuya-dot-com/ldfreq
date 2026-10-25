@@ -17,7 +17,7 @@ to have different starting values and linear time slopes. The inputs are
 checks the connection between tables and a model; it supplies no
 evidence of development, proficiency or causation.
 
-This guide requires **ldfreq 0.5.0.9001**. The public functions
+The public functions
 [`lexdiv_study_table()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
 and
 [`lexdiv_study_model_data()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
@@ -385,10 +385,9 @@ interpret its fitted coefficients as research findings.
 
 ## Report specified means and one planned comparison
 
-Development **0.5.0.9001** adds the following optional reporting recipe.
-It uses `emmeans` and `pbkrtest` in addition to lme4. Install these
-optional packages to run it; the earlier table workflow does not require
-them.
+The following optional reporting recipe uses `emmeans` and `pbkrtest` in
+addition to lme4. Install these optional packages to run it; the earlier
+table workflow does not require them.
 
 The target is the model’s population mean MATTR10 at weeks 0, 4 and 8
 for each of the two named tasks. We also average those tasks with

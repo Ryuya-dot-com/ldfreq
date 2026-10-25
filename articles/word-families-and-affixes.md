@@ -109,18 +109,6 @@ knitr::kable(counts$comparison[counts$comparison$scope == "all_selected",
   row.names = FALSE, col.names = c("Document", "Unit", "N", "V", "TTR", "Status"))
 ```
 
-| Document | Unit    |   N |   V |  TTR | Status     |
-|:---------|:--------|----:|----:|-----:|:-----------|
-| listed   | surface |   4 |   4 | 1.00 | complete   |
-| listed   | lemma   |   4 |   3 | 0.75 | complete   |
-| listed   | family  |   4 |   2 | 0.50 | complete   |
-| unlisted | surface |   2 |   2 | 1.00 | complete   |
-| unlisted | lemma   |   2 |   2 | 1.00 | complete   |
-| unlisted | family  |   2 |  NA |   NA | incomplete |
-| empty    | surface |   0 |   0 |   NA | empty      |
-| empty    | lemma   |   0 |   0 |   NA | empty      |
-| empty    | family  |   0 |   0 |   NA | empty      |
-
 For `use uses colour color`, **four occurrences remain four tokens**.
 There are four surface types, three supplied lemma types and two Nation
 families. Grouping changes the type count, not the number or order of
@@ -141,36 +129,14 @@ knitr::kable(counts$documents[c("document_id", "selected_tokens",
   "matched_tokens", "unlisted_tokens", "common_tokens", "token_coverage")],
   digits = 2, row.names = FALSE,
   col.names = c("Document", "Tokens", "Matched", "Unlisted", "Common subset", "Coverage"))
-```
-
-| Document | Tokens | Matched | Unlisted | Common subset | Coverage |
-|:---------|-------:|--------:|---------:|--------------:|---------:|
-| listed   |      4 |       4 |        0 |             4 |      1.0 |
-| unlisted |      2 |       1 |        1 |             1 |      0.5 |
-| empty    |      0 |       0 |        0 |             0 |       NA |
-
-``` r
 knitr::kable(counts$comparison[
   counts$comparison$document_id == "unlisted" &
     counts$comparison$scope == "common_resolved",
   c("unit", "N", "V", "ttr")], row.names = FALSE)
-```
-
-| unit    |   N |   V | ttr |
-|:--------|----:|----:|----:|
-| surface |   1 |   1 |   1 |
-| lemma   |   1 |   1 |   1 |
-| family  |   1 |   1 |   1 |
-
-``` r
 o <- families$occurrences
 knitr::kable(o[o$status == "unlisted",
   c("document_id", "pre", "keyword", "post", "status")], row.names = FALSE)
 ```
-
-| document_id | pre | keyword     | post | status   |
-|:------------|:----|:------------|:-----|:---------|
-| unlisted    | use | reusability |      | unlisted |
 
 The common resolved subset contains only `use`: all three units have N =
 1, V = 1 and TTR = 1. That is a result **conditional on one retained
@@ -320,31 +286,12 @@ forms <- c("transmit", "transport", "transmission", "teacher", "teachers")
 morpholex <- recipes$read_morpholex_parts(
   sheets = c("0-1-0", "0-1-1", "1-1-0"), words = forms)
 knitr::kable(morpholex$analyses[c("form", "completeness")], row.names = FALSE)
-```
-
-| form         | completeness |
-|:-------------|:-------------|
-| transmit     | complete     |
-| transmission | complete     |
-| teacher      | complete     |
-| teachers     | complete     |
-| transport    | complete     |
-
-``` r
 source_words <- do.call(rbind, lapply(morpholex_data(
   c("0-1-0", "0-1-1", "1-1-0"))$sheets,
   function(x) x[c("Word", "MorphoLexSegm")]))
 knitr::kable(source_words[source_words$Word %in% forms,
   c("Word", "MorphoLexSegm")], row.names = FALSE)
 ```
-
-| Word         | MorphoLexSegm       |
-|:-------------|:--------------------|
-| transmit     | {(transmit)}        |
-| transmission | {(transmit)}\>ion\> |
-| teacher      | {(teach)}\>er\>     |
-| teachers     | {(teach)}\>er\>     |
-| transport    | {\<trans\<(port)}   |
 
 In this reference, `transmit` is undivided, `transport` is
 `trans- + port`, and `transmission` uses canonical `transmit + -ion`.
@@ -370,12 +317,6 @@ r <- morphynet$relations
 knitr::kable(r[r$target_word == "reusability",
   c("source_word", "target_word", "morpheme", "affix_position")], row.names = FALSE)
 ```
-
-| source_word | target_word | morpheme | affix_position |
-|:------------|:------------|:---------|:---------------|
-| reuse       | reusability | ability  | suffix         |
-| reusable    | reusability | ity      | suffix         |
-| usability   | reusability | re       | prefix         |
 
 The incoming relations use `reuse + ability`, `reusable + ity`, and
 `usability + re`. Three relations are not three affixes to sum within
@@ -428,11 +369,6 @@ knitr::kable(initial$occurrences[initial$occurrences$surface == "reusability",
   row.names = FALSE, col.names = c("Document", "Left", "Word", "Right", "Candidates"))
 ```
 
-| Document | Left                    | Word        | Right | Candidates |
-|:---------|:------------------------|:------------|:------|-----------:|
-| a        | the teacher discussed   | reusability | .     |          3 |
-| b        | the teachers questioned | reusability | .     |          3 |
-
 Record one selected MorphyNet relation and one explicit unresolved
 decision. Here selection is an **authored reporting convention**, not a
 claim that the sentence proves a unique derivation. Candidate IDs come
@@ -460,25 +396,11 @@ linked <- recipes$link_morphology_candidates(review_family,
 knitr::kable(linked$reviewed_relations[c("document_id", "surface",
   "source_word", "target_word", "morpheme", "affix_position")], row.names = FALSE,
   col.names = c("Document", "Word", "Source", "Target", "Morpheme", "Position"))
-```
-
-| Document | Word        | Source   | Target      | Morpheme | Position |
-|:---------|:------------|:---------|:------------|:---------|:---------|
-| a        | reusability | reusable | reusability | ity      | suffix   |
-
-``` r
 knitr::kable(linked$documents[c("document_id", "eligible_N",
   "morphynet_selected_N", "morphynet_unresolved_N", "selected_suffix_relations")],
   row.names = FALSE,
   col.names = c("Document", "Eligible tokens", "Selected", "Unresolved", "Suffix relations"))
 ```
-
-| Document | Eligible tokens | Selected | Unresolved | Suffix relations |
-|:---------|----------------:|---------:|-----------:|-----------------:|
-| a        |               4 |        1 |          0 |                1 |
-| b        |               4 |        0 |          1 |                0 |
-| unlisted |               1 |        0 |          0 |                0 |
-| empty    |               0 |        0 |          0 |                0 |
 
 Only the selected occurrence contributes one suffix **relation**. The
 second occurrence stays unresolved; all other candidates stay
