@@ -40,8 +40,9 @@ examples from your corpus. ldfreq offers an English lexical tokenizer that runs
 in R with its existing `stringi` dependency, without Python, model downloads,
 or an external service.
 
-Select it explicitly with `tokenizer = "english"`. The default `"unicode"`
-retains the original segmentation for compatibility with existing analyses.
+`tokenizer = "english"` and `case = "lower"` are the defaults for raw-text
+functions. Pass `tokenizer = "unicode"` or `case = "preserve"` when a study
+requires pure Unicode character-class splitting or case-sensitive forms.
 
 Tokenization does not correct learner spelling or grammar. Preserve the source
 and declare any correction policy separately. The
@@ -281,8 +282,8 @@ universal exclusion policy.
 ## Analyze an ID/text table
 
 Use one row per document, with explicit unique IDs and character text. Other
-columns, such as writer or task, are not selected automatically. From 0.3.0.9005,
-pass them explicitly with `metadata` to keep a checked study table in the result;
+columns, such as writer or task, are not selected automatically. Pass them
+explicitly with `metadata` to keep a checked study table in the result;
 see the [file example](#retain-study-metadata) below.
 Empty text is a valid zero-token document. `NA` text is an error naming the
 document; decide whether it denotes missing data before analysis rather than

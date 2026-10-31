@@ -3,6 +3,23 @@ url: https://ryuya-dot-com.github.io/ldfreq/
 template:
   bootstrap: 5
 
+home:
+  title: Reproducible Lexical Diversity and Frequency Profiles in R
+  description: >
+    Compute lexical diversity, reference-vocabulary coverage, custom lexical
+    norms, and source-linked corpus analyses while preserving counted words,
+    settings, and missingness reasons.
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, lightswitch, github]
+  components:
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/Ryuya-dot-com/ldfreq
+      aria-label: GitHub repository
+
 reference:
   - title: Overview
     contents:
@@ -48,7 +65,7 @@ reference:
       - lexdiv_mattr_profile
       - plot.lexdiv_mattr_profile
       - lexdiv_screen_lengths
-  - title: Caller-supplied lexical norms
+  - title: Custom lexical norms
     contents:
       - lexdiv_norm_profile
       - lexdiv_norm_profile_batch

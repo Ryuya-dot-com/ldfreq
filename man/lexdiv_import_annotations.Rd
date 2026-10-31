@@ -55,8 +55,9 @@ used when \code{documents} supplies raw texts directly.}
 }
 \value{
 A sealed \code{lexdiv_annotations} object containing \code{tokens},
-\code{segments}, \code{documents}, \code{provenance}, and O(1)
-\code{integrity_sha256}. When created by \code{lexdiv_as_annotations()},
+\code{segments}, \code{documents}, \code{provenance}, and
+\code{integrity_sha256} (used to verify that aligned source records remain
+unmodified). When created by \code{lexdiv_as_annotations()},
 \code{tokens} includes \code{is_word} (\code{TRUE} for lexical words,
 \code{FALSE} for punctuation/excluded spans) and \code{term} (normalized/cased
 word form or \code{NA_character_}). \code{print()} displays up to 12 token rows

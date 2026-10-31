@@ -11,7 +11,6 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 3.5)
 has_quanteda <- requireNamespace("quanteda", quietly = TRUE) &&
   utils::packageVersion("quanteda") >= "4.5.0"
-has_plot <- requireNamespace("ggplot2", quietly = TRUE)
 ```
 
 Three occurrences can be spread through a document or concentrated near its
@@ -21,8 +20,8 @@ saved occurrences for context sorting, position plots and a within-document
 dispersion measure. It keeps the search unit, excluded positions and denominators
 visible so that a changed search can be explained.
 
-This workflow uses optional **quanteda >= 4.5.0**; plotting also
-needs **ggplot2**. Install these packages before running the guide. Search with
+This workflow uses optional **quanteda >= 4.5.0**; position plotting uses
+Base R graphics and requires no extra plotting package. Search with
 `lexdiv_concordance()`, sort with `lexdiv_sort_concordance()`, calculate DP with
 `lexdiv_concordance_dispersion()`, and draw saved positions with `plot()`.
 These operations need no helper sourcing. The example inputs and
@@ -66,31 +65,16 @@ To explain a lexical-diversity result, follow the
 It uses the same complete annotations and selection masks for counted words
 and concordance searches, then retains them in the saved study record.
 
-For a short English text without supplied annotations, the following explicit
-quanteda tokenization recipe can prepare complete surfaces. The alignment check
-will reject text that this tokenizer changes or leaves partly uncovered; inspect
-the tokens and adjust the chosen annotation route, rather than dropping the
-check. Declare sentence/turn segments first if matches must respect them.
+For raw English texts without external annotations, `lexdiv_as_annotations()`
+partitions every non-whitespace span directly while flagging lexical words
+(`is_word = TRUE`) and lowercased `term` values:
 
 ```{r concordance-raw, eval=has_quanteda}
-raw_segments <- data.frame(document_id = c("my_text", "empty"),
-  segment_id = "s1", text = c("We learn new words. We learned them.", ""))
-raw_tokens <- as.list(quanteda::tokens(raw_segments$text, what = "word",
-  remove_punct = FALSE, remove_symbols = FALSE, remove_numbers = FALSE,
-  remove_url = FALSE, remove_separators = TRUE, split_hyphens = FALSE))
-raw_rows <- do.call(rbind, lapply(seq_along(raw_tokens), function(i) data.frame(
-  document_id = rep(raw_segments$document_id[i], length(raw_tokens[[i]])),
-  segment_id = rep(raw_segments$segment_id[i], length(raw_tokens[[i]])),
-  token_index = seq_along(raw_tokens[[i]]), surface = raw_tokens[[i]])))
-raw_annotations <- lexdiv_import_annotations(raw_rows, raw_segments,
-  list(language = "en", analyzer = "quanteda-tokens-word",
-    analyzer_version = as.character(utils::packageVersion("quanteda")),
-    dictionary = "none", dictionary_version = "not-applicable",
-    unit = "word-tokenizer-with-punctuation", normalization = "none",
-    settings = paste("remove_punct=FALSE; remove_symbols=FALSE; remove_numbers=FALSE;",
-      "remove_url=FALSE; remove_separators=TRUE; split_hyphens=FALSE")))
+raw_annotations <- lexdiv_as_annotations(
+  c(my_text = "We learn new words. We learned them.", empty = "")
+)
 raw_search <- lexdiv_concordance(raw_annotations,
-  list(learning = "^learn(ed)?$"), valuetype = "regex")
+  list(learning = "^learn(ed)?$"), term_col = "term", valuetype = "regex")
 raw_search$counts
 ```
 
@@ -189,7 +173,7 @@ queries, settings or source creates a different search identity; sorting does no
 
 ## Plot those same occurrences
 
-```{r concordance-position-plot, eval=has_quanteda && has_plot}
+```{r concordance-position-plot, eval=has_quanteda}
 positions <- plot(search, "word")
 ```
 
@@ -200,15 +184,15 @@ no occurrence or text-length line. This is an occurrence plot, not a density
 estimate or a dispersion statistic.
 
 For page- or Unit-based counts and recurrence after a teaching introduction,
-see [textbook progression](textbook-progression.html), available in development
-0.5.0.9001. It joins these saved occurrences to a separate ordered
-section roster; the token-position and DP definitions here remain unchanged.
+see [textbook progression](textbook-progression.html). It joins these saved
+occurrences to a separate ordered section roster; the token-position and DP
+definitions here remain unchanged.
 
 Relative coordinates are `(position - 0.5) / source_tokens`, the centers of the
 original token slots on a common 0–1 scale. Exclusions do not shorten the axis.
 Use `relative = FALSE` for a shared absolute token-position axis:
 
-```{r concordance-position-mono, eval=has_quanteda && has_plot}
+```{r concordance-position-mono, eval=has_quanteda}
 plot(search, "phrase", relative = FALSE, monochrome = TRUE)
 stopifnot(identical(positions$occurrences$occurrence_id,
   search$occurrences$occurrence_id[search$occurrences$query_id == "word"]))

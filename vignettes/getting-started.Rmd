@@ -30,15 +30,13 @@ texts <- data.frame(
   document_id = c("essay_a", "essay_b", "empty"),
   text = c("Cats chase cats and dogs.", "The reader reads a story.", "")
 )
-analysis <- lexdiv_metrics_text_batch(
-  texts, tokenizer = "english", normalization = "NFC",
-  case = "lower", metrics = "ttr"
-)
+analysis <- lexdiv_metrics_text_batch(texts, metrics = "ttr")
 analysis$results
 ```
 
-`tokenizer = "english"` selects the English word rules; `case = "lower"`
-counts `Cats` and `cats` as the same form. This example counts surface forms,
+By default, `tokenizer = "english"` applies the English word rules, `normalization = "NFC"`
+canonicalizes Unicode accents, and `case = "lower"` counts `Cats` and `cats` as
+the same form. This example counts surface forms,
 without lemmatization or part-of-speech filtering. These are measurement
 choices, not automatic corrections of the source text.
 
@@ -119,7 +117,7 @@ Select scalar fields for CSV, keeping availability and word counts beside
 values. The complete `analysis` object still holds the settings and token audit.
 
 ```{r first-report-table}
-report <- lexdiv_widen(analysis$results,
+report <- lexdiv_widen(analysis,
   values_from = c("value", "status", "missing_reason", "N", "V"))
 report
 ```
@@ -312,11 +310,12 @@ Checker. NWLC documents manual word-list alignment. New JACET profiles
 therefore expose AntBNC-versus-headword conflicts and accept explicit upstream
 overrides.
 
-## Caller-supplied lexical norms
+## Custom lexical norms
 
-`lexdiv_norm_profile()` exact-matches caller-prepared terms against one
-caller-supplied table. It does not download a norm, transform lookup terms, or
-infer that measures with different units and directions are comparable.
+`lexdiv_norm_profile()` exact-matches prepared terms against your own norm
+table (`data.frame` or `tibble`). You can run a quick exploratory profile
+directly, or attach explicit scale and citation metadata with
+`lexdiv_norm_spec()` and `lexdiv_resource_meta()`:
 
 ```{r}
 synthetic_norms <- data.frame(
@@ -325,29 +324,24 @@ synthetic_norms <- data.frame(
   concreteness = c(5, 3, 4),
   stringsAsFactors = FALSE
 )
-norm_specs <- data.frame(
-  measure_id = c("familiarity", "concreteness"),
-  value_column = c("familiarity", "concreteness"),
+norm_specs <- lexdiv_norm_spec(
+  c("familiarity", "concreteness"),
   construct_id = c("subjective_familiarity", "concreteness"),
-  value_unit = c("seven_point_rating", "seven_point_rating"),
+  value_unit = "seven_point_rating",
   direction = c("higher", "descriptive"),
-  language = c("English", "English"),
-  variety = c("unspecified", "unspecified"),
-  population_id = c("example_adults", "example_adults"),
-  collection_year = c("2025", "2025"),
-  valid_min = c(1, 1),
-  valid_max = c(7, 7),
-  stringsAsFactors = FALSE
+  language = "English",
+  population_id = "example_adults",
+  collection_year = "2025",
+  valid_min = 1,
+  valid_max = 7
 )
-norm_resource <- list(
+norm_resource <- lexdiv_resource_meta(
   resource_id = "synthetic_norms",
   resource_version = "1",
   creator = "Project-authored example",
-  source_reference = "Getting-started synthetic fixture",
+  source_reference = "Getting-started synthetic example",
   data_license = "synthetic-example-only",
-  transformation_id = "none",
-  lookup_unit = "lowercase_lemma",
-  resource_key_normalization_id = "caller-prepared-v1"
+  lookup_unit = "lowercase_lemma"
 )
 
 norm_profile <- lexdiv_norm_profile(
@@ -570,12 +564,10 @@ canonical plan and returns each complete moving-window value plus the number
 and nominal weight of windows containing each token position.
 
 ```{r, fig.width=5, fig.height=3}
-methods <- lexdiv_methods()
-mattr_method <- methods$method_id[methods$metric_id == "mattr"]
 mattr_plan <- lexdiv_plan(
   presets = character(),
   grids = lexdiv_grid(
-    mattr_method,
+    "mattr",
     "window_length",
     c(10, 20),
     request_id_prefix = "mattr"
@@ -675,9 +667,9 @@ Use `jsonlite::read_json(contract_paths[[1]], simplifyVector = FALSE)` when an
 R list representation is convenient. Reading the files does not run a metric,
 download a resource, or expose caller file paths.
 
-## Offline installed-package check
+## Self-contained offline workflow script
 
-An installed smoke script exercises the public workflows without network access
+An installed example script exercises the public workflows without network access
 or an external runtime. This integration example requires all five reference
 resources to have been explicitly downloaded beforehand. The core examples
 earlier in this guide do not require them:

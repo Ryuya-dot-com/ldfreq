@@ -336,7 +336,7 @@ Do not give those arbitrary orientations independent linguistic meanings.
 ```{r mca-maps}
 mca_labels <- NULL
 if (has_ca) {
-  # Since 0.4.0.9002: keep original IDs and choose separate display names.
+  # Keep original IDs and choose separate display names.
   ids <- unique(mca_result$rows$id)
   mca_labels <- setNames(sprintf("use%02d", seq_along(ids)), ids)
   mca_display <- mca_helper$ordination_mca_plot(mca_result, labels = mca_labels)
@@ -344,7 +344,7 @@ if (has_ca) {
 }
 ```
 
-The optional `labels` argument requires **0.5.0.9001**. Review tools can
+Review tools can
 return long occurrence IDs that overlap or are clipped in a plot. Supply a
 character vector whose names are exactly the displayed occurrence IDs (or
 category IDs on a category map); its order need not match the result table.
@@ -357,7 +357,7 @@ The warning about repeated eigenvalues is intentional. These maps show the first
 two retained axes (one axis for rank-one inputs). Occurrence and category maps
 use separate principal coordinates: cross-map distances are not association
 strengths. Full tables retain co-located IDs even when display labels are combined.
-Since 0.4.0.9002, the CA/MCA/MDS plots group labels at coordinates equal to eight
+The CA/MCA/MDS plots group labels at coordinates equal to eight
 decimal places, including numerical zeroes. This is a display rule; stored and
 returned coordinates keep their full precision and points are not jittered.
 Interpret the coding scheme, category counts, contributions and representation

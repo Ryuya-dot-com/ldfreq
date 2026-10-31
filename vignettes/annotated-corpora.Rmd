@@ -409,9 +409,9 @@ into single words or alter TTR, MATTR or MTLD.
 
 ### Save the complete review and reproduce its tables
 
-For teacher preparation, the [DDL material example](ddl-materials.html)
-(development 0.5.0.9001) uses an explicit subset of accepted occurrences
-to create learner HTML, a separate teacher table and a complete private record.
+For teacher preparation, the [DDL material example](ddl-materials.html) uses
+an explicit subset of accepted occurrences to create learner HTML, a separate
+teacher table and a complete private record.
 It retains pending candidates and does not change this review's criterion.
 
 ```{r phrase-review-save, eval=has_phrase_example}
@@ -440,7 +440,6 @@ Two researchers may read the same `take off` match differently. The question
 here is **whether they make the same inclusion decision, and whether their
 decisions change the document profile**. It is not a test of phrase-detection
 recall: expressions absent from the list have not been sampled for review.
-The following guide-local code runs with the existing 0.3.0.9003 installation.
 
 The design follows these distinctions in the annotation literature:
 

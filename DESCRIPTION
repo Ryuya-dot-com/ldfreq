@@ -24,7 +24,7 @@ Description: Compares lexical diversity and reference-vocabulary profiles while
     TUBELEX tables support lexical-level coverage and corpus-relative frequency
     profiles, with off-list terms and non-computable requests kept explicit.
     Additional functions provide exact lexical overlap, reference-set coverage,
-    caller-supplied word-family, lexical norm and adjacent n-gram frequency profiles,
+    custom word-family, lexical norm and adjacent n-gram frequency profiles,
     descriptive comparisons of scored
     vocabulary response pairs, multi-document workflows, and plots.
     MorphoLex English and Nation's BNC/COCA Level 6 word-family lists are
@@ -33,7 +33,7 @@ Description: Compares lexical diversity and reference-vocabulary profiles while
     A local MorphyNet reader retains derivational relations and source identity.
     External annotations, local MASC Penn annotations and optional 'quanteda' integration retain
     supplied token boundaries and source positions for corpus analysis.
-    Contextual review connects caller-supplied lexical candidates and explicit
+    Contextual review connects user-supplied lexical candidates and explicit
     decisions to keyword-in-context displays and original text.
     External model outputs can be attached with checked source identities
     while keeping model suggestions separate from reviewer decisions.

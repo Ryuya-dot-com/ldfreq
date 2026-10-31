@@ -91,14 +91,11 @@ location. Include the license and provenance files. A partial or modified
 cache is rejected. Inspect the returned `path`, remove that specific version
 directory if you intend to replace it, and explicitly download again.
 
-## Update from 0.4.x
+## Reproducibility and citation
 
-Earlier versions bundled these snapshots. In 0.5.0.9001 their data bytes and
-resource identities are unchanged, but they are stored separately. Calls such
-as `nj8_profile()` without a supplied word list now require the explicit cache
-setup above. Existing saved results remain readable. Caller-supplied word lists
-and reference tables continue to work without downloads.
-
-Record the resource version, source hash, coverage and citation with your
-results. `citation("ldfreq")` cites the package; it does not replace citations
-for the data and measurement methods.
+Custom word lists and norm tables work completely offline without downloading
+any optional resource. When you use a cached reference dataset (`tubelex`,
+`nj8`, `morpholex`, `bnccoca`, or `morphynet`), record the resource version,
+SHA-256 hash, match coverage, and dataset citation alongside your results.
+`citation("ldfreq")` cites the R package; it does not replace citations for the
+underlying lexical datasets and measurement methods.

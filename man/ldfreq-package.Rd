@@ -13,10 +13,7 @@ the words counted, analysis settings and reasons for unavailable scores.
 After installing the package, run:
 \preformatted{
 library(ldfreq)
-result <- lexdiv_metrics_text(
-  "Cats chase cats and dogs.",
-  tokenizer = "english", case = "lower", metrics = "ttr"
-)
+result <- lexdiv_metrics_text("Cats chase cats and dogs.", metrics = "ttr")
 result$results
 }
 The text has five word occurrences (\code{N = 5}) and four distinct lowercase
@@ -391,13 +388,13 @@ Exact term/content-word overlap describes lexical sharing under the selected
 unit and annotation. It is not a plagiarism detector or a direct measure of
 semantic similarity, coherence, proficiency, or writing quality.
 }
-\section{Quality screens}{
+\section{Token-count screens}{
 \code{below_quality_floor} and \code{lexdiv_screen_lengths()} are advisory token-count
-evidence screens. Here, quality is a field name retained for compatibility; it does not mean writing
-quality, measurement validity, or reliability. The screens never change a value,
-effective parameter, status, or document membership. Passing a screen does not
-establish validity or reliability; failing one does not erase an otherwise
-computable value.
+evidence screens derived from empirical length-stability studies; they do not
+measure writing quality, construct validity, or score reliability. The screens
+never change a value, effective parameter, status, or document membership.
+Passing a screen does not establish validity or reliability; failing one does
+not erase an otherwise computable value.
 }
 \section{Versioned surfaces}{
 The core metrics, raw-text preprocessing, lexical overlap, reference coverage,
@@ -407,13 +404,12 @@ versioned contracts. This keeps a change in tokenization or resource matching
 from silently redefining a core metric. Expected-TTR D is separately named and
 explicitly distinguished from CLAN VOCD.
 }
-\section{Offline smoke test}{
-After loading \pkg{ldfreq}, run the installed script returned by
+\section{Self-contained offline example}{
+After loading \pkg{ldfreq}, you can run the self-contained example script at
 \code{system.file("examples", "offline-smoke.R", package = "ldfreq")}. It
-exercises single, batch, profile, local-MATTR, profile-batch,
-term/content-word overlap, many-document reference coverage, lexical-norm,
-lexical-level, and screen workflows without
-a network connection or external runtime.
+exercises single, batch, plan, local-MATTR, term/content-word overlap,
+reference coverage, custom norm, and lexical-level workflows end to end
+without a network connection or external runtime.
 }
 \seealso{
 \code{\link{lexdiv_metrics}}, \code{\link{lexdiv_convenience}},
@@ -432,19 +428,14 @@ a network connection or external runtime.
 library(ldfreq)
 
 # One raw English text: inspect the score and the counted words.
-result <- lexdiv_metrics_text(
-  "Cats chase cats and dogs.",
-  tokenizer = "english", case = "lower", metrics = "ttr"
-)
+result <- lexdiv_metrics_text("Cats chase cats and dogs.", metrics = "ttr")
 result$results  # N = 5, V = 4, TTR = 0.8
 result$token_audit
 
 # Several texts: names identify documents, including the empty one.
 texts <- c(essay_a = "Cats chase cats and dogs.", essay_b = "The reader reads a story.",
   empty = "")
-batch <- lexdiv_metrics_text_batch(
-  texts, tokenizer = "english", case = "lower", metrics = "ttr"
-)
+batch <- lexdiv_metrics_text_batch(texts, metrics = "ttr")
 batch$results  # TTR = 0.8, 1, NA; the empty text has reason "empty_input".
 
 # Other entry points: ?lexdiv_metrics for pre-tokenized words;
