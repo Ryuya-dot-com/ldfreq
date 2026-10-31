@@ -94,6 +94,7 @@ def verify_ci(state, changed, old, new, run, repo, jobs=None):
     # Changed release controls are checked afresh; other test inputs must match.
     allowed_files = {".github/workflows/R-CMD-check.yaml",
                      ".github/workflows/release-candidate.yaml",
+                     ".github/workflows/pkgdown.yaml",
                      "development/RELEASE-CHECKLIST.md", "README.md",
                      "experiments/package-resource-inventory/check-resource-inventory.R"}
     allowed_controls = {"generate-release-evidence.R", "validate-public-scan.R",
