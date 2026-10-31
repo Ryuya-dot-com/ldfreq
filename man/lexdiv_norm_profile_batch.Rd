@@ -3,9 +3,17 @@
 \alias{print.lexdiv_norm_profile_batch}
 \title{Apply Caller-Supplied Lexical Norms to Multiple Documents}
 \usage{
-lexdiv_norm_profile_batch(documents, norms, key, measure_specs, resource,
-  weightings = c("token", "type"), id_col = "document_id",
-  terms_col = "terms", max_rows = 1e6)
+lexdiv_norm_profile_batch(
+  documents,
+  norms,
+  key,
+  measure_specs = lexdiv_norm_spec(setdiff(names(norms), key)),
+  resource = lexdiv_resource_meta("caller_norms"),
+  weightings = c("token", "type"),
+  id_col = "document_id",
+  terms_col = "terms",
+  max_rows = 1e6
+)
 
 \method{print}{lexdiv_norm_profile_batch}(x, ...)
 }

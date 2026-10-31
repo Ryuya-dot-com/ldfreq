@@ -163,10 +163,13 @@ if (length(discarding_generics)) {
 
 retired_names <- c(
   "new_jacet8000_profile", "new_jacet8000_profile_batch",
-  "tubelex_frequency_profile", "lexdiv_overlap_measure_ids"
+  "tubelex_frequency_profile", "lexdiv_overlap_measure_ids",
+  "lexdiv_ngram_compare", "lexdiv_ngram_reference_build",
+  "lexdiv_concordance_sort", "lexdiv_screen",
+  "lexdiv_variant_ids", "lexdiv_profile", "lexdiv_profile_batch"
 )
 public_paths <- c(
-  "DESCRIPTION", "NAMESPACE", "NEWS.md", "README.md", "R", "man",
+  "DESCRIPTION", "NAMESPACE", "README.md", "R", "man",
   file.path("inst", "examples"), file.path("inst", "spec"), "vignettes"
 )
 public_files <- unlist(lapply(public_paths, function(path) {
@@ -181,8 +184,10 @@ public_files <- unlist(lapply(public_paths, function(path) {
 }), use.names = FALSE)
 public_files <- public_files[!dir.exists(public_files)]
 for (retired in retired_names) {
+  # Match public identifier, excluding internal .lexdiv_profile* helpers and S3 classes.
+  pattern <- paste0("(?<![.A-Za-z0-9_])", retired, "(?![A-Za-z0-9_])")
   hits <- vapply(public_files, function(path) {
-    any(grepl(retired, readLines(path, warn = FALSE), fixed = TRUE))
+    any(grepl(pattern, readLines(path, warn = FALSE), perl = TRUE))
   }, logical(1L))
   if (any(hits)) {
     relative <- substring(public_files[hits], nchar(package_root) + 2L)

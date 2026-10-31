@@ -173,7 +173,7 @@ test_that("invalid input fails atomically before resource loading", {
     c("apple", ""),
     factor("apple"),
     matrix("apple", nrow = 1L),
-    structure("apple", names = "term"),
+    structure("apple", custom = "term"),
     bytes_term,
     latin1_term
   )

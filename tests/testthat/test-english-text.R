@@ -14,7 +14,7 @@ test_that("English lexical boundaries follow explicit examples", {
     list("", character()), list("!!! \U0001F600", character())
   )
   for (example in cases) {
-    x <- lexdiv_tokenize(example[[1L]], tokenizer = "english")
+    x <- lexdiv_tokenize(example[[1L]], tokenizer = "english", case = "preserve")
     expect_identical(x$tokens$surface, example[[2L]])
     expect_s3_class(lexdiv_metrics_text(x, metrics = "ttr"), "lexdiv_text_results")
     processed <- stringi::stri_trans_char(stringi::stri_trans_nfc(example[[1L]]),
@@ -58,24 +58,25 @@ test_that("English normalization, offsets and exclusions survive validation", {
     normalization = "NFKC", case = "lower")$tokens$surface, "abc")
 })
 
-test_that("Unicode defaults and saved 0.2.0 objects remain usable", {
-  old <- lexdiv_tokenize("John\u2019s 3.14 2026-10-04")
+test_that("Unicode mode and saved 0.2.0 objects remain usable", {
+  old <- lexdiv_tokenize("John\u2019s 3.14 2026-10-04", tokenizer = "unicode", case = "preserve")
   expect_identical(old$tokens$surface, c("John\u2019s", "2026-10-04"))
   old$provenance$contract_version <- "0.2.0"
   expect_no_error(lexdiv_metrics_text(old, metrics = "ttr"))
-  english <- lexdiv_tokenize("John\u2019s 3.14 2026-10-04", tokenizer = "english")
-  expect_identical(english$tokens$surface, "John's")
+  english <- lexdiv_tokenize("John\u2019s 3.14 2026-10-04")
+  expect_identical(english$tokens$surface, "john's")
   english$provenance$contract_version <- "0.2.0"
   expect_error(lexdiv_metrics_text(english, metrics = "ttr"), "provenance")
 })
 
-test_that("raw-text batches reject unsupported arguments even without documents", {
-  plan <- lexdiv_plan(presets = character(), specs = list(lexdiv_spec("ttr_v_over_n_v1")))
+test_that("raw-text batches support plan execution and reject unsupported arguments", {
+  plan <- lexdiv_plan(presets = character(), specs = list(lexdiv_spec("ttr")))
   inputs <- list(stats::setNames(character(), character()), c(doc = "a a b"),
     stats::setNames(list(), character()), list(doc = lexdiv_tokenize("a a b")))
   for (input in inputs) {
-    expect_error(lexdiv_metrics_text_batch(input, plan = plan), "unused argument.*plan")
-    expect_error(lexdiv_metrics_text_batch(input, max_rows = 10), "unused argument.*max_rows")
+    planned <- lexdiv_metrics_text_batch(input, plan = plan)
+    expect_s3_class(planned$results, "lexdiv_profile_batch_results")
+    expect_error(lexdiv_metrics_text_batch(input, max_rows = 10), "max_rows requires")
     expect_error(lexdiv_metrics_text_batch(input, tokens_col = "tokens"), "unused argument.*tokens_col")
   }
 })

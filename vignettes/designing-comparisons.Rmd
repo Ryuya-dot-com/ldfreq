@@ -146,7 +146,7 @@ mattr_method <- lexdiv_methods()$method_id[
   lexdiv_methods()$metric_id == "mattr"]
 plan <- lexdiv_plan(presets = character(), grids = lexdiv_grid(
   mattr_method, "window_length", c(20, 40), request_id_prefix = "window"))
-sensitivity <- lexdiv_profile_batch(documents, plan)
+sensitivity <- lexdiv_metrics_batch(documents, plan = plan)
 sensitivity[, c("document_id", "request_id", "value", "requested_parameters")]
 wide <- lexdiv_widen(sensitivity)
 ```

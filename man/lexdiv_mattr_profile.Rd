@@ -24,7 +24,7 @@ lengths.}
 }
 \value{
 A \code{lexdiv_mattr_profile} list. \code{summary} contains the unchanged
-canonical \code{\link{lexdiv_profile}()} rows; \code{windows} contains local
+canonical \code{lexdiv_profile_results} rows; \code{windows} contains local
 TTR values; \code{exposure} contains position-only inclusion counts and
 weights; \code{diagnostics} reconciles the local mean with the canonical
 result; and \code{provenance} records the profile contract, schema, and plan

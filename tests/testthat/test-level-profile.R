@@ -145,7 +145,7 @@ test_that("annotated tokenizations retain lemma exclusions and token indexes", {
 test_that("AntBNC flemma conflicts remain explicit and selectable", {
   path <- antbnc_fixture_file()
   on.exit(unlink(path), add = TRUE)
-  tokenization <- lexdiv_tokenize("Interesting interests saw")
+  tokenization <- lexdiv_tokenize("Interesting interests saw", case = "preserve")
   annotated <- lexdiv_flemmatize(tokenization, path)
   wordlist <- data.frame(
     NJ8 = c(1L, 2L, 7001L, 8000L),
@@ -207,7 +207,7 @@ test_that("flemma overrides can resolve New JACET headword conflicts upstream", 
     stringsAsFactors = FALSE
   )
   annotated <- lexdiv_flemmatize(
-    lexdiv_tokenize("Interesting saw"),
+    lexdiv_tokenize("Interesting saw", case = "preserve"),
     path,
     overrides = overrides
   )
@@ -442,7 +442,7 @@ test_that("New JACET batch preserves flemma conflict policies", {
   path <- antbnc_fixture_file()
   on.exit(unlink(path), add = TRUE)
   annotated <- lexdiv_flemmatize(
-    lexdiv_tokenize("Interesting interests saw"),
+    lexdiv_tokenize("Interesting interests saw", case = "preserve"),
     path
   )
   wordlist <- data.frame(

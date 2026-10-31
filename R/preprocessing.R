@@ -6,7 +6,7 @@
 # metric computation.
 
 .lexprep_contract_id <- "ldfreq-preprocessing"
-.lexprep_contract_version <- "0.4.0"
+.lexprep_contract_version <- "1.0.0"
 .lexprep_tokenizer_id <- "ldfreq-unicode-word-tokenizer"
 .lexprep_tokenizer_version <- "0.1.0"
 .lexprep_flemma_backend_id <- "ldfreq-antbnc-flemma-adapter"
@@ -387,6 +387,7 @@
     is.list(provenance) && !is.object(provenance) &&
       identical(provenance$contract_id, .lexprep_contract_id) &&
       (identical(provenance$contract_version, .lexprep_contract_version) ||
+        identical(provenance$contract_version, "0.4.0") ||
         identical(provenance$contract_version, "0.3.0") ||
         (identical(tokenizer, "unicode") &&
           identical(provenance$contract_version, "0.2.0"))) &&
@@ -637,9 +638,9 @@
 lexdiv_tokenize <- function(
     text,
     normalization = "NFC",
-    case = "preserve",
+    case = "lower",
     keep_numbers = FALSE,
-    tokenizer = "unicode") {
+    tokenizer = "english") {
   text <- .lexprep_text(text)
   normalization <- .lexprep_scalar_choice(
     normalization,
@@ -1226,6 +1227,91 @@ lexdiv_flemmatize <- function(
   x
 }
 
+#' Lemmatize a named batch of tokenization objects
+#'
+#' @param documents A plain named list of `lexdiv_tokenization` objects as
+#'   returned by [lexdiv_tokenize_batch()].
+#' @inheritParams lexdiv_lemmatize
+#' @param lemmas,upos For `method = "supplied"` (or supplied UPOS), named lists
+#'   aligned with `documents`.
+#' @return An input-ordered named list of lemmatized `lexdiv_tokenization` objects.
+#' @export
+lexdiv_lemmatize_batch <- function(
+    documents,
+    method = "supplied",
+    lemmas = NULL,
+    upos = NULL,
+    backend_id = NULL,
+    backend_version = NULL,
+    upos_backend_id = NULL,
+    upos_backend_version = NULL,
+    dictionary = NULL,
+    dictionary_id = NULL,
+    dictionary_version = NULL) {
+  if (!is.list(documents) || is.object(documents) || is.data.frame(documents) ||
+      !identical(names(attributes(documents)), "names")) {
+    stop("documents must be a plain named list of tokenization objects.", call. = FALSE)
+  }
+  ids <- .lex_batch_validate_ids(names(documents), length(documents))
+  for (i in seq_along(documents)) {
+    .lexprep_validate_tokenization(documents[[i]],
+      sprintf("Document %s", encodeString(ids[[i]], quote = '"')))
+  }
+  check_list <- function(val, arg) {
+    if (is.null(val)) return(NULL)
+    if (!is.list(val) || is.object(val) || !identical(names(val), ids)) {
+      stop(sprintf("%s must be NULL or a plain list with names matching documents.", arg), call. = FALSE)
+    }
+    val
+  }
+  lemmas <- check_list(lemmas, "lemmas")
+  upos <- check_list(upos, "upos")
+  out <- lapply(seq_along(documents), function(i) {
+    lexdiv_lemmatize(
+      documents[[i]],
+      method = method,
+      lemmas = if (is.null(lemmas)) NULL else lemmas[[i]],
+      upos = if (is.null(upos)) NULL else upos[[i]],
+      backend_id = backend_id,
+      backend_version = backend_version,
+      upos_backend_id = upos_backend_id,
+      upos_backend_version = upos_backend_version,
+      dictionary = dictionary,
+      dictionary_id = dictionary_id,
+      dictionary_version = dictionary_version
+    )
+  })
+  stats::setNames(out, ids)
+}
+
+#' Flemmatize a named batch of tokenization objects
+#'
+#' @param documents A plain named list of `lexdiv_tokenization` objects.
+#' @inheritParams lexdiv_flemmatize
+#' @return An input-ordered named list of flemmatized `lexdiv_tokenization` objects.
+#' @export
+lexdiv_flemmatize_batch <- function(
+    documents,
+    resource,
+    overrides = NULL,
+    normalization = "nfkc_lower",
+    resource_version = NULL,
+    override_version = NULL) {
+  if (!is.list(documents) || is.object(documents) || is.data.frame(documents) ||
+      !identical(names(attributes(documents)), "names")) {
+    stop("documents must be a plain named list of tokenization objects.", call. = FALSE)
+  }
+  ids <- .lex_batch_validate_ids(names(documents), length(documents))
+  for (i in seq_along(documents)) {
+    .lexprep_validate_tokenization(documents[[i]],
+      sprintf("Document %s", encodeString(ids[[i]], quote = '"')))
+  }
+  out <- lapply(documents, lexdiv_flemmatize,
+    resource = resource, overrides = overrides, normalization = normalization,
+    resource_version = resource_version, override_version = override_version)
+  stats::setNames(out, ids)
+}
+
 .lexprep_selected_units <- function(x, unit, word_inclusion) {
   token_table <- x$tokens
   row_count <- nrow(token_table)
@@ -1316,7 +1402,7 @@ lexdiv_metrics_text <- function(
     unit = "surface",
     word_inclusion = "all",
     normalization = "NFC",
-    case = "preserve",
+    case = "lower",
     keep_numbers = FALSE,
     metrics = setdiff(lexdiv_metric_ids(), c("expected_ttr_d", "mtld_ma")),
     segment_length = 50L,
@@ -1324,7 +1410,16 @@ lexdiv_metrics_text <- function(
     mtld_threshold = 0.72,
     sample_size = 42L,
     expected_ttr_sample_sizes = 35:50,
-    tokenizer = "unicode") {
+    tokenizer = "english",
+    plan = NULL) {
+  if (!is.null(plan)) {
+    if (!missing(metrics) || !missing(segment_length) ||
+        !missing(window_length) || !missing(mtld_threshold) ||
+        !missing(sample_size) || !missing(expected_ttr_sample_sizes)) {
+      stop("With plan, omit metrics and individual metric parameters.", call. = FALSE)
+    }
+    plan <- .profile_validate_plan(plan)
+  }
   supplied_tokenizer_arguments <- c(
     normalization = !missing(normalization),
     case = !missing(case),
@@ -1368,15 +1463,19 @@ lexdiv_metrics_text <- function(
     )
   }
   selected <- .lexprep_selected_units(tokenization, unit, word_inclusion)
-  results <- lexdiv_metrics(
-    tokens = selected$units,
-    metrics = metrics,
-    segment_length = segment_length,
-    window_length = window_length,
-    mtld_threshold = mtld_threshold,
-    sample_size = sample_size,
-    expected_ttr_sample_sizes = expected_ttr_sample_sizes
-  )
+  results <- if (!is.null(plan)) {
+    lexdiv_metrics(tokens = selected$units, plan = plan)
+  } else {
+    lexdiv_metrics(
+      tokens = selected$units,
+      metrics = metrics,
+      segment_length = segment_length,
+      window_length = window_length,
+      mtld_threshold = mtld_threshold,
+      sample_size = sample_size,
+      expected_ttr_sample_sizes = expected_ttr_sample_sizes
+    )
+  }
   token_count <- nrow(selected$audit)
   eligible_count <- sum(selected$audit$eligible)
   preprocessing <- list(

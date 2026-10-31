@@ -104,8 +104,9 @@ flemma_text <- lexdiv_metrics_text(
 frequency_terms <- c("the", "cat", "saw", "the", "other", "cat")
 frequency <- tubelex_profile(frequency_terms)
 frequency_batch <- tubelex_profile_batch(list(a = frequency_terms, b = frequency_terms))
-stopifnot(identical(frequency, frequency_batch$a),
-          identical(names(frequency_batch), c("a", "b")))
+stopifnot(inherits(frequency_batch, "tubelex_profile_batch"),
+          identical(frequency, frequency_batch$profiles$a),
+          identical(names(frequency_batch$profiles), c("a", "b")))
 synthetic_levels <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
   Word = c("the", "see", "cat", "saw"),
@@ -146,9 +147,9 @@ mattr_4 <- lexdiv_spec(
   request_id = "mattr_4"
 )
 plan <- lexdiv_plan(presets = character(), specs = mattr_4)
-profile <- lexdiv_profile(tokens, plan)
+profile <- lexdiv_metrics(tokens, plan = plan)
 mattr_profile <- lexdiv_mattr_profile(tokens, plan)
-profile_batch <- lexdiv_profile_batch(documents, plan)
+profile_batch <- lexdiv_metrics_batch(documents, plan = plan)
 screen <- lexdiv_screen_lengths(profile_batch, floors = c(tokens_4 = 4L))
 
 check_print_contract <- function(value) {

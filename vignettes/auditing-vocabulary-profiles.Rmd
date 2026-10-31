@@ -658,7 +658,7 @@ documents <- list(clustered = rep(c("river", "stone", "cloud"), each = 20),
 method <- lexdiv_methods()$method_id[lexdiv_methods()$metric_id == "mattr"]
 plan <- lexdiv_plan(presets = character(), grids = lexdiv_grid(
   method, "window_length", c(10, 20), request_id_prefix = "window"))
-results <- lexdiv_profile_batch(documents, plan)
+results <- lexdiv_metrics_batch(documents, plan = plan)
 results[, c("document_id", "request_id", "value", "status")]
 ```
 

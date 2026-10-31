@@ -251,17 +251,14 @@ The plot method invisibly returns the summary rows and exact values drawn.
 document-major tables while the external resource provenance is stored once.
 }
 \examples{
-# Optional data: review and explicitly download these resources first.
-if (all(lexdiv_resource_info(c("nj8"))$available)) {
-nj8_profile(c("the", "true", "false", "nan"))
-
+# Caller-supplied wordlist works completely offline:
 wordlist <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
   Word = c("the", "develop", "rare", "extreme")
 )
 profile <- nj8_profile(
   c("The", "develop", "unknown", "the"),
-  wordlist = NULL,
+  wordlist = wordlist,
   unit = "surface"
 )
 profile$summary
@@ -269,29 +266,14 @@ profile$coverage
 
 batch <- nj8_profile_batch(
   list(doc_a = c("The", "develop"), doc_b = c("rare", "outside")),
-  wordlist = NULL,
+  wordlist = wordlist,
   unit = "surface"
 )
 batch$coverage
 
-contract_path <- system.file(
-  "spec", "lexical-level-profile-contract.json", package = "ldfreq"
-)
-stopifnot(nzchar(contract_path))
-basename(contract_path)
-
-\dontrun{
-# A legitimately obtained official workbook can be used directly.
-official <- nj8_profile(
-  c("the", "develop", "unknown"),
-  "/path/to/j8_2016.xlsx"
-)
-}
-
-if (interactive()) {
-  plot(profile)
-  plot(profile, weighting = "type", include_off_list = FALSE)
-}
+# Optional cached NJ8 snapshot:
+if (all(lexdiv_resource_info(c("nj8"))$available)) {
+  nj8_profile(c("the", "true", "false", "nan"))
 }
 }
 \seealso{

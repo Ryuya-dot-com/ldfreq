@@ -45,16 +45,16 @@ For ordinary text analyses, inspect \code{result$results} and
 \code{\link{lexdiv_widen}} or plot document values with \code{plot(result, metric_id = "ttr")}.
 Save the original text and complete result together as RDS.
 
-For planned observations, start with token vectors and a
-\code{\link{lexdiv_plan}}. Pass the complete output of
-\code{\link{lexdiv_metrics_batch}(tokens, plan = plan)}, together with the
-schedule, submissions and reporting decisions, to \code{\link{lexdiv_study_table}}.
-Then use \code{\link{lexdiv_study_model_data}} to select one response per
-observation for a modelling package. The raw-text convenience functions do
-not accept a plan; their result tables cannot replace this plan-based input.
+For planned observations, create a \code{\link{lexdiv_plan}} and run either
+\code{\link{lexdiv_metrics_batch}(tokens, plan = plan)} or
+\code{\link{lexdiv_metrics_text_batch}(texts, plan = plan)}, then pass the
+result together with the schedule, submissions and reporting decisions to
+\code{\link{lexdiv_study_table}}. Use \code{\link{lexdiv_study_model_data}} to
+select one response per observation for a modelling package.
 
 For source-linked exploration, prepare complete annotations using
-\code{\link{lexdiv_import_annotations}}. A saved \code{\link{lexdiv_concordance}}
+\code{\link{lexdiv_import_annotations}} or bridge raw texts/tokenizations directly
+with \code{\link{lexdiv_as_annotations}}. A saved \code{\link{lexdiv_concordance}}
 search feeds \code{\link{lexdiv_sort_concordance}},
 \code{\link{lexdiv_concordance_dispersion}}, \code{\link{lexdiv_collocations}}
 or \code{plot(search, query_id)}. A \code{\link{lexdiv_keyness}} comparison
@@ -177,10 +177,10 @@ Choose the entry point from the form of data you already have:
   explicit segment IDs and original positions, then construct or import a
   local reference with \code{lexdiv_ngram_reference()} and look up target
   sequences with \code{lexdiv_ngram_profile()}. Corpus text is not bundled.}
-  \item{Chunked reference construction}{Use \code{\link{lexdiv_ngram_reference_build}}
+  \item{Chunked reference construction}{Use \code{\link{lexdiv_build_ngram_reference}}
   to accumulate exact counts from whole-document chunks without retaining
   all occurrence tables. Distinct types and the document roster stay in memory.}
-  \item{Reference-choice sensitivity}{Use \code{\link{lexdiv_ngram_compare}}
+  \item{Reference-choice sensitivity}{Use \code{\link{lexdiv_compare_ngrams}}
   to retain separate reference coverage and compare frequencies on common
   target items, with explicit baseline differences and denominators.}
   \item{Supplied corpus annotations}{Use \code{\link{lexdiv_read_masc}} for
@@ -228,7 +228,7 @@ tables and provenance. Those data and their dictionary use CC BY-NC-SA 4.0
 separately from the MIT license of the independent R code.
 Adjacent bigram/trigram extraction and caller-supplied reference frequencies
 retain segment boundaries, original positions, opportunity totals and coverage.
-\code{\link{lexdiv_ngram_compare}} compares reference choices using the same
+\code{\link{lexdiv_compare_ngrams}} compares reference choices using the same
 target items, retaining coverage and common-set differences from a baseline.
 Result rows retain method, parameter or denominator, schema, and contract
 provenance.
@@ -423,7 +423,7 @@ a network connection or external runtime.
 \code{\link{lexdiv_reference_coverage}},
 \code{\link{lexdiv_norm_profile}},
 \code{\link{lexdiv_norm_profile_batch}},
-\code{\link{lexdiv_profile}}, \code{\link{lexdiv_mattr_profile}},
+\code{\link{lexdiv_plan}}, \code{\link{lexdiv_mattr_profile}},
 \code{\link{lexdiv_variant_metrics}},
 \code{\link{nj8_profile}},
 \code{\link{tubelex_profile}}

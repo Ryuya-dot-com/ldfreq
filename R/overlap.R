@@ -88,6 +88,7 @@ lexdiv_overlap_ids <- function() {
 }
 
 .lexoverlap_term_state <- function(terms) {
+  terms <- .lex_strip_names(terms)
   if (
     !is.character(terms) || is.object(terms) || !is.null(dim(terms)) ||
       !is.null(attributes(terms))

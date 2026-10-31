@@ -1,5 +1,6 @@
 \name{lexdiv_evaluate_contextual}
 \alias{lexdiv_evaluate_contextual}
+\alias{print.lexdiv_contextual_evaluation}
 \title{Compare contextual candidate scores with an explicit reference review}
 \description{
 Derives a unique best-scoring candidate only for complete score inventories and

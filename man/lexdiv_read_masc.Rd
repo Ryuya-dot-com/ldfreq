@@ -1,6 +1,7 @@
 \name{lexdiv_read_masc}
 \alias{lexdiv_read_masc}
 \alias{lexdiv_as_quanteda}
+\alias{print.lexdiv_masc}
 \title{Read local MASC Penn annotations and retain positions in quanteda}
 \description{
 Imports supplied Penn tokens from the MASC GrAF 1.0 layout, or transfers

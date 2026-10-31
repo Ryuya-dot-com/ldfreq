@@ -1,5 +1,6 @@
 \name{lexdiv_ambiguity_review}
 \alias{lexdiv_ambiguity_review}
+\alias{print.lexdiv_ambiguity_review}
 \title{Review lexical candidates in their original contexts}
 \description{
 Connects source-verified token occurrences to quanteda keyword-in-context

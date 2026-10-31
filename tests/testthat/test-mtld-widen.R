@@ -63,7 +63,7 @@ test_that("MTLD diagnostics preserve specification and name guards", {
     lexdiv_spec(method, parameters = list(threshold = .72), request_id = "standard"),
     lexdiv_spec(method, parameters = list(threshold = .5), request_id = "lower")
   ))
-  x <- lexdiv_profile_batch(list(a = rep(c("a", "b"), 25)), plan)
+  x <- lexdiv_metrics_batch(list(a = rep(c("a", "b"), 25)), plan = plan)
   wide <- lexdiv_widen(x, values_from = "value", mtld_diagnostics = TRUE)
   expect_equal(wide$standard__forward_complete_factors, 16)
   expect_equal(wide$lower__forward_complete_factors, 10)

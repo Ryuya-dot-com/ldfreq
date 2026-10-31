@@ -1,5 +1,6 @@
 \name{lexdiv_evaluate_annotations}
 \alias{lexdiv_evaluate_annotations}
+\alias{print.lexdiv_annotation_evaluation}
 \title{Evaluate external annotation labels against an explicit reference}
 \description{
 Pairs complete external annotations on the same source segmentation, reports

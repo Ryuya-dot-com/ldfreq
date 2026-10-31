@@ -1,5 +1,6 @@
 \name{lexdiv_compare_annotations}
 \alias{lexdiv_compare_annotations}
+\alias{print.lexdiv_annotation_comparison}
 \title{Compare annotation versions on identical tokenized documents}
 \usage{
 lexdiv_compare_annotations(before, after, max_tokens = 1e6)

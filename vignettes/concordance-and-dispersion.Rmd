@@ -177,7 +177,7 @@ surface token. Left sorting uses L1, then L2; right sorting uses R1, then R2.
 It does not alphabetize the complete displayed `pre` string. Ties retain query
 order, supplied segment order and original match position. Absent context sorts
 last at each depth. Sorting uses UTF-8 radix order, independent of locale, rather
-than language-specific collation. `ignore_case = TRUE` case-folds only the sort
+than language-specific collation. `case_insensitive = TRUE` case-folds only the sort
 keys. Request a depth no larger than the saved `window`.
 
 `from`/`to` are segment token positions. `document_from`/`document_to` concatenate
@@ -278,7 +278,7 @@ temporary files can disappear when R closes. Keep the original session record.
 
 ```{r concordance-save, eval=has_quanteda}
 record <- list(search = search, sorted = right_sorted, dispersion = dispersion,
-  sort = list(side = "right", depth = 2L, ignore_case = FALSE),
+  sort = list(side = "right", depth = 2L, case_insensitive = FALSE),
   session = utils::sessionInfo())
 saved <- tempfile(fileext = ".rds") # Choose a persistent filename for research data.
 saveRDS(record, saved)

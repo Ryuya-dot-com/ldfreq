@@ -1,83 +1,56 @@
 # API and measurement lifecycle
 
-## Current distributions
+## Current distribution
 
-The current development release is **0.5.0.9001**. It includes all current guide
-workflows. Stable **0.4.0** remains available as a separate fixed release.
-Pin the package archive used in an analysis and use `citation("ldfreq")` to
-cite that exact version. New releases do not replace earlier fixed archives.
+The current stable release is **1.0.0**. It provides a streamlined, cohesive
+public API with unified entry points, modern R container compatibility
+(`tibble` / `data.table` and named vectors), ergonomic metadata helpers, direct
+raw-text-to-corpus bridges, and structured S3 results across all workflows.
+Earlier pre-1.0 archives remain available in the release history for exact
+reproduction of 0.x scripts. Pin the package archive used in an analysis and
+use `citation("ldfreq")` to cite that exact version.
 
-The [release-scope guide](https://ryuya-dot-com.github.io/ldfreq/articles/release-scope.html)
-explains supported inputs, optional integrations and compatibility. The
-[NEWS](https://ryuya-dot-com.github.io/ldfreq/news/index.html) records changes by version.
-
-## Reference data in 0.5.0.9001
+## Reference data
 
 Third-party reference data are optional downloads with their own licenses.
 Use `lexdiv_resource_info()` to inspect the terms, source, version and hash,
 then explicitly use `lexdiv_download_resources(..., accept_license = TRUE)`.
-Ordinary computation and installation never download resources. The MIT code
-can be installed and used without obtaining MorphoLex or any other reference
-snapshot. Existing resource-based analyses need this one-time setup; the
-reference data bytes and measurement definitions are unchanged.
+Ordinary computation and installation never download resources.
 
-Rendered guides are published on the website. The compact package archive
-contains guide sources and installed example scripts; it does not include
-rendered outputs from the separately licensed reference data.
-
-## Metric identities and saved results
+## Metric identities and contracts in 1.0.0
 
 Package version, metric method ID, metric-contract version, result schema,
-preprocessing and reference-resource identity are separate. Preserve them with
-the original inputs and complete results. Changes in a package version do not
-relabel the methods or values inside an earlier saved result.
+preprocessing contract, and reference-resource identity remain explicit:
 
-The current catalog has thirteen metrics: eleven defaults, opt-in `mtld_ma`,
-and experimental `expected_ttr_d`. MTLD-MA adds a separate method definition;
-it does not change ordinary MTLD or existing presets. Core contract 0.2.0
-continues to describe the unchanged existing definitions and result schema.
-Adding an opt-in method does not invalidate plans for unchanged definitions.
+- Core lexical-diversity formulas (`ldfreq-lexical-diversity-core` 0.2.0) are
+  unchanged: eleven default metrics, opt-in `mtld_ma`, and experimental
+  `expected_ttr_d`.
+- Preprocessing contract **1.0.0** sets practical defaults for raw English text
+  (`case = "lower"`, `tokenizer = "english"`, `normalization = "NFC"`,
+  `keep_numbers = FALSE`) while recording every choice in provenance and
+  continuing to validate saved 0.2.0–0.4.0 tokenization objects.
+- Generic norm profile contract **0.2.0** adds `lexdiv_norm_spec()` and
+  `lexdiv_resource_meta()` constructors with ergonomic defaults.
+- TUBELEX profile contract **0.3.0** upgrades `tubelex_profile_batch()` to a
+  structured S3 batch object (`$summary`, `$lookup`, `$coverage`, `$profiles`)
+  matching `nj8_profile_batch()` and `lexdiv_norm_profile_batch()`.
 
-For historical analyses, package 0.3.0 changed ordinary MTLD from a minimum-ten
-factor rule to no minimum and advanced the core contract from 0.1.0 to 0.2.0.
-The old rule remains an explicit variant. Do not mix old and new MTLD values
-under one method label. Plans from the old contract must be recreated; reading
-old RDS results does not require rewriting their identities or values.
+## Major API design in 1.0.0
 
-Expected-TTR D remains an experimental curve estimator, not CLAN VOCD. Formula
-agreement, length sensitivity, sampling reliability and proficiency validity
-are distinct claims. The [selection guide](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html)
-provides evidence and conditions for choosing among the implemented measures.
-
-## Naming and compatibility
-
-General analysis functions use `lexdiv_`; resource-specific operations retain
-resource prefixes. Operation names put the action before its object. `_text`
-identifies raw text and `_batch` identifies separately named documents.
-
-| Current name | Earlier compatible name |
-|---|---|
-| `lexdiv_compare_ngrams()` | `lexdiv_ngram_compare()` |
-| `lexdiv_build_ngram_reference()` | `lexdiv_ngram_reference_build()` |
-| `lexdiv_screen_lengths()` | `lexdiv_screen()` |
-| `lexdiv_sort_concordance()` | `lexdiv_concordance_sort()` |
-
-These four pairs are exact aliases, with the same arguments and results.
-Study-table, concordance, collocation and keyness functions are public APIs;
-their earlier installed source helpers remain compatibility wrappers. Saved
-old records remain accepted by the corresponding operations. No implicit
-migration overwrites a saved record.
-
-Ordination, readability, L2SCA import and teaching workflows remain explicitly
-sourced recipes. Their guides define the required inputs and external tools.
-Pin the package archive when using these scripts. Their availability does not
-imply automatic linguistic annotation or educational interpretation.
-
-## Change policy
-
-A change to a formula, threshold rule, token selection or missingness meaning
-requires an identifiable method or contract change and migration documentation.
-An added optional operation should preserve existing defaults and result shapes.
-Document public renamings with compatibility aliases before removing old names.
-Errors in input types must be reported rather than silently coerced to scores;
-intended categorical metadata and legitimate missing results retain their roles.
+- **Single canonical entry points**: Duplicate functions and pre-1.0 aliases
+  are removed. Pass `plan = plan` directly to `lexdiv_metrics()`,
+  `lexdiv_metrics_batch()`, `lexdiv_metrics_text()`, or
+  `lexdiv_metrics_text_batch()`, and query variant definitions via
+  `lexdiv_methods(scope = "variants")`.
+- **Connected workflows**:
+  - `lexdiv_as_annotations()` converts raw texts or `lexdiv_tokenization`
+    objects directly into sealed `lexdiv_annotations` objects for
+    `lexdiv_concordance()`, `lexdiv_collocations()`, `lexdiv_keyness()`, and
+    `lexdiv_family_profile()`.
+  - `lexdiv_lemmatize_batch()` and `lexdiv_flemmatize_batch()` annotate entire
+    batches produced by `lexdiv_tokenize_batch()`.
+  - `lexdiv_widen()`, `lexdiv_screen_lengths()`, and `lexdiv_study_table()`
+    directly accept `lexdiv_text_results` / `lexdiv_text_batch_results`.
+- **Consistent S3 classes and bounded printing**: Every analysis result carries
+  an explicit S3 class with a concise `print()` method capped at 12 rows, and
+  `plot.lexdiv_concordance()` uses zero-dependency Base R graphics.

@@ -2,17 +2,7 @@
 # Search and KWIC formatting belong to quanteda; no meaning is inferred here.
 lexdiv_ambiguity_review <- function(x, targets, candidates, resource,
                                     decisions = NULL, window = 5, max_tokens = 1e6) {
-  x <- .lexnorm_plain_list(x, "x")
-  if (!all(c("tokens", "segments", "provenance") %in% names(x)) ||
-      !is.list(x$provenance) ||
-      !identical(x$provenance$importer, "ldfreq-external-annotations"))
-    stop("x must be an unmodified lexdiv_import_annotations() result.", call. = FALSE)
-  segments <- .lexnorm_plain_data_frame(x$segments, "x$segments")
-  checked <- lexdiv_import_annotations(x$tokens,
-    segments[setdiff(names(segments), c("token_count", "text_sha256"))],
-    x$provenance$annotation, max_tokens = max_tokens)
-  if (!identical(x, checked))
-    stop("x has changed; import the complete annotations again before review.", call. = FALSE)
+  x <- .lexann_check(x, "x", max_tokens)
   targets <- unique(.lexnorm_plain_character(targets, "targets"))
   if (any(stringi::stri_detect_regex(targets, "\\p{White_Space}")))
     stop("targets must be single-token surface forms without whitespace.", call. = FALSE)
@@ -129,12 +119,11 @@ lexdiv_ambiguity_review <- function(x, targets, candidates, resource,
       matching = "exact case-sensitive surface; no normalization",
       context = "quanteda token window within segment; original segment text retained",
       selection_validation = "source identity and candidate membership only; no sense inference"))
-  out$provenance$content_sha256 <- .lexng_hash(out)
-  out
+  .lexng_seal(out, "lexdiv_ambiguity_review")
 }
 
 .lexamb_validate_review <- function(x) {
-    if (!is.list(x) || !is.list(x$provenance) ||
+    if (!inherits(x, "lexdiv_ambiguity_review") || !is.list(x) || !is.list(x$provenance) ||
         !identical(x$provenance$review, "ldfreq-ambiguity-review") ||
         !identical(x$provenance$review_version, "0.1.0") ||
         !identical(x$provenance$content_sha256, .lexng_hash(x)))
@@ -194,12 +183,47 @@ lexdiv_compare_ambiguity <- function(a, b) {
   status_pairs <- status_pairs[!duplicated(keys), , drop = FALSE]
   status_pairs$count <- counts
   rownames(status_pairs) <- NULL
-  list(summary = summarize(seq_len(nrow(pairs))), terms = terms,
-    pairs = pairs, review_queue = pairs[pairs$outcome != "agreement", , drop = FALSE],
-    status_pairs = status_pairs, reviews = list(a = a, b = b),
-    provenance = list(comparison = "ldfreq-ambiguity-comparison", comparison_version = "0.1.0",
-      review_id = a$provenance$review_id, pairing = "exact occurrence ID",
-      agreement_denominator = "occurrences with a selected candidate in both reviews",
-      missing_policy = "unresolved, unreviewed and no_candidates are not semantic agreements",
-      interpretation = "descriptive selection agreement; no accuracy, independence or reliability claim"))
+  structure(
+    list(summary = summarize(seq_len(nrow(pairs))), terms = terms,
+      pairs = pairs, review_queue = pairs[pairs$outcome != "agreement", , drop = FALSE],
+      status_pairs = status_pairs, reviews = list(a = a, b = b),
+      provenance = list(comparison = "ldfreq-ambiguity-comparison", comparison_version = "0.1.0",
+        review_id = a$provenance$review_id, pairing = "exact occurrence ID",
+        agreement_denominator = "occurrences with a selected candidate in both reviews",
+        missing_policy = "unresolved, unreviewed and no_candidates are not semantic agreements",
+        interpretation = "descriptive selection agreement; no accuracy, independence or reliability claim")),
+    class = "lexdiv_ambiguity_comparison"
+  )
+}
+
+#' @export
+print.lexdiv_ambiguity_review <- function(x, ...) {
+  .lexamb_validate_review(x)
+  cat(sprintf(
+    "<lexdiv_ambiguity_review: %d target%s; %d occurrence%s; %d decision%s>\n",
+    nrow(x$summary), if (nrow(x$summary) == 1L) "" else "s",
+    nrow(x$occurrences), if (nrow(x$occurrences) == 1L) "" else "s",
+    nrow(x$decisions), if (nrow(x$decisions) == 1L) "" else "s"
+  ))
+  shown <- utils::head(x$summary, 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$summary) > nrow(shown)) {
+    cat("... additional target rows omitted\n")
+  }
+  invisible(x)
+}
+
+#' @export
+print.lexdiv_ambiguity_comparison <- function(x, ...) {
+  if (!inherits(x, "lexdiv_ambiguity_comparison") || !is.list(x) ||
+      !is.data.frame(x$summary)) {
+    stop("x must be a lexdiv_ambiguity_comparison object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<lexdiv_ambiguity_comparison: %d occurrence%s; %d both selected>\n",
+    x$summary$occurrences, if (x$summary$occurrences == 1) "" else "s",
+    x$summary$both_selected
+  ))
+  print.data.frame(x$summary, row.names = FALSE, ...)
+  invisible(x)
 }

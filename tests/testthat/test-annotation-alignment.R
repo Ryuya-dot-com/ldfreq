@@ -128,7 +128,7 @@ test_that("invalid inputs and mismatched sources fail before alignment", {
   bad <- ref
   bad$tokens$upos[1] <- "VERB"
   expect_error(lexdiv_align_annotations(bad, ref), "has changed")
-  expect_error(lexdiv_align_annotations(ref$tokens, ref), "plain list")
+  expect_error(lexdiv_align_annotations(ref$tokens, ref), "unmodified")
   expect_error(lexdiv_align_annotations(alignment_input("a  b", c("a", "b")), ref), "original text")
   expect_error(lexdiv_align_annotations(alignment_input("a b", c("a", "b"), id = "other"), ref), "segment IDs")
   expect_error(lexdiv_align_annotations(ref, ref, max_tokens = 1), "max_tokens")

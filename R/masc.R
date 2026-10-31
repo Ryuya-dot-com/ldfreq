@@ -163,12 +163,37 @@ lexdiv_read_masc <- function(files, resource_version, document_ids = NULL,
   bind <- function(name) {
     value <- do.call(rbind, lapply(pieces, `[[`, name)); rownames(value) <- NULL; value
   }
-  list(tokens = bind("tokens"), segments = bind("segments"), documents = bind("documents"),
-    provenance = list(reader = "ldfreq-masc-penn", reader_version = "0.2.0",
-      resource_version = resource_version, token_layer = "penn", segment_layer = "s",
-      offset_unit = offset_unit, output_positions = "1-based inclusive Unicode codepoints",
-      format_documentation = "https://anc.org/data/masc/corpus/masc-structure/",
-      files = bind("sources")))
+  structure(
+    list(tokens = bind("tokens"), segments = bind("segments"), documents = bind("documents"),
+      provenance = list(reader = "ldfreq-masc-penn", reader_version = "0.2.0",
+        resource_version = resource_version, token_layer = "penn", segment_layer = "s",
+        offset_unit = offset_unit, output_positions = "1-based inclusive Unicode codepoints",
+        format_documentation = "https://anc.org/data/masc/corpus/masc-structure/",
+        files = bind("sources"))),
+    class = "lexdiv_masc"
+  )
+}
+
+#' @export
+print.lexdiv_masc <- function(x, ...) {
+  if (!inherits(x, "lexdiv_masc") || !is.list(x) || !is.data.frame(x$documents)) {
+    stop("x must be a lexdiv_masc object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<lexdiv_masc: %d document%s; %d segment%s; %d token%s; version %s>\n",
+    nrow(x$documents), if (nrow(x$documents) == 1L) "" else "s",
+    nrow(x$segments), if (nrow(x$segments) == 1L) "" else "s",
+    nrow(x$tokens), if (nrow(x$tokens) == 1L) "" else "s",
+    x$provenance$resource_version
+  ))
+  cols <- intersect(c("document_id", "title", "medium", "genre", "tokens", "segments"),
+    names(x$documents))
+  shown <- utils::head(x$documents[cols], 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$documents) > nrow(shown)) {
+    cat("... additional document rows omitted\n")
+  }
+  invisible(x)
 }
 
 lexdiv_as_quanteda <- function(data, segments, term_col = "surface", max_tokens = 1e6) {

@@ -85,7 +85,7 @@ test_that("token- and type-weighted summaries remain conditional on matches", {
 })
 
 test_that("a known tokenizer mismatch requires an explicit opt-in", {
-  tokenization <- lexdiv_tokenize("Apple apple missing")
+  tokenization <- lexdiv_tokenize("Apple apple missing", tokenizer = "unicode", case = "preserve")
   expect_error(profile_lookup_function(tokenization, "tubelex",
     loader = synthetic_profile_tubelex_load), "Treebank segmentation")
   result <- profile_lookup_function(
@@ -127,16 +127,20 @@ test_that("TUBELEX batch retains full profiles and document-local failures", {
   documents <- list(b = c("Apple", "apple", "missing-word"),
     a = c("the", "book"), empty = character(), bad = c("the", NA_character_))
   batch <- tubelex_profile_batch(documents)
-  expect_identical(names(batch), names(documents))
+  expect_s3_class(batch, "tubelex_profile_batch")
+  expect_identical(names(batch$profiles), names(documents))
   individual <- lapply(documents, tubelex_profile)
-  expect_identical(batch, individual)
-  expect_identical(vapply(batch, `[[`, character(1), "status"),
-    c(b = "ok", a = "ok", empty = "empty", bad = "invalid_input"))
+  expect_identical(batch$profiles, individual)
+  expect_identical(batch$coverage$status,
+    c("ok", "ok", "empty", "invalid_input"))
   tidy <- data.frame(id = names(documents), stringsAsFactors = FALSE)
   tidy$words <- unname(documents)
   expect_identical(tubelex_profile_batch(tidy, id_col = "id", terms_col = "words"), batch)
   empty_documents <- stats::setNames(list(), character())
-  expect_identical(tubelex_profile_batch(empty_documents), empty_documents)
+  empty_batch <- tubelex_profile_batch(empty_documents)
+  expect_s3_class(empty_batch, "tubelex_profile_batch")
+  expect_identical(empty_batch$status, "empty")
+  expect_identical(empty_batch$profiles, empty_documents)
   expect_error(tubelex_profile_batch(list()), "plain named list")
   expect_error(tubelex_profile_batch(documents, max_rows = 3), "max_rows")
   expect_error(tubelex_profile_batch(list(x = "a", x = "b")), "unique")
@@ -148,7 +152,7 @@ test_that("TUBELEX batch retains full profiles and document-local failures", {
     "normalization")
   allowed <- tubelex_profile_batch(list(x = lexdiv_tokenize("apple")),
     tokenization_mismatch = "allow")
-  expect_identical(allowed$x$provenance$tokenization_alignment,
+  expect_identical(allowed$profiles$x$provenance$tokenization_alignment,
     "known_different_tokenizer_explicitly_allowed")
 })
 
@@ -226,7 +230,7 @@ test_that("the installed TUBELEX profile contract matches the stable public resu
     contract$contract_id,
     "ldfreq-tubelex-frequency-profile"
   )
-  expect_identical(contract$contract_version, "0.2.0")
+  expect_identical(contract$contract_version, "0.3.0")
   expect_identical(
     contract$status,
     "normative"

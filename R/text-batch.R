@@ -6,14 +6,21 @@
     stop("id_col and text_col must select different columns.", call. = FALSE)
   }
   if (is.data.frame(documents)) {
+    documents <- base::as.data.frame(
+      documents, stringsAsFactors = FALSE, check.names = FALSE, optional = TRUE
+    )
     columns <- .lex_batch_column_names(names(documents))
     if (sum(columns == id_col) != 1L || sum(columns == text_col) != 1L) {
       stop("documents must contain exactly one selected ID column and one selected text column.",
         call. = FALSE)
     }
-    ids <- .lex_batch_validate_ids(documents[[which(columns == id_col)]], nrow(documents))
-    texts <- documents[[which(columns == text_col)]]
-    if (!is.character(texts) || !is.null(attributes(texts))) {
+    ids <- .lex_batch_validate_ids(
+      .lex_strip_names(documents[[which(columns == id_col)]]),
+      nrow(documents)
+    )
+    texts <- .lex_strip_names(documents[[which(columns == text_col)]])
+    if (!is.character(texts) || is.object(texts) || !is.null(dim(texts)) ||
+        !is.null(attributes(texts))) {
       stop("The selected text column must be a plain character vector.", call. = FALSE)
     }
   } else {
@@ -40,13 +47,18 @@
   if (!is.data.frame(metadata)) {
     stop("metadata must be NULL or a data frame with a document_id column.", call. = FALSE)
   }
-  metadata <- as.data.frame(metadata)
+  metadata <- base::as.data.frame(
+    metadata, stringsAsFactors = FALSE, check.names = FALSE, optional = TRUE
+  )
   columns <- .lex_batch_column_names(names(metadata))
   if (any(!nzchar(columns)) || anyDuplicated(columns) || !"document_id" %in% columns) {
     stop("metadata must have unique, non-empty column names including document_id.", call. = FALSE)
   }
   names(metadata) <- columns
-  metadata$document_id <- .lex_batch_validate_ids(metadata$document_id, nrow(metadata))
+  metadata$document_id <- .lex_batch_validate_ids(
+    .lex_strip_names(metadata$document_id),
+    nrow(metadata)
+  )
   if (!all(vapply(metadata, function(column) {
     is.atomic(column) && is.null(dim(column))
   }, logical(1)))) {
@@ -78,8 +90,8 @@
 #' @export
 lexdiv_tokenize_batch <- function(
     documents, id_col = "document_id", text_col = "text",
-    normalization = "NFC", case = "preserve", keep_numbers = FALSE,
-    tokenizer = "unicode") {
+    normalization = "NFC", case = "lower", keep_numbers = FALSE,
+    tokenizer = "english") {
   texts <- .lextext_documents(documents, id_col, text_col)
   # Validate settings even for a zero-document corpus.
   lexdiv_tokenize("", normalization, case, keep_numbers, tokenizer)
@@ -97,7 +109,11 @@ lexdiv_tokenize_batch <- function(
 #' @inheritParams lexdiv_tokenize_batch
 #' @inheritParams lexdiv_metrics_text
 #' @param ... Metric requests forwarded to [lexdiv_metrics_text()], validated
-#'   even with zero documents. `plan` and `max_rows` are not supported.
+#'   even with zero documents. Must be empty when `plan` is supplied.
+#' @param plan Optional normalized plan from [lexdiv_plan()]. When supplied,
+#'   `$results` is a `lexdiv_profile_batch_results` table accepted directly by
+#'   [lexdiv_study_table()] and [lexdiv_screen_lengths()].
+#' @param max_rows Maximum document-by-specification rows when `plan` is supplied.
 #' @param metadata Optional data frame with a unique plain character
 #'   `document_id` for every input document and atomic study-information columns.
 #'   Rows are matched by ID and retained separately in `$metadata`. Specify by name.
@@ -109,8 +125,8 @@ lexdiv_tokenize_batch <- function(
 lexdiv_metrics_text_batch <- function(
     documents, id_col = "document_id", text_col = "text",
     unit = "surface", word_inclusion = "all",
-    normalization = "NFC", case = "preserve", keep_numbers = FALSE,
-    tokenizer = "unicode", ..., metadata = NULL) {
+    normalization = "NFC", case = "lower", keep_numbers = FALSE,
+    tokenizer = "english", ..., plan = NULL, max_rows = 1e6, metadata = NULL) {
   supplied <- c(normalization = !missing(normalization), case = !missing(case),
     keep_numbers = !missing(keep_numbers), tokenizer = !missing(tokenizer))
   if (is.list(documents) && !is.data.frame(documents)) {
@@ -137,30 +153,57 @@ lexdiv_metrics_text_batch <- function(
   metadata <- .lextext_metadata(metadata, names(prepared))
   unit <- .lexprep_scalar_choice(unit, c("surface", "lemma", "flemma"), "unit")
   word_inclusion <- .lexprep_scalar_choice(word_inclusion, c("all", "content"), "word_inclusion")
-  # Check the actual callee's arguments even when no document is evaluated.
-  match.call(lexdiv_metrics_text,
-    quote(lexdiv_metrics_text(NULL, unit = unit, word_inclusion = word_inclusion, ...)),
-    envir = environment())
-  prototype <- lexdiv_metrics_batch(stats::setNames(list(), character()), ...)
-  pieces <- lapply(seq_along(prepared), function(i) {
-    tryCatch(lexdiv_metrics_text(prepared[[i]], unit = unit,
-      word_inclusion = word_inclusion, ...), error = function(e) {
-        stop(sprintf("Document %s: %s", encodeString(names(prepared)[[i]], quote = '"'),
-          conditionMessage(e)), call. = FALSE)
-      })
-  })
+
+  if (!is.null(plan)) {
+    if (...length() > 0L) {
+      stop("With plan, omit all metric arguments in ...; put requests in the plan.", call. = FALSE)
+    }
+    max_rows <- .profile_positive_integer(max_rows, "max_rows")
+    plan <- .profile_validate_plan(plan)
+    pieces <- lapply(seq_along(prepared), function(i) {
+      tryCatch(lexdiv_metrics_text(prepared[[i]], unit = unit,
+        word_inclusion = word_inclusion, plan = plan), error = function(e) {
+          stop(sprintf("Document %s: %s", encodeString(names(prepared)[[i]], quote = '"'),
+            conditionMessage(e)), call. = FALSE)
+        })
+    })
+    selected_units <- stats::setNames(
+      lapply(prepared, function(tok) .lexprep_selected_units(tok, unit, word_inclusion)$units),
+      names(prepared)
+    )
+    results <- .lexdiv_profile_batch(selected_units, plan = plan, max_rows = max_rows)
+  } else {
+    if (!missing(max_rows)) {
+      stop("max_rows requires a non-NULL plan.", call. = FALSE)
+    }
+    match.call(lexdiv_metrics_text,
+      quote(lexdiv_metrics_text(NULL, unit = unit, word_inclusion = word_inclusion, ...)),
+      envir = environment())
+    prototype <- lexdiv_metrics_batch(stats::setNames(list(), character()), ...)
+    pieces <- lapply(seq_along(prepared), function(i) {
+      tryCatch(lexdiv_metrics_text(prepared[[i]], unit = unit,
+        word_inclusion = word_inclusion, ...), error = function(e) {
+          stop(sprintf("Document %s: %s", encodeString(names(prepared)[[i]], quote = '"'),
+            conditionMessage(e)), call. = FALSE)
+        })
+    })
+    if (length(pieces)) {
+      results <- do.call(base::rbind.data.frame, lapply(seq_along(pieces), function(i) {
+        .lex_batch_prepend_id(pieces[[i]]$results, names(prepared)[[i]])
+      }))
+      results <- .lex_batch_restore_result_attributes(results, prototype)
+    } else {
+      results <- prototype
+    }
+  }
+
   if (length(pieces)) {
-    results <- do.call(base::rbind.data.frame, lapply(seq_along(pieces), function(i) {
-      .lex_batch_prepend_id(pieces[[i]]$results, names(prepared)[[i]])
-    }))
-    results <- .lex_batch_restore_result_attributes(results, prototype)
     audits <- lapply(seq_along(pieces), function(i) {
       data.frame(document_id = rep.int(names(prepared)[[i]], nrow(pieces[[i]]$token_audit)),
         pieces[[i]]$token_audit, stringsAsFactors = FALSE)
     })
     token_audit <- do.call(base::rbind.data.frame, audits)
   } else {
-    results <- prototype
     token_audit <- data.frame(document_id = character(),
       .lexprep_selected_units(lexdiv_tokenize(""), "surface", "all")$audit,
       stringsAsFactors = FALSE)

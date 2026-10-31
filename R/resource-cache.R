@@ -33,7 +33,7 @@ lexdiv_resource_info <- function(
     path <- file.path(cache_dir, name, item$version)
     data.frame(resource = name, version = item$version, license = item$license,
       license_url = item$license_url,
-      notice_url = paste0("https://github.com/Ryuya-dot-com/ldfreq/blob/v0.4.0.9006/inst/licenses/", name, "/NOTICE.md"),
+      notice_url = paste0("https://github.com/Ryuya-dot-com/ldfreq/blob/v1.0.0/inst/licenses/", name, "/NOTICE.md"),
       download_bytes = item$bytes,
       available = .lex_resource_verified(path, item$files), path = path,
       url = item$url, sha256 = item$sha256, citation = item$citation,

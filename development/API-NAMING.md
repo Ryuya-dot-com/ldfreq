@@ -1,4 +1,4 @@
-# API naming conventions
+# API naming conventions (v1.0.0)
 
 General analysis functions use `lexdiv_`. Resource-specific operations use the
 resource name (`nj8_`, `tubelex_`, `morpholex_`, `bnccoca_`, `morphynet_`).
@@ -6,45 +6,46 @@ This distinction identifies a resource dependency, not a different code license.
 
 - Operations use action before object: `compare_annotations`, `compare_ngrams`,
   `build_ngram_reference`, `sort_concordance`, `screen_lengths`.
-- Result constructors and summaries use nouns: `metrics`, `study_table`,
-  `concordance`, `keyness`, `ngram_profile`, `concordance_dispersion`.
-- `_text` means raw text; `_batch` means separately identified documents.
-  Never infer these distinctions from string length or whitespace.
-- `_ids` returns character identifiers. Catalog tables use `methods`,
-  `presets` or `resource_info`.
-- An argument selects a variation of one operation. Use S3 methods when an
-  input/result class identifies an implementation; keep separate functions
-  when combining them would hide distinct inputs, meanings or missingness.
-- Retain documented compatibility aliases when changing a public name. Do not
-  change an old name's return type to make it fit a new convention.
+- Result constructors, bridges, and summaries use nouns: `metrics`,
+  `study_table`, `concordance`, `keyness`, `ngram_profile`,
+  `concordance_dispersion`, `norm_spec`, `resource_meta`, `as_annotations`,
+  `as_documents`.
+- Every `lexdiv_*` export contains at most three semantic words after the
+  `lexdiv_` prefix.
+- `_text` means raw text; `_batch` means separately identified documents
+  (`lexdiv_tokenize_batch`, `lexdiv_lemmatize_batch`, `lexdiv_flemmatize_batch`,
+  `lexdiv_metrics_batch`, `lexdiv_metrics_text_batch`, `nj8_profile_batch`,
+  `tubelex_profile_batch`, `lexdiv_norm_profile_batch`).
+- `_ids` returns character identifiers (`lexdiv_metric_ids`,
+  `lexdiv_overlap_ids`). Multi-column catalog tables use `methods`, `presets`,
+  or `resource_info`.
+- Parameter names are unified across functions:
+  - Document ID column selector: always `id_col = "document_id"`.
+  - Case-insensitive matching/sorting flag: always `case_insensitive = FALSE`.
+  - Raw-text preprocessing defaults: `normalization = "NFC"`,
+    `case = "lower"`, `keep_numbers = FALSE`, `tokenizer = "english"`.
 
-## Compatibility in 0.5.0.9001
+## Unified entry points in 1.0.0
 
-| Canonical usage | Compatible earlier usage |
+Version 1.0.0 removes all duplicate entry points and pre-1.0 legacy aliases:
+
+| Canonical v1.0.0 API | Retired pre-1.0 name |
 |---|---|
-| `lexdiv_compare_ngrams()` | `lexdiv_ngram_compare()` |
-| `lexdiv_build_ngram_reference()` | `lexdiv_ngram_reference_build()` |
-| `lexdiv_sort_concordance()` | `lexdiv_concordance_sort()` |
-| `lexdiv_screen_lengths()` | `lexdiv_screen()` |
-| `lexdiv_methods(scope = "variants")` | `lexdiv_variant_ids()` |
-| `lexdiv_metrics(tokens, plan = plan)` | `lexdiv_profile(tokens, plan)` |
+| `lexdiv_compare_ngrams()` | (retired pre-1.0 alias) |
+| `lexdiv_build_ngram_reference()` | (retired pre-1.0 alias) |
+| `lexdiv_sort_concordance()` | (retired pre-1.0 alias) |
+| `lexdiv_screen_lengths()` | (retired pre-1.0 alias) |
+| `lexdiv_methods(scope = "variants")` | (retired data-frame `_ids` export) |
+| `lexdiv_metrics(tokens, plan = plan)` | (retired separate single-doc plan runner) |
+| `lexdiv_metrics_batch(docs, plan = plan)` | (retired separate batch plan runner) |
 
-The four renamed functions are exact aliases, including defaults and returned
-objects. The other two routes already share the same implementation. Examples
-use canonical names; prior scripts and saved results remain supported. The
-resource-profile and general `profile` names retain their established meaning
-in local-window, reference-lookup and compatibility contexts.
+## Plot conventions
 
-For an added API, check the operation, input contract, result type, resource
-identity and compatibility route, then keep NAMESPACE, help, examples,
-API-SURFACE.md, tests, NEWS and pkgdown navigation consistent.
+All package `plot()` methods use zero-dependency Base R graphics (no `ggplot2`
+dependency is required to call `plot()` on any `ldfreq` object, including
+`lexdiv_concordance` and `tubelex_profile_batch`):
 
-## Plot arguments for 1.0.0
-
-Use `col` for the primary point, line or bar series. Distinct overlays retain
-their meaningful names (`mean_col`, `cumulative_col`). NJ8's former `bar_col`
-is replaced by `col`; callers get an explicit migration error. A monochrome
-request overrides series colors. Manually drawn axes honor the same axis
-switches and text settings as the underlying base plot. Bar plots reject
-arguments that change their fixed vertical, linear coordinate system rather
-than applying them to only part of a composite figure.
+- Default APA style: no embedded plot titles/subtitles (`main = NULL`), color
+  by default (`#0072B2` / `#D55E00`), and `monochrome = TRUE` for black/grey
+  print output.
+- Graphics `par()` state is restored on exit via `.lex_plot_style()`.

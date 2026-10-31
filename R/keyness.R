@@ -1,16 +1,10 @@
-# Shared implementation for the public API and legacy installed examples.
-keyness_compare <- function(x, target, reference, preprocessing_id,
+# Shared implementation for the public API and installed examples.
+keyness_compare <- function(x, target, reference, preprocessing_id = "default",
     term_col = "surface", keep = rep(TRUE, nrow(x$tokens)), min_count = 1L,
     max_tokens = 1e6) {
   min_count <- .concordance_whole(min_count, "min_count")
   max_tokens <- .concordance_whole(max_tokens, "max_tokens")
-  if (!is.list(x) || !identical(x$provenance$importer, "ldfreq-external-annotations"))
-    stop("Supply an unchanged lexdiv_import_annotations() result.", call. = FALSE)
-  checked <- ldfreq::lexdiv_import_annotations(x$tokens,
-    x$segments[setdiff(names(x$segments), c("token_count", "text_sha256"))],
-    x$provenance$annotation, max_tokens = max_tokens)
-  if (!identical(x, checked))
-    stop("Source annotations changed; import the complete source again.", call. = FALSE)
+  x <- .lexann_check(x, "x", max_tokens)
   strings <- function(z) is.character(z) && length(z) > 0L && !anyNA(z) &&
     all(validUTF8(z)) && all(nzchar(stringi::stri_trim_both(z)))
   ids <- x$documents$document_id
@@ -119,13 +113,15 @@ keyness_compare <- function(x, target, reference, preprocessing_id,
     document_counts = document_counts, occurrences = occurrences, token_audit = token_audit,
     source = x, settings = settings, provenance = provenance)
   result$integrity_sha256 <- .concordance_hash(result)
+  class(result) <- "lexdiv_keyness"
   result
 }
 
 keyness_validate <- function(x) {
   if (!is.list(x) || !identical(x$provenance$recipe, "ldfreq-example-keyness") ||
       !identical(x$provenance$recipe_version, "1") ||
-      !identical(x$integrity_sha256, .concordance_hash(x[names(x) != "integrity_sha256"])))
+      !identical(x$integrity_sha256,
+        .concordance_hash(unclass(x[names(x) != "integrity_sha256"]))))
     stop("The saved keyness record changed; repeat lexdiv_keyness().", call. = FALSE)
   invisible(x)
 }
@@ -143,3 +139,24 @@ keyness_concordance <- function(x, term, window = 5L, max_cells = 1e6) {
 }
 
 lexdiv_keyness <- keyness_compare
+
+#' @export
+print.lexdiv_keyness <- function(x, ...) {
+  keyness_validate(x)
+  cat(sprintf(
+    "<lexdiv_keyness: %d target doc%s vs %d reference doc%s; %d term%s>\n",
+    x$totals$documents[[1L]], if (x$totals$documents[[1L]] == 1) "" else "s",
+    x$totals$documents[[2L]], if (x$totals$documents[[2L]] == 1) "" else "s",
+    nrow(x$results), if (nrow(x$results) == 1L) "" else "s"
+  ))
+  cols <- c("term", "target_count", "reference_count", "target_per_1000",
+    "reference_per_1000", "log_ratio", "signed_G2", "direction", "status")
+  shown <- utils::head(x$results[cols], 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$results) > nrow(shown)) {
+    cat(sprintf("... %d additional term row%s omitted\n",
+      nrow(x$results) - nrow(shown),
+      if (nrow(x$results) - nrow(shown) == 1L) "" else "s"))
+  }
+  invisible(x)
+}

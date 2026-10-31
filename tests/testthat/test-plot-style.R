@@ -3,16 +3,16 @@ plot_style_examples <- function() {
   plan <- lexdiv_plan(presets = character(), grids = lexdiv_grid(
     "mattr_sliding_step1_v1", parameter = "window_length", values = 3
   ))
-  batch <- lexdiv_profile_batch(documents, plan)
+  batch <- lexdiv_metrics_batch(documents, plan = plan)
   list(
     metric = lexdiv_metrics(documents$short, metrics = "mattr", window_length = 3),
     batch = lexdiv_metrics_batch(documents, metrics = "mattr", window_length = 3),
-    profile = lexdiv_profile(documents$short, plan),
+    profile = lexdiv_metrics(documents$short, plan = plan),
     profile_batch = batch,
     text = lexdiv_metrics_text("a b a", metrics = "mattr", window_length = 3),
     text_batch = lexdiv_metrics_text_batch(c(short = "a b a", long = "a b c a"),
       metrics = "mattr", window_length = 3),
-    screen = lexdiv_screen(batch, floors = c(tokens_50 = 50L)),
+    screen = lexdiv_screen_lengths(batch, floors = c(tokens_50 = 50L)),
     tubelex = structure(list(summary = data.frame(weighting = c("token", "type"),
       coverage = c(.75, .5))), class = "tubelex_profile"),
     levels = nj8_profile(c("a", "b", "unknown"),

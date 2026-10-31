@@ -1,5 +1,6 @@
 \name{lexdiv_score_contextual}
 \alias{lexdiv_score_contextual}
+\alias{print.lexdiv_contextual_scores}
 \title{Score contextual candidates using separate labeled training examples}
 \description{
 Experimental supervised baselines using imported target embeddings: cosine to

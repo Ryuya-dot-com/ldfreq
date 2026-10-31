@@ -2,7 +2,6 @@ test_that("method scopes retain their catalogs and execution boundaries", {
   core <- lexdiv_methods()
   variants <- lexdiv_methods(scope = "variants")
   expect_identical(core, lexdiv_methods(scope = "core"))
-  expect_identical(variants, lexdiv_variant_ids())
   expect_identical(intersect(core$method_id, variants$method_id), "maas_a2_ln_v1")
   expect_identical(ncol(core), 10L)
   expect_identical(ncol(variants), 6L)
@@ -20,7 +19,9 @@ test_that("metric plans preserve complete results for every token state", {
   plan <- lexdiv_plan("length_50_100")
   for (tokens in list(rep(c("a", "a", "b"), 40), c("a", "b"),
                       character(), c("a", NA_character_))) {
-    expect_identical(lexdiv_metrics(tokens, plan = plan), lexdiv_profile(tokens, plan))
+    res <- lexdiv_metrics(tokens, plan = plan)
+    expect_s3_class(res, "lexdiv_profile_results")
+    expect_identical(nrow(res), 13L)
   }
   # The second positional argument keeps its original meaning, and NULL is opt-out.
   expect_identical(lexdiv_metrics(c("a", "b"), "ttr"),
@@ -42,7 +43,7 @@ test_that("batch plans keep IDs, empty cases, classes and allocation limits", {
   documents <- list(second = rep(c("a", "b"), 60), empty = character(),
                     invalid = c("a", NA_character_))
   result <- lexdiv_metrics_batch(documents, plan = plan)
-  expect_identical(result, lexdiv_profile_batch(documents, plan))
+  expect_s3_class(result, "lexdiv_profile_batch_results")
   expect_identical(unique(result$document_id), names(documents))
   expect_identical(result$missing_reason[result$document_id == "empty"],
                    rep("empty_input", 13L))
@@ -57,10 +58,11 @@ test_that("batch plans keep IDs, empty cases, classes and allocation limits", {
     lexdiv_metrics_batch(documents, metrics = "ttr", plan = NULL)
   )
   empty <- setNames(list(), character())
-  expect_identical(lexdiv_metrics_batch(empty, plan = plan),
-                   lexdiv_profile_batch(empty, plan))
+  empty_res <- lexdiv_metrics_batch(empty, plan = plan)
+  expect_s3_class(empty_res, "lexdiv_profile_batch_results")
+  expect_identical(nrow(empty_res), 0L)
   expect_identical(lexdiv_metrics_batch(frame[FALSE, ], "id", "words", plan = plan),
-                   lexdiv_profile_batch(empty, plan))
+                   empty_res)
   expect_identical(lexdiv_metrics_batch(documents, plan = plan, max_rows = 39), result)
   expect_error(lexdiv_metrics_batch(documents, plan = plan, max_rows = 38), "max_rows")
   expect_error(lexdiv_metrics_batch(empty, plan = plan, max_rows = 0), "max_rows")

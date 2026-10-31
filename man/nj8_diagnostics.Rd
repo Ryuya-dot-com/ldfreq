@@ -1,5 +1,6 @@
 \name{nj8_diagnostics}
 \alias{nj8_diagnostics}
+\alias{print.nj8_diagnostics}
 \title{Diagnose NJ8 non-matches and lexical-unit transformations}
 \description{
 Counts unmatched lookup terms and surface-to-unit mappings across an existing

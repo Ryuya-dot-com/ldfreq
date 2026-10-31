@@ -1,7 +1,9 @@
 # Public, coverage-aware TUBELEX frequency and prevalence profile.
 
 .tubelex_profile_contract_id <- "ldfreq-tubelex-frequency-profile"
-.tubelex_profile_contract_version <- "0.2.0"
+.tubelex_profile_contract_version <- "0.3.0"
+.tubelex_batch_contract_id <- "ldfreq-tubelex-frequency-profile-batch"
+.tubelex_batch_contract_version <- "0.3.0"
 .tubelex_normalization_ids <- c(
   tubelex = "nfkc-trim-en-lower-v1",
   tubelex_apostrophe = "nfkc-trim-en-lower-internal-apostrophe-v1",
@@ -28,6 +30,7 @@
       tokenization_alignment = "known_different_tokenizer_explicitly_allowed"
     ))
   }
+  terms <- .lex_strip_names(terms)
   .lex_warn_likely_raw_text(
     terms,
     "terms",
@@ -224,7 +227,7 @@
 #' therefore be negative. Exact formulas and denominators are returned in
 #' provenance and in the installed lexical-resource lookup contract.
 #'
-#' @param terms A plain character vector of source-prepared ordered terms, or an object returned
+#' @param terms A character vector of source-prepared ordered terms, or an object returned
 #'   by [lexdiv_tokenize()] with explicit mismatch opt-in. Order and duplicates are retained in the lookup
 #'   table. Each character-vector element is one complete lookup term; a single
 #'   string containing whitespace triggers a warning because it may be raw
@@ -237,16 +240,6 @@
 #' @param tokenization_mismatch `"error"` rejects general tokenization objects;
 #'   `"allow"` records their explicit use for segmentation sensitivity. Character
 #'   vectors remain caller-prepared terms whose segmentation is not verified.
-#'
-#' The cached CSV is decoded as UTF-8 independently of LC_CTYPE. C/POSIX
-#' sessions can query ASCII and explicitly encoded UTF-8 terms. Schema-failure
-#' printing retains the machine-readable reason and suggests checking the
-#' resource and encoding; a non-UTF-8 locale is a possible cause in older loaders,
-#' not proof of the cause of every schema failure.
-#' Missing cache files return `resource_error` with `resource_unavailable`;
-#' manifest or data hash failures return `resource_error` with `hash_mismatch`.
-#' Inspect [lexdiv_resource_info()] and explicitly download the resource after
-#' reviewing its license. Profile calls never download or repair cache files.
 #'
 #' @return A `tubelex_profile` list containing matched-only token- and
 #'   type-weighted summaries, the lossless lookup table, token/type coverage,
@@ -274,11 +267,14 @@ tubelex_profile <- function(
 
 #' Profile several documents with one validated TUBELEX resource load
 #'
-#' @param documents An explicitly named list, or an ID/list-column data frame.
+#' @param documents An explicitly named list, or an ID/list-column data frame or tibble.
 #' @inheritParams tubelex_profile
 #' @param id_col,terms_col Column names for data-frame input.
 #' @param max_rows Maximum combined lookup and summary rows across documents.
-#' @return An input-ordered named list of complete `tubelex_profile` objects.
+#' @return A `tubelex_profile_batch` S3 object containing document-major
+#'   `summary`, `lookup`, and `coverage` tables, `profiles` (the input-ordered
+#'   named list of per-document `tubelex_profile` objects), `provenance`, and
+#'   `diagnostics`.
 #' @export
 tubelex_profile_batch <- function(
     documents,
@@ -314,10 +310,154 @@ tubelex_profile_batch <- function(
     if (is.null(loaded)) loaded <<- .lexres_load_tubelex()
     loaded
   }
-  output <- lapply(batch$tokens, .tubelex_profile,
+  profiles <- lapply(batch$tokens, .tubelex_profile,
     normalization = normalization, loader = loader,
     tokenization_mismatch = tokenization_mismatch)
-  stats::setNames(output, batch$ids)
+  profiles <- stats::setNames(profiles, batch$ids)
+
+  cov_fields <- names(.lexres_lookup_coverage(character(), logical()))
+  if (!length(profiles)) {
+    summary <- data.frame(
+      document_id = character(),
+      status = character(),
+      failure_reason = character(),
+      .tubelex_empty_summary()[FALSE, , drop = FALSE],
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+    lookup <- data.frame(
+      document_id = character(),
+      query_index = integer(),
+      term = character(),
+      lookup_term = character(),
+      matched = logical(),
+      resource_word = character(),
+      count = numeric(),
+      videos = numeric(),
+      channels = numeric(),
+      zipf = numeric(),
+      video_prevalence = numeric(),
+      channel_prevalence = numeric(),
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+    coverage <- as.data.frame(
+      c(
+        list(
+          document_id = character(),
+          status = character(),
+          failure_reason = character()
+        ),
+        stats::setNames(rep(list(numeric()), length(cov_fields)), cov_fields)
+      ),
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+    batch_status <- "empty"
+    batch_failure <- NA_character_
+  } else {
+    statuses <- vapply(profiles, `[[`, character(1L), "status")
+    failures <- vapply(profiles, `[[`, character(1L), "failure_reason")
+    summary <- do.call(base::rbind.data.frame, lapply(seq_along(profiles), function(i) {
+      data.frame(
+        document_id = rep.int(batch$ids[[i]], nrow(profiles[[i]]$summary)),
+        status = rep.int(statuses[[i]], nrow(profiles[[i]]$summary)),
+        failure_reason = rep.int(failures[[i]], nrow(profiles[[i]]$summary)),
+        profiles[[i]]$summary,
+        stringsAsFactors = FALSE,
+        check.names = FALSE
+      )
+    }))
+    rownames(summary) <- NULL
+    lookup <- do.call(base::rbind.data.frame, lapply(seq_along(profiles), function(i) {
+      tbl <- profiles[[i]]$lookup
+      data.frame(
+        document_id = rep.int(batch$ids[[i]], nrow(tbl)),
+        tbl,
+        stringsAsFactors = FALSE,
+        check.names = FALSE
+      )
+    }))
+    rownames(lookup) <- NULL
+    coverage <- data.frame(
+      document_id = batch$ids,
+      status = statuses,
+      failure_reason = failures,
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+    for (field in cov_fields) {
+      coverage[[field]] <- vapply(
+        profiles, function(p) as.double(p$coverage[[field]]), numeric(1L)
+      )
+    }
+    rownames(coverage) <- NULL
+    batch_status <- if (any(statuses == "resource_error")) {
+      "resource_error"
+    } else if (any(statuses == "invalid_input")) {
+      "invalid_input"
+    } else if (all(statuses == "empty")) {
+      "empty"
+    } else {
+      "ok"
+    }
+    batch_failure <- if (batch_status %in% c("resource_error", "invalid_input")) {
+      failures[which(!is.na(failures))[1L]]
+    } else {
+      NA_character_
+    }
+  }
+
+  provenance <- list(
+    contract_id = .tubelex_profile_contract_id,
+    contract_version = .tubelex_profile_contract_version,
+    batch_contract_id = .tubelex_batch_contract_id,
+    batch_contract_version = .tubelex_batch_contract_version,
+    resource = if (length(profiles)) {
+      profiles[[1L]]$provenance$resource
+    } else {
+      .lexres_resource_ref(.lexres_tubelex_expectation())
+    },
+    lookup = if (length(profiles)) {
+      profiles[[1L]]$provenance$lookup
+    } else {
+      .lexres_lookup_ref()
+    },
+    query_normalization = normalization,
+    query_normalization_id = unname(.tubelex_normalization_ids[[normalization]]),
+    tokenization_mismatch = tokenization_mismatch,
+    document_count = as.double(length(batch$ids)),
+    document_ids = batch$ids,
+    unmatched_values_are_missing = TRUE,
+    matched_only_summary = TRUE
+  )
+  diagnostics <- list(
+    documents = coverage[c("document_id", "status", "failure_reason",
+      intersect(c("input_tokens", "eligible_tokens", "matched_tokens", "token_coverage"),
+        names(coverage)))],
+    batch = list(
+      document_count = as.double(length(batch$ids)),
+      planned_rows = as.double(planned_rows),
+      max_rows = as.double(max_rows),
+      document_order_preserved = TRUE,
+      single_resource_load = TRUE,
+      runtime_network_access = FALSE
+    )
+  )
+
+  structure(
+    list(
+      status = batch_status,
+      failure_reason = batch_failure,
+      summary = summary,
+      lookup = lookup,
+      coverage = coverage,
+      profiles = profiles,
+      provenance = provenance,
+      diagnostics = diagnostics
+    ),
+    class = "tubelex_profile_batch"
+  )
 }
 
 #' @export
@@ -350,4 +490,78 @@ print.tubelex_profile <- function(x, ...) {
   }
   print(x$summary, row.names = FALSE, ...)
   invisible(x)
+}
+
+#' @export
+print.tubelex_profile_batch <- function(x, ...) {
+  if (!inherits(x, "tubelex_profile_batch") || !is.list(x) ||
+      !is.data.frame(x$summary)) {
+    stop("x must be a tubelex_profile_batch object.", call. = FALSE)
+  }
+  doc_n <- x$provenance$document_count
+  cat(sprintf(
+    "<tubelex_profile_batch: %s; %d document%s; normalization=%s; %d summary row%s; %d lookup row%s>\n",
+    x$status,
+    doc_n, if (doc_n == 1) "" else "s",
+    x$provenance$query_normalization,
+    nrow(x$summary), if (nrow(x$summary) == 1L) "" else "s",
+    nrow(x$lookup), if (nrow(x$lookup) == 1L) "" else "s"
+  ))
+  if (identical(x$status, "resource_error") && !is.na(x$failure_reason)) {
+    cat("Resource failure:", x$failure_reason, "\n")
+  }
+  shown <- utils::head(x$summary, 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$summary) > nrow(shown)) {
+    cat(sprintf("... %d additional summary row%s omitted\n",
+      nrow(x$summary) - nrow(shown),
+      if (nrow(x$summary) - nrow(shown) == 1L) "" else "s"))
+  }
+  invisible(x)
+}
+
+#' @export
+plot.tubelex_profile_batch <- function(
+    x,
+    weighting = c("token", "type"),
+    col = "#0072B2",
+    main = NULL,
+    ylab = NULL,
+    ...,
+    monochrome = FALSE) {
+  weighting <- match.arg(weighting)
+  monochrome <- .lexprep_scalar_flag(monochrome, "monochrome")
+  if (monochrome) col <- "grey70"
+  if (!inherits(x, "tubelex_profile_batch") || !is.list(x) ||
+      !is.data.frame(x$summary)) {
+    stop("x must be a tubelex_profile_batch object.", call. = FALSE)
+  }
+  frame <- x$summary[x$summary$weighting == weighting, , drop = FALSE]
+  finite <- is.finite(frame$coverage)
+  if (!any(finite)) {
+    stop("The TUBELEX batch profile has no finite coverage to plot.", call. = FALSE)
+  }
+  if (is.null(ylab)) ylab <- paste(weighting, "coverage")
+  dots <- .lex_plot_bar_dots(list(...), reserved = c("ylim", "names.arg"))
+  old_par <- .lex_plot_style(dots)
+  on.exit(graphics::par(old_par), add = TRUE)
+  if (identical(dots$axes, FALSE) || identical(dots$xaxt, "n")) {
+    dots$axisnames <- FALSE
+  }
+  positions <- do.call(barplot, c(list(
+    height = frame$coverage,
+    names.arg = frame$document_id,
+    ylim = c(0, 1),
+    col = col,
+    main = main,
+    ylab = ylab
+  ), dots))
+  invisible(data.frame(
+    document_id = frame$document_id,
+    weighting = frame$weighting,
+    coverage = frame$coverage,
+    position = as.double(positions),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  ))
 }

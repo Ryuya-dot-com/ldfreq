@@ -145,6 +145,21 @@ lexdiv_align_annotations <- function(predicted, reference, column = NULL,
       boundary = "internal junction (left token end, right token start); excludes segment edges; includes supplied whitespace and punctuation tokens",
       label_scope = "exact_span_pairs_only; segmentation exclusions are not label false negatives",
       interpretation = "descriptive correspondence to supplied reference; reference status and independent validity are not established"))
-  out$provenance$content_sha256 <- .lexng_hash(out)
-  out
+  .lexng_seal(out, "lexdiv_annotation_alignment")
+}
+
+#' @export
+print.lexdiv_annotation_alignment <- function(x, ...) {
+  if (!inherits(x, "lexdiv_annotation_alignment") || !is.list(x) ||
+      !is.data.frame(x$summary)) {
+    stop("x must be a lexdiv_annotation_alignment object.", call. = FALSE)
+  }
+  doc_n <- length(unique(x$documents$document_id))
+  cat(sprintf(
+    "<lexdiv_annotation_alignment: %d document%s; %d alignment group%s>\n",
+    doc_n, if (doc_n == 1L) "" else "s",
+    nrow(x$groups), if (nrow(x$groups) == 1L) "" else "s"
+  ))
+  print.data.frame(x$summary, row.names = FALSE, ...)
+  invisible(x)
 }

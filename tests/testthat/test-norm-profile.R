@@ -204,20 +204,27 @@ test_that("structurally invalid resources fail before lookup", {
     "unique"
   )
 
-  wrong_order <- fixture$resource[rev(names(fixture$resource))]
-  expect_error(
-    lexdiv_norm_profile(
-      "alpha", fixture$norms, "term", fixture$specs, wrong_order
-    ),
-    "exact ordered fields"
+  reordered_resource <- fixture$resource[rev(names(fixture$resource))]
+  reordered_specs <- fixture$specs[rev(names(fixture$specs))]
+  reordered <- lexdiv_norm_profile(
+    "alpha", fixture$norms, "term", reordered_specs, reordered_resource
   )
+  canonical <- lexdiv_norm_profile(
+    "alpha", fixture$norms, "term", fixture$specs, fixture$resource
+  )
+  expect_identical(reordered, canonical)
 
-  wrong_specs <- fixture$specs[rev(names(fixture$specs))]
   expect_error(
     lexdiv_norm_profile(
-      "alpha", fixture$norms, "term", wrong_specs, fixture$resource
+      "alpha", fixture$norms, "term", fixture$specs, fixture$resource[-1]
     ),
-    "exact ordered columns"
+    "must contain the fields"
+  )
+  expect_error(
+    lexdiv_norm_profile(
+      "alpha", fixture$norms, "term", fixture$specs[-1], fixture$resource
+    ),
+    "must contain the columns"
   )
 
   out_of_range <- fixture$norms
@@ -306,7 +313,7 @@ test_that("normative contract matches the live result", {
   expect_identical(unlist(contract$result_contract$lookup_columns), names(result$lookup))
   expect_identical(unlist(contract$result_contract$summary_columns), names(result$summary))
   expect_identical(unlist(contract$result_contract$coverage_columns), names(result$coverage))
-  expect_identical(schema$properties$contract_version$const, "0.1.0")
+  expect_identical(schema$properties$contract_version$const, "0.2.0")
 })
 
 test_that("randomized results agree with an independent direct oracle", {

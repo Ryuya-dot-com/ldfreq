@@ -420,7 +420,8 @@ lexical sophistication.
 Passing a `lexdiv_tokenization` object requires
 `tokenization_mismatch = "allow"` for an explicit sensitivity analysis.
 High coverage alone cannot validate segmentation. For multiple documents,
-`tubelex_profile_batch()` returns a named list of complete profiles while
+`tubelex_profile_batch()` returns a structured `tubelex_profile_batch` object
+(`$summary`, `$lookup`, `$coverage`, and `$profiles`) while
 loading one verified resource snapshot per call. See
 [designing comparisons guide](designing-comparisons.html) for a worked design.
 
@@ -552,8 +553,6 @@ The plan supplies all method parameters: omit `metrics`, `window_length` and
 other individual metric arguments when `plan` is set. The returned data frame
 keeps the plan fingerprint, request IDs and specification IDs. Save the plan
 and complete result together with `saveRDS()` as in the earlier saving example.
-`lexdiv_profile()` and `lexdiv_profile_batch()` remain supported and return the
-same complete objects. The plan entry points accept pre-tokenized documents.
 
 Use `lexdiv_methods()` for methods accepted by plans. To inspect Maas and MTLD
 comparison definitions, select a different catalog:
@@ -564,8 +563,7 @@ comparison_methods[, c("family", "method_id", "scale")]
 ```
 
 Pass those method IDs to `lexdiv_variant_metrics(variants = ...)`; they are not
-all accepted by `lexdiv_spec()`. `lexdiv_variant_ids()` remains supported and
-returns the same catalog. The two scopes retain their own descriptive columns.
+all accepted by `lexdiv_spec()`. The two scopes retain their own descriptive columns.
 
 MATTR has an additional local diagnostic surface. It accepts a MATTR-only
 canonical plan and returns each complete moving-window value plus the number
@@ -636,7 +634,7 @@ separate variant surface makes those choices comparable without changing the
 canonical registry or silently replacing a method.
 
 ```{r}
-variant_catalog <- lexdiv_variant_ids()
+variant_catalog <- lexdiv_methods(scope = "variants")
 variant_catalog
 
 variant_results <- lexdiv_variant_metrics(

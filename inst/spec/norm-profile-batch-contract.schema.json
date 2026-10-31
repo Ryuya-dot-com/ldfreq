@@ -48,7 +48,7 @@
           "const": "norm-profile-contract.json"
         },
         "contract_version": {
-          "const": "0.1.0"
+          "const": "0.2.0"
         },
         "arithmetic_and_matching_unchanged": {
           "const": true

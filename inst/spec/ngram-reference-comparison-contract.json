@@ -1,6 +1,6 @@
 {
   "contract_id": "ldfreq-ngram-reference-comparison",
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "status": "experimental",
   "inputs": "One unmodified lexdiv_ngrams target and at least two uniquely named lexdiv_ngram_reference results",
   "compatibility": "Matching preprocessing_id, lookup_unit and resource_key_normalization_id declarations; all requested n supported; declarations do not prove equivalence",

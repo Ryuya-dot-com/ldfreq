@@ -25,10 +25,21 @@ test_that("numeric settings and sheet selectors retain their declared types", {
   expect_error(ldfreq:::.mtld_parameters(data.frame(threshold=.72)),"list")
 })
 
-test_that("canonical action names are exact compatibility aliases", {
-  expect_identical(lexdiv_compare_ngrams,lexdiv_ngram_compare)
-  expect_identical(lexdiv_build_ngram_reference,lexdiv_ngram_reference_build)
-  expect_identical(lexdiv_sort_concordance,lexdiv_concordance_sort)
-  expect_identical(lexdiv_screen_lengths,lexdiv_screen)
-  expect_identical(lexdiv_methods("variants"),lexdiv_variant_ids())
+test_that("v1.0.0 retires legacy pre-1.0 compatibility aliases cleanly", {
+  exports <- getNamespaceExports("ldfreq")
+  expect_true(all(c(
+    "lexdiv_compare_ngrams",
+    "lexdiv_build_ngram_reference",
+    "lexdiv_sort_concordance",
+    "lexdiv_screen_lengths"
+  ) %in% exports))
+  expect_false(any(c(
+    "lexdiv_ngram_compare",
+    "lexdiv_ngram_reference_build",
+    "lexdiv_concordance_sort",
+    "lexdiv_screen",
+    "lexdiv_variant_ids",
+    "lexdiv_profile",
+    "lexdiv_profile_batch"
+  ) %in% exports))
 })

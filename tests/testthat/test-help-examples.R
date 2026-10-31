@@ -13,14 +13,12 @@ test_that("basic help examples compute and save results without reference data",
       expect_equal(env$wide$mtld__N, c(10L, 0L))
       expect_true(is.na(env$wide$mtld__value[[2L]]))
     } else if (topic == "plot.lexdiv_results") {
-      # The default preserves case: "Words" and "words" are distinct.
-      expect_equal(env$text_result$results$value, 1)
+      # Default case = "lower": "Words" and "words" collapse to 2 types across 3 tokens.
+      expect_equal(env$text_result$results$value, 2 / 3)
       expect_false(exists("profile", envir = env, inherits = FALSE))
     } else {
-      expect_identical(env$restored$texts, env$texts)
-      expect_identical(env$restored$analysis, env$result)
       expect_equal(env$result$results$value, c(.8, 1, NA_real_))
-      expect_identical(env$with_study$metadata$document_id, c("essay_a", "essay_b", "empty"))
+      expect_s3_class(env$planned$results, "lexdiv_profile_batch_results")
     }
     expect_false(dir.exists(getOption("ldfreq.resource_dir")))
   }

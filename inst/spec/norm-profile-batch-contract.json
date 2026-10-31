@@ -7,7 +7,7 @@
   "function": "lexdiv_norm_profile_batch",
   "single_document_contract": {
     "file": "norm-profile-contract.json",
-    "contract_version": "0.1.0",
+    "contract_version": "0.2.0",
     "arithmetic_and_matching_unchanged": true
   },
   "input_contract": {

@@ -1,5 +1,6 @@
 \name{lexdiv_family_profile}
 \alias{lexdiv_family_profile}
+\alias{print.lexdiv_family_profile}
 \title{Count resource-defined word families while retaining source occurrences}
 \description{
 Count the word families represented in each document using an explicit

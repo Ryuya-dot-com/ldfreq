@@ -77,6 +77,12 @@
 
 .lex_batch_documents <- function(documents, id_col, tokens_col) {
   if (is.data.frame(documents)) {
+    documents <- base::as.data.frame(
+      documents,
+      stringsAsFactors = FALSE,
+      check.names = FALSE,
+      optional = TRUE
+    )
     column_names <- .lex_batch_column_names(names(documents))
     id_matches <- which(column_names == id_col)
     tokens_matches <- which(column_names == tokens_col)
@@ -87,7 +93,7 @@
       )
     }
 
-    ids <- .subset2(documents, id_matches)
+    ids <- .lex_strip_names(.subset2(documents, id_matches))
     token_column <- .subset2(documents, tokens_matches)
     document_count <- nrow(documents)
     ids <- .lex_batch_validate_ids(ids, document_count)
@@ -181,7 +187,7 @@
 #' @return A long-form `lexdiv_batch_results` data frame ordered by document and
 #'   then requested metric. The explicit document/batch envelope is followed by
 #'   all single-document result columns, whose schema identity is preserved.
-#'   With `plan`, returns the complete [lexdiv_profile_batch()] result.
+#'   With `plan`, returns the complete `lexdiv_profile_batch_results` table.
 #' @export
 lexdiv_metrics_batch <- function(
     documents,
@@ -194,7 +200,7 @@ lexdiv_metrics_batch <- function(
     if (...length() > 0L) {
       stop("With plan, omit all metric arguments in ...; put requests in the plan.", call. = FALSE)
     }
-    return(lexdiv_profile_batch(
+    return(.lexdiv_profile_batch(
       documents, plan = plan, id_col = id_col, tokens_col = tokens_col,
       max_rows = max_rows
     ))

@@ -1,6 +1,8 @@
 \name{lexdiv_keyness}
 \alias{lexdiv_keyness}
 \alias{lexdiv_keyness_concordance}
+\alias{print.lexdiv_keyness}
+\alias{print.lexdiv_keyness_concordance}
 \title{Compare word frequencies in explicit target and reference corpora}
 \description{
 Retain corpus denominators, document-level counts and source occurrences beside
@@ -8,7 +10,7 @@ descriptive G-squared and log-ratio scores. Return an exact term's occurrences
 to a source-aligned concordance without redefining the counted vocabulary.
 }
 \usage{
-lexdiv_keyness(x, target, reference, preprocessing_id,
+lexdiv_keyness(x, target, reference, preprocessing_id = "default",
     term_col = "surface", keep = rep(TRUE, nrow(x$tokens)), min_count = 1L,
     max_tokens = 1e6)
 lexdiv_keyness_concordance(x, term, window = 5L, max_cells = 1e6)

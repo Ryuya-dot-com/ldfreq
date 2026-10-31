@@ -45,8 +45,8 @@ test_that("widening cannot conceal different parameter or contract identities", 
     list(window_length = 2), request_id = "mattr"))
   p4 <- lexdiv_plan(presets = character(), specs = lexdiv_spec(method,
     list(window_length = 4), request_id = "mattr"))
-  combined <- rbind(lexdiv_profile_batch(list(a = tokens), p2),
-    lexdiv_profile_batch(list(b = tokens), p4))
+  combined <- rbind(lexdiv_metrics_batch(list(a = tokens), plan = p2),
+    lexdiv_metrics_batch(list(b = tokens), plan = p4))
   expect_error(lexdiv_widen(combined), "different measurement specifications")
   expect_equal(ncol(lexdiv_widen(combined, names_from = "specification_id",
     values_from = "value")), 3L)
@@ -56,7 +56,7 @@ test_that("metric plots require one specification and retain its identity", {
   method <- lexdiv_methods()$method_id[lexdiv_methods()$metric_id == "mattr"]
   plan <- lexdiv_plan(presets = character(), grids = lexdiv_grid(
     method, "window_length", c(2, 4), request_id_prefix = "window"))
-  x <- lexdiv_profile_batch(list(essay = c("a", "b", "a", "b")), plan)
+  x <- lexdiv_metrics_batch(list(essay = c("a", "b", "a", "b")), plan = plan)
   path <- tempfile(fileext = ".pdf")
   grDevices::pdf(path)
   on.exit({grDevices::dev.off(); unlink(path)}, add = TRUE)

@@ -158,7 +158,7 @@
 #'   `exposure`, and `diagnostics`, checked before detail allocation.
 #'
 #' @return A `lexdiv_mattr_profile` list. `summary` contains the unchanged
-#'   canonical [lexdiv_profile()] rows; `windows` contains local TTR values;
+#'   canonical `lexdiv_profile_results` rows; `windows` contains local TTR values;
 #'   `exposure` contains position-only inclusion counts and weights;
 #'   `diagnostics` reconciles the local mean with the canonical result; and
 #'   `provenance` records the profile contract, schema, and plan identity.
@@ -173,7 +173,7 @@ lexdiv_mattr_profile <- function(tokens, plan, max_rows = 1e6) {
     stop("plan must contain only MATTR specifications.", call. = FALSE)
   }
 
-  summary <- lexdiv_profile(tokens, plan)
+  summary <- .lexdiv_profile(tokens, plan)
   specification_count <- length(plan$specifications)
   fixed_rows <- 2 * as.double(specification_count)
   if (fixed_rows > max_rows) {

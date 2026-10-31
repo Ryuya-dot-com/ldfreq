@@ -30,10 +30,10 @@ test_that("MTLD-MA uses completed overlapping factors and excludes short factors
 test_that("MTLD-MA is opt-in and preserves plan, batch and raw-text dispatch", {
   x <- rep(letters[1:20], 8)
   expect_false("mtld_ma" %in% lexdiv_metrics(x)$metric_id)
-  expect_false("mtld_ma" %in% lexdiv_profile(x)$metric_id)
+  expect_false("mtld_ma" %in% lexdiv_metrics(x, plan = lexdiv_plan())$metric_id)
   a <- lexdiv_metrics(x, metrics = "mtld_ma", mtld_threshold = .7)
   plan <- lexdiv_plan(presets = character(), specs = lexdiv_spec(a$method_id, list(threshold = .7)))
-  expect_equal(lexdiv_profile(x, plan)$value, a$value)
+  expect_equal(lexdiv_metrics(x, plan = plan)$value, a$value)
   expect_equal(lexdiv_metrics_batch(list(doc = x), metrics = "mtld_ma", mtld_threshold = .7)$value, a$value)
   expect_equal(lexdiv_metrics_text(paste(x, collapse = " "), metrics = "mtld_ma",
     mtld_threshold = .7)$results$value, a$value)

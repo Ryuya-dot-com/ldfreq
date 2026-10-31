@@ -143,8 +143,28 @@ lexdiv_score_contextual <- function(x, training, reference, training_info) {
       training_info = training_info, direction = "higher",
       split_checks = "disjoint document IDs and no identical target-bearing segment text",
       interpretation = "supervised within-surface baselines; split validity and annotation quality require external evidence")))
-  out$provenance$content_sha256 <- .lexng_hash(out)
-  out
+  .lexng_seal(out, "lexdiv_contextual_scores")
+}
+
+#' @export
+print.lexdiv_contextual_scores <- function(x, ...) {
+  if (!inherits(x, "lexdiv_contextual_scores") || !is.list(x) ||
+      !is.data.frame(x$prototypes)) {
+    stop("x must be a lexdiv_contextual_scores object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<lexdiv_contextual_scores: %d prototype%s; %d query occurrence%s>\n",
+    nrow(x$prototypes), if (nrow(x$prototypes) == 1L) "" else "s",
+    nrow(x$query_occurrences), if (nrow(x$query_occurrences) == 1L) "" else "s"
+  ))
+  cols <- intersect(c("surface", "candidate_id", "label", "training_n"),
+    names(x$prototypes))
+  shown <- utils::head(x$prototypes[cols], 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$prototypes) > nrow(shown)) {
+    cat("... additional prototype rows omitted\n")
+  }
+  invisible(x)
 }
 
 .lexctx_unit <- function(x) {

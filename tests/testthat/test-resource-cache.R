@@ -47,9 +47,10 @@ test_that("TUBELEX cache failures retain structured single and batch results", {
     expect_false(single$diagnostics$download_attempted)
     expect_true(all(is.na(single$summary$mean_zipf)))
     batch <- tubelex_profile_batch(list(doc = "apple", empty = character()))
-    expect_identical(batch$doc, single)
-    expect_identical(batch$empty$status, "resource_error")
-    expect_identical(batch$empty$failure_reason, reason)
+    expect_s3_class(batch, "tubelex_profile_batch")
+    expect_identical(batch$profiles$doc, single)
+    expect_identical(batch$profiles$empty$status, "resource_error")
+    expect_identical(batch$profiles$empty$failure_reason, reason)
   }
   check_failure("resource_unavailable")
   expect_false(dir.exists(cache))
@@ -82,7 +83,7 @@ test_that("TUBELEX data-file failures use the same contract as manifest failures
     expect_identical(single$status, "resource_error")
     expect_identical(single$failure_reason, reason)
     expect_false(single$diagnostics$download_attempted)
-    expect_identical(tubelex_profile_batch(list(doc = "apple"))$doc, single)
+    expect_identical(tubelex_profile_batch(list(doc = "apple"))$profiles$doc, single)
   }
 })
 

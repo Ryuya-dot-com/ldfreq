@@ -16,6 +16,8 @@ reference:
   - title: Raw text and lexical units
     contents:
       - lexdiv_preprocessing
+      - lexdiv_text_batch
+      - lexdiv_flemmatize
       - lexdiv_compare_annotations
       - lexdiv_import_annotations
       - lexdiv_evaluate_annotations
@@ -26,8 +28,6 @@ reference:
       - lexdiv_import_contextual
       - lexdiv_evaluate_contextual
       - lexdiv_score_contextual
-      - lexdiv_text_batch
-      - lexdiv_flemmatize
       - lexdiv_family_profile
   - title: Study tables and corpus exploration
     contents:
@@ -42,18 +42,12 @@ reference:
   - title: Formula variants
     contents:
       - lexdiv_variant_metrics
-  - title: Profiles and screens
+  - title: Plans, profiles, and screens
     contents:
-      - lexdiv_spec
-      - lexdiv_grid
       - lexdiv_plan
-      - lexdiv_methods
-      - lexdiv_presets
-      - lexdiv_profile
-      - lexdiv_profile_batch
       - lexdiv_mattr_profile
       - plot.lexdiv_mattr_profile
-      - lexdiv_screen
+      - lexdiv_screen_lengths
   - title: Caller-supplied lexical norms
     contents:
       - lexdiv_norm_profile
@@ -64,8 +58,8 @@ reference:
   - title: Adjacent n-gram frequencies
     contents:
       - lexdiv_ngrams
-      - lexdiv_ngram_reference_build
-      - lexdiv_ngram_compare
+      - lexdiv_build_ngram_reference
+      - lexdiv_compare_ngrams
       - lexdiv_read_masc
   - title: Reference-resource profiles
     contents:

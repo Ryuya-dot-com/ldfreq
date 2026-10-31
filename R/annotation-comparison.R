@@ -105,7 +105,29 @@ lexdiv_compare_annotations <- function(before, after, max_tokens = 1e6) {
   }
   if (length(pieces)) changes <- do.call(base::rbind.data.frame, pieces)
   row.names(changes) <- NULL
-  list(documents = documents, changes = changes,
-    provenance = list(before = lapply(before, `[[`, "provenance"),
-      after = lapply(after, `[[`, "provenance")))
+  structure(
+    list(documents = documents, changes = changes,
+      provenance = list(before = lapply(before, `[[`, "provenance"),
+        after = lapply(after, `[[`, "provenance"))),
+    class = "lexdiv_annotation_comparison"
+  )
+}
+
+#' @export
+print.lexdiv_annotation_comparison <- function(x, ...) {
+  if (!inherits(x, "lexdiv_annotation_comparison") || !is.list(x) ||
+      !is.data.frame(x$documents)) {
+    stop("x must be a lexdiv_annotation_comparison object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<lexdiv_annotation_comparison: %d document%s; %d changed token%s>\n",
+    nrow(x$documents), if (nrow(x$documents) == 1L) "" else "s",
+    nrow(x$changes), if (nrow(x$changes) == 1L) "" else "s"
+  ))
+  shown <- utils::head(x$documents, 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$documents) > nrow(shown)) {
+    cat("... additional document rows omitted\n")
+  }
+  invisible(x)
 }

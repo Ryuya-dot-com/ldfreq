@@ -65,10 +65,11 @@ ordinary calculations. Existing saved results remain readable.
 
 The canonical action names are `lexdiv_compare_ngrams()`,
 `lexdiv_build_ngram_reference()`, `lexdiv_sort_concordance()` and
-`lexdiv_screen_lengths()`. The previous names remain exact compatibility
-aliases. Use `lexdiv_methods(scope = "variants")` for the variant catalog and
-`lexdiv_metrics(tokens, plan = plan)` to execute a plan; earlier calls remain
-supported. MTLD-MA is opt-in and does not change the eleven default metrics.
+`lexdiv_screen_lengths()`. Pre-1.0 compatibility aliases and duplicate plan
+entry points are removed in 1.0.0. Use `lexdiv_methods(scope = "variants")` for
+the variant catalog and pass `plan = plan` directly to `lexdiv_metrics*()` or
+`lexdiv_metrics_text*()`. MTLD-MA is opt-in and does not change the eleven
+default metrics.
 
 **From 0.1.0 or 0.2.0:** the intervening changes below affect interpretation
 or compatibility. Retain the old archive and results before computing again.
@@ -88,8 +89,9 @@ or compatibility. Retain the old archive and results before computing again.
    without editing their IDs or values; comparison and plot checks reject
    unlike measurement identities.
 4. Preprocessing contract 0.1.0 objects must be recreated from original text
-   and explicit annotations. The current 0.4.0 contract retains valid 0.3.0
-   objects and 0.2.0 Unicode objects. A legacy object without recorded
+   and explicit annotations. Contract 1.0.0 defaults raw-text helpers to
+   `case = "lower"` and `tokenizer = "english"`, while continuing to accept valid
+   0.2.0–0.4.0 tokenization objects. A legacy object without recorded
    textstem dictionary identity cannot establish strict lemma comparability.
    Do not manually fill provenance fields to bypass validation.
 5. TUBELEX contract 0.2.0 rejects known tokenizer mismatch by default.

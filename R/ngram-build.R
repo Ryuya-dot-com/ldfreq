@@ -1,6 +1,10 @@
 # Process bounded extraction chunks, retaining counts rather than occurrences.
-lexdiv_ngram_reference_build <- function(sources, read_chunk, resource, max_types = 1e6) {
-  sources <- .lex_batch_validate_ids(sources, length(sources))
+lexdiv_build_ngram_reference <- function(
+    sources,
+    read_chunk,
+    resource = lexdiv_resource_meta("caller_ngram_reference"),
+    max_types = 1e6) {
+  sources <- .lex_batch_validate_ids(.lex_strip_names(sources), length(sources))
   if (!length(sources)) stop("sources must not be empty.", call. = FALSE)
   if (!is.function(read_chunk)) stop("read_chunk must be a function.", call. = FALSE)
   resource <- .lexnorm_resource(resource)
@@ -59,11 +63,31 @@ lexdiv_ngram_reference_build <- function(sources, read_chunk, resource, max_type
   reference <- lexdiv_ngram_reference(counts, resource, totals, preprocessing_id, complete = TRUE)
   source_table <- do.call(rbind, records); rownames(source_table) <- NULL
   document_table <- do.call(rbind, roster); rownames(document_table) <- NULL
-  list(reference = reference, sources = source_table, documents = document_table,
-    provenance = list(builder = "ldfreq-ngram-reference-build", builder_version = "0.1.0",
-      preprocessing_id = preprocessing_id, source_order = sources,
-      document_policy = "whole-documents-in-exactly-one-chunk",
-      retained = "counts-denominators-document-roster-extraction-fingerprints",
-      max_types = max_types,
-      network_policy = "no-package-network-calls-callback-is-caller-controlled"))
+  .lexng_seal(
+    list(reference = reference, sources = source_table, documents = document_table,
+      provenance = list(builder = "ldfreq-ngram-reference-build", builder_version = "0.2.0",
+        preprocessing_id = preprocessing_id, source_order = sources,
+        document_policy = "whole-documents-in-exactly-one-chunk",
+        retained = "counts-denominators-document-roster-extraction-fingerprints",
+        max_types = max_types,
+        network_policy = "no-package-network-calls-callback-is-caller-controlled")),
+    "lexdiv_ngram_build"
+  )
+}
+
+#' @export
+print.lexdiv_ngram_build <- function(x, ...) {
+  if (!inherits(x, "lexdiv_ngram_build") || !is.list(x) ||
+      !inherits(x$reference, "lexdiv_ngram_reference")) {
+    stop("x must be a lexdiv_ngram_build object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<lexdiv_ngram_build: %d source chunk%s; %d document%s; %d n-gram type%s>\n",
+    length(x$provenance$source_order),
+    if (length(x$provenance$source_order) == 1L) "" else "s",
+    nrow(x$documents), if (nrow(x$documents) == 1L) "" else "s",
+    nrow(x$reference$counts), if (nrow(x$reference$counts) == 1L) "" else "s"
+  ))
+  print.data.frame(x$reference$totals, row.names = FALSE, ...)
+  invisible(x)
 }

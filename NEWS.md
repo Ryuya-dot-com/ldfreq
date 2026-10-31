@@ -1,7 +1,38 @@
 # ldfreq 1.0.0
 
-## Updating existing analyses
+## Public API consolidation and ergonomics
 
+- **Unified canonical entry points**: Pre-1.0 duplicate entry points and
+  compatibility aliases (`lexdiv_ngram_compare()`,
+  `lexdiv_ngram_reference_build()`, `lexdiv_concordance_sort()`,
+  `lexdiv_screen()`, `lexdiv_variant_ids()`, `lexdiv_profile()`, and
+  `lexdiv_profile_batch()`) are removed. Pass `plan = plan` directly to
+  `lexdiv_metrics()`, `lexdiv_metrics_batch()`, `lexdiv_metrics_text()`, or
+  `lexdiv_metrics_text_batch()`, and query variant definitions with
+  `lexdiv_methods(scope = "variants")`.
+- **Harmonized parameters and raw-text defaults**: `lexdiv_as_documents()` uses
+  `id_col = "document_id"`, `lexdiv_sort_concordance()` uses
+  `case_insensitive = FALSE`, and raw-text functions (`lexdiv_tokenize*`,
+  `lexdiv_metrics_text*`, `lexdiv_as_annotations()`) default to
+  `case = "lower"` and `tokenizer = "english"` under preprocessing contract
+  `1.0.0`.
+- **R ecosystem compatibility and ergonomic constructors**: Subclassed data
+  frames (`tibble`, `data.table`) and named 1D character vectors are accepted
+  across data-frame and term-vector inputs. `lexdiv_norm_spec()` and
+  `lexdiv_resource_meta()` provide concise constructors and defaults for
+  `lexdiv_norm_profile*()` and `lexdiv_build_ngram_reference()`, while
+  `lexdiv_spec()` and `lexdiv_grid()` accept `metric_id` shorthands.
+- **Connected raw-text and corpus workflows**: `lexdiv_as_annotations()`
+  converts raw texts or `lexdiv_tokenization` batches directly into sealed
+  `lexdiv_annotations` objects (`integrity_sha256` O(1) verification),
+  `lexdiv_lemmatize_batch()` and `lexdiv_flemmatize_batch()` annotate batches,
+  and `lexdiv_widen()`, `lexdiv_screen_lengths()`, and `lexdiv_study_table()`
+  accept `lexdiv_text_*` results directly.
+- **Consistent S3 objects and Base-R plotting**: `tubelex_profile_batch()`
+  returns a structured `tubelex_profile_batch` S3 object (`$summary`, `$lookup`,
+  `$coverage`, `$profiles`) with `print()` and `plot()` methods, all analysis
+  outputs carry explicit S3 classes with bounded 12-row `print()` methods, and
+  `plot.lexdiv_concordance()` uses zero-dependency Base R graphics.
 - In NJ8 plots, replace `bar_col` with `col`: use `plot(profile, col = ...)`,
   as with the other plot methods. Use one bar color and one cumulative-curve
   color; monochrome mode also controls the bar outline and off-list shade.

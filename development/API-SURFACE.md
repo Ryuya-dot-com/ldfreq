@@ -1,102 +1,95 @@
 # Public API surface
 
-Current API inventory for the 1.0.0 changes. Names, help and navigation are checked by
+Current API inventory for **ldfreq 1.0.0**. Names, help and navigation are checked by
 `Rscript development/audit-public-api.R .`. Scientific definitions are in the
 installed method contracts; return columns and examples are in each help topic.
 
-## Naming and compatibility
+## Naming and unified entry points in 1.0.0
 
-Use action-first names for compare, build, sort and screen operations.
-`lexdiv_metrics(..., plan = plan)` is the common calculation entry point;
-`lexdiv_profile()` retains compatibility. `lexdiv_methods(scope = "variants")`
-is the variant catalog; the legacy `lexdiv_variant_ids()` data-frame return is
-unchanged. `_ids` names otherwise return character identifiers. `_text` marks
-raw input and `_batch` marks identified multi-document input. Resource-branded
-readers/profiles retain their resource prefix. No implicit token/text guessing.
+- Action-first names are the sole public entry points: `lexdiv_compare_ngrams()`,
+  `lexdiv_build_ngram_reference()`, `lexdiv_sort_concordance()`, and
+  `lexdiv_screen_lengths()`. All pre-1.0 legacy compatibility aliases are retired.
+- `lexdiv_metrics(..., plan = plan)`, `lexdiv_metrics_batch(..., plan = plan)`,
+  `lexdiv_metrics_text(..., plan = plan)`, and
+  `lexdiv_metrics_text_batch(..., plan = plan)` are the unified calculation
+  entry points. `lexdiv_methods(scope = "variants")` is the sole variant catalog.
+- Raw-text functions (`lexdiv_tokenize*`, `lexdiv_metrics_text*`, and
+  `lexdiv_as_annotations()`) default to `case = "lower", tokenizer = "english"`
+  while recording exact preprocessing provenance.
+- `lexdiv_as_annotations()` bridges raw texts or tokenizations directly into
+  `lexdiv_concordance()`, `lexdiv_collocations()`, `lexdiv_keyness()`,
+  `lexdiv_ambiguity_review()`, and `lexdiv_family_profile()`.
+- `tibble` / `data.table` data frames and named 1D character vectors are
+  transparently accepted across data-frame and term-vector inputs.
 
 ## Export inventory
 
-| `lexdiv_study_table()` | Planned observations joined to saved plan results; ordinary data frame with distinct submission/computation/reporting states | One selected document per observation; no recomputation or model fitting | Base | No | Complete ordinary table |
-| `lexdiv_study_model_data()` | Explicit single-condition/request selection with metadata and exclusion audit | One row per observation and unique document | Base list | No | `$data`, `$audit` |
-| `lexdiv_concordance()` | Complete source-aligned token-pattern search; classed full record | Declared source document roster including empty/zero-match documents | Base list | `plot()` selects one query, returns displayed tables invisibly | `$occurrences`, `$counts`, `$documents`, full `$source`, settings/provenance |
-| `lexdiv_concordance_sort()` | Sort saved context nearest-token-first with stable ties | Same search and occurrence IDs | Base table | No | Ordered occurrence table |
-| `lexdiv_concordance_dispersion()` | Unnormalised single-token within-document DP and per-part exposure | Document rows, not across-document dispersion | Base list | Position view belongs to search | `$documents`, `$parts`, occurrence IDs/settings/search ID |
-| `lexdiv_collocations()` | Ordered eligible slot-pair opportunities, MI and t-score | Per-document audit beside pooled counts; not n-gram reference frequency | Base list | No | `$results`, `$pairs`, `$documents`, complete `$search`, settings/provenance |
-| `lexdiv_keyness()` | Explicit disjoint target/reference counts, G-squared and unsmoothed log-ratio; no tests | Pooled token totals with document counts and coverage | Base list | No | `$results`, `$totals`, `$documents`, `$document_counts`, `$occurrences`, `$token_audit`, full `$source` |
-| `lexdiv_keyness_concordance()` | Exact counted-term return to original contexts | Same retained source; no new comparison | Base list | `plot($search)` | Comparison ID, term and classed `$search` |
-| `morphynet_read_derivations()` | Local six-field derivational TSV reader; preserves source/target/POS, affix position, alternatives and file identity | Reference resource; not a document profiler | Base list | No | `$relations`, scalar `$resource` for candidate review, `$provenance`; example preserves source row mapping and occurrence decisions |
-| `bnccoca_data()` | Cached Nation BNC/COCA Level 6 membership, Version 1.0.0; no inferred members | Reference resource, not document data | Base list | No | `$dictionary`, separate `$supplementary`, `$catalog`, `$resource` for family lookup, `$provenance` for source/conversion identity |
-| `morpholex_data()` | Cached MorphoLex-en worksheet values and provenance; all sheets or an explicit ordered subset | Reference resource, not document data | Base list | No | `$sheets` (character-valued original data frames), `$provenance` including source identity, license and complete sheet catalog |
-| `lexdiv_family_profile()` | Experimental exact form/POS lookup against a caller-defined family table; optional source/policy-bound occurrence review; retains original lookup, ambiguity and missingness | Complete imported annotations with document IDs; pooled summary explicitly separate from document metrics | Base list | No | `$occurrences`, `$candidates`, `$members`, `$documents`, `$summary`, complete `$annotations`, `$dictionary`, `$review_input`, `$review`, `$provenance` |
-| `lexdiv_amod_pairs()` | Experimental basic-UD ADJ–amod–NOUN extraction from complete source-checked annotations; validates trees and distinguishes missing sentences from zero pairs | Explicit document/sentence IDs; observed counts beside complete totals and coverage | Base list | No: select counts, types or coverage explicitly; guide overlays original count distributions | `$occurrences`, `$counts`, `$segments`, `$documents`, `$summary`, complete `$annotations` and `$provenance` |
-| `lexdiv_score_contextual()` | Experimental supervised centroid-cosine and training-frequency baselines over separate imported reviews | Same supplied inventory, disjoint documents, explicit training/reference audit | Base list | No | `$centroid`, `$frequency`, `$candidates`, `$prototypes`, both occurrence audits and complete inputs |
-| `lexdiv_evaluate_contextual()` | Experimental complete-inventory ranking and descriptive comparison to an explicit reference review | Overall and per-target counts, coverage, and term-specific confusion; source IDs preserved | Base list | No | `$summary`, `$terms`, `$pairs`, `$confusion`, `$review_queue`, complete inputs and policy |
-| `lexdiv_import_contextual()` | Experimental source-checked external embeddings/scores, distinct from human decisions; no inference | One complete review with all-occurrence coverage and ID-paired output | Base list | No | `$occurrences`, `$embeddings`, `$suggestions`, `$summary`, complete `$review` and model `$provenance` |
-| `lexdiv_metric_ids()` | Core metric ID character vector | Catalog used by both core calls | Base | No | Vector |
-| `lexdiv_content_overlap()` | Annotated content-word overlap composite | Pair operation; no batch inference | Overlap method | No: denominators differ by measure | `$summary`, `$coverage`, term and exclusion tables |
-| `lexdiv_lemmatize()` | Adds explicit lemma/UPOS layers and textstem dictionary fingerprints to `lexdiv_tokenization` | Tokenization object remains document-scoped | Tokenization method | No | `$tokens`, `$provenance` |
-| `lexdiv_compare_annotations()` | Validates identical source/tokenization before auditing changed lemma/UPOS/flemma labels | Single pair or named batches paired by ID | Base list | No | `$documents`, `$changes`, before/after `$provenance` |
-| `lexdiv_compare_responses()` | Validates scored binary response pairs and composite IDs; preserves missingness and explicit denominators | Explicit categorical strata; repeated observations require additional keys | Base list | No: select a quantity and stratum | `$responses`, `$counts`, `$summary`, `$provenance` |
-| `lexdiv_flemmatize()` | Adds explicit flemma layer to `lexdiv_tokenization` | Tokenization object remains document-scoped | Tokenization method | No | `$tokens`, `$provenance` |
-| `lexdiv_grid()` | Bounded ordered list of method specifications | Feeds a plan, not documents | Concise grid method | No | List elements remain complete specs |
-| `lexdiv_as_documents()` | Adapts named/tidy/quanteda tokens to a plain named list | Creates the batch boundary | Base | No | Plain named list |
-| `lexdiv_read_masc()` | Experimental GrAF 1.0 Penn reader preserving supplied tokens, regions, text and hashes | Explicit vector of headers and unique IDs | Base list | No | `$tokens`, `$segments`, `$documents`, `$provenance` |
-| `lexdiv_import_annotations()` | Experimental exact alignment of complete external surfaces to original text, preserving feature columns and declared analyzer/dictionary metadata | Ordered segment roster includes empty documents | Base list | No | `$tokens`, `$segments`, `$documents`, `$provenance` |
-| `lexdiv_evaluate_annotations()` | Experimental single-label evaluation against an explicit reference on the same imported source segmentation | Per-document coverage and all-occurrence pairing in reference order | Base list | No: select a label and denominator | `$summary`, `$labels`, `$documents`, `$pairs`, `$confusion`, `$review_queue`, complete inputs and declared policy |
-| `lexdiv_align_annotations()` | Experimental source-interval correspondence across different token segmentations; optional label evaluation on exact spans only | Same source segment roster; preserves empty documents and both token indices | Base list | No: select geometry or conditional labels explicitly | `$summary`, `$documents`, `$groups`, `$members`, `$boundaries`, `$review_queue`, optional `$annotation_evaluation`, complete inputs and policy |
-| `lexdiv_as_quanteda()` | Explicit token/segment tables to quanteda without closing gaps or retokenizing | Each segment has a mapping to its original document | Base list | Through quanteda | `$tokens`, `$positions`, `$segments`, `$provenance` |
-| `lexdiv_length_evidence()` | Evidence registry data frame | Not document data | Base data-frame | No | Data frame |
-| `lexdiv_mattr_profile()` | Canonical MATTR summary plus local-window and positional-exposure tables | Document-scoped; accepts a MATTR-only canonical plan | Bounded composite method | One explicit request | `$summary`, `$windows`, `$exposure`, `$diagnostics` |
-| `lexdiv_norm_profile()` | Conditional lexical-norm means plus exact lookup and separate resource/value coverage | Document-scoped; caller supplies one norm table and its provenance | Bounded composite method | No: measures may have unlike scales and directions | `$summary`, `$lookup`, `$coverage`, `$provenance`, `$diagnostics` |
-| `lexdiv_norm_profile_batch()` | Shared caller-supplied reference table applied to explicit documents with unchanged single-document arithmetic | One resource validation and global row ceiling; no corpus pooling | Bounded composite method | No: select a document, construct and weighting explicitly | `$summary`, `$lookup`, `$coverage`, shared `$provenance`, document/batch `$diagnostics` |
-| `lexdiv_ngrams()` | Adjacent bigram/trigram extraction within explicit segments and consecutive original positions | Multiple documents with optional empty-document roster | Bounded composite method | No | `$occurrences`, `$counts`, `$document_counts`, `$documents`, `$totals`, `$provenance` |
-| `lexdiv_ngram_reference()` | Validated extraction or caller aggregate with completeness, opportunity totals and source metadata | One declared reference population per n; reusable across targets | Bounded composite method | No | `$counts`, `$totals`, `$provenance`; save/read RDS |
-| `lexdiv_ngram_profile()` | Exact sequence lookup and available-value means with sample zeros distinguished from unlisted keys | Per-document, per-n token/type summaries, no pooling | Bounded composite method | No: select document, n and weighting | `$lookup`, `$summary`, `$documents`, `$provenance` |
-| `lexdiv_ngram_compare()` | Reference choice, common-item means and baseline differences beside unchanged per-reference coverage | One target, named references; common set across all references, no pooling | Base list | No: select document, n, weighting and reference | `$lookup`, `$summary`, `$documents`, `$references`, `$provenance` |
-| `lexdiv_methods()` | Core or comparison method catalog selected by scope | Shared discovery; executor documented per scope | Base data-frame | No | Core parameters or comparison metadata |
-| `lexdiv_metrics()` | Metric rows, or full request profiles with `plan` | Paired with `lexdiv_metrics_batch()` | Result/profile method | Single selected metric/request | Data frame |
-| `lexdiv_metrics_batch()` | Document-major metric or plan result data frame | Explicit batch form; plan row bound | Batch/profile-batch method | Single selected metric/request | Data frame |
-| `lexdiv_metrics_text()` | Core results plus token audit and preprocessing | Paired with `lexdiv_metrics_text_batch()` | Text-result method | Delegates to unchanged `$results` | `$results`, `$token_audit`, `$preprocessing` |
-| `lexdiv_metrics_text_batch()` | Raw/prepared document metrics with audits and provenance | Explicit text batch | Text-batch method | Delegates to complete `$results` | `$results`, `$token_audit`, `$preprocessing` |
-| `lexdiv_overlap_ids()` | Overlap measure ID character vector | Shared by both pair operations | Base | No | Vector |
-| `lexdiv_plan()` | Deduplicated bounded request plan | Shared by profile calls | Concise plan method | No | `$specifications` and plan identity fields |
-| `lexdiv_presets()` | Preset registry data frame | Shared by profile calls | Base data-frame | No | Data frame |
-| `lexdiv_profile()` | One-row-per-request long result data frame | Paired with `lexdiv_profile_batch()` | Profile-result method | Single selected request/metric | Data frame |
-| `lexdiv_profile_batch()` | Document-major request-profile data frame | Explicit batch form | Profile-batch method | Single selected request/metric | Data frame |
-| `lexdiv_reference_coverage()` | Token/type coverage of many documents by one exact reference set | Explicit many-to-one batch operation | Bounded composite method | One explicit weighting | `$summary`, `$documents`, `$reference`, optional `$terms` |
-| `lexdiv_screen()` | Independent token-floor screen data frame | Accepts single or batch profile rows | Base data-frame | One selected screen | Data frame |
-| `lexdiv_spec()` | One normalized method/parameter request | Feeds grids/plans | Concise spec method | No | Named list fields |
-| `lexdiv_tokenize()` | Lossless token rows and preprocessing provenance | Document-scoped | Tokenization method | No | `$tokens`, `$provenance` |
-| `lexdiv_tokenize_batch()` | Named raw-text vector or ID/text table to complete tokenizations | Explicit text batch | Base list | No | Named list of `$tokens` / `$provenance` objects |
-| `lexdiv_term_overlap()` | Exact term-set overlap composite | Pair operation; no batch inference | Overlap method | No: denominators differ by measure | `$summary`, `$counts`, optional term tables |
-| `lexdiv_variant_ids()` | Variant registry data frame | Not document data | Base data-frame | No | Data frame |
-| `lexdiv_variant_metrics()` | Cross-definition result data frame | Document-scoped | Variant-result method | No: families and scales differ | Data frame |
-| `lexdiv_widen()` | Pure long-to-wide transformation | Preserves document IDs when present | Wide-result method | No | Data frame |
-| `nj8_profile()` | Level summary, lookup, coverage, provenance, diagnostics | Paired with `nj8_profile_batch()` | Level-profile method | One weighting and scale | Named component tables |
-| `nj8_profile_batch()` | Document-major level-profile composite | Explicit batch form | Batch-level method | No: document selection must be explicit | Named component tables with `document_id` |
-| `nj8_diagnostics()` | Counts unmatched terms and lexical-unit mappings; flags observable string changes while retaining coverage and provenance | Accepts a single or batch NJ8 profile without repeating lookup | Base | No: inspect count and mapping tables | `$unmatched_terms`, `$unit_mappings`, `$coverage`, `$exclusion_reasons` |
-| `tubelex_diagnostics()` | Reusable frequency tables, coverage, unmatched counts and query mappings from existing profiles | Single profile or named batch, preserving empty and failed documents | Base list | No: choose weighting and condition explicitly | `$summary`, `$documents`, `$unmatched_terms`, `$normalization_mappings`, full per-document metadata |
-| `tubelex_profile()` | Frequency/prevalence summary, lookup, coverage, provenance | Paired with `tubelex_profile_batch()` | TUBELEX method | Token/type coverage | Named component tables |
-| `tubelex_profile_batch()` | Input-ordered named list of complete frequency profiles | One verified resource snapshot per batch call | Base list | No: choose a document explicitly | Each document retains summary, lookup, coverage, provenance |
-| `lexdiv_ngram_reference_build()` | Experimental sequential accumulation of whole-document extractions into exact reference counts | Unique document IDs across chunks; no pruning | Base list | No | `$reference`, `$sources`, `$documents`, `$provenance` |
-| `lexdiv_ambiguity_review()` | Experimental source-verified KWIC and explicit lexical-candidate decisions | Complete imported annotations; per-occurrence IDs and snapshot checks | Base list | No | `$occurrences`, `$candidates`, `$decisions`, `$summary`, complete `$source` and `$provenance` |
-| `lexdiv_compare_ambiguity()` | Descriptive agreement and unresolved decisions paired by occurrence ID | Two complete reviews of the same source and candidate snapshot | Base list | No | `$summary`, `$terms`, `$pairs`, `$review_queue`, `$status_pairs`, original `$reviews` |
-| `lexdiv_resource_info()` | Inspect optional resources and terms | data.frame | No download |
-| `lexdiv_download_resources()` | Explicit verified resource download | invisible data.frame | Requires license acknowledgement |
-| `lexdiv_compare_ngrams()` | Canonical name for `lexdiv_ngram_compare()` | Same signature and result | Compatibility alias retained |
-| `lexdiv_build_ngram_reference()` | Canonical name for `lexdiv_ngram_reference_build()` | Same signature and result | Compatibility alias retained |
-| `lexdiv_screen_lengths()` | Canonical name for `lexdiv_screen()` | Same signature and result | Compatibility alias retained |
-| `lexdiv_sort_concordance()` | Canonical name for `lexdiv_concordance_sort()` | Same signature and result | Compatibility alias retained |
-
-## Plot and help changes for 1.0.0
-
-The primary color argument is `col`, including NJ8 bars; `bar_col` is no
-longer accepted. Fixed-coordinate bar plots reject incompatible structural
-arguments. Axis switches and text settings apply to manually drawn axes too.
-Metric plots preserve the selected document roster, including missing rows in
-their invisible return. Missing rows have labelled positions without points.
-TTR adds token counts to labels and defaults to a zero-to-one scale; this is
-a descriptive display, not a length adjustment or a ranking of writers.
-Token-container conversion, wide results and plots have separate help topics;
-`lexdiv_convenience` remains an overview for existing links. Canonical examples
-retain old function aliases and unchanged saved measurement results.
+| `bnccoca_data()` | Cached Nation BNC/COCA Level 6 membership; no inferred members | Reference resource, not document data | Base list | No | `$dictionary`, `$supplementary`, `$catalog`, `$resource`, `$provenance` |
+| `lexdiv_align_annotations()` | Source-interval correspondence across different token segmentations; optional label evaluation on exact spans | Same source segment roster; preserves empty documents and both token indices | Classed `lexdiv_annotation_alignment` | No | `$summary`, `$documents`, `$groups`, `$members`, `$boundaries`, `$review_queue`, `$provenance` |
+| `lexdiv_ambiguity_review()` | Source-verified KWIC and explicit lexical-candidate decisions | Complete imported annotations; O(1) integrity check | Classed `lexdiv_ambiguity_review` | No | `$occurrences`, `$candidates`, `$decisions`, `$summary`, `$source`, `$provenance` |
+| `lexdiv_amod_pairs()` | Basic-UD ADJ-amod-NOUN extraction from source-checked annotations | Explicit document/sentence IDs; observed counts beside complete totals | Classed `lexdiv_amod_pairs` | No | `$occurrences`, `$counts`, `$segments`, `$documents`, `$summary`, `$annotations`, `$provenance` |
+| `lexdiv_as_annotations()` | Bridges raw texts or `lexdiv_tokenization` objects into source-aligned `lexdiv_annotations` | Complete non-whitespace coverage with `is_word` and normalized `term` | Classed `lexdiv_annotations` | No | `$tokens`, `$segments`, `$documents`, `$provenance`, `$integrity_sha256` |
+| `lexdiv_as_documents()` | Adapts named/tidy/tibble/quanteda tokens to a plain named list (`id_col`, `token_col`) | Creates the batch boundary | Base | No | Plain named list |
+| `lexdiv_as_quanteda()` | Explicit token/segment tables to quanteda without closing gaps or retokenizing | Each segment maps to its original document | Base list | Through quanteda | `$tokens`, `$positions`, `$segments`, `$provenance` |
+| `lexdiv_build_ngram_reference()` | Sequential accumulation of whole-document extractions into exact reference counts | Unique document IDs across chunks; ergonomic `resource` default | Classed `lexdiv_ngram_build` | No | `$reference`, `$sources`, `$documents`, `$provenance` |
+| `lexdiv_collocations()` | Ordered eligible slot-pair opportunities, MI and t-score | Single-query default `query_id`; per-document audit beside pooled counts | Classed `lexdiv_collocations` | No | `$results`, `$pairs`, `$documents`, `$search`, `$settings`, `$provenance` |
+| `lexdiv_compare_ambiguity()` | Descriptive agreement and unresolved decisions paired by occurrence ID | Two complete reviews of the same source and candidate snapshot | Classed `lexdiv_ambiguity_comparison` | No | `$summary`, `$terms`, `$pairs`, `$review_queue`, `$status_pairs`, `$reviews` |
+| `lexdiv_compare_annotations()` | Validates identical source/tokenization before auditing changed lemma/UPOS/flemma labels | Single pair or named batches paired by ID | Classed `lexdiv_annotation_comparison` | No | `$documents`, `$changes`, before/after `$provenance` |
+| `lexdiv_compare_ngrams()` | Reference choice, common-item means and baseline differences beside per-reference coverage | One target, named references; common set across all references | Classed `lexdiv_ngram_comparison` | No | `$summary`, `$lookup`, `$documents`, `$references`, `$provenance` |
+| `lexdiv_compare_responses()` | Validates scored binary response pairs and composite IDs; preserves missingness | Explicit categorical strata | Classed `lexdiv_response_comparison` | No | `$responses`, `$counts`, `$summary`, `$provenance` |
+| `lexdiv_concordance()` | Complete source-aligned token-pattern search | Declared source document roster including zero-match documents | Classed `lexdiv_concordance` | Base-R `plot()` draws positional barcode | `$occurrences`, `$counts`, `$documents`, `$source`, `$settings`, `$provenance` |
+| `lexdiv_concordance_dispersion()` | Unnormalised single-token within-document DP and per-part exposure | Single-query default `query_id`; document rows | Classed `lexdiv_dispersion` | Position view belongs to `plot(concordance)` | `$documents`, `$parts`, `$occurrence_ids`, `$settings`, `$search_id` |
+| `lexdiv_content_overlap()` | Annotated content-word overlap composite | Pair operation; no batch inference | Classed `lexdiv_overlap` | No | `$summary`, `$coverage`, term and exclusion tables |
+| `lexdiv_download_resources()` | Explicit verified resource download | Requires license acknowledgement | Base | No | Invisible data frame |
+| `lexdiv_evaluate_annotations()` | Single-label evaluation against an explicit reference on the same source segmentation | Per-document coverage and all-occurrence pairing | Classed `lexdiv_annotation_evaluation` | No | `$summary`, `$labels`, `$documents`, `$pairs`, `$confusion`, `$review_queue`, `$provenance` |
+| `lexdiv_evaluate_contextual()` | Complete-inventory ranking and descriptive comparison to a reference review | Overall and per-target counts, coverage, and confusion | Classed `lexdiv_contextual_evaluation` | No | `$summary`, `$terms`, `$pairs`, `$confusion`, `$review_queue`, `$provenance` |
+| `lexdiv_family_profile()` | Exact form/POS lookup against a caller-defined family table with optional review | Complete imported annotations with document IDs | Classed `lexdiv_family_profile` | No | `$occurrences`, `$candidates`, `$members`, `$documents`, `$summary`, `$provenance` |
+| `lexdiv_flemmatize()` | Adds explicit flemma layer to `lexdiv_tokenization` | Single tokenization | Classed `lexdiv_tokenization` | No | `$tokens`, `$provenance` |
+| `lexdiv_flemmatize_batch()` | Adds explicit flemma layer across a named batch of tokenizations with one parsed AntBNC list | Batch counterpart to `lexdiv_flemmatize()` | Named list | No | Named list of `lexdiv_tokenization` objects |
+| `lexdiv_grid()` | Bounded ordered list of method specifications | Accepts `method_id` or `metric_id` shorthand | Classed `lexdiv_grid` | No | List of `lexdiv_spec` objects |
+| `lexdiv_import_annotations()` | Exact alignment of complete external surfaces to original text with O(1) integrity hash | Accepts `data.frame` or `tibble` | Classed `lexdiv_annotations` | No | `$tokens`, `$segments`, `$documents`, `$provenance`, `$integrity_sha256` |
+| `lexdiv_import_contextual()` | Source-checked external embeddings/scores, distinct from human decisions | Complete review with ID-paired output | Classed `lexdiv_contextual` | No | `$occurrences`, `$embeddings`, `$suggestions`, `$summary`, `$review`, `$provenance` |
+| `lexdiv_keyness()` | Disjoint target/reference counts, G-squared and unsmoothed log-ratio | Default `preprocessing_id = "default"`; pooled totals with document counts | Classed `lexdiv_keyness` | No | `$results`, `$totals`, `$documents`, `$document_counts`, `$occurrences`, `$token_audit` |
+| `lexdiv_keyness_concordance()` | Exact counted-term return to original contexts | Same retained source; no new comparison | Classed `lexdiv_keyness_concordance` | `plot($search)` | `$comparison_id`, `$term`, classed `$search` |
+| `lexdiv_lemmatize()` | Adds explicit lemma/UPOS layers and dictionary fingerprints to `lexdiv_tokenization` | Single tokenization | Classed `lexdiv_tokenization` | No | `$tokens`, `$provenance` |
+| `lexdiv_lemmatize_batch()` | Adds explicit lemma/UPOS layers across a named batch of tokenizations | Batch counterpart to `lexdiv_lemmatize()` | Named list | No | Named list of `lexdiv_tokenization` objects |
+| `lexdiv_length_evidence()` | Evidence registry data frame | Not document data | Base data frame | No | Data frame |
+| `lexdiv_mattr_profile()` | Canonical MATTR summary plus local-window and positional-exposure tables | Document-scoped; accepts a MATTR-only canonical plan | Classed `lexdiv_mattr_profile` | `plot()` draws local curve | `$summary`, `$windows`, `$exposure`, `$diagnostics` |
+| `lexdiv_methods()` | Core or variant method catalog selected by `scope` | Shared discovery (`"core"` or `"variants"`) | Base data frame | No | Core parameters or variant metadata |
+| `lexdiv_metric_ids()` | Core metric ID character vector | Catalog used by core calls | Base | No | Character vector |
+| `lexdiv_metrics()` | Single-document metric rows, or full request profiles when `plan` is supplied | Paired with `lexdiv_metrics_batch()` | `lexdiv_results` / `lexdiv_profile_results` | Single selected metric/request | Data frame |
+| `lexdiv_metrics_batch()` | Multi-document metric or plan result data frame | Accepts named list, `data.frame`, or `tibble` | `lexdiv_batch_results` / `lexdiv_profile_batch_results` | Single selected metric/request | Data frame |
+| `lexdiv_metrics_text()` | Raw/prepared single-text metrics (or `plan` profile) plus token audit and provenance | Defaults to `case = "lower", tokenizer = "english"` | Classed `lexdiv_text_results` | Delegates to `$results` | `$results`, `$token_audit`, `$preprocessing` |
+| `lexdiv_metrics_text_batch()` | Raw/prepared multi-document metrics (or `plan` profile) with audits and provenance | Defaults to `case = "lower", tokenizer = "english"`; feeds `lexdiv_study_table()` and `lexdiv_widen()` directly | Classed `lexdiv_text_batch_results` | Delegates to `$results` | `$results`, `$token_audit`, `$preprocessing` |
+| `lexdiv_ngram_profile()` | Exact sequence lookup and available-value means | Per-document, per-n token/type summaries | Classed `lexdiv_ngram_profile` | No | `$summary`, `$lookup`, `$documents`, `$provenance` |
+| `lexdiv_ngram_reference()` | Validated extraction or caller aggregate with completeness and opportunity totals | Reusable across targets | Classed `lexdiv_ngram_reference` | No | `$counts`, `$totals`, `$provenance` |
+| `lexdiv_ngrams()` | Adjacent bigram/trigram extraction within explicit segments and consecutive positions | Accepts `data.frame` or `tibble` | Classed `lexdiv_ngrams` | No | `$occurrences`, `$counts`, `$document_counts`, `$documents`, `$totals`, `$provenance` |
+| `lexdiv_norm_profile()` | Conditional lexical-norm means plus exact lookup and coverage | Ergonomic defaults via `lexdiv_norm_spec()` and `lexdiv_resource_meta()` | Classed `lexdiv_norm_profile` | No | `$summary`, `$lookup`, `$coverage`, `$provenance`, `$diagnostics` |
+| `lexdiv_norm_profile_batch()` | Shared caller-supplied norm table applied across documents | Ergonomic defaults via `lexdiv_norm_spec()` and `lexdiv_resource_meta()` | Classed `lexdiv_norm_profile_batch` | No | `$summary`, `$lookup`, `$coverage`, `$provenance`, `$diagnostics` |
+| `lexdiv_norm_spec()` | Concise constructor for 11-column lexical-norm `measure_specs` tables | Fills canonical sensible defaults in any column order | Base data frame | No | 11-column `measure_specs` data frame |
+| `lexdiv_overlap_ids()` | Overlap measure ID character vector | Shared by pair overlap operations | Base | No | Character vector |
+| `lexdiv_plan()` | Deduplicated bounded request plan | Shared by `lexdiv_metrics*` and `lexdiv_metrics_text*` | Classed `lexdiv_plan` | No | `$specifications` and plan identity fields |
+| `lexdiv_presets()` | Preset registry data frame | Shared by `lexdiv_plan()` | Base data frame | No | Data frame |
+| `lexdiv_read_masc()` | GrAF 1.0 Penn reader preserving supplied tokens, regions, text and hashes | Concise `print` hides full raw document text | Classed `lexdiv_masc` | No | `$tokens`, `$segments`, `$documents`, `$provenance` |
+| `lexdiv_reference_coverage()` | Token/type coverage of many documents by one exact reference set | Many-to-one batch operation | Classed `lexdiv_reference_coverage` | One explicit weighting | `$summary`, `$documents`, `$reference`, optional `$terms` |
+| `lexdiv_resource_info()` | Inspect optional resources and license terms | No network access | Base data frame | No | Data frame |
+| `lexdiv_resource_meta()` | Concise constructor for 8-field caller lexical-resource metadata lists | Fills sensible defaults in canonical field order | Base list | No | 8-element `resource` metadata list |
+| `lexdiv_score_contextual()` | Supervised centroid-cosine and training-frequency baselines over imported reviews | Same inventory, disjoint documents | Classed `lexdiv_contextual_scores` | No | `$centroid`, `$frequency`, `$candidates`, `$prototypes`, `$provenance` |
+| `lexdiv_screen_lengths()` | Independent token-floor screen data frame | Accepts plan-based `lexdiv_metrics*` or `lexdiv_metrics_text*` results directly | Classed `lexdiv_screen_results` | One selected screen | Data frame |
+| `lexdiv_sort_concordance()` | Sort saved concordance context nearest-token-first with `case_insensitive` flag | Same search and occurrence IDs | Base data frame | No | Ordered occurrence table |
+| `lexdiv_spec()` | One normalized method/parameter request | Accepts `method_id` or `metric_id` shorthand (e.g. `"mtld"`) | Classed `lexdiv_spec` | No | Named list fields |
+| `lexdiv_study_model_data()` | Explicit single-condition/request selection with metadata and exclusion audit | One row per observation and unique document | Classed `lexdiv_study_model_data` | No | `$data`, `$audit` |
+| `lexdiv_study_table()` | Planned observations joined to plan results (including `lexdiv_text_batch_results` directly) | Accepts `data.frame` or `tibble`; auto-populates character counts from text batch | Base data frame | No | Complete ordinary table |
+| `lexdiv_term_overlap()` | Exact term-set overlap composite | Pair operation; accepts named character vectors | Classed `lexdiv_overlap` | No | `$summary`, `$counts`, optional term tables |
+| `lexdiv_tokenize()` | Lossless token rows and preprocessing provenance | Defaults to `case = "lower", tokenizer = "english"` | Classed `lexdiv_tokenization` | No | `$tokens`, `$provenance` |
+| `lexdiv_tokenize_batch()` | Named raw-text vector or ID/text table to complete tokenizations | Defaults to `case = "lower", tokenizer = "english"` | Named list | No | Named list of `lexdiv_tokenization` objects |
+| `lexdiv_variant_metrics()` | Cross-definition result data frame | Uses `lexdiv_methods(scope = "variants")` catalog | Classed `lexdiv_variant_results` | No | Data frame |
+| `lexdiv_widen()` | Pure long-to-wide transformation | Directly unwraps `lexdiv_text_results` and `lexdiv_text_batch_results` | Classed `lexdiv_wide_results` | No | Data frame |
+| `morpholex_data()` | Cached MorphoLex-en worksheet values and provenance | Reference resource | Base list | No | `$sheets`, `$provenance` |
+| `morphynet_read_derivations()` | Local six-field derivational TSV reader | Reference resource | Base list | No | `$relations`, `$resource`, `$provenance` |
+| `nj8_diagnostics()` | Counts unmatched terms and lexical-unit mappings for NJ8 profiles | Single or batch NJ8 profile | Classed `nj8_diagnostics` | No | `$unmatched_terms`, `$unit_mappings`, `$coverage`, `$exclusion_reasons` |
+| `nj8_profile()` | NJ8 level summary, lookup, coverage, provenance, diagnostics | Paired with `nj8_profile_batch()` | Classed `nj8_profile` | One weighting and scale | Named component tables |
+| `nj8_profile_batch()` | Document-major NJ8 level-profile composite | Accepts named list, `data.frame`, or `tibble` | Classed `nj8_profile_batch` | No | Named component tables with `document_id` |
+| `tubelex_diagnostics()` | Reusable frequency tables, coverage, unmatched counts and query mappings | Accepts `tubelex_profile`, `tubelex_profile_batch`, or named list | Classed `tubelex_diagnostics` | No | `$summary`, `$documents`, `$unmatched_terms`, `$normalization_mappings` |
+| `tubelex_profile()` | TUBELEX frequency/prevalence summary, lookup, coverage, provenance | Paired with `tubelex_profile_batch()` | Classed `tubelex_profile` | Token/type coverage | Named component tables |
+| `tubelex_profile_batch()` | Structured document-major TUBELEX batch composite with retained `$profiles` | One verified resource load per batch call | Classed `tubelex_profile_batch` | Per-document coverage bars | `$summary`, `$lookup`, `$coverage`, `$profiles`, `$provenance`, `$diagnostics` |
