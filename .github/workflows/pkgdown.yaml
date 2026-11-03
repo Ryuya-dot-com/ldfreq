@@ -20,8 +20,13 @@ jobs:
     timeout-minutes: 30
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      LDFREQ_RESOURCE_DIR: ${{ runner.temp }}/ldfreq-empty-resources
     steps:
+      - name: Use an empty reference-data cache
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/ldfreq-empty-resources"
+          echo "LDFREQ_RESOURCE_DIR=$RUNNER_TEMP/ldfreq-empty-resources" >> "$GITHUB_ENV"
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
