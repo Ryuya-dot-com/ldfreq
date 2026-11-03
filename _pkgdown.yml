@@ -69,6 +69,17 @@ reference:
       - lexdiv_screen_lengths
       - lexdiv_length_evidence
 
+  - title: Recipes, portable records, and reporting
+    desc: >
+      Reuse resolved settings, inspect differences, and export results or
+      calculation descriptions without changing the measurement engine.
+    contents:
+      - lexdiv_recipe
+      - lexdiv_run_recipe
+      - lexdiv_write
+      - lexdiv_compare_analyses
+      - lexdiv_methods_text
+
   - title: Reference-vocabulary and morphology profiles
     desc: >
       Inspect license terms, download SHA-256-verified optional datasets, and
@@ -142,6 +153,7 @@ articles:
       - getting-started
       - choosing-metrics
       - from-text-to-report
+      - recipes-and-exports
       - release-scope
 
   - title: Prepare and check your input

@@ -3,6 +3,15 @@ test_that("inspection and missing readers do not create or download caches", {
   withr::local_options(ldfreq.resource_dir=cache)
   expect_false(dir.exists(cache))
   info <- lexdiv_resource_info()
+  expect_true(all(file.exists(info$notice_path)))
+  expect_true(all(startsWith(info$notice_url, "file://")))
+  for (i in seq_len(nrow(info))) {
+    name <- info$resource[i]
+    expected <- getFromNamespace(".lex_resource_catalog", "ldfreq")[[name]]$files[[
+      paste0("licenses/", name, "/NOTICE.md")]]
+    expect_identical(digest::digest(file = info$notice_path[i], algo = "sha256"), expected)
+    expect_match(utils::URLdecode(info$notice_url[i]), info$notice_path[i], fixed = TRUE)
+  }
   expect_false(any(info$available))
   expect_false(dir.exists(cache))
   expect_error(lexdiv_download_resources("morpholex"), "accept_license")

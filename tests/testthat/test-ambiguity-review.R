@@ -93,7 +93,7 @@ test_that("stale, mismatched and duplicated decisions fail rather than silently 
     segments, f$x$provenance$annotation)
   expect_error(do.call(lexdiv_ambiguity_review, c(changed, list(decisions = decisions))), "review_id")
   changed <- f; changed$x$tokens$surface[2] <- "BANK"
-  expect_error(do.call(lexdiv_ambiguity_review, changed), "align")
+  expect_error(do.call(lexdiv_ambiguity_review, changed), "has changed")
   changed <- f; changed$x$provenance$annotation$dictionary_version <- "2"
   expect_error(do.call(lexdiv_ambiguity_review, changed), "changed")
   changed <- f; changed$x$segments$text_sha256[1] <- "tampered"

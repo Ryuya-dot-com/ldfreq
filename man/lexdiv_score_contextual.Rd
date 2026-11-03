@@ -68,7 +68,8 @@ English/Japanese scoring, baseline comparison and KWIC example.
 }
 \value{
 A plain list. \code{centroid} and \code{frequency} are complete contextual-import
-results ready for \code{lexdiv_evaluate_contextual(..., direction = "higher")}.
+results. Pass them to \code{\link{lexdiv_evaluate_contextual}} with
+\code{direction = "higher"}.
 Their processed/skipped status refers to the scoring stage; reasons also retain
 the original embedding-output status/reason. No new human selections are made.
 \code{candidates} preserves the supplied inventory with \code{n_selected},

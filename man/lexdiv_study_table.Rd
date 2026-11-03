@@ -35,8 +35,8 @@ lexdiv_study_model_data(
 \code{document_id}, plus \code{input_characters} (automatically populated from
 preprocessing provenance if omitted when \code{results} is a
 \code{lexdiv_text_batch_results} object).}
-\item{results}{Complete result of \code{lexdiv_metrics_batch(documents, plan = plan)}
-or \code{lexdiv_metrics_text_batch(documents, plan = plan)}.}
+\item{results}{Complete result from \code{\link{lexdiv_metrics_batch}} or
+\code{\link{lexdiv_metrics_text_batch}}, computed with \code{plan = plan}.}
 \item{plan}{The explicit \code{\link{lexdiv_plan}} used for \code{results}.}
 \item{condition_id}{Nonblank character label for the selected analysis condition.}
 \item{reporting}{Optional data frame/tibble with \code{document_id},

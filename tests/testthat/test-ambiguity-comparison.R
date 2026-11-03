@@ -64,7 +64,9 @@ test_that("sorting decisions and changing the context window retain pairing and 
   expect_equal(z$summary$agreement_among_both_selected, 2 / 3)
   expect_identical(z$terms$term, f$a$summary$term)
   expect_identical(z$pairs$b_candidate_id, f$b$occurrences$candidate_id)
-  expect_identical(z$reviews$b$decisions, f$db[6:1, ])
+  expected_decisions <- f$db[6:1, ]
+  rownames(expected_decisions) <- NULL
+  expect_identical(z$reviews$b$decisions, expected_decisions)
   expect_equal(z$reviews$a$provenance$window, 5)
   expect_equal(z$reviews$b$provenance$window, 0)
 })

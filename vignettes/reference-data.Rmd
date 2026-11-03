@@ -47,12 +47,17 @@ corpora and the conditions under which those summaries were calculated.
 ## Inspect first, download explicitly
 
 ```{r inspect}
-lexdiv_resource_info("morpholex")[c("resource", "version", "license",
-  "license_url", "notice_url", "download_bytes")]
+info <- lexdiv_resource_info("morpholex")
+info[c("resource", "version", "license", "license_url", "download_bytes")]
+head(readLines(info$notice_path, encoding = "UTF-8"))
 ```
 
-Open the license and notice links and confirm that the terms fit your intended
-use. Select only the resources you need. No download happens unless you make
+The resource notices and license texts are installed with the package, before
+any data download. Open a notice with `file.show(info$notice_path)`; the CC
+license text, where applicable, is in the same directory. `notice_url` points
+to this local file, while `license_url` links to the license's website.
+Confirm that the terms fit your intended use. Select only the resources you need.
+No download happens unless you make
 this call with `accept_license = TRUE`:
 
 ```{r download, eval=FALSE}

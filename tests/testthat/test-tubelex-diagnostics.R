@@ -1,28 +1,30 @@
 test_that("TUBELEX diagnostic tables preserve documents and conditional summaries", {
   skip_optional_resources(c("tubelex"))
-  profiles <- tubelex_profile_batch(list(b = c("Apple", "apple", "zzunmatchedxyz", "zzunmatchedxyz"),
-    a = c("the", "zzunmatchedxyz"), blank = character(), bad = c("the", NA_character_)))
+  documents <- list(b = c("Apple", "apple", "zzunmatchedxyz", "zzunmatchedxyz"),
+    a = c("the", "zzunmatchedxyz"), blank = character(), bad = c("the", NA_character_))
+  profiles <- tubelex_profile_batch(documents)
+  per_document <- profiles$profiles
   copy <- unserialize(serialize(profiles, NULL))
   report <- tubelex_diagnostics(profiles)
   expect_identical(profiles, copy)
-  expect_identical(report$documents$document_id, names(profiles))
-  expect_identical(report$summary$document_id, rep(names(profiles), each = 2L))
+  expect_identical(report$documents$document_id, names(documents))
+  expect_identical(report$summary$document_id, rep(names(documents), each = 2L))
   expect_identical(report$documents$status, c("ok", "ok", "empty", "invalid_input"))
   expect_identical(report$summary$mean_zipf,
-    unlist(lapply(profiles, function(x) x$summary$mean_zipf), use.names = FALSE))
+    unlist(lapply(per_document, function(x) x$summary$mean_zipf), use.names = FALSE))
   expect_identical(report$unmatched_terms$lookup_term, "zzunmatchedxyz")
   expect_identical(report$unmatched_terms$token_count, 3)
   expect_identical(report$unmatched_terms$document_count, 2)
   expect_identical(report$documents$token_coverage, c(0.5, 0.5, NA_real_, NA_real_))
   expect_equal(report$documents$eligible_tokens, c(4, 2, 0, NA))
-  expect_identical(report$provenance, lapply(profiles, `[[`, "provenance"))
-  expect_identical(report$diagnostics, lapply(profiles, `[[`, "diagnostics"))
+  expect_identical(report$provenance, lapply(per_document, `[[`, "provenance"))
+  expect_identical(report$diagnostics, lapply(per_document, `[[`, "diagnostics"))
   expect_true(any(report$normalization_mappings$lookup_changed))
   saved <- tempfile(fileext = ".rds"); on.exit(unlink(saved))
   saveRDS(list(profiles = profiles, report = report), saved)
   restored <- readRDS(saved)
   expect_identical(tubelex_diagnostics(restored$profiles), restored$report)
-  expect_identical(tubelex_diagnostics(profiles$b)$documents$document_id, "document_1")
+  expect_identical(tubelex_diagnostics(per_document$b)$documents$document_id, "document_1")
 })
 
 test_that("empty batches and all-unmatched documents retain typed results", {

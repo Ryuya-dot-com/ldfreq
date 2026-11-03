@@ -6,5 +6,7 @@ bibentry(
   author = person(given = "Ryuya", family = "Komuro"),
   year = "2026",
   note = paste("R package version", meta$Version),
-  url = paste0("https://github.com/Ryuya-dot-com/ldfreq/tree/v", meta$Version)
+  url = if (length(strsplit(meta$Version, ".", fixed = TRUE)[[1L]]) > 3L)
+    "https://github.com/Ryuya-dot-com/ldfreq" else
+    paste0("https://github.com/Ryuya-dot-com/ldfreq/tree/v", meta$Version)
 )

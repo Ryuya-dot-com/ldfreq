@@ -245,9 +245,11 @@ an unknown metric ID or invalid selected parameter, stop the call instead of
 returning a result row.
 }
 \section{Migration from core contract 0.1.0}{
-Package 0.3.0 uses core contract 0.2.0. MTLD has the new method ID
-\code{mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1}. The old
-\code{mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1} remains in
+Package 0.3.0 uses core contract 0.2.0. MTLD has the new method ID:
+\preformatted{mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1}
+The old method ID
+\preformatted{mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1}
+remains in
 \code{lexdiv_variant_metrics()}, with the same minimum input length, values,
 and tail behavior (including credit greater than one).
 

@@ -6,6 +6,12 @@ The current stable release is **1.0.0**. Pin the package version used in an
 analysis and run `citation("ldfreq")` to cite that exact release alongside the
 measurement methods and reference datasets used in your study.
 
+The public development snapshot 1.0.0.9001 contains incompatible changes
+relative to 1.0.0, including changed raw-text defaults and retired entry points.
+It is not a stable 1.x release. See the migration instructions in the README
+and NEWS before using it. A future stable release containing incompatible
+changes requires a major version increment and migration notes.
+
 ## Stability and reproducibility commitments
 
 `ldfreq` treats lexical measures as auditable measurement specifications rather
@@ -21,7 +27,7 @@ than opaque numbers:
 - **Saved-result integrity**: Exported corpus, annotation, and profile objects
   carry explicit S3 classes and integrity checks so accidental post-hoc edits
   cannot silently alter downstream tables or plots.
-- **Deprecation policy**: In the 1.x release series, public functions, argument
+- **Deprecation policy**: In the stable 1.x release series, public functions, argument
   names, and documented result columns are maintained compatibly; any future
   breaking change requires a major version increment and migration notes in
   `NEWS.md`.

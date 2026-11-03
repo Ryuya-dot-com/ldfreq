@@ -28,24 +28,43 @@
 
 ## Installation
 
-Install **ldfreq 1.0.0** from GitHub (R 4.1 or later):
+The examples on this page use the **development snapshot 1.0.0.9001**
+(R 4.1 or later). It contains incompatible changes relative to stable 1.0.0;
+review the migration notes below before using it with an existing analysis.
 
 ```r
-# Using pak (recommended)
+# Development snapshot from GitHub main
 install.packages("pak")
-pak::pak("Ryuya-dot-com/ldfreq")
+pak::pak("Ryuya-dot-com/ldfreq@main")
 
-# Or using remotes
+# Or use remotes
 install.packages("remotes")
-remotes::install_github("Ryuya-dot-com/ldfreq@v1.0.0")
+remotes::install_github("Ryuya-dot-com/ldfreq@main")
 ```
 
-To install offline from a local release archive or checkout:
+To install the current stable release instead, use
+`remotes::install_github("Ryuya-dot-com/ldfreq@v1.0.0")`. Its documentation
+is included with that version; use `browseVignettes("ldfreq")` after installation.
+
+To install the development snapshot from its local archive:
 
 ```r
 install.packages(c("digest", "stringi"))
-install.packages("ldfreq_1.0.0.tar.gz", repos = NULL, type = "source")
+install.packages("ldfreq_1.0.0.9001.tar.gz", repos = NULL, type = "source")
 ```
+
+### Migrating from 1.0.0
+
+Raw-text tokenization and metric functions now default to `case = "lower"` and
+`tokenizer = "english"`. To request the 1.0.0 preprocessing choices, explicitly
+set `case = "preserve", tokenizer = "unicode"` and retain the recorded settings.
+Different tokenization can change scores and makes direct comparisons unsafe
+without examining the counting conditions.
+
+Several former entry points and argument names have also changed. Consult the
+[development change notes](https://github.com/Ryuya-dot-com/ldfreq/blob/main/NEWS.md)
+for the replacement names and the relevant help pages before reopening an
+existing workflow. Stable 1.0.0 remains available unchanged.
 
 ## Quick start
 
@@ -101,6 +120,9 @@ plot(kwic, "story")
 
 ## Choose your workflow
 
+Start with `lexdiv_metrics_text_batch()` for ordinary text analysis. Add the
+workflow tools below when the research design or reporting task needs them.
+
 | Research question | Main functions | Worked guide |
 |---|---|---|
 | How do lexical-diversity scores vary across texts or counting rules? | `lexdiv_metrics_text_batch()` → `lexdiv_widen()` / `plot()` | [From text to report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html) |
@@ -109,12 +131,20 @@ plot(kwic, "story")
 | Which words and contexts explain a corpus pattern? | `lexdiv_as_annotations()` → `lexdiv_concordance()` → `lexdiv_collocations()` / `lexdiv_keyness()` | [Concordance & dispersion](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html) · [Keyness](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html) |
 | How do I analyze Japanese texts with morphological annotations? | `lexdiv_import_annotations()` → explicit unit/POS selection → diversity or norm profiles | [Japanese annotations](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html) |
 
+For repeated runs and portable reporting, development builds also provide
+reusable recipes and exports, described in the
+[guide index](https://ryuya-dot-com.github.io/ldfreq/articles/index.html):
+`lexdiv_recipe()` → `lexdiv_run_recipe()` → `lexdiv_write()`, with saved-analysis
+comparison, English/Japanese calculation descriptions, a folder CLI and a Python
+bridge to the same R engine. Recipes are optional for ordinary text analysis.
+
 ## Optional reference data
 
 `ldfreq` code is MIT licensed and installs **without** third-party datasets. Core diversity metrics, custom norm/reference tables, and corpus tools work completely offline. To use optional external resources (`tubelex`, `nj8`, `morpholex`, `bnccoca`, `morphynet`), inspect their license terms first and download only what you need:
 
 ```r
-lexdiv_resource_info()  # source, version, license terms, and download size
+info <- lexdiv_resource_info("tubelex")
+file.show(info$notice_path)  # installed terms; no data download or internet needed
 lexdiv_download_resources("tubelex", accept_license = TRUE)
 ```
 
@@ -126,4 +156,5 @@ Cite the exact `ldfreq` version used in your analysis alongside the relevant mea
 citation("ldfreq")
 ```
 
-Komuro, R. (2026). *ldfreq: Reproducible Lexical Diversity and Frequency Profiles* (Version 1.0.0) [R package]. <https://github.com/Ryuya-dot-com/ldfreq/tree/v1.0.0>
+The citation reports the installed version. Cite the stable release and the
+development snapshot separately when both were used.

@@ -31,9 +31,14 @@ lexdiv_resource_info <- function(
   do.call(rbind, lapply(resources, function(name) {
     item <- .lex_resource_catalog[[name]]
     path <- file.path(cache_dir, name, item$version)
+    notice <- system.file("licenses", "resources", name, "NOTICE.md",
+      package = "ldfreq", mustWork = TRUE)
+    encoded_notice <- gsub("%2F", "/", utils::URLencode(notice, reserved = TRUE), fixed = TRUE)
+    encoded_notice <- gsub("%3A", ":", encoded_notice, fixed = TRUE)
     data.frame(resource = name, version = item$version, license = item$license,
       license_url = item$license_url,
-      notice_url = paste0("https://github.com/Ryuya-dot-com/ldfreq/blob/v1.0.0/inst/licenses/", name, "/NOTICE.md"),
+      notice_url = paste0("file://", if (.Platform$OS.type == "windows") "/" else "", encoded_notice),
+      notice_path = notice,
       download_bytes = item$bytes,
       available = .lex_resource_verified(path, item$files), path = path,
       url = item$url, sha256 = item$sha256, citation = item$citation,
@@ -45,7 +50,7 @@ lexdiv_download_resources <- function(resources, accept_license = FALSE, cache_d
   resources <- .lex_resource_names(resources)
   cache_dir <- .lex_resource_cache(cache_dir)
   if (!identical(accept_license, TRUE))
-    stop("Review lexdiv_resource_info(resources), including each license_url, then explicitly set accept_license = TRUE to download.", call. = FALSE)
+    stop("Review lexdiv_resource_info(resources), including each notice_path and license_url, then explicitly set accept_license = TRUE to download.", call. = FALSE)
   for (name in resources) {
     item <- .lex_resource_catalog[[name]]
     target <- file.path(cache_dir, name, item$version)

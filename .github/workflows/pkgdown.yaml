@@ -3,7 +3,6 @@ name: pkgdown
 on:
   push:
     branches: [main]
-    tags: ["v*"]
   pull_request:
   workflow_dispatch:
 
@@ -21,6 +20,7 @@ jobs:
     timeout-minutes: 30
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      LDFREQ_RESOURCE_DIR: ${{ runner.temp }}/ldfreq-empty-resources
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -53,7 +53,7 @@ jobs:
           pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
 
       - name: Deploy docs/ to gh-pages branch
-        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         shell: bash
         run: |
           set -euo pipefail

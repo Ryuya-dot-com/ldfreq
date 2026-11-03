@@ -12,11 +12,17 @@ lexdiv_download_resources(resources, accept_license = FALSE, cache_dir = NULL)
 }
 \arguments{
 \item{resources}{Unique resource names as a plain character vector. The inspection default lists all resources; downloading always requires an explicit selection.}
-\item{accept_license}{Exactly \code{TRUE} after reviewing each resource's \code{license_url} and \code{notice_url}. Defaults to \code{FALSE}, which refuses downloads.}
+\item{accept_license}{Exactly \code{TRUE} after reviewing each resource's \code{notice_path} and license terms. Defaults to \code{FALSE}, which refuses downloads.}
 \item{cache_dir}{One directory path. Defaults to option \code{ldfreq.resource_dir}, then environment variable \code{LDFREQ_RESOURCE_DIR}, then \code{tools::R_user_dir("ldfreq", "cache")}. Set the same option or environment variable when reading resources stored outside the default cache.}
 }
-\value{A data frame with resource name, fixed version, license and notice URLs, download bytes, verified availability, cache path, archive URL, SHA-256 and citation. The downloader returns it invisibly.}
+\value{A data frame with resource name, fixed version, license URL, local \code{notice_path}, \code{notice_url} (a local \code{file://} URL), download bytes, verified availability, cache path, archive URL, SHA-256 and citation. The downloader returns it invisibly.}
 \details{
+Resource notices and license texts are installed with the code, so they can
+be read before downloading any data and without an internet connection.
+Use \code{file.show(info$notice_path)} or \code{readLines(info$notice_path)}
+for one selected resource. The local copies match the pinned download bundle.
+These explanatory files contain no reference dataset.
+
 Archives are downloaded from a fixed release and checked for byte count,
 SHA-256, expected member names and individual file hashes before installation.
 A verified cache is reused without a download. An incomplete or modified cache
@@ -39,8 +45,11 @@ caches may be removed explicitly by the user.
 }
 \examples{
 lexdiv_resource_info()[c("resource", "license", "available", "download_bytes")]
+info <- lexdiv_resource_info("tubelex")
+head(readLines(info$notice_path, encoding = "UTF-8"))
 \dontrun{
-# Review the source, license_url and notice_url before downloading.
+# Open the local terms before downloading. Adjacent files contain CC licenses.
+file.show(info$notice_path)
 lexdiv_download_resources("tubelex", accept_license = TRUE)
 lexdiv_resource_info("tubelex")
 }

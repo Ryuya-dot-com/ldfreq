@@ -49,9 +49,13 @@ element. Zero length and named vectors are allowed.}
 numeric norm columns named by \code{measure_specs}.}
 \item{key}{One string naming the exact-match key column in \code{norms}.}
 \item{measure_specs}{Data frame or tibble of 11 measure-specification columns
-(in any column order), defaulting to \code{lexdiv_norm_spec(setdiff(names(norms), key))}.}
+(in any column order). Defaults to:
+\preformatted{lexdiv_norm_spec(setdiff(names(norms), key))}
+}
 \item{resource}{Named list of 8 resource-metadata fields (in any field order),
-defaulting to \code{lexdiv_resource_meta("caller_norms")}.}
+with default:
+\preformatted{lexdiv_resource_meta("caller_norms")}
+}
 \item{weightings}{A non-empty subset of \code{c("token", "type")}.}
 \item{max_rows}{Positive whole-number row bound checked before allocation.}
 \item{value_column, measure_id, construct_id, value_unit, direction, language,

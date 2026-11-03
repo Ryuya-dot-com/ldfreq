@@ -1,6 +1,6 @@
 # Public API surface
 
-Current API inventory for **ldfreq 1.0.0**. Names, help and navigation are checked by
+Current API inventory for **ldfreq 1.0.0.9001**. Names, help and navigation are checked by
 `Rscript development/audit-public-api.R .`. Scientific definitions are in the
 installed method contracts; return columns and examples are in each help topic.
 
@@ -24,6 +24,14 @@ installed method contracts; return columns and examples are in each help topic.
 
 ## Export inventory
 
+| Function | Purpose | Input / contract | Return | Plot | Main output |
+|---|---|---|---|---|---|
+| `lexdiv_recipe()` | Resolved raw-text recipe with pinned engine and optional resource identities | Surface forms, all word tokens | Classed list | No | Configuration without source text |
+| `lexdiv_run_recipe()` | Execute a resolved recipe through existing calculation APIs | Explicit named documents and condition | Classed list | No | Sources, results, preprocessing, profiles and calculation record |
+| `lexdiv_write()` | Write recipe/analysis JSON or scalar long-result CSV | Refuses existing outputs | File | No | Typed JSON or document-by-condition-by-request CSV |
+| `lexdiv_read()` | Read and validate a portable JSON record | No document score recalculation | Classed list | No | Recipe or analysis |
+| `lexdiv_compare_analyses()` | Explain measurement and diagnostic differences between saved analyses | No automatic pooling or study-validity claim | Base list | No | Measurement classification and difference table |
+| `lexdiv_methods_text()` | English/Japanese calculation descriptions from saved records | Original calculation version retained | Character vector | No | Methods paragraphs and references |
 | `bnccoca_data()` | Cached Nation BNC/COCA Level 6 membership; no inferred members | Reference resource, not document data | Base list | No | `$dictionary`, `$supplementary`, `$catalog`, `$resource`, `$provenance` |
 | `lexdiv_align_annotations()` | Source-interval correspondence across different token segmentations; optional label evaluation on exact spans | Same source segment roster; preserves empty documents and both token indices | Classed `lexdiv_annotation_alignment` | No | `$summary`, `$documents`, `$groups`, `$members`, `$boundaries`, `$review_queue`, `$provenance` |
 | `lexdiv_ambiguity_review()` | Source-verified KWIC and explicit lexical-candidate decisions | Complete imported annotations; O(1) integrity check | Classed `lexdiv_ambiguity_review` | No | `$occurrences`, `$candidates`, `$decisions`, `$summary`, `$source`, `$provenance` |
