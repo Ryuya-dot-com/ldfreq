@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Release scope and compatibility • ldfreq</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -20,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,10 +38,23 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+<li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Start here</h6></li>
+    <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/recipes-and-exports.html">Reuse settings and export an auditable analysis</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Input &amp; Japanese/English setup</h6></li>
+    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
+    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
+    <li><a class="dropdown-item" href="../articles/annotated-corpora.html">From corpus annotations to quanteda and lexical profiles</a></li>
+    <li><a class="dropdown-item" href="../articles/annotation-evaluation.html">Evaluate annotations and their effect on document scores</a></li>
+    <li><a class="dropdown-item" href="../articles/annotation-alignment.html">Compare token boundaries before comparing labels and document scores</a></li>
+    <li><a class="dropdown-item" href="../articles/ambiguity-review.html">Review lexical ambiguity with KWIC and original context</a></li>
+    <li><a class="dropdown-item" href="../articles/contextual-models.html">Connect contextual model outputs to research occurrences</a></li>
+    <li><a class="dropdown-item" href="../articles/open-access-papers.html">Analyze open-access academic papers</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -47,7 +65,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq" aria-label="GitHub repository"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -60,11 +78,10 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Release scope and compatibility</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>Release scope and compatibility</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/vignettes/release-scope.Rmd" class="external-link"><code>vignettes/release-scope.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/main/vignettes/release-scope.Rmd" class="external-link"><code>vignettes/release-scope.Rmd</code></a></small>
       <div class="d-none name"><code>release-scope.Rmd</code></div>
     </div>
 
@@ -228,67 +245,46 @@ matrix; the matrix does not execute every externally supplied model or
 corpus.</p>
 </div>
 <div class="section level2">
-<h2 id="moving-from-an-earlier-version">Moving from an earlier version<a class="anchor" aria-label="anchor" href="#moving-from-an-earlier-version"></a>
+<h2 id="reproducibility-and-compatibility-across-versions">Reproducibility and compatibility across versions<a class="anchor" aria-label="anchor" href="#reproducibility-and-compatibility-across-versions"></a>
 </h2>
-<p><strong>From 0.4.x:</strong> first download only the optional
-reference resources you need. The data bytes are unchanged, but default
-NJ8/TUBELEX and morphology readers now use the explicit cache. No
-resource is downloaded during installation or ordinary calculations.
-Existing saved results remain readable.</p>
-<p>The canonical action names are <code><a href="../reference/lexdiv_ngram_compare.html">lexdiv_compare_ngrams()</a></code>,
-<code><a href="../reference/lexdiv_ngram_reference_build.html">lexdiv_build_ngram_reference()</a></code>,
-<code><a href="../reference/lexdiv_concordance.html">lexdiv_sort_concordance()</a></code> and
-<code><a href="../reference/lexdiv_profile.html">lexdiv_screen_lengths()</a></code>. The previous names remain exact
-compatibility aliases. Use
-<code>lexdiv_methods(scope = "variants")</code> for the variant catalog
-and <code>lexdiv_metrics(tokens, plan = plan)</code> to execute a plan;
-earlier calls remain supported. MTLD-MA is opt-in and does not change
-the eleven default metrics.</p>
-<p><strong>From 0.1.0 or 0.2.0:</strong> the intervening changes below
-affect interpretation or compatibility. Retain the old archive and
-results before computing again.</p>
+<p><code>ldfreq 1.0.0</code> separates core formula identities, raw-text
+preprocessing, and reference-dataset versions so that each choice
+remains auditable over time:</p>
 <ol style="list-style-type: decimal">
-<li>Core contract 0.2.0 uses no-minimum MTLD, with method ID
-<code>mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1</code>. The former
-min10 method remains explicitly available in
-<code><a href="../reference/lexdiv_variant_metrics.html">lexdiv_variant_metrics()</a></code>. Do not mix their values under one
-unlabeled MTLD column. See the migration section of
-<code><a href="../reference/lexdiv_metrics.html">?lexdiv_metrics</a></code> and the <a href="../reference/lexdiv_variant_metrics.html">formula-variant
-help</a>.</li>
-<li>Default metric results have eleven rows. Canonical and
-length-comparison presets contain eleven and thirteen requests.
-<code><a href="../reference/lexdiv_metrics.html">lexdiv_metric_ids()</a></code> still lists thirteen supported metrics,
-including experimental expected-TTR D and MTLD-MA. Select these
-explicitly when they are part of the study design.</li>
-<li>Recreate old specifications and plans with current
-<code><a href="../reference/lexdiv_profile.html">lexdiv_spec()</a></code> and <code><a href="../reference/lexdiv_profile.html">lexdiv_plan()</a></code> before new
-calculations. Specification hashes include the core contract version,
-even for an unchanged formula. Read saved results without editing their
-IDs or values; comparison and plot checks reject unlike measurement
-identities.</li>
-<li>Preprocessing contract 0.1.0 objects must be recreated from original
-text and explicit annotations. The current 0.4.0 contract retains valid
-0.3.0 objects and 0.2.0 Unicode objects. A legacy object without
-recorded textstem dictionary identity cannot establish strict lemma
-comparability. Do not manually fill provenance fields to bypass
-validation.</li>
-<li>TUBELEX contract 0.2.0 rejects known tokenizer mismatch by default.
-Prepare compatible terms, or explicitly record a sensitivity analysis
-with <code>tokenization_mismatch = "allow"</code>. Character-vector
-alignment remains unverified. NJ8 uses the fixed cached list when
-<code>wordlist</code> is omitted or <code>NULL</code>; explicit external
-lists retain their own identity.</li>
-<li>Version 0.2.0 corrected cancellation in near-saturated expected-TTR
-D without changing its estimator or method ID. Keep the package version
-as well as the method ID when comparing historical calculations. Details
-and the numerical correction are recorded in NEWS.</li>
+<li>
+<strong>Unified entry points</strong>: Execute multi-parameter plans
+by passing <code>plan = plan</code> to <code><a href="../reference/lexdiv_metrics.html">lexdiv_metrics()</a></code>,
+<code><a href="../reference/lexdiv_metrics.html">lexdiv_metrics_batch()</a></code>, <code><a href="../reference/lexdiv_preprocessing.html">lexdiv_metrics_text()</a></code>,
+or <code><a href="../reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch()</a></code>. Inspect Maas and MTLD
+comparison definitions via
+<code>lexdiv_methods(scope = "variants")</code> and
+<code><a href="../reference/lexdiv_variant_metrics.html">lexdiv_variant_metrics()</a></code>.</li>
+<li>
+<strong>Explicit defaults and opt-in measures</strong>: Raw-text
+helpers default to <code>case = "lower"</code> and
+<code>tokenizer = "english"</code>. Default metric calls compute eleven
+established measures; moving-average MTLD (<code>mtld_ma</code>) and
+experimental deterministic expected-TTR <em>D</em>
+(<code>expected_ttr_d</code>) require explicit selection.</li>
+<li>
+<strong>Optional reference-data cache</strong>: Third-party datasets
+(<code>tubelex</code>, <code>nj8</code>, <code>morpholex</code>,
+<code>bnccoca</code>, <code>morphynet</code>) are downloaded explicitly
+once with
+<code>lexdiv_download_resources(..., accept_license = TRUE)</code> and
+verified by SHA-256 hash on read. Custom word lists and norm tables work
+offline without downloads.</li>
+<li>
+<strong>Saved-record integrity</strong>: Recreate plans with
+<code><a href="../reference/lexdiv_plan.html">lexdiv_spec()</a></code> and <code><a href="../reference/lexdiv_plan.html">lexdiv_plan()</a></code> when starting
+a new study, and never manually edit IDs or hashes inside saved RDS
+objects. Comparison, study-table, and plotting functions verify
+measurement identities so unlike specifications cannot be mixed
+silently.</li>
 </ol>
-<p>Pre-1.0 breaking changes require a minor-version increment and an
-explicit migration explanation. Exported functions, arguments, methods
-and schemas require a documented deprecation cycle before removal. The
-package-level <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/main/LIFECYCLE.md" class="external-link">lifecycle
-policy</a> also separates formula, preprocessing and resource changes
-from cosmetic fixes.</p>
+<p>The package-level <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/main/LIFECYCLE.md" class="external-link">lifecycle
+policy</a> documents compatibility commitments for the 1.x release
+series.</p>
 </div>
 <div class="section level2">
 <h2 id="saving-citing-and-interpreting-a-result">Saving, citing and interpreting a result<a class="anchor" aria-label="anchor" href="#saving-citing-and-interpreting-a-result"></a>

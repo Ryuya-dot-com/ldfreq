@@ -1,5 +1,81 @@
 # Changelog
 
+## ldfreq 1.0.0.9001 (development)
+
+### Migration from stable 1.0.0
+
+This development snapshot contains incompatible changes. Stable 1.0.0
+remains available; a future stable release with these changes requires a
+major version increment. Pin the version and check the counting settings
+in existing analyses.
+
+- Raw-text tokenization and metric functions now default to
+  `case = "lower"` and `tokenizer = "english"`. Specify
+  `case = "preserve", tokenizer = "unicode"` to request the 1.0.0
+  preprocessing choices. Different choices can change token counts and
+  scores.
+- The former exports `lexdiv_concordance_sort()`,
+  `lexdiv_ngram_compare()`, `lexdiv_ngram_reference_build()`, and
+  `lexdiv_screen()` are replaced by
+  [`lexdiv_sort_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
+  [`lexdiv_compare_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_ngrams.md),
+  [`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_build_ngram_reference.md),
+  and
+  [`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_screen_lengths.md),
+  respectively.
+- Replace `lexdiv_profile(tokens, plan)` with
+  `lexdiv_metrics(tokens, plan = plan)` and
+  `lexdiv_profile_batch(documents, plan)` with
+  `lexdiv_metrics_batch(documents, plan = plan)`. Replace
+  `lexdiv_variant_ids()` with `lexdiv_methods(scope = "variants")`.
+- Rename `document_col` to `id_col` in
+  [`lexdiv_as_documents()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_as_documents.md),
+  and `ignore_case` to `case_insensitive` in
+  [`lexdiv_sort_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md).
+
+### Additions and fixes
+
+- Keep long method IDs, function calls and related-help links readable
+  in the standard PDF manual without custom line-wrapping settings.
+- Compare token counts by shared document ID as well as by batch
+  distribution, so swapped document lengths cannot silently pass the
+  length checks. Methods descriptions include saved stringi/ICU versions
+  and stable decimal parameters even under `options(OutDec = ",")`.
+- Add resolved raw-text recipes, explicit environment and reference
+  requirements, and JSON saving/reloading through
+  [`lexdiv_recipe()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_recipe.md),
+  [`lexdiv_run_recipe()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_run_recipe.md),
+  [`lexdiv_write()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_write.md)
+  and
+  [`lexdiv_read()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_write.md).
+  The initial schema supports surface forms with built-in tokenizers and
+  optional pinned NJ8/TUBELEX resources. Reference acquisition remains
+  explicit; TUBELEX segmentation differences require consent.
+- Add saved-analysis differences through
+  [`lexdiv_compare_analyses()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_analyses.md)
+  and deterministic English/Japanese calculation descriptions through
+  [`lexdiv_methods_text()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_methods_text.md).
+  Configuration equality does not establish study validity.
+- Add tidy CSV output with condition/request identities and missingness,
+  an installed Rscript entry point, and a standard-library `ldfreq_r`
+  Python bridge. All entry points call the R calculation APIs; no Web UI
+  JSON compatibility is claimed.
+- JSON analysis records include original texts and token audits. CSV
+  output is an analysis table and must be accompanied by JSON for
+  complete provenance. Restored metric batches connect to
+  [`lexdiv_study_table()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
+  while keeping empty submissions and planned observations without
+  submissions distinct.
+- Restore NJ8/TUBELEX profile classes in recipe results and JSON records
+  so existing diagnostics and plots work without recalculation. Add
+  compact recipe/analysis displays that keep full source text out of
+  ordinary printing.
+- Install optional-resource notices and license texts for review before
+  any download.
+  [`lexdiv_resource_info()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_resources.md)
+  exposes `notice_path`; `notice_url` now points to that local file
+  instead of missing or unrelated repository pages.
+
 ## ldfreq 1.0.0
 
 ### Updating existing analyses
@@ -100,9 +176,9 @@
   Add 182 real-block koRpus comparisons and document its MATTR
   N-equals-window boundary difference.
 - Use the consistent names
-  [`lexdiv_compare_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md),
-  [`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md),
-  [`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+  [`lexdiv_compare_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_ngrams.md),
+  [`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_build_ngram_reference.md),
+  [`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_screen_lengths.md)
   and
   [`lexdiv_sort_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md).
   The previous names remain exact aliases; arguments and saved results
@@ -137,8 +213,7 @@
   a helper or fitting a model.
 - Use
   [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
-  [`lexdiv_concordance_sort()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
-  and
+  `lexdiv_concordance_sort()` and
   [`lexdiv_concordance_dispersion()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
   for source-linked searches and saved within-document distributions.
   [`plot()`](https://rdrr.io/r/graphics/plot.default.html) on the new
@@ -409,9 +484,9 @@
   and profile functions remain supported.
 - Select the Maas/MTLD comparison catalog with
   `lexdiv_methods(scope = "variants")`. The default core catalog and
-  [`lexdiv_variant_ids()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md)
-  output are unchanged. Comparison-only methods do not become plan
-  methods. No new export, formula, result schema or dependency.
+  `lexdiv_variant_ids()` output are unchanged. Comparison-only methods
+  do not become plan methods. No new export, formula, result schema or
+  dependency.
 
 ## ldfreq 0.3.0.9006 (development)
 
@@ -562,7 +637,7 @@
 
 - Classified deterministic expected-TTR D as experimental in the
   contract and
-  [`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+  [`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
   metadata and excluded it from default computations and presets.
   Explicit selection remains supported; its estimator and method ID are
   unchanged. CLAN equivalence has not been established.
@@ -1174,13 +1249,12 @@
 
 ### Building references from larger local inputs
 
-- Added
-  [`lexdiv_ngram_reference_build()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md)
-  to read whole-document extraction chunks sequentially and retain exact
-  type counts, document counts, denominators and source fingerprints.
-  Occurrence tables are released after each chunk. Distinct types and
-  document IDs still occupy memory; there is no disk-backed index,
-  pruning or automatic resume. No dependency was added.
+- Added `lexdiv_ngram_reference_build()` to read whole-document
+  extraction chunks sequentially and retain exact type counts, document
+  counts, denominators and source fingerprints. Occurrence tables are
+  released after each chunk. Distinct types and document IDs still
+  occupy memory; there is no disk-backed index, pruning or automatic
+  resume. No dependency was added.
 - MASC reader interface 0.2.0 accepts `documentHeader`/`.hdr` references
   as well as Mini-MASC’s `cesHeader`/`.anc` layout. Boundary checks are
   unchanged. An audit of all 392 official MASC 3.0.0 documents accepted
@@ -1189,13 +1263,12 @@
 
 ### Comparing reference choices
 
-- Added
-  [`lexdiv_ngram_compare()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md)
-  to apply named references to the same target, retain each reference’s
-  available-value mean and coverage, and compare rates on target items
-  with defined values in every reference. Common-set means, differences
-  from an explicit baseline, source positions, denominators and metadata
-  stay together; undefined comparisons remain missing.
+- Added `lexdiv_ngram_compare()` to apply named references to the same
+  target, retain each reference’s available-value mean and coverage, and
+  compare rates on target items with defined values in every reference.
+  Common-set means, differences from an explicit baseline, source
+  positions, denominators and metadata stay together; undefined
+  comparisons remain missing.
 - Added an offline example showing that pruning can raise a conditional
   mean while frequencies on the common items remain unchanged. Existing
   frequency arithmetic is reused; there are no new dependencies or
@@ -1465,17 +1538,16 @@
   to expose every complete step-one MATTR window, its local TTR, and
   position-only window exposure without retaining token strings. It
   accepts only canonical MATTR specifications from the existing
-  [`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+  [`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
   /
-  [`lexdiv_grid()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+  [`lexdiv_grid()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
   /
-  [`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+  [`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
   identity layer.
-- The unchanged
-  [`lexdiv_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-  rows remain the summary authority. Local means reconcile with the core
-  value; empty, invalid, and too-short inputs retain canonical
-  structured missingness and receive no fabricated detail rows.
+- The unchanged `lexdiv_profile()` rows remain the summary authority.
+  Local means reconcile with the core value; empty, invalid, and
+  too-short inputs retain canonical structured missingness and receive
+  no fabricated detail rows.
 - Added a combined row bound, bounded print method, and
   one-request-at-a-time plot method. The contract treats the output as a
   descriptive local trajectory and positional-exposure audit, not an
@@ -1586,9 +1658,7 @@
   adapter identities, caller-declared resource/override labels, identity
   fallback, and match coverage are recorded without retaining local file
   names, content hashes, absolute paths, or redistributing the list.
-- Added
-  [`lexdiv_variant_ids()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md)
-  and
+- Added `lexdiv_variant_ids()` and
   [`lexdiv_variant_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md)
   to compare four Maas definitions and four sequential-MTLD definitions.
   TAALED-related rows are formula comparators, not end-to-end

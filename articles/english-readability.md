@@ -17,6 +17,7 @@ proficiency level. Only declared English input is supported.
 ## Start from sentences and inspect what was counted
 
 ``` r
+
 library(ldfreq)
 
 demo <- new.env(parent = globalenv())
@@ -45,6 +46,7 @@ the result are local to each supplied segment, not offsets into an
 unsupplied file.
 
 ``` r
+
 helper <- new.env(parent = globalenv())
 sys.source(system.file("examples", "readability.R", package = "ldfreq", mustWork = TRUE), helper)
 prepared <- helper$readability_prepare(segments, language = "en",
@@ -89,6 +91,7 @@ preprocessing.
 ## Estimate syllables, then review pronunciations
 
 ``` r
+
 automatic <- helper$readability_score(prepared)
 audit <- cbind(prepared$tokens[c("document_id", "segment_id", "original_surface", "counted")],
   automatic$syllables[c("syllables", "method")])
@@ -157,6 +160,7 @@ syllables respectively, with the spoken forms recorded in
 `review_reason`.
 
 ``` r
+
 print(demo$initial$components, row.names = FALSE)
 #>  document_id words sentences syllables known_syllables missing_syllable_words
 #>           d1     6         2         6               6                      0
@@ -190,6 +194,7 @@ sentences, keep a row; their unresolved counts do not make included text
 unavailable.
 
 ``` r
+
 reviewed <- automatic$syllables
 reviewed$review_reason <- ""
 # Change selected syllables, method, and review_reason after inspecting the text.
@@ -225,6 +230,7 @@ not establish a universal grade interpretation for L2 writers or
 readers.
 
 ``` r
+
 print(analysis$results[c("document_id", "measure", "value", "words", "sentences",
   "syllables", "below_word_threshold", "status")], digits = 3, row.names = FALSE)
 #>  document_id              measure  value words sentences syllables
@@ -277,6 +283,7 @@ does not establish end-to-end equivalence for arbitrary texts.
 ## Keep writer, task and occasion in the research table
 
 ``` r
+
 print(demo$study_long[c("observation_id", "writer_id", "task", "occasion",
   "document_id", "measure", "value", "words", "status")], digits = 3, row.names = FALSE)
 #>  observation_id writer_id        task occasion document_id              measure
@@ -317,6 +324,7 @@ settings. Keep one row per observation and selected measure in a model;
 do not stack both differently scaled scores as replications.
 
 ``` r
+
 model_data <- subset(demo$study_long,
   measure == "Flesch_Reading_Ease" & status == "ok")
 stopifnot(!anyDuplicated(model_data$observation_id),
@@ -334,6 +342,7 @@ readability table is separate from the lexical-metric plan contract used
 there.
 
 ``` r
+
 fit <- lme4::lmer(value ~ task + occasion + (1 | writer_id), data = model_data)
 ```
 
@@ -344,6 +353,7 @@ at [`getwd()`](https://rdrr.io/r/base/getwd.html). The following uses
 the current directory.
 
 ``` r
+
 saveRDS(demo$record, "readability-record.rds", version = 2)
 write.csv(demo$study_long, "readability-study-long.csv", row.names = FALSE, na = "NA")
 saved <- readRDS("readability-record.rds")
@@ -357,6 +367,7 @@ In a fresh R session, use the same package snapshot and your saved path.
 No automatic syllable counter is needed to inspect the retained counts:
 
 ``` r
+
 library(ldfreq)
 helper <- new.env(parent = globalenv())
 sys.source(system.file("examples", "readability.R", package = "ldfreq",

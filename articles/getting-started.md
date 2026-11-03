@@ -16,16 +16,14 @@ Replace `texts` with your own ID/text table when using this workflow for
 research.
 
 ``` r
+
 library(ldfreq)
 
 texts <- data.frame(
   document_id = c("essay_a", "essay_b", "empty"),
   text = c("Cats chase cats and dogs.", "The reader reads a story.", "")
 )
-analysis <- lexdiv_metrics_text_batch(
-  texts, tokenizer = "english", normalization = "NFC",
-  case = "lower", metrics = "ttr"
-)
+analysis <- lexdiv_metrics_text_batch(texts, metrics = "ttr")
 analysis$results
 #> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
 #>   document_id metric_id value  status missing_reason N V below_quality_floor
@@ -34,10 +32,12 @@ analysis$results
 #> 3       empty       ttr    NA missing    empty_input 0 0                TRUE
 ```
 
-`tokenizer = "english"` selects the English word rules; `case = "lower"`
-counts `Cats` and `cats` as the same form. This example counts surface
-forms, without lemmatization or part-of-speech filtering. These are
-measurement choices, not automatic corrections of the source text.
+By default, `tokenizer = "english"` applies the English word rules,
+`normalization = "NFC"` canonicalizes Unicode accents, and
+`case = "lower"` counts `Cats` and `cats` as the same form. This example
+counts surface forms, without lemmatization or part-of-speech filtering.
+These are measurement choices, not automatic corrections of the source
+text.
 
 A single sentence can instead go directly to
 [`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md);
@@ -65,6 +65,7 @@ view; the complete token audit also retains annotations and exclusion
 reasons:
 
 ``` r
+
 analysis$token_audit[c("document_id", "token_index", "surface", "eligible")]
 #>    document_id token_index surface eligible
 #> 1      essay_a           1    cats     TRUE
@@ -98,6 +99,7 @@ For example, neither five-word sentence has a complete 50-token MATTR
 window:
 
 ``` r
+
 short_window <- lexdiv_metrics_text_batch(
   texts, tokenizer = "english", normalization = "NFC",
   case = "lower", metrics = "mattr", window_length = 50
@@ -145,7 +147,8 @@ fields for CSV, keeping availability and word counts beside values. The
 complete `analysis` object still holds the settings and token audit.
 
 ``` r
-report <- lexdiv_widen(analysis$results,
+
+report <- lexdiv_widen(analysis,
   values_from = c("value", "status", "missing_reason", "N", "V"))
 report
 #> <lexdiv_wide_results: 3 rows; 6 columns>
@@ -156,6 +159,7 @@ report
 ```
 
 ``` r
+
 plot(analysis, metric_id = "ttr")
 ```
 
@@ -186,6 +190,7 @@ absolute path; choose filenames that do not overwrite results you want
 to keep.
 
 ``` r
+
 output_dir <- file.path(tempdir(), "ldfreq-start")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 rds_path <- file.path(output_dir, "analysis.rds")
@@ -210,6 +215,7 @@ In a later R session, read the saved RDS from the lasting path you
 chose. For example, if you used `results/ldfreq`:
 
 ``` r
+
 library(ldfreq)
 restored <- readRDS(file.path("results", "ldfreq", "analysis.rds"))
 restored$report
@@ -263,6 +269,7 @@ Normalization, case, and number handling are explicit arguments rather
 than global options.
 
 ``` r
+
 raw_result <- lexdiv_metrics_text(
   "Cats and cat ran run.",
   tokenizer = "english", normalization = "NFC",
@@ -283,6 +290,7 @@ offsets refer to the processed text, and its provenance keeps source and
 processed text hashes without storing the source text itself.
 
 ``` r
+
 tokenization <- lexdiv_tokenize(
   "Cats and cat ran run.",
   tokenizer = "english", normalization = "NFC",
@@ -308,6 +316,7 @@ backend ID and version, even if one documented pipeline generated both
 layers.
 
 ``` r
+
 annotated <- lexdiv_lemmatize(
   tokenization,
   lemmas = c("cat", "and", "cat", "run", "run"),
@@ -346,14 +355,14 @@ lemma_content$preprocessing
 #> [1] "ldfreq-preprocessing"
 #> 
 #> $contract_version
-#> [1] "0.4.0"
+#> [1] "1.0.0"
 #> 
 #> $tokenization
 #> $tokenization$contract_id
 #> [1] "ldfreq-preprocessing"
 #> 
 #> $tokenization$contract_version
-#> [1] "0.4.0"
+#> [1] "1.0.0"
 #> 
 #> $tokenization$tokenizer_id
 #> [1] "ldfreq-english-word-tokenizer"
@@ -459,6 +468,7 @@ tags, so a content-word analysis still needs tags from a separately
 identified source.
 
 ``` r
+
 if (requireNamespace("textstem", quietly = TRUE)) {
   automatic_lemmas <- lexdiv_lemmatize(
     lexdiv_tokenize("The cats were running and studies.",
@@ -545,6 +555,7 @@ Local file names and content hashes are not retained in public flemma
 provenance.
 
 ``` r
+
 flemmas <- lexdiv_flemmatize(
   tokenization,
   "/path/to/antbnc_lemmas_ver_004.txt",
@@ -558,43 +569,42 @@ Level Checker. NWLC documents manual word-list alignment. New JACET
 profiles therefore expose AntBNC-versus-headword conflicts and accept
 explicit upstream overrides.
 
-## Caller-supplied lexical norms
+## Custom lexical norms
 
 [`lexdiv_norm_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile.md)
-exact-matches caller-prepared terms against one caller-supplied table.
-It does not download a norm, transform lookup terms, or infer that
-measures with different units and directions are comparable.
+exact-matches prepared terms against your own norm table (`data.frame`
+or `tibble`). You can run a quick exploratory profile directly, or
+attach explicit scale and citation metadata with
+[`lexdiv_norm_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile.md)
+and
+[`lexdiv_resource_meta()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile.md):
 
 ``` r
+
 synthetic_norms <- data.frame(
   term = c("cat", "run", "other"),
   familiarity = c(6, 5, NA_real_),
   concreteness = c(5, 3, 4),
   stringsAsFactors = FALSE
 )
-norm_specs <- data.frame(
-  measure_id = c("familiarity", "concreteness"),
-  value_column = c("familiarity", "concreteness"),
+norm_specs <- lexdiv_norm_spec(
+  c("familiarity", "concreteness"),
   construct_id = c("subjective_familiarity", "concreteness"),
-  value_unit = c("seven_point_rating", "seven_point_rating"),
+  value_unit = "seven_point_rating",
   direction = c("higher", "descriptive"),
-  language = c("English", "English"),
-  variety = c("unspecified", "unspecified"),
-  population_id = c("example_adults", "example_adults"),
-  collection_year = c("2025", "2025"),
-  valid_min = c(1, 1),
-  valid_max = c(7, 7),
-  stringsAsFactors = FALSE
+  language = "English",
+  population_id = "example_adults",
+  collection_year = "2025",
+  valid_min = 1,
+  valid_max = 7
 )
-norm_resource <- list(
+norm_resource <- lexdiv_resource_meta(
   resource_id = "synthetic_norms",
   resource_version = "1",
   creator = "Project-authored example",
-  source_reference = "Getting-started synthetic fixture",
+  source_reference = "Getting-started synthetic example",
   data_license = "synthetic-example-only",
-  transformation_id = "none",
-  lookup_unit = "lowercase_lemma",
-  resource_key_normalization_id = "caller-prepared-v1"
+  lookup_unit = "lowercase_lemma"
 )
 
 norm_profile <- lexdiv_norm_profile(
@@ -649,12 +659,14 @@ Core calculations and examples using your own tables do not require
 these downloads.
 
 ``` r
+
 lexdiv_resource_info(c("tubelex", "nj8"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
 ```
 
 ``` r
+
 has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
 has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
 has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
@@ -677,6 +689,7 @@ original terms, lookup terms, unmatched rows, token/type coverage, and
 matched-only conditional summaries.
 
 ``` r
+
 # Manually prepared terms illustrate this sentence, not a general tokenizer.
 frequency <- tubelex_profile(c("I", "do", "n't", "think", "it", "'s", "a", "book"))
 frequency$summary
@@ -694,7 +707,8 @@ Passing a `lexdiv_tokenization` object requires
 High coverage alone cannot validate segmentation. For multiple
 documents,
 [`tubelex_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md)
-returns a named list of complete profiles while loading one verified
+returns a structured `tubelex_profile_batch` object (`$summary`,
+`$lookup`, `$coverage`, and `$profiles`) while loading one verified
 resource snapshot per call. See [designing comparisons
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.md)
 for a worked design.
@@ -711,6 +725,7 @@ supplies a small synthetic table so that each level can be checked by
 hand.
 
 ``` r
+
 synthetic_nj8 <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
   Word = c("the", "develop", "rare", "extreme")
@@ -806,6 +821,7 @@ token, not a whole sentence. The core preserves their order and
 spelling:
 
 ``` r
+
 tokens <- c("the", "cat", "saw", "the", "other", "cat")
 result <- lexdiv_metrics(tokens, metrics = c("ttr", "rttr", "yule_k"))
 result
@@ -819,6 +835,7 @@ result
 Batch input must carry explicit, unique document identifiers.
 
 ``` r
+
 documents <- list(
   document_a = c("one", "two", "one"),
   document_b = c("alpha", "beta", "gamma", "delta")
@@ -844,6 +861,7 @@ type-weighted rows separately, with the numerator and denominator
 retained for downstream models.
 
 ``` r
+
 reference_coverage <- lexdiv_reference_coverage(
   documents,
   reference = c("one", "two", "alpha"),
@@ -872,6 +890,7 @@ objects through their registered
 [`as.list()`](https://rdrr.io/r/base/list.html) method.
 
 ``` r
+
 tidy_tokens <- data.frame(
   document_id = c("a", "a", "b", "b"),
   token = c("one", "two", "three", "three")
@@ -892,6 +911,7 @@ Base-R plot methods require one metric selection when several
 incompatible metric scales are present.
 
 ``` r
+
 plot(tidy_long, metric_id = "ttr")
 ```
 
@@ -917,6 +937,7 @@ A profile plan records parameter variants before computation. The
 MTLD or turning descriptive token floors into alternative metric values.
 
 ``` r
+
 plan <- lexdiv_plan(presets = "length_50_100")
 profile <- lexdiv_metrics(tokens, plan = plan)
 head(profile)
@@ -988,18 +1009,14 @@ data frame keeps the plan fingerprint, request IDs and specification
 IDs. Save the plan and complete result together with
 [`saveRDS()`](https://rdrr.io/r/base/readRDS.html) as in the earlier
 saving example.
-[`lexdiv_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-and
-[`lexdiv_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-remain supported and return the same complete objects. The plan entry
-points accept pre-tokenized documents.
 
 Use
-[`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+[`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
 for methods accepted by plans. To inspect Maas and MTLD comparison
 definitions, select a different catalog:
 
 ``` r
+
 comparison_methods <- lexdiv_methods(scope = "variants")
 comparison_methods[, c("family", "method_id", "scale")]
 #>   family                                               method_id
@@ -1024,10 +1041,8 @@ comparison_methods[, c("family", "method_id", "scale")]
 
 Pass those method IDs to `lexdiv_variant_metrics(variants = ...)`; they
 are not all accepted by
-[`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
-[`lexdiv_variant_ids()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md)
-remains supported and returns the same catalog. The two scopes retain
-their own descriptive columns.
+[`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md).
+The two scopes retain their own descriptive columns.
 
 MATTR has an additional local diagnostic surface. It accepts a
 MATTR-only canonical plan and returns each complete moving-window value
@@ -1035,12 +1050,11 @@ plus the number and nominal weight of windows containing each token
 position.
 
 ``` r
-methods <- lexdiv_methods()
-mattr_method <- methods$method_id[methods$metric_id == "mattr"]
+
 mattr_plan <- lexdiv_plan(
   presets = character(),
   grids = lexdiv_grid(
-    mattr_method,
+    "mattr",
     "window_length",
     c(10, 20),
     request_id_prefix = "mattr"
@@ -1137,9 +1151,9 @@ validated study design is needed to make claims about those constructs.
 
 The canonical preset contains eleven methods; moving-average MTLD and
 experimental expected-TTR D require explicit selection. Use
-[`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+[`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
 and
-[`lexdiv_presets()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+[`lexdiv_presets()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
 to inspect the thirteen supported methods and their bounded presets.
 
 Expected-TTR D fits an explicit D curve to exact finite-population
@@ -1147,6 +1161,7 @@ expected TTR values. It uses no random sampling or arbitrary D cap and
 is not CLAN VOCD.
 
 ``` r
+
 lexdiv_metrics(
   rep(c("a", "b", "a", "c"), 20),
   metrics = "expected_ttr_d"
@@ -1163,7 +1178,8 @@ variants. The separate variant surface makes those choices comparable
 without changing the canonical registry or silently replacing a method.
 
 ``` r
-variant_catalog <- lexdiv_variant_ids()
+
+variant_catalog <- lexdiv_methods(scope = "variants")
 variant_catalog
 #>   family                                               method_id direction
 #> 1   maas                                           maas_a2_ln_v1     lower
@@ -1240,6 +1256,7 @@ normalization rules, result schemas, and resource boundaries are
 installed as JSON contracts:
 
 ``` r
+
 contract_files <- c(
   "lexical-diversity-contract.json",
   "ldfreq-preprocessing-contract.json",
@@ -1267,14 +1284,15 @@ Use `jsonlite::read_json(contract_paths[[1]], simplifyVector = FALSE)`
 when an R list representation is convenient. Reading the files does not
 run a metric, download a resource, or expose caller file paths.
 
-## Offline installed-package check
+## Self-contained offline workflow script
 
-An installed smoke script exercises the public workflows without network
-access or an external runtime. This integration example requires all
-five reference resources to have been explicitly downloaded beforehand.
-The core examples earlier in this guide do not require them:
+An installed example script exercises the public workflows without
+network access or an external runtime. This integration example requires
+all five reference resources to have been explicitly downloaded
+beforehand. The core examples earlier in this guide do not require them:
 
 ``` r
+
 smoke_path <- system.file("examples", "offline-smoke.R", package = "ldfreq")
 stopifnot(nzchar(smoke_path))
 source(smoke_path, local = TRUE)

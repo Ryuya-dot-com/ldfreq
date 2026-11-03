@@ -29,6 +29,7 @@ Core calculations and examples using your own tables do not require
 these downloads.
 
 ``` r
+
 lexdiv_resource_info(c("tubelex"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex"), accept_license = TRUE)
@@ -60,10 +61,12 @@ cached **English**
 Acquire the frequency file explicitly, once:
 
 ``` r
+
 library(ldfreq)
 ```
 
 ``` r
+
 data_dir <- "japanese-resources"
 dir.create(data_dir, showWarnings = FALSE)
 revision <- "7cb5fb36add76b83a266d1967536e1a1d3faa513"
@@ -96,6 +99,7 @@ for a key, not a disambiguated frequency. Neither a reading nor a WLSP
 record selection splits that aggregate count.
 
 ``` r
+
 items <- data.frame(
   item_id = c("a1", "a2", "a3", "a4", "b1", "b2", "b3", "b4", "b5"),
   condition = c(rep("A", 4), rep("B", 5)),
@@ -128,6 +132,7 @@ After inspecting `selected` from that guide, its original positions and
 `orthBase` can be connected as follows:
 
 ``` r
+
 token_items <- data.frame(item_id = paste0("token-", seq_len(nrow(selected))),
   document_id = selected$document_id, segment_id = selected$segment_id,
   token_index = selected$token_index, term = selected$surface,
@@ -164,6 +169,7 @@ selections below illustrate those decisions for the stated contexts, not
 validated sense-specific norms.
 
 ``` r
+
 source(system.file("examples", "japanese-norms.R", package = "ldfreq"))
 source(system.file("examples", "wlsp-items.R", package = "ldfreq"))
 aoa <- profile_japanese_norm_items(items, file.path(data_dir, "data_AoA.csv"), "aoa")
@@ -205,6 +211,7 @@ caveats remain as documented in the norms guide and helper metadata.
 ## Inspect every condition and each available subset
 
 ``` r
+
 measure_columns <- c(frequency = "tubelex_per_million", familiarity = "wlsp_know",
                      aoa = "aoa_mean", boi = "boi_mean")
 coverage <- do.call(rbind, lapply(split(joined, joined$condition), function(x) {
@@ -250,6 +257,7 @@ the inspection on the final item IDs. Do not sum these measures into a
 composite difficulty score.
 
 ``` r
+
 bundle <- list(items = joined, coverage = coverage, complete = complete,
   frequency = frequency, aoa = aoa, boi = boi, wlsp = wlsp, session = sessionInfo())
 saveRDS(bundle, "japanese-stimulus-review.rds")

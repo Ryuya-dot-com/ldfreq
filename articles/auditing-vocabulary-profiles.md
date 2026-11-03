@@ -10,12 +10,14 @@ Core calculations and examples using your own tables do not require
 these downloads.
 
 ``` r
+
 lexdiv_resource_info(c("nj8"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("nj8"), accept_license = TRUE)
 ```
 
 ``` r
+
 has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
 ```
 
@@ -37,6 +39,7 @@ The authored annotation examples need no optional package or external
 model.
 
 ``` r
+
 library(ldfreq)
 
 texts <- c(a = "Students have jobs.", b = "Students enjoy jobs.", blank = "")
@@ -44,6 +47,7 @@ prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
 ```
 
 ``` r
+
 surface <- nj8_profile_batch(prepared, unit = "surface")
 audit <- nj8_diagnostics(surface)
 audit$unmatched_terms
@@ -65,6 +69,7 @@ installing `textstem`. That dictionary backend does not provide
 context-sensitive POS disambiguation.
 
 ``` r
+
 lemmas <- list(a = c("student", "have", "job"),
                b = c("student", "enjoy", "job"), blank = character())
 annotated <- Map(function(x, lemma) lexdiv_lemmatize(x, lemmas = lemma,
@@ -72,6 +77,7 @@ annotated <- Map(function(x, lemma) lexdiv_lemmatize(x, lemmas = lemma,
 ```
 
 ``` r
+
 lemma <- nj8_profile_batch(annotated, unit = "lemma")
 comparison <- data.frame(document_id = surface$coverage$document_id,
   surface_coverage = surface$coverage$token_coverage,
@@ -99,6 +105,7 @@ very small windows illustrate the workflow; they are not recommended
 settings for learner essays or a replication of the cited study.
 
 ``` r
+
 conditions <- expand.grid(unit = c("surface", "lemma"),
   window_length = c(2L, 4L), stringsAsFactors = FALSE)
 conditions$condition_id <- paste0(conditions$unit, "_w", conditions$window_length)
@@ -180,6 +187,7 @@ package counts supplied strings as given; `unit = "lemma"` does not
 automatically append POS, mood or tense.
 
 ``` r
+
 scheme_tokens <- lexdiv_tokenize(
   "Students see students and saw teachers.", case = "lower")
 scheme_pos <- c("NOUN", "VERB", "NOUN", "CCONJ", "VERB", "NOUN")
@@ -284,6 +292,7 @@ performs no inference, downloads or automatic file writes. Source it
 into its own environment:
 
 ``` r
+
 sensitivity <- new.env()
 invisible(capture.output(sys.source(system.file("examples",
   "annotation-sensitivity-demo.R", package = "ldfreq", mustWork = TRUE),
@@ -311,6 +320,7 @@ Surface-based scores and exact surface-phrase matches remain unchanged.
 A label’s change alone is not evidence that the new label is correct.
 
 ``` r
+
 subset(effects$differences, document_id %in% c("lemma", "pos") &
   condition_id == "lemma_content", select = c(document_id, metric_id,
     N_before, N_after, value_before, value_after, delta, difference_status))
@@ -333,6 +343,7 @@ coincide. Four documents are too few to motivate a smooth distribution
 estimate.
 
 ``` r
+
 document_changes <- subset(effects$differences,
   condition_id == "lemma_content" & metric_id == "ttr")
 document_changes[, c("document_id", "difference_status", "missing_reason_before",
@@ -379,6 +390,7 @@ reflects tails at 0 and 1, rather than simply cropping an unbounded
 density.
 
 ``` r
+
 draw_ttr_densities <- function(paired, bw, monochrome = FALSE) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) stop("Install optional ggplot2.")
   x <- paired$value_before; y <- paired$value_after
@@ -414,6 +426,7 @@ pairing metadata even when displaying marginal densities.
 ### Keep selection coverage separate from reference coverage
 
 ``` r
+
 subset(effects$coverage, document_id %in% c("missing", "unknown", "empty") &
   condition_id == "lemma_content", select = c(document_id, version,
     source_tokens, selected_tokens, reference_eligible_tokens,
@@ -464,6 +477,7 @@ ID. `before` and `after` are versions, not independent raters or
 gold/prediction labels.
 
 ``` r
+
 # Save explicitly to a new local file, respecting access rules for original text.
 saveRDS(list(result = effects, session = sessionInfo()), "annotation-sensitivity.rds")
 
@@ -494,6 +508,7 @@ surface forms. This tiny authored dictionary illustrates lookup; it is
 not a general English dictionary.
 
 ``` r
+
 if (requireNamespace("textstem", quietly = TRUE)) {
   dictionary <- data.frame(term = c("cats", "ran", "third"),
     lemma = c("cat", "run", "3"))
@@ -551,6 +566,7 @@ scheme, not a recommendation to retain numeric fraction labels in every
 study.
 
 ``` r
+
 if (requireNamespace("textstem", quietly = TRUE)) {
   revisions <- data.frame(token_index = 4L, before_lemma = "3",
     after_lemma = "third", reason = "ordinal word-form counting scheme")
@@ -587,6 +603,7 @@ lemma comparability in
 ## Inspect surprising transformations
 
 ``` r
+
 example <- lexdiv_tokenize("second compound missing", case = "lower")
 example <- lexdiv_lemmatize(example, lemmas = c("2", "two words", NA),
   backend_id = "authored-transformations", backend_version = "1")
@@ -668,6 +685,7 @@ authored demonstrations, not learner data or independently validated
 gold corrections. No corpus or model download is needed.
 
 ``` r
+
 review_example <- new.env(parent = environment())
 sys.source(system.file("examples", "reviewed-text-demo.R", package = "ldfreq",
   mustWork = TRUE), envir = review_example)
@@ -675,6 +693,7 @@ text_review <- review_example$result
 ```
 
 ``` r
+
 subset(text_review$metrics, metric_id == "ttr" &
   document_id %in% c("spelling", "grammar", "boundary"),
   select = c(document_id, version, N, V, value, status))
@@ -747,6 +766,7 @@ text. Do not disguise text correction as a lemma change or reuse
 original dependency heads after a word insertion.
 
 ``` r
+
 review_path <- tempfile(fileext = ".rds")
 saveRDS(list(result = text_review, session = sessionInfo()), review_path)
 saved_review <- readRDS(review_path)$result
@@ -785,12 +805,13 @@ repeated tokens are an illustration of parameter effects, not learner
 observations.
 
 ``` r
+
 documents <- list(clustered = rep(c("river", "stone", "cloud"), each = 20),
                   interleaved = rep(c("river", "stone", "cloud"), 20))
 method <- lexdiv_methods()$method_id[lexdiv_methods()$metric_id == "mattr"]
 plan <- lexdiv_plan(presets = character(), grids = lexdiv_grid(
   method, "window_length", c(10, 20), request_id_prefix = "window"))
-results <- lexdiv_profile_batch(documents, plan)
+results <- lexdiv_metrics_batch(documents, plan = plan)
 results[, c("document_id", "request_id", "value", "status")]
 #> <lexdiv_profile_batch_results: 2 documents; 4 specification results; schema unknown>
 #>   document_id request_id      value status
@@ -818,6 +839,7 @@ authored counterexample holds the number and frequency of tokens fixed
 and moves one unique token from an endpoint to the middle.
 
 ``` r
+
 positions <- list(endpoint = c("x", rep("a", 6)),
   middle = c(rep("a", 3), "x", rep("a", 3)))
 position_scores <- lexdiv_metrics_batch(positions,

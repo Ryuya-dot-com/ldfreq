@@ -10,12 +10,14 @@ Core calculations and examples using your own tables do not require
 these downloads.
 
 ``` r
+
 lexdiv_resource_info(c("tubelex"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex"), accept_license = TRUE)
 ```
 
 ``` r
+
 has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
 ```
 
@@ -73,6 +75,7 @@ existing output, does no runtime downloading, and processes the supplied
 text locally.
 
 ``` r
+
 library(ldfreq)
 texts <- list(
   first = "I don't think it's John's book.",
@@ -102,6 +105,7 @@ saveRDS(list(profiles = profiles, preprocessing = prepared$preprocessing),
 The first sentence yields:
 
 ``` r
+
 c("i", "do", "n't", "think", "it", "'s", "john", "'s", "book")
 #> [1] "i"     "do"    "n't"   "think" "it"    "'s"    "john"  "'s"    "book"
 ```
@@ -125,6 +129,7 @@ rate. Any extra exclusion changes the analysis denominator and must be
 applied consistently and reported.
 
 ``` r
+
 library(ldfreq)
 terms <- c("i", "do", "n't", "think", "it", "'s", "john", "'s", "book")
 profile <- tubelex_profile(terms, normalization = "identity")

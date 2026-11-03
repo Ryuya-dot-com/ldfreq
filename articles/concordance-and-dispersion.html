@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Search words and phrases, then inspect their distribution • ldfreq</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -20,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,10 +38,23 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+<li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Start here</h6></li>
+    <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/recipes-and-exports.html">Reuse settings and export an auditable analysis</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Input &amp; Japanese/English setup</h6></li>
+    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
+    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
+    <li><a class="dropdown-item" href="../articles/annotated-corpora.html">From corpus annotations to quanteda and lexical profiles</a></li>
+    <li><a class="dropdown-item" href="../articles/annotation-evaluation.html">Evaluate annotations and their effect on document scores</a></li>
+    <li><a class="dropdown-item" href="../articles/annotation-alignment.html">Compare token boundaries before comparing labels and document scores</a></li>
+    <li><a class="dropdown-item" href="../articles/ambiguity-review.html">Review lexical ambiguity with KWIC and original context</a></li>
+    <li><a class="dropdown-item" href="../articles/contextual-models.html">Connect contextual model outputs to research occurrences</a></li>
+    <li><a class="dropdown-item" href="../articles/open-access-papers.html">Analyze open-access academic papers</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -47,7 +65,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq" aria-label="GitHub repository"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -60,11 +78,10 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Search words and phrases, then inspect their distribution</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>Search words and phrases, then inspect their distribution</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/vignettes/concordance-and-dispersion.Rmd" class="external-link"><code>vignettes/concordance-and-dispersion.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/main/vignettes/concordance-and-dispersion.Rmd" class="external-link"><code>vignettes/concordance-and-dispersion.Rmd</code></a></small>
       <div class="d-none name"><code>concordance-and-dispersion.Rmd</code></div>
     </div>
 
@@ -78,9 +95,9 @@ position plots and a within-document dispersion measure. It keeps the
 search unit, excluded positions and denominators visible so that a
 changed search can be explained.</p>
 <p>This workflow uses optional <strong>quanteda &gt;= 4.5.0</strong>;
-plotting also needs <strong>ggplot2</strong>. Install these packages
-before running the guide. Search with <code><a href="../reference/lexdiv_concordance.html">lexdiv_concordance()</a></code>,
-sort with <code><a href="../reference/lexdiv_concordance.html">lexdiv_sort_concordance()</a></code>, calculate DP with
+position plotting uses Base R graphics and requires no extra plotting
+package. Search with <code><a href="../reference/lexdiv_concordance.html">lexdiv_concordance()</a></code>, sort with
+<code><a href="../reference/lexdiv_concordance.html">lexdiv_sort_concordance()</a></code>, calculate DP with
 <code><a href="../reference/lexdiv_concordance.html">lexdiv_concordance_dispersion()</a></code>, and draw saved positions
 with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. These operations need no helper sourcing. The
 example inputs and lemmas are authored for hand checking; they are not
@@ -154,31 +171,16 @@ this guide.</p>
 example</a>. It uses the same complete annotations and selection masks
 for counted words and concordance searches, then retains them in the
 saved study record.</p>
-<p>For a short English text without supplied annotations, the following
-explicit quanteda tokenization recipe can prepare complete surfaces. The
-alignment check will reject text that this tokenizer changes or leaves
-partly uncovered; inspect the tokens and adjust the chosen annotation
-route, rather than dropping the check. Declare sentence/turn segments
-first if matches must respect them.</p>
+<p>For raw English texts without external annotations,
+<code><a href="../reference/lexdiv_import_annotations.html">lexdiv_as_annotations()</a></code> partitions every non-whitespace
+span directly while flagging lexical words (<code>is_word = TRUE</code>)
+and lowercased <code>term</code> values:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">raw_segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"my_text"</span>, <span class="st">"empty"</span><span class="op">)</span>,</span>
-<span>  segment_id <span class="op">=</span> <span class="st">"s1"</span>, text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"We learn new words. We learned them."</span>, <span class="st">""</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">raw_tokens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="fu">quanteda</span><span class="fu">::</span><span class="fu"><a href="https://quanteda.io/reference/tokens.html" class="external-link">tokens</a></span><span class="op">(</span><span class="va">raw_segments</span><span class="op">$</span><span class="va">text</span>, what <span class="op">=</span> <span class="st">"word"</span>,</span>
-<span>  remove_punct <span class="op">=</span> <span class="cn">FALSE</span>, remove_symbols <span class="op">=</span> <span class="cn">FALSE</span>, remove_numbers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  remove_url <span class="op">=</span> <span class="cn">FALSE</span>, remove_separators <span class="op">=</span> <span class="cn">TRUE</span>, split_hyphens <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">raw_rows</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">raw_tokens</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">raw_segments</span><span class="op">$</span><span class="va">document_id</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">raw_tokens</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  segment_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">raw_segments</span><span class="op">$</span><span class="va">segment_id</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">raw_tokens</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  token_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">raw_tokens</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, surface <span class="op">=</span> <span class="va">raw_tokens</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">raw_annotations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_import_annotations.html">lexdiv_import_annotations</a></span><span class="op">(</span><span class="va">raw_rows</span>, <span class="va">raw_segments</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>language <span class="op">=</span> <span class="st">"en"</span>, analyzer <span class="op">=</span> <span class="st">"quanteda-tokens-word"</span>,</span>
-<span>    analyzer_version <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"quanteda"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    dictionary <span class="op">=</span> <span class="st">"none"</span>, dictionary_version <span class="op">=</span> <span class="st">"not-applicable"</span>,</span>
-<span>    unit <span class="op">=</span> <span class="st">"word-tokenizer-with-punctuation"</span>, normalization <span class="op">=</span> <span class="st">"none"</span>,</span>
-<span>    settings <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"remove_punct=FALSE; remove_symbols=FALSE; remove_numbers=FALSE;"</span>,</span>
-<span>      <span class="st">"remove_url=FALSE; remove_separators=TRUE; split_hyphens=FALSE"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">raw_annotations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_import_annotations.html">lexdiv_as_annotations</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>my_text <span class="op">=</span> <span class="st">"We learn new words. We learned them."</span>, empty <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">raw_search</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_concordance.html">lexdiv_concordance</a></span><span class="op">(</span><span class="va">raw_annotations</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>learning <span class="op">=</span> <span class="st">"^learn(ed)?$"</span><span class="op">)</span>, valuetype <span class="op">=</span> <span class="st">"regex"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>learning <span class="op">=</span> <span class="st">"^learn(ed)?$"</span><span class="op">)</span>, term_col <span class="op">=</span> <span class="st">"term"</span>, valuetype <span class="op">=</span> <span class="st">"regex"</span><span class="op">)</span></span>
 <span><span class="va">raw_search</span><span class="op">$</span><span class="va">counts</span></span>
 <span><span class="co">#&gt;   document_id query_id occurrences</span></span>
 <span><span class="co">#&gt; 1     my_text learning           2</span></span>
@@ -348,9 +350,9 @@ L2; right sorting uses R1, then R2. It does not alphabetize the complete
 displayed <code>pre</code> string. Ties retain query order, supplied
 segment order and original match position. Absent context sorts last at
 each depth. Sorting uses UTF-8 radix order, independent of locale,
-rather than language-specific collation. <code>ignore_case = TRUE</code>
-case-folds only the sort keys. Request a depth no larger than the saved
-<code>window</code>.</p>
+rather than language-specific collation.
+<code>case_insensitive = TRUE</code> case-folds only the sort keys.
+Request a depth no larger than the saved <code>window</code>.</p>
 <p><code>from</code>/<code>to</code> are segment token positions.
 <code>document_from</code>/<code>document_to</code> concatenate original
 segment slots in supplied order, without inventing separator tokens.
@@ -375,9 +377,9 @@ is an occurrence plot, not a density estimate or a dispersion
 statistic.</p>
 <p>For page- or Unit-based counts and recurrence after a teaching
 introduction, see <a href="textbook-progression.html">textbook
-progression</a>, available in development 0.5.0.9001. It joins these
-saved occurrences to a separate ordered section roster; the
-token-position and DP definitions here remain unchanged.</p>
+progression</a>. It joins these saved occurrences to a separate ordered
+section roster; the token-position and DP definitions here remain
+unchanged.</p>
 <p>Relative coordinates are
 <code>(position - 0.5) / source_tokens</code>, the centers of the
 original token slots on a common 0–1 scale. Exclusions do not shorten
@@ -469,7 +471,7 @@ to <code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd
 when R closes. Keep the original session record.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>search <span class="op">=</span> <span class="va">search</span>, sorted <span class="op">=</span> <span class="va">right_sorted</span>, dispersion <span class="op">=</span> <span class="va">dispersion</span>,</span>
-<span>  sort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>side <span class="op">=</span> <span class="st">"right"</span>, depth <span class="op">=</span> <span class="fl">2L</span>, ignore_case <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>  sort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>side <span class="op">=</span> <span class="st">"right"</span>, depth <span class="op">=</span> <span class="fl">2L</span>, case_insensitive <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>  session <span class="op">=</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">saved</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span> <span class="co"># Choose a persistent filename for research data.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">record</span>, <span class="va">saved</span><span class="op">)</span></span>

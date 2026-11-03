@@ -8,9 +8,8 @@ a within-document dispersion measure. It keeps the search unit, excluded
 positions and denominators visible so that a changed search can be
 explained.
 
-This workflow uses optional **quanteda \>= 4.5.0**; plotting also needs
-**ggplot2**. Install these packages before running the guide. Search
-with
+This workflow uses optional **quanteda \>= 4.5.0**; position plotting
+uses Base R graphics and requires no extra plotting package. Search with
 [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
 sort with
 [`lexdiv_sort_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md),
@@ -25,6 +24,7 @@ evaluation of an annotation system.
 ## Prepare complete annotations
 
 ``` r
+
 library(ldfreq)
 
 demo <- new.env(parent = globalenv())
@@ -74,32 +74,18 @@ It uses the same complete annotations and selection masks for counted
 words and concordance searches, then retains them in the saved study
 record.
 
-For a short English text without supplied annotations, the following
-explicit quanteda tokenization recipe can prepare complete surfaces. The
-alignment check will reject text that this tokenizer changes or leaves
-partly uncovered; inspect the tokens and adjust the chosen annotation
-route, rather than dropping the check. Declare sentence/turn segments
-first if matches must respect them.
+For raw English texts without external annotations,
+[`lexdiv_as_annotations()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md)
+partitions every non-whitespace span directly while flagging lexical
+words (`is_word = TRUE`) and lowercased `term` values:
 
 ``` r
-raw_segments <- data.frame(document_id = c("my_text", "empty"),
-  segment_id = "s1", text = c("We learn new words. We learned them.", ""))
-raw_tokens <- as.list(quanteda::tokens(raw_segments$text, what = "word",
-  remove_punct = FALSE, remove_symbols = FALSE, remove_numbers = FALSE,
-  remove_url = FALSE, remove_separators = TRUE, split_hyphens = FALSE))
-raw_rows <- do.call(rbind, lapply(seq_along(raw_tokens), function(i) data.frame(
-  document_id = rep(raw_segments$document_id[i], length(raw_tokens[[i]])),
-  segment_id = rep(raw_segments$segment_id[i], length(raw_tokens[[i]])),
-  token_index = seq_along(raw_tokens[[i]]), surface = raw_tokens[[i]])))
-raw_annotations <- lexdiv_import_annotations(raw_rows, raw_segments,
-  list(language = "en", analyzer = "quanteda-tokens-word",
-    analyzer_version = as.character(utils::packageVersion("quanteda")),
-    dictionary = "none", dictionary_version = "not-applicable",
-    unit = "word-tokenizer-with-punctuation", normalization = "none",
-    settings = paste("remove_punct=FALSE; remove_symbols=FALSE; remove_numbers=FALSE;",
-      "remove_url=FALSE; remove_separators=TRUE; split_hyphens=FALSE")))
+
+raw_annotations <- lexdiv_as_annotations(
+  c(my_text = "We learn new words. We learned them.", empty = "")
+)
 raw_search <- lexdiv_concordance(raw_annotations,
-  list(learning = "^learn(ed)?$"), valuetype = "regex")
+  list(learning = "^learn(ed)?$"), term_col = "term", valuetype = "regex")
 raw_search$counts
 #>   document_id query_id occurrences
 #> 1     my_text learning           2
@@ -114,6 +100,7 @@ tokenizer settings.
 ## Choose a search unit and pattern
 
 ``` r
+
 keep <- !annotations$tokens$surface %in% c(".", "very")
 search <- lexdiv_concordance(annotations,
   queries = list(word = "learn", phrase = c("learn", "new"), absent = "unlisted"),
@@ -171,6 +158,7 @@ types](https://quanteda.io/reference/valuetype.html):
 | `"regex"` | `"^learn(ed)?$"` | A regular expression applied to each token; anchors restrict it to a whole token |
 
 ``` r
+
 wildcard <- lexdiv_concordance(annotations,
   list(forms = "learn*", phrase = c("learn*", "new")), valuetype = "glob", keep = keep)
 regular <- lexdiv_concordance(annotations,
@@ -210,6 +198,7 @@ The example therefore does not turn `learn very new` into `learn new`
 after excluding `very`.
 
 ``` r
+
 print(search$documents, row.names = FALSE)
 #>  document_id source_tokens kept_tokens searchable_tokens missing_terms
 #>       spread            12          12                12             0
@@ -232,6 +221,7 @@ searches before raising it for a larger input.
 ## Sort by the nearest context words
 
 ``` r
+
 right_sorted <- lexdiv_sort_concordance(search, side = "right", depth = 2L)
 left_sorted <- lexdiv_sort_concordance(search, side = "left", depth = 2L)
 print(right_sorted[c("query_id", "document_id", "pre", "keyword", "post")], row.names = FALSE)
@@ -255,8 +245,8 @@ R1, then R2. It does not alphabetize the complete displayed `pre`
 string. Ties retain query order, supplied segment order and original
 match position. Absent context sorts last at each depth. Sorting uses
 UTF-8 radix order, independent of locale, rather than language-specific
-collation. `ignore_case = TRUE` case-folds only the sort keys. Request a
-depth no larger than the saved `window`.
+collation. `case_insensitive = TRUE` case-folds only the sort keys.
+Request a depth no larger than the saved `window`.
 
 `from`/`to` are segment token positions. `document_from`/`document_to`
 concatenate original segment slots in supplied order, without inventing
@@ -269,6 +259,7 @@ different search identity; sorting does not.
 ## Plot those same occurrences
 
 ``` r
+
 positions <- plot(search, "word")
 ```
 
@@ -282,10 +273,9 @@ is an occurrence plot, not a density estimate or a dispersion statistic.
 
 For page- or Unit-based counts and recurrence after a teaching
 introduction, see [textbook
-progression](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.md),
-available in development 0.5.0.9001. It joins these saved occurrences to
-a separate ordered section roster; the token-position and DP definitions
-here remain unchanged.
+progression](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.md).
+It joins these saved occurrences to a separate ordered section roster;
+the token-position and DP definitions here remain unchanged.
 
 Relative coordinates are `(position - 0.5) / source_tokens`, the centers
 of the original token slots on a common 0–1 scale. Exclusions do not
@@ -293,12 +283,14 @@ shorten the axis. Use `relative = FALSE` for a shared absolute
 token-position axis:
 
 ``` r
+
 plot(search, "phrase", relative = FALSE, monochrome = TRUE)
 ```
 
 ![](concordance-and-dispersion_files/figure-html/concordance-position-mono-1.png)
 
 ``` r
+
 stopifnot(identical(positions$occurrences$occurrence_id,
   search$occurrences$occurrence_id[search$occurrences$query_id == "word"]))
 ```
@@ -330,6 +322,7 @@ departure from the declared exposure distribution; it does not
 necessarily mean a geometrically narrower cluster.
 
 ``` r
+
 dispersion <- lexdiv_concordance_dispersion(search, "word", parts = 3L)
 print(dispersion$documents[c("document_id", "searchable_tokens", "occurrences",
   "DP", "status", "missing_reason")], digits = 4, row.names = FALSE)
@@ -385,8 +378,9 @@ temporary files can disappear when R closes. Keep the original session
 record.
 
 ``` r
+
 record <- list(search = search, sorted = right_sorted, dispersion = dispersion,
-  sort = list(side = "right", depth = 2L, ignore_case = FALSE),
+  sort = list(side = "right", depth = 2L, case_insensitive = FALSE),
   session = utils::sessionInfo())
 saved <- tempfile(fileext = ".rds") # Choose a persistent filename for research data.
 saveRDS(record, saved)
@@ -401,6 +395,7 @@ stopifnot(identical(restored, record),
 In a fresh R session, use the same package snapshot and your saved path:
 
 ``` r
+
 library(ldfreq)
 restored <- readRDS("concordance-record.rds")
 sorted <- do.call(lexdiv_sort_concordance,

@@ -30,6 +30,7 @@ block; positions increase inside it. The function never sorts input or
 joins segments.
 
 ``` r
+
 library(ldfreq)
 
 reference_tokens <- data.frame(
@@ -70,6 +71,7 @@ prevents `make a decision` from becoming a new adjacent phrase
 `make decision`:
 
 ``` r
+
 with_gap <- data.frame(document_id = "gap_demo", segment_id = "s1",
   token_index = c(1L, 3L), term = c("make", "decision"))
 gap_result <- lexdiv_ngrams(with_gap, preparation)
@@ -103,6 +105,7 @@ they do not grant rights or validate representativeness. Save fuller
 sampling documentation alongside the reference if needed.
 
 ``` r
+
 resource <- list(
   resource_id = "authored_ngram_demo", resource_version = "1",
   creator = "ldfreq example authors",
@@ -131,7 +134,7 @@ counts.
 
 When the reference has many documents, retaining all n-gram occurrences
 can be unnecessary.
-[`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md)
+[`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_build_ngram_reference.md)
 calls your reader once for each source ID and adds its counts and
 denominators. Each callback returns an ordinary
 [`lexdiv_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngrams.md)
@@ -141,6 +144,7 @@ dependency is needed.
 Here each source is one document from the same authored example:
 
 ``` r
+
 read_document <- function(id) {
   rows <- reference_tokens[reference_tokens$document_id == id, ]
   lexdiv_ngrams(rows, preparation, documents = id)
@@ -169,6 +173,7 @@ and profile values unchanged.
 For local prepared token files, a callback can read one file at a time:
 
 ``` r
+
 # manifest has unique source_id, file and document_id columns.
 # Each RDS contains one prepared document, including its original positions.
 read_local <- function(id) {
@@ -213,6 +218,7 @@ and join by ID; do not collapse repetitions across participants into
 independent observations.
 
 ``` r
+
 target_tokens <- data.frame(
   document_id = rep(c("decision_item", "choice_item"), each = 3),
   segment_id = "s1", token_index = rep(1:3, 2),
@@ -298,6 +304,7 @@ Now suppose a supplied table lists only sequences occurring at least
 twice. Keep the original totals and declare the table incomplete:
 
 ``` r
+
 pruned_resource <- resource
 pruned_resource$resource_id <- "authored_ngram_demo_pruned"
 pruned_resource$transformation_id <- "explicit-segments-retain-count-ge-2-v1"
@@ -348,7 +355,7 @@ sample-zero counts. The result retains that reason explicitly.
 
 ## Compare references on the same target items
 
-[`lexdiv_compare_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md)
+[`lexdiv_compare_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_ngrams.md)
 keeps both the available-value summaries above and an additional
 comparison on the **same items with defined rates in every reference**.
 This distinction matters when missing rows change the apparent mean. The
@@ -356,6 +363,7 @@ first named reference is the default baseline; choose another with
 `baseline` when the research question requires it.
 
 ``` r
+
 references <- list(complete = reference, pruned = partial)
 compared <- lexdiv_compare_ngrams(target, references, baseline = "complete")
 subset(compared$summary, document_id == "choice_item" & n == 2 & weighting == "token",
@@ -409,6 +417,7 @@ not select a preferred corpus, pool documents, compute significance or
 convert frequency differences into proficiency or employability scores.
 
 ``` r
+
 path <- tempfile(fileext = ".rds")
 saveRDS(list(target = target, references = references, comparison = compared), path)
 saved <- readRDS(path)
@@ -430,6 +439,7 @@ it. Use trusted local files and retain the full object rather than only
 its mean table.
 
 ``` r
+
 reference_file <- tempfile(fileext = ".rds")
 saveRDS(reference, reference_file)
 restored <- readRDS(reference_file)
@@ -446,6 +456,7 @@ column with missing values, even in an all-bigram file. Keep terms as
 character strings and document the missing-value convention:
 
 ``` r
+
 count_file <- tempfile(fileext = ".csv")
 totals_file <- tempfile(fileext = ".csv")
 write.csv(reference$counts, count_file, row.names = FALSE, na = "",

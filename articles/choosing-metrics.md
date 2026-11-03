@@ -77,6 +77,7 @@ document has no TTR. This illustrates the denominator, not a finding
 about writers.
 
 ``` r
+
 documents <- list(short = rep(letters[1:4], 5), empty = character(),
   long = rep(letters[1:4], 20))
 ttr <- lexdiv_metrics_batch(documents, metrics = "ttr")
@@ -278,6 +279,7 @@ outcome for short responses. Reducing its minimum factor length to
 rescue missing values would change the method.
 
 ``` r
+
 tokens <- rep(letters[1:20], 8)
 lexdiv_metrics(tokens, metrics = c("mtld", "mtld_ma"))[
   c("metric_id", "value", "status", "diagnostics")]
@@ -494,7 +496,7 @@ to retain writer, task and occasion identities and pass the resulting
 table to an appropriate statistical model. Use [comparison
 design](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.md)
 for window, order and preprocessing sensitivity.
-[`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+[`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
 lists definitions and
 [`lexdiv_length_evidence()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_length_evidence.md)
 distinguishes published length guidance from a formula’s minimum

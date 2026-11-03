@@ -69,7 +69,7 @@ Invisibly, the exact window rows displayed.
 
 First calculate `lexdiv_mattr_profile(tokens, plan)` from ordered tokens
 and a MATTR-only
-[`lexdiv_plan`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
+[`lexdiv_plan`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md).
 Then call `plot(profile, request_id = ...)`. For a comparison of
 whole-document metric values, use
 [`plot.lexdiv_results`](https://ryuya-dot-com.github.io/ldfreq/reference/plot.lexdiv_results.md)

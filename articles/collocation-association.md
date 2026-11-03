@@ -20,6 +20,7 @@ accuracy.
 ## Start with a complete, source-linked search
 
 ``` r
+
 library(ldfreq)
 
 demo <- new.env(parent = globalenv())
@@ -57,6 +58,7 @@ guide](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersio
 for preparing aligned annotations from your text or parser output.
 
 ``` r
+
 search <- lexdiv_concordance(annotations, list(node = "learn"),
   term_col = "lemma", keep = keep, window = 5L)
 nearby <- lexdiv_collocations(search, "node", span = c(left = 3L, right = 3L))
@@ -73,6 +75,7 @@ Specify and preserve any normalization in the annotations.
 ## Adjacent words: inspect the denominator first
 
 ``` r
+
 adjacent <- lexdiv_collocations(search, "a") # L0/R1
 print(adjacent$results, digits = 4, row.names = FALSE)
 #>  context observed node_marginal context_marginal opportunities expected     MI
@@ -146,6 +149,7 @@ external corpus, and a missing lemma is not a known zero.
 ## Expand the span without changing the meaning of a position
 
 ``` r
+
 span <- lexdiv_collocations(search, "a", span = c(left = 2L, right = 2L))
 print(span$results, digits = 4, row.names = FALSE)
 #>  context observed node_marginal context_marginal opportunities expected      MI
@@ -217,6 +221,7 @@ or a streaming large-corpus engine.
 ## Select frequent combinations and return to their source
 
 ``` r
+
 selected <- lexdiv_collocations(search, "a", min_count = 2L)
 shown <- subset(selected$results, meets_min_count)
 shown <- shown[order(-shown$MI, -shown$observed), ]
@@ -234,6 +239,7 @@ recommendation for ranking rare combinations. Choose a threshold
 appropriate to your corpus and report it.
 
 ``` r
+
 pairs <- subset(span$pairs, is_node & context_term == "b")
 kwic <- span$search$occurrences[
   match(pairs$occurrence_id, span$search$occurrences$occurrence_id), ]
@@ -279,6 +285,7 @@ For research, replace `file` below with a lasting private path such as
 disappear when R closes.
 
 ``` r
+
 record <- list(adjacent = adjacent, span = span, session = sessionInfo())
 file <- tempfile(fileext = ".rds") # use a durable project path for your analysis
 saveRDS(record, file, version = 2)
@@ -294,6 +301,7 @@ The following reads the stored analysis without a new search or
 recalculation:
 
 ``` r
+
 library(ldfreq)
 reopened <- readRDS("collocation-record.rds")
 reopened$span$results

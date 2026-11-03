@@ -25,6 +25,7 @@ Core calculations and examples using your own tables do not require
 these downloads.
 
 ``` r
+
 lexdiv_resource_info(c("tubelex", "nj8"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
@@ -70,11 +71,10 @@ example](https://ryuya-dot-com.github.io/ldfreq/articles/lexical-ordination.html
 accepts the complete annotation import and source-linked occurrence
 rows. Retain the review’s full candidate inventory, resource version and
 decisions with that analysis; leave unselected candidate codes as `NA`.
-Long review occurrence IDs can use separate, ID-matched display labels
-in **0.5.0.9001**. Do not replace the original IDs, turn unresolved
-judgments into known senses, or discretize normative scores merely to
-run MCA. Two-variable questions may be answered by a cross-tabulation
-without an ordination.
+Long review occurrence IDs can use separate, ID-matched display labels.
+Do not replace the original IDs, turn unresolved judgments into known
+senses, or discretize normative scores merely to run MCA. Two-variable
+questions may be answered by a cross-tabulation without an ordination.
 
 ## Will the results agree with other tools?
 
@@ -85,7 +85,7 @@ those choices before attributing a difference to R versus Python or to
 ldfreq. Compare full token rows first: equal aggregate scores can
 conceal different analyses.
 
-Using the gibasa recipe from ldfreq **0.3.0.9007**, a [same-dictionary
+Using the gibasa recipe in this guide, a [same-dictionary
 comparison](https://github.com/Ryuya-dot-com/ldfreq/tree/6dab71bb7ecd56a41042b59ecc1ea2b3dbea3863/experiments/japanese-backends#same-dictionary-rpython-comparison-2026-10-14)
 checked gibasa 1.1.3 against fugashi 1.5.2 with unidic-lite 1.0.8,
 identical dictionary/configuration hashes and no user dictionary. All
@@ -152,6 +152,7 @@ covered by the package’s MIT license; no corpus or dictionary is
 redistributed.
 
 ``` r
+
 library(ldfreq)
 
 segments <- data.frame(
@@ -201,6 +202,7 @@ whitespace-only gaps; non-whitespace characters cannot be skipped.
 Original line endings and positions are retained.
 
 ``` r
+
 words <- imported$tokens[imported$tokens$surface != "。", ]
 lexdiv_metrics(words$surface, metrics = "ttr")
 #> <lexdiv_results: 1 metric; contract 0.2.0>
@@ -233,6 +235,7 @@ text; neither annotation is presented as an official short-unit or
 long-unit analysis.
 
 ``` r
+
 coarse_rows <- data.frame(document_id = "essay", segment_id = "s1",
   token_index = 1:6,
   surface = c("国際連合", "で", "国際協力", "を", "学ぶ", "。"))
@@ -382,6 +385,7 @@ external model is required for this walkthrough.
 To run the complete example at once:
 
 ``` r
+
 source(system.file("examples", "japanese-file-workflow.R", package = "ldfreq"))
 as.data.frame(ja_file_record$metrics)  # All retained body words
 ja_file_record$counts          # Reviewed target occurrences only
@@ -395,6 +399,7 @@ of its new text.
 ### 1. Read the original files and import prepared annotations
 
 ``` r
+
 sys.source(system.file("examples", "text-file-input.R", package = "ldfreq", mustWork = TRUE),
   envir = environment())
 ja_file_dir <- system.file("examples", "text-input", "japanese-workflow",
@@ -436,6 +441,7 @@ explains explicit UTF-8/CP932 decoding in more detail.
 ### 2. Select the body without rewriting the text
 
 ``` r
+
 # One segment and one contiguous body range per document in this small recipe.
 # Empty original files have NA/NA bounds. Titles remain in the complete import.
 ja_body_ranges <- data.frame(document_id = ja_document_ids,
@@ -462,6 +468,7 @@ complete import nor its original token indices are edited.
 Show the body-range validation and selection code
 
 ``` r
+
 select_japanese_example_body <- function(imported, ranges) {
   s <- imported$segments; t <- imported$tokens
   if (anyDuplicated(s$document_id) || anyDuplicated(ranges$document_id) ||
@@ -494,6 +501,7 @@ ja_file_selection <- select_japanese_example_body(ja_file_import, ja_body_ranges
 ### 3. Inspect KWIC and record contextual decisions
 
 ``` r
+
 ja_file_candidates <- data.frame(
   term = c("りんご", "リンゴ", "林檎", rep("はし", 3)),
   candidate_id = c(rep("apple", 3), "bridge", "chopsticks", "edge"),
@@ -613,6 +621,7 @@ for the whole word population.
 Show how the body measures and target tables are calculated
 
 ``` r
+
 ja_file_words <- ja_file_import$tokens[ja_file_selection$retained, ]
 ja_file_sequences <- stats::setNames(lapply(ja_document_ids, function(id)
   ja_file_words$surface[ja_file_words$document_id == id]), ja_document_ids)
@@ -647,6 +656,7 @@ ja_file_record <- list(files = ja_file_manifest, imported = ja_file_import,
 ### 5. Save enough to resume
 
 ``` r
+
 ja_file_output <- tempfile("japanese-file-review-")
 dir.create(ja_file_output)
 saveRDS(ja_file_record, file.path(ja_file_output, "analysis.rds"), version = 2)
@@ -661,6 +671,7 @@ In your project, save the same complete `ja_file_record` to a chosen
 persistent path:
 
 ``` r
+
 saveRDS(ja_file_record, "japanese-file-analysis.rds", version = 2)
 saved <- readRDS("japanese-file-analysis.rds")
 saved$counts
@@ -689,11 +700,13 @@ explicitly sourced example, not an exported function or a new analyzer.
 Continue from the file workflow above:
 
 ``` r
+
 sys.source(system.file("examples", "japanese-document-profile.R", package = "ldfreq", mustWork = TRUE),
   envir = environment())
 ```
 
 ``` r
+
 # A declared, deliberately partial example map; other POS remain unmapped.
 ja_pos_groups <- c("名詞" = "content", "動詞" = "content", "形容詞" = "content",
   "形状詞" = "content", "副詞" = "content", "助詞" = "function", "助動詞" = "function")
@@ -769,6 +782,7 @@ different categories.
 Inspect the three tables and the source-linked rows directly:
 
 ``` r
+
 ja_profile$documents[c("document_id", "pos_missing_N", "origin_missing_N", "pos_unmapped_N")]
 #>   document_id pos_missing_N origin_missing_N pos_unmapped_N
 #> 1    variants             0                0              0
@@ -807,6 +821,7 @@ body ranges, decisions and the existing N/V/TTR results. Save them
 together:
 
 ``` r
+
 ja_profile_record <- list(profile = ja_profile, file_review = ja_file_record)
 saveRDS(ja_profile_record, file.path(ja_file_output, "document-profile.rds"), version = 2)
 for (name in c("documents", "characters", "features"))
@@ -821,6 +836,7 @@ sources and conditions. Recompute from the saved inputs and policy
 without rerunning a model:
 
 ``` r
+
 saved_profile <- readRDS(file.path(ja_file_output, "document-profile.rds"))$profile
 replayed_profile <- japanese_document_profile(saved_profile$imported, saved_profile$selection,
   saved_profile$policy$pos_groups, saved_profile$policy$condition,
@@ -839,6 +855,7 @@ To run both the file workflow and profiling example together in a fresh
 session:
 
 ``` r
+
 source(system.file("examples", "japanese-document-profile-demo.R", package = "ldfreq"))
 ja_profile$documents
 ja_file_output  # Temporary folder; choose a persistent output for your study.
@@ -859,11 +876,13 @@ examples. No download, analyzer or API call is needed. Start with the
 complete file/profile example above.
 
 ``` r
+
 sys.source(system.file("examples", "japanese-frequency-documents.R", package = "ldfreq", mustWork = TRUE),
   envir = environment())
 ```
 
 ``` r
+
 ja_frequency_keys <- ja_profile$tokens[c("document_id", "segment_id", "token_index", "start", "end", "surface")]
 ja_frequency_keys$lookup_term <- ja_frequency_keys$surface
 ja_frequency_keys$key_reason <- "Author-specified surface key for this teaching table"
@@ -893,6 +912,7 @@ and reason for each key. A lexical decision alone does not establish
 compatibility with a particular frequency table.
 
 ``` r
+
 # Fictional values, including one observed zero and one missing annotation.
 ja_demo_norms <- data.frame(word = c("林檎", "と", "を", "橋", "箸", "で", "渡る", "食べる", "見る"),
   per_million = c(10, 1000, 500, 2, 3, 200, 40, 60, 0),
@@ -930,6 +950,7 @@ Here `homophones` has 9 retained tokens, 8 supplied keys and 8 matches:
 unmatched + unresolved.
 
 ``` r
+
 subset(ja_frequency$norms$summary, measure_id == "per_million",
   select = c(document_id, weighting, estimate, input_units, observed_value_units, missing_reason))
 #>    document_id weighting estimate input_units observed_value_units
@@ -970,12 +991,14 @@ statuses and each `value_` column, including excluded occurrences for
 inspection.
 
 ``` r
+
 plot_japanese_frequency_coverage(ja_frequency)
 ```
 
 ![](japanese-annotations_files/figure-html/ja-frequency-coverage-plot-1.png)
 
 ``` r
+
 # Use monochrome = TRUE for black and white.
 ```
 
@@ -987,6 +1010,7 @@ manuscript.
 ### Compare selection conditions on common original spans
 
 ``` r
+
 # A second selection policy on unchanged text and unchanged lookup keys.
 ja_content_selection <- ja_profile$selection
 ja_content_keep <- !is.na(ja_profile$tokens$pos_group) & ja_profile$tokens$pos_group == "content"
@@ -1027,6 +1051,7 @@ frequency itself is observed as zero. Choose your measure set before
 forming the intersection and report the retained counts.
 
 ``` r
+
 ja_frequency_record <- list(comparison = ja_frequency_comparison, review = ja_profile_record)
 saveRDS(ja_frequency_record, file.path(ja_file_output, "frequency-analysis.rds"), version = 2)
 utils::write.csv(ja_frequency$documents, file.path(ja_file_output, "frequency-documents.csv"),
@@ -1045,6 +1070,7 @@ Replay needs the saved reference, not a model, API key or a new
 download:
 
 ``` r
+
 ja_frequency_saved <- readRDS(file.path(ja_file_output, "frequency-analysis.rds"))
 ja_frequency_inputs <- ja_frequency_saved$comparison$all
 ja_frequency_replayed <- lapply(ja_frequency_inputs, function(x)
@@ -1056,6 +1082,7 @@ stopifnot(identical(ja_frequency_replayed, ja_frequency_inputs),
 Run the entire authored workflow in a fresh session with:
 
 ``` r
+
 source(system.file("examples", "japanese-frequency-demo.R", package = "ldfreq"))
 ja_frequency$documents
 ja_file_output
@@ -1092,6 +1119,7 @@ If you set the environment variable, retrieve its value in your R
 session:
 
 ``` r
+
 dic_dir <- Sys.getenv("LDFREQ_UNIDIC_LITE_1_0_8")
 stopifnot(nzchar(dic_dir), dir.exists(dic_dir))
 ```
@@ -1102,6 +1130,7 @@ sampled corpus text. The full-width letters and an invented string
 expose normalization and missing-feature decisions.
 
 ``` r
+
 ja_segments <- data.frame(document_id = c("essay", "essay", "empty"),
   segment_id = c("s1", "s2", "s1"),
   text = c("国際連合で国際協力を学ぶ。", "ＡＩで学びました。 qzxv😀", ""))
@@ -1117,6 +1146,7 @@ configuration or request normalization or automatic sentence splitting.
 Use a path without spaces for this gibasa recipe.
 
 ``` r
+
 analyze_unidic <- function(segments, dic_dir) {
   rc <- path.expand("~/.mecabrc")
   temporary_rc <- !file.exists(rc)
@@ -1161,6 +1191,7 @@ unknown-word classification. Do not fabricate a definitive unknown flag
 from it.
 
 ``` r
+
 dictionary_files <- c("sys.dic", "unk.dic", "char.bin", "matrix.bin", "dicrc")
 dictionary_hashes <- setNames(lapply(file.path(dic_dir, dictionary_files),
   function(path) digest::digest(file = path, algo = "sha256")),
@@ -1213,6 +1244,7 @@ question calls for a different lexical population, and change the
 preprocessing label accordingly.
 
 ``` r
+
 t <- ja$tokens
 punctuation <- !is.na(t$POS1) & t$POS1 %in% c("補助記号", "空白")
 has_whitespace <- stringi::stri_detect_regex(t$surface, "\\p{White_Space}")
@@ -1242,6 +1274,7 @@ denominator; an empty document has unavailable coverage rather than
 100%.
 
 ``` r
+
 selection_counts <- do.call(rbind, lapply(ja$documents$document_id,
   function(id) {
   rows <- t$document_id == id
@@ -1265,6 +1298,7 @@ grouping those occurrences changes V and TTR; it does not describe all
 original lexical candidates. Keep the coverage table beside it.
 
 ``` r
+
 surface_by_document <- setNames(lapply(ja$documents$document_id,
   function(id) selected$surface[selected$document_id == id]),
   ja$documents$document_id)
@@ -1287,6 +1321,7 @@ those gaps for concordances and other quanteda operations in a UTF-8 R
 session.
 
 ``` r
+
 saveRDS(list(imported = ja, selection = selection, coverage = selection_counts,
   common_forms = common_results, metrics = results, ngrams = grams),
   "japanese-analysis.rds")
@@ -1317,6 +1352,7 @@ Python or model. The IDs identify illustrative lexical items, not word
 families or a validated inventory of word senses.
 
 ``` r
+
 source(system.file("examples", "japanese-orthography.R", package = "ldfreq"))
 spelling <- japanese_orthography_example
 spelling$occurrences[, c("document_id", "segment_id", "pre", "keyword", "post",
@@ -1391,6 +1427,7 @@ kanji. Saving the whole object preserves the source, candidate
 inventory, decisions and reviewer reasons:
 
 ``` r
+
 saveRDS(spelling, "japanese-orthography-review.rds")
 restored <- readRDS("japanese-orthography-review.rds")
 ```
@@ -1412,6 +1449,7 @@ supplies both annotations explicitly and requires neither that analyzer
 nor its dictionary.
 
 ``` r
+
 boundary <- japanese_boundary_example
 subset(boundary$alignment$groups, relation != "exact",
   select = c(start, end, pre, keyword, post, predicted_n, reference_n))
@@ -1494,6 +1532,7 @@ analyzer or exported API is introduced. The earlier
 workflow continues to handle single-token lexical candidates.
 
 ``` r
+
 source(system.file("examples", "junimorph-spans.R", package = "ldfreq"))
 source(system.file("examples", "junimorph-spans-demo.R", package = "ldfreq"))
 span_demo <- junimorph_spans_example
@@ -1551,6 +1590,7 @@ inputs. Obtain `jpn` separately; the package includes only the reader
 and authored examples.
 
 ``` r
+
 reference <- read_junimorph("local-resources/jpn", list(
   resource_id = "J-UniMorph",
   resource_version = "jpn git blob 6b001fa9d33139bd9b85ffe70f74c1143ae9df24",
@@ -1612,6 +1652,7 @@ needs only the local ZIP and metadata tables; optional `readxl` reads
 the workbooks.
 
 ``` r
+
 source(system.file("examples", "ninjal-essays.R", package = "ldfreq"))
 data_dir <- "ninjal-essay-data"
 essays <- as.data.frame(readxl::read_excel(
@@ -1638,6 +1679,7 @@ archive, supply a named vector with each selected member’s inspected
 encoding:
 
 ``` r
+
 files <- essays[["日本語作文txt"]]
 encodings <- setNames(rep("UTF-8", length(files)), files)
 # A local list of member names verified as CP932, not a list of error words.
@@ -1717,6 +1759,7 @@ source except auxiliary symbols and whitespace, while retaining
 missing-base tokens in the full denominator.
 
 ``` r
+
 source(system.file("examples", "japanese-frequency-documents.R", package = "ldfreq"))
 source(system.file("examples", "japanese-tubelex.R", package = "ldfreq"))
 t <- ja$tokens

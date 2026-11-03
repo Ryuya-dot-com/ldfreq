@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Optional reference data and licenses • ldfreq</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -20,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,10 +38,23 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+<li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Start here</h6></li>
+    <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/recipes-and-exports.html">Reuse settings and export an auditable analysis</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Input &amp; Japanese/English setup</h6></li>
+    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
+    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
+    <li><a class="dropdown-item" href="../articles/annotated-corpora.html">From corpus annotations to quanteda and lexical profiles</a></li>
+    <li><a class="dropdown-item" href="../articles/annotation-evaluation.html">Evaluate annotations and their effect on document scores</a></li>
+    <li><a class="dropdown-item" href="../articles/annotation-alignment.html">Compare token boundaries before comparing labels and document scores</a></li>
+    <li><a class="dropdown-item" href="../articles/ambiguity-review.html">Review lexical ambiguity with KWIC and original context</a></li>
+    <li><a class="dropdown-item" href="../articles/contextual-models.html">Connect contextual model outputs to research occurrences</a></li>
+    <li><a class="dropdown-item" href="../articles/open-access-papers.html">Analyze open-access academic papers</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -47,7 +65,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq" aria-label="GitHub repository"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -60,11 +78,10 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Optional reference data and licenses</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>Optional reference data and licenses</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/vignettes/reference-data.Rmd" class="external-link"><code>vignettes/reference-data.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/main/vignettes/reference-data.Rmd" class="external-link"><code>vignettes/reference-data.Rmd</code></a></small>
       <div class="d-none name"><code>reference-data.Rmd</code></div>
     </div>
 
@@ -146,19 +163,27 @@ which those summaries were calculated.</p>
 <h2 id="inspect-first-download-explicitly">Inspect first, download explicitly<a class="anchor" aria-label="anchor" href="#inspect-first-download-explicitly"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"morpholex"</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"resource"</span>, <span class="st">"version"</span>, <span class="st">"license"</span>,</span>
-<span>  <span class="st">"license_url"</span>, <span class="st">"notice_url"</span>, <span class="st">"download_bytes"</span><span class="op">)</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">info</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"morpholex"</span><span class="op">)</span></span>
+<span><span class="va">info</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"resource"</span>, <span class="st">"version"</span>, <span class="st">"license"</span>, <span class="st">"license_url"</span>, <span class="st">"download_bytes"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;    resource  version         license</span></span>
 <span><span class="co">#&gt; 1 morpholex 5bc425fb CC-BY-NC-SA-4.0</span></span>
-<span><span class="co">#&gt;                                          license_url</span></span>
-<span><span class="co">#&gt; 1 https://creativecommons.org/licenses/by-nc-sa/4.0/</span></span>
-<span><span class="co">#&gt;                                                                                   notice_url</span></span>
-<span><span class="co">#&gt; 1 https://github.com/Ryuya-dot-com/ldfreq/blob/v0.4.0.9006/inst/licenses/morpholex/NOTICE.md</span></span>
-<span><span class="co">#&gt;   download_bytes</span></span>
-<span><span class="co">#&gt; 1        1336656</span></span></code></pre></div>
-<p>Open the license and notice links and confirm that the terms fit your
-intended use. Select only the resources you need. No download happens
-unless you make this call with <code>accept_license = TRUE</code>:</p>
+<span><span class="co">#&gt;                                          license_url download_bytes</span></span>
+<span><span class="co">#&gt; 1 https://creativecommons.org/licenses/by-nc-sa/4.0/        1336656</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="va">info</span><span class="op">$</span><span class="va">notice_path</span>, encoding <span class="op">=</span> <span class="st">"UTF-8"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "# MorphoLex-en data and documentation"                                  </span></span>
+<span><span class="co">#&gt; [2] ""                                                                       </span></span>
+<span><span class="co">#&gt; [3] "Creators: Claudia H. Sánchez-Gutiérrez, Hugo Mailhot, S. Hélène Deacon,"</span></span>
+<span><span class="co">#&gt; [4] "and Maximiliano A. Wilson."                                             </span></span>
+<span><span class="co">#&gt; [5] ""                                                                       </span></span>
+<span><span class="co">#&gt; [6] "Source: &lt;https://github.com/hugomailhot/MorphoLex-en&gt;"</span></span></code></pre></div>
+<p>The resource notices and license texts are installed with the
+package, before any data download. Open a notice with
+<code>file.show(info$notice_path)</code>; the CC license text, where
+applicable, is in the same directory. <code>notice_url</code> points to
+this local file, while <code>license_url</code> links to the license’s
+website. Confirm that the terms fit your intended use. Select only the
+resources you need. No download happens unless you make this call with
+<code>accept_license = TRUE</code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/lexdiv_resources.html">lexdiv_download_resources</a></span><span class="op">(</span><span class="st">"tubelex"</span>, accept_license <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co"># Or select several resources after reviewing each one's terms:</span></span>
@@ -192,17 +217,16 @@ remove that specific version directory if you intend to replace it, and
 explicitly download again.</p>
 </div>
 <div class="section level2">
-<h2 id="update-from-0-4-x">Update from 0.4.x<a class="anchor" aria-label="anchor" href="#update-from-0-4-x"></a>
+<h2 id="reproducibility-and-citation">Reproducibility and citation<a class="anchor" aria-label="anchor" href="#reproducibility-and-citation"></a>
 </h2>
-<p>Earlier versions bundled these snapshots. In 0.5.0.9001 their data
-bytes and resource identities are unchanged, but they are stored
-separately. Calls such as <code><a href="../reference/nj8_profile.html">nj8_profile()</a></code> without a supplied
-word list now require the explicit cache setup above. Existing saved
-results remain readable. Caller-supplied word lists and reference tables
-continue to work without downloads.</p>
-<p>Record the resource version, source hash, coverage and citation with
-your results. <code>citation("ldfreq")</code> cites the package; it does
-not replace citations for the data and measurement methods.</p>
+<p>Custom word lists and norm tables work completely offline without
+downloading any optional resource. When you use a cached reference
+dataset (<code>tubelex</code>, <code>nj8</code>, <code>morpholex</code>,
+<code>bnccoca</code>, or <code>morphynet</code>), record the resource
+version, SHA-256 hash, match coverage, and dataset citation alongside
+your results. <code>citation("ldfreq")</code> cites the R package; it
+does not replace citations for the underlying lexical datasets and
+measurement methods.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

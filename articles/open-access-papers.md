@@ -10,6 +10,7 @@ Core calculations and examples using your own tables do not require
 these downloads.
 
 ``` r
+
 lexdiv_resource_info(c("tubelex", "nj8"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
@@ -63,6 +64,7 @@ run during package checks or site builds; downloading is an explicit
 analyst action.
 
 ``` r
+
 # install.packages("xml2") # only if not already installed
 library(ldfreq)
 source(system.file("examples", "open-access-papers.R", package = "ldfreq"))
@@ -147,6 +149,7 @@ English tokens above use a different segmentation. After that setup, the
 following code can be run in the same R session:
 
 ``` r
+
 jsonlite::write_json(as.list(papers$texts), "open-paper-texts.json", auto_unbox = TRUE)
 script <- system.file("examples", "tubelex-tokenize.py", package = "ldfreq")
 # The Python recipe refuses to overwrite an existing output file.
@@ -182,6 +185,7 @@ modifications. The saved XML and text hashes identify the actual inputs,
 while the full results preserve parameters and resource identities.
 
 ``` r
+
 saved <- readRDS("open-paper-analysis/analysis.rds")
 stopifnot(identical(replayed, saved))
 citation("ldfreq")

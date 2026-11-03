@@ -33,6 +33,7 @@ rejected rather than guessed into alignment.
 The installed, authored English/Japanese example runs entirely offline:
 
 ``` r
+
 library(ldfreq)
 
 env <- new.env(parent = baseenv())
@@ -72,6 +73,7 @@ not a permanent registry of occurrences.
 ## Report correspondence and conditional label agreement separately
 
 ``` r
+
 aligned$summary
 #>             measure reference_n predicted_n matched fp fn precision    recall
 #> 1        token_span           9          15       4 11  5 0.2666667 0.4444444
@@ -114,6 +116,7 @@ authored labels provide no accuracy evidence for a real analyzer.
 ## Calculate document metrics from each complete sequence
 
 ``` r
+
 example$differences
 #>   document_id metric_id reference_N predicted_N reference_V predicted_V
 #> 1     english       ttr           4           8           3           6
@@ -157,6 +160,7 @@ than computing diversity on the matched subset.
 ## Save and replay without rerunning an analyzer
 
 ``` r
+
 saveRDS(example, "annotation-alignment.rds", version = 2)
 restored <- readRDS("annotation-alignment.rds")
 replayed <- do.call(lexdiv_align_annotations, restored$inputs)

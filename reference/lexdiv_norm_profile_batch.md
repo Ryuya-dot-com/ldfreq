@@ -7,9 +7,17 @@ coverage and missingness. Documents are not pooled into a corpus score.
 ## Usage
 
 ``` r
-lexdiv_norm_profile_batch(documents, norms, key, measure_specs, resource,
-  weightings = c("token", "type"), id_col = "document_id",
-  terms_col = "terms", max_rows = 1e6)
+lexdiv_norm_profile_batch(
+  documents,
+  norms,
+  key,
+  measure_specs = lexdiv_norm_spec(setdiff(names(norms), key)),
+  resource = lexdiv_resource_meta("caller_norms"),
+  weightings = c("token", "type"),
+  id_col = "document_id",
+  terms_col = "terms",
+  max_rows = 1e6
+)
 
 # S3 method for class 'lexdiv_norm_profile_batch'
 print(x, ...)

@@ -27,9 +27,9 @@ print(x, ...)
 - plan:
 
   A normalized
-  [`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+  [`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
   containing only MATTR specifications. Use
-  [`lexdiv_grid()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+  [`lexdiv_grid()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
   to request several window lengths.
 
 - max_rows:
@@ -49,13 +49,11 @@ print(x, ...)
 ## Value
 
 A `lexdiv_mattr_profile` list. `summary` contains the unchanged
-canonical
-[`lexdiv_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-rows; `windows` contains local TTR values; `exposure` contains
-position-only inclusion counts and weights; `diagnostics` reconciles the
-local mean with the canonical result; and `provenance` records the
-profile contract, schema, and plan identity. The print method returns
-`x` invisibly.
+canonical `lexdiv_profile_results` rows; `windows` contains local TTR
+values; `exposure` contains position-only inclusion counts and weights;
+`diagnostics` reconciles the local mean with the canonical result; and
+`provenance` records the profile contract, schema, and plan identity.
+The print method returns `x` invisibly.
 
 ## Details
 

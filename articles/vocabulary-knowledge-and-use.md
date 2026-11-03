@@ -19,12 +19,14 @@ Core calculations and examples using your own tables do not require
 these downloads.
 
 ``` r
+
 lexdiv_resource_info(c("tubelex"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex"), accept_license = TRUE)
 ```
 
 ``` r
+
 has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
 ```
 
@@ -82,6 +84,7 @@ Two items use the same form, `bank`, for different intended senses.
 item and sense identities even when the lookup form is identical.
 
 ``` r
+
 library(ldfreq)
 
 items <- data.frame(
@@ -126,6 +129,7 @@ administration order and missingness reason. Use separate rows/IDs for
 repeated occasions or senses.
 
 ``` r
+
 responses <- expand.grid(item_id = items$item_id,
   learner_id = c("learner_a", "learner_b", "learner_c"),
   stringsAsFactors = FALSE, KEEP.OUT.ATTRS = FALSE)
@@ -163,6 +167,7 @@ without treating the criterion as an infallible observation of
 real-world ability.
 
 ``` r
+
 comparison <- lexdiv_compare_responses(analysis,
   test = "recognition", criterion = "meaning_recall")
 comparison$counts
@@ -226,6 +231,7 @@ for a missing value, and preserves the literal text `NA` as a possible
 ID. Scores must be exactly `0`, `1`, or missing.
 
 ``` r
+
 input_dir <- tempfile("vocabulary-example-")
 dir.create(input_dir)
 write.csv(items, file.path(input_dir, "items.csv"), row.names = FALSE,
@@ -285,6 +291,7 @@ learner/item keys. This duplicated demonstration is a software example,
 not evidence of change.
 
 ``` r
+
 repeated <- rbind(transform(analysis, occasion_id = "pre"),
                   transform(analysis, occasion_id = "post"))
 by_occasion <- lexdiv_compare_responses(repeated,
@@ -336,6 +343,7 @@ guide](https://ryuya-dot-com.github.io/ldfreq/articles/tubelex-input.md)
 for connected text.
 
 ``` r
+
 profiles <- tubelex_profile_batch(list(
   a = c("the", "bank", "bank", "ldfreq"),
   b = c("an", "accurate", "description"), blank = character(),
@@ -386,6 +394,7 @@ and audit trail, not a validated employability measure or an automatic
 response scorer.
 
 ``` r
+
 saved <- tempfile(fileext = ".rds")
 saveRDS(list(items = items, responses = responses, item_profile = item_profile,
   analysis = analysis, comparison = comparison, profiles = profiles, audit = audit,

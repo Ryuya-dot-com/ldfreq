@@ -8,7 +8,7 @@ the counted vocabulary.
 ## Usage
 
 ``` r
-lexdiv_keyness(x, target, reference, preprocessing_id,
+lexdiv_keyness(x, target, reference, preprocessing_id = "default",
     term_col = "surface", keep = rep(TRUE, nrow(x$tokens)), min_count = 1L,
     max_tokens = 1e6)
 lexdiv_keyness_concordance(x, term, window = 5L, max_cells = 1e6)
@@ -127,7 +127,7 @@ if (requireNamespace("quanteda", quietly = TRUE)) {
 #> 2  a        a    b             a           a            b
 #> 3           a  b b             a                     b, b
 #>                                                      occurrence_id
-#> 1 4ec6c37193104e90e9166d30bccd65daedde5cc5366753be792bbde5eba7c685
-#> 2 51944ee3acabdfe00295d12799ccef0890f25477ad2ed84781c1004f2d6967b0
-#> 3 d1b9abecf37571c303a07a04a4be6f02d73d1e8e16b29d8a66ac7043ad906ae9
+#> 1 5aeea771b3eed0f27ff5d387bd64cf8c891901fd9938abac55e50e1b2e746605
+#> 2 62faf040df533d66ad58aa5474b0179dd60b8d99157077ee26a7526fb837e5c7
+#> 3 ec62d27c879c37fe8b0352b09b75edf0a41141e8b5373370a2d11c8b0da2b423
 ```

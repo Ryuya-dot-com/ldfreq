@@ -17,6 +17,7 @@ loads the unchanged concordance helpers.
 ## Begin with an inspectable example
 
 ``` r
+
 library(ldfreq)
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "textbook-progression-demo.R",
@@ -48,6 +49,7 @@ lemmas and maps `recycled` to `recycle`; it does not run an automatic
 lemmatizer.
 
 ``` r
+
 helper$textbook_progression_plot(x, by = "page")
 ```
 
@@ -64,6 +66,7 @@ long books; the helper does not paginate or automatically suppress
 labels.
 
 ``` r
+
 helper$textbook_progression_plot(x, by = "unit", monochrome = TRUE)
 ```
 
@@ -104,6 +107,7 @@ volume, printed labels, original files and actual teaching dates
 alongside the analysis when needed.
 
 ``` r
+
 helper <- new.env(parent = globalenv())
 sys.source(system.file("examples", "textbook-progression.R",
   package = "ldfreq", mustWork = TRUE), helper)
@@ -134,6 +138,7 @@ footprint or readable plot size.
 Suppose an exercise on page 7 has not been transcribed:
 
 ``` r
+
 s <- demo$sections
 missing_exercise <- s[7, ]
 missing_exercise$segment_id <- "p07-exercise"
@@ -167,6 +172,7 @@ An unobserved section excluded by the explicit section mask does not
 invalidate the selected scope either:
 
 ``` r
+
 body <- helper$textbook_progression(demo$search, s, demo$targets,
   include = s$role == "body")
 stopifnot(identical(body$summary$occurrences, x$summary$occurrences))
@@ -181,6 +187,7 @@ activities.
 ## Assess recurrence after a declared introduction
 
 ``` r
+
 x$summary[c("query_id", "introduction_unit", "later_units",
   "complete_later_units", "later_occurrences", "later_unit_coverage", "later_status")]
 #>   query_id introduction_unit later_units complete_later_units later_occurrences
@@ -226,13 +233,14 @@ is not a substitute for the progression display.
 ## Return from counts to the original uses
 
 ``` r
+
 subset(x$occurrences, query_id == "river" & included & unit > 1,
   select = c(occurrence_id, page, unit, role, pre, keyword, post))
 #>                                                      occurrence_id page unit
-#> 3 ef2e4be9fd08c67d352c77c2c28ff5b06a9dbcef31d2d6153153d80644c7ccc6    5    3
-#> 4 57853e4216a59bc8ce5e472f1bd3a1e8db9422160e81ba1792e150e8ffaebb3a    5    3
-#> 5 f70c273d3c0158cf258715b8f91822805af10960f8a67b91d0dc9dc5d0bd43a0    9    5
-#> 6 02aa75c75c39a1ebf5ea43e7a52fc18cc2b8ace57d30e56fc5b2a2509105497c    9    5
+#> 3 9e51193bc317bf0fb632b84856188ceca56c475d0d978c97d8d0dcd099f135b2    5    3
+#> 4 89afe5f837c1df686ce6d7dfb95e2adf2e7c3bbffbb35083a86dbd4761701ab3    5    3
+#> 5 407b49edd9be185ce25d0ac872bb3d126e69e7991e0eae85240ca60c39cb83f8    9    5
+#> 6 0ab1ec79f06b87d7031147b56237549dbd8bf6b12826986ace4917db0df844ad    9    5
 #>   role                  pre keyword              post
 #> 3 body                 The    river      is clean. We
 #> 4 body      . We cross the    river                 .
@@ -257,6 +265,7 @@ learning evidence must support that interpretation.
 ## Save and reopen without rerunning the search
 
 ``` r
+
 record <- list(progression = x, session = utils::sessionInfo())
 saved <- tempfile(fileext = ".rds") # Use a lasting private path for research data.
 saveRDS(record, saved)
@@ -269,6 +278,7 @@ choices, queries and inclusion mask. The plot checks the saved record’s
 integrity and does not tokenize or search again. In a fresh R session:
 
 ``` r
+
 library(ldfreq)
 helper <- new.env(parent = globalenv())
 sys.source(system.file("examples", "textbook-progression.R",

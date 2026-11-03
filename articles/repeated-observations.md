@@ -35,6 +35,7 @@ only, three words, a document withheld from reporting and an unknown
 writer ID.
 
 ``` r
+
 library(ldfreq)
 
 demo <- new.env(parent = globalenv())
@@ -94,6 +95,7 @@ full tokenization objects, original texts and the selected surface-token
 vectors. The plan asks for TTR and MATTR with a fixed ten-token window:
 
 ``` r
+
 plan <- lexdiv_plan(presets = character(), specs = list(
   lexdiv_spec("ttr_v_over_n_v1", request_id = "ttr"),
   lexdiv_spec("mattr_sliding_step1_v1", list(window_length = 10),
@@ -174,6 +176,7 @@ its computational specification, not a study design.
 ## Build the complete study table
 
 ``` r
+
 study <- lexdiv_study_table(
   record$planned, record$submissions, record$results, record$plan,
   condition_id = record$condition$id, reporting = record$reporting
@@ -237,6 +240,7 @@ diagnostics and your study’s reporting rules separately.
 ## Select one response and explain the denominator
 
 ``` r
+
 selected <- lexdiv_study_model_data(study,
   condition_id = record$condition$id, request_id = "mattr10",
   required = c("writer_id", "task", "occasion"))
@@ -324,6 +328,7 @@ checked. `na.action = na.fail` prevents additional unrecorded row
 omission.
 
 ``` r
+
 model_data <- selected$data
 model_data$task <- factor(model_data$task, levels = c("description", "argument"))
 contrasts(model_data$task) <- contr.treatment(levels(model_data$task), base = 1)
@@ -406,6 +411,7 @@ contrast. An interaction or nonlinear trajectory is a different model
 and question.
 
 ``` r
+
 inference_path <- system.file("examples", "study-inference.R",
   package = "ldfreq", mustWork = TRUE)
 sys.source(inference_path, envir = environment())
@@ -506,6 +512,7 @@ of the plotted intervals, to assess the uncertainty of the planned
 contrast.
 
 ``` r
+
 draw_study_estimates <- function(x, monochrome = FALSE) {
   if (is.null(x$tables)) stop("Interval tables are unavailable; inspect diagnostics.")
   observations <- x$observations
@@ -557,6 +564,7 @@ analysis; a temporary folder is used here so the example does not
 overwrite research files.
 
 ``` r
+
 output_dir <- tempfile("repeated-study-")
 dir.create(output_dir)
 record$ldfreq_version <- as.character(packageVersion("ldfreq"))
@@ -583,6 +591,7 @@ version label alone does not preserve the software bytes. The full
 session record describes the package environment.
 
 ``` r
+
 saved <- readRDS(file.path(output_dir, "study.rds"))
 stopifnot(identical(as.character(packageVersion("ldfreq")), saved$ldfreq_version))
 replayed <- lexdiv_study_table(saved$planned, saved$submissions,
@@ -616,6 +625,7 @@ calculation session and versions; loading an old record must not relabel
 its inference method.
 
 ``` r
+
 saved$inference$settings
 #> $response
 #> [1] "MATTR10"

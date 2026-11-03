@@ -72,12 +72,14 @@ Core calculations and examples using your own tables do not require
 these downloads.
 
 ``` r
+
 lexdiv_resource_info(c("tubelex", "nj8"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
 ```
 
 ``` r
+
 has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
 ```
 
@@ -111,6 +113,7 @@ MTLD. The full result objects retain method parameters and schema
 identities in the saved record.
 
 ``` r
+
 library(ldfreq)
 
 reader <- new.env(parent = baseenv())
@@ -157,6 +160,7 @@ applied. Lowercasing can merge spellings such as `Rose` and `rose`; it
 does not resolve their meanings.
 
 ``` r
+
 en_dir <- system.file("examples", "text-input", "texts",
   package = "ldfreq", mustWork = TRUE)
 en_paths <- sort(list.files(en_dir, pattern = "[.]txt$", full.names = TRUE,
@@ -208,6 +212,7 @@ and for paired values. It does not select documents on the basis of an
 observed score difference.
 
 ``` r
+
 pair_fields <- c("document_id", "metric_id", "N", "value", "status", "mtld_tail_only")
 en_pairs <- merge(subset(en_table, condition == "preserve", pair_fields),
   subset(en_table, condition == "lower", pair_fields),
@@ -251,6 +256,7 @@ text and counted forms. The first document is selected here only as an
 illustration.
 
 ``` r
+
 inspected_id <- en_ids[1]
 print(subset(en_table, document_id == inspected_id & metric_id == "ttr",
   c(document_id, condition, N, V, value, status, missing_reason)), row.names = FALSE)
@@ -341,6 +347,7 @@ provides a separate route for generating annotations. The authored
 example does not demonstrate analyzer accuracy.
 
 ``` r
+
 ja_dir <- system.file("examples", "text-input", "japanese-workflow",
   package = "ldfreq", mustWork = TRUE)
 ja_ids <- c("variants", "homophones", "unlisted", "no_targets", "empty")
@@ -370,6 +377,7 @@ strings as UTF-8 too, including on C/POSIX locales. Its literal
 text and its hash are retained. Next declare the selection policy.
 
 ``` r
+
 # One complete segment per document; the body extends to its end.
 ja_body_start <- setNames(c(5L, 4L, 1L, 1L, NA_integer_), ja_ids)
 start <- unname(ja_body_start[ja_tokens$document_id])
@@ -391,6 +399,7 @@ The inputs stay named by document ID, including zero-token selections.
 Build the diagnostic table without dropping those documents:
 
 ``` r
+
 ja_runs <- lapply(ja_inputs, calculate)
 ja_table <- do.call(rbind, lapply(names(ja_runs), function(condition) {
   out <- diagnostic_rows(ja_runs[[condition]])
@@ -454,6 +463,7 @@ stop, whereas `empty` has no source tokens; the imported source retains
 that distinction.
 
 ``` r
+
 print(as.data.frame(with(ja_table, table(condition, metric_id, status))))
 #>    condition metric_id  status Freq
 #> 1   all_body     mattr missing    5
@@ -493,6 +503,7 @@ original occurrence, including titles, full stops and unknown POS, under
 both selection policies:
 
 ``` r
+
 ja_source_audit <- do.call(rbind, lapply(names(ja_selections), function(condition) {
   out <- ja_tokens[c("document_id", "segment_id", "token_index", "start", "end",
     "surface", "POS1")]
@@ -548,6 +559,7 @@ original text. Each document remains in the count table, including the
 empty document.
 
 ``` r
+
 ja_searches <- NULL
 if (requireNamespace("quanteda", quietly = TRUE) &&
     utils::packageVersion("quanteda") >= "4.5.0") {
@@ -620,6 +632,7 @@ writer/task structure, analyzer and dictionary information. Do not infer
 these from filenames or scores.
 
 ``` r
+
 en_record <- list(texts = en_texts, sources = en_sources, prepared = en_prepared,
   inputs = en_inputs, results = en_runs, diagnostics = en_table, paired = en_pairs,
   counts = en_counts, settings = settings, session = sessionInfo(),
@@ -631,6 +644,7 @@ en_record <- list(texts = en_texts, sources = en_sources, prepared = en_prepared
 ```
 
 ``` r
+
 ja_record <- list(texts = ja_texts, sources = ja_sources, annotation_source = ja_csv,
   imported = ja_import, body_start = ja_body_start, pos_groups = ja_groups,
   selections = ja_selections, unknown_selection = ja_unknown,
@@ -654,6 +668,7 @@ overwritten on a repeat run; choose separate directories for different
 analyses.
 
 ``` r
+
 record <- en_record
 output_dir <- tempfile("ldfreq-condition-report-")
 dir.create(output_dir, recursive = TRUE)
@@ -680,7 +695,7 @@ stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 #> 31 English input files were analyzed. Each file was one document. English tokenization used NFC, excluded numbers, URLs and emails, and retained contractions and hyphenated words. We compared case-preserved and lowercased surface forms without lemmatization or spelling correction, retaining all documents and diagnostic flags.
 #> 
-#> Calculations used ldfreq 1.0.0: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
+#> Calculations used ldfreq 1.0.0.9001: full-document TTR, MATTR with a common window of 50, and MTLD method mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1, threshold 0.72. MTLD used strict <, no minimum factor length, final-token closure checks, linear residual credit (1 - TTR) / (1 - threshold), and the arithmetic mean of directions. We retained unavailable results and reasons, the advisory length flag, complete factor counts and directional gaps. Gaps describe order sensitivity, not precision.
 ```
 
 The CSV is a flat inspection table; **the RDS is the complete analysis
@@ -722,6 +737,7 @@ The Japanese imported-token path above has a different input format and
 continues to use the explicit join shown here.
 
 ``` r
+
 join_study_metadata <- function(rows, metadata) {
   if (!is.data.frame(rows) || !is.data.frame(metadata) ||
       anyDuplicated(names(rows)) || anyDuplicated(names(metadata)) ||
@@ -765,6 +781,7 @@ ten sampled participants. For your study, replace the CSV path and use
 your actual recorded IDs.
 
 ``` r
+
 study_record <- en_record
 metadata_path <- system.file("examples", "text-input", "metadata.csv",
   package = "ldfreq", mustWork = TRUE)
@@ -784,6 +801,7 @@ selections. Supply an actual study CSV in research; do not infer
 Japanese authorship or ability from these labels.
 
 ``` r
+
 study_record <- ja_record
 study_metadata <- data.frame(document_id = ja_ids,
   writer_id = c("authored-A", "authored-A", NA, "authored-B", "authored-B"),
@@ -802,6 +820,7 @@ requested above; full requested and effective parameters remain in
 `study_record$results`.
 
 ``` r
+
 study_rows <- study_record$diagnostics
 stopifnot(all(study_rows$metric_id %in% c("ttr", "mattr", "mtld")))
 study_rows$window_length <- ifelse(study_rows$metric_id == "mattr",
@@ -827,6 +846,7 @@ this English reference unused. Select language-appropriate references
 and matching units for other studies.
 
 ``` r
+
 study_references <- NULL
 study_coverage <- NULL
 if (use_nj8) {
@@ -890,6 +910,7 @@ comparisons, add those metadata columns to `study_group_keys`
 explicitly; missing group labels remain visible.
 
 ``` r
+
 summarize_study_documents <- function(rows, keys) {
   settings_keys <- c("condition", "metric_id", "method_id", "window_length", "mtld_threshold")
   needed <- c("document_id", "writer_id", "value", "reportable_value", "status", "metric_id",
@@ -982,6 +1003,7 @@ MTLD comparison.
 ### Save the study table and its full analysis record
 
 ``` r
+
 study_record$study <- list(metadata = study_metadata, metadata_input = metadata_input,
   table = study_table, summary = study_summary, group_keys = study_group_keys,
   references = study_references, coverage = study_coverage,
@@ -1032,6 +1054,7 @@ another saved ID to inspect, for example, the unknown selection in
 `"unlisted"`.
 
 ``` r
+
 saved <- readRDS(file.path(study_output, "study.rds"))
 stopifnot(!is.null(saved$source_audit))
 id <- "variants"
@@ -1115,6 +1138,7 @@ building never download the corpus.
 After creating the local report, inspect it with:
 
 ``` r
+
 pelic <- readRDS("/path/to/local-report/study.rds")
 pelic$study$summary[c("metric_id", "n_documents", "n_writers_known",
   "n_reported", "n_unavailable", "n_withheld", "mean", "sd", "median")]
@@ -1156,6 +1180,7 @@ and document-length distribution before comparing results. Keep writer
 and task IDs with document IDs in the study’s own table.
 
 ``` r
+
 levels <- NULL
 texts <- c(
   first = "The student reads a book and discusses the book with a friend.",
@@ -1197,6 +1222,7 @@ same lemma procedure, report its coverage, and select `unit = "lemma"`.
 Do not switch units only for documents with poor matching.
 
 ``` r
+
 levels <- nj8_profile_batch(prepared, unit = "surface")
 print(levels$coverage[, c(
   "document_id", "eligible_tokens", "matched_tokens", "token_coverage", "type_coverage"
@@ -1217,6 +1243,7 @@ total token coverage. Lower cumulative levels describe the fraction
 found at or below that level, not a learner’s vocabulary knowledge.
 
 ``` r
+
 level8 <- subset(levels$summary, weighting == "token" & level == 8)
 stopifnot(isTRUE(all.equal(
   level8$cumulative_proportion, levels$coverage$token_coverage
@@ -1237,6 +1264,7 @@ The guide’s earlier `diagnostic_rows()` helper provides the
 corresponding long tables.
 
 ``` r
+
 en_wide <- lexdiv_widen(en_runs$lower,
   values_from = c("value", "status", "missing_reason", "N"),
   mtld_diagnostics = TRUE)
@@ -1277,6 +1305,7 @@ Select scalar fields for CSV, and keep the complete original result in
 RDS:
 
 ``` r
+
 write.csv(en_wide, "english-analysis.csv", row.names = FALSE, na = "")
 saveRDS(list(original = en_runs$lower, wide = en_wide), "english-analysis.rds")
 restored <- readRDS("english-analysis.rds")
@@ -1298,6 +1327,7 @@ they were the same specification. Coverage is then joined by explicit
 IDs, preserving document order.
 
 ``` r
+
 analysis <- lexdiv_widen(metrics)
 if (!is.null(levels)) {
   coverage <- levels$coverage[match(analysis$document_id, levels$coverage$document_id), ]
@@ -1382,6 +1412,7 @@ previous settings afterwards. Longer document labels need more room, a
 larger figure, or a custom horizontal dot plot rather than smaller text.
 
 ``` r
+
 draw_mattr <- function(monochrome = FALSE) {
   old <- par(mar = c(4.2, 4.5, 1, 1))
   on.exit(par(old))
@@ -1471,6 +1502,7 @@ universal recommended settings.
 ### Prepare the text and analysis
 
 ``` r
+
 library(ldfreq)
 
 trajectory_text <- paste(
@@ -1536,6 +1568,7 @@ defined here as an example, not exported by ldfreq.
 ### Draw the overlapping trajectories
 
 ``` r
+
 draw_trajectory <- function(monochrome = FALSE) {
   old <- par(mar = c(4.2, 4.3, 2.2, 0.8), mgp = c(2.65, 0.65, 0),
              tcl = -0.25, family = "sans", las = 1, bty = "l")
@@ -1597,6 +1630,7 @@ PDF at its intended publication size. Place any figure title and
 explanatory note outside the image.
 
 ``` r
+
 png("ldfreq-trajectory.png", width = 6.5, height = 4,
     units = "in", res = 300, pointsize = 11, bg = "white")
 draw_trajectory()
@@ -1625,6 +1659,7 @@ under the study’s data access rules. It is not intended for automatic
 public sharing.
 
 ``` r
+
 record <- list(
   prepared = prepared, diversity = diversity, metrics = metrics, levels = levels,
   analysis = analysis, session = sessionInfo()

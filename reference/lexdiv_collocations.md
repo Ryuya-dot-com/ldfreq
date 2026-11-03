@@ -7,7 +7,7 @@ tokenizer, model or statistical significance decision is supplied.
 ## Usage
 
 ``` r
-lexdiv_collocations(search, query_id, span = c(left = 0L, right = 1L),
+lexdiv_collocations(search, query_id = NULL, span = c(left = 0L, right = 1L),
                     min_count = 1L, max_pairs = 1e6)
 ```
 

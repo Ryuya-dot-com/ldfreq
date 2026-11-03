@@ -30,11 +30,11 @@ A plain list with three components:
 
 - documents:
 
-  One row per document, including empty documents, with `document_id`,
-  `tokens`, `before_has_*`/`after_has_*` for each of `lemma`, `upos`,
-  and `flemma`, the corresponding `*_changed_tokens` counts, and
-  `changed_tokens`, the count of positions changed in at least one
-  layer.
+  One row per document, including empty documents, with `document_id`
+  and `tokens`. Availability columns `before_has_*` and `after_has_*`
+  cover each of `lemma`, `upos`, and `flemma`. The corresponding
+  `*_changed_tokens` columns count changes in each layer;
+  `changed_tokens` counts positions changed in at least one layer.
 
 - changes:
 

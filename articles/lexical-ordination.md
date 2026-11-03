@@ -22,6 +22,7 @@ document-by-term frequency table.
 ## Begin with the counted documents
 
 ``` r
+
 library(ldfreq)
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "lexical-ordination-demo.R",
@@ -85,6 +86,7 @@ guide](https://ryuya-dot-com.github.io/ldfreq/articles/annotated-corpora.md)
 describes source-aligned inputs.
 
 ``` r
+
 helper <- new.env(parent = globalenv())
 for (file in c("concordance.R", "lexical-ordination.R"))
   sys.source(system.file("examples", file, package = "ldfreq", mustWork = TRUE), helper)
@@ -114,6 +116,7 @@ collection.
 ## CA: inspect the words that define the configuration
 
 ``` r
+
 has_ca <- requireNamespace("ca", quietly = TRUE)
 if (has_ca) {
   ca_result <- helper$ordination_ca(tab, k = 2)
@@ -162,12 +165,14 @@ it is `NA` for points with numerically zero distance to the centroid. A
 distant rare word need not contribute much.
 
 ``` r
+
 if (has_ca) helper$ordination_plot(ca_result)
 ```
 
 ![](lexical-ordination_files/figure-html/ca-documents-1.png)
 
 ``` r
+
 if (has_ca) helper$ordination_plot(ca_result, which = "terms", monochrome = TRUE)
 ```
 
@@ -193,6 +198,7 @@ among words. Neither removes the sampling uncertainty of short
 documents; Jaccard also depends on the observed type sets.
 
 ``` r
+
 jaccard <- helper$ordination_mds(tab, distance = "jaccard", k = 2)
 hellinger <- helper$ordination_mds(tab, distance = "hellinger", k = 2)
 as.matrix(jaccard$distance)["d1", "d7"]
@@ -209,6 +215,7 @@ retains document labels. Directional coverage is not a symmetric
 distance and is not accepted here.
 
 ``` r
+
 helper$ordination_plot(hellinger)
 ```
 
@@ -227,6 +234,7 @@ coordinates.
 ## Check what a two-dimensional map loses
 
 ``` r
+
 jaccard$diagnostics
 #> $requested_dimensions
 #> [1] 2
@@ -303,6 +311,7 @@ both prevent distance reconstruction. There is no automatic
 acceptability threshold for the resulting map.
 
 ``` r
+
 with(hellinger$pairs, {
   plot(original_distance, fitted_distance, asp = 1, pch = 16, col = "#0072B2",
     xlab = "Original Hellinger distance", ylab = "Distance in two-dimensional map")
@@ -323,6 +332,7 @@ effective dimension counts and any recorded rank warning from
 ## Return to the evidence and save the complete analysis
 
 ``` r
+
 helper$ordination_occurrences(tab, "learn")
 #>    document_id segment_id token_index start end token_row  term
 #> 1           d1         s1           1     1   5         1 learn
@@ -380,6 +390,7 @@ For research, replace `path` below with a lasting private path such as
 disappear when R closes.
 
 ``` r
+
 record <- list(table = tab, ca = if (has_ca) ca_result else NULL,
   jaccard = jaccard, hellinger = hellinger, session = sessionInfo())
 path <- tempfile(fileext = ".rds") # Choose a persistent private path for your study.
@@ -393,6 +404,7 @@ stopifnot(identical(reopened, record))
 In another R session, use the same package snapshot and your saved path:
 
 ``` r
+
 library(ldfreq)
 helper <- new.env(parent = globalenv())
 for (script in c("concordance.R", "lexical-ordination.R"))
@@ -439,6 +451,7 @@ helps the question. Do not discretize a continuous score merely to make
 it suitable for MCA.
 
 ``` r
+
 mca_demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "occurrence-mca-demo.R",
   package = "ldfreq", mustWork = TRUE), mca_demo)
@@ -521,6 +534,7 @@ accepted, with `NA` for missing codes; numeric and ordered variables
 need a separate justified analysis, not implicit conversion.
 
 ``` r
+
 mca_table <- mca_helper$ordination_mca_table(
   annotations, occurrences,
   definitions = c(sense = "Your explicit sense inventory",
@@ -530,6 +544,7 @@ mca_table <- mca_helper$ordination_mca_table(
 ```
 
 ``` r
+
 if (has_ca) {
   mca_result <- mca_helper$ordination_mca(mca_table, k = 2)
   print(mca_result$axes)
@@ -541,8 +556,8 @@ if (has_ca) {
 #> 2    2 3.333333e-01     2.500000e-01     TRUE           TRUE
 #> 3    3 3.333333e-01     2.500000e-01    FALSE          FALSE
 #> 4    4 2.677670e-01     2.008253e-01    FALSE          FALSE
-#> 5    5 1.970247e-32     1.477685e-32    FALSE           TRUE
-#> 6    6 2.521422e-33     1.891067e-33    FALSE          FALSE
+#> 5    5 6.631281e-32     4.973461e-32    FALSE           TRUE
+#> 6    6 1.261433e-32     9.460748e-33    FALSE          FALSE
 #> $total_inertia
 #> [1] 1.333333
 #> 
@@ -575,13 +590,13 @@ if (has_ca) {
 #>  v2l3    1 -5.255105e-01 0.1111111 1.4142136 7.692308e-02 1.380806e-01
 #>  v3l1    1 -1.751702e-01 0.2000000 0.8164966 1.538462e-02 4.602688e-02
 #>  v3l2    1  2.627553e-01 0.1333333 1.2247449 2.307692e-02 4.602688e-02
-#>  v1l1    2 -2.730441e-16 0.1777778 0.9354143 3.976165e-32 8.520355e-32
-#>  v1l2    2 -2.695901e-16 0.1555556 1.0690450 3.391678e-32 6.359395e-32
-#>  v2l1    2  8.383612e-01 0.1111111 1.4142136 2.342832e-01 3.514247e-01
-#>  v2l2    2  2.435153e-01 0.1111111 1.4142136 1.976656e-02 2.964984e-02
-#>  v2l3    2 -1.081876e+00 0.1111111 1.4142136 3.901522e-01 5.852283e-01
-#>  v3l1    2  4.870305e-01 0.2000000 0.8164966 1.423192e-01 3.557981e-01
-#>  v3l2    2 -7.305458e-01 0.1333333 1.2247449 2.134788e-01 3.557981e-01
+#>  v1l1    2 -7.077617e-17 0.1777778 0.9354143 2.671609e-33 5.724876e-33
+#>  v1l2    2 -6.393056e-17 0.1555556 1.0690450 1.907321e-33 3.576227e-33
+#>  v2l1    2  1.226004e+00 0.1111111 1.4142136 5.010283e-01 7.515424e-01
+#>  v2l2    2 -1.200303e-01 0.1111111 1.4142136 4.802428e-03 7.203642e-03
+#>  v2l3    2 -1.105973e+00 0.1111111 1.4142136 4.077256e-01 6.115884e-01
+#>  v3l1    2 -2.400607e-01 0.2000000 0.8164966 3.457748e-02 8.644371e-02
+#>  v3l2    2  3.600910e-01 0.1333333 1.2247449 5.186623e-02 8.644371e-02
 #>    variable      level
 #>       sense    finance
 #>       sense      river
@@ -621,9 +636,10 @@ without changing the complete geometry. Do not give those arbitrary
 orientations independent linguistic meanings.
 
 ``` r
+
 mca_labels <- NULL
 if (has_ca) {
-  # Since 0.4.0.9002: keep original IDs and choose separate display names.
+  # Keep original IDs and choose separate display names.
   ids <- unique(mca_result$rows$id)
   mca_labels <- setNames(sprintf("use%02d", seq_along(ids)), ids)
   mca_display <- mca_helper$ordination_mca_plot(mca_result, labels = mca_labels)
@@ -640,30 +656,30 @@ if (has_ca) {
 
 ![](lexical-ordination_files/figure-html/mca-maps-2.png)
 
-The optional `labels` argument requires **0.5.0.9001**. Review tools can
-return long occurrence IDs that overlap or are clipped in a plot. Supply
-a character vector whose names are exactly the displayed occurrence IDs
-(or category IDs on a category map); its order need not match the result
-table. Choose short, distinguishable display names. The returned
-`mca_display` table keeps `id`, `label`, `x` and `y` for every point,
-including co-located points. Use its original `id` to look up source
-text; a display name is not a replacement identifier. Without `labels`,
-the existing ID/category labels are used.
+Review tools can return long occurrence IDs that overlap or are clipped
+in a plot. Supply a character vector whose names are exactly the
+displayed occurrence IDs (or category IDs on a category map); its order
+need not match the result table. Choose short, distinguishable display
+names. The returned `mca_display` table keeps `id`, `label`, `x` and `y`
+for every point, including co-located points. Use its original `id` to
+look up source text; a display name is not a replacement identifier.
+Without `labels`, the existing ID/category labels are used.
 
 The warning about repeated eigenvalues is intentional. These maps show
 the first two retained axes (one axis for rank-one inputs). Occurrence
 and category maps use separate principal coordinates: cross-map
 distances are not association strengths. Full tables retain co-located
-IDs even when display labels are combined. Since 0.4.0.9002, the
-CA/MCA/MDS plots group labels at coordinates equal to eight decimal
-places, including numerical zeroes. This is a display rule; stored and
-returned coordinates keep their full precision and points are not
-jittered. Interpret the coding scheme, category counts, contributions
-and representation quality together. Group labels used for display are
-not a test of group effects; MCA does not model repeated writers or
-capture every higher-order interaction.
+IDs even when display labels are combined. The CA/MCA/MDS plots group
+labels at coordinates equal to eight decimal places, including numerical
+zeroes. This is a display rule; stored and returned coordinates keep
+their full precision and points are not jittered. Interpret the coding
+scheme, category counts, contributions and representation quality
+together. Group labels used for display are not a test of group effects;
+MCA does not model repeated writers or capture every higher-order
+interaction.
 
 ``` r
+
 mca_helper$ordination_mca_occurrences(mca_table, c("u01", "u16"))
 #>   document_id segment_id token_index start end surface occurrence_id writer_id
 #> 1         d01         s1           2     5   8    bank           u01  author-A
@@ -683,6 +699,7 @@ parser, original input files or optional `ca` package; fitting is not
 rerun:
 
 ``` r
+
 library(ldfreq)
 mca_helper <- new.env(parent = globalenv())
 for (script in c("concordance.R", "lexical-ordination.R", "occurrence-mca.R"))

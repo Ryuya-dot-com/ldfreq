@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Explore lexical composition and categories with CA, MCA and MDS • ldfreq</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -20,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,10 +38,23 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+<li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Start here</h6></li>
+    <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/recipes-and-exports.html">Reuse settings and export an auditable analysis</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Input &amp; Japanese/English setup</h6></li>
+    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
+    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
+    <li><a class="dropdown-item" href="../articles/annotated-corpora.html">From corpus annotations to quanteda and lexical profiles</a></li>
+    <li><a class="dropdown-item" href="../articles/annotation-evaluation.html">Evaluate annotations and their effect on document scores</a></li>
+    <li><a class="dropdown-item" href="../articles/annotation-alignment.html">Compare token boundaries before comparing labels and document scores</a></li>
+    <li><a class="dropdown-item" href="../articles/ambiguity-review.html">Review lexical ambiguity with KWIC and original context</a></li>
+    <li><a class="dropdown-item" href="../articles/contextual-models.html">Connect contextual model outputs to research occurrences</a></li>
+    <li><a class="dropdown-item" href="../articles/open-access-papers.html">Analyze open-access academic papers</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -47,7 +65,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq" aria-label="GitHub repository"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -60,11 +78,10 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Explore lexical composition and categories with CA, MCA and MDS</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>Explore lexical composition and categories with CA, MCA and MDS</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/vignettes/lexical-ordination.Rmd" class="external-link"><code>vignettes/lexical-ordination.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/main/vignettes/lexical-ordination.Rmd" class="external-link"><code>vignettes/lexical-ordination.Rmd</code></a></small>
       <div class="d-none name"><code>lexical-ordination.Rmd</code></div>
     </div>
 
@@ -571,8 +588,8 @@ analysis, not implicit conversion.</p>
 <span><span class="co">#&gt; 2    2 3.333333e-01     2.500000e-01     TRUE           TRUE</span></span>
 <span><span class="co">#&gt; 3    3 3.333333e-01     2.500000e-01    FALSE          FALSE</span></span>
 <span><span class="co">#&gt; 4    4 2.677670e-01     2.008253e-01    FALSE          FALSE</span></span>
-<span><span class="co">#&gt; 5    5 1.970247e-32     1.477685e-32    FALSE           TRUE</span></span>
-<span><span class="co">#&gt; 6    6 2.521422e-33     1.891067e-33    FALSE          FALSE</span></span>
+<span><span class="co">#&gt; 5    5 6.631281e-32     4.973461e-32    FALSE           TRUE</span></span>
+<span><span class="co">#&gt; 6    6 1.261433e-32     9.460748e-33    FALSE          FALSE</span></span>
 <span><span class="co">#&gt; $total_inertia</span></span>
 <span><span class="co">#&gt; [1] 1.333333</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -605,13 +622,13 @@ analysis, not implicit conversion.</p>
 <span><span class="co">#&gt;  v2l3    1 -5.255105e-01 0.1111111 1.4142136 7.692308e-02 1.380806e-01</span></span>
 <span><span class="co">#&gt;  v3l1    1 -1.751702e-01 0.2000000 0.8164966 1.538462e-02 4.602688e-02</span></span>
 <span><span class="co">#&gt;  v3l2    1  2.627553e-01 0.1333333 1.2247449 2.307692e-02 4.602688e-02</span></span>
-<span><span class="co">#&gt;  v1l1    2 -2.730441e-16 0.1777778 0.9354143 3.976165e-32 8.520355e-32</span></span>
-<span><span class="co">#&gt;  v1l2    2 -2.695901e-16 0.1555556 1.0690450 3.391678e-32 6.359395e-32</span></span>
-<span><span class="co">#&gt;  v2l1    2  8.383612e-01 0.1111111 1.4142136 2.342832e-01 3.514247e-01</span></span>
-<span><span class="co">#&gt;  v2l2    2  2.435153e-01 0.1111111 1.4142136 1.976656e-02 2.964984e-02</span></span>
-<span><span class="co">#&gt;  v2l3    2 -1.081876e+00 0.1111111 1.4142136 3.901522e-01 5.852283e-01</span></span>
-<span><span class="co">#&gt;  v3l1    2  4.870305e-01 0.2000000 0.8164966 1.423192e-01 3.557981e-01</span></span>
-<span><span class="co">#&gt;  v3l2    2 -7.305458e-01 0.1333333 1.2247449 2.134788e-01 3.557981e-01</span></span>
+<span><span class="co">#&gt;  v1l1    2 -7.077617e-17 0.1777778 0.9354143 2.671609e-33 5.724876e-33</span></span>
+<span><span class="co">#&gt;  v1l2    2 -6.393056e-17 0.1555556 1.0690450 1.907321e-33 3.576227e-33</span></span>
+<span><span class="co">#&gt;  v2l1    2  1.226004e+00 0.1111111 1.4142136 5.010283e-01 7.515424e-01</span></span>
+<span><span class="co">#&gt;  v2l2    2 -1.200303e-01 0.1111111 1.4142136 4.802428e-03 7.203642e-03</span></span>
+<span><span class="co">#&gt;  v2l3    2 -1.105973e+00 0.1111111 1.4142136 4.077256e-01 6.115884e-01</span></span>
+<span><span class="co">#&gt;  v3l1    2 -2.400607e-01 0.2000000 0.8164966 3.457748e-02 8.644371e-02</span></span>
+<span><span class="co">#&gt;  v3l2    2  3.600910e-01 0.1333333 1.2247449 5.186623e-02 8.644371e-02</span></span>
 <span><span class="co">#&gt;    variable      level</span></span>
 <span><span class="co">#&gt;       sense    finance</span></span>
 <span><span class="co">#&gt;       sense      river</span></span>
@@ -651,7 +668,7 @@ independent linguistic meanings.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mca_labels</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="va">has_ca</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># Since 0.4.0.9002: keep original IDs and choose separate display names.</span></span>
+<span>  <span class="co"># Keep original IDs and choose separate display names.</span></span>
 <span>  <span class="va">ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">mca_result</span><span class="op">$</span><span class="va">rows</span><span class="op">$</span><span class="va">id</span><span class="op">)</span></span>
 <span>  <span class="va">mca_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"use%02d"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">ids</span><span class="op">)</span><span class="op">)</span>, <span class="va">ids</span><span class="op">)</span></span>
 <span>  <span class="va">mca_display</span> <span class="op">&lt;-</span> <span class="va">mca_helper</span><span class="op">$</span><span class="fu">ordination_mca_plot</span><span class="op">(</span><span class="va">mca_result</span>, labels <span class="op">=</span> <span class="va">mca_labels</span><span class="op">)</span></span>
@@ -663,29 +680,28 @@ independent linguistic meanings.</p>
 <pre><code><span><span class="co">#&gt; Warning: Displayed axes touch a repeated eigenvalue; their orientation is not</span></span>
 <span><span class="co">#&gt; unique. Inspect axes and diagnostics.</span></span></code></pre>
 <p><img src="lexical-ordination_files/figure-html/mca-maps-2.png" class="r-plt" alt="" width="576"></p>
-<p>The optional <code>labels</code> argument requires
-<strong>0.5.0.9001</strong>. Review tools can return long occurrence IDs
-that overlap or are clipped in a plot. Supply a character vector whose
-names are exactly the displayed occurrence IDs (or category IDs on a
-category map); its order need not match the result table. Choose short,
-distinguishable display names. The returned <code>mca_display</code>
-table keeps <code>id</code>, <code>label</code>, <code>x</code> and
-<code>y</code> for every point, including co-located points. Use its
-original <code>id</code> to look up source text; a display name is not a
+<p>Review tools can return long occurrence IDs that overlap or are
+clipped in a plot. Supply a character vector whose names are exactly the
+displayed occurrence IDs (or category IDs on a category map); its order
+need not match the result table. Choose short, distinguishable display
+names. The returned <code>mca_display</code> table keeps
+<code>id</code>, <code>label</code>, <code>x</code> and <code>y</code>
+for every point, including co-located points. Use its original
+<code>id</code> to look up source text; a display name is not a
 replacement identifier. Without <code>labels</code>, the existing
 ID/category labels are used.</p>
 <p>The warning about repeated eigenvalues is intentional. These maps
 show the first two retained axes (one axis for rank-one inputs).
 Occurrence and category maps use separate principal coordinates:
 cross-map distances are not association strengths. Full tables retain
-co-located IDs even when display labels are combined. Since 0.4.0.9002,
-the CA/MCA/MDS plots group labels at coordinates equal to eight decimal
-places, including numerical zeroes. This is a display rule; stored and
-returned coordinates keep their full precision and points are not
-jittered. Interpret the coding scheme, category counts, contributions
-and representation quality together. Group labels used for display are
-not a test of group effects; MCA does not model repeated writers or
-capture every higher-order interaction.</p>
+co-located IDs even when display labels are combined. The CA/MCA/MDS
+plots group labels at coordinates equal to eight decimal places,
+including numerical zeroes. This is a display rule; stored and returned
+coordinates keep their full precision and points are not jittered.
+Interpret the coding scheme, category counts, contributions and
+representation quality together. Group labels used for display are not a
+test of group effects; MCA does not model repeated writers or capture
+every higher-order interaction.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mca_helper</span><span class="op">$</span><span class="fu">ordination_mca_occurrences</span><span class="op">(</span><span class="va">mca_table</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"u01"</span>, <span class="st">"u16"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   document_id segment_id token_index start end surface occurrence_id writer_id</span></span>

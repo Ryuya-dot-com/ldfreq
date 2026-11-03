@@ -5,14 +5,22 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Reproducible Lexical Diversity and Frequency Profiles • ldfreq</title>
+<title>Reproducible Lexical Diversity and Frequency Profiles in R • ldfreq</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" sizes="any" href="favicon.ico">
+<link rel="manifest" href="site.webmanifest">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Reproducible Lexical Diversity and Frequency Profiles">
-<meta name="description" content="Compares lexical diversity and reference-vocabulary profiles while retaining the formula, parameters, preprocessing choices, and match coverage used in each analysis. Supports eleven default lexical-diversity measures and optional moving-average MTLD and an experimental expected-TTR D estimator, computed from ordered tokens or raw English text; compares selected Maas and MTLD definitions; and exposes local MATTR windows. Optional New JACET 8000 and TUBELEX tables support lexical-level coverage and corpus-relative frequency profiles, with off-list terms and non-computable requests kept explicit. Additional functions provide exact lexical overlap, reference-set coverage, caller-supplied word-family, lexical norm and adjacent n-gram frequency profiles, descriptive comparisons of scored vocabulary response pairs, multi-document workflows, and plots. MorphoLex English and Nations BNC/COCA Level 6 word-family lists are optional reference resources. Reference data require explicit download and acceptance of their separate licenses; ordinary calculations are offline. A local MorphyNet reader retains derivational relations and source identity. External annotations, local MASC Penn annotations and optional quanteda' integration retain supplied token boundaries and source positions for corpus analysis. Contextual review connects caller-supplied lexical candidates and explicit decisions to keyword-in-context displays and original text. External model outputs can be attached with checked source identities while keeping model suggestions separate from reviewer decisions. The methods include Covington and McFall (2010) &lt;doi:10.1080/09296171003643098&gt; and McCarthy and Jarvis (2010) &lt;doi:10.3758/BRM.42.2.381&gt;.">
-<meta property="og:description" content="Compares lexical diversity and reference-vocabulary profiles while retaining the formula, parameters, preprocessing choices, and match coverage used in each analysis. Supports eleven default lexical-diversity measures and optional moving-average MTLD and an experimental expected-TTR D estimator, computed from ordered tokens or raw English text; compares selected Maas and MTLD definitions; and exposes local MATTR windows. Optional New JACET 8000 and TUBELEX tables support lexical-level coverage and corpus-relative frequency profiles, with off-list terms and non-computable requests kept explicit. Additional functions provide exact lexical overlap, reference-set coverage, caller-supplied word-family, lexical norm and adjacent n-gram frequency profiles, descriptive comparisons of scored vocabulary response pairs, multi-document workflows, and plots. MorphoLex English and Nations BNC/COCA Level 6 word-family lists are optional reference resources. Reference data require explicit download and acceptance of their separate licenses; ordinary calculations are offline. A local MorphyNet reader retains derivational relations and source identity. External annotations, local MASC Penn annotations and optional quanteda' integration retain supplied token boundaries and source positions for corpus analysis. Contextual review connects caller-supplied lexical candidates and explicit decisions to keyword-in-context displays and original text. External model outputs can be attached with checked source identities while keeping model suggestions separate from reviewer decisions. The methods include Covington and McFall (2010) &lt;doi:10.1080/09296171003643098&gt; and McCarthy and Jarvis (2010) &lt;doi:10.3758/BRM.42.2.381&gt;.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Reproducible Lexical Diversity and Frequency Profiles in R">
+<meta name="description" content="Compute lexical diversity, reference-vocabulary coverage, custom lexical norms, and source-linked corpus analyses while preserving counted words, settings, and missingness reasons.
+">
+<meta property="og:description" content="Compute lexical diversity, reference-vocabulary coverage, custom lexical norms, and source-linked corpus analyses while preserving counted words, settings, and missingness reasons.
+">
+<meta property="og:image" content="https://ryuya-dot-com.github.io/ldfreq/logo.svg">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +30,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,10 +43,23 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/getting-started.html">Getting started with ldfreq</a></li>
+<li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Start here</h6></li>
+    <li><a class="dropdown-item" href="articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
     <li><a class="dropdown-item" href="articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="articles/recipes-and-exports.html">Reuse settings and export an auditable analysis</a></li>
     <li><a class="dropdown-item" href="articles/release-scope.html">Release scope and compatibility</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Input &amp; Japanese/English setup</h6></li>
+    <li><a class="dropdown-item" href="articles/english-tokenization.html">English tokenization and document input</a></li>
+    <li><a class="dropdown-item" href="articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
+    <li><a class="dropdown-item" href="articles/annotated-corpora.html">From corpus annotations to quanteda and lexical profiles</a></li>
+    <li><a class="dropdown-item" href="articles/annotation-evaluation.html">Evaluate annotations and their effect on document scores</a></li>
+    <li><a class="dropdown-item" href="articles/annotation-alignment.html">Compare token boundaries before comparing labels and document scores</a></li>
+    <li><a class="dropdown-item" href="articles/ambiguity-review.html">Review lexical ambiguity with KWIC and original context</a></li>
+    <li><a class="dropdown-item" href="articles/contextual-models.html">Connect contextual model outputs to research occurrences</a></li>
+    <li><a class="dropdown-item" href="articles/open-access-papers.html">Analyze open-access academic papers</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="articles/index.html">More articles...</a></li>
   </ul>
@@ -49,7 +70,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq" aria-label="GitHub repository"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -58,116 +79,173 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="ldfreq">ldfreq<a class="anchor" aria-label="anchor" href="#ldfreq"></a>
-</h1></div>
-<p><strong>Lexical diversity, vocabulary profiles and corpus comparisons in R.</strong> Keep the original text, token choices, reference coverage and measurement settings connected to the results you report.</p>
-<p><a href="https://ryuya-dot-com.github.io/ldfreq/articles/index.html">Guides</a> · <a href="https://ryuya-dot-com.github.io/ldfreq/reference/index.html">Function reference</a> · <a href="https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html">Metric selection</a> · <a href="https://github.com/Ryuya-dot-com/ldfreq/issues" class="external-link">Issues</a></p>
+<div class="page-header">
+<img src="logo.svg" class="logo" alt=""><h1 id="ldfreq-">ldfreq 
+<a class="anchor" aria-label="anchor" href="#ldfreq-"></a>
+</h1>
+</div>
+<!-- badges: start -->
+
+<p><strong>Reproducible lexical diversity, vocabulary profiles, and source-linked corpus analysis in R.</strong></p>
+<p><code>ldfreq</code> measures lexical diversity and reference-vocabulary coverage while keeping every score connected to the exact words counted, preprocessing choices, coverage rates, and reasons for unavailable values.</p>
+<p><a href="https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html">Get started</a> · <a href="https://ryuya-dot-com.github.io/ldfreq/articles/index.html">Guides</a> · <a href="https://ryuya-dot-com.github.io/ldfreq/reference/index.html">Function reference</a> · <a href="https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html">Choosing metrics</a> · <a href="https://github.com/Ryuya-dot-com/ldfreq/issues" class="external-link">Report an issue</a></p>
+<div class="section level2">
+<h2 id="why-ldfreq">Why ldfreq?<a class="anchor" aria-label="anchor" href="#why-ldfreq"></a>
+</h2>
+<ul>
+<li>
+<strong>Auditable from raw text to model table</strong>: Every result retains counted tokens (<code>$token_audit</code>), parameter settings, and explicit <code>status</code> / <code>missing_reason</code> fields—short or empty documents are never silently dropped or turned into zeros.</li>
+<li>
+<strong>One cohesive workflow</strong>: Compute 13 lexical-diversity measures, profile vocabulary against frequency/level/norm/word-family lists (<code>TUBELEX</code>, <code>New JACET 8000</code>, <code>BNC/COCA</code>, <code>MorphoLex</code>, or your own tables), and inspect source contexts with KWIC concordances, dispersion, collocations, and keyness.</li>
+<li>
+<strong>Lightweight and R-native</strong>: Requires only <strong>2 runtime packages</strong> (<code>digest</code> and <code>stringi</code>), runs offline out of the box, accepts <code>data.frame</code>, <code>tibble</code>, <code>data.table</code>, and <code>quanteda</code> objects, and produces publication-ready Base-R figures (<code>monochrome = TRUE</code> supported).</li>
+</ul>
 <p><a id="installation"></a></p>
+</div>
 <div class="section level2">
-<h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install the fixed release <strong>1.0.0</strong> below (R 4.1 or later).</p>
+<p>The examples on this page use the <strong>development snapshot 1.0.0.9001</strong> (R 4.1 or later). It contains incompatible changes relative to stable 1.0.0; review the migration notes below before using it with an existing analysis.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"digest"</span>, <span class="st">"stringi"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span></span>
-<span>  <span class="st">"https://github.com/Ryuya-dot-com/ldfreq/releases/download/v1.0.0/ldfreq_1.0.0.tar.gz"</span>,</span>
-<span>  repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span></code></pre></div>
-<p>Optional integrations state their additional packages in the relevant guide. Use <code>browseVignettes("ldfreq")</code> for guides matching your installed version. Earlier releases remain available in the <a href="https://github.com/Ryuya-dot-com/ldfreq/releases" class="external-link">release archive</a>.</p>
-</div>
-<div class="section level2">
-<h2 id="start-with-your-text">Start with your text<a class="anchor" aria-label="anchor" href="#start-with-your-text"></a>
-</h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">text</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span>
-<span>  <span class="st">"Students compared two versions of a short story in their writing class."</span>,</span>
-<span>  <span class="st">"They marked repeated words and discussed how each writer introduced new ideas."</span>,</span>
-<span>  <span class="st">"One group revised the opening while another group examined the ending."</span>,</span>
-<span>  <span class="st">"After reading the stories again, the students explained their choices and"</span>,</span>
-<span>  <span class="st">"saved both the original texts and their revised versions for later comparison."</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lexdiv_preprocessing.html">lexdiv_metrics_text</a></span><span class="op">(</span><span class="va">text</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>, case <span class="op">=</span> <span class="st">"lower"</span>,</span>
-<span>  metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mattr"</span>, <span class="st">"hdd"</span>, <span class="st">"mtld"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">result</span><span class="op">$</span><span class="va">results</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"metric_id"</span>, <span class="st">"value"</span>, <span class="st">"N"</span>, <span class="st">"status"</span>, <span class="st">"missing_reason"</span><span class="op">)</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="co"># Development snapshot from GitHub main</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pak"</span><span class="op">)</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@main"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Check counted words, make a report table, and retain the full analysis.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">token_audit</span><span class="op">)</span></span>
-<span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lexdiv_widen.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">results</span>,</span>
-<span>  values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"missing_reason"</span>, <span class="st">"N"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">report</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>text <span class="op">=</span> <span class="va">text</span>, analysis <span class="op">=</span> <span class="va">result</span>, report <span class="op">=</span> <span class="va">report</span><span class="op">)</span>, <span class="st">"analysis.rds"</span><span class="op">)</span></span></code></pre></div>
-<p>This connects <strong>text → scores and counted words → report table → saved record</strong>. Reopen it with <code>readRDS("analysis.rds")</code>; the full record retains information that a values-only table would lose. The <a href="https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html">first-analysis guide</a> extends this to several documents, missing scores and a plot.</p>
-<p>Use <code>lexdiv_metrics(tokens, ...)</code> for an already ordered character vector of words, and <code><a href="reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch()</a></code> for multiple named texts. Inspect <code>status</code> and <code>missing_reason</code>: an unavailable score is not zero. Keep window and sample sizes fixed when comparing documents.</p>
+<span><span class="co"># Or use remotes</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"Ryuya-dot-com/ldfreq@main"</span><span class="op">)</span></span></code></pre></div>
+<p>To install the current stable release instead, use <code>remotes::install_github("Ryuya-dot-com/ldfreq@v1.0.0")</code>. Its documentation is included with that version; use <code>browseVignettes("ldfreq")</code> after installation.</p>
+<p>To install the development snapshot from its local archive:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"digest"</span>, <span class="st">"stringi"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ldfreq_1.0.0.9001.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="migrating-from-100">Migrating from 1.0.0<a class="anchor" aria-label="anchor" href="#migrating-from-100"></a>
+</h3>
+<p>Raw-text tokenization and metric functions now default to <code>case = "lower"</code> and <code>tokenizer = "english"</code>. To request the 1.0.0 preprocessing choices, explicitly set <code>case = "preserve", tokenizer = "unicode"</code> and retain the recorded settings. Different tokenization can change scores and makes direct comparisons unsafe without examining the counting conditions.</p>
+<p>Several former entry points and argument names have also changed. Consult the <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/main/NEWS.md" class="external-link">development change notes</a> for the replacement names and the relevant help pages before reopening an existing workflow. Stable 1.0.0 remains available unchanged.</p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="choose-a-measure-for-your-question">Choose a measure for your question<a class="anchor" aria-label="anchor" href="#choose-a-measure-for-your-question"></a>
+<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<p>For local lexical variety, start with <strong>MATTR at a fixed window size</strong>. Our evidence covers English surface words at window 50; check its consistency for your material, especially short texts. Use <strong>HD-D at a fixed sample size</strong> when the distribution of word frequencies, rather than local sequence, is the target. MTLD and MTLD-MA measure factor lengths and need particular care with short texts. TTR is useful at a controlled length; it is strongly affected by length otherwise.</p>
-<p>The <a href="https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html">metric-selection guide</a> explains these choices using published research and PELIC, ICNALE, OANC and BAWE results, including length sensitivity, sampling agreement, missing scores and actual external-tool comparisons. No single measure answers every research question.</p>
-<p><a id="choose-a-research-question"></a></p>
+<p>Pass one text to <code><a href="reference/lexdiv_preprocessing.html">lexdiv_metrics_text()</a></code> or a document table (<code>data.frame</code> or <code>tibble</code>) to <code><a href="reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch()</a></code>. English tokenization (<code>tokenizer = "english"</code>) and lowercasing (<code>case = "lower"</code>) are used by default and recorded alongside the results:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ryuya-dot-com.github.io/ldfreq/">ldfreq</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">essays</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"essay_01"</span>, <span class="st">"essay_02"</span>, <span class="st">"empty_doc"</span><span class="op">)</span>,</span>
+<span>  text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span>
+<span>      <span class="st">"Students compared two versions of a short story in their writing class."</span>,</span>
+<span>      <span class="st">"They marked repeated words and discussed how each writer introduced new ideas."</span>,</span>
+<span>      <span class="st">"One group revised the opening while another group examined the ending."</span>,</span>
+<span>      <span class="st">"After reading the stories again, the students explained their choices and"</span>,</span>
+<span>      <span class="st">"saved both the original texts and their revised versions for later comparison."</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="st">"A short draft with too few words for a 50-token moving window."</span>,</span>
+<span>    <span class="st">""</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">batch</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch</a></span><span class="op">(</span><span class="va">essays</span>, metrics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ttr"</span>, <span class="st">"mattr"</span>, <span class="st">"hdd"</span>, <span class="st">"mtld"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">batch</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_text_batch_results: 3 documents; 70 audited tokens&gt;</span></span>
+<span><span class="co">#&gt; &lt;lexdiv_batch_results: 3 documents; 12 metric records; schema 0.1.0&gt;</span></span>
+<span><span class="co">#&gt;    document_id metric_id      value  status                    missing_reason  N  V</span></span>
+<span><span class="co">#&gt; 1     essay_01       ttr  0.7931034      ok                              &lt;NA&gt; 58 46</span></span>
+<span><span class="co">#&gt; 2     essay_01     mattr  0.8177778      ok                              &lt;NA&gt; 58 46</span></span>
+<span><span class="co">#&gt; 3     essay_01       hdd  0.8312797      ok                              &lt;NA&gt; 58 46</span></span>
+<span><span class="co">#&gt; 4     essay_01      mtld 78.4933333      ok                              &lt;NA&gt; 58 46</span></span>
+<span><span class="co">#&gt; 5     essay_02       ttr  0.9166667      ok                              &lt;NA&gt; 12 11</span></span>
+<span><span class="co">#&gt; 6     essay_02     mattr         NA missing too_short_for_requested_parameter 12 11</span></span>
+<span><span class="co">#&gt; 7     essay_02       hdd         NA missing too_short_for_requested_parameter 12 11</span></span>
+<span><span class="co">#&gt; 8     essay_02      mtld 40.3200000      ok                              &lt;NA&gt; 12 11</span></span>
+<span><span class="co">#&gt; 9    empty_doc       ttr         NA missing                       empty_input  0  0</span></span>
+<span><span class="co">#&gt; ...</span></span>
+<span></span>
+<span><span class="co"># Reshape directly to a wide reporting table and plot available scores:</span></span>
+<span><span class="va">wide</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lexdiv_widen.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">batch</span>, values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"missing_reason"</span>, <span class="st">"N"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">batch</span>, metric_id <span class="op">=</span> <span class="st">"mtld"</span><span class="op">)</span></span></code></pre></div>
+<p>Inspect <code>batch$token_audit</code> to verify every counted word, or bridge raw texts straight into corpus search and keyness with <code><a href="reference/lexdiv_import_annotations.html">lexdiv_as_annotations()</a></code>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ann</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lexdiv_import_annotations.html">lexdiv_as_annotations</a></span><span class="op">(</span><span class="va">essays</span><span class="op">)</span></span>
+<span><span class="va">kwic</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lexdiv_concordance.html">lexdiv_concordance</a></span><span class="op">(</span><span class="va">ann</span>, queries <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>story <span class="op">=</span> <span class="st">"stor*"</span><span class="op">)</span>,</span>
+<span>                           term_col <span class="op">=</span> <span class="st">"term"</span>, valuetype <span class="op">=</span> <span class="st">"glob"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">kwic</span>, <span class="st">"story"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="follow-a-workflow">Follow a workflow<a class="anchor" aria-label="anchor" href="#follow-a-workflow"></a>
+<h2 id="choose-your-workflow">Choose your workflow<a class="anchor" aria-label="anchor" href="#choose-your-workflow"></a>
 </h2>
-<p>Choose a question, then follow the linked example. The <a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#connect-the-analysis-steps">connection map</a> shows the inputs, functions and outputs for each route.</p>
+<p>Start with <code><a href="reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch()</a></code> for ordinary text analysis. Add the workflow tools below when the research design or reporting task needs them.</p>
 <table class="table">
 <colgroup>
-<col width="50%">
-<col width="50%">
+<col width="33%">
+<col width="33%">
+<col width="33%">
 </colgroup>
 <thead><tr>
-<th>Your question</th>
-<th>Connected workflow</th>
+<th>Research question</th>
+<th>Main functions</th>
+<th>Worked guide</th>
 </tr></thead>
 <tbody>
 <tr>
-<td>How do scores vary across texts or counting choices?</td>
+<td>How do lexical-diversity scores vary across texts or counting rules?</td>
 <td>
-<code><a href="reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch()</a></code> → inspect counts and status → <code><a href="reference/lexdiv_widen.html">lexdiv_widen()</a></code> / <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. <a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html">Text to report</a>
+<code><a href="reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch()</a></code> → <code><a href="reference/lexdiv_widen.html">lexdiv_widen()</a></code> / <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>
 </td>
+<td><a href="https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html">From text to report</a></td>
 </tr>
 <tr>
-<td>How do writers, tasks or occasions compare?</td>
-<td>Tokens + measurement plan → <code><a href="reference/lexdiv_metrics.html">lexdiv_metrics_batch()</a></code> → planned-observation table → one response per observation. <a href="https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html">Study tables and models</a>
+<td>How do writers, tasks, or occasions compare in longitudinal designs?</td>
+<td>
+<code><a href="reference/lexdiv_plan.html">lexdiv_plan()</a></code> → <code>lexdiv_metrics_text_batch(..., plan = plan)</code> → <code><a href="reference/lexdiv_study_table.html">lexdiv_study_table()</a></code> → <code><a href="reference/lexdiv_study_table.html">lexdiv_study_model_data()</a></code>
 </td>
+<td><a href="https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html">Repeated observations</a></td>
 </tr>
 <tr>
-<td>How frequent, familiar or morphologically varied are the words?</td>
-<td>Terms + declared reference → word matches and coverage → document summary. <a href="https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html">Lexical norms</a>, <a href="https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html">families and affixes</a>
+<td>How frequent, familiar, or morphologically varied is the vocabulary?</td>
+<td>
+<code><a href="reference/tubelex_profile.html">tubelex_profile_batch()</a></code>, <code><a href="reference/nj8_profile.html">nj8_profile_batch()</a></code>, <code><a href="reference/lexdiv_norm_profile.html">lexdiv_norm_profile()</a></code>, <code><a href="reference/lexdiv_family_profile.html">lexdiv_family_profile()</a></code>
 </td>
+<td><a href="https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html">Corpus reference profiles</a></td>
 </tr>
 <tr>
 <td>Which words and contexts explain a corpus pattern?</td>
-<td>Complete annotations → <code><a href="reference/lexdiv_concordance.html">lexdiv_concordance()</a></code> → positions / <code><a href="reference/lexdiv_collocations.html">lexdiv_collocations()</a></code>; <code><a href="reference/lexdiv_keyness.html">lexdiv_keyness()</a></code> → source contexts. <a href="https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html">Search</a>, <a href="https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html">keyness</a>
+<td>
+<code><a href="reference/lexdiv_import_annotations.html">lexdiv_as_annotations()</a></code> → <code><a href="reference/lexdiv_concordance.html">lexdiv_concordance()</a></code> → <code><a href="reference/lexdiv_collocations.html">lexdiv_collocations()</a></code> / <code><a href="reference/lexdiv_keyness.html">lexdiv_keyness()</a></code>
+</td>
+<td>
+<a href="https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html">Concordance &amp; dispersion</a> · <a href="https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html">Keyness</a>
 </td>
 </tr>
 <tr>
-<td>How do I prepare Japanese text?</td>
+<td>How do I analyze Japanese texts with morphological annotations?</td>
 <td>
-<code><a href="reference/lexdiv_import_annotations.html">lexdiv_import_annotations()</a></code> → explicit word selection → diversity or reference profiles. <a href="https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html">Japanese workflows</a>
-</td>
+<code><a href="reference/lexdiv_import_annotations.html">lexdiv_import_annotations()</a></code> → explicit unit/POS selection → diversity or norm profiles</td>
+<td><a href="https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html">Japanese annotations</a></td>
 </tr>
 </tbody>
 </table>
+<p>For repeated runs and portable reporting, development builds also provide reusable recipes and exports, described in the <a href="https://ryuya-dot-com.github.io/ldfreq/articles/index.html">guide index</a>: <code><a href="reference/lexdiv_recipe.html">lexdiv_recipe()</a></code> → <code><a href="reference/lexdiv_run_recipe.html">lexdiv_run_recipe()</a></code> → <code><a href="reference/lexdiv_write.html">lexdiv_write()</a></code>, with saved-analysis comparison, English/Japanese calculation descriptions, a folder CLI and a Python bridge to the same R engine. Recipes are optional for ordinary text analysis.</p>
 </div>
 <div class="section level2">
 <h2 id="optional-reference-data">Optional reference data<a class="anchor" aria-label="anchor" href="#optional-reference-data"></a>
 </h2>
-<p>The package code is MIT licensed. Third-party reference data are <strong>not bundled</strong>. Inspect the terms for the resource you need, then explicitly download it:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"tubelex"</span><span class="op">)</span>  <span class="co"># source, fixed version, license and size</span></span>
-<span><span class="co"># After reviewing the linked terms:</span></span>
+<p><code>ldfreq</code> code is MIT licensed and installs <strong>without</strong> third-party datasets. Core diversity metrics, custom norm/reference tables, and corpus tools work completely offline. To use optional external resources (<code>tubelex</code>, <code>nj8</code>, <code>morpholex</code>, <code>bnccoca</code>, <code>morphynet</code>), inspect their license terms first and download only what you need:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">info</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lexdiv_resources.html">lexdiv_resource_info</a></span><span class="op">(</span><span class="st">"tubelex"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/file.show.html" class="external-link">file.show</a></span><span class="op">(</span><span class="va">info</span><span class="op">$</span><span class="va">notice_path</span><span class="op">)</span>  <span class="co"># installed terms; no data download or internet needed</span></span>
 <span><span class="fu"><a href="reference/lexdiv_resources.html">lexdiv_download_resources</a></span><span class="op">(</span><span class="st">"tubelex"</span>, accept_license <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>The verified cache is reused offline; installation and ordinary calculations do not download data. MorphoLex remains CC BY-NC-SA 4.0, BNC/COCA CC BY-SA 4.0, MorphyNet CC BY-SA 3.0, TUBELEX BSD-3-Clause, and NJ8 has its own permission and attribution terms. Downloading a resource does not change its license.</p>
 </div>
 <div class="section level2">
-<h2 id="cite-the-version-you-used">Cite the version you used<a class="anchor" aria-label="anchor" href="#cite-the-version-you-used"></a>
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>Cite the exact <code>ldfreq</code> version used in your analysis alongside the relevant measurement methods and reference datasets:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"ldfreq"</span><span class="op">)</span></span></code></pre></div>
-<p>Komuro, R. (2026). <em>ldfreq: Reproducible Lexical Diversity and Frequency Profiles</em> (Version 1.0.0) [R package]. <a href="https://github.com/Ryuya-dot-com/ldfreq/tree/v1.0.0" class="external-link">Fixed release</a>.</p>
-<p>Also cite the selected measurement methods and any reference data you use. See <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/v1.0.0/CITATION.cff" class="external-link">CITATION.cff</a>, <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/v1.0.0/LICENSE.md" class="external-link">license</a>, and <a href="https://ryuya-dot-com.github.io/ldfreq/news/index.html">release notes</a>.</p>
+<p>The citation reports the installed version. Cite the stable release and the development snapshot separately when both were used.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -175,6 +253,8 @@
 <ul class="list-unstyled">
 <li><a href="https://github.com/Ryuya-dot-com/ldfreq/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/Ryuya-dot-com/ldfreq/issues" class="external-link">Report a bug</a></li>
+<li><a href="articles/getting-started.html">Read the Getting Started guide</a></li>
+<li><a href="articles/choosing-metrics.html">Choose the right metric</a></li>
 </ul>
 </div>
 
@@ -208,7 +288,16 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/Ryuya-dot-com/ldfreq/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/Ryuya-dot-com/ldfreq/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
+<li><a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a></li>
+<li><a href="https://cran.r-project.org/" class="external-link"><img src="https://img.shields.io/badge/R-%3E%3D%204.1.0-276DC3.svg?logo=r&amp;logoColor=white" alt="R &gt;= 4.1.0"></a></li>
+<li><a href="https://github.com/Ryuya-dot-com/ldfreq/blob/main/DESCRIPTION" class="external-link"><img src="https://img.shields.io/badge/dependencies-2%20(digest%2C%20stringi)-0072B2.svg" alt="Dependencies: 2"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>

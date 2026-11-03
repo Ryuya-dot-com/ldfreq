@@ -95,23 +95,23 @@ example.
 ## Value
 
 A plain list. `centroid` and `frequency` are complete contextual-import
-results ready for
-`lexdiv_evaluate_contextual(..., direction = "higher")`. Their
-processed/skipped status refers to the scoring stage; reasons also
-retain the original embedding-output status/reason. No new human
-selections are made. `candidates` preserves the supplied inventory with
-`n_selected`, `n_vectors` and `prototype_status` (`available`,
-`no_selected_reference`, `no_valid_vectors`, `zero_centroid`).
-`prototypes` contains normalized centroids in candidate-table row order;
-unavailable rows are `NA`. `training_occurrences` records reference
-choices, count/centroid inclusion and exclusion status.
-`query_occurrences` retains original model statuses and reasons beside
-`embedding_status`, score counts and each scorer's status. Full `query`,
-`training`, `reference` and declared `provenance` are retained. Save the
-whole result with [`saveRDS()`](https://rdrr.io/r/base/readRDS.html) to
-preserve this audit; the two score outputs alone retain training
-fingerprints and required declarations but not the complete training
-inputs.
+results. Pass them to
+[`lexdiv_evaluate_contextual`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_evaluate_contextual.md)
+with `direction = "higher"`. Their processed/skipped status refers to
+the scoring stage; reasons also retain the original embedding-output
+status/reason. No new human selections are made. `candidates` preserves
+the supplied inventory with `n_selected`, `n_vectors` and
+`prototype_status` (`available`, `no_selected_reference`,
+`no_valid_vectors`, `zero_centroid`). `prototypes` contains normalized
+centroids in candidate-table row order; unavailable rows are `NA`.
+`training_occurrences` records reference choices, count/centroid
+inclusion and exclusion status. `query_occurrences` retains original
+model statuses and reasons beside `embedding_status`, score counts and
+each scorer's status. Full `query`, `training`, `reference` and declared
+`provenance` are retained. Save the whole result with
+[`saveRDS()`](https://rdrr.io/r/base/readRDS.html) to preserve this
+audit; the two score outputs alone retain training fingerprints and
+required declarations but not the complete training inputs.
 
 ## See also
 

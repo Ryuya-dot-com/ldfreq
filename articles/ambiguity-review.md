@@ -35,6 +35,7 @@ morphological analyzer and inspect their alignment; successful import
 does not validate their meaning.
 
 ``` r
+
 library(ldfreq)
 
 segments <- data.frame(document_id = c("en", "en", "empty"),
@@ -66,6 +67,7 @@ inventory is bundled here.
 ## Inspect a KWIC row and the complete original segment
 
 ``` r
+
 review <- lexdiv_ambiguity_review(x, c("bank", "absent"), candidates, resource,
   window = 2)
 review$occurrences[c("segment_id", "token_index", "pre", "keyword", "post",
@@ -95,6 +97,7 @@ KWIC displays reconstruct token sequences with spaces. For exact
 original text, inspect `segment_text` and its character offsets:
 
 ``` r
+
 review$occurrences[c("document_id", "segment_id", "start", "end", "segment_text")]
 #>   document_id segment_id start end            segment_text
 #> 1          en         s1     5   8    The bank lent money.
@@ -119,6 +122,7 @@ occurrence; the second example sentence itself strongly suggests the
 river sense.
 
 ``` r
+
 decisions <- review$occurrences[c("review_id", "occurrence_id")]
 decisions$status <- c("selected", "unresolved")
 decisions$candidate_id <- c("bank-financial", NA_character_)
@@ -202,6 +206,7 @@ zeros. They are illustrations, not entries from a sense dictionary or
 independently validated annotations.
 
 ``` r
+
 library(ldfreq)
 worksheet_segments <- data.frame(
   document_id = c("en", "en", "other", "empty"),
@@ -247,6 +252,7 @@ API. Filtering a display is fine; retain all worksheet rows when saving
 this complete-sheet workflow.
 
 ``` r
+
 worksheet_context <- worksheet_before$occurrences[c("review_id", "occurrence_id",
   "document_id", "segment_id", "token_index", "surface", "pre", "keyword", "post",
   "start", "end", "segment_text", "candidate_count", "status")]
@@ -313,6 +319,7 @@ clear; its unresolved status illustrates workflow accounting, not a
 claim that its interpretation is unknowable.
 
 ``` r
+
 edited_sheet <- worksheet
 finance_row <- which(edited_sheet$segment_id == "s1" &
   edited_sheet$surface == "bank")
@@ -346,6 +353,7 @@ membership, required decision fields and whether the source/candidate
 snapshot still matches.
 
 ``` r
+
 input_helpers <- new.env(parent = baseenv())
 sys.source(system.file("examples", "text-file-input.R", package = "ldfreq",
   mustWork = TRUE), input_helpers)
@@ -382,6 +390,7 @@ read_review_sheet <- function(path, before) {
 ```
 
 ``` r
+
 worksheet_saved <- readRDS(file.path(review_dir, "review-before.rds"))
 worksheet_input <- read_review_sheet(
   file.path(review_dir, "decisions-edited.csv"), worksheet_saved)
@@ -431,6 +440,7 @@ denominator is the searched target occurrences, not all words, writers,
 or only occurrences with candidates.
 
 ``` r
+
 worksheet_report <- data.frame(
   document_id = unique(worksheet_after$source$segments$document_id))
 occ <- worksheet_after$occurrences
@@ -502,6 +512,7 @@ annotator performance. In a study, collect independent decisions before
 sharing them.
 
 ``` r
+
 decisions_b <- review$occurrences[c("review_id", "occurrence_id")]
 decisions_b$status <- "selected"
 decisions_b$candidate_id <- c("bank-river", "bank-river")
@@ -576,6 +587,7 @@ retained; the function does not infer a reading from the sentence or
 discard a candidate using upstream POS.
 
 ``` r
+
 ja_segments <- data.frame(document_id = "ja", segment_id = c("s1", "s2"),
   text = c("その店は人気がある。", "ここは人気がない。"))
 ja_tokens <- data.frame(document_id = "ja", segment_id = rep(c("s1", "s2"), c(7, 6)),
@@ -607,6 +619,7 @@ following chunk is explicit local-file work and is not run during
 installation or site building:
 
 ``` r
+
 source(system.file("examples", "wlsp-items.R", package = "ldfreq"))
 inventory <- wlsp_ambiguity_candidates("人気", "japanese-resources/bunruidb-fam.csv")
 wlsp_review <- lexdiv_ambiguity_review(ja, "人気",
@@ -686,6 +699,7 @@ not a general reference-frequency norm or evidence of each learner’s
 ability to use every sense.
 
 ``` r
+
 path <- tempfile(fileext = ".rds")
 bundle <- list(review_a = reviewed, review_b = review_b, comparison = comparison)
 saveRDS(bundle, path)

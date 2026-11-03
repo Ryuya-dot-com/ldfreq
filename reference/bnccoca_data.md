@@ -79,9 +79,10 @@ conflicting candidates. The default example uses only `dictionary`.
 The data and this conversion are CC BY-SA 4.0; independent R code
 remains MIT. Retain attribution, changes and ShareAlike conditions when
 redistributing the data. The complete license and notice are under
-`licenses/bnccoca/` inside the version directory returned by
-`lexdiv_resource_info("bnccoca")$path`. Other cached resources have
-separate terms.
+`licenses/bnccoca/` inside the version directory. For `"bnccoca"`, the
+`path` column returned by
+[`lexdiv_resource_info`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_resources.md)
+identifies that directory. Other cached resources have separate terms.
 
 ## References
 

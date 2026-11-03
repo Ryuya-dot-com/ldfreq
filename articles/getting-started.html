@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Getting started with ldfreq • ldfreq</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -20,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,10 +38,23 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+<li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Start here</h6></li>
+    <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/recipes-and-exports.html">Reuse settings and export an auditable analysis</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Input &amp; Japanese/English setup</h6></li>
+    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
+    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
+    <li><a class="dropdown-item" href="../articles/annotated-corpora.html">From corpus annotations to quanteda and lexical profiles</a></li>
+    <li><a class="dropdown-item" href="../articles/annotation-evaluation.html">Evaluate annotations and their effect on document scores</a></li>
+    <li><a class="dropdown-item" href="../articles/annotation-alignment.html">Compare token boundaries before comparing labels and document scores</a></li>
+    <li><a class="dropdown-item" href="../articles/ambiguity-review.html">Review lexical ambiguity with KWIC and original context</a></li>
+    <li><a class="dropdown-item" href="../articles/contextual-models.html">Connect contextual model outputs to research occurrences</a></li>
+    <li><a class="dropdown-item" href="../articles/open-access-papers.html">Analyze open-access academic papers</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -47,7 +65,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq" aria-label="GitHub repository"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -60,11 +78,10 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Getting started with ldfreq</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>Getting started with ldfreq</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/vignettes/getting-started.Rmd" class="external-link"><code>vignettes/getting-started.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/main/vignettes/getting-started.Rmd" class="external-link"><code>vignettes/getting-started.Rmd</code></a></small>
       <div class="d-none name"><code>getting-started.Rmd</code></div>
     </div>
 
@@ -90,18 +107,16 @@ workflow for research.</p>
 <span>  document_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"essay_a"</span>, <span class="st">"essay_b"</span>, <span class="st">"empty"</span><span class="op">)</span>,</span>
 <span>  text <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cats chase cats and dogs."</span>, <span class="st">"The reader reads a story."</span>, <span class="st">""</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch</a></span><span class="op">(</span></span>
-<span>  <span class="va">texts</span>, tokenizer <span class="op">=</span> <span class="st">"english"</span>, normalization <span class="op">=</span> <span class="st">"NFC"</span>,</span>
-<span>  case <span class="op">=</span> <span class="st">"lower"</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span></span>
-<span><span class="op">)</span></span>
+<span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_text_batch.html">lexdiv_metrics_text_batch</a></span><span class="op">(</span><span class="va">texts</span>, metrics <span class="op">=</span> <span class="st">"ttr"</span><span class="op">)</span></span>
 <span><span class="va">analysis</span><span class="op">$</span><span class="va">results</span></span>
 <span><span class="co">#&gt; &lt;lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0&gt;</span></span>
 <span><span class="co">#&gt;   document_id metric_id value  status missing_reason N V below_quality_floor</span></span>
 <span><span class="co">#&gt; 1     essay_a       ttr   0.8      ok           &lt;NA&gt; 5 4               FALSE</span></span>
 <span><span class="co">#&gt; 2     essay_b       ttr   1.0      ok           &lt;NA&gt; 5 5               FALSE</span></span>
 <span><span class="co">#&gt; 3       empty       ttr    NA missing    empty_input 0 0                TRUE</span></span></code></pre></div>
-<p><code>tokenizer = "english"</code> selects the English word rules;
-<code>case = "lower"</code> counts <code>Cats</code> and
+<p>By default, <code>tokenizer = "english"</code> applies the English
+word rules, <code>normalization = "NFC"</code> canonicalizes Unicode
+accents, and <code>case = "lower"</code> counts <code>Cats</code> and
 <code>cats</code> as the same form. This example counts surface forms,
 without lemmatization or part-of-speech filtering. These are measurement
 choices, not automatic corrections of the source text.</p>
@@ -258,7 +273,7 @@ recalculating them. Select scalar fields for CSV, keeping availability
 and word counts beside values. The complete <code>analysis</code> object
 still holds the settings and token audit.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_widen.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">analysis</span><span class="op">$</span><span class="va">results</span>,</span>
+<code class="sourceCode R"><span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_widen.html">lexdiv_widen</a></span><span class="op">(</span><span class="va">analysis</span>,</span>
 <span>  values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"status"</span>, <span class="st">"missing_reason"</span>, <span class="st">"N"</span>, <span class="st">"V"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">report</span></span>
 <span><span class="co">#&gt; &lt;lexdiv_wide_results: 3 rows; 6 columns&gt;</span></span>
@@ -470,14 +485,14 @@ both layers.</p>
 <span><span class="co">#&gt; [1] "ldfreq-preprocessing"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $contract_version</span></span>
-<span><span class="co">#&gt; [1] "0.4.0"</span></span>
+<span><span class="co">#&gt; [1] "1.0.0"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $tokenization</span></span>
 <span><span class="co">#&gt; $tokenization$contract_id</span></span>
 <span><span class="co">#&gt; [1] "ldfreq-preprocessing"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $tokenization$contract_version</span></span>
-<span><span class="co">#&gt; [1] "0.4.0"</span></span>
+<span><span class="co">#&gt; [1] "1.0.0"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $tokenization$tokenizer_id</span></span>
 <span><span class="co">#&gt; [1] "ldfreq-english-word-tokenizer"</span></span>
@@ -673,12 +688,14 @@ profiles therefore expose AntBNC-versus-headword conflicts and accept
 explicit upstream overrides.</p>
 </div>
 <div class="section level2">
-<h2 id="caller-supplied-lexical-norms">Caller-supplied lexical norms<a class="anchor" aria-label="anchor" href="#caller-supplied-lexical-norms"></a>
+<h2 id="custom-lexical-norms">Custom lexical norms<a class="anchor" aria-label="anchor" href="#custom-lexical-norms"></a>
 </h2>
-<p><code><a href="../reference/lexdiv_norm_profile.html">lexdiv_norm_profile()</a></code> exact-matches caller-prepared
-terms against one caller-supplied table. It does not download a norm,
-transform lookup terms, or infer that measures with different units and
-directions are comparable.</p>
+<p><code><a href="../reference/lexdiv_norm_profile.html">lexdiv_norm_profile()</a></code> exact-matches prepared terms
+against your own norm table (<code>data.frame</code> or
+<code>tibble</code>). You can run a quick exploratory profile directly,
+or attach explicit scale and citation metadata with
+<code><a href="../reference/lexdiv_norm_profile.html">lexdiv_norm_spec()</a></code> and
+<code><a href="../reference/lexdiv_norm_profile.html">lexdiv_resource_meta()</a></code>:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">synthetic_norms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cat"</span>, <span class="st">"run"</span>, <span class="st">"other"</span><span class="op">)</span>,</span>
@@ -686,29 +703,24 @@ directions are comparable.</p>
 <span>  concreteness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span>,</span>
 <span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">norm_specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  measure_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"familiarity"</span>, <span class="st">"concreteness"</span><span class="op">)</span>,</span>
-<span>  value_column <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"familiarity"</span>, <span class="st">"concreteness"</span><span class="op">)</span>,</span>
+<span><span class="va">norm_specs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_norm_profile.html">lexdiv_norm_spec</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"familiarity"</span>, <span class="st">"concreteness"</span><span class="op">)</span>,</span>
 <span>  construct_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subjective_familiarity"</span>, <span class="st">"concreteness"</span><span class="op">)</span>,</span>
-<span>  value_unit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"seven_point_rating"</span>, <span class="st">"seven_point_rating"</span><span class="op">)</span>,</span>
+<span>  value_unit <span class="op">=</span> <span class="st">"seven_point_rating"</span>,</span>
 <span>  direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"higher"</span>, <span class="st">"descriptive"</span><span class="op">)</span>,</span>
-<span>  language <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"English"</span>, <span class="st">"English"</span><span class="op">)</span>,</span>
-<span>  variety <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unspecified"</span>, <span class="st">"unspecified"</span><span class="op">)</span>,</span>
-<span>  population_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"example_adults"</span>, <span class="st">"example_adults"</span><span class="op">)</span>,</span>
-<span>  collection_year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2025"</span>, <span class="st">"2025"</span><span class="op">)</span>,</span>
-<span>  valid_min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  valid_max <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">7</span><span class="op">)</span>,</span>
-<span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  language <span class="op">=</span> <span class="st">"English"</span>,</span>
+<span>  population_id <span class="op">=</span> <span class="st">"example_adults"</span>,</span>
+<span>  collection_year <span class="op">=</span> <span class="st">"2025"</span>,</span>
+<span>  valid_min <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  valid_max <span class="op">=</span> <span class="fl">7</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">norm_resource</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span><span class="va">norm_resource</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_norm_profile.html">lexdiv_resource_meta</a></span><span class="op">(</span></span>
 <span>  resource_id <span class="op">=</span> <span class="st">"synthetic_norms"</span>,</span>
 <span>  resource_version <span class="op">=</span> <span class="st">"1"</span>,</span>
 <span>  creator <span class="op">=</span> <span class="st">"Project-authored example"</span>,</span>
-<span>  source_reference <span class="op">=</span> <span class="st">"Getting-started synthetic fixture"</span>,</span>
+<span>  source_reference <span class="op">=</span> <span class="st">"Getting-started synthetic example"</span>,</span>
 <span>  data_license <span class="op">=</span> <span class="st">"synthetic-example-only"</span>,</span>
-<span>  transformation_id <span class="op">=</span> <span class="st">"none"</span>,</span>
-<span>  lookup_unit <span class="op">=</span> <span class="st">"lowercase_lemma"</span>,</span>
-<span>  resource_key_normalization_id <span class="op">=</span> <span class="st">"caller-prepared-v1"</span></span>
+<span>  lookup_unit <span class="op">=</span> <span class="st">"lowercase_lemma"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">norm_profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_norm_profile.html">lexdiv_norm_profile</a></span><span class="op">(</span></span>
@@ -795,10 +807,12 @@ context-independent lexical sophistication.</p>
 <p>Passing a <code>lexdiv_tokenization</code> object requires
 <code>tokenization_mismatch = "allow"</code> for an explicit sensitivity
 analysis. High coverage alone cannot validate segmentation. For multiple
-documents, <code><a href="../reference/tubelex_profile.html">tubelex_profile_batch()</a></code> returns a named list of
-complete profiles while loading one verified resource snapshot per call.
-See <a href="designing-comparisons.html">designing comparisons guide</a>
-for a worked design.</p>
+documents, <code><a href="../reference/tubelex_profile.html">tubelex_profile_batch()</a></code> returns a structured
+<code>tubelex_profile_batch</code> object (<code>$summary</code>,
+<code>$lookup</code>, <code>$coverage</code>, and
+<code>$profiles</code>) while loading one verified resource snapshot per
+call. See <a href="designing-comparisons.html">designing comparisons
+guide</a> for a worked design.</p>
 </div>
 <div class="section level2">
 <h2 id="new-jacet-8000-lexical-levels">New JACET 8000 lexical levels<a class="anchor" aria-label="anchor" href="#new-jacet-8000-lexical-levels"></a>
@@ -1002,7 +1016,7 @@ publication size.</p>
 duplicating MTLD or turning descriptive token floors into alternative
 metric values.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_plan</a></span><span class="op">(</span>presets <span class="op">=</span> <span class="st">"length_50_100"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_plan.html">lexdiv_plan</a></span><span class="op">(</span>presets <span class="op">=</span> <span class="st">"length_50_100"</span><span class="op">)</span></span>
 <span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_metrics.html">lexdiv_metrics</a></span><span class="op">(</span><span class="va">tokens</span>, plan <span class="op">=</span> <span class="va">plan</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;lexdiv_profile_results: 6 specifications; schema 0.1.0&gt;</span></span>
@@ -1021,7 +1035,7 @@ metric values.</p>
 <span><span class="co">#&gt; 5               FALSE</span></span>
 <span><span class="co">#&gt; 6                TRUE</span></span>
 <span></span>
-<span><span class="va">screen</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_screen_lengths</a></span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span>
+<span><span class="va">screen</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_screen_lengths.html">lexdiv_screen_lengths</a></span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">screen</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         screen_schema_id screen_schema_version       profile_schema_id</span></span>
 <span><span class="co">#&gt; 1 lexdiv-r-screen-result                 0.1.0 lexdiv-r-profile-result</span></span>
@@ -1070,15 +1084,12 @@ metric values.</p>
 <code>plan</code> is set. The returned data frame keeps the plan
 fingerprint, request IDs and specification IDs. Save the plan and
 complete result together with <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS()</a></code> as in the earlier
-saving example. <code><a href="../reference/lexdiv_profile.html">lexdiv_profile()</a></code> and
-<code><a href="../reference/lexdiv_profile.html">lexdiv_profile_batch()</a></code> remain supported and return the same
-complete objects. The plan entry points accept pre-tokenized
-documents.</p>
-<p>Use <code><a href="../reference/lexdiv_profile.html">lexdiv_methods()</a></code> for methods accepted by plans. To
+saving example.</p>
+<p>Use <code><a href="../reference/lexdiv_plan.html">lexdiv_methods()</a></code> for methods accepted by plans. To
 inspect Maas and MTLD comparison definitions, select a different
 catalog:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">comparison_methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_methods</a></span><span class="op">(</span>scope <span class="op">=</span> <span class="st">"variants"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">comparison_methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_plan.html">lexdiv_methods</a></span><span class="op">(</span>scope <span class="op">=</span> <span class="st">"variants"</span><span class="op">)</span></span>
 <span><span class="va">comparison_methods</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"family"</span>, <span class="st">"method_id"</span>, <span class="st">"scale"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;   family                                               method_id</span></span>
 <span><span class="co">#&gt; 1   maas                                           maas_a2_ln_v1</span></span>
@@ -1100,20 +1111,17 @@ catalog:</p>
 <span><span class="co">#&gt; 8 adjusted-factor-length</span></span></code></pre></div>
 <p>Pass those method IDs to
 <code>lexdiv_variant_metrics(variants = ...)</code>; they are not all
-accepted by <code><a href="../reference/lexdiv_profile.html">lexdiv_spec()</a></code>.
-<code><a href="../reference/lexdiv_variant_metrics.html">lexdiv_variant_ids()</a></code> remains supported and returns the same
-catalog. The two scopes retain their own descriptive columns.</p>
+accepted by <code><a href="../reference/lexdiv_plan.html">lexdiv_spec()</a></code>. The two scopes retain their own
+descriptive columns.</p>
 <p>MATTR has an additional local diagnostic surface. It accepts a
 MATTR-only canonical plan and returns each complete moving-window value
 plus the number and nominal weight of windows containing each token
 position.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">methods</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_methods</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">mattr_method</span> <span class="op">&lt;-</span> <span class="va">methods</span><span class="op">$</span><span class="va">method_id</span><span class="op">[</span><span class="va">methods</span><span class="op">$</span><span class="va">metric_id</span> <span class="op">==</span> <span class="st">"mattr"</span><span class="op">]</span></span>
-<span><span class="va">mattr_plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_plan</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">mattr_plan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_plan.html">lexdiv_plan</a></span><span class="op">(</span></span>
 <span>  presets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  grids <span class="op">=</span> <span class="fu"><a href="../reference/lexdiv_profile.html">lexdiv_grid</a></span><span class="op">(</span></span>
-<span>    <span class="va">mattr_method</span>,</span>
+<span>  grids <span class="op">=</span> <span class="fu"><a href="../reference/lexdiv_plan.html">lexdiv_grid</a></span><span class="op">(</span></span>
+<span>    <span class="st">"mattr"</span>,</span>
 <span>    <span class="st">"window_length"</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span><span class="op">)</span>,</span>
 <span>    request_id_prefix <span class="op">=</span> <span class="st">"mattr"</span></span>
@@ -1205,7 +1213,7 @@ validated study design is needed to make claims about those
 constructs.</p>
 <p>The canonical preset contains eleven methods; moving-average MTLD and
 experimental expected-TTR D require explicit selection. Use
-<code><a href="../reference/lexdiv_profile.html">lexdiv_methods()</a></code> and <code><a href="../reference/lexdiv_profile.html">lexdiv_presets()</a></code> to
+<code><a href="../reference/lexdiv_plan.html">lexdiv_methods()</a></code> and <code><a href="../reference/lexdiv_plan.html">lexdiv_presets()</a></code> to
 inspect the thirteen supported methods and their bounded presets.</p>
 <p>Expected-TTR D fits an explicit D curve to exact finite-population
 expected TTR values. It uses no random sampling or arbitrary D cap and
@@ -1227,7 +1235,7 @@ variants. The separate variant surface makes those choices comparable
 without changing the canonical registry or silently replacing a
 method.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">variant_catalog</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_variant_metrics.html">lexdiv_variant_ids</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">variant_catalog</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lexdiv_plan.html">lexdiv_methods</a></span><span class="op">(</span>scope <span class="op">=</span> <span class="st">"variants"</span><span class="op">)</span></span>
 <span><span class="va">variant_catalog</span></span>
 <span><span class="co">#&gt;   family                                               method_id direction</span></span>
 <span><span class="co">#&gt; 1   maas                                           maas_a2_ln_v1     lower</span></span>
@@ -1329,9 +1337,9 @@ when an R list representation is convenient. Reading the files does not
 run a metric, download a resource, or expose caller file paths.</p>
 </div>
 <div class="section level2">
-<h2 id="offline-installed-package-check">Offline installed-package check<a class="anchor" aria-label="anchor" href="#offline-installed-package-check"></a>
+<h2 id="self-contained-offline-workflow-script">Self-contained offline workflow script<a class="anchor" aria-label="anchor" href="#self-contained-offline-workflow-script"></a>
 </h2>
-<p>An installed smoke script exercises the public workflows without
+<p>An installed example script exercises the public workflows without
 network access or an external runtime. This integration example requires
 all five reference resources to have been explicitly downloaded
 beforehand. The core examples earlier in this guide do not require

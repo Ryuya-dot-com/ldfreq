@@ -10,12 +10,14 @@ Core calculations and examples using your own tables do not require
 these downloads.
 
 ``` r
+
 lexdiv_resource_info(c("tubelex"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex"), accept_license = TRUE)
 ```
 
 ``` r
+
 has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
 ```
 
@@ -109,6 +111,7 @@ explicit. Global TTR supplies a useful contrast: it depends on the full
 document length.
 
 ``` r
+
 library(ldfreq)
 
 vocabulary <- c("river", "stone", "tree", "cloud")
@@ -153,11 +156,12 @@ A second common window asks whether the conclusion is sensitive to the
 local scale. Do not pool the scores as interchangeable measurements.
 
 ``` r
+
 mattr_method <- lexdiv_methods()$method_id[
   lexdiv_methods()$metric_id == "mattr"]
 plan <- lexdiv_plan(presets = character(), grids = lexdiv_grid(
   mattr_method, "window_length", c(20, 40), request_id_prefix = "window"))
-sensitivity <- lexdiv_profile_batch(documents, plan)
+sensitivity <- lexdiv_metrics_batch(documents, plan = plan)
 sensitivity[, c("document_id", "request_id", "value", "requested_parameters")]
 #> <lexdiv_profile_batch_results: 3 documents; 6 specification results; schema unknown>
 #>        document_id request_id      value
@@ -193,6 +197,7 @@ every token, including the last. The earlier min10 method is preserved
 for reproduction.
 
 ``` r
+
 mtld_boundary <- data.frame(N = c(50L, 51L, 52L, 59L, 60L))
 mtld_boundary$MTLD <- vapply(mtld_boundary$N, function(n) {
   lexdiv_metrics(rep("a", n), metrics = "mtld")$value
@@ -235,6 +240,7 @@ package; replace `folder` with your own input directory to check a
 study’s documents.
 
 ``` r
+
 folder <- system.file("examples", "text-input", "texts", package = "ldfreq")
 files <- sort(list.files(folder, pattern = "[.]txt$", full.names = TRUE))
 texts <- vapply(files, function(path) {
@@ -285,6 +291,7 @@ saved results from earlier versions. Other MTLD variants have different
 diagnostics.
 
 ``` r
+
 mtld_support_table <- function(x) {
   fields <- c("forward_score", "reverse_score", "forward_complete_factors",
     "reverse_complete_factors", "forward_tail_credit", "reverse_tail_credit")
@@ -412,6 +419,7 @@ This recipe reports Pearson and Spearman correlations with the
 missing and report their count rather than treating them as zero.
 
 ``` r
+
 length_associations <- function(results) {
   do.call(rbind, lapply(split(as.data.frame(results), results$metric_id), function(x) {
     stopifnot(!anyDuplicated(x$document_id)) # one setting per document/metric
@@ -504,6 +512,7 @@ tutorial code; it does not add fields to package results or change the
 MTLD definition.
 
 ``` r
+
 mtld_factor_screen <- function(x, threshold = 0.72) {
   stopifnot(is.character(x), !anyNA(x), all(nzchar(x)),
     is.numeric(threshold), length(threshold) == 1L,
@@ -541,6 +550,7 @@ the metric’s status or establish that a text is long enough for a
 study’s purposes.
 
 ``` r
+
 factor_screen <- do.call(rbind, lapply(tokens, mtld_factor_screen))
 factor_screen$document_id <- names(tokens)
 table(factor_screen$screen)
@@ -620,6 +630,7 @@ tokenizer in this package. Prepare and record a compatible external
 pipeline; these hand-prepared terms illustrate only one sentence.
 
 ``` r
+
 terms <- c("I", "do", "n't", "think", "it", "'s", "a", "book")
 frequency <- tubelex_profile(terms)
 frequency$summary[, c("weighting", "coverage", "mean_zipf")]

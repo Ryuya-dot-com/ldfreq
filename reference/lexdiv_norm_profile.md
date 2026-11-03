@@ -1,11 +1,8 @@
 # Profile Terms with Caller-Supplied Lexical Norms
 
 Computes token- and/or type-weighted arithmetic means for one or more
-lexical- norm variables. Matching is exact: the function neither
-tokenizes nor normalizes the supplied terms. Means use observed values
-from matched keys only. Resource coverage and annotation coverage are
-therefore returned separately and should accompany every interpretation
-of an estimate.
+lexical-norm variables from matched observed keys while reporting
+resource and annotation coverage separately.
 
 ## Usage
 
@@ -14,10 +11,35 @@ lexdiv_norm_profile(
   terms,
   norms,
   key,
-  measure_specs,
-  resource,
+  measure_specs = lexdiv_norm_spec(setdiff(names(norms), key)),
+  resource = lexdiv_resource_meta("caller_norms"),
   weightings = c("token", "type"),
   max_rows = 1e+06
+)
+
+lexdiv_norm_spec(
+  value_column,
+  measure_id = value_column,
+  construct_id = measure_id,
+  value_unit = "unspecified",
+  direction = "descriptive",
+  language = "unspecified",
+  variety = "unspecified",
+  population_id = "unspecified",
+  collection_year = "unspecified",
+  valid_min = NA_real_,
+  valid_max = NA_real_
+)
+
+lexdiv_resource_meta(
+  resource_id = "caller_resource",
+  resource_version = "unspecified",
+  creator = "unspecified",
+  source_reference = "unspecified",
+  data_license = "unspecified",
+  transformation_id = "none",
+  lookup_unit = "exact_term",
+  resource_key_normalization_id = "caller-prepared-v1"
 )
 
 # S3 method for class 'lexdiv_norm_profile'
@@ -28,14 +50,13 @@ print(x, ...)
 
 - terms:
 
-  A plain character vector with one caller-prepared lookup term per
-  element. Zero length is allowed. Terms are retained in `lookup`.
+  A character vector with one caller-prepared lookup term per element.
+  Zero length and named vectors are allowed.
 
 - norms:
 
-  An ordinary data frame containing one unique key column and the
-  numeric norm columns named by `measure_specs`. Other columns are
-  ignored and are not copied into the result.
+  A data frame or tibble containing one unique key column and the
+  numeric norm columns named by `measure_specs`.
 
 - key:
 
@@ -43,30 +64,38 @@ print(x, ...)
 
 - measure_specs:
 
-  An ordinary data frame with the exact ordered columns `measure_id`,
-  `value_column`, `construct_id`, `value_unit`, `direction`, `language`,
-  `variety`, `population_id`, `collection_year`, `valid_min`, and
-  `valid_max`. IDs must be unique; `direction` is `"higher"`, `"lower"`,
-  or `"descriptive"`; numeric bounds may be `NA`.
+  Data frame or tibble of 11 measure-specification columns (in any
+  column order). Defaults to:
+
+      lexdiv_norm_spec(setdiff(names(norms), key))
 
 - resource:
 
-  A plain named list with the exact ordered fields `resource_id`,
-  `resource_version`, `creator`, `source_reference`, `data_license`,
-  `transformation_id`, `lookup_unit`, and
-  `resource_key_normalization_id`. These are caller assertions recorded
-  for provenance; they do not establish redistribution rights.
+  Named list of 8 resource-metadata fields (in any field order), with
+  default:
+
+      lexdiv_resource_meta("caller_norms")
 
 - weightings:
 
-  A non-empty subset of `c("token", "type")`, without duplicates. Type
-  identity is the exact lookup term after no package-side
-  transformation.
+  A non-empty subset of `c("token", "type")`.
 
 - max_rows:
 
-  A positive whole-number bound on the combined rows planned for
-  `lookup`, `summary`, and `coverage`, checked before result allocation.
+  Positive whole-number row bound checked before allocation.
+
+- value_column, measure_id, construct_id, value_unit, direction,
+  language, variety, population_id, collection_year, valid_min,
+  valid_max:
+
+  Vectorized or scalar fields recycled across `value_column` by
+  `lexdiv_norm_spec()`.
+
+- resource_id, resource_version, creator, source_reference,
+  data_license, transformation_id, lookup_unit,
+  resource_key_normalization_id:
+
+  Scalar provenance fields assembled by `lexdiv_resource_meta()`.
 
 - x:
 
@@ -79,40 +108,15 @@ print(x, ...)
 
 ## Value
 
-A `lexdiv_norm_profile` list with `status`, `summary`, `lookup`,
-`coverage`, `provenance`, and `diagnostics`. `summary` contains
-conditional observed matched-only means and their denominators. `lookup`
-contains one input-major, measure-minor row per term and measure.
-`coverage` is the analysis-ready denominator projection of `summary`. No
-missing value is imputed and no automatic coverage threshold is applied.
-`print.lexdiv_norm_profile()` returns `x` invisibly.
-
-## Details
-
-For several documents sharing a reference table, use
-[`lexdiv_norm_profile_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile_batch.md)
-to validate the shared inputs once and retain separate document
-estimates and coverage under a global row bound.
-
-The three coverage rates have different denominators:
-`resource_coverage = matched_units / input_units`,
-`value_coverage = observed_value_units / input_units`, and
-`annotation_coverage = observed_value_units / matched_units`. A matched
-key with an `NA` norm is `missing_annotation`; an unmatched key is
-`not_applicable_oov`. The function does not infer a universal direction,
-compare unlike scales, form composite scores, or approve a data license.
+`lexdiv_norm_profile()` returns a `lexdiv_norm_profile` list with
+`status`, `summary`, `lookup`, `coverage`, `provenance`, and
+`diagnostics`. `lexdiv_norm_spec()` returns an 11-column specification
+data frame. `lexdiv_resource_meta()` returns an 8-element metadata list.
+[`print()`](https://rdrr.io/r/base/print.html) returns `x` invisibly.
 
 ## See also
 
 [`lexdiv_norm_profile_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile_batch.md)
-for separately identified documents; [prepare a reference table, inspect
-coverage and save the
-analysis](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html).
-
-[japanese norms
-guide](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.html)
-for stimulus-item tables, local Japanese norm files, scale
-interpretation and data terms.
 
 ## Examples
 
@@ -120,88 +124,38 @@ interpretation and data terms.
 norms <- data.frame(
   term = c("book", "read", "rare"),
   familiarity = c(6, 5, NA_real_),
-  stringsAsFactors = FALSE
-)
-specs <- data.frame(
-  measure_id = "familiarity",
-  value_column = "familiarity",
-  construct_id = "subjective_familiarity",
-  value_unit = "seven_point_rating",
-  direction = "higher",
-  language = "English",
-  variety = "unspecified",
-  population_id = "example_adults",
-  collection_year = "2025",
-  valid_min = 1,
-  valid_max = 7,
-  stringsAsFactors = FALSE
-)
-resource <- list(
-  resource_id = "example_norms",
-  resource_version = "2025-01",
-  creator = "Example creator",
-  source_reference = "Example citation",
-  data_license = "Example terms; verify before redistribution",
-  transformation_id = "none",
-  lookup_unit = "lowercase_lemma",
-  resource_key_normalization_id = "caller-prepared-v1"
+  aoa = c(4.2, 5.0, 11.5)
 )
 
-profile <- lexdiv_norm_profile(
-  c("book", "book", "rare", "unknown"),
-  norms,
-  "term",
-  specs,
-  resource
-)
-profile$summary
-#>   result_order   resource_id resource_version  measure_id
-#> 1            1 example_norms          2025-01 familiarity
-#> 2            2 example_norms          2025-01 familiarity
-#>             construct_id         value_unit direction language     variety
-#> 1 subjective_familiarity seven_point_rating    higher  English unspecified
-#> 2 subjective_familiarity seven_point_rating    higher  English unspecified
-#>    population_id collection_year                             statistic_id
-#> 1 example_adults            2025 arithmetic_mean_observed_matched_only_v1
-#> 2 example_adults            2025 arithmetic_mean_observed_matched_only_v1
-#>   weighting     type_identity estimate status missing_reason input_units
-#> 1     token              <NA>        6     ok           <NA>           4
-#> 2      type exact_lookup_term        6     ok           <NA>           3
-#>   matched_units unmatched_units observed_value_units
-#> 1             3               1                    2
-#> 2             2               1                    1
-#>   matched_missing_value_units resource_coverage value_coverage
-#> 1                           1         0.7500000      0.5000000
-#> 2                           1         0.6666667      0.3333333
-#>   annotation_coverage
-#> 1           0.6666667
-#> 2           0.5000000
-profile$coverage
-#>   result_order   resource_id resource_version  measure_id weighting input_units
-#> 1            1 example_norms          2025-01 familiarity     token           4
-#> 2            2 example_norms          2025-01 familiarity      type           3
-#>   matched_units unmatched_units observed_value_units
-#> 1             3               1                    2
-#> 2             2               1                    1
-#>   matched_missing_value_units resource_coverage value_coverage
-#> 1                           1         0.7500000      0.5000000
-#> 2                           1         0.6666667      0.3333333
-#>   annotation_coverage
-#> 1           0.6666667
-#> 2           0.5000000
-profile$lookup
-#>   input_index    term  measure_id       lookup_status value       value_status
-#> 1           1    book familiarity    matched_resource     6           observed
-#> 2           2    book familiarity    matched_resource     6           observed
-#> 3           3    rare familiarity    matched_resource    NA missing_annotation
-#> 4           4 unknown familiarity unknown_to_resource    NA not_applicable_oov
-print(profile)
-#> <lexdiv_norm_profile: ok; example_norms@2025-01; 1 measure; 4 lookup rows; schema 0.1.0>
+# Concise call with automatic measure_specs and resource defaults:
+quick <- lexdiv_norm_profile(c("book", "book", "rare", "unknown"), norms, "term")
+quick
+#> <lexdiv_norm_profile: ok; caller_norms@unspecified; 2 measures; 8 lookup rows; schema 0.1.0>
 #>   measure_id weighting estimate status missing_reason resource_coverage
-#>  familiarity     token        6     ok           <NA>         0.7500000
-#>  familiarity      type        6     ok           <NA>         0.6666667
+#>  familiarity     token 6.000000     ok           <NA>         0.7500000
+#>  familiarity      type 6.000000     ok           <NA>         0.6666667
+#>          aoa     token 6.633333     ok           <NA>         0.7500000
+#>          aoa      type 7.850000     ok           <NA>         0.6666667
 #>  annotation_coverage
 #>            0.6666667
 #>            0.5000000
+#>            1.0000000
+#>            1.0000000
 #> Means are conditional on observed matched values; inspect $coverage.
+
+# Explicit publication-ready metadata via helpers:
+specs <- lexdiv_norm_spec(
+  c("familiarity", "aoa"),
+  direction = c("higher", "lower"),
+  valid_min = c(1, 0),
+  valid_max = c(7, 25)
+)
+meta <- lexdiv_resource_meta("example_norms", resource_version = "2025-01")
+profile <- lexdiv_norm_profile(c("book", "read"), norms, "term", specs, meta)
+profile$summary[, c("measure_id", "weighting", "estimate", "value_coverage")]
+#>    measure_id weighting estimate value_coverage
+#> 1 familiarity     token      5.5              1
+#> 2 familiarity      type      5.5              1
+#> 3         aoa     token      4.6              1
+#> 4         aoa      type      4.6              1
 ```

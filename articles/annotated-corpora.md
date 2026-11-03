@@ -15,6 +15,7 @@ installation is needed.
 ## Read an annotated document
 
 ``` r
+
 library(ldfreq)
 
 header <- system.file("extdata", "masc-example", "example.anc", package = "ldfreq")
@@ -57,6 +58,7 @@ authored Penn tag `.`. This small example is not a complete punctuation
 policy for all corpora or tagsets.
 
 ``` r
+
 words <- corpus$tokens[corpus$tokens$pos != ".", ]
 q <- lexdiv_as_quanteda(words, corpus$segments)
 as.list(q$tokens)
@@ -98,6 +100,7 @@ This is a setting of the running R session, not a restriction on Macs.
 Check the session used for your analysis:
 
 ``` r
+
 l10n_info()[["UTF-8"]]
 #> [1] TRUE
 ```
@@ -113,6 +116,7 @@ documentation](https://stat.ethz.ch/R-manual/R-devel/library/base/html/locales.h
 ## Use quanteda for n-grams and original-document frequencies
 
 ``` r
+
 ng <- quanteda::tokens_ngrams(q$tokens, n = 2:4)
 segment_counts <- quanteda::dfm(ng, tolower = FALSE)
 document_counts <- quanteda::dfm_group(
@@ -149,6 +153,7 @@ Search the original token object, not the n-gram token object whose
 positions refer to a transformed sequence.
 
 ``` r
+
 hits <- as.data.frame(quanteda::kwic(q$tokens, "re-use", valuetype = "fixed"))
 locations <- q$positions[c("quanteda_docname", "token_index", "document_id",
                            "annotation_id", "start", "end")]
@@ -187,6 +192,7 @@ parser, or infer idiomatic meanings.
 Run the complete English/Japanese illustration:
 
 ``` r
+
 example_env <- new.env()
 sys.source(system.file("examples", "phrase-list-demo.R", package = "ldfreq"),
            envir = example_env)
@@ -234,6 +240,7 @@ where sentences end.
 Provide a named list of explicit component vectors:
 
 ``` r
+
 phrases <- list(
   long = c("In", "the", "end", "of", "the", "day"),
   nested = c("the", "end"),
@@ -262,6 +269,7 @@ information with the list. Merely putting spaces into a Japanese
 expression does not establish token boundaries.
 
 ``` r
+
 source(system.file("examples", "phrase-list-kwic.R", package = "ldfreq"), local = TRUE)
 a <- example_env$annotations
 keep <- !a$tokens$surface %in% c(",", ".", "。", "very")
@@ -344,6 +352,7 @@ automatically a word-only or eligible-window denominator.
 Keep a full result for replay and a separate review table for judgments:
 
 ``` r
+
 path <- tempfile(fileext = ".rds")
 saveRDS(result, path)
 restored <- readRDS(path)
@@ -390,6 +399,7 @@ use optional quanteda \>= 4.5.0 in a UTF-8 R session. The standalone
 example runs offline, without a corpus, model or API key:
 
 ``` r
+
 source(system.file("examples", "phrase-review-demo.R",
   package = "ldfreq", mustWork = TRUE), local = TRUE)
 phrase_after$documents
@@ -406,6 +416,7 @@ To follow the review step by step, prepare the same inputs below, then
 run the export, decision and save chunks in order.
 
 ``` r
+
 library(ldfreq)
 source(system.file("examples", "phrase-list-kwic.R", package = "ldfreq",
   mustWork = TRUE), local = TRUE)
@@ -479,6 +490,7 @@ expansion or discontinuous search is implied.
 For your own unchanged search result, start with:
 
 ``` r
+
 source(system.file("examples", "phrase-list-kwic.R",
   package = "ldfreq", mustWork = TRUE), local = TRUE)
 before <- phrase_list_review(my_search,
@@ -488,6 +500,7 @@ before <- phrase_list_review(my_search,
 ### Export context separately from the editable worksheet
 
 ``` r
+
 phrase_review_dir <- tempfile("ldfreq-phrase-review-")
 dir.create(phrase_review_dir)
 saveRDS(phrase_before, file.path(phrase_review_dir, "review-before.rds"), version = 2)
@@ -523,6 +536,7 @@ leave some rows unresolved or unreviewed. They are not automated
 semantic analysis.
 
 ``` r
+
 # Illustrative edits to the worksheet; in a study inspect context and edit the CSV.
 phrase_sheet <- phrase_before$worksheet
 complete_docs <- phrase_sheet$document_id %in% c("en", "ja")
@@ -545,6 +559,7 @@ write.csv(phrase_sheet, file.path(phrase_review_dir, "decisions-edited.csv"),
 ### Reapply by identity, then inspect counts and coverage
 
 ``` r
+
 phrase_reader <- new.env(parent = baseenv())
 sys.source(system.file("examples", "text-file-input.R", package = "ldfreq",
   mustWork = TRUE), phrase_reader)
@@ -628,12 +643,12 @@ or alter TTR, MATTR or MTLD.
 
 For teacher preparation, the [DDL material
 example](https://ryuya-dot-com.github.io/ldfreq/articles/ddl-materials.md)
-(development 0.5.0.9001) uses an explicit subset of accepted occurrences
-to create learner HTML, a separate teacher table and a complete private
-record. It retains pending candidates and does not change this review’s
-criterion.
+uses an explicit subset of accepted occurrences to create learner HTML,
+a separate teacher table and a complete private record. It retains
+pending candidates and does not change this review’s criterion.
 
 ``` r
+
 phrase_record <- list(before = phrase_saved, after = phrase_after,
   worksheet_input = phrase_csv, session = sessionInfo())
 saveRDS(phrase_record, file.path(phrase_review_dir, "analysis.rds"), version = 2)
@@ -672,8 +687,7 @@ Two researchers may read the same `take off` match differently. The
 question here is **whether they make the same inclusion decision, and
 whether their decisions change the document profile**. It is not a test
 of phrase-detection recall: expressions absent from the list have not
-been sampled for review. The following guide-local code runs with the
-existing 0.3.0.9003 installation.
+been sampled for review.
 
 The design follows these distinctions in the annotation literature:
 
@@ -703,6 +717,7 @@ repeated pass by one person as intra-rater comparison instead. The
 helper below is local to this guide.
 
 ``` r
+
 compare_phrase_reviews <- function(a, b, reviewers) {
   if (!is.character(reviewers) || length(reviewers) != 2L ||
       anyNA(reviewers) || anyDuplicated(reviewers) ||
@@ -779,6 +794,7 @@ different completion states. **It is simulated teaching material, not an
 independent human rating.**
 
 ``` r
+
 review_a <- phrase_after
 sheet_b <- phrase_before$worksheet
 complete <- sheet_b$document_id %in% c("en", "ja")
@@ -872,6 +888,7 @@ excluded states remain in the comparison. Install `irr` separately to
 run this block.
 
 ``` r
+
 # install.packages("irr")  # once, when this optional analysis is needed
 stopifnot(requireNamespace("irr", quietly = TRUE))
 phrase_kappa <- do.call(rbind, lapply(names(phrase_comparison$ratings), function(id) {
@@ -903,6 +920,7 @@ this block reconstructs [Artstein and Poesio’s Tables
 describe dialogue-act categories, not learner data.
 
 ``` r
+
 published_ratings <- data.frame(
   a = rep(c("STAT", "IREQ", "STAT", "IREQ"), c(20, 20, 10, 50)),
   b = rep(c("STAT", "STAT", "IREQ", "IREQ"), c(20, 20, 10, 50)))
@@ -942,6 +960,7 @@ is an explicit working-copy choice, not automatic acceptance of A
 whenever the raters differ.
 
 ``` r
+
 discussion <- review_a$worksheet
 edit <- (discussion$document_id == "en" & discussion$segment_id == "s2") |
   (discussion$document_id == "en" & discussion$phrase_id == "departure_long") |
@@ -1014,6 +1033,7 @@ original profiles side by side, with their completion status; do not
 turn a discussion result into an independent third rating.
 
 ``` r
+
 agreement_record <- list(comparison = phrase_comparison,
   discussion_log = discussion_log, after_discussion = after_discussion,
   profiles = phrase_profiles, session = sessionInfo())
@@ -1061,6 +1081,7 @@ phrase-inventory completeness or learner proficiency.
 ## Connect to the existing ldfreq reference workflow
 
 ``` r
+
 prepared <- q$positions
 prepared$term <- prepared$surface
 sequences <- lexdiv_ngrams(prepared,
@@ -1084,6 +1105,7 @@ as the same tokenization.
 Save source evidence with the analysis:
 
 ``` r
+
 path <- tempfile(fileext = ".rds")
 saveRDS(list(corpus = corpus, quanteda = q, sequences = sequences), path)
 restored <- readRDS(path)
@@ -1103,6 +1125,7 @@ analysis therefore needs an explicit missingness policy even when
 surface tokens are available.
 
 ``` r
+
 headers <- list.files("/path/to/Mini-MASC/data", pattern = "\\.anc$",
                       recursive = TRUE, full.names = TRUE)
 masc <- lexdiv_read_masc(headers, resource_version = "Mini-MASC-1.0")
@@ -1159,7 +1182,7 @@ file import. These functions do not yet provide a validated standard
 MASC/OANC frequency resource.
 
 Once inputs have been validated,
-[`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md)
+[`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_build_ngram_reference.md)
 can accumulate references in whole-document chunks. This avoids
 retaining every occurrence table, while counts and the document roster
 remain in memory. See the [n-gram

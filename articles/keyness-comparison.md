@@ -19,6 +19,7 @@ learner data or an evaluation of annotation accuracy.
 ## Declare the documents and inspect the coverage
 
 ``` r
+
 library(ldfreq)
 
 demo <- new.env(parent = globalenv())
@@ -39,6 +40,7 @@ document `outside` is not in either corpus. Empty documents remain
 declared documents; they do not supply tokens to the denominator.
 
 ``` r
+
 print(demo$annotations$segments[c("document_id", "text")], row.names = FALSE)
 #>  document_id                           text
 #>           t1 learn learn learn learn read .
@@ -58,6 +60,7 @@ explains how to prepare complete, aligned annotations with original
 offsets.
 
 ``` r
+
 comparison <- lexdiv_keyness(annotations,
   target = target_document_ids, reference = reference_document_ids,
   preprocessing_id = "lemma-exclude-punctuation-v1",
@@ -92,6 +95,7 @@ repeat the comparison if its membership changes.
 ## Read counts before scores
 
 ``` r
+
 counts <- comparison$results
 print(counts[c("term", "target_count", "reference_count",
   "target_documents", "reference_documents")], row.names = FALSE)
@@ -107,6 +111,7 @@ table includes **all other counted terms**, not just words chosen for
 display:
 
 ``` r
+
 word <- subset(counts, term == "learn")
 table2 <- rbind(target = c(word$target_count, word$target_other),
   reference = c(word$reference_count, word$reference_other))
@@ -127,6 +132,7 @@ probabilities described by [Dunning (1993, Section
 cell is retained in `$results`.
 
 ``` r
+
 print(counts[c("term", "target_per_1000", "reference_per_1000", "log_ratio")],
   digits = 4, row.names = FALSE)
 #>   term target_per_1000 reference_per_1000 log_ratio
@@ -178,6 +184,7 @@ workflow](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.
 ## Select rows while retaining the original comparison
 
 ``` r
+
 selected <- lexdiv_keyness(comparison$source,
   target = comparison$settings$target, reference = comparison$settings$reference,
   preprocessing_id = comparison$settings$preprocessing_id,
@@ -209,6 +216,7 @@ of the word’s absence.
 ## Return to exactly the counted occurrences
 
 ``` r
+
 context <- lexdiv_keyness_concordance(comparison, "learn", window = 2L)
 hits <- context$search$occurrences
 hits$corpus <- comparison$documents$corpus[
@@ -251,6 +259,7 @@ For research, replace `file` below with a lasting private path such as
 disappear when R closes.
 
 ``` r
+
 record <- list(comparison = comparison,
   target_reason = "Authored target documents for checking the calculation",
   reference_reason = "Disjoint authored reference with known counts",
@@ -269,6 +278,7 @@ stopifnot(identical(replayed, reopened$comparison))
 In a fresh R session, use the same package snapshot and your saved path:
 
 ``` r
+
 library(ldfreq)
 reopened <- readRDS("keyness-record.rds")
 reopened$comparison$results

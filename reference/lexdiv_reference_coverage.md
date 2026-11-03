@@ -193,8 +193,12 @@ research design.
 
 The installed `reference-coverage-contract.json` file fixes formulas,
 empty/invalid-input behavior, output shape, and the privacy boundary.
-Locate it with
-`system.file("spec", "reference-coverage-contract.json", package = "ldfreq")`.
+Locate it with:
+
+    system.file(
+      "spec", "reference-coverage-contract.json",
+      package = "ldfreq"
+    )
 
 ## Value
 

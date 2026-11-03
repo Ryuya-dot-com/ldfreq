@@ -20,6 +20,7 @@ writing it again uses only ldfreq’s required packages.
 ## Run the authored English and Japanese examples
 
 ``` r
+
 demo <- new.env(parent = globalenv())
 sys.source(system.file("examples", "ddl-materials-demo.R",
   package = "ldfreq", mustWork = TRUE), demo)
@@ -51,6 +52,7 @@ examples does not imply that the complete candidate collection has been
 reviewed.
 
 ``` r
+
 output <- tempfile("ldfreq-teaching-")
 files <- helper$ddl_material_write(x, output)
 stopifnot(identical(readRDS(files["record"]), x))
@@ -98,6 +100,7 @@ language. The following continues from `before`, a
 `phrase_list_review()` result:
 
 ``` r
+
 write.csv(before$worksheet, "decisions.csv", row.names = FALSE,
   na = "<MISSING>", fileEncoding = "UTF-8")
 # In the table, edit only status, reviewer and reason; keep every original row.
@@ -117,6 +120,7 @@ worksheet presented as a completed lesson.
 ## Supply the teaching tables
 
 ``` r
+
 x$activities
 #>   activity_id
 #> 1     observe
@@ -153,6 +157,7 @@ declaration supplied by the teacher, not an automated license check or
 permission grant.
 
 ``` r
+
 rebuilt <- helper$ddl_material(
   review = x$review,
   activities = x$activities,
@@ -206,6 +211,7 @@ judgment.
 ## Reopen and reproduce without a new search
 
 ``` r
+
 library(ldfreq)
 helper <- new.env(parent = globalenv())
 sys.source(system.file("examples", "ddl-materials.R",

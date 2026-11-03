@@ -33,7 +33,7 @@ or another package's MTLD implementation is numerically identical to the
 defined target method.
 
 Use these records to interpret advisory flags and
-[`lexdiv_screen_lengths`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md),
+[`lexdiv_screen_lengths`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_screen_lengths.md),
 not to choose a measure from a token cutoff alone. The [metric-selection
 guide](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html)
 also reports the package's corpus comparisons, length sensitivity and

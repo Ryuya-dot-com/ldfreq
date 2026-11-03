@@ -27,6 +27,7 @@ of the same spelling, not a demonstrated related-sense manipulation. Use
 real annotations for a real study.
 
 ``` r
+
 library(ldfreq)
 
 words <- list(c("The", "bank", "lent", "money", "."),
@@ -119,6 +120,7 @@ Keep the reference separate from the imported model output and its
 original human review.
 
 ``` r
+
 decisions <- input[c("review_id", "occurrence_id")]
 decisions$status <- c("selected", "selected", "selected", "unresolved")
 decisions$candidate_id <- c("financial", "river", "popularity", NA_character_)
@@ -231,6 +233,7 @@ illustration. They are not an independent annotation study or a trained
 BERT benchmark.
 
 ``` r
+
 train_words <- list(c("Her", "bank", "approved", "a", "loan", "."),
                     c("A", "bank", "holds", "deposits", "."),
                     c("We", "rested", "by", "the", "bank", "."),
@@ -364,6 +367,7 @@ RDS files are not access controls, tamper-proof registration or proof
 that a researcher did not inspect test examples.
 
 ``` r
+
 template <- system.file("examples", "contextual-study", package = "ldfreq", mustWork = TRUE)
 study_dir <- tempfile("ldfreq-study-") # Choose a permanent new folder for your study.
 dir.create(study_dir)
@@ -508,6 +512,7 @@ used. It is not a trained WSD model and does not produce candidate
 scores.
 
 ``` r
+
 # Explicit optional step: jsonlite is a suggested package.
 # 'review' and 'input' are the unchanged objects created above.
 request_path <- tempfile(fileext = ".json")
@@ -579,6 +584,7 @@ needs quanteda and UTF-8 for the same reason as the earlier KWIC
 example.
 
 ``` r
+
 proposal_tools <- new.env(parent = baseenv())
 for (script in c("candidate-proposals.R", "candidate-proposals-demo.R")) {
   sys.source(system.file("examples", script, package = "ldfreq", mustWork = TRUE),
@@ -639,6 +645,7 @@ automatically accept the model’s proposals or constitute independent
 human validation.
 
 ``` r
+
 human_decisions <- illustration$review$occurrences[1:2,
   c("review_id", "occurrence_id")]
 human_decisions$status <- "selected"
@@ -680,6 +687,7 @@ Outputs](https://developers.openai.com/api/docs/guides/structured-outputs).
 The following chunk is not evaluated when the guide is built:
 
 ``` r
+
 # Continue from the offline example above. Set OPENAI_API_KEY privately first.
 # If needed, run install.packages(c("httr2", "jsonlite")) once.
 api_plan <- illustration$plan
@@ -774,6 +782,7 @@ annotations, and collect separate evidence when interpreting a norm or
 inferring learner knowledge.
 
 ``` r
+
 saved <- tempfile(fileext = ".rds")
 saveRDS(imported, saved)
 stopifnot(identical(readRDS(saved), imported))

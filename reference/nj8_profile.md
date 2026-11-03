@@ -372,46 +372,108 @@ once.
 ## Examples
 
 ``` r
-# Optional data: review and explicitly download these resources first.
-if (all(lexdiv_resource_info(c("nj8"))$available)) {
-nj8_profile(c("the", "true", "false", "nan"))
-
+# Caller-supplied wordlist works completely offline:
 wordlist <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
   Word = c("the", "develop", "rare", "extreme")
 )
 profile <- nj8_profile(
   c("The", "develop", "unknown", "the"),
-  wordlist = NULL,
+  wordlist = wordlist,
   unit = "surface"
 )
 profile$summary
+#>    weighting level level_label items proportion cumulative_items
+#> 1      token     1     Level 1     2  0.5000000                2
+#> 2      token     2     Level 2     1  0.2500000                3
+#> 3      token     3     Level 3     0  0.0000000                3
+#> 4      token     4     Level 4     0  0.0000000                3
+#> 5      token     5     Level 5     0  0.0000000                3
+#> 6      token     6     Level 6     0  0.0000000                3
+#> 7      token     7     Level 7     0  0.0000000                3
+#> 8      token     8     Level 8     0  0.0000000                3
+#> 9      token    NA    Off-list     1  0.2500000               NA
+#> 10      type     1     Level 1     1  0.3333333                1
+#> 11      type     2     Level 2     1  0.3333333                2
+#> 12      type     3     Level 3     0  0.0000000                2
+#> 13      type     4     Level 4     0  0.0000000                2
+#> 14      type     5     Level 5     0  0.0000000                2
+#> 15      type     6     Level 6     0  0.0000000                2
+#> 16      type     7     Level 7     0  0.0000000                2
+#> 17      type     8     Level 8     0  0.0000000                2
+#> 18      type    NA    Off-list     1  0.3333333               NA
+#>    cumulative_proportion
+#> 1              0.5000000
+#> 2              0.7500000
+#> 3              0.7500000
+#> 4              0.7500000
+#> 5              0.7500000
+#> 6              0.7500000
+#> 7              0.7500000
+#> 8              0.7500000
+#> 9                     NA
+#> 10             0.3333333
+#> 11             0.6666667
+#> 12             0.6666667
+#> 13             0.6666667
+#> 14             0.6666667
+#> 15             0.6666667
+#> 16             0.6666667
+#> 17             0.6666667
+#> 18                    NA
 profile$coverage
+#> $input_tokens
+#> [1] 4
+#> 
+#> $eligible_tokens
+#> [1] 4
+#> 
+#> $excluded_tokens
+#> [1] 0
+#> 
+#> $selection_coverage
+#> [1] 1
+#> 
+#> $matched_tokens
+#> [1] 3
+#> 
+#> $off_list_tokens
+#> [1] 1
+#> 
+#> $token_coverage
+#> [1] 0.75
+#> 
+#> $eligible_types
+#> [1] 3
+#> 
+#> $matched_types
+#> [1] 2
+#> 
+#> $off_list_types
+#> [1] 1
+#> 
+#> $type_coverage
+#> [1] 0.6666667
+#> 
 
 batch <- nj8_profile_batch(
   list(doc_a = c("The", "develop"), doc_b = c("rare", "outside")),
-  wordlist = NULL,
+  wordlist = wordlist,
   unit = "surface"
 )
 batch$coverage
+#>   document_id input_tokens eligible_tokens excluded_tokens selection_coverage
+#> 1       doc_a            2               2               0                  1
+#> 2       doc_b            2               2               0                  1
+#>   matched_tokens off_list_tokens token_coverage eligible_types matched_types
+#> 1              2               0            1.0              2             2
+#> 2              1               1            0.5              2             1
+#>   off_list_types type_coverage
+#> 1              0           1.0
+#> 2              1           0.5
 
-contract_path <- system.file(
-  "spec", "lexical-level-profile-contract.json", package = "ldfreq"
-)
-stopifnot(nzchar(contract_path))
-basename(contract_path)
-
-if (FALSE) { # \dontrun{
-# A legitimately obtained official workbook can be used directly.
-official <- nj8_profile(
-  c("the", "develop", "unknown"),
-  "/path/to/j8_2016.xlsx"
-)
-} # }
-
-if (interactive()) {
-  plot(profile)
-  plot(profile, weighting = "type", include_off_list = FALSE)
-}
+# Optional cached NJ8 snapshot:
+if (all(lexdiv_resource_info(c("nj8"))$available)) {
+  nj8_profile(c("the", "true", "false", "nan"))
 }
 ```

@@ -2,16 +2,24 @@
 
 ### Start here
 
+First steps from a raw text table to metrics, figures, saved RDS
+records, and empirical guidance on choosing measures.
+
 - [Getting started with
   ldfreq](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.md):
 - [Choosing a lexical-diversity
   measure](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.md):
 - [From files to a diagnostic
   report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.md):
+- [Reuse settings and export an auditable
+  analysis](https://ryuya-dot-com.github.io/ldfreq/articles/recipes-and-exports.md):
 - [Release scope and
   compatibility](https://ryuya-dot-com.github.io/ldfreq/articles/release-scope.md):
 
 ### Prepare and check your input
+
+Read TXT/CSV files, configure English tokenization, import Japanese
+morphological annotations, and review ambiguous forms in context.
 
 - [English tokenization and document
   input](https://ryuya-dot-com.github.io/ldfreq/articles/english-tokenization.md):
@@ -31,6 +39,10 @@
   papers](https://ryuya-dot-com.github.io/ldfreq/articles/open-access-papers.md):
 
 ### Describe words and reference coverage
+
+Set up optional reference data and profile frequency, lexical levels,
+word families, roots/affixes, n-grams, and Japanese psycholinguistic
+norms.
 
 - [Optional reference data and
   licenses](https://ryuya-dot-com.github.io/ldfreq/articles/reference-data.md):
@@ -55,6 +67,10 @@
 
 ### Explain patterns with source contexts
 
+Connect corpus statistics back to exact source occurrences via KWIC
+concordances, dispersion, collocations, keyness, ordination, and
+dependencies.
+
 - [Search words and phrases, then inspect their
   distribution](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.md):
 - [Count nearby words and explain their
@@ -68,6 +84,10 @@
 
 ### Design comparisons and report results
 
+Plan longitudinal writer/task/occasion studies, mixed-effects model
+tables, vocabulary test comparisons, readability, and syntactic
+complexity.
+
 - [Designing comparable lexical-diversity
   analyses](https://ryuya-dot-com.github.io/ldfreq/articles/designing-comparisons.md):
 - [From planned observations to a mixed
@@ -80,6 +100,9 @@
   table](https://ryuya-dot-com.github.io/ldfreq/articles/syntactic-complexity.md):
 
 ### Prepare teaching materials
+
+Track vocabulary recurrence across textbook units and build data-driven
+learning (DDL) handouts from reviewed corpus examples.
 
 - [Trace target vocabulary through textbook pages and
   units](https://ryuya-dot-com.github.io/ldfreq/articles/textbook-progression.md):

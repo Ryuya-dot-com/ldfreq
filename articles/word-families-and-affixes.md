@@ -36,6 +36,7 @@ visible; their TTR values are not recommendations for comparing short
 and long essays.
 
 ``` r
+
 library(ldfreq)
 recipes <- new.env(parent = baseenv())
 sys.source(system.file("examples", "family-count-comparison.R",
@@ -64,12 +65,14 @@ Core calculations and examples using your own tables do not require
 these downloads.
 
 ``` r
+
 lexdiv_resource_info(c("morpholex", "bnccoca", "morphynet"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("morpholex", "bnccoca", "morphynet"), accept_license = TRUE)
 ```
 
 ``` r
+
 has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
 has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
 has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
@@ -88,6 +91,7 @@ absent from the chosen family inventory. The supplied lemmas leave
 silently mixed with lemmatization.
 
 ``` r
+
 segments <- data.frame(
   document_id = c("listed", "unlisted", "empty"), segment_id = "s1",
   text = c("use uses colour color", "use reusability", ""))
@@ -125,6 +129,7 @@ zero types and undefined TTR.
 ### Check coverage before interpreting a smaller count
 
 ``` r
+
 knitr::kable(counts$documents[c("document_id", "selected_tokens",
   "matched_tokens", "unlisted_tokens", "common_tokens", "token_coverage")],
   digits = 2, row.names = FALSE,
@@ -160,6 +165,7 @@ work. Its five lexical tokens are
 the imported source and is excluded from the count.
 
 ``` r
+
 sys.source(system.file("examples", "word-parts-demo.R",
   package = "ldfreq", mustWork = TRUE), recipes)
 parts <- recipes$word_parts_example$profile
@@ -187,6 +193,7 @@ inflection/derivation describes **process**. They are two
 classifications of the same affix, not four counts to add together.
 
 ``` r
+
 knitr::kable(parts$frequency[parts$frequency$document_id == "parts",
   c("part_id", "canonical", "role", "process", "observed_occurrences")],
   col.names = c("Part ID", "Form", "Position", "Process", "Occurrences"),
@@ -207,6 +214,7 @@ knitr::kable(parts$frequency[parts$frequency$document_id == "parts",
 | ION      | ion   | suffix   | derivation |           1 |
 
 ``` r
+
 knitr::kable(parts$documents[c("document_id", "selected_tokens",
   "complete_coverage", "observed_affix_occurrences", "affix_occurrences",
   "affixes_per_token")], digits = 2, row.names = FALSE,
@@ -221,6 +229,7 @@ knitr::kable(parts$documents[c("document_id", "selected_tokens",
 | empty | 0 | NA | 0 | 0 | NA |
 
 ``` r
+
 # Follow a count back to its original token and supplied analysis.
 knitr::kable(parts$part_occurrences[
   parts$part_occurrences$surface == "teachers",
@@ -282,6 +291,7 @@ contextual judgments separately.
 ### Inspect recorded segmentation before counting it
 
 ``` r
+
 forms <- c("transmit", "transport", "transmission", "teacher", "teachers")
 morpholex <- recipes$read_morpholex_parts(
   sheets = c("0-1-0", "0-1-1", "1-1-0"), words = forms)
@@ -311,6 +321,7 @@ for source variables, provenance and an optional local-workbook route.
 ### Keep alternative formation relations separate
 
 ``` r
+
 morphynet <- morphynet_read_derivations(file.path(lexdiv_resource_info("morphynet")$path,
   "extdata", "morphynet-example", "eng.derivational.example.tsv"), language = "en", resource_version = "Nine-row teaching excerpt")
 r <- morphynet$relations
@@ -342,6 +353,7 @@ needed and check [`l10n_info()`](https://rdrr.io/r/base/l10n_info.html)
 before this exercise; there is no automatic environment change.
 
 ``` r
+
 sys.source(system.file("examples", "morphology-link.R",
   package = "ldfreq", mustWork = TRUE), recipes)
 review_segments <- data.frame(document_id = c("a", "b", "unlisted", "empty"),
@@ -376,6 +388,7 @@ from the reference; occurrence IDs distinguish the two uses of the same
 spelling.
 
 ``` r
+
 review <- initial$reviews$morphynet
 decisions <- review$occurrences[review$occurrences$surface == "reusability",
   c("review_id", "occurrence_id")]
@@ -422,6 +435,7 @@ set; resume from the latest saved set to retain earlier choices. Changed
 sources or references require a new review.
 
 ``` r
+
 stopifnot(identical(initial$occurrences[c("document_id", "segment_id",
   "token_index", "surface", "family_id")],
   linked$occurrences[c("document_id", "segment_id", "token_index", "surface", "family_id")]))
@@ -447,6 +461,7 @@ Lemma-based comparisons require a supplied lemma column; missing values
 are not guessed.
 
 ``` r
+
 segments <- read.csv("segments.csv", colClasses = "character",
   na.strings = character(), fileEncoding = "UTF-8", check.names = FALSE)
 tokens <- read.csv("tokens.csv", colClasses = "character",
@@ -478,6 +493,7 @@ project directory for your research. If the optional review was skipped,
 `linked` is `NULL`.
 
 ``` r
+
 output_dir <- file.path(tempdir(), "ldfreq-morphology-tutorial")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 bundle <- list(families = families, counts = counts, nation = nation,
@@ -505,6 +521,7 @@ earlier example objects. Replaying a saved optional review also requires
 quanteda and UTF-8.
 
 ``` r
+
 library(ldfreq)
 saved <- readRDS(file.path("results", "morphology", "analysis.rds"))
 recipes <- new.env(parent = baseenv())

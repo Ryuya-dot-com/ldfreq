@@ -67,6 +67,7 @@ same declared feature; this does not establish comparable feature
 coverage across languages.
 
 ``` r
+
 library(ldfreq)
 
 env <- new.env(parent = baseenv())
@@ -106,6 +107,7 @@ row number is not an occurrence identity.
 ## Report counts beside coverage
 
 ``` r
+
 predicted <- example$predicted
 predicted$documents[c("document_id", "tokens", "analyzed_tokens", "token_coverage",
   "observed_pairs", "pairs", "pairs_with_unit", "types", "status")]
@@ -168,6 +170,7 @@ complete type total is `NA`.
 ## Compare occurrences as well as totals
 
 ``` r
+
 example$differences
 #>   document_id reference_pairs predicted_pairs delta_pairs reference_types
 #> 1     english               2               1          -1               2
@@ -213,6 +216,7 @@ to examine segmentation changes before defining a cross-segmentation
 dependency evaluation.
 
 ``` r
+
 draw_pair_distributions <- function(example, monochrome = FALSE) {
   d <- example$differences
   keep <- d$evaluated & example$reference$documents$tokens > 0
@@ -253,6 +257,7 @@ for final-size export.
 ## Save inputs and reproduce the result
 
 ``` r
+
 path <- tempfile(fileext = ".rds")
 saveRDS(example$inputs, path)
 saved <- readRDS(path)
@@ -306,11 +311,13 @@ If you set the environment variable, retrieve its value in your R
 session:
 
 ``` r
+
 model_file <- Sys.getenv("LDFREQ_UDPIPE_MODEL")
 stopifnot(nzchar(model_file), file.exists(model_file))
 ```
 
 ``` r
+
 source(system.file("examples", "udpipe-amod.R", package = "ldfreq", mustWork = TRUE), local = TRUE)
 stopifnot(file.exists(model_file), file.info(model_file)$size > 0)
 model_sha256 <- digest::digest(file = model_file, algo = "sha256")
@@ -368,6 +375,7 @@ filtering or normalization did not occur upstream.
 ## Compare parser occurrences to the authored example
 
 ``` r
+
 ref_occ <- subset(example$reference$occurrences, document_id %in% roster$document_id)
 key <- c("document_id", "segment_id", "dependent_start", "dependent_end", "head_start", "head_end")
 ref <- ref_occ[key]; ref$in_reference <- rep(TRUE, nrow(ref))
@@ -403,6 +411,7 @@ to that reference. These small, visible authored cases demonstrate a
 workflow, not independent accuracy estimates.
 
 ``` r
+
 # Overlay the original count distributions; color is the default.
 parser_plot <- list(differences = transform(document_comparison, evaluated = TRUE,
                       predicted_pairs = pairs),
@@ -412,6 +421,7 @@ draw_pair_distributions(parser_plot)
 ```
 
 ``` r
+
 record <- list(raw_annotation = raw_annotation, segments = roster, provenance = metadata,
                imported = parsed, pairs = actual, comparison = occurrence_comparison,
                document_comparison = document_comparison, session = sessionInfo())

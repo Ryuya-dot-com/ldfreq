@@ -25,8 +25,8 @@ lexdiv_download_resources(resources, accept_license = FALSE, cache_dir = NULL)
 
 - accept_license:
 
-  Exactly `TRUE` after reviewing each resource's `license_url` and
-  `notice_url`. Defaults to `FALSE`, which refuses downloads.
+  Exactly `TRUE` after reviewing each resource's `notice_path` and
+  license terms. Defaults to `FALSE`, which refuses downloads.
 
 - cache_dir:
 
@@ -38,11 +38,19 @@ lexdiv_download_resources(resources, accept_license = FALSE, cache_dir = NULL)
 
 ## Value
 
-A data frame with resource name, fixed version, license and notice URLs,
-download bytes, verified availability, cache path, archive URL, SHA-256
-and citation. The downloader returns it invisibly.
+A data frame with resource name, fixed version, license URL, local
+`notice_path`, `notice_url` (a local `file://` URL), download bytes,
+verified availability, cache path, archive URL, SHA-256 and citation.
+The downloader returns it invisibly.
 
 ## Details
+
+Resource notices and license texts are installed with the code, so they
+can be read before downloading any data and without an internet
+connection. Use `file.show(info$notice_path)` or
+`readLines(info$notice_path)` for one selected resource. The local
+copies match the pinned download bundle. These explanatory files contain
+no reference dataset.
 
 Archives are downloaded from a fixed release and checked for byte count,
 SHA-256, expected member names and individual file hashes before
@@ -76,8 +84,17 @@ lexdiv_resource_info()[c("resource", "license", "available", "download_bytes")]
 #> 3 morpholex                        CC-BY-NC-SA-4.0     FALSE        1336656
 #> 4   bnccoca                           CC-BY-SA-4.0     FALSE         518734
 #> 5 morphynet                           CC-BY-SA-3.0     FALSE           9184
+info <- lexdiv_resource_info("tubelex")
+head(readLines(info$notice_path, encoding = "UTF-8"))
+#> [1] "# TUBELEX attribution and change notice"                                         
+#> [2] ""                                                                                
+#> [3] "This package's bundled English frequency/prevalence index is derived solely"     
+#> [4] "from an already published aggregate **TUBELEX** frequency table. It does not use"
+#> [5] "or distribute source subtitles."                                                 
+#> [6] ""                                                                                
 if (FALSE) { # \dontrun{
-# Review the source, license_url and notice_url before downloading.
+# Open the local terms before downloading. Adjacent files contain CC licenses.
+file.show(info$notice_path)
 lexdiv_download_resources("tubelex", accept_license = TRUE)
 lexdiv_resource_info("tubelex")
 } # }

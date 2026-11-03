@@ -19,6 +19,7 @@ on learner writing or validity as a proficiency measure.
 ## Inspect an example before running a parser
 
 ``` r
+
 library(ldfreq)
 
 demo <- new.env(parent = globalenv())
@@ -71,6 +72,7 @@ different tokenization.
 ## Follow a value back to the source
 
 ``` r
+
 print(subset(analysis$results,
   document_id %in% c("manual_coord_clauses", "manual_finite_complement", "manual_fragment_NP"),
   select = c("document_id", "measure", "numerator", "denominator",
@@ -159,6 +161,7 @@ text must be nonmissing UTF-8. Additional research metadata stays in
 your independently saved roster.
 
 ``` r
+
 helper <- new.env(parent = globalenv())
 sys.source(system.file("examples", "l2sca.R", package = "ldfreq", mustWork = TRUE), helper)
 documents <- data.frame(document_id = c("d1", "d2"),
@@ -190,6 +193,7 @@ Invalid UTF-8 process output is retained as base64 and marked failed
 rather than silently decoded into usable text.
 
 ``` r
+
 documents <- readRDS("original-documents.rds")
 analysis <- helper$l2sca_import("syntax-trace.json", documents)
 analysis$components
@@ -241,6 +245,7 @@ outputs and their statuses together.
 ## Carry review decisions and missing observations into a study
 
 ``` r
+
 print(demo$review[c("document_id", "decision", "reason")], row.names = FALSE)
 #>                  document_id       decision
 #>         manual_coord_clauses        include
@@ -325,6 +330,7 @@ For research, replace `saved` below with a lasting private path such as
 disappear when R closes.
 
 ``` r
+
 saved <- tempfile(fileext = ".rds")
 saveRDS(demo$record, saved, version = 2)
 restored <- readRDS(saved)
@@ -338,6 +344,7 @@ In a fresh R session, use the same package snapshot and your saved path.
 Inspecting the saved trace does not require Java or a parser model:
 
 ``` r
+
 library(ldfreq)
 helper <- new.env(parent = globalenv())
 sys.source(system.file("examples", "l2sca.R", package = "ldfreq",

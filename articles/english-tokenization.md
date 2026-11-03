@@ -10,12 +10,14 @@ Core calculations and examples using your own tables do not require
 these downloads.
 
 ``` r
+
 lexdiv_resource_info(c("tubelex", "nj8"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
 ```
 
 ``` r
+
 has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
 ```
 
@@ -33,9 +35,10 @@ ldfreq offers an English lexical tokenizer that runs in R with its
 existing `stringi` dependency, without Python, model downloads, or an
 external service.
 
-Select it explicitly with `tokenizer = "english"`. The default
-`"unicode"` retains the original segmentation for compatibility with
-existing analyses.
+`tokenizer = "english"` and `case = "lower"` are the defaults for
+raw-text functions. Pass `tokenizer = "unicode"` or `case = "preserve"`
+when a study requires pure Unicode character-class splitting or
+case-sensitive forms.
 
 Tokenization does not correct learner spelling or grammar. Preserve the
 source and declare any correction policy separately. The [reviewed-text
@@ -44,6 +47,7 @@ keeps approved, rejected and unresolved edits and compares complete
 original and revised texts without treating off-list words as errors.
 
 ``` r
+
 library(ldfreq)
 
 text <- "John’s well-known book costs 3.14. See https://example.org on 2026-10-04."
@@ -106,6 +110,7 @@ sensitivity example illustrates the consequences; it does not establish
 that either rule is universally superior.
 
 ``` r
+
 comparison_text <- "Read read at https://example.org on 2026-10-04."
 prepared <- lapply(c("unicode", "english"), function(rule) {
   lexdiv_tokenize(comparison_text, tokenizer = rule, case = "lower")
@@ -168,6 +173,7 @@ alternatives actually present in the resource; it is not a comprehensive
 British/American conversion table.
 
 ``` r
+
 spelling_lookup <- nj8_profile(c("colour", "color", "centre", "center",
   "theatre", "theater"), unit = "surface")
 spelling_lookup$lookup[, c("surface_term", "lookup_term", "matched", "level")]
@@ -279,6 +285,7 @@ are explicitly reviewed; this is not an automatically validated or
 comprehensive spelling dictionary.
 
 ``` r
+
 policy_example <- new.env(parent = environment())
 sys.source(system.file("examples", "lexical-counting-policy.R", package = "ldfreq",
   mustWork = TRUE), envir = policy_example)
@@ -310,6 +317,7 @@ on selected known tokens. The three-token MATTR window is illustrative
 only.
 
 ``` r
+
 policy_path <- tempfile(fileext = ".rds")
 saveRDS(list(result = counting, session = sessionInfo()), policy_path)
 stopifnot(identical(readRDS(policy_path)$result, counting))
@@ -325,14 +333,14 @@ validity or a preferred universal exclusion policy.
 
 Use one row per document, with explicit unique IDs and character text.
 Other columns, such as writer or task, are not selected automatically.
-From 0.3.0.9005, pass them explicitly with `metadata` to keep a checked
-study table in the result; see the [file
-example](#retain-study-metadata) below. Empty text is a valid zero-token
-document. `NA` text is an error naming the document; decide whether it
-denotes missing data before analysis rather than silently replacing it
-with an empty string.
+Pass them explicitly with `metadata` to keep a checked study table in
+the result; see the [file example](#retain-study-metadata) below. Empty
+text is a valid zero-token document. `NA` text is an error naming the
+document; decide whether it denotes missing data before analysis rather
+than silently replacing it with an empty string.
 
 ``` r
+
 essays <- data.frame(
   essay_id = c("essay_02", "essay_01", "empty"),
   response = c("The student reads a book and discusses the book.",
@@ -364,6 +372,7 @@ analysis$results
 ```
 
 ``` r
+
 levels <- nj8_profile_batch(tokens, unit = "surface")
 levels$coverage
 ```
@@ -424,6 +433,7 @@ text-input/
 ```
 
 ``` r
+
 library(ldfreq)
 input_helpers <- new.env(parent = baseenv())
 sys.source(system.file("examples", "text-file-input.R",
@@ -475,6 +485,7 @@ With subdirectories, retain their relative paths so that two files named
 `essay.txt` are distinguishable.
 
 ``` r
+
 selected_files <- file.path("texts", list.files(
   file.path(input_dir, "texts"), pattern = "[.]txt$",
   recursive = FALSE, ignore.case = TRUE))
@@ -538,6 +549,7 @@ quotation marks and line breaks. Do not split such a CSV with
 physical line as one document.
 
 ``` r
+
 csv_input <- input_helpers$read_text_file(file.path(input_dir, "essays.csv"))
 csv_documents <- read.csv(text = csv_input$text,
   colClasses = "character", na.strings = "<MISSING>", check.names = FALSE)
@@ -571,6 +583,7 @@ distribution; keep it common across comparable texts rather than
 shrinking it for short documents.
 
 ``` r
+
 file_tokens <- lexdiv_tokenize_batch(file_documents,
   id_col = "document_id", text_col = "text", tokenizer = "english",
   normalization = "NFC", case = "lower")
@@ -639,6 +652,7 @@ complete object to retain the typed metadata table together with the
 analysis.
 
 ``` r
+
 plot(file_analysis, metric_id = "mattr", xlab = "Document", las = 2)
 ```
 
@@ -658,6 +672,7 @@ image.
 ### Save the input, decisions and results together
 
 ``` r
+
 file_record <- list(documents = file_documents, sources = file_sources,
   file_map = file_map, csv_source = csv_input$source,
   metadata = file_metadata, metadata_source = metadata_input$source,
@@ -686,6 +701,7 @@ under the same access conditions as the original material.
 Reading is independent of the annotation language:
 
 ``` r
+
 japanese_input <- input_helpers$read_text_file(file.path(input_dir, "japanese.txt"))
 cat(japanese_input$text)
 #> 学生は図書館で本を読みました。
@@ -720,6 +736,7 @@ normalization.
 ## Save the complete analysis
 
 ``` r
+
 record <- list(tokens = tokens, diversity = analysis, nj8 = levels,
                session = sessionInfo())
 path <- tempfile(fileext = ".rds")

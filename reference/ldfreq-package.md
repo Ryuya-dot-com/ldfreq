@@ -12,11 +12,9 @@ reasons for unavailable scores.
 
 After installing the package, run:
 
+
     library(ldfreq)
-    result <- lexdiv_metrics_text(
-      "Cats chase cats and dogs.",
-      tokenizer = "english", case = "lower", metrics = "ttr"
-    )
+    result <- lexdiv_metrics_text("Cats chase cats and dogs.", metrics = "ttr")
     result$results
 
 The text has five word occurrences (`N = 5`) and four distinct lowercase
@@ -49,20 +47,23 @@ For ordinary text analyses, inspect `result$results` and
 or plot document values with `plot(result, metric_id = "ttr")`. Save the
 original text and complete result together as RDS.
 
-For planned observations, start with token vectors and a
-[`lexdiv_plan`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
-Pass the complete output of
-[`lexdiv_metrics_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)`(tokens, plan = plan)`,
-together with the schedule, submissions and reporting decisions, to
+For planned observations, create a
+[`lexdiv_plan`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
+and run either
+[`lexdiv_metrics_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)`(tokens, plan = plan)`
+or
+[`lexdiv_metrics_text_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md)`(texts, plan = plan)`,
+then pass the result together with the schedule, submissions and
+reporting decisions to
 [`lexdiv_study_table`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md).
-Then use
+Use
 [`lexdiv_study_model_data`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_study_table.md)
-to select one response per observation for a modelling package. The
-raw-text convenience functions do not accept a plan; their result tables
-cannot replace this plan-based input.
+to select one response per observation for a modelling package.
 
 For source-linked exploration, prepare complete annotations using
-[`lexdiv_import_annotations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md).
+[`lexdiv_import_annotations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md)
+or bridge raw texts/tokenizations directly with
+[`lexdiv_as_annotations`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_import_annotations.md).
 A saved
 [`lexdiv_concordance`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
 search feeds
@@ -291,7 +292,7 @@ Choose the entry point from the form of data you already have:
 - Chunked reference construction:
 
   Use
-  [`lexdiv_ngram_reference_build`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md)
+  [`lexdiv_build_ngram_reference`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_build_ngram_reference.md)
   to accumulate exact counts from whole-document chunks without
   retaining all occurrence tables. Distinct types and the document
   roster stay in memory.
@@ -299,7 +300,7 @@ Choose the entry point from the form of data you already have:
 - Reference-choice sensitivity:
 
   Use
-  [`lexdiv_ngram_compare`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md)
+  [`lexdiv_compare_ngrams`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_ngrams.md)
   to retain separate reference coverage and compare frequencies on
   common target items, with explicit baseline differences and
   denominators.
@@ -368,7 +369,7 @@ attribution and applicable ShareAlike conditions), separately from the
 MIT license of the independent R code. Adjacent bigram/trigram
 extraction and caller-supplied reference frequencies retain segment
 boundaries, original positions, opportunity totals and coverage.
-[`lexdiv_ngram_compare`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md)
+[`lexdiv_compare_ngrams`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_ngrams.md)
 compares reference choices using the same target items, retaining
 coverage and common-set differences from a baseline. Result rows retain
 method, parameter or denominator, schema, and contract provenance.
@@ -569,13 +570,13 @@ selected unit and annotation. It is not a plagiarism detector or a
 direct measure of semantic similarity, coherence, proficiency, or
 writing quality.
 
-## Quality screens
+## Token-count screens
 
 `below_quality_floor` and
-[`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-are advisory token-count evidence screens. Here, quality is a field name
-retained for compatibility; it does not mean writing quality,
-measurement validity, or reliability. The screens never change a value,
+[`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_screen_lengths.md)
+are advisory token-count evidence screens derived from empirical
+length-stability studies; they do not measure writing quality, construct
+validity, or score reliability. The screens never change a value,
 effective parameter, status, or document membership. Passing a screen
 does not establish validity or reliability; failing one does not erase
 an otherwise computable value.
@@ -589,14 +590,13 @@ keeps a change in tokenization or resource matching from silently
 redefining a core metric. Expected-TTR D is separately named and
 explicitly distinguished from CLAN VOCD.
 
-## Offline smoke test
+## Self-contained offline example
 
-After loading ldfreq, run the installed script returned by
+After loading ldfreq, you can run the self-contained example script at
 `system.file("examples", "offline-smoke.R", package = "ldfreq")`. It
-exercises single, batch, profile, local-MATTR, profile-batch,
-term/content-word overlap, many-document reference coverage,
-lexical-norm, lexical-level, and screen workflows without a network
-connection or external runtime.
+exercises single, batch, plan, local-MATTR, term/content-word overlap,
+reference coverage, custom norm, and lexical-level workflows end to end
+without a network connection or external runtime.
 
 ## See also
 
@@ -608,7 +608,7 @@ connection or external runtime.
 [`lexdiv_reference_coverage`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_reference_coverage.md),
 [`lexdiv_norm_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile.md),
 [`lexdiv_norm_profile_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile_batch.md),
-[`lexdiv_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md),
+[`lexdiv_plan`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md),
 [`lexdiv_mattr_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_mattr_profile.md),
 [`lexdiv_variant_metrics`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md),
 [`nj8_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/nj8_profile.md),
@@ -620,10 +620,7 @@ connection or external runtime.
 library(ldfreq)
 
 # One raw English text: inspect the score and the counted words.
-result <- lexdiv_metrics_text(
-  "Cats chase cats and dogs.",
-  tokenizer = "english", case = "lower", metrics = "ttr"
-)
+result <- lexdiv_metrics_text("Cats chase cats and dogs.", metrics = "ttr")
 result$results  # N = 5, V = 4, TTR = 0.8
 #> <lexdiv_results: 1 metric; contract 0.2.0>
 #>   metric_id value status missing_reason N V below_quality_floor
@@ -645,9 +642,7 @@ result$token_audit
 # Several texts: names identify documents, including the empty one.
 texts <- c(essay_a = "Cats chase cats and dogs.", essay_b = "The reader reads a story.",
   empty = "")
-batch <- lexdiv_metrics_text_batch(
-  texts, tokenizer = "english", case = "lower", metrics = "ttr"
-)
+batch <- lexdiv_metrics_text_batch(texts, metrics = "ttr")
 batch$results  # TTR = 0.8, 1, NA; the empty text has reason "empty_input".
 #> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
 #>   document_id metric_id value  status missing_reason N V below_quality_floor

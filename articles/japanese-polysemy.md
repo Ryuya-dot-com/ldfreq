@@ -30,6 +30,7 @@ data license is **CC BY-NC-SA 3.0**; apply its conditions to extracts
 and joined tables. The MIT code license does not replace it.
 
 ``` r
+
 data_dir <- "japanese-resources"
 dir.create(data_dir, showWarnings = FALSE)
 polysemy_path <- file.path(data_dir, "polysemous.txt")
@@ -69,6 +70,7 @@ phrases; it does not establish a mapping. An exact `WORD` match may
 still leave several records.
 
 ``` r
+
 reference$data[grepl("人気", reference$data$WORD, fixed = TRUE), c("WID", "WORD", "LABEL")]
 reference$data[reference$data$WORD == "【犬】（いぬ）", c("WID", "WORD", "LABEL")]
 ```
@@ -79,6 +81,7 @@ leaves the lookup key unresolved; a supplied key absent from the table
 is instead unmatched.
 
 ``` r
+
 items <- data.frame(item_id = paste0("item_", 1:6),
   condition = c("A", "B", "A", "B", "A", "B"),
   term = c("人気", "人気", "犬", "犬", "未登録の例語", "判断保留"),
@@ -126,6 +129,7 @@ candidate mapping is explicit; the helper does not infer it from the
 observed surface.
 
 ``` r
+
 segments <- data.frame(document_id = "ja", segment_id = c("s1", "s2"),
   text = c("その店は人気がある。", "森には人気がない。"))
 tokens <- data.frame(document_id = "ja", segment_id = rep(c("s1", "s2"), each = 7),

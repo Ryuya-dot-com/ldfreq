@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>From corpus annotations to quanteda and lexical profiles • ldfreq</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -20,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ldfreq</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,10 +38,23 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
+<li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Start here</h6></li>
+    <li><a class="dropdown-item" href="../articles/getting-started.html">Getting started with ldfreq</a></li>
     <li><a class="dropdown-item" href="../articles/choosing-metrics.html">Choosing a lexical-diversity measure</a></li>
     <li><a class="dropdown-item" href="../articles/from-text-to-report.html">From files to a diagnostic report</a></li>
+    <li><a class="dropdown-item" href="../articles/recipes-and-exports.html">Reuse settings and export an auditable analysis</a></li>
     <li><a class="dropdown-item" href="../articles/release-scope.html">Release scope and compatibility</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Input &amp; Japanese/English setup</h6></li>
+    <li><a class="dropdown-item" href="../articles/english-tokenization.html">English tokenization and document input</a></li>
+    <li><a class="dropdown-item" href="../articles/japanese-annotations.html">Japanese annotations: from original text to lexical measures</a></li>
+    <li><a class="dropdown-item" href="../articles/annotated-corpora.html">From corpus annotations to quanteda and lexical profiles</a></li>
+    <li><a class="dropdown-item" href="../articles/annotation-evaluation.html">Evaluate annotations and their effect on document scores</a></li>
+    <li><a class="dropdown-item" href="../articles/annotation-alignment.html">Compare token boundaries before comparing labels and document scores</a></li>
+    <li><a class="dropdown-item" href="../articles/ambiguity-review.html">Review lexical ambiguity with KWIC and original context</a></li>
+    <li><a class="dropdown-item" href="../articles/contextual-models.html">Connect contextual model outputs to research occurrences</a></li>
+    <li><a class="dropdown-item" href="../articles/open-access-papers.html">Analyze open-access academic papers</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul>
@@ -47,7 +65,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/Ryuya-dot-com/ldfreq" aria-label="GitHub repository"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -60,11 +78,10 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>From corpus annotations to quanteda and lexical profiles</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>From corpus annotations to quanteda and lexical profiles</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/HEAD/vignettes/annotated-corpora.Rmd" class="external-link"><code>vignettes/annotated-corpora.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/Ryuya-dot-com/ldfreq/blob/main/vignettes/annotated-corpora.Rmd" class="external-link"><code>vignettes/annotated-corpora.Rmd</code></a></small>
       <div class="d-none name"><code>annotated-corpora.Rmd</code></div>
     </div>
 
@@ -777,10 +794,10 @@ single words or alter TTR, MATTR or MTLD.</p>
 <h3 id="save-the-complete-review-and-reproduce-its-tables">Save the complete review and reproduce its tables<a class="anchor" aria-label="anchor" href="#save-the-complete-review-and-reproduce-its-tables"></a>
 </h3>
 <p>For teacher preparation, the <a href="ddl-materials.html">DDL
-material example</a> (development 0.5.0.9001) uses an explicit subset of
-accepted occurrences to create learner HTML, a separate teacher table
-and a complete private record. It retains pending candidates and does
-not change this review’s criterion.</p>
+material example</a> uses an explicit subset of accepted occurrences to
+create learner HTML, a separate teacher table and a complete private
+record. It retains pending candidates and does not change this review’s
+criterion.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">phrase_record</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>before <span class="op">=</span> <span class="va">phrase_saved</span>, after <span class="op">=</span> <span class="va">phrase_after</span>,</span>
 <span>  worksheet_input <span class="op">=</span> <span class="va">phrase_csv</span>, session <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
@@ -819,9 +836,7 @@ inter-rater agreement or psycholinguistic validity.</p>
 differently. The question here is <strong>whether they make the same
 inclusion decision, and whether their decisions change the document
 profile</strong>. It is not a test of phrase-detection recall:
-expressions absent from the list have not been sampled for review. The
-following guide-local code runs with the existing 0.3.0.9003
-installation.</p>
+expressions absent from the list have not been sampled for review.</p>
 <p>The design follows these distinctions in the annotation
 literature:</p>
 <table class="table">
@@ -1056,7 +1071,7 @@ separately to run this block.</p>
 <span>    <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">a</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">b</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1L</span><span class="op">)</span></span>
 <span>      <span class="st">"constant_single_category"</span> <span class="kw">else</span> <span class="st">"computed_descriptive"</span></span>
 <span>  <span class="va">value</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">status</span> <span class="op">==</span> <span class="st">"computed_descriptive"</span><span class="op">)</span></span>
-<span>    <span class="fu">irr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/irr/man/kappa2.html" class="external-link">kappa2</a></span><span class="op">(</span><span class="va">r</span>, weight <span class="op">=</span> <span class="st">"unweighted"</span><span class="op">)</span><span class="op">$</span><span class="va">value</span> <span class="kw">else</span> <span class="cn">NA_real_</span></span>
+<span>    <span class="fu">irr</span><span class="fu">::</span><span class="fu">kappa2</span><span class="op">(</span><span class="va">r</span>, weight <span class="op">=</span> <span class="st">"unweighted"</span><span class="op">)</span><span class="op">$</span><span class="va">value</span> <span class="kw">else</span> <span class="cn">NA_real_</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>phrase_id <span class="op">=</span> <span class="va">id</span>, both_decided <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span>, kappa <span class="op">=</span> <span class="va">value</span>, status <span class="op">=</span> <span class="va">status</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">phrase_kappa</span></span>
@@ -1079,7 +1094,7 @@ learner data.</p>
 <code class="sourceCode R"><span><span class="va">published_ratings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"STAT"</span>, <span class="st">"IREQ"</span>, <span class="st">"STAT"</span>, <span class="st">"IREQ"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">20</span>, <span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"STAT"</span>, <span class="st">"STAT"</span>, <span class="st">"IREQ"</span>, <span class="st">"IREQ"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">20</span>, <span class="fl">10</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">published_kappa</span> <span class="op">&lt;-</span> <span class="fu">irr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/irr/man/kappa2.html" class="external-link">kappa2</a></span><span class="op">(</span><span class="va">published_ratings</span>, weight <span class="op">=</span> <span class="st">"unweighted"</span><span class="op">)</span><span class="op">$</span><span class="va">value</span></span>
+<span><span class="va">published_kappa</span> <span class="op">&lt;-</span> <span class="fu">irr</span><span class="fu">::</span><span class="fu">kappa2</span><span class="op">(</span><span class="va">published_ratings</span>, weight <span class="op">=</span> <span class="st">"unweighted"</span><span class="op">)</span><span class="op">$</span><span class="va">value</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">published_kappa</span>, <span class="fl">8</span><span class="op">/</span><span class="fl">23</span>, tolerance <span class="op">=</span> <span class="fl">1e-12</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">published_kappa</span>  <span class="co"># 0.3478261; observed agreement is 70/100</span></span></code></pre></div>
 <p>The verification also reproduced the prevalence examples in Di
@@ -1315,7 +1330,7 @@ matter. A reference’s usefulness for your question requires more than
 successful file import. These functions do not yet provide a validated
 standard MASC/OANC frequency resource.</p>
 <p>Once inputs have been validated,
-<code><a href="../reference/lexdiv_ngram_reference_build.html">lexdiv_build_ngram_reference()</a></code> can accumulate references in
+<code><a href="../reference/lexdiv_build_ngram_reference.html">lexdiv_build_ngram_reference()</a></code> can accumulate references in
 whole-document chunks. This avoids retaining every occurrence table,
 while counts and the document roster remain in memory. See the <a href="ngram-profiles.html#accumulate-a-reference-in-whole-document-chunks">n-gram
 guide</a> for the callback, denominator and exclusion-record

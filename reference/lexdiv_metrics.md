@@ -107,7 +107,7 @@ print(x, ...)
 - plan:
 
   Optional normalized plan from
-  [`lexdiv_plan`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
+  [`lexdiv_plan`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md).
   With a non-`NULL` plan, omit `metrics` and all individual metric
   parameters, including arguments in the batch function's `...`. The
   plan specifies every method, parameter and request order. `NULL` keeps
@@ -147,14 +147,10 @@ document-major, requested-metric-minor long form. Its first three
 columns are `document_id`, `batch_schema_id`, and
 `batch_schema_version`; all single-document record columns follow.
 
-With a non-`NULL` `plan`, the functions return exactly the result of
-[`lexdiv_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-or
-[`lexdiv_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md),
-respectively: a `lexdiv_profile_results` or
-`lexdiv_profile_batch_results` data frame, including the plan
-fingerprint, request and specification IDs, profile schema columns,
-classes and attributes. No plan metadata is discarded.
+With a non-`NULL` `plan`, the functions return a
+`lexdiv_profile_results` or `lexdiv_profile_batch_results` data frame,
+including the plan fingerprint, request and specification IDs, profile
+schema columns, classes and attributes. No plan metadata is discarded.
 
 ## Details
 
@@ -282,15 +278,11 @@ Batch-envelope and core-record schemas have separate explicit IDs and
 versions.
 
 For several settings of the same method, build a
-[`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-and pass it as `plan`. The existing
-[`lexdiv_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-and
-[`lexdiv_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-entry points remain supported. Combining a plan with explicit metric
-arguments is an error even when those arguments equal their defaults.
-This avoids an ambiguous override of the recorded plan. Plan execution
-here accepts pre-tokenized input; it does not tokenize raw text.
+[`lexdiv_plan`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
+and pass it as `plan`. Combining a plan with explicit metric arguments
+is an error even when those arguments equal their defaults. This avoids
+an ambiguous override of the recorded plan. Plan execution here accepts
+pre-tokenized input; it does not tokenize raw text.
 
 ## Reading status and missing reason
 
@@ -320,18 +312,24 @@ row.
 
 ## Migration from core contract 0.1.0
 
-Package 0.3.0 uses core contract 0.2.0. MTLD has the new method ID
-`mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1`. The old
-`mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1` remains in
+Package 0.3.0 uses core contract 0.2.0. MTLD has the new method ID:
+
+    mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1
+
+The old method ID
+
+    mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1
+
+remains in
 [`lexdiv_variant_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md),
 with the same minimum input length, values, and tail behavior (including
 credit greater than one).
 
 Read existing RDS results without editing their IDs or values. Old plans
 and specifications must be explicitly recreated with the current
-[`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+[`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
 and
-[`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+[`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
 before new computation. All specification hashes change because they
 include the core contract version, even for unchanged formulas. Record
 the package version, method ID, contract version, parameters and
@@ -469,7 +467,35 @@ planned[, c("request_id", "metric_id", "value", "status", "missing_reason")]
 #> 12  msttr_100     msttr           NA missing too_short_for_requested_parameter
 #> 13  mattr_100     mattr           NA missing too_short_for_requested_parameter
 planned_batch <- lexdiv_metrics_batch(documents, plan = plan)
-stopifnot(identical(planned_batch, lexdiv_profile_batch(documents, plan)))
+planned_batch[, c("document_id", "request_id", "value", "status")]
+#> <lexdiv_profile_batch_results: 2 documents; 26 specification results; schema unknown>
+#>    document_id request_id        value  status
+#> 1        doc_a        ttr    0.6666667      ok
+#> 2        doc_a       rttr    1.1547005      ok
+#> 3        doc_a       cttr    0.8164966      ok
+#> 4        doc_a     herdan    0.6309298      ok
+#> 5        doc_a       maas    0.3359422      ok
+#> 6        doc_a      msttr           NA missing
+#> 7        doc_a      mattr           NA missing
+#> 8        doc_a       mtld    3.0000000      ok
+#> 9        doc_a        hdd           NA missing
+#> 10       doc_a     yule_k 2222.2222222      ok
+#> 11       doc_a     yule_i    1.3333333      ok
+#> 12       doc_a  msttr_100           NA missing
+#> 13       doc_a  mattr_100           NA missing
+#> 14       doc_b        ttr           NA missing
+#> 15       doc_b       rttr           NA missing
+#> 16       doc_b       cttr           NA missing
+#> 17       doc_b     herdan           NA missing
+#> 18       doc_b       maas           NA missing
+#> 19       doc_b      msttr           NA missing
+#> 20       doc_b      mattr           NA missing
+#> 21       doc_b       mtld           NA missing
+#> 22       doc_b        hdd           NA missing
+#> 23       doc_b     yule_k           NA missing
+#> 24       doc_b     yule_i           NA missing
+#> 25       doc_b  msttr_100           NA missing
+#> 26       doc_b  mattr_100           NA missing
 
 # Further methods. Sample size 2 is for this tiny illustration only.
 lexdiv_metric_ids()

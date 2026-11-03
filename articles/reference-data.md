@@ -39,23 +39,32 @@ which those summaries were calculated.
 ## Inspect first, download explicitly
 
 ``` r
-lexdiv_resource_info("morpholex")[c("resource", "version", "license",
-  "license_url", "notice_url", "download_bytes")]
+
+info <- lexdiv_resource_info("morpholex")
+info[c("resource", "version", "license", "license_url", "download_bytes")]
 #>    resource  version         license
 #> 1 morpholex 5bc425fb CC-BY-NC-SA-4.0
-#>                                          license_url
-#> 1 https://creativecommons.org/licenses/by-nc-sa/4.0/
-#>                                                                                   notice_url
-#> 1 https://github.com/Ryuya-dot-com/ldfreq/blob/v0.4.0.9006/inst/licenses/morpholex/NOTICE.md
-#>   download_bytes
-#> 1        1336656
+#>                                          license_url download_bytes
+#> 1 https://creativecommons.org/licenses/by-nc-sa/4.0/        1336656
+head(readLines(info$notice_path, encoding = "UTF-8"))
+#> [1] "# MorphoLex-en data and documentation"                                  
+#> [2] ""                                                                       
+#> [3] "Creators: Claudia H. Sánchez-Gutiérrez, Hugo Mailhot, S. Hélène Deacon,"
+#> [4] "and Maximiliano A. Wilson."                                             
+#> [5] ""                                                                       
+#> [6] "Source: <https://github.com/hugomailhot/MorphoLex-en>"
 ```
 
-Open the license and notice links and confirm that the terms fit your
-intended use. Select only the resources you need. No download happens
-unless you make this call with `accept_license = TRUE`:
+The resource notices and license texts are installed with the package,
+before any data download. Open a notice with
+`file.show(info$notice_path)`; the CC license text, where applicable, is
+in the same directory. `notice_url` points to this local file, while
+`license_url` links to the license’s website. Confirm that the terms fit
+your intended use. Select only the resources you need. No download
+happens unless you make this call with `accept_license = TRUE`:
 
 ``` r
+
 lexdiv_download_resources("tubelex", accept_license = TRUE)
 # Or select several resources after reviewing each one's terms:
 lexdiv_download_resources(c("nj8", "bnccoca"), accept_license = TRUE)
@@ -66,6 +75,7 @@ the cache available. Normal reads verify the required file and do not
 contact the network. A previously verified resource is reused.
 
 ``` r
+
 tubelex_profile(c("student", "learn", "unfamiliar"))
 nj8_profile(c("student", "learn", "unfamiliar"))
 morpholex_data(sheets = "All roots")  # requires the separate morpholex resource
@@ -75,6 +85,7 @@ bnccoca_data()
 ## Choose a cache location or work offline
 
 ``` r
+
 options(ldfreq.resource_dir = "/path/to/my/reference-cache")
 lexdiv_download_resources("tubelex", accept_license = TRUE)
 lexdiv_resource_info("tubelex")
@@ -93,16 +104,12 @@ modified cache is rejected. Inspect the returned `path`, remove that
 specific version directory if you intend to replace it, and explicitly
 download again.
 
-## Update from 0.4.x
+## Reproducibility and citation
 
-Earlier versions bundled these snapshots. In 0.5.0.9001 their data bytes
-and resource identities are unchanged, but they are stored separately.
-Calls such as
-[`nj8_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/nj8_profile.md)
-without a supplied word list now require the explicit cache setup above.
-Existing saved results remain readable. Caller-supplied word lists and
-reference tables continue to work without downloads.
-
-Record the resource version, source hash, coverage and citation with
-your results. `citation("ldfreq")` cites the package; it does not
-replace citations for the data and measurement methods.
+Custom word lists and norm tables work completely offline without
+downloading any optional resource. When you use a cached reference
+dataset (`tubelex`, `nj8`, `morpholex`, `bnccoca`, or `morphynet`),
+record the resource version, SHA-256 hash, match coverage, and dataset
+citation alongside your results. `citation("ldfreq")` cites the R
+package; it does not replace citations for the underlying lexical
+datasets and measurement methods.

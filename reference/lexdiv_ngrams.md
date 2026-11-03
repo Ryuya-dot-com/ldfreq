@@ -242,14 +242,20 @@ co-occurrences.
 
 ## See also
 
-[`lexdiv_compare_ngrams`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md)
-for multiple references,
-[`lexdiv_build_ngram_reference`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md)
-to combine corpus chunks, [the extraction-to-reference-profile
-workflow](https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html),
-[`lexdiv_norm_profile_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile_batch.md),
-[`lexdiv_reference_coverage`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_reference_coverage.md),
-[`tubelex_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md)
+- [`lexdiv_compare_ngrams`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_compare_ngrams.md)
+  for multiple references
+
+- [`lexdiv_build_ngram_reference`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_build_ngram_reference.md)
+  to combine corpus chunks
+
+- [The extraction-to-reference-profile
+  workflow](https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html)
+
+- [`lexdiv_norm_profile_batch`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_norm_profile_batch.md)
+
+- [`lexdiv_reference_coverage`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_reference_coverage.md)
+
+- [`tubelex_profile`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md)
 
 ## Examples
 

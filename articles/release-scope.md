@@ -52,78 +52,45 @@ required for the core R calculations. Their specific guide checks are
 separate from the R/OS matrix; the matrix does not execute every
 externally supplied model or corpus.
 
-## Moving from an earlier version
+## Reproducibility and compatibility across versions
 
-**From 0.4.x:** first download only the optional reference resources you
-need. The data bytes are unchanged, but default NJ8/TUBELEX and
-morphology readers now use the explicit cache. No resource is downloaded
-during installation or ordinary calculations. Existing saved results
-remain readable.
+`ldfreq 1.0.0` separates core formula identities, raw-text
+preprocessing, and reference-dataset versions so that each choice
+remains auditable over time:
 
-The canonical action names are
-[`lexdiv_compare_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_compare.md),
-[`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_ngram_reference_build.md),
-[`lexdiv_sort_concordance()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_concordance.md)
-and
-[`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md).
-The previous names remain exact compatibility aliases. Use
-`lexdiv_methods(scope = "variants")` for the variant catalog and
-`lexdiv_metrics(tokens, plan = plan)` to execute a plan; earlier calls
-remain supported. MTLD-MA is opt-in and does not change the eleven
-default metrics.
-
-**From 0.1.0 or 0.2.0:** the intervening changes below affect
-interpretation or compatibility. Retain the old archive and results
-before computing again.
-
-1.  Core contract 0.2.0 uses no-minimum MTLD, with method ID
-    `mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1`. The former min10
-    method remains explicitly available in
+1.  **Unified entry points**: Execute multi-parameter plans by passing
+    `plan = plan` to
+    [`lexdiv_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md),
+    [`lexdiv_metrics_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md),
+    [`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_preprocessing.md),
+    or
+    [`lexdiv_metrics_text_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_text_batch.md).
+    Inspect Maas and MTLD comparison definitions via
+    `lexdiv_methods(scope = "variants")` and
     [`lexdiv_variant_metrics()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md).
-    Do not mix their values under one unlabeled MTLD column. See the
-    migration section of
-    [`?lexdiv_metrics`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
-    and the [formula-variant
-    help](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_variant_metrics.md).
-2.  Default metric results have eleven rows. Canonical and
-    length-comparison presets contain eleven and thirteen requests.
-    [`lexdiv_metric_ids()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_metrics.md)
-    still lists thirteen supported metrics, including experimental
-    expected-TTR D and MTLD-MA. Select these explicitly when they are
-    part of the study design.
-3.  Recreate old specifications and plans with current
-    [`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+2.  **Explicit defaults and opt-in measures**: Raw-text helpers default
+    to `case = "lower"` and `tokenizer = "english"`. Default metric
+    calls compute eleven established measures; moving-average MTLD
+    (`mtld_ma`) and experimental deterministic expected-TTR *D*
+    (`expected_ttr_d`) require explicit selection.
+3.  **Optional reference-data cache**: Third-party datasets (`tubelex`,
+    `nj8`, `morpholex`, `bnccoca`, `morphynet`) are downloaded
+    explicitly once with
+    `lexdiv_download_resources(..., accept_license = TRUE)` and verified
+    by SHA-256 hash on read. Custom word lists and norm tables work
+    offline without downloads.
+4.  **Saved-record integrity**: Recreate plans with
+    [`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
     and
-    [`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-    before new calculations. Specification hashes include the core
-    contract version, even for an unchanged formula. Read saved results
-    without editing their IDs or values; comparison and plot checks
-    reject unlike measurement identities.
-4.  Preprocessing contract 0.1.0 objects must be recreated from original
-    text and explicit annotations. The current 0.4.0 contract retains
-    valid 0.3.0 objects and 0.2.0 Unicode objects. A legacy object
-    without recorded textstem dictionary identity cannot establish
-    strict lemma comparability. Do not manually fill provenance fields
-    to bypass validation.
-5.  TUBELEX contract 0.2.0 rejects known tokenizer mismatch by default.
-    Prepare compatible terms, or explicitly record a sensitivity
-    analysis with `tokenization_mismatch = "allow"`. Character-vector
-    alignment remains unverified. NJ8 uses the fixed cached list when
-    `wordlist` is omitted or `NULL`; explicit external lists retain
-    their own identity.
-6.  Version 0.2.0 corrected cancellation in near-saturated expected-TTR
-    D without changing its estimator or method ID. Keep the package
-    version as well as the method ID when comparing historical
-    calculations. Details and the numerical correction are recorded in
-    NEWS.
+    [`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
+    when starting a new study, and never manually edit IDs or hashes
+    inside saved RDS objects. Comparison, study-table, and plotting
+    functions verify measurement identities so unlike specifications
+    cannot be mixed silently.
 
-Pre-1.0 breaking changes require a minor-version increment and an
-explicit migration explanation. Exported functions, arguments, methods
-and schemas require a documented deprecation cycle before removal. The
-package-level [lifecycle
+The package-level [lifecycle
 policy](https://github.com/Ryuya-dot-com/ldfreq/blob/main/LIFECYCLE.md)
-also separates formula, preprocessing and resource changes from cosmetic
-fixes.
+documents compatibility commitments for the 1.x release series.
 
 ## Saving, citing and interpreting a result
 

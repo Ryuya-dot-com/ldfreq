@@ -1,6 +1,7 @@
 # Preprocessing, parameter sensitivity, and frequency coverage
 
 ``` r
+
 library(ldfreq)
 ```
 
@@ -14,12 +15,14 @@ Core calculations and examples using your own tables do not require
 these downloads.
 
 ``` r
+
 lexdiv_resource_info(c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"))
 # After reviewing each resource's license and notice:
 lexdiv_download_resources(c("tubelex", "nj8", "morpholex", "bnccoca", "morphynet"), accept_license = TRUE)
 ```
 
 ``` r
+
 has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
 has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
 has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
@@ -66,6 +69,7 @@ converted into a universal software default. `ldfreq` therefore exposes
 the alternatives and their coverage.
 
 ``` r
+
 tokenization <- lexdiv_tokenize("Cats and cat ran run.")
 annotated <- lexdiv_lemmatize(
   tokenization,
@@ -117,6 +121,7 @@ must be tokenized and annotated explicitly; `ldfreq` does not guess its
 UPOS tags or lemmas.
 
 ``` r
+
 comparison <- lexdiv_lemmatize(
   lexdiv_tokenize("Cats and birds ran."),
   lemmas = c("cat", "and", "bird", "run"),
@@ -200,6 +205,7 @@ instead retains both the number of matched document items and the full
 document denominator.
 
 ``` r
+
 coverage_documents <- list(
   essay_a = c("cat", "cat", "run", "rare"),
   essay_b = c("bird", "run", "unknown")
@@ -253,6 +259,7 @@ items, and explicit overrides take precedence over the raw AntBNC
 mapping.
 
 ``` r
+
 antbnc_fixture <- tempfile(fileext = ".txt")
 writeLines(
   c(
@@ -275,7 +282,7 @@ flemma_annotations$tokens[, c(
   "surface", "flemma", "flemma_matched", "flemma_match_rule"
 )]
 #>   surface flemma flemma_matched flemma_match_rule
-#> 1    Cats    cat           TRUE            antbnc
+#> 1    cats    cat           TRUE            antbnc
 #> 2     and    and          FALSE          identity
 #> 3     cat    cat           TRUE            antbnc
 #> 4     ran    run           TRUE            antbnc
@@ -330,6 +337,7 @@ dependency. This offline example contains **authored decisions**, not
 verified entries from Nation’s lists:
 
 ``` r
+
 family_env <- new.env(parent = baseenv())
 sys.source(system.file("examples", "word-families.R", package = "ldfreq",
   mustWork = TRUE), family_env)
@@ -377,6 +385,7 @@ and complete family types/TTR are `NA`. Inspect original context and
 both candidates:
 
 ``` r
+
 families$occurrences[families$occurrences$status %in% c("ambiguous", "unlisted"),
   c("document_id", "segment_id", "token_index", "pre", "keyword", "post", "status")]
 #>   document_id segment_id token_index   pre keyword   post    status
@@ -406,6 +415,7 @@ The source spellings and memberships are preserved, including uppercase
 keys.
 
 ``` r
+
 sys.source(system.file("examples", "bnccoca-families.R", package = "ldfreq",
   mustWork = TRUE), family_env)
 nation <- family_env$bnccoca_example
@@ -423,6 +433,7 @@ therefore remain `NA`. Inspect the original KWIC, rather than inventing
 a family or interpreting noncoverage as an error:
 
 ``` r
+
 nation$profile$occurrences[nation$profile$occurrences$status == "unlisted",
   c("document_id", "pre", "keyword", "post", "status")]
 ```
@@ -466,6 +477,7 @@ should be made explicitly upstream. Family lookup retains its declared
 `nfkc_lower` normalization.
 
 ``` r
+
 sys.source(system.file("examples", "family-count-comparison.R", package = "ldfreq",
   mustWork = TRUE), family_env)
 counts <- family_env$compare_family_counts(nation$profile)
@@ -496,6 +508,7 @@ rows.
 Keep unresolved occurrences available for inspection:
 
 ``` r
+
 o <- counts$profile$occurrences
 o[counts$selection$selected & o$status != "matched",
   c("document_id", "token_index", "pre", "keyword", "post", "status")]
@@ -508,6 +521,7 @@ membership does not establish a proper noun in context. Save the full
 result and the reference:
 
 ``` r
+
 saveRDS(list(counts = counts, reference = nation$reference,
   session = sessionInfo()), "family-comparison.rds")
 saved <- readRDS("family-comparison.rds")
@@ -537,6 +551,7 @@ levels or alternative definitions, select the intended rows explicitly
 extra level/band columns for inspection.
 
 ``` r
+
 dictionary <- read.csv("my-family-table.csv", colClasses = "character",
   fileEncoding = "UTF-8")
 resource <- list(resource_id = "my-family-table", resource_version = "1",
@@ -585,6 +600,7 @@ lookup and replay of saved judgments do not require loading quanteda or
 running a language model.
 
 ``` r
+
 if (requireNamespace("quanteda", quietly = TRUE)) {
   sys.source(system.file("examples", "word-family-review.R", package = "ldfreq",
     mustWork = TRUE), family_env)
@@ -619,6 +635,7 @@ candidate set or resource snapshot. Decisions identify **record IDs**,
 not family IDs:
 
 ``` r
+
 stopifnot(length(families$review_input$targets) > 0)
 review <- do.call(lexdiv_ambiguity_review,
   c(list(x = families$annotations), families$review_input))
@@ -674,6 +691,7 @@ model, network or quanteda. Family membership remains a separate input
 and is not inferred.
 
 ``` r
+
 parts_env <- new.env(parent = baseenv())
 sys.source(system.file("examples", "word-parts.R", package = "ldfreq",
   mustWork = TRUE), parts_env)
@@ -787,6 +805,7 @@ reference table, source tokens and candidate/part expansion, not total
 memory. Keep inputs scoped to the analysis at hand.
 
 ``` r
+
 # Full tables remain available beside aggregate results.
 word_parts$part_occurrences
 #>    document_id segment_id token_index      surface completeness analysis_id
@@ -862,6 +881,7 @@ does not yet apply occurrence-specific reviewer decisions or
 automatically choose a candidate.
 
 ``` r
+
 saveRDS(word_parts, "word-parts.rds")
 restored <- readRDS("word-parts.rds")
 stopifnot(identical(do.call(parts_env$word_parts_profile, restored$inputs), restored))
@@ -917,6 +937,7 @@ from the official repository, retain its CC BY-SA 3.0 terms, and read
 it:
 
 ``` r
+
 reference <- morphynet_read_derivations("eng.derivational.v1.tsv",
   language = "en", resource_version = "English v1")
 reference$resource$source_sha256
@@ -939,6 +960,7 @@ is not a reference for estimating vocabulary coverage. The contexts and
 reviewer decisions are authored illustrations:
 
 ``` r
+
 morphynet_env <- new.env(parent = baseenv())
 sys.source(system.file("examples", "morphynet-relations.R", package = "ldfreq",
   mustWork = TRUE), morphynet_env)
@@ -962,6 +984,7 @@ relation means; context alone does not guarantee a unique morphological
 derivation.
 
 ``` r
+
 if (!is.null(morphynet$reviewed)) {
   morphynet$reviewed$occurrences[c("segment_id", "pre", "keyword", "post",
     "candidate_count", "status", "reason")]
@@ -981,6 +1004,7 @@ including the empty document, is retained. Review summaries describe the
 declared targets, not all corpus tokens.
 
 ``` r
+
 saveRDS(morphynet, "morphynet-review.rds")
 restored <- readRDS("morphynet-review.rds")
 replayed <- lexdiv_ambiguity_review(restored$annotations, restored$targets,
@@ -1012,6 +1036,7 @@ conditions; commercial use is not granted by that license. See the
 cached `licenses/morpholex/NOTICE.md`.
 
 ``` r
+
 morpholex <- morpholex_data(c("0-1-1", "All roots"))
 word_rows <- morpholex$sheets[["0-1-1"]]
 word_rows[word_rows$Word %in% c("teacher", "teachers"),
@@ -1033,6 +1058,7 @@ model or internet connection. The word-parts recipe can use the same
 snapshot:
 
 ``` r
+
 sys.source(system.file("examples", "morpholex-word-parts.R", package = "ldfreq",
   mustWork = TRUE), parts_env)
 forms <- c("transmit", "transport", "transmission", "teacher", "teachers")
@@ -1058,6 +1084,7 @@ occurrences. Save the complete reference/profile pair to keep both
 inputs and results:
 
 ``` r
+
 saveRDS(list(reference = reference, profile = profile), "morpholex-profile.rds")
 # Optional: read an explicitly obtained workbook instead; requires readxl.
 local_reference <- parts_env$read_morpholex_parts(path = "MorphoLEX_en.xlsx",
@@ -1096,6 +1123,7 @@ are authored; references are the cached Nation/MorphoLex snapshots and
 the nine-row MorphyNet teaching excerpt.
 
 ``` r
+
 source(system.file("examples", "morphology-link.R", package = "ldfreq"))
 source(system.file("examples", "morphology-link-demo.R", package = "ldfreq"))
 linked <- morphology_link_example$reviewed
@@ -1141,6 +1169,7 @@ still not independently verified linguistic truth, and MorphoLex’s
 derivational scope still excludes inflection.
 
 ``` r
+
 saveRDS(linked, "linked-morphology.rds")
 restored <- readRDS("linked-morphology.rds")
 stopifnot(identical(do.call(link_morphology_candidates, restored$inputs), restored))
@@ -1173,13 +1202,12 @@ window parameter. Bestgen (2025,
 useful for within-text fluctuation but should not be treated as a
 parameter-free universal score.
 
-[`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
+[`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_plan.md)
 records parameter variants as different requests. Run them through
-`lexdiv_metrics(..., plan = plan)`;
-[`lexdiv_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/lexdiv_profile.md)
-remains supported:
+`lexdiv_metrics(..., plan = plan)`:
 
 ``` r
+
 long_tokens <- rep(
   c("one", "two", "three", "one", "four", "five", "one", "six"),
   20
@@ -1204,6 +1232,7 @@ reuses the same MATTR specifications and exposes both quantities without
 retaining token strings:
 
 ``` r
+
 methods <- lexdiv_methods()
 mattr_method <- methods$method_id[methods$metric_id == "mattr"]
 mattr_plan <- lexdiv_plan(
@@ -1315,6 +1344,7 @@ such as `MTLD` therefore does not identify a method on its own.
 expands these choices in a separate contract:
 
 ``` r
+
 variant_tokens <- rep(
   c("one", "two", "three", "one", "four", "five"),
   12
@@ -1385,6 +1415,7 @@ TUBELEX output is therefore named as frequency and prevalence, not as an
 unqualified sophistication score.
 
 ``` r
+
 # Resource-compatible segmentation must be prepared separately.
 # This manually prepared sequence illustrates only the sentence shown.
 frequency <- tubelex_profile(c("I", "do", "n't", "think", "it", "'s", "a", "book"))
@@ -1453,6 +1484,7 @@ installed. The example below uses a small synthetic table for
 hand-checkable results.
 
 ``` r
+
 synthetic_nj8 <- data.frame(
   NJ8 = c(1L, 1001L, 6001L, 8000L),
   Word = c("the", "develop", "rare", "extreme")
@@ -1542,6 +1574,7 @@ so both documents share the same input contract without inventing lemma
 annotations.
 
 ``` r
+
 level_batch <- nj8_profile_batch(
   list(
     document_a = c("The", "develop", "rare"),
@@ -1572,6 +1605,7 @@ before the list is processed. Shared list provenance is stored once;
 document-specific preprocessing provenance remains separate.
 
 ``` r
+
 plot(level_profile, weighting = "token")
 ```
 

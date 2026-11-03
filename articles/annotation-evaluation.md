@@ -33,6 +33,7 @@ It does not invoke Python, download a model, load a corpus, or write
 files.
 
 ``` r
+
 library(ldfreq)
 
 source(system.file("examples", "annotation-evaluation.R", package = "ldfreq"))
@@ -71,6 +72,7 @@ prediction-failure reasons. The evaluator preserves those columns in its
 complete inputs but does not interpret their names or adjudicate them.
 
 ``` r
+
 head(example$inputs$reference$tokens)
 #>   document_id segment_id token_index surface  upos review_status
 #> 1     english         s1           1    cats  NOUN      selected
@@ -129,6 +131,7 @@ Evaluate one categorical column at a time with a complete label
 inventory:
 
 ``` r
+
 evaluated_again <- lexdiv_evaluate_annotations(
   predicted = example$inputs$predicted,
   reference = example$inputs$reference,
@@ -160,6 +163,7 @@ for an external morphology input example.
 ## Interpret label-specific errors with their denominators
 
 ``` r
+
 evaluated$labels
 #>   label reference_n predictions_evaluated tp missing_predictions
 #> 1  NOUN           6                     6  4                   0
@@ -212,6 +216,7 @@ as the target. The following extracts noun errors while excluding
 unavailable references from the FP calculation:
 
 ``` r
+
 pairs <- evaluated$pairs
 known <- !is.na(pairs$reference_label)
 false_positives <- known & pairs$predicted_label %in% "NOUN" &
@@ -258,6 +263,7 @@ its document score: an unknown label could change the selected noun
 sequence.
 
 ``` r
+
 example$differences
 #>      document_id reference_nouns predicted_nouns reference_ttr predicted_ttr
 #> 1        english               2               2           0.5             1
@@ -333,6 +339,7 @@ declarations, the evaluation and document-score settings. Keep these
 together:
 
 ``` r
+
 saveRDS(example, "annotation-evaluation.rds", version = 2)
 restored <- readRDS("annotation-evaluation.rds")
 replayed <- do.call(lexdiv_evaluate_annotations, restored$inputs)

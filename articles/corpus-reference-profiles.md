@@ -24,6 +24,7 @@ language background and sampling conditions. Keep unknown information
 missing; do not infer L1 from a genre label.
 
 ``` r
+
 library(ldfreq)
 
 texts <- data.frame(
@@ -56,6 +57,7 @@ relevant. Exact matching does not silently correct case, accents,
 spelling or inflection.
 
 ``` r
+
 norms <- data.frame(term = c("read", "book", "discuss", "policy"),
   familiarity = c(6, 7, 5, NA_real_),
   aoa_years = c(6, 4, 9, 12))
@@ -132,6 +134,7 @@ with different reasons. Neither receives zero. The blank document
 retains rows with `empty_input`; it does not disappear from the study.
 
 ``` r
+
 profiles$coverage
 #>    document_id result_order    resource_id resource_version  measure_id
 #> 1   demo_essay            1 authored_norms                1 familiarity
@@ -234,6 +237,7 @@ input has no coverage rate and receives no point. All numbers are
 authored examples.
 
 ``` r
+
 selected <- profiles$summary[profiles$summary$measure_id == "familiarity" &
   profiles$summary$weighting == "token", ]
 lookup <- profiles$lookup[profiles$lookup$measure_id == "familiarity", ]
@@ -292,6 +296,7 @@ order. Additional columns in an input data frame are not automatically
 copied into the batch output.
 
 ``` r
+
 metadata <- texts[, c("document_id", "corpus_id", "register", "participant_id")]
 row_index <- match(profiles$summary$document_id, metadata$document_id)
 stopifnot(!anyNA(row_index), !anyDuplicated(metadata$document_id),

@@ -47,6 +47,7 @@ sense and any mapping decisions in additional columns if they differ
 from the lookup form.
 
 ``` r
+
 library(ldfreq)
 
 items <- data.frame(
@@ -72,6 +73,7 @@ as a query word absent from the table. Both produce `NA`, with different
 reasons.
 
 ``` r
+
 toy <- data.frame(term = c("学校", "研究", "辞書"),
                   rating = c(2, 5, NA_real_))
 specs <- data.frame(measure_id = "illustration", value_column = "rating",
@@ -112,6 +114,7 @@ Inspect missingness by condition rather than silently dropping unmatched
 rows:
 
 ``` r
+
 condition_coverage <- do.call(rbind, lapply(split(item_table, item_table$condition),
   function(x) data.frame(condition = x$condition[1], items = nrow(x),
     with_value = sum(x$value_status == "observed"),
@@ -146,6 +149,7 @@ the source and updating the example, not disabling the hash check
 without examining the change.
 
 ``` r
+
 source(system.file("examples", "japanese-norms.R", package = "ldfreq"))
 aoa <- profile_japanese_norm_items(items, "data_AoA.csv", resource = "aoa")
 aoa$items                  # Original IDs/conditions plus source IDs, n, SD and values
@@ -183,6 +187,7 @@ spelling. Do not assume that two data providers’ numerical source IDs
 are equal. Do not use an inner join that discards unmatched stimuli.
 
 ``` r
+
 index <- match(aoa$items$item_id, boi$items$item_id)
 stopifnot(!anyNA(index), !anyDuplicated(boi$items$item_id))
 combined <- aoa$items
@@ -239,6 +244,7 @@ the intended stimulus; the helper keeps them as metadata and does not
 use them to automatically discard candidates or resolve word senses.
 
 ``` r
+
 source(system.file("examples", "wlsp-items.R", package = "ldfreq"))
 stimuli <- data.frame(
   item_id = c("p1", "p2", "p3", "p4", "p5"),
@@ -267,6 +273,7 @@ item and a reason. This example selects the two intended readings of
 reading alone does not make its correspondence unique.
 
 ``` r
+
 chosen <- subset(review$candidates,
   (item_id == "p1" & reading == "にんき") |
   (item_id == "p2" & reading == "ひとけ") | item_id == "p3")
@@ -305,6 +312,7 @@ Keep the denominator and reasons visible, including items without
 values:
 
 ``` r
+
 selection_coverage <- do.call(rbind, lapply(
   split(resolved$items, resolved$items$condition), function(x) data.frame(
     condition = x$condition[1], items = nrow(x),

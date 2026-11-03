@@ -21,12 +21,9 @@ tubelex_diagnostics(x, max_rows = 1e6)
 
   One unmodified
   [`tubelex_profile()`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md)
-  result, or a plain named list as returned by
-  [`tubelex_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md).
-  IDs must be unique, non-empty valid-UTF-8 strings. A single profile
-  uses `document_1`. An empty named list is allowed. Profiles must use
-  profile contract 0.2.0 and the currently cached resource; unsupported
-  records must be recreated from their inputs.
+  result, a
+  [`tubelex_profile_batch()`](https://ryuya-dot-com.github.io/ldfreq/reference/tubelex_profile.md)
+  result, or a plain named list of `tubelex_profile` objects.
 
 - max_rows:
 
