@@ -45,8 +45,25 @@ lexdiv_evaluate_annotations <- function(predicted, reference, column, labels,
       scoring = "single-label exact match on available references; absent prediction counts as false negative",
       weighting = "token occurrences; no sampling weights or macro average",
       interpretation = "descriptive reference agreement; independence, validity and holdout are caller declarations")))
-  out$provenance$content_sha256 <- .lexng_hash(out)
-  out
+  .lexng_seal(out, "lexdiv_annotation_evaluation")
+}
+
+#' @export
+print.lexdiv_annotation_evaluation <- function(x, ...) {
+  if (!inherits(x, "lexdiv_annotation_evaluation") || !is.list(x) ||
+      !is.data.frame(x$summary)) {
+    stop("x must be a lexdiv_annotation_evaluation object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<lexdiv_annotation_evaluation: column=%s; %d token%s; %d label%s>\n",
+    x$provenance$column,
+    x$summary$tokens,
+    if (x$summary$tokens == 1) "" else "s",
+    nrow(x$labels),
+    if (nrow(x$labels) == 1L) "" else "s"
+  ))
+  print.data.frame(x$summary, row.names = FALSE, ...)
+  invisible(x)
 }
 
 .lexann_context <- function(context_chars) {
@@ -80,16 +97,7 @@ lexdiv_evaluate_annotations <- function(predicted, reference, column, labels,
 }
 
 .lexann_validate <- function(x, argument, max_tokens, column = NULL, labels = NULL) {
-  x <- .lexnorm_plain_list(x, argument)
-  if (!all(c("tokens", "segments", "provenance") %in% names(x)) ||
-      !identical(x$provenance$importer, "ldfreq-external-annotations"))
-    stop(argument, " must be an unmodified lexdiv_import_annotations() result.", call. = FALSE)
-  segments <- .lexnorm_plain_data_frame(x$segments, paste0(argument, "$segments"))
-  checked <- lexdiv_import_annotations(x$tokens,
-    segments[setdiff(names(segments), c("token_count", "text_sha256"))],
-    x$provenance$annotation, max_tokens = max_tokens)
-  if (!identical(x, checked))
-    stop(argument, " has changed; import the complete annotations again.", call. = FALSE)
+  x <- .lexann_check(x, argument, max_tokens)
   if (is.null(column)) return(x)
   value <- x$tokens[[column]]
   if (!column %in% names(x$tokens) || !is.character(value) ||

@@ -3,39 +3,78 @@
 study_long_table <- function(planned, submissions, results, plan, condition_id,
                              reporting = NULL, max_rows = 1e6) {
   fail <- function(message) stop(message, call. = FALSE)
-  table_ok <- function(x) is.data.frame(x) && !anyDuplicated(names(x)) &&
+  as_plain_df <- function(x) {
+    if (!is.data.frame(x)) return(NULL)
+    out <- base::as.data.frame(x, stringsAsFactors = FALSE, check.names = FALSE, optional = TRUE)
+    rownames(out) <- NULL
+    out
+  }
+  table_ok <- function(x) !is.null(x) && !anyDuplicated(names(x)) &&
     all(nzchar(names(x))) && !anyNA(names(x))
   ids_ok <- function(x) is.character(x) && !is.object(x) && is.null(dim(x)) &&
     !anyNA(x) && all(validUTF8(x)) && all(nzchar(trimws(x)))
   unique_ids <- function(x) ids_ok(x) && !anyDuplicated(x)
+
+  planned <- as_plain_df(planned)
+  submissions <- as_plain_df(submissions)
+  if (!is.null(reporting)) reporting <- as_plain_df(reporting)
+
+  text_batch_chars <- NULL
+  if (inherits(results, "lexdiv_text_batch_results") && is.list(results)) {
+    text_batch_chars <- vapply(results$preprocessing, function(p) {
+      as.double(p$tokenization$input_characters)
+    }, numeric(1L))
+    results <- results$results
+  }
+
   if (!table_ok(planned) ||
       !all(c("observation_id", "writer_id", "task", "occasion") %in% names(planned)) ||
-      !unique_ids(planned$observation_id) ||
+      !unique_ids(.lex_strip_names(planned$observation_id)) ||
       !all(vapply(planned, function(x) is.atomic(x) && is.null(dim(x)), logical(1))))
     fail("planned needs unique character observation_id, writer_id, task, occasion and atomic columns.")
+  planned$observation_id <- .lex_strip_names(planned$observation_id)
   for (name in c("writer_id", "task")) {
     x <- planned[[name]]
     if (!(is.character(x) || is.factor(x)) ||
-        !ids_ok(as.character(x[!is.na(x)])))
+        !ids_ok(.lex_strip_names(as.character(x[!is.na(x)]))))
       fail("writer_id and task must be character/factor labels; use NA for unknown labels.")
   }
+
+  if (!is.null(submissions) && !is.null(text_batch_chars) &&
+      setequal(names(submissions), c("observation_id", "document_id"))) {
+    submissions$input_characters <- unname(
+      text_batch_chars[match(submissions$document_id, names(text_batch_chars))]
+    )
+  }
+
   if (!table_ok(submissions) ||
       !setequal(names(submissions), c("observation_id", "document_id", "input_characters")) ||
-      !unique_ids(submissions$observation_id) || !unique_ids(submissions$document_id) ||
+      !unique_ids(.lex_strip_names(submissions$observation_id)) ||
+      !unique_ids(.lex_strip_names(submissions$document_id)) ||
       !all(submissions$observation_id %in% planned$observation_id))
     fail("submissions needs observation_id, document_id and input_characters, with at most one document per known observation.")
-  chars <- submissions$input_characters
+  submissions$observation_id <- .lex_strip_names(submissions$observation_id)
+  submissions$document_id <- .lex_strip_names(submissions$document_id)
+  chars <- .lex_strip_names(submissions$input_characters)
   if (!is.numeric(chars) || is.object(chars) || !is.null(dim(chars)) || any(is.nan(chars)) ||
       any(!is.na(chars) & (!is.finite(chars) | chars < 0 | chars != floor(chars))))
     fail("input_characters must be nonnegative whole counts, or NA when unavailable.")
+  if (!is.null(text_batch_chars)) {
+    expected_chars <- unname(text_batch_chars[match(submissions$document_id, names(text_batch_chars))])
+    both_known <- !is.na(chars) & !is.na(expected_chars)
+    if (any(chars[both_known] != expected_chars[both_known]))
+      fail("submissions$input_characters disagrees with the supplied text-batch preprocessing record.")
+  }
   if (!ids_ok(condition_id) || length(condition_id) != 1L)
     fail("condition_id must be one explicit nonblank character identifier.")
   if (!is.numeric(max_rows) || is.object(max_rows) || !is.null(dim(max_rows)) ||
       length(max_rows) != 1L || is.na(max_rows) ||
       !is.finite(max_rows) || max_rows < 1 || max_rows != floor(max_rows))
     fail("max_rows must be one positive whole number.")
-  if (!table_ok(results) || !inherits(results, "lexdiv_profile_batch_results"))
-    fail("results must be the complete result of lexdiv_metrics_batch(..., plan = plan).")
+  if (!is.data.frame(results) || anyDuplicated(names(results)) ||
+      !all(nzchar(names(results))) || anyNA(names(results)) ||
+      !inherits(results, "lexdiv_profile_batch_results"))
+    fail("results must be the complete plan-based result of lexdiv_metrics_batch() or lexdiv_metrics_text_batch().")
 
   # Empty tokens validate the public plan and supply request metadata, even
   # when no document was submitted. No submitted document is recalculated.
@@ -109,8 +148,10 @@ study_long_table <- function(planned, submissions, results, plan, condition_id,
   if (!is.null(reporting)) {
     required <- c("document_id", "request_id", "reporting_status", "reporting_reason")
     if (!table_ok(reporting) || !setequal(names(reporting), required) ||
-        !ids_ok(reporting$document_id) || !ids_ok(reporting$request_id) ||
-        !ids_ok(reporting$reporting_status) || !ids_ok(reporting$reporting_reason) ||
+        !ids_ok(.lex_strip_names(reporting$document_id)) ||
+        !ids_ok(.lex_strip_names(reporting$request_id)) ||
+        !ids_ok(.lex_strip_names(reporting$reporting_status)) ||
+        !ids_ok(.lex_strip_names(reporting$reporting_reason)) ||
         any(!reporting$reporting_status %in% c("report", "withhold")))
       fail("reporting needs complete document/request decisions (report/withhold) and nonblank reasons.")
     report_key <- (match(reporting$document_id, submissions$document_id) - 1) *
@@ -128,6 +169,9 @@ study_long_table <- function(planned, submissions, results, plan, condition_id,
 study_model_data <- function(study, condition_id, request_id,
                              required = c("writer_id", "task", "occasion")) {
   fail <- function(message) stop(message, call. = FALSE)
+  if (is.data.frame(study)) {
+    study <- base::as.data.frame(study, stringsAsFactors = FALSE, check.names = FALSE, optional = TRUE)
+  }
   strings_ok <- function(x, missing = FALSE) is.character(x) && !is.object(x) &&
     is.null(dim(x)) && (missing || !anyNA(x)) &&
     all(validUTF8(x[!is.na(x)])) && all(nzchar(trimws(x[!is.na(x)])))
@@ -199,7 +243,24 @@ study_model_data <- function(study, condition_id, request_id,
     fail("A selected document cannot represent multiple model observations.")
   rownames(data) <- data$observation_id
   rownames(audit) <- NULL
-  list(data = data, audit = audit)
+  structure(list(data = data, audit = audit), class = "lexdiv_study_model_data")
+}
+
+#' @export
+print.lexdiv_study_model_data <- function(x, ...) {
+  cat(sprintf(
+    "<lexdiv_study_model_data: %d/%d observations included>\n",
+    nrow(x$data), nrow(x$audit)
+  ))
+  visible <- intersect(
+    c("observation_id", "writer_id", "task", "occasion", "document_id", "request_id", "value", "N"),
+    names(x$data)
+  )
+  print.data.frame(utils::head(x$data[visible], 12L), row.names = FALSE, ...)
+  if (nrow(x$data) > 12L) {
+    cat(sprintf("... %d additional model rows omitted (inspect $data and $audit)\n", nrow(x$data) - 12L))
+  }
+  invisible(x)
 }
 
 lexdiv_study_table <- study_long_table

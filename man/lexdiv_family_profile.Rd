@@ -1,5 +1,6 @@
 \name{lexdiv_family_profile}
 \alias{lexdiv_family_profile}
+\alias{print.lexdiv_family_profile}
 \title{Count resource-defined word families while retaining source occurrences}
 \description{
 Count the word families represented in each document using an explicit
@@ -174,10 +175,16 @@ Bauer, L., and Nation, P. (1993). Word families.
 \emph{International Journal of Lexicography}, 6(4), 253--279.
 \doi{10.1093/ijl/6.4.253}.
 }
-\seealso{\code{\link{lexdiv_import_annotations}},
-\code{\link{bnccoca_data}}, \code{\link{lexdiv_flemmatize}},
-\code{\link{lexdiv_metrics}}, \code{\link{lexdiv_compare_ambiguity}},
-\href{https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html}{Word families, roots and affixes tutorial}}
+\seealso{
+\itemize{
+\item \code{\link{lexdiv_import_annotations}}
+\item \code{\link{bnccoca_data}}
+\item \code{\link{lexdiv_flemmatize}}
+\item \code{\link{lexdiv_metrics}}
+\item \code{\link{lexdiv_compare_ambiguity}}
+\item \href{https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html}{Word families, roots and affixes tutorial}
+}
+}
 \examples{
 # Optional data: review and explicitly download these resources first.
 if (all(lexdiv_resource_info(c("bnccoca"))$available)) {

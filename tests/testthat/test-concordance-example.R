@@ -96,7 +96,7 @@ test_that("context sorting uses nearest tokens, stable ties and absent context l
   a <- concordance_input(list(upper = c("node", "B"), lower = c("node", "a")))
   x <- e$helper$concordance_search(a, list(q = "node"))
   expect_identical(sort(x)$document_id, c("upper", "lower"))
-  expect_identical(sort(x, ignore_case = TRUE)$document_id, c("lower", "upper"))
+  expect_identical(sort(x, case_insensitive = TRUE)$document_id, c("lower", "upper"))
 })
 
 test_that("Unicode source spans stay exact under quanteda's matching semantics", {
@@ -156,19 +156,32 @@ test_that("missing lemmas change denominators without closing source gaps", {
 })
 
 test_that("plots use saved IDs, common source coordinates and retain empty documents", {
-  skip_if_not_installed("ggplot2")
+  path <- tempfile(fileext = ".pdf")
+  grDevices::pdf(path)
+  on.exit({ grDevices::dev.off(); unlink(path) }, add = TRUE)
+  plot_args <- NULL
+  local_mocked_bindings(.lex_plot = function(...) {
+    plot_args <<- list(...)
+    graphics::plot(...)
+  }, .package = "ldfreq")
+  point_color <- NULL
+  real_points <- graphics::points
+  local_mocked_bindings(points = function(..., col) {
+    point_color <<- col
+    real_points(..., col = col)
+  }, .package = "graphics")
   e <- concordance_example(); draw <- e$helper$concordance_positions
   p <- draw(e$search, "word"); abs <- draw(e$search, "phrase", relative = FALSE)
-  expect_identical(p$data$occurrence_id, e$dispersion$occurrence_ids)
-  expect_equal(p$data$position_from[1:3], (c(1, 5, 9) - 0.5) / 12)
-  expect_equal(abs$data$position_from, c(2, 7))
-  expect_equal(abs$data$position_to, c(3, 8))
-  expect_identical(levels(p$data$document), rev(e$search$documents$document_id))
-  expect_equal(p$layers[[1]]$data$axis_end, c(1, 1, 1, 1, 0))
-  expect_null(p$labels$title); expect_null(p$labels$subtitle); expect_null(p$labels$caption)
-  expect_identical(draw(e$search, "word", monochrome = TRUE)$layers[[3]]$aes_params$colour, "black")
-  expect_no_warning(ggplot2::ggplot_build(p))
-  expect_no_warning(ggplot2::ggplot_build(draw(e$search, "absent")))
+  expect_identical(p$occurrences$occurrence_id, e$dispersion$occurrence_ids)
+  expect_equal(p$occurrences$position_from[1:3], (c(1, 5, 9) - 0.5) / 12)
+  expect_equal(abs$occurrences$position_from, c(2, 7))
+  expect_equal(abs$occurrences$position_to, c(3, 8))
+  expect_identical(levels(p$occurrences$document), rev(e$search$documents$document_id))
+  expect_equal(p$documents$axis_end, c(1, 1, 1, 1, 0))
+  expect_null(plot_args$main)
+  expect_no_warning(draw(e$search, "word", monochrome = TRUE))
+  expect_identical(point_color, "black")
+  expect_no_warning(draw(e$search, "absent"))
 })
 
 test_that("invalid input and changed saved searches are rejected, while RDS preserves the record", {
@@ -183,7 +196,7 @@ test_that("invalid input and changed saved searches are rejected, while RDS pres
   expect_error(f(a, list(q = "x"), max_cells = 1), "max_tokens")
   expect_error(f(a, list(q = "learn"), window = 50, max_cells = 100), "context cells")
   changed <- a; changed$documents$document_id[1] <- "altered"
-  expect_error(f(changed, list(q = "x")), "Source annotations changed")
+  expect_error(f(changed, list(q = "x")), "has changed")
   for (field in c("occurrences", "counts", "settings", "source")) {
     changed <- e$search; changed[[field]] <- NULL
     expect_error(e$helper$concordance_sort(changed), "saved concordance changed")

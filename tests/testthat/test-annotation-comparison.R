@@ -85,7 +85,7 @@ test_that("different sources or segmentation never receive positional annotation
   expect_error(lexdiv_compare_annotations(before,
     lexdiv_tokenize("Cats saw cats!", case = "lower")), "same source text")
   expect_error(lexdiv_compare_annotations(before,
-    lexdiv_tokenize("Cats saw cats.", case = "lower", tokenizer = "english")),
+    lexdiv_tokenize("Cats saw cats.", case = "lower", tokenizer = "unicode")),
     "same source text")
   expect_error(lexdiv_compare_annotations(before,
     lexdiv_tokenize("cats saw cats.", case = "lower")), "same source text")

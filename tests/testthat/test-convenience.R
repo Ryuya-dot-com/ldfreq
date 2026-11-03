@@ -43,7 +43,7 @@ test_that("tidy adapters reject ambiguous selected columns and invalid selectors
   for (bad in list(factor("token"), matrix("token"), I("token"),
     setNames("token", "name"))) {
     expect_error(lexdiv_as_documents(tidy, token_col = bad), "token_col")
-    expect_error(lexdiv_as_documents(tidy, document_col = bad), "document_col")
+    expect_error(lexdiv_as_documents(tidy, id_col = bad), "id_col")
   }
   expect_equal(lexdiv_metrics_batch(lexdiv_as_documents(tidy), metrics = "ttr")$value, 0.5)
 })
@@ -57,8 +57,8 @@ test_that("empty document adapters compose with both batch interfaces", {
     expect_identical(documents, empty)
     expect_identical(lexdiv_metrics_batch(documents, metrics = "ttr"),
       lexdiv_metrics_batch(empty, metrics = "ttr"))
-    expect_identical(lexdiv_profile_batch(documents, plan),
-      lexdiv_profile_batch(empty, plan))
+    expect_identical(lexdiv_metrics_batch(documents, plan = plan),
+      lexdiv_metrics_batch(empty, plan = plan))
   }
 })
 
@@ -89,9 +89,9 @@ test_that("long results widen without recomputation", {
 
 test_that("profile request IDs remain distinct in wide output", {
   plan <- lexdiv_plan("length_50_100")
-  profile <- lexdiv_profile_batch(
+  profile <- lexdiv_metrics_batch(
     list(a = rep(c("a", "b"), 60L)),
-    plan
+    plan = plan
   )
   wide <- lexdiv_widen(profile, values_from = "value")
   expect_true(all(c("msttr", "msttr_100", "mattr", "mattr_100") %in% names(wide)))

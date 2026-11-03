@@ -2,99 +2,165 @@ url: https://ryuya-dot-com.github.io/ldfreq/
 
 template:
   bootstrap: 5
+  bslib:
+    primary: "#0072B2"
+    border-radius: 0.375rem
+    btn-border-radius: 0.25rem
+
+home:
+  title: Reproducible Lexical Diversity and Frequency Profiles in R
+  description: >
+    Compute lexical diversity, reference-vocabulary coverage, custom lexical
+    norms, and source-linked corpus analyses while preserving counted words,
+    settings, and missingness reasons.
+  links:
+    - text: Read the Getting Started guide
+      href: articles/getting-started.html
+    - text: Choose the right metric
+      href: articles/choosing-metrics.html
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, lightswitch, github]
+  components:
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/Ryuya-dot-com/ldfreq
+      aria-label: GitHub repository
 
 reference:
-  - title: Overview
+  - title: Package overview
+    desc: >
+      High-level map of inputs, workflows, measurement boundaries, and citations.
     contents:
       - ldfreq-package
-  - title: Core metrics
+
+  - title: Core lexical-diversity metrics
+    desc: >
+      Compute eleven default lexical-diversity measures, moving-average MTLD,
+      and experimental expected-TTR D from pre-tokenized word vectors.
     contents:
       - lexdiv_metrics
-      - lexdiv_resources
-      - lexdiv_metric_ids
       - lexdiv_metrics_batch
-  - title: Raw text and lexical units
+      - lexdiv_metric_ids
+      - lexdiv_variant_metrics
+
+  - title: Raw text, tokenization, and word units
+    desc: >
+      Tokenize raw English texts, attach lemma or AntBNC flemma layers, bridge
+      raw texts into corpus annotations, or import Japanese/external annotations.
     contents:
       - lexdiv_preprocessing
-      - lexdiv_compare_annotations
-      - lexdiv_import_annotations
-      - lexdiv_evaluate_annotations
-      - lexdiv_align_annotations
-      - lexdiv_amod_pairs
-      - lexdiv_ambiguity_review
-      - lexdiv_compare_ambiguity
-      - lexdiv_import_contextual
-      - lexdiv_evaluate_contextual
-      - lexdiv_score_contextual
       - lexdiv_text_batch
       - lexdiv_flemmatize
+      - lexdiv_import_annotations
       - lexdiv_family_profile
-  - title: Study tables and corpus exploration
+      - lexdiv_read_masc
+
+  - title: Plans, local MATTR trajectories, and token-floor screens
+    desc: >
+      Define multi-parameter measurement plans, inspect window-by-window MATTR
+      profiles, and evaluate empirical token-count floors without altering scores.
+    contents:
+      - lexdiv_plan
+      - lexdiv_mattr_profile
+      - plot.lexdiv_mattr_profile
+      - lexdiv_screen_lengths
+      - lexdiv_length_evidence
+
+  - title: Recipes, portable records, and reporting
+    desc: >
+      Reuse resolved settings, inspect differences, and export results or
+      calculation descriptions without changing the measurement engine.
+    contents:
+      - lexdiv_recipe
+      - lexdiv_run_recipe
+      - lexdiv_write
+      - lexdiv_compare_analyses
+      - lexdiv_methods_text
+
+  - title: Reference-vocabulary and morphology profiles
+    desc: >
+      Inspect license terms, download SHA-256-verified optional datasets, and
+      profile vocabulary with TUBELEX, New JACET 8000, BNC/COCA, MorphoLex, or MorphyNet.
+    contents:
+      - lexdiv_resources
+      - tubelex_profile
+      - tubelex_diagnostics
+      - nj8_profile
+      - nj8_diagnostics
+      - bnccoca_data
+      - morpholex_data
+      - morphynet_read_derivations
+
+  - title: Custom lexical norms, overlap, and n-grams
+    desc: >
+      Apply your own familiarity/AoA/frequency tables, measure exact lexical
+      overlap or set coverage, and build or compare adjacent n-gram references.
+    contents:
+      - lexdiv_norm_profile
+      - lexdiv_norm_profile_batch
+      - lexdiv_overlap
+      - lexdiv_reference_coverage
+      - lexdiv_ngrams
+      - lexdiv_build_ngram_reference
+      - lexdiv_compare_ngrams
+
+  - title: Study tables and source-linked corpus exploration
+    desc: >
+      Prepare longitudinal mixed-model tables, search KWIC concordances, and
+      compute within-document dispersion, collocations, keyness, or response pairs.
     contents:
       - lexdiv_study_table
       - lexdiv_concordance
       - lexdiv_collocations
       - lexdiv_keyness
-  - title: Exact lexical overlap and coverage
-    contents:
-      - lexdiv_overlap
-      - lexdiv_reference_coverage
-  - title: Formula variants
-    contents:
-      - lexdiv_variant_metrics
-  - title: Profiles and screens
-    contents:
-      - lexdiv_spec
-      - lexdiv_grid
-      - lexdiv_plan
-      - lexdiv_methods
-      - lexdiv_presets
-      - lexdiv_profile
-      - lexdiv_profile_batch
-      - lexdiv_mattr_profile
-      - plot.lexdiv_mattr_profile
-      - lexdiv_screen
-  - title: Caller-supplied lexical norms
-    contents:
-      - lexdiv_norm_profile
-      - lexdiv_norm_profile_batch
-  - title: Scored vocabulary responses
-    contents:
       - lexdiv_compare_responses
-  - title: Adjacent n-gram frequencies
+
+  - title: Annotation review, alignment, and contextual models
+    desc: >
+      Audit changed tags, align different segmentations, record human KWIC
+      disambiguation decisions, and evaluate external contextual model proposals.
     contents:
-      - lexdiv_ngrams
-      - lexdiv_ngram_reference_build
-      - lexdiv_ngram_compare
-      - lexdiv_read_masc
-  - title: Reference-resource profiles
-    contents:
-      - morpholex_data
-      - bnccoca_data
-      - morphynet_read_derivations
-      - nj8_profile
-      - nj8_diagnostics
-      - tubelex_profile
-      - tubelex_diagnostics
-  - title: Output and visualization
+      - lexdiv_compare_annotations
+      - lexdiv_evaluate_annotations
+      - lexdiv_align_annotations
+      - lexdiv_ambiguity_review
+      - lexdiv_compare_ambiguity
+      - lexdiv_import_contextual
+      - lexdiv_evaluate_contextual
+      - lexdiv_score_contextual
+      - lexdiv_amod_pairs
+
+  - title: Reshaping, container conversion, and plotting
+    desc: >
+      Convert tidy or quanteda token containers, reshape long results to wide
+      reporting tables, and draw publication-ready Base-R figures.
     contents:
       - lexdiv_as_documents
       - lexdiv_widen
       - plot.lexdiv_results
       - lexdiv_convenience
-  - title: Evidence
-    contents:
-      - lexdiv_length_evidence
 
 articles:
   - title: Start here
-    navbar: ~
+    navbar: Start here
+    desc: >
+      First steps from a raw text table to metrics, figures, saved RDS records,
+      and empirical guidance on choosing measures.
     contents:
       - getting-started
       - choosing-metrics
       - from-text-to-report
+      - recipes-and-exports
       - release-scope
+
   - title: Prepare and check your input
+    navbar: Input & Japanese/English setup
+    desc: >
+      Read TXT/CSV files, configure English tokenization, import Japanese
+      morphological annotations, and review ambiguous forms in context.
     contents:
       - english-tokenization
       - japanese-annotations
@@ -104,7 +170,11 @@ articles:
       - ambiguity-review
       - contextual-models
       - open-access-papers
+
   - title: Describe words and reference coverage
+    desc: >
+      Set up optional reference data and profile frequency, lexical levels,
+      word families, roots/affixes, n-grams, and Japanese psycholinguistic norms.
     contents:
       - reference-data
       - corpus-reference-profiles
@@ -116,21 +186,33 @@ articles:
       - japanese-norms
       - japanese-polysemy
       - japanese-stimuli
+
   - title: Explain patterns with source contexts
+    desc: >
+      Connect corpus statistics back to exact source occurrences via KWIC
+      concordances, dispersion, collocations, keyness, ordination, and dependencies.
     contents:
       - concordance-and-dispersion
       - collocation-association
       - keyness-comparison
       - lexical-ordination
       - dependency-pairs
+
   - title: Design comparisons and report results
+    desc: >
+      Plan longitudinal writer/task/occasion studies, mixed-effects model
+      tables, vocabulary test comparisons, readability, and syntactic complexity.
     contents:
       - designing-comparisons
       - repeated-observations
       - vocabulary-knowledge-and-use
       - english-readability
       - syntactic-complexity
+
   - title: Prepare teaching materials
+    desc: >
+      Track vocabulary recurrence across textbook units and build data-driven
+      learning (DDL) handouts from reviewed corpus examples.
     contents:
       - textbook-progression
       - ddl-materials

@@ -24,7 +24,7 @@
     "schema_id": "lexdiv-mattr-profile-result",
     "schema_version": "0.1.0",
     "components": ["summary", "windows", "exposure", "diagnostics", "provenance"],
-    "summary_reuses_lexdiv_profile": true,
+    "summary_reuses_canonical_plan_profile": true,
     "missing_requests_have_detail_rows": false,
     "combined_row_bound": "max_rows"
   },
@@ -54,7 +54,7 @@
     "causal_contribution_claimed": false
   },
   "missingness": {
-    "source": "canonical lexdiv_profile status and missing_reason",
+    "source": "canonical plan-based lexdiv_metrics status and missing_reason",
     "empty_invalid_and_short_are_structured": true,
     "detail_values_imputed": false
   },

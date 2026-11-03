@@ -1,5 +1,5 @@
 # Compare reference choices on one unchanged target and one explicit common set.
-lexdiv_ngram_compare <- function(x, references, baseline = NULL, max_rows = 1e6) {
+lexdiv_compare_ngrams <- function(x, references, baseline = NULL, max_rows = 1e6) {
   .lexng_validate_result(x, "lexdiv_ngrams")
   references <- .lexnorm_plain_list(references, "references")
   if (length(references) < 2L)
@@ -68,14 +68,40 @@ lexdiv_ngram_compare <- function(x, references, baseline = NULL, max_rows = 1e6)
   bind <- function(tables) {
     result <- do.call(rbind, tables); rownames(result) <- NULL; result
   }
-  list(summary = bind(summaries), lookup = bind(lookups),
-    documents = x$documents, references = bind(metadata),
-    provenance = list(contract_id = "ldfreq-ngram-reference-comparison",
-      contract_version = "0.1.0", baseline = baseline, reference_order = ids,
-      target = x$provenance,
-      references = lapply(references, `[[`, "provenance"),
-      common_basis = "defined-rates-in-all-references-including-defined-sample-zeros",
-      difference = "reference-minus-baseline-on-common-target-items",
-      rate_denominator = "reference-eligible-n-gram-opportunities",
-      max_rows = max_rows, runtime_network_access = FALSE))
+  .lexng_seal(
+    list(summary = bind(summaries), lookup = bind(lookups),
+      documents = x$documents, references = bind(metadata),
+      provenance = list(contract_id = "ldfreq-ngram-reference-comparison",
+        contract_version = "0.2.0", baseline = baseline, reference_order = ids,
+        target = x$provenance,
+        references = lapply(references, `[[`, "provenance"),
+        common_basis = "defined-rates-in-all-references-including-defined-sample-zeros",
+        difference = "reference-minus-baseline-on-common-target-items",
+        rate_denominator = "reference-eligible-n-gram-opportunities",
+        max_rows = max_rows, runtime_network_access = FALSE)),
+    "lexdiv_ngram_comparison"
+  )
+}
+
+#' @export
+print.lexdiv_ngram_comparison <- function(x, ...) {
+  if (!inherits(x, "lexdiv_ngram_comparison") || !is.list(x) ||
+      !is.data.frame(x$summary)) {
+    stop("x must be a lexdiv_ngram_comparison object.", call. = FALSE)
+  }
+  refs <- x$provenance$reference_order
+  cat(sprintf(
+    "<lexdiv_ngram_comparison: %d references (baseline=%s); %d summary row%s>\n",
+    length(refs), x$provenance$baseline,
+    nrow(x$summary), if (nrow(x$summary) == 1L) "" else "s"
+  ))
+  cols <- intersect(c("reference_id", "document_id", "n", "weighting",
+    "value_coverage", "common_coverage", "common_mean_frequency_per_million",
+    "difference_from_baseline", "comparison_status"), names(x$summary))
+  shown <- utils::head(x$summary[cols], 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$summary) > nrow(shown)) {
+    cat("... additional summary rows omitted\n")
+  }
+  invisible(x)
 }

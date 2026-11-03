@@ -92,9 +92,8 @@ document-major, requested-metric-minor long form. Its first three columns are
 \code{document_id}, \code{batch_schema_id}, and
 \code{batch_schema_version}; all single-document record columns follow.
 
-With a non-\code{NULL} \code{plan}, the functions return exactly the result of
-\code{\link{lexdiv_profile}} or \code{lexdiv_profile_batch()}, respectively:
-a \code{lexdiv_profile_results} or \code{lexdiv_profile_batch_results} data
+With a non-\code{NULL} \code{plan}, the functions return a
+\code{lexdiv_profile_results} or \code{lexdiv_profile_batch_results} data
 frame, including the plan fingerprint, request and specification IDs, profile
 schema columns, classes and attributes. No plan metadata is discarded.
 }
@@ -218,9 +217,8 @@ Named-list and data-frame inputs preserve document order, followed within each
 document by requested metric order. Batch-envelope and core-record schemas have
 separate explicit IDs and versions.
 
-For several settings of the same method, build a \code{lexdiv_plan()} and pass
-it as \code{plan}. The existing \code{lexdiv_profile()} and
-\code{lexdiv_profile_batch()} entry points remain supported. Combining a plan
+For several settings of the same method, build a \code{\link{lexdiv_plan}} and
+pass it as \code{plan}. Combining a plan
 with explicit metric arguments is an error even when those arguments equal
 their defaults. This avoids an ambiguous override of the recorded plan.
 Plan execution here accepts pre-tokenized input; it does not tokenize raw text.
@@ -247,9 +245,11 @@ an unknown metric ID or invalid selected parameter, stop the call instead of
 returning a result row.
 }
 \section{Migration from core contract 0.1.0}{
-Package 0.3.0 uses core contract 0.2.0. MTLD has the new method ID
-\code{mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1}. The old
-\code{mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1} remains in
+Package 0.3.0 uses core contract 0.2.0. MTLD has the new method ID:
+\preformatted{mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1}
+The old method ID
+\preformatted{mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1}
+remains in
 \code{lexdiv_variant_metrics()}, with the same minimum input length, values,
 and tail behavior (including credit greater than one).
 
@@ -317,7 +317,7 @@ plan <- lexdiv_plan("length_50_100")
 planned <- lexdiv_metrics(tokens, plan = plan)
 planned[, c("request_id", "metric_id", "value", "status", "missing_reason")]
 planned_batch <- lexdiv_metrics_batch(documents, plan = plan)
-stopifnot(identical(planned_batch, lexdiv_profile_batch(documents, plan)))
+planned_batch[, c("document_id", "request_id", "value", "status")]
 
 # Further methods. Sample size 2 is for this tiny illustration only.
 lexdiv_metric_ids()

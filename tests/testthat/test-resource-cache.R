@@ -3,6 +3,15 @@ test_that("inspection and missing readers do not create or download caches", {
   withr::local_options(ldfreq.resource_dir=cache)
   expect_false(dir.exists(cache))
   info <- lexdiv_resource_info()
+  expect_true(all(file.exists(info$notice_path)))
+  expect_true(all(startsWith(info$notice_url, "file://")))
+  for (i in seq_len(nrow(info))) {
+    name <- info$resource[i]
+    expected <- getFromNamespace(".lex_resource_catalog", "ldfreq")[[name]]$files[[
+      paste0("licenses/", name, "/NOTICE.md")]]
+    expect_identical(digest::digest(file = info$notice_path[i], algo = "sha256"), expected)
+    expect_match(utils::URLdecode(info$notice_url[i]), info$notice_path[i], fixed = TRUE)
+  }
   expect_false(any(info$available))
   expect_false(dir.exists(cache))
   expect_error(lexdiv_download_resources("morpholex"), "accept_license")
@@ -47,9 +56,10 @@ test_that("TUBELEX cache failures retain structured single and batch results", {
     expect_false(single$diagnostics$download_attempted)
     expect_true(all(is.na(single$summary$mean_zipf)))
     batch <- tubelex_profile_batch(list(doc = "apple", empty = character()))
-    expect_identical(batch$doc, single)
-    expect_identical(batch$empty$status, "resource_error")
-    expect_identical(batch$empty$failure_reason, reason)
+    expect_s3_class(batch, "tubelex_profile_batch")
+    expect_identical(batch$profiles$doc, single)
+    expect_identical(batch$profiles$empty$status, "resource_error")
+    expect_identical(batch$profiles$empty$failure_reason, reason)
   }
   check_failure("resource_unavailable")
   expect_false(dir.exists(cache))
@@ -82,7 +92,7 @@ test_that("TUBELEX data-file failures use the same contract as manifest failures
     expect_identical(single$status, "resource_error")
     expect_identical(single$failure_reason, reason)
     expect_false(single$diagnostics$download_attempted)
-    expect_identical(tubelex_profile_batch(list(doc = "apple"))$doc, single)
+    expect_identical(tubelex_profile_batch(list(doc = "apple"))$profiles$doc, single)
   }
 })
 

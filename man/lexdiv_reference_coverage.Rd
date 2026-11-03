@@ -130,8 +130,11 @@ preprocessing pipeline, and research design.
 \section{Formal contract}{
 The installed \file{reference-coverage-contract.json} file fixes formulas,
 empty/invalid-input behavior, output shape, and the privacy boundary. Locate it
-with \code{system.file("spec", "reference-coverage-contract.json",
-package = "ldfreq")}.
+with:
+\preformatted{system.file(
+  "spec", "reference-coverage-contract.json",
+  package = "ldfreq"
+)}
 }
 \value{
 \code{lexdiv_reference_coverage()} returns a

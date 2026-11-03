@@ -112,6 +112,20 @@ lexdiv_evaluate_contextual <- function(x, reference, direction, reference_info,
       prediction_policy = "unique best within tolerance, only when every supplied inventory candidate is scored",
       weighting = "occurrences; pooled proportions are not word-level macro averages",
       interpretation = "descriptive reference agreement; independence, reference validity and holdout are caller declarations"))
-  out$provenance$content_sha256 <- .lexng_hash(out)
-  out
+  .lexng_seal(out, "lexdiv_contextual_evaluation")
+}
+
+#' @export
+print.lexdiv_contextual_evaluation <- function(x, ...) {
+  if (!inherits(x, "lexdiv_contextual_evaluation") || !is.list(x) ||
+      !is.data.frame(x$summary)) {
+    stop("x must be a lexdiv_contextual_evaluation object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<lexdiv_contextual_evaluation: direction=%s; %d occurrence%s>\n",
+    x$provenance$direction,
+    x$summary$occurrences, if (x$summary$occurrences == 1) "" else "s"
+  ))
+  print.data.frame(x$summary, row.names = FALSE, ...)
+  invisible(x)
 }

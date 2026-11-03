@@ -83,13 +83,7 @@
   )
 )
 
-#' List supported Maas and MTLD comparison variants
-#'
-#' @return A data frame describing every method accepted by
-#'   [lexdiv_variant_metrics()]. Formula-level references to another tool do
-#'   not assert tokenizer, missing-value, or end-to-end compatibility.
-#' @export
-lexdiv_variant_ids <- function() {
+.lexdiv_variant_ids <- function() {
   methods <- .lexvariant_catalog
   output <- data.frame(
     family = vapply(methods, `[[`, character(1L), "family"),
@@ -406,7 +400,7 @@ lexdiv_variant_ids <- function() {
 #'
 #' @param tokens Input accepted by [lexdiv_metrics()].
 #' @param variants A plain, non-empty, duplicate-free vector selected from the
-#'   `method_id` column of [lexdiv_variant_ids()].
+#'   `method_id` column of `lexdiv_methods(scope = "variants")`.
 #' @param mtld_thresholds One to 16 distinct MTLD thresholds strictly between
 #'   zero and one. Each requested MTLD method is expanded over this vector.
 #'
@@ -415,7 +409,7 @@ lexdiv_variant_ids <- function() {
 #' @export
 lexdiv_variant_metrics <- function(
     tokens,
-    variants = lexdiv_variant_ids()$method_id,
+    variants = lexdiv_methods(scope = "variants")$method_id,
     mtld_thresholds = 0.72) {
   variants <- .lexvariant_validate_methods(variants)
   thresholds <- .lexvariant_validate_thresholds(mtld_thresholds)

@@ -30,6 +30,7 @@
       exclusion_reason = selected$audit$exclusion_reason[!eligible]
     ))
   }
+  terms <- .lex_strip_names(terms)
   if (
     !is.character(terms) || is.object(terms) || !is.null(dim(terms)) ||
       !is.null(attributes(terms)) || anyNA(terms) || any(!nzchar(terms)) ||

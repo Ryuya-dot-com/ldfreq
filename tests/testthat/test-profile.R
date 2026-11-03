@@ -3,9 +3,24 @@ grid_function <- getFromNamespace("lexdiv_grid", "ldfreq")
 plan_function <- getFromNamespace("lexdiv_plan", "ldfreq")
 methods_function <- getFromNamespace("lexdiv_methods", "ldfreq")
 presets_function <- getFromNamespace("lexdiv_presets", "ldfreq")
-profile_function <- getFromNamespace("lexdiv_profile", "ldfreq")
-profile_batch_function <- getFromNamespace("lexdiv_profile_batch", "ldfreq")
-screen_function <- getFromNamespace("lexdiv_screen", "ldfreq")
+profile_function <- function(tokens, plan = lexdiv_plan()) {
+  lexdiv_metrics(tokens, plan = plan)
+}
+profile_batch_function <- function(
+    documents,
+    plan = lexdiv_plan(),
+    id_col = "document_id",
+    tokens_col = "tokens",
+    max_rows = 1e6) {
+  lexdiv_metrics_batch(
+    documents,
+    id_col = id_col,
+    tokens_col = tokens_col,
+    plan = plan,
+    max_rows = max_rows
+  )
+}
+screen_function <- getFromNamespace("lexdiv_screen_lengths", "ldfreq")
 core_function <- getFromNamespace("lexdiv_metrics", "ldfreq")
 
 method_id_for <- function(metric_id) {
@@ -62,7 +77,8 @@ test_that("specs materialize defaults and normalize scalar representations", {
   expect_identical(integer$request_id, "window_a")
   expect_identical(integer$default_quality_floor_tokens, 50)
 
-  expect_error(spec_function("msttr"), "method_id")
+  expect_identical(spec_function("msttr"), default)
+  expect_error(spec_function("unknown_method"), "method_id")
   expect_error(spec_function(method_id, list(segment_length = 0)), "segment_length")
   expect_error(spec_function(method_id, list(window_length = 50)), "Unknown parameter")
   expect_error(

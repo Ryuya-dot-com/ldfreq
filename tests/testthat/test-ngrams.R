@@ -132,7 +132,7 @@ test_that("reference tables validate counts, completeness and compatible declara
   expect_error(build(totals = x$totals[1, ]), "Invalid n")
   expect_error(build(complete = NA), "TRUE or FALSE")
   expect_error(lexdiv_ngram_reference(x, resource, totals = x$totals), "taken from")
-  expect_error(lexdiv_ngram_reference(x, resource[-1]), "exact ordered fields")
+  expect_error(lexdiv_ngram_reference(x, resource[-1]), "must contain the fields")
   ref <- build()
   expect_error(lexdiv_ngram_profile(lexdiv_ngrams(ngram_fixture(), "other"), ref), "preprocessing_id")
   only2 <- lexdiv_ngram_reference(ngram_extract(n = 2), resource)

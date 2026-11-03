@@ -16,7 +16,8 @@ ngcompare_fixture <- function() {
 }
 
 test_that("common items distinguish frequency changes from changing coverage", {
-  f <- ngcompare_fixture(); out <- lexdiv_ngram_compare(f$x, f$references)
+  f <- ngcompare_fixture(); out <- lexdiv_compare_ngrams(f$x, f$references)
+  expect_s3_class(out, "lexdiv_ngram_comparison")
   s <- subset(out$summary, document_id == "d" & n == 2)
   expect_equal(s$mean_frequency_per_million, c(175000, 400000/3, 200000, 200000))
   expect_equal(s$value_coverage, c(1, 1, 1/2, 1/3))
@@ -44,21 +45,21 @@ test_that("common items distinguish frequency changes from changing coverage", {
   p <- tempfile(fileext = ".rds"); on.exit(unlink(p))
   saveRDS(list(target = f$x, references = f$references, comparison = out), p)
   saved <- readRDS(p)
-  expect_identical(lexdiv_ngram_compare(saved$target, saved$references), saved$comparison)
+  expect_identical(lexdiv_compare_ngrams(saved$target, saved$references), saved$comparison)
 })
 
 test_that("baseline and all-reference intersection are explicit", {
   f <- ngcompare_fixture()
-  reverse <- lexdiv_ngram_compare(f$x, f$references, baseline = "pruned")
+  reverse <- lexdiv_compare_ngrams(f$x, f$references, baseline = "pruned")
   s <- subset(reverse$summary, document_id == "d" & n == 2)
   expect_equal(s$difference_from_baseline, c(100000, 100000, 0, 0))
-  reordered <- lexdiv_ngram_compare(f$x, rev(f$references), baseline = "full")
+  reordered <- lexdiv_compare_ngrams(f$x, rev(f$references), baseline = "full")
   expect_identical(reordered$provenance$reference_order, c("pruned", "full"))
   expect_equal(subset(reordered$summary, document_id == "d" & n == 2)$difference_from_baseline,
     c(-100000, -100000, 0, 0))
   third <- lexdiv_ngram_reference(f$references$full$counts[2, ],
     f$references$full$provenance$resource, f$references$full$totals, "same", FALSE)
-  out <- lexdiv_ngram_compare(f$x, c(f$references, list(third = third)))
+  out <- lexdiv_compare_ngrams(f$x, c(f$references, list(third = third)))
   expect_false(any(out$lookup$common_available))
   s <- subset(out$summary, document_id == "d" & n == 2)
   expect_identical(s$comparison_status, rep("no_common_values", 6))
@@ -71,20 +72,20 @@ test_that("defined sample zeros belong to the common set but zero denominators d
   f <- ngcompare_fixture(); a <- f$references$full
   counts <- a$counts[c(1, 3), ]; counts$count <- c(2, 8)
   b <- lexdiv_ngram_reference(counts, a$provenance$resource, a$totals, "same", TRUE)
-  out <- lexdiv_ngram_compare(f$x, list(a = a, b = b))
+  out <- lexdiv_compare_ngrams(f$x, list(a = a, b = b))
   s <- subset(out$summary, document_id == "d" & n == 2)
   expect_equal(s$common_items, c(4, 3, 4, 3))
   expect_equal(s$common_coverage, rep(1, 4))
   expect_equal(s$difference_from_baseline, c(0, 0, -75000, -200000/3))
   empty <- lexdiv_ngrams(f$tokens[FALSE, ], "same")
   zero <- lexdiv_ngram_reference(empty, a$provenance$resource)
-  out <- lexdiv_ngram_compare(f$x, list(a = a, zero = zero))
+  out <- lexdiv_compare_ngrams(f$x, list(a = a, zero = zero))
   expect_true(all(out$summary$common_items == 0))
   expect_true(all(is.na(out$summary$difference_from_baseline)))
   expect_identical(subset(out$summary, reference_id == "zero" & document_id == "d" & n == 2)$missing_reason,
     rep("zero_reference_opportunities", 2))
-  none <- lexdiv_ngram_compare(empty, f$references)
-  full <- lexdiv_ngram_compare(f$x, f$references)
+  none <- lexdiv_compare_ngrams(empty, f$references)
+  full <- lexdiv_compare_ngrams(f$x, f$references)
   for (field in c("summary", "lookup", "documents"))
     expect_identical(none[[field]], full[[field]][FALSE, ])
   s <- subset(full$summary, document_id == "empty" | n == 3)
@@ -94,26 +95,26 @@ test_that("defined sample zeros belong to the common set but zero denominators d
 
 test_that("inconsistent references and excessive output fail before profiling", {
   f <- ngcompare_fixture()
-  expect_error(lexdiv_ngram_compare(f$x, unname(f$references)), "names")
-  expect_error(lexdiv_ngram_compare(f$x, f$references[1]), "at least two")
-  expect_error(lexdiv_ngram_compare(f$x, setNames(f$references, c("a", "a"))), "unique")
-  expect_error(lexdiv_ngram_compare(f$x, f$references, "unknown"), "baseline")
+  expect_error(lexdiv_compare_ngrams(f$x, unname(f$references)), "names")
+  expect_error(lexdiv_compare_ngrams(f$x, f$references[1]), "at least two")
+  expect_error(lexdiv_compare_ngrams(f$x, setNames(f$references, c("a", "a"))), "unique")
+  expect_error(lexdiv_compare_ngrams(f$x, f$references, "unknown"), "baseline")
   bad <- f$references; bad$full$totals$opportunities[1] <- 1
-  expect_error(lexdiv_ngram_compare(f$x, bad), "unmodified")
+  expect_error(lexdiv_compare_ngrams(f$x, bad), "unmodified")
   a <- f$references$full
   for (field in c("lookup_unit", "resource_key_normalization_id")) {
     resource <- a$provenance$resource; resource[[field]] <- "different"
     b <- lexdiv_ngram_reference(a$counts, resource, a$totals, "same", TRUE)
-    expect_error(lexdiv_ngram_compare(f$x, list(a = a, b = b)), field)
+    expect_error(lexdiv_compare_ngrams(f$x, list(a = a, b = b)), field)
   }
   b <- lexdiv_ngram_reference(a$counts, a$provenance$resource, a$totals, "different", TRUE)
-  expect_error(lexdiv_ngram_compare(f$x, list(a = a, b = b)), "preprocessing_id")
+  expect_error(lexdiv_compare_ngrams(f$x, list(a = a, b = b)), "preprocessing_id")
   b <- lexdiv_ngram_reference(a$counts, a$provenance$resource, a$totals[1, ], "same", TRUE)
-  expect_error(lexdiv_ngram_compare(f$x, list(a = a, b = b)), "every requested n")
-  expect_equal(nrow(lexdiv_ngram_compare(f$x, f$references, max_rows = 24)$summary), 16)
+  expect_error(lexdiv_compare_ngrams(f$x, list(a = a, b = b)), "every requested n")
+  expect_equal(nrow(lexdiv_compare_ngrams(f$x, f$references, max_rows = 24)$summary), 16)
   local_mocked_bindings(lexdiv_ngram_profile = function(...) stop("PROFILE_REACHED"), .package = "ldfreq")
-  expect_error(lexdiv_ngram_compare(f$x, f$references, max_rows = 23), "exceed max_rows")
-  expect_error(lexdiv_ngram_compare(f$x, f$references, max_rows = 24), "PROFILE_REACHED")
+  expect_error(lexdiv_compare_ngrams(f$x, f$references, max_rows = 23), "exceed max_rows")
+  expect_error(lexdiv_compare_ngrams(f$x, f$references, max_rows = 24), "PROFILE_REACHED")
 })
 
 test_that("bigrams and trigrams use their own reference denominators and requested order", {
@@ -128,7 +129,7 @@ test_that("bigrams and trigrams use their own reference denominators and request
   counts$count <- c(2, 2, 6, 3, 1)
   b <- lexdiv_ngram_reference(counts, resource,
     data.frame(n = c(3L, 2L), opportunities = c(4, 10), documents = 5), "same", TRUE)
-  out <- lexdiv_ngram_compare(target, list(a = a, b = b))
+  out <- lexdiv_compare_ngrams(target, list(a = a, b = b))
   expect_identical(out$lookup$n, rep(c(3L, 2L, 2L), 2))
   expect_equal(out$summary$reference_opportunities, c(2, 2, 10, 10, 4, 4, 10, 10))
   expect_equal(out$summary$common_mean_frequency_per_million,
@@ -160,7 +161,7 @@ test_that("generated reference comparisons agree with a direct component-wise or
         if (keep[match_row]) rates[i,j] <- count[match_row] / sum(count) * 1e6
       }
     }
-    out <- lexdiv_ngram_compare(x, references)
+    out <- lexdiv_compare_ngrams(x, references)
     common <- apply(rates, 1, function(v) all(!is.na(v)))
     expect_equal(out$lookup$frequency_per_million, as.vector(rates))
     expect_identical(out$lookup$common_available, rep(common, 3))

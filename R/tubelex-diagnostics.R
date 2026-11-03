@@ -6,7 +6,7 @@
       !.lexprep_is_plain_choice(x$status, c("ok", "empty", "invalid_input", "resource_error")) ||
       !is.list(x$provenance) || !is.list(x$coverage) || !is.list(x$diagnostics) ||
       !identical(x$provenance$contract_id, .tubelex_profile_contract_id) ||
-      !identical(x$provenance$contract_version, "0.2.0")) fail()
+      !x$provenance$contract_version %in% c("0.3.0", "0.2.0")) fail()
   p <- x$provenance
   if (!identical(p$resource, .lexres_resource_ref(.lexres_tubelex_expectation())) ||
       !identical(p$lookup, .lexres_lookup_ref()) ||
@@ -71,19 +71,30 @@
 #' frequency summaries, and counts unmatched terms and normalization mappings.
 #' No tokenization, resource lookup or network access is performed.
 #'
-#' @param x One [tubelex_profile()] result or the plain named list returned by
-#'   [tubelex_profile_batch()]. A zero-document named list is allowed.
+#' @param x One [tubelex_profile()] result, a [tubelex_profile_batch()] result,
+#'   or a plain named list of `tubelex_profile` objects. A zero-document batch
+#'   or named list is allowed.
 #' @param max_rows Maximum number of input lookup rows plus two summary rows
 #'   per document, checked before constructing aggregate tables.
-#' @return A plain list with `summary`, `documents`, `unmatched_terms`,
-#'   `normalization_mappings`, `provenance`, and `diagnostics`. Metadata lists
-#'   retain each complete document record; the input profiles are unmodified.
+#' @return A `tubelex_diagnostics` list with `summary`, `documents`,
+#'   `unmatched_terms`, `normalization_mappings`, `provenance`, and
+#'   `diagnostics`. Metadata lists retain each complete document record; the
+#'   input profiles are unmodified.
 #' @export
 tubelex_diagnostics <- function(x, max_rows = 1e6) {
   max_rows <- .profile_positive_integer(max_rows, "max_rows")
-  if (inherits(x, "tubelex_profile")) x <- list(document_1 = x)
+  if (inherits(x, "tubelex_profile")) {
+    x <- list(document_1 = x)
+  } else if (inherits(x, "tubelex_profile_batch")) {
+    if (!is.list(x) || !is.list(x$profiles)) {
+      stop("x has an invalid tubelex_profile_batch structure; use the unmodified result.",
+        call. = FALSE)
+    }
+    x <- x$profiles
+  }
   if (!is.list(x) || is.object(x) || !identical(names(attributes(x)), "names")) {
-    stop("x must be one TUBELEX profile or a plain named list of profiles.", call. = FALSE)
+    stop("x must be one TUBELEX profile, a tubelex_profile_batch object, or a plain named list of profiles.",
+      call. = FALSE)
   }
   ids <- .lex_batch_validate_ids(names(x), length(x))
   rows <- vapply(x, function(profile) {
@@ -96,8 +107,6 @@ tubelex_diagnostics <- function(x, max_rows = 1e6) {
     stop("The requested TUBELEX diagnostic input exceeds max_rows.", call. = FALSE)
   }
   for (i in seq_along(x)) .tubelex_diagnostic_validate(x[[i]], ids[i])
-  # Condition IDs prevent pooling counts across differing query/input settings.
-  # Equal settings on unverified vectors do not establish tokenizer equivalence.
   setting_fields <- c("profile_version", "resource_id", "resource_version",
     "query_normalization", "tokenization_alignment", "input_source",
     "tokenizer_id", "tokenizer_version", "text_normalization", "text_case", "keep_numbers")
@@ -149,8 +158,35 @@ tubelex_diagnostics <- function(x, max_rows = 1e6) {
   mappings$lookup_changed <- mappings$term != mappings$lookup_term
   mappings$number_marker <- mappings$lookup_term == "<num>"
   rownames(documents) <- rownames(summary) <- NULL
-  list(summary = summary, documents = documents, unmatched_terms = unmatched,
-    normalization_mappings = mappings,
-    provenance = stats::setNames(lapply(x, `[[`, "provenance"), ids),
-    diagnostics = stats::setNames(lapply(x, `[[`, "diagnostics"), ids))
+  structure(
+    list(summary = summary, documents = documents, unmatched_terms = unmatched,
+      normalization_mappings = mappings,
+      provenance = stats::setNames(lapply(x, `[[`, "provenance"), ids),
+      diagnostics = stats::setNames(lapply(x, `[[`, "diagnostics"), ids)),
+    class = "tubelex_diagnostics"
+  )
+}
+
+#' @export
+print.tubelex_diagnostics <- function(x, ...) {
+  if (!inherits(x, "tubelex_diagnostics") || !is.list(x) ||
+      !is.data.frame(x$documents)) {
+    stop("x must be a tubelex_diagnostics object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<tubelex_diagnostics: %d document%s; %d unmatched term%s; %d mapping%s>\n",
+    nrow(x$documents), if (nrow(x$documents) == 1L) "" else "s",
+    nrow(x$unmatched_terms), if (nrow(x$unmatched_terms) == 1L) "" else "s",
+    nrow(x$normalization_mappings), if (nrow(x$normalization_mappings) == 1L) "" else "s"
+  ))
+  cols <- intersect(
+    c("document_id", "condition_id", "status", "eligible_tokens", "matched_tokens", "token_coverage"),
+    names(x$documents)
+  )
+  shown <- utils::head(x$documents[cols], 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$documents) > nrow(shown)) {
+    cat("... additional document rows omitted\n")
+  }
+  invisible(x)
 }

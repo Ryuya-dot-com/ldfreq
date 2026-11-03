@@ -905,7 +905,7 @@ MATTR is useful for within-text fluctuation but should not be treated as a
 parameter-free universal score.
 
 `lexdiv_plan()` records parameter variants as different requests. Run them
-through `lexdiv_metrics(..., plan = plan)`; `lexdiv_profile()` remains supported:
+through `lexdiv_metrics(..., plan = plan)`:
 
 ```{r}
 long_tokens <- rep(

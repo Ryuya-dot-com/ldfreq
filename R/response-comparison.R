@@ -107,7 +107,29 @@ lexdiv_compare_responses <- function(data, test, criterion,
   summary$proportion <- ifelse(summary$denominator == 0, NA_real_,
     summary$numerator / summary$denominator)
   rownames(counts) <- rownames(summary) <- NULL
-  list(responses = data, counts = counts, summary = summary,
-    provenance = list(comparison_version = "0.1.0", test = test, criterion = criterion,
-      keys = keys, by = by, missing_policy = "retain; proportions use complete pairs except complete_pair_fraction"))
+  structure(
+    list(responses = data, counts = counts, summary = summary,
+      provenance = list(comparison_version = "0.1.0", test = test, criterion = criterion,
+        keys = keys, by = by, missing_policy = "retain; proportions use complete pairs except complete_pair_fraction")),
+    class = "lexdiv_response_comparison"
+  )
+}
+
+#' @export
+print.lexdiv_response_comparison <- function(x, ...) {
+  if (!inherits(x, "lexdiv_response_comparison") || !is.list(x) ||
+      !is.data.frame(x$summary)) {
+    stop("x must be a lexdiv_response_comparison object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<lexdiv_response_comparison: %s vs %s; %d response row%s>\n",
+    x$provenance$test, x$provenance$criterion,
+    nrow(x$responses), if (nrow(x$responses) == 1L) "" else "s"
+  ))
+  shown <- utils::head(x$summary, 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$summary) > nrow(shown)) {
+    cat("... additional summary rows omitted\n")
+  }
+  invisible(x)
 }

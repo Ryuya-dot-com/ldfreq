@@ -32,6 +32,7 @@
 }
 
 .lexres_lookup_input <- function(terms) {
+  terms <- .lex_strip_names(terms)
   plain_container <- is.character(terms) &&
     !is.object(terms) &&
     is.null(dim(terms)) &&

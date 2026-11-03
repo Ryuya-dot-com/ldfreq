@@ -152,7 +152,7 @@ test_that("malformed schemas and incompatible declarations are rejected", {
   g <- f; g$dictionary$upos <- "NN"
   expect_error(do.call(lexdiv_family_profile, g), "UD tags")
   g <- f; g$annotations$tokens$surface[1] <- "changed"
-  expect_error(do.call(lexdiv_family_profile, g), "align exactly")
+  expect_error(do.call(lexdiv_family_profile, g), "has changed")
   expect_error(do.call(lexdiv_family_profile, c(f, list(exclude_pos = "NN"))), "UD POS")
   expect_error(do.call(lexdiv_family_profile, c(f, list(max_tokens = 2))), "max_tokens")
 })

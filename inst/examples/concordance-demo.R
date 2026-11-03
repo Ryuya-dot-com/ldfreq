@@ -30,7 +30,7 @@ search <- helper$concordance_search(annotations,
 sorted <- helper$concordance_sort(search, side = "right", depth = 2L)
 dispersion <- helper$concordance_dispersion(search, "word", parts = 3L)
 record <- list(search = search, sorted = sorted, dispersion = dispersion,
-  sort = list(side = "right", depth = 2L, ignore_case = FALSE),
+  sort = list(side = "right", depth = 2L, case_insensitive = FALSE),
   session = utils::sessionInfo())
 stopifnot(identical(dispersion$occurrence_ids,
   search$occurrences$occurrence_id[search$occurrences$query_id == "word"]),

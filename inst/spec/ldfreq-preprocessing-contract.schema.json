@@ -25,7 +25,7 @@
       "const": "ldfreq-preprocessing"
     },
     "contract_version": {
-      "const": "0.4.0"
+      "const": "1.0.0"
     },
     "status": {
       "const": "normative"

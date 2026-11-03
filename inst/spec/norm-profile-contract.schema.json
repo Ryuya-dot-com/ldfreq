@@ -14,7 +14,7 @@
   "properties": {
     "$schema": {"const": "norm-profile-contract.schema.json"},
     "contract_id": {"const": "ldfreq-generic-norm-profile"},
-    "contract_version": {"const": "0.1.0"},
+    "contract_version": {"const": "0.2.0"},
     "status": {"const": "normative"},
     "public_api": {"const": true},
     "function": {"const": "lexdiv_norm_profile"},

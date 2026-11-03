@@ -13,10 +13,7 @@ the words counted, analysis settings and reasons for unavailable scores.
 After installing the package, run:
 \preformatted{
 library(ldfreq)
-result <- lexdiv_metrics_text(
-  "Cats chase cats and dogs.",
-  tokenizer = "english", case = "lower", metrics = "ttr"
-)
+result <- lexdiv_metrics_text("Cats chase cats and dogs.", metrics = "ttr")
 result$results
 }
 The text has five word occurrences (\code{N = 5}) and four distinct lowercase
@@ -45,16 +42,16 @@ For ordinary text analyses, inspect \code{result$results} and
 \code{\link{lexdiv_widen}} or plot document values with \code{plot(result, metric_id = "ttr")}.
 Save the original text and complete result together as RDS.
 
-For planned observations, start with token vectors and a
-\code{\link{lexdiv_plan}}. Pass the complete output of
-\code{\link{lexdiv_metrics_batch}(tokens, plan = plan)}, together with the
-schedule, submissions and reporting decisions, to \code{\link{lexdiv_study_table}}.
-Then use \code{\link{lexdiv_study_model_data}} to select one response per
-observation for a modelling package. The raw-text convenience functions do
-not accept a plan; their result tables cannot replace this plan-based input.
+For planned observations, create a \code{\link{lexdiv_plan}} and run either
+\code{\link{lexdiv_metrics_batch}(tokens, plan = plan)} or
+\code{\link{lexdiv_metrics_text_batch}(texts, plan = plan)}, then pass the
+result together with the schedule, submissions and reporting decisions to
+\code{\link{lexdiv_study_table}}. Use \code{\link{lexdiv_study_model_data}} to
+select one response per observation for a modelling package.
 
 For source-linked exploration, prepare complete annotations using
-\code{\link{lexdiv_import_annotations}}. A saved \code{\link{lexdiv_concordance}}
+\code{\link{lexdiv_import_annotations}} or bridge raw texts/tokenizations directly
+with \code{\link{lexdiv_as_annotations}}. A saved \code{\link{lexdiv_concordance}}
 search feeds \code{\link{lexdiv_sort_concordance}},
 \code{\link{lexdiv_concordance_dispersion}}, \code{\link{lexdiv_collocations}}
 or \code{plot(search, query_id)}. A \code{\link{lexdiv_keyness}} comparison
@@ -177,10 +174,10 @@ Choose the entry point from the form of data you already have:
   explicit segment IDs and original positions, then construct or import a
   local reference with \code{lexdiv_ngram_reference()} and look up target
   sequences with \code{lexdiv_ngram_profile()}. Corpus text is not bundled.}
-  \item{Chunked reference construction}{Use \code{\link{lexdiv_ngram_reference_build}}
+  \item{Chunked reference construction}{Use \code{\link{lexdiv_build_ngram_reference}}
   to accumulate exact counts from whole-document chunks without retaining
   all occurrence tables. Distinct types and the document roster stay in memory.}
-  \item{Reference-choice sensitivity}{Use \code{\link{lexdiv_ngram_compare}}
+  \item{Reference-choice sensitivity}{Use \code{\link{lexdiv_compare_ngrams}}
   to retain separate reference coverage and compare frequencies on common
   target items, with explicit baseline differences and denominators.}
   \item{Supplied corpus annotations}{Use \code{\link{lexdiv_read_masc}} for
@@ -228,7 +225,7 @@ tables and provenance. Those data and their dictionary use CC BY-NC-SA 4.0
 separately from the MIT license of the independent R code.
 Adjacent bigram/trigram extraction and caller-supplied reference frequencies
 retain segment boundaries, original positions, opportunity totals and coverage.
-\code{\link{lexdiv_ngram_compare}} compares reference choices using the same
+\code{\link{lexdiv_compare_ngrams}} compares reference choices using the same
 target items, retaining coverage and common-set differences from a baseline.
 Result rows retain method, parameter or denominator, schema, and contract
 provenance.
@@ -391,13 +388,13 @@ Exact term/content-word overlap describes lexical sharing under the selected
 unit and annotation. It is not a plagiarism detector or a direct measure of
 semantic similarity, coherence, proficiency, or writing quality.
 }
-\section{Quality screens}{
+\section{Token-count screens}{
 \code{below_quality_floor} and \code{lexdiv_screen_lengths()} are advisory token-count
-evidence screens. Here, quality is a field name retained for compatibility; it does not mean writing
-quality, measurement validity, or reliability. The screens never change a value,
-effective parameter, status, or document membership. Passing a screen does not
-establish validity or reliability; failing one does not erase an otherwise
-computable value.
+evidence screens derived from empirical length-stability studies; they do not
+measure writing quality, construct validity, or score reliability. The screens
+never change a value, effective parameter, status, or document membership.
+Passing a screen does not establish validity or reliability; failing one does
+not erase an otherwise computable value.
 }
 \section{Versioned surfaces}{
 The core metrics, raw-text preprocessing, lexical overlap, reference coverage,
@@ -407,13 +404,12 @@ versioned contracts. This keeps a change in tokenization or resource matching
 from silently redefining a core metric. Expected-TTR D is separately named and
 explicitly distinguished from CLAN VOCD.
 }
-\section{Offline smoke test}{
-After loading \pkg{ldfreq}, run the installed script returned by
+\section{Self-contained offline example}{
+After loading \pkg{ldfreq}, you can run the self-contained example script at
 \code{system.file("examples", "offline-smoke.R", package = "ldfreq")}. It
-exercises single, batch, profile, local-MATTR, profile-batch,
-term/content-word overlap, many-document reference coverage, lexical-norm,
-lexical-level, and screen workflows without
-a network connection or external runtime.
+exercises single, batch, plan, local-MATTR, term/content-word overlap,
+reference coverage, custom norm, and lexical-level workflows end to end
+without a network connection or external runtime.
 }
 \seealso{
 \code{\link{lexdiv_metrics}}, \code{\link{lexdiv_convenience}},
@@ -423,7 +419,7 @@ a network connection or external runtime.
 \code{\link{lexdiv_reference_coverage}},
 \code{\link{lexdiv_norm_profile}},
 \code{\link{lexdiv_norm_profile_batch}},
-\code{\link{lexdiv_profile}}, \code{\link{lexdiv_mattr_profile}},
+\code{\link{lexdiv_plan}}, \code{\link{lexdiv_mattr_profile}},
 \code{\link{lexdiv_variant_metrics}},
 \code{\link{nj8_profile}},
 \code{\link{tubelex_profile}}
@@ -432,19 +428,14 @@ a network connection or external runtime.
 library(ldfreq)
 
 # One raw English text: inspect the score and the counted words.
-result <- lexdiv_metrics_text(
-  "Cats chase cats and dogs.",
-  tokenizer = "english", case = "lower", metrics = "ttr"
-)
+result <- lexdiv_metrics_text("Cats chase cats and dogs.", metrics = "ttr")
 result$results  # N = 5, V = 4, TTR = 0.8
 result$token_audit
 
 # Several texts: names identify documents, including the empty one.
 texts <- c(essay_a = "Cats chase cats and dogs.", essay_b = "The reader reads a story.",
   empty = "")
-batch <- lexdiv_metrics_text_batch(
-  texts, tokenizer = "english", case = "lower", metrics = "ttr"
-)
+batch <- lexdiv_metrics_text_batch(texts, metrics = "ttr")
 batch$results  # TTR = 0.8, 1, NA; the empty text has reason "empty_input".
 
 # Other entry points: ?lexdiv_metrics for pre-tokenized words;

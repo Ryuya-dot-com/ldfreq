@@ -1,5 +1,6 @@
 \name{lexdiv_align_annotations}
 \alias{lexdiv_align_annotations}
+\alias{print.lexdiv_annotation_alignment}
 \title{Align different token segmentations using original source positions}
 \description{
 Connects complete external annotations of the same original segments by

@@ -106,15 +106,27 @@ lexdiv_import_contextual <- function(review, data, model, embeddings = NULL,
       review_id = review$provenance$review_id, model = model,
       coordinates = "segment-local-1-based-inclusive-Unicode-codepoints",
       interpretation = "caller-supplied model output; no inference, automatic selection or validity claim"))
-  out$provenance$content_sha256 <- .lexng_hash(out)
-  out
+  .lexng_seal(out, "lexdiv_contextual")
 }
 
 .lexctx_validate_output <- function(x) {
-  if (!is.list(x) || !is.list(x$provenance) ||
+  if (!inherits(x, "lexdiv_contextual") || !is.list(x) || !is.list(x$provenance) ||
       !identical(x$provenance$importer, "ldfreq-contextual-output") ||
       !identical(x$provenance$importer_version, "0.1.0") ||
       !identical(x$provenance$content_sha256, .lexng_hash(x)))
     stop("Use unmodified lexdiv_import_contextual() results with content fingerprints.", call. = FALSE)
+  invisible(x)
+}
+
+#' @export
+print.lexdiv_contextual <- function(x, ...) {
+  .lexctx_validate_output(x)
+  cat(sprintf(
+    "<lexdiv_contextual: model=%s; %d occurrence%s; %d with embeddings>\n",
+    x$provenance$model$model_id,
+    x$summary$occurrences, if (x$summary$occurrences == 1) "" else "s",
+    x$summary$with_embeddings
+  ))
+  print.data.frame(x$summary, row.names = FALSE, ...)
   invisible(x)
 }

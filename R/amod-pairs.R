@@ -165,6 +165,20 @@ lexdiv_amod_pairs <- function(annotations, unit = c("surface", "lemma"),
       types = "ordered dependent/head terms; exact case-sensitive matching; counts condition on available units",
       coordinates = annotations$provenance$coordinates,
       scope = "one sentence per segment; basic source-aligned syntactic words only; no enhanced dependencies or inference"))
-  out$provenance$content_sha256 <- .lexng_hash(out)
-  out
+  .lexng_seal(out, "lexdiv_amod_pairs")
+}
+
+#' @export
+print.lexdiv_amod_pairs <- function(x, ...) {
+  if (!inherits(x, "lexdiv_amod_pairs") || !is.list(x) || !is.data.frame(x$summary)) {
+    stop("x must be a lexdiv_amod_pairs object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<lexdiv_amod_pairs: unit=%s; %d document%s; %d observed pair%s>\n",
+    x$provenance$unit,
+    nrow(x$documents), if (nrow(x$documents) == 1L) "" else "s",
+    x$summary$observed_pairs, if (x$summary$observed_pairs == 1) "" else "s"
+  ))
+  print.data.frame(x$summary, row.names = FALSE, ...)
+  invisible(x)
 }

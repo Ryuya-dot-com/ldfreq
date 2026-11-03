@@ -1,121 +1,160 @@
-# ldfreq
+# ldfreq <a href="https://ryuya-dot-com.github.io/ldfreq/"><img src="man/figures/logo.svg" align="right" height="138" alt="ldfreq website" /></a>
 
-**Lexical diversity, vocabulary profiles and corpus comparisons in R.**
-Keep the original text, token choices, reference coverage and measurement settings
-connected to the results you report.
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/Ryuya-dot-com/ldfreq/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Ryuya-dot-com/ldfreq/actions/workflows/R-CMD-check.yaml)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![R >= 4.1.0](https://img.shields.io/badge/R-%3E%3D%204.1.0-276DC3.svg?logo=r&logoColor=white)](https://cran.r-project.org/)
+[![Dependencies: 2](https://img.shields.io/badge/dependencies-2%20(digest%2C%20stringi)-0072B2.svg)](https://github.com/Ryuya-dot-com/ldfreq/blob/main/DESCRIPTION)
+<!-- badges: end -->
 
+**Reproducible lexical diversity, vocabulary profiles, and source-linked corpus analysis in R.**
+
+`ldfreq` measures lexical diversity and reference-vocabulary coverage while keeping every score connected to the exact words counted, preprocessing choices, coverage rates, and reasons for unavailable values.
+
+[Get started](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html) ·
 [Guides](https://ryuya-dot-com.github.io/ldfreq/articles/index.html) ·
 [Function reference](https://ryuya-dot-com.github.io/ldfreq/reference/index.html) ·
-[Metric selection](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html) ·
-[Issues](https://github.com/Ryuya-dot-com/ldfreq/issues)
+[Choosing metrics](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html) ·
+[Report an issue](https://github.com/Ryuya-dot-com/ldfreq/issues)
+
+## Why ldfreq?
+
+- **Auditable from raw text to model table**: Every result retains counted tokens (`$token_audit`), parameter settings, and explicit `status` / `missing_reason` fields—short or empty documents are never silently dropped or turned into zeros.
+- **One cohesive workflow**: Compute 13 lexical-diversity measures, profile vocabulary against frequency/level/norm/word-family lists (`TUBELEX`, `New JACET 8000`, `BNC/COCA`, `MorphoLex`, or your own tables), and inspect source contexts with KWIC concordances, dispersion, collocations, and keyness.
+- **Lightweight and R-native**: Requires only **2 runtime packages** (`digest` and `stringi`), runs offline out of the box, accepts `data.frame`, `tibble`, `data.table`, and `quanteda` objects, and produces publication-ready Base-R figures (`monochrome = TRUE` supported).
 
 <a id="installation"></a>
 
-## Install
+## Installation
 
-Install the fixed release **1.0.0** below (R 4.1 or later).
+The examples on this page use the **development snapshot 1.0.0.9001**
+(R 4.1 or later). It contains incompatible changes relative to stable 1.0.0;
+review the migration notes below before using it with an existing analysis.
+
+```r
+# Development snapshot from GitHub main
+install.packages("pak")
+pak::pak("Ryuya-dot-com/ldfreq@main")
+
+# Or use remotes
+install.packages("remotes")
+remotes::install_github("Ryuya-dot-com/ldfreq@main")
+```
+
+To install the current stable release instead, use
+`remotes::install_github("Ryuya-dot-com/ldfreq@v1.0.0")`. Its documentation
+is included with that version; use `browseVignettes("ldfreq")` after installation.
+
+To install the development snapshot from its local archive:
 
 ```r
 install.packages(c("digest", "stringi"))
-install.packages(
-  "https://github.com/Ryuya-dot-com/ldfreq/releases/download/v1.0.0/ldfreq_1.0.0.tar.gz",
-  repos = NULL, type = "source"
-)
-library(ldfreq)
+install.packages("ldfreq_1.0.0.9001.tar.gz", repos = NULL, type = "source")
 ```
 
-Optional integrations state their additional packages in the relevant guide.
-Use `browseVignettes("ldfreq")` for guides matching your installed version.
-Earlier releases remain available in the [release archive](https://github.com/Ryuya-dot-com/ldfreq/releases).
+### Migrating from 1.0.0
 
-## Start with your text
+Raw-text tokenization and metric functions now default to `case = "lower"` and
+`tokenizer = "english"`. To request the 1.0.0 preprocessing choices, explicitly
+set `case = "preserve", tokenizer = "unicode"` and retain the recorded settings.
+Different tokenization can change scores and makes direct comparisons unsafe
+without examining the counting conditions.
+
+Several former entry points and argument names have also changed. Consult the
+[development change notes](https://github.com/Ryuya-dot-com/ldfreq/blob/main/NEWS.md)
+for the replacement names and the relevant help pages before reopening an
+existing workflow. Stable 1.0.0 remains available unchanged.
+
+## Quick start
+
+Pass one text to `lexdiv_metrics_text()` or a document table (`data.frame` or `tibble`) to `lexdiv_metrics_text_batch()`. English tokenization (`tokenizer = "english"`) and lowercasing (`case = "lower"`) are used by default and recorded alongside the results:
 
 ```r
-text <- paste(
-  "Students compared two versions of a short story in their writing class.",
-  "They marked repeated words and discussed how each writer introduced new ideas.",
-  "One group revised the opening while another group examined the ending.",
-  "After reading the stories again, the students explained their choices and",
-  "saved both the original texts and their revised versions for later comparison."
-)
-result <- lexdiv_metrics_text(text, tokenizer = "english", case = "lower",
-  metrics = c("mattr", "hdd", "mtld"))
-result$results[c("metric_id", "value", "N", "status", "missing_reason")]
+library(ldfreq)
 
-# Check counted words, make a report table, and retain the full analysis.
-head(result$token_audit)
-report <- lexdiv_widen(result$results,
-  values_from = c("value", "status", "missing_reason", "N"))
-report
-saveRDS(list(text = text, analysis = result, report = report), "analysis.rds")
+essays <- data.frame(
+  document_id = c("essay_01", "essay_02", "empty_doc"),
+  text = c(
+    paste(
+      "Students compared two versions of a short story in their writing class.",
+      "They marked repeated words and discussed how each writer introduced new ideas.",
+      "One group revised the opening while another group examined the ending.",
+      "After reading the stories again, the students explained their choices and",
+      "saved both the original texts and their revised versions for later comparison."
+    ),
+    "A short draft with too few words for a 50-token moving window.",
+    ""
+  )
+)
+
+batch <- lexdiv_metrics_text_batch(essays, metrics = c("ttr", "mattr", "hdd", "mtld"))
+batch
+#> <lexdiv_text_batch_results: 3 documents; 70 audited tokens>
+#> <lexdiv_batch_results: 3 documents; 12 metric records; schema 0.1.0>
+#>    document_id metric_id      value  status                    missing_reason  N  V
+#> 1     essay_01       ttr  0.7931034      ok                              <NA> 58 46
+#> 2     essay_01     mattr  0.8177778      ok                              <NA> 58 46
+#> 3     essay_01       hdd  0.8312797      ok                              <NA> 58 46
+#> 4     essay_01      mtld 78.4933333      ok                              <NA> 58 46
+#> 5     essay_02       ttr  0.9166667      ok                              <NA> 12 11
+#> 6     essay_02     mattr         NA missing too_short_for_requested_parameter 12 11
+#> 7     essay_02       hdd         NA missing too_short_for_requested_parameter 12 11
+#> 8     essay_02      mtld 40.3200000      ok                              <NA> 12 11
+#> 9    empty_doc       ttr         NA missing                       empty_input  0  0
+#> ...
+
+# Reshape directly to a wide reporting table and plot available scores:
+wide <- lexdiv_widen(batch, values_from = c("value", "status", "missing_reason", "N"))
+plot(batch, metric_id = "mtld")
 ```
 
-This connects **text → scores and counted words → report table → saved record**.
-Reopen it with `readRDS("analysis.rds")`; the full record retains information
-that a values-only table would lose. The [first-analysis guide](https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html)
-extends this to several documents, missing scores and a plot.
+Inspect `batch$token_audit` to verify every counted word, or bridge raw texts straight into corpus search and keyness with `lexdiv_as_annotations()`:
 
-Use `lexdiv_metrics(tokens, ...)` for an already ordered character vector of
-words, and `lexdiv_metrics_text_batch()` for multiple named texts. Inspect
-`status` and `missing_reason`: an unavailable score is not zero. Keep window
-and sample sizes fixed when comparing documents.
+```r
+ann <- lexdiv_as_annotations(essays)
+kwic <- lexdiv_concordance(ann, queries = list(story = "stor*"),
+                           term_col = "term", valuetype = "glob")
+plot(kwic, "story")
+```
 
-## Choose a measure for your question
+## Choose your workflow
 
-For local lexical variety, start with **MATTR at a fixed window size**. Our
-evidence covers English surface words at window 50; check its consistency for
-your material, especially short texts. Use **HD-D at a
-fixed sample size** when the distribution of word frequencies, rather than
-local sequence, is the target. MTLD and MTLD-MA measure factor lengths and need
-particular care with short texts. TTR is useful at a controlled length; it is
-strongly affected by length otherwise.
+Start with `lexdiv_metrics_text_batch()` for ordinary text analysis. Add the
+workflow tools below when the research design or reporting task needs them.
 
-The [metric-selection guide](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html)
-explains these choices using published research and PELIC, ICNALE, OANC and
-BAWE results, including length sensitivity, sampling agreement, missing scores
-and actual external-tool comparisons. No single measure answers every research question.
+| Research question | Main functions | Worked guide |
+|---|---|---|
+| How do lexical-diversity scores vary across texts or counting rules? | `lexdiv_metrics_text_batch()` → `lexdiv_widen()` / `plot()` | [From text to report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html) |
+| How do writers, tasks, or occasions compare in longitudinal designs? | `lexdiv_plan()` → `lexdiv_metrics_text_batch(..., plan = plan)` → `lexdiv_study_table()` → `lexdiv_study_model_data()` | [Repeated observations](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html) |
+| How frequent, familiar, or morphologically varied is the vocabulary? | `tubelex_profile_batch()`, `nj8_profile_batch()`, `lexdiv_norm_profile()`, `lexdiv_family_profile()` | [Corpus reference profiles](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html) |
+| Which words and contexts explain a corpus pattern? | `lexdiv_as_annotations()` → `lexdiv_concordance()` → `lexdiv_collocations()` / `lexdiv_keyness()` | [Concordance & dispersion](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html) · [Keyness](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html) |
+| How do I analyze Japanese texts with morphological annotations? | `lexdiv_import_annotations()` → explicit unit/POS selection → diversity or norm profiles | [Japanese annotations](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html) |
 
-<a id="choose-a-research-question"></a>
-
-## Follow a workflow
-
-Choose a question, then follow the linked example. The [connection map](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html#connect-the-analysis-steps)
-shows the inputs, functions and outputs for each route.
-
-| Your question | Connected workflow |
-|---|---|
-| How do scores vary across texts or counting choices? | `lexdiv_metrics_text_batch()` → inspect counts and status → `lexdiv_widen()` / `plot()`. [Text to report](https://ryuya-dot-com.github.io/ldfreq/articles/from-text-to-report.html) |
-| How do writers, tasks or occasions compare? | Tokens + measurement plan → `lexdiv_metrics_batch()` → planned-observation table → one response per observation. [Study tables and models](https://ryuya-dot-com.github.io/ldfreq/articles/repeated-observations.html) |
-| How frequent, familiar or morphologically varied are the words? | Terms + declared reference → word matches and coverage → document summary. [Lexical norms](https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html), [families and affixes](https://ryuya-dot-com.github.io/ldfreq/articles/word-families-and-affixes.html) |
-| Which words and contexts explain a corpus pattern? | Complete annotations → `lexdiv_concordance()` → positions / `lexdiv_collocations()`; `lexdiv_keyness()` → source contexts. [Search](https://ryuya-dot-com.github.io/ldfreq/articles/concordance-and-dispersion.html), [keyness](https://ryuya-dot-com.github.io/ldfreq/articles/keyness-comparison.html) |
-| How do I prepare Japanese text? | `lexdiv_import_annotations()` → explicit word selection → diversity or reference profiles. [Japanese workflows](https://ryuya-dot-com.github.io/ldfreq/articles/japanese-annotations.html) |
+For repeated runs and portable reporting, development builds also provide
+reusable recipes and exports, described in the
+[guide index](https://ryuya-dot-com.github.io/ldfreq/articles/index.html):
+`lexdiv_recipe()` → `lexdiv_run_recipe()` → `lexdiv_write()`, with saved-analysis
+comparison, English/Japanese calculation descriptions, a folder CLI and a Python
+bridge to the same R engine. Recipes are optional for ordinary text analysis.
 
 ## Optional reference data
 
-The package code is MIT licensed. Third-party reference data are **not bundled**.
-Inspect the terms for the resource you need, then explicitly download it:
+`ldfreq` code is MIT licensed and installs **without** third-party datasets. Core diversity metrics, custom norm/reference tables, and corpus tools work completely offline. To use optional external resources (`tubelex`, `nj8`, `morpholex`, `bnccoca`, `morphynet`), inspect their license terms first and download only what you need:
 
 ```r
-lexdiv_resource_info("tubelex")  # source, fixed version, license and size
-# After reviewing the linked terms:
+info <- lexdiv_resource_info("tubelex")
+file.show(info$notice_path)  # installed terms; no data download or internet needed
 lexdiv_download_resources("tubelex", accept_license = TRUE)
 ```
 
-The verified cache is reused offline; installation and ordinary calculations
-do not download data. MorphoLex remains CC BY-NC-SA 4.0, BNC/COCA CC BY-SA 4.0,
-MorphyNet CC BY-SA 3.0, TUBELEX BSD-3-Clause, and NJ8 has its own permission and
-attribution terms. Downloading a resource does not change its license.
+## Citation
 
-## Cite the version you used
+Cite the exact `ldfreq` version used in your analysis alongside the relevant measurement methods and reference datasets:
 
 ```r
 citation("ldfreq")
 ```
 
-Komuro, R. (2026). *ldfreq: Reproducible Lexical Diversity and Frequency Profiles*
-(Version 1.0.0) [R package].
-[Fixed release](https://github.com/Ryuya-dot-com/ldfreq/tree/v1.0.0).
-
-Also cite the selected measurement methods and any reference data you use.
-See [CITATION.cff](https://github.com/Ryuya-dot-com/ldfreq/blob/v1.0.0/CITATION.cff), [license](https://github.com/Ryuya-dot-com/ldfreq/blob/v1.0.0/LICENSE.md), and
-[release notes](https://ryuya-dot-com.github.io/ldfreq/news/index.html).
+The citation reports the installed version. Cite the stable release and the
+development snapshot separately when both were used.

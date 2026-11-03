@@ -1,0 +1,85 @@
+name: pkgdown
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pkgdown-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pkgdown:
+    name: Build and deploy pkgdown site
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Use an empty reference-data cache
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/ldfreq-empty-resources"
+          echo "LDFREQ_RESOURCE_DIR=$RUNNER_TEMP/ldfreq-empty-resources" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: ${{ github.event_name != 'pull_request' }}
+
+      - uses: r-lib/actions/setup-r@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        with:
+          r-version: "release"
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-pandoc@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+
+      - uses: r-lib/actions/setup-r-dependencies@d3c5be51b12e724e68f33216ca3c148b66d5f0b6 # v2
+        with:
+          cache: always
+          extra-packages: |
+            any::pkgdown
+            any::rsvg
+          dependencies: 'c("Depends", "Imports", "LinkingTo", "Suggests")'
+
+      - name: Install local ldfreq package
+        shell: bash
+        run: R CMD INSTALL --no-multiarch .
+
+      - name: Build pkgdown website cleanly into docs/
+        shell: Rscript {0}
+        run: |
+          unlink("docs", recursive = TRUE, force = TRUE)
+          pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
+
+      - name: Deploy docs/ to gh-pages branch
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+          worktree_dir="${RUNNER_TEMP}/gh-pages-deploy"
+          rm -rf "${worktree_dir}"
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages
+            git worktree add -B gh-pages "${worktree_dir}" origin/gh-pages
+          else
+            git worktree add --orphan -b gh-pages "${worktree_dir}"
+          fi
+          find "${worktree_dir}" -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          cp -R docs/. "${worktree_dir}/"
+          touch "${worktree_dir}/.nojekyll"
+          cd "${worktree_dir}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No documentation changes to publish."
+          else
+            git commit -m "Deploy pkgdown site from ${GITHUB_SHA::7}"
+            git push origin gh-pages
+          fi

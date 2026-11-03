@@ -220,6 +220,30 @@ lexdiv_family_profile <- function(annotations, dictionary, resource,
       coordinates = annotations$provenance$coordinates,
       assignment = "exact unique-family lookup; optional source/policy-bound record review; explicit unresolved vetoes assignment; no fallback",
       scope = "counts relative to the supplied family definition; not affix analysis or learner knowledge"))
-  out$provenance$content_sha256 <- .lexng_hash(out)
-  out
+  .lexng_seal(out, "lexdiv_family_profile")
+}
+
+#' @export
+print.lexdiv_family_profile <- function(x, ...) {
+  if (!inherits(x, "lexdiv_family_profile") || !is.list(x) ||
+      !is.data.frame(x$summary)) {
+    stop("x must be a lexdiv_family_profile object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<lexdiv_family_profile: unit=%s; %d document%s; %d matched / %d known selected>\n",
+    x$provenance$unit,
+    nrow(x$documents), if (nrow(x$documents) == 1L) "" else "s",
+    x$summary$matched_tokens, x$summary$known_selected_tokens
+  ))
+  cols <- intersect(
+    c("document_id", "tokens", "known_selected_tokens", "matched_tokens",
+      "unresolved_tokens", "conditional_token_coverage", "observed_family_types", "status"),
+    names(x$documents)
+  )
+  shown <- utils::head(x$documents[cols], 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$documents) > nrow(shown)) {
+    cat("... additional document rows omitted\n")
+  }
+  invisible(x)
 }

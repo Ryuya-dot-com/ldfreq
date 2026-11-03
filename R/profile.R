@@ -186,11 +186,18 @@
   method_ids <- vapply(methods, `[[`, character(1L), "method_id")
   index <- match(method_id, method_ids)
   if (is.na(index)) {
+    metric_ids <- vapply(methods, `[[`, character(1L), "metric_id")
+    metric_matches <- which(metric_ids == method_id)
+    if (length(metric_matches) == 1L) {
+      index <- metric_matches
+    }
+  }
+  if (is.na(index)) {
     stop(
       sprintf(
         paste0(
           "Unknown method_id: %s. ",
-          "Use lexdiv_methods() to list valid method IDs."
+          "Use lexdiv_methods() to list valid method or metric IDs."
         ),
         method_id
       ),
@@ -731,12 +738,12 @@ print.lexdiv_plan <- function(x, ...) {
 #' @return A data frame with a human-readable name and definition, score
 #'   direction and scale, stability classification, exact method identity, default parameters, and the
 #'   method's advisory default token floor for `scope = "core"`. With
-#'   `scope = "variants"`, the unchanged [lexdiv_variant_ids()] data frame.
+#'   `scope = "variants"`, the variant method table used by [lexdiv_variant_metrics()].
 #' @export
 lexdiv_methods <- function(scope = c("core", "variants")) {
   scope <- match.arg(scope)
   if (identical(scope, "variants")) {
-    return(lexdiv_variant_ids())
+    return(.lexdiv_variant_ids())
   }
   methods <- .profile_method_definitions()
   output <- data.frame(
@@ -850,14 +857,7 @@ lexdiv_presets <- function() {
   result
 }
 
-#' Compute a normalized method plan for one tokenized document
-#'
-#' @param tokens Input accepted by [lexdiv_metrics()].
-#' @param plan A normalized plan returned by [lexdiv_plan()].
-#'
-#' @return A `lexdiv_profile_results` long data frame in plan order.
-#' @export
-lexdiv_profile <- function(tokens, plan = lexdiv_plan()) {
+.lexdiv_profile <- function(tokens, plan = lexdiv_plan()) {
   plan <- .profile_validate_plan(plan)
   rows <- lapply(seq_along(plan$specifications), function(index) {
     specification <- plan$specifications[[index]]
@@ -931,16 +931,7 @@ print.lexdiv_profile_batch_results <- function(x, ...) {
   invisible(x)
 }
 
-#' Compute a normalized method plan for multiple tokenized documents
-#'
-#' @param documents Input accepted by [lexdiv_metrics_batch()].
-#' @param plan A normalized plan returned by [lexdiv_plan()].
-#' @param id_col,tokens_col Data-frame column selectors.
-#' @param max_rows Maximum document-by-specification output rows.
-#'
-#' @return A document-major `lexdiv_profile_batch_results` long data frame.
-#' @export
-lexdiv_profile_batch <- function(
+.lexdiv_profile_batch <- function(
     documents,
     plan = lexdiv_plan(),
     id_col = "document_id",
@@ -967,7 +958,7 @@ lexdiv_profile_batch <- function(
   }
 
   if (document_count == 0L) {
-    prototype <- lexdiv_profile(character(), plan)
+    prototype <- .lexdiv_profile(character(), plan)
     output <- prototype[FALSE, , drop = FALSE]
     output <- .lex_batch_prepend_id(output, character())
     row.names(output) <- NULL
@@ -975,7 +966,7 @@ lexdiv_profile_batch <- function(
   }
 
   pieces <- lapply(seq_len(document_count), function(index) {
-    result <- lexdiv_profile(batch$tokens[[index]], plan)
+    result <- .lexdiv_profile(batch$tokens[[index]], plan)
     result <- .lex_batch_prepend_id(result, batch$ids[[index]])
     .profile_profile_batch_class(result)
   })
@@ -1202,23 +1193,28 @@ lexdiv_profile_batch <- function(
 
 #' Evaluate independent token-count screens without duplicating metric values
 #'
-#' @param x A result returned by [lexdiv_profile()] or
-#'   [lexdiv_profile_batch()].
+#' @param x A plan-based result returned by [lexdiv_metrics()],
+#'   [lexdiv_metrics_batch()], [lexdiv_metrics_text()], or
+#'   [lexdiv_metrics_text_batch()].
 #' @param floors Named positive integer screening floors.
 #' @param max_rows Maximum source-row-by-floor output rows, checked before
 #'   allocation.
 #'
 #' @return A `lexdiv_screen_results` table without a metric-value column.
 #' @export
-lexdiv_screen <- function(
+lexdiv_screen_lengths <- function(
     x,
     floors = c(tokens_50 = 50L, tokens_100 = 100L),
     max_rows = 2e6) {
+  if (inherits(x, c("lexdiv_text_results", "lexdiv_text_batch_results")) &&
+      is.list(x) && is.data.frame(x$results)) {
+    x <- x$results
+  }
   if (
     !inherits(x, "lexdiv_profile_results") ||
       !is.data.frame(x)
   ) {
-    stop("x must be a lexdiv profile result.", call. = FALSE)
+    stop("x must be a plan-based lexdiv profile result.", call. = FALSE)
   }
   .profile_validate_screen_source(x)
   floors <- .profile_validate_floors(floors)

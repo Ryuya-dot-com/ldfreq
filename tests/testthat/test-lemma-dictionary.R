@@ -1,6 +1,7 @@
 # Dictionary identity is independent of labels, row order, and storage class.
 dictionary_annotate <- function(dictionary, text = "Cats RUN unknown", ...) {
-  lexdiv_lemmatize(lexdiv_tokenize(text), method = "textstem",
+  # Explicit historical preprocessing also makes the 0.2.0 fixture meaningful.
+  lexdiv_lemmatize(lexdiv_tokenize(text, case = "preserve", tokenizer = "unicode"), method = "textstem",
     dictionary = dictionary, dictionary_id = "fixture", dictionary_version = "1", ...)
 }
 
@@ -106,7 +107,7 @@ test_that("new dictionary provenance is validated while legacy objects stay read
     legacy <- absent; legacy$provenance$contract_version <- version
     expect_no_error(lexdiv_metrics_text(legacy, unit = "lemma", metrics = "ttr"))
     updated <- lexdiv_lemmatize(legacy, method = "textstem")
-    expect_identical(updated$provenance$contract_version, "0.4.0")
+    expect_identical(updated$provenance$contract_version, "1.0.0")
     expect_true(is.list(updated$provenance$annotation$dictionary))
   }
   legacy_english <- lexdiv_tokenize("cats", tokenizer = "english")

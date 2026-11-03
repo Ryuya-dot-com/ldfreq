@@ -50,7 +50,8 @@ definitions. Both builder platforms and the release-control checks then run
 afresh; the required check rejects either builder's failure. This preserves
 completed numerical evidence without treating the earlier workflow as successful.
 `Recheck-Windows: true` additionally permits only the exact `.gitattributes`
-repair that protects the byte-pinned TUBELEX LICENSE from CRLF conversion.
+repairs that protect the byte-pinned TUBELEX LICENSE or the installed resource
+notices and license files from CRLF conversion.
 The Windows package job then runs afresh; the other four package environments
 and C-locale job still require completed successful evidence.
 

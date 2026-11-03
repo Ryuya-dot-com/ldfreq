@@ -1,11 +1,12 @@
-# Shared implementation for the public API and legacy installed examples.
+# Shared implementation for the public API and installed examples.
 .concordance_hash <- function(x) {
   digest::digest(x, algo = "sha256", serializeVersion = 2L)
 }
 
 .concordance_check <- function(x) {
   if (!is.list(x) || !identical(x$provenance$recipe_version, "1") ||
-      !identical(x$integrity_sha256, .concordance_hash(x[names(x) != "integrity_sha256"])))
+      !identical(x$integrity_sha256,
+        .concordance_hash(unclass(x[names(x) != "integrity_sha256"]))))
     stop("The saved concordance changed; repeat lexdiv_concordance() from its source.",
       call. = FALSE)
   invisible(x)
@@ -25,13 +26,7 @@ concordance_search <- function(x, queries, term_col = "surface",
   valuetype <- match.arg(valuetype)
   window <- .concordance_whole(window, "window", 0)
   max_cells <- .concordance_whole(max_cells, "max_cells")
-  if (!is.list(x) || !identical(x$provenance$importer, "ldfreq-external-annotations"))
-    stop("Supply an unchanged lexdiv_import_annotations() result.", call. = FALSE)
-  checked <- ldfreq::lexdiv_import_annotations(x$tokens,
-    x$segments[setdiff(names(x$segments), c("token_count", "text_sha256"))],
-    x$provenance$annotation, max_tokens = max_cells)
-  if (!identical(x, checked))
-    stop("Source annotations changed; import the complete source again.", call. = FALSE)
+  x <- .lexann_check(x, "x", max_cells)
   strings <- function(z) is.character(z) && length(z) > 0L && !anyNA(z) &&
     all(validUTF8(z)) && all(nzchar(stringi::stri_trim_both(z)))
   if (!is.list(queries) || !length(queries) || !strings(names(queries)) ||
@@ -50,7 +45,7 @@ concordance_search <- function(x, queries, term_col = "surface",
     stop("Search terms must be valid UTF-8.", call. = FALSE)
   available <- !is.na(term) & nzchar(stringi::stri_trim_both(term))
   searchable <- keep & available
-  q <- ldfreq::lexdiv_as_quanteda(x$tokens[searchable, , drop = FALSE],
+  q <- lexdiv_as_quanteda(x$tokens[searchable, , drop = FALSE],
     x$segments, term_col = term_col, max_tokens = max_cells)
   ids <- x$documents$document_id
   if (as.double(length(ids)) * length(queries) > max_cells)
@@ -140,19 +135,19 @@ concordance_search <- function(x, queries, term_col = "surface",
 }
 
 concordance_sort <- function(x, side = c("right", "left"), depth = 1L,
-    ignore_case = FALSE) {
+    case_insensitive = FALSE) {
   .concordance_check(x)
   side <- match.arg(side); depth <- .concordance_whole(depth, "depth")
   if (depth > x$settings$window)
     stop("depth exceeds the saved context window; repeat the search with a larger window.",
       call. = FALSE)
-  if (!is.logical(ignore_case) || length(ignore_case) != 1L || is.na(ignore_case))
-    stop("ignore_case must be TRUE or FALSE.", call. = FALSE)
+  if (!is.logical(case_insensitive) || length(case_insensitive) != 1L || is.na(case_insensitive))
+    stop("case_insensitive must be TRUE or FALSE.", call. = FALSE)
   hits <- x$occurrences
   context <- hits[[paste0(side, "_tokens")]]
   keys <- lapply(seq_len(depth), function(j) {
     value <- vapply(context, function(z) if (length(z) >= j) z[j] else NA_character_, "")
-    if (ignore_case) value <- stringi::stri_trans_casefold(value)
+    if (case_insensitive) value <- stringi::stri_trans_casefold(value)
     enc2utf8(value)
   })
   # Radix character order is reproducible across locales; absent context sorts last.
@@ -161,17 +156,28 @@ concordance_sort <- function(x, side = c("right", "left"), depth = 1L,
   hits
 }
 
-concordance_positions <- function(x, query_id, relative = TRUE, monochrome = FALSE) {
+concordance_positions <- function(
+    x,
+    query_id = NULL,
+    relative = TRUE,
+    monochrome = FALSE,
+    col = NULL,
+    main = NULL,
+    xlab = NULL,
+    ylab = "",
+    ...) {
   .concordance_check(x)
+  if (is.null(query_id)) {
+    if (length(x$queries) != 1L) stop("Choose one saved query_id.", call. = FALSE)
+    query_id <- names(x$queries)[[1L]]
+  }
   if (!is.character(query_id) || length(query_id) != 1L || is.na(query_id) ||
       !query_id %in% names(x$queries)) stop("Choose one saved query_id.", call. = FALSE)
   for (flag in list(relative, monochrome)) if (!is.logical(flag) ||
       length(flag) != 1L || is.na(flag)) stop("Plot options must be TRUE or FALSE.", call. = FALSE)
-  if (!requireNamespace("ggplot2", quietly = TRUE))
-    stop("Install the optional ggplot2 package to draw positions.", call. = FALSE)
   hits <- x$occurrences[x$occurrences$query_id == query_id, , drop = FALSE]
   docs <- x$documents
-  count <- x$counts[x$counts$query_id == query_id, ]
+  count <- x$counts[x$counts$query_id == query_id, , drop = FALSE]
   ids <- docs$document_id
   docs$document <- factor(ids, levels = rev(ids))
   hits$document <- factor(hits$document_id, levels = rev(ids))
@@ -179,30 +185,80 @@ concordance_positions <- function(x, query_id, relative = TRUE, monochrome = FAL
   hits$position_from <- if (relative) (hits$document_from - 0.5) / n else hits$document_from
   hits$position_to <- if (relative) (hits$document_to - 0.5) / n else hits$document_to
   docs$axis_end <- if (relative) as.numeric(docs$source_tokens > 0) else docs$source_tokens
-  colour <- if (monochrome) "black" else "#0072B2"
-  position_from <- document <- axis_end <- position_to <- NULL
-  p <- ggplot2::ggplot(hits, ggplot2::aes(x = position_from, y = document)) +
-    ggplot2::geom_segment(data = docs,
-      ggplot2::aes(x = 0, xend = axis_end, y = document, yend = document),
-      inherit.aes = FALSE, colour = "grey75") +
-    ggplot2::geom_segment(ggplot2::aes(xend = position_to, yend = document),
-      colour = colour, linewidth = 0.7) +
-    ggplot2::geom_point(colour = colour, shape = 3, size = 2) +
-    ggplot2::scale_y_discrete(drop = FALSE, labels = stats::setNames(
-      paste0(ids, " [", count$occurrences, " matches; ", docs$source_tokens, " tokens]"), ids)) +
-    ggplot2::labs(x = if (relative) "Relative position in original token slots" else
-      "Original token position in document", y = NULL) +
-    ggplot2::theme_minimal(base_size = 11) +
-    ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
-      panel.grid.minor = ggplot2::element_blank())
-  if (relative) p <- p + ggplot2::scale_x_continuous(limits = c(0, 1))
-  p
+  hit_col <- if (monochrome) "black" else if (is.null(col)) "#0072B2" else col
+  if (is.null(xlab)) {
+    xlab <- if (relative) {
+      "Relative position in original token slots"
+    } else {
+      "Original token position in document"
+    }
+  }
+  y_pos <- as.integer(docs$document)
+  labels <- paste0(
+    ids, " [",
+    count$occurrences[match(ids, count$document_id)],
+    " matches; ", docs$source_tokens, " tokens]"
+  )
+  dots <- list(...)
+  allowed_dots <- c(
+    "bty", "las", "family", "tcl", "mgp", "cex", "cex.axis", "cex.lab",
+    "cex.main", "col.axis", "col.lab", "font.axis", "xlim", "ylim",
+    "axes", "xaxt", "yaxt", "frame.plot"
+  )
+  bad_dots <- setdiff(names(dots), allowed_dots)
+  if (length(dots) && (is.null(names(dots)) || any(!nzchar(names(dots))) || length(bad_dots))) {
+    stop(
+      "Unsupported plot argument(s): ",
+      paste(if (length(bad_dots)) bad_dots else "unnamed", collapse = ", "),
+      call. = FALSE
+    )
+  }
+  xlim <- if (!is.null(dots$xlim)) {
+    dots$xlim
+  } else if (relative) {
+    c(0, 1)
+  } else {
+    c(0, max(1, docs$axis_end, na.rm = TRUE))
+  }
+  ylim <- if (!is.null(dots$ylim)) {
+    dots$ylim
+  } else {
+    c(0.5, max(1, nrow(docs)) + 0.5)
+  }
+  old_par <- .lex_plot_style(dots)
+  on.exit(graphics::par(old_par), add = TRUE)
+  plot_dots <- dots
+  plot_dots[c("xlim", "ylim", "yaxt")] <- NULL
+  do.call(.lex_plot, c(list(
+    NA_real_, NA_real_,
+    xlim = xlim, ylim = ylim, yaxt = "n",
+    xlab = xlab, ylab = ylab, main = main
+  ), plot_dots))
+  if (!identical(dots$axes, FALSE) && !identical(dots$yaxt, "n")) {
+    axis(2, at = y_pos, labels = labels)
+  }
+  if (nrow(docs) > 0L) {
+    graphics::segments(0, y_pos, docs$axis_end, y_pos, col = "grey75")
+  }
+  if (nrow(hits) > 0L) {
+    hit_y <- as.integer(hits$document)
+    graphics::segments(
+      hits$position_from, hit_y, hits$position_to, hit_y,
+      col = hit_col, lwd = 1.5
+    )
+    graphics::points(hits$position_from, hit_y, col = hit_col, pch = 3)
+  }
+  invisible(list(occurrences = hits, documents = docs, counts = count))
 }
 
-concordance_dispersion <- function(x, query_id, parts = 10L, max_cells = 1e6) {
+concordance_dispersion <- function(x, query_id = NULL, parts = 10L, max_cells = 1e6) {
   .concordance_check(x)
   parts <- .concordance_whole(parts, "parts", 2)
   max_cells <- .concordance_whole(max_cells, "max_cells")
+  if (is.null(query_id)) {
+    if (length(x$queries) != 1L) stop("Choose one saved query_id.", call. = FALSE)
+    query_id <- names(x$queries)[[1L]]
+  }
   if (!is.character(query_id) || length(query_id) != 1L || is.na(query_id) ||
       !query_id %in% names(x$queries)) stop("Choose one saved query_id.", call. = FALSE)
   if (length(x$queries[[query_id]]) != 1L)
@@ -240,15 +296,36 @@ concordance_dispersion <- function(x, query_id, parts = 10L, max_cells = 1e6) {
       parts = parts, nonempty_parts = sum(exposure > 0),
       DP = dp, status = if (is.na(reason)) "ok" else "missing", missing_reason = reason)
   }
-  list(documents = do.call(rbind, summary), parts = do.call(rbind, tables),
-    occurrence_ids = hits$occurrence_id,
-    settings = list(measure = "DP", normalization = "none",
-      partition = "floor((original_position-1)*parts/source_tokens)+1",
-      parts = parts, expected = "searchable-token-share-in-each-part",
-      scope = "within-document; single-token-query",
-      reference = "https://doi.org/10.1075/ijcl.13.4.02gri"),
-    search_id = x$provenance$search_id)
+  structure(
+    list(documents = do.call(rbind, summary), parts = do.call(rbind, tables),
+      occurrence_ids = hits$occurrence_id,
+      settings = list(measure = "DP", normalization = "none",
+        partition = "floor((original_position-1)*parts/source_tokens)+1",
+        parts = parts, expected = "searchable-token-share-in-each-part",
+        scope = "within-document; single-token-query",
+        reference = "https://doi.org/10.1075/ijcl.13.4.02gri"),
+      search_id = x$provenance$search_id),
+    class = "lexdiv_dispersion"
+  )
 }
 
-lexdiv_concordance_sort <- concordance_sort
+lexdiv_sort_concordance <- concordance_sort
 lexdiv_concordance_dispersion <- concordance_dispersion
+
+#' @export
+print.lexdiv_dispersion <- function(x, ...) {
+  if (!inherits(x, "lexdiv_dispersion") || !is.list(x) || !is.data.frame(x$documents)) {
+    stop("x must be a lexdiv_dispersion object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<lexdiv_dispersion: %d document%s; %d parts; measure=%s>\n",
+    nrow(x$documents), if (nrow(x$documents) == 1L) "" else "s",
+    x$settings$parts, x$settings$measure
+  ))
+  shown <- utils::head(x$documents, 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$documents) > nrow(shown)) {
+    cat("... additional document rows omitted\n")
+  }
+  invisible(x)
+}

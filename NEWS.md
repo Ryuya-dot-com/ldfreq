@@ -1,3 +1,56 @@
+# ldfreq 1.0.0.9001 (development)
+
+## Migration from stable 1.0.0
+
+This development snapshot contains incompatible changes. Stable 1.0.0 remains
+available; a future stable release with these changes requires a major version
+increment. Pin the version and check the counting settings in existing analyses.
+
+- Raw-text tokenization and metric functions now default to `case = "lower"`
+  and `tokenizer = "english"`. Specify `case = "preserve", tokenizer = "unicode"`
+  to request the 1.0.0 preprocessing choices. Different choices can change
+  token counts and scores.
+- The former exports `lexdiv_concordance_sort()`, `lexdiv_ngram_compare()`,
+  `lexdiv_ngram_reference_build()`, and `lexdiv_screen()` are replaced by
+  `lexdiv_sort_concordance()`, `lexdiv_compare_ngrams()`,
+  `lexdiv_build_ngram_reference()`, and `lexdiv_screen_lengths()`, respectively.
+- Replace `lexdiv_profile(tokens, plan)` with `lexdiv_metrics(tokens, plan = plan)`
+  and `lexdiv_profile_batch(documents, plan)` with
+  `lexdiv_metrics_batch(documents, plan = plan)`. Replace `lexdiv_variant_ids()`
+  with `lexdiv_methods(scope = "variants")`.
+- Rename `document_col` to `id_col` in `lexdiv_as_documents()`, and `ignore_case`
+  to `case_insensitive` in `lexdiv_sort_concordance()`.
+
+## Additions and fixes
+
+- Keep long method IDs, function calls and related-help links readable in the
+  standard PDF manual without custom line-wrapping settings.
+- Compare token counts by shared document ID as well as by batch distribution,
+  so swapped document lengths cannot silently pass the length checks. Methods
+  descriptions include saved stringi/ICU versions and stable decimal parameters
+  even under `options(OutDec = ",")`.
+- Add resolved raw-text recipes, explicit environment and reference requirements,
+  and JSON saving/reloading through `lexdiv_recipe()`, `lexdiv_run_recipe()`,
+  `lexdiv_write()` and `lexdiv_read()`. The initial schema supports surface forms
+  with built-in tokenizers and optional pinned NJ8/TUBELEX resources. Reference
+  acquisition remains explicit; TUBELEX segmentation differences require consent.
+- Add saved-analysis differences through `lexdiv_compare_analyses()` and
+  deterministic English/Japanese calculation descriptions through
+  `lexdiv_methods_text()`. Configuration equality does not establish study validity.
+- Add tidy CSV output with condition/request identities and missingness, an
+  installed Rscript entry point, and a standard-library `ldfreq_r` Python bridge. All entry
+  points call the R calculation APIs; no Web UI JSON compatibility is claimed.
+- JSON analysis records include original texts and token audits. CSV output is
+  an analysis table and must be accompanied by JSON for complete provenance.
+  Restored metric batches connect to `lexdiv_study_table()` while keeping
+  empty submissions and planned observations without submissions distinct.
+- Restore NJ8/TUBELEX profile classes in recipe results and JSON records so
+  existing diagnostics and plots work without recalculation. Add compact
+  recipe/analysis displays that keep full source text out of ordinary printing.
+- Install optional-resource notices and license texts for review before any
+  download. `lexdiv_resource_info()` exposes `notice_path`; `notice_url` now
+  points to that local file instead of missing or unrelated repository pages.
+
 # ldfreq 1.0.0
 
 ## Updating existing analyses

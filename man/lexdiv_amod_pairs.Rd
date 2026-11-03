@@ -1,5 +1,6 @@
 \name{lexdiv_amod_pairs}
 \alias{lexdiv_amod_pairs}
+\alias{print.lexdiv_amod_pairs}
 \title{Extract source-linked adjective and common-noun dependency pairs}
 \description{
 Validates supplied basic Universal Dependencies (UD) trees and extracts

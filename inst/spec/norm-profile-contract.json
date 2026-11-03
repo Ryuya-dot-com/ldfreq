@@ -1,7 +1,7 @@
 {
   "$schema": "norm-profile-contract.schema.json",
   "contract_id": "ldfreq-generic-norm-profile",
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "status": "normative",
   "public_api": true,
   "function": "lexdiv_norm_profile",

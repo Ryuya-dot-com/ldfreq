@@ -1,5 +1,6 @@
 \name{lexdiv_compare_annotations}
 \alias{lexdiv_compare_annotations}
+\alias{print.lexdiv_annotation_comparison}
 \title{Compare annotation versions on identical tokenized documents}
 \usage{
 lexdiv_compare_annotations(before, after, max_tokens = 1e6)
@@ -20,9 +21,10 @@ explicit alternative counting schemes.
 A plain list with three components:
 \describe{
 \item{documents}{One row per document, including empty documents, with
-\code{document_id}, \code{tokens}, \code{before_has_*}/\code{after_has_*} for
-each of \code{lemma}, \code{upos}, and \code{flemma}, the corresponding
-\code{*_changed_tokens} counts, and \code{changed_tokens}, the count of positions
+\code{document_id} and \code{tokens}. Availability columns
+\code{before_has_*} and \code{after_has_*} cover each of \code{lemma},
+\code{upos}, and \code{flemma}. The corresponding \code{*_changed_tokens}
+columns count changes in each layer; \code{changed_tokens} counts positions
 changed in at least one layer.}
 \item{changes}{Only positions where a label differs. Columns are
 \code{document_id}, \code{token_index}, \code{start}, \code{end}, \code{surface},

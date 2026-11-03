@@ -1,5 +1,6 @@
 \name{lexdiv_compare_ambiguity}
 \alias{lexdiv_compare_ambiguity}
+\alias{print.lexdiv_ambiguity_comparison}
 \title{Compare two contextual lexical-candidate reviews}
 \description{
 Pairs intact review results by occurrence ID, describes candidate-selection

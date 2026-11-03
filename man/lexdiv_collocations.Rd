@@ -1,5 +1,6 @@
 \name{lexdiv_collocations}
 \alias{lexdiv_collocations}
+\alias{print.lexdiv_collocations}
 \title{Count collocation opportunities and descriptive association scores}
 \description{
 Use one saved single-token concordance query as the node and retain all eligible
@@ -7,7 +8,7 @@ ordered token-pair opportunities for MI and t-score. No tokenizer, model or
 statistical significance decision is supplied.
 }
 \usage{
-lexdiv_collocations(search, query_id, span = c(left = 0L, right = 1L),
+lexdiv_collocations(search, query_id = NULL, span = c(left = 0L, right = 1L),
                     min_count = 1L, max_pairs = 1e6)
 }
 \arguments{

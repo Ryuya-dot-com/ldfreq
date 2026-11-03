@@ -16,7 +16,7 @@ test_that("MATTR profile preserves canonical summaries and exact local windows",
   tokens <- c("a", "b", "a", "c", "d", "a", "e")
   plan <- mattr_profile_plan(c(3, 5))
   result <- lexdiv_mattr_profile(tokens, plan)
-  canonical <- lexdiv_profile(tokens, plan)
+  canonical <- lexdiv_metrics(tokens, plan = plan)
 
   expect_s3_class(result, "lexdiv_mattr_profile")
   expect_identical(names(result), c(

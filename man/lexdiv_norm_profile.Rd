@@ -1,5 +1,7 @@
 \name{lexdiv_norm_profile}
 \alias{lexdiv_norm_profile}
+\alias{lexdiv_norm_spec}
+\alias{lexdiv_resource_meta}
 \alias{print.lexdiv_norm_profile}
 \title{Profile Terms with Caller-Supplied Lexical Norms}
 \usage{
@@ -7,127 +9,96 @@ lexdiv_norm_profile(
   terms,
   norms,
   key,
-  measure_specs,
-  resource,
+  measure_specs = lexdiv_norm_spec(setdiff(names(norms), key)),
+  resource = lexdiv_resource_meta("caller_norms"),
   weightings = c("token", "type"),
   max_rows = 1e+06
+)
+
+lexdiv_norm_spec(
+  value_column,
+  measure_id = value_column,
+  construct_id = measure_id,
+  value_unit = "unspecified",
+  direction = "descriptive",
+  language = "unspecified",
+  variety = "unspecified",
+  population_id = "unspecified",
+  collection_year = "unspecified",
+  valid_min = NA_real_,
+  valid_max = NA_real_
+)
+
+lexdiv_resource_meta(
+  resource_id = "caller_resource",
+  resource_version = "unspecified",
+  creator = "unspecified",
+  source_reference = "unspecified",
+  data_license = "unspecified",
+  transformation_id = "none",
+  lookup_unit = "exact_term",
+  resource_key_normalization_id = "caller-prepared-v1"
 )
 
 \method{print}{lexdiv_norm_profile}(x, ...)
 }
 \arguments{
-\item{terms}{A plain character vector with one caller-prepared lookup term per
-element. Zero length is allowed. Terms are retained in \code{lookup}.}
-
-\item{norms}{An ordinary data frame containing one unique key column and the
-numeric norm columns named by \code{measure_specs}. Other columns are ignored
-and are not copied into the result.}
-
+\item{terms}{A character vector with one caller-prepared lookup term per
+element. Zero length and named vectors are allowed.}
+\item{norms}{A data frame or tibble containing one unique key column and the
+numeric norm columns named by \code{measure_specs}.}
 \item{key}{One string naming the exact-match key column in \code{norms}.}
-
-\item{measure_specs}{An ordinary data frame with the exact ordered columns
-\code{measure_id}, \code{value_column}, \code{construct_id},
-\code{value_unit}, \code{direction}, \code{language}, \code{variety},
-\code{population_id}, \code{collection_year}, \code{valid_min}, and
-\code{valid_max}. IDs must be unique; \code{direction} is \code{"higher"},
-\code{"lower"}, or \code{"descriptive"}; numeric bounds may be \code{NA}.}
-
-\item{resource}{A plain named list with the exact ordered fields
-\code{resource_id}, \code{resource_version}, \code{creator},
-\code{source_reference}, \code{data_license}, \code{transformation_id},
-\code{lookup_unit}, and \code{resource_key_normalization_id}. These are caller
-assertions recorded for provenance; they do not establish redistribution
-rights.}
-
-\item{weightings}{A non-empty subset of \code{c("token", "type")}, without
-duplicates. Type identity is the exact lookup term after no package-side
-transformation.}
-
-\item{max_rows}{A positive whole-number bound on the combined rows planned for
-\code{lookup}, \code{summary}, and \code{coverage}, checked before result
-allocation.}
-
+\item{measure_specs}{Data frame or tibble of 11 measure-specification columns
+(in any column order). Defaults to:
+\preformatted{lexdiv_norm_spec(setdiff(names(norms), key))}
+}
+\item{resource}{Named list of 8 resource-metadata fields (in any field order),
+with default:
+\preformatted{lexdiv_resource_meta("caller_norms")}
+}
+\item{weightings}{A non-empty subset of \code{c("token", "type")}.}
+\item{max_rows}{Positive whole-number row bound checked before allocation.}
+\item{value_column, measure_id, construct_id, value_unit, direction, language,
+variety, population_id, collection_year, valid_min, valid_max}{Vectorized or
+scalar fields recycled across \code{value_column} by \code{lexdiv_norm_spec()}.}
+\item{resource_id, resource_version, creator, source_reference, data_license,
+transformation_id, lookup_unit, resource_key_normalization_id}{Scalar provenance
+fields assembled by \code{lexdiv_resource_meta()}.}
 \item{x}{A \code{lexdiv_norm_profile} object.}
-
 \item{...}{Additional arguments passed to \code{print.data.frame()}.}
 }
 \value{
-A \code{lexdiv_norm_profile} list with \code{status}, \code{summary},
-\code{lookup}, \code{coverage}, \code{provenance}, and \code{diagnostics}.
-\code{summary} contains conditional observed matched-only means and their
-denominators. \code{lookup} contains one input-major, measure-minor row per
-term and measure. \code{coverage} is the analysis-ready denominator projection
-of \code{summary}. No missing value is imputed and no automatic coverage
-threshold is applied. \code{print.lexdiv_norm_profile()} returns \code{x}
-invisibly.
+\code{lexdiv_norm_profile()} returns a \code{lexdiv_norm_profile} list with
+\code{status}, \code{summary}, \code{lookup}, \code{coverage},
+\code{provenance}, and \code{diagnostics}. \code{lexdiv_norm_spec()} returns an
+11-column specification data frame. \code{lexdiv_resource_meta()} returns an
+8-element metadata list. \code{print()} returns \code{x} invisibly.
 }
 \description{
-Computes token- and/or type-weighted arithmetic means for one or more lexical-
-norm variables. Matching is exact: the function neither tokenizes nor
-normalizes the supplied terms. Means use observed values from matched keys
-only. Resource coverage and annotation coverage are therefore returned
-separately and should accompany every interpretation of an estimate.
-}
-\details{
-For several documents sharing a reference table, use
-\code{\link{lexdiv_norm_profile_batch}} to validate the shared inputs once and
-retain separate document estimates and coverage under a global row bound.
-
-The three coverage rates have different denominators:
-\code{resource_coverage = matched_units / input_units},
-\code{value_coverage = observed_value_units / input_units}, and
-\code{annotation_coverage = observed_value_units / matched_units}. A matched
-key with an \code{NA} norm is \code{missing_annotation}; an unmatched key is
-\code{not_applicable_oov}. The function does not infer a universal direction,
-compare unlike scales, form composite scores, or approve a data license.
-}
-\seealso{
-\code{\link{lexdiv_norm_profile_batch}} for separately identified documents;
-\href{https://ryuya-dot-com.github.io/ldfreq/articles/corpus-reference-profiles.html}{prepare a reference table, inspect coverage and save the analysis}.
-
-\href{https://ryuya-dot-com.github.io/ldfreq/articles/japanese-norms.html}{japanese norms guide} for stimulus-item
-tables, local Japanese norm files, scale interpretation and data terms.
+Computes token- and/or type-weighted arithmetic means for one or more
+lexical-norm variables from matched observed keys while reporting resource and
+annotation coverage separately.
 }
 \examples{
 norms <- data.frame(
   term = c("book", "read", "rare"),
   familiarity = c(6, 5, NA_real_),
-  stringsAsFactors = FALSE
-)
-specs <- data.frame(
-  measure_id = "familiarity",
-  value_column = "familiarity",
-  construct_id = "subjective_familiarity",
-  value_unit = "seven_point_rating",
-  direction = "higher",
-  language = "English",
-  variety = "unspecified",
-  population_id = "example_adults",
-  collection_year = "2025",
-  valid_min = 1,
-  valid_max = 7,
-  stringsAsFactors = FALSE
-)
-resource <- list(
-  resource_id = "example_norms",
-  resource_version = "2025-01",
-  creator = "Example creator",
-  source_reference = "Example citation",
-  data_license = "Example terms; verify before redistribution",
-  transformation_id = "none",
-  lookup_unit = "lowercase_lemma",
-  resource_key_normalization_id = "caller-prepared-v1"
+  aoa = c(4.2, 5.0, 11.5)
 )
 
-profile <- lexdiv_norm_profile(
-  c("book", "book", "rare", "unknown"),
-  norms,
-  "term",
-  specs,
-  resource
+# Concise call with automatic measure_specs and resource defaults:
+quick <- lexdiv_norm_profile(c("book", "book", "rare", "unknown"), norms, "term")
+quick
+
+# Explicit publication-ready metadata via helpers:
+specs <- lexdiv_norm_spec(
+  c("familiarity", "aoa"),
+  direction = c("higher", "lower"),
+  valid_min = c(1, 0),
+  valid_max = c(7, 25)
 )
-profile$summary
-profile$coverage
-profile$lookup
-print(profile)
+meta <- lexdiv_resource_meta("example_norms", resource_version = "2025-01")
+profile <- lexdiv_norm_profile(c("book", "read"), norms, "term", specs, meta)
+profile$summary[, c("measure_id", "weighting", "estimate", "value_coverage")]
 }
+\seealso{\code{\link{lexdiv_norm_profile_batch}}}

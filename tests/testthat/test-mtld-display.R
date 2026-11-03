@@ -6,8 +6,8 @@ test_that("MTLD print exposes tail-only estimation without changing records", {
     lexdiv_metrics(tail, metrics = "mtld"),
     lexdiv_metrics_batch(list(tail = tail, complete = rep("a", 50)),
                          metrics = "mtld"),
-    lexdiv_profile(tail, plan),
-    lexdiv_profile_batch(list(tail = tail), plan),
+    lexdiv_metrics(tail, plan = plan),
+    lexdiv_metrics_batch(list(tail = tail), plan = plan),
     lexdiv_variant_metrics(tail,
       variants = "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1")
   )

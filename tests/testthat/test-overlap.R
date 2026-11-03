@@ -132,7 +132,7 @@ test_that("invalid terms are atomic and never silently deleted", {
     c("a", ""),
     factor(c("a", "b")),
     matrix(c("a", "b"), nrow = 1L),
-    structure(c("a", "b"), names = c("one", "two")),
+    structure(c("a", "b"), custom = "bad"),
     c("a", invalid_utf8)
   )
   for (value in cases) {

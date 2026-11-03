@@ -1,5 +1,6 @@
 \name{tubelex_diagnostics}
 \alias{tubelex_diagnostics}
+\alias{print.tubelex_diagnostics}
 \title{Tabulate TUBELEX profiles while retaining coverage and input conditions}
 \description{
 Reference snapshots require a prior explicit download; see \code{\link{lexdiv_download_resources}} for terms and cache setup.
@@ -12,11 +13,9 @@ tokenization, annotation, model download, or learner scoring is performed.
 tubelex_diagnostics(x, max_rows = 1e6)
 }
 \arguments{
-\item{x}{One unmodified \code{tubelex_profile()} result, or a plain named list
-as returned by \code{tubelex_profile_batch()}. IDs must be unique, non-empty
-valid-UTF-8 strings. A single profile uses \code{document_1}. An empty named
-list is allowed. Profiles must use profile contract 0.2.0 and the currently
-cached resource; unsupported records must be recreated from their inputs.}
+\item{x}{One unmodified \code{tubelex_profile()} result, a
+\code{tubelex_profile_batch()} result, or a plain named list of
+\code{tubelex_profile} objects.}
 \item{max_rows}{Positive whole-number limit on total input lookup rows plus
 two summary rows per document, checked before constructing aggregate tables.}
 }

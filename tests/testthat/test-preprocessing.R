@@ -1,7 +1,7 @@
 test_that("Unicode tokenization is deterministic and parameterized", {
   text <- enc2utf8("Caf\u00e9 \u2014 John's well-being, 2026; COVID-19 and 3.14.")
-  first <- lexdiv_tokenize(text)
-  second <- lexdiv_tokenize(text)
+  first <- lexdiv_tokenize(text, tokenizer = "unicode", case = "preserve")
+  second <- lexdiv_tokenize(text, tokenizer = "unicode", case = "preserve")
 
   expect_identical(first, second)
   expect_s3_class(first, "lexdiv_tokenization")
@@ -16,7 +16,7 @@ test_that("Unicode tokenization is deterministic and parameterized", {
   expect_identical(first$provenance$keep_numbers, FALSE)
   expect_match(first$provenance$source_text_sha256, "^[0-9a-f]{64}$")
 
-  with_numbers <- lexdiv_tokenize(text, keep_numbers = TRUE)
+  with_numbers <- lexdiv_tokenize(text, tokenizer = "unicode", case = "preserve", keep_numbers = TRUE)
   expect_identical(
     with_numbers$tokens$surface,
     enc2utf8(c(
@@ -710,7 +710,7 @@ test_that("the installed preprocessing contract matches the public implementatio
   schema <- jsonlite::read_json(schema_path, simplifyVector = FALSE)
 
   expect_identical(contract$contract_id, "ldfreq-preprocessing")
-  expect_identical(contract$contract_version, "0.4.0")
+  expect_identical(contract$contract_version, "1.0.0")
   expect_identical(contract$status, "normative")
   expect_identical(contract$public_api, TRUE)
   expect_identical(

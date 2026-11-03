@@ -1,5 +1,5 @@
 test_that("the variant catalog is explicit and duplicate-free", {
-  catalog <- lexdiv_variant_ids()
+  catalog <- lexdiv_methods(scope = "variants")
 
   expect_identical(nrow(catalog), 8L)
   expect_identical(anyDuplicated(catalog$method_id), 0L)
@@ -18,7 +18,7 @@ test_that("the variant catalog is explicit and duplicate-free", {
 
 test_that("Maas scale and logarithm-base variants follow their formulas", {
   tokens <- c("a", "b", "c", "a")
-  ids <- lexdiv_variant_ids()$method_id
+  ids <- lexdiv_methods(scope = "variants")$method_id
   maas_ids <- ids[startsWith(ids, "maas_")]
   result <- lexdiv_variant_metrics(tokens, variants = maas_ids)
   values <- stats::setNames(result$value, result$method_id)
@@ -175,8 +175,8 @@ test_that("the installed variant contract matches the public catalog", {
   expect_identical(contract$contract_version, "0.1.0")
   expect_identical(contract$status, "normative")
   expect_identical(contract$core_contract_changed, FALSE)
-  expect_identical(contract_ids, lexdiv_variant_ids()$method_id)
-  expect_identical(contract_labels, lexdiv_variant_ids()$reference_label)
+  expect_identical(contract_ids, lexdiv_methods(scope = "variants")$method_id)
+  expect_identical(contract_labels, lexdiv_methods(scope = "variants")$reference_label)
   expect_identical(
     contract$compatibility_boundary$official_TAALED_compatibility_claimed,
     FALSE

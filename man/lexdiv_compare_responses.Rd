@@ -1,5 +1,6 @@
 \name{lexdiv_compare_responses}
 \alias{lexdiv_compare_responses}
+\alias{print.lexdiv_response_comparison}
 \title{Compare paired binary vocabulary responses with an explicit criterion}
 \usage{
 lexdiv_compare_responses(data, test, criterion,

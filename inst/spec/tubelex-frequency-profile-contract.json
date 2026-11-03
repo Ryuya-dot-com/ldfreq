@@ -1,7 +1,7 @@
 {
   "$schema": "tubelex-frequency-profile-contract.schema.json",
   "contract_id": "ldfreq-tubelex-frequency-profile",
-  "contract_version": "0.2.0",
+  "contract_version": "0.3.0",
   "status": "normative",
   "public_api": true,
   "resource": {
@@ -42,7 +42,7 @@
   },
   "batch": {
     "export": "tubelex_profile_batch",
-    "result": "input-ordered-named-list-of-complete-tubelex_profile-objects",
+    "result": "structured-tubelex_profile_batch-with-summary-lookup-coverage-and-profiles",
     "resource_scope": "one-lazily-verified-snapshot-per-call-no-global-cache",
     "row_budget": "sum-of-planned-lookup-and-two-summary-rows-per-document-before-loading",
     "invalid_terms": "document-local-invalid-profile",
@@ -98,8 +98,8 @@
   },
   "diagnostic_tables": {
     "export": "tubelex_diagnostics",
-    "version": "0.1.0",
-    "input": "unmodified-current-resource-profile-contract-0.2.0-single-or-plain-named-list",
+    "version": "0.2.0",
+    "input": "unmodified-current-resource-profile-contract-0.3.0-or-0.2.0-single-batch-or-plain-named-list",
     "components": [
       "summary",
       "documents",

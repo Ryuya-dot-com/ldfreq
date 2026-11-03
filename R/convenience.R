@@ -49,7 +49,7 @@
 #' Convert common R token containers to named documents
 #'
 #' Creates the explicit named-list boundary accepted by
-#' [lexdiv_metrics_batch()] and [lexdiv_profile_batch()]. A tidy token table
+#' [lexdiv_metrics_batch()]. A tidy token table
 #' is grouped in first-document-appearance and row order. A `quanteda` tokens
 #' object is converted through its registered `as.list()` method; no `quanteda`
 #' runtime dependency is added to `ldfreq`.
@@ -58,7 +58,7 @@
 #'
 #' @param x A named list of token vectors, a data frame with one token per row,
 #'   or a `quanteda` tokens object.
-#' @param document_col Name of the document-ID column for data-frame input.
+#' @param id_col Name of the document-ID column for data-frame input.
 #' @param token_col Name of the token column for data-frame input.
 #'
 #' @return A plain named list of plain character vectors, preserving document
@@ -66,12 +66,12 @@
 #' @export
 lexdiv_as_documents <- function(
     x,
-    document_col = "document_id",
+    id_col = "document_id",
     token_col = "token") {
-  document_col <- .lex_batch_scalar_name(document_col, "document_col")
+  id_col <- .lex_batch_scalar_name(id_col, "id_col")
   token_col <- .lex_batch_scalar_name(token_col, "token_col")
-  if (identical(document_col, token_col)) {
-    stop("document_col and token_col must differ.", call. = FALSE)
+  if (identical(id_col, token_col)) {
+    stop("id_col and token_col must differ.", call. = FALSE)
   }
 
   if (inherits(x, "tokens")) {
@@ -89,14 +89,15 @@ lexdiv_as_documents <- function(
   }
 
   if (is.data.frame(x)) {
+    x <- base::as.data.frame(x, stringsAsFactors = FALSE, check.names = FALSE, optional = TRUE)
     columns <- .lex_batch_column_names(names(x))
-    if (sum(columns == document_col) != 1L || sum(columns == token_col) != 1L) {
+    if (sum(columns == id_col) != 1L || sum(columns == token_col) != 1L) {
       stop(
         "A data-frame input must contain exactly one selected ID column and one selected token column.",
         call. = FALSE
       )
     }
-    ids <- .lex_document_ids(x[[which(columns == document_col)]], document_col)
+    ids <- .lex_document_ids(.lex_strip_names(x[[which(columns == id_col)]]), id_col)
     tokens <- x[[which(columns == token_col)]]
     if (!is.character(tokens) || is.object(tokens) || !is.null(dim(tokens))) {
       stop(sprintf("%s must be a plain character token column.", token_col), call. = FALSE)
@@ -197,8 +198,12 @@ lexdiv_widen <- function(
       "requested_parameters", "effective_parameters", "N", "V"
     ),
     mtld_diagnostics = FALSE) {
+  if (inherits(x, c("lexdiv_text_results", "lexdiv_text_batch_results")) &&
+      is.list(x) && is.data.frame(x$results)) {
+    x <- x$results
+  }
   if (!is.data.frame(x)) {
-    stop("x must be a lexical-diversity result data frame.", call. = FALSE)
+    stop("x must be a lexical-diversity result data frame or text-results object.", call. = FALSE)
   }
   mtld_diagnostics <- .lexprep_scalar_flag(mtld_diagnostics, "mtld_diagnostics")
   if (is.null(id_cols)) {

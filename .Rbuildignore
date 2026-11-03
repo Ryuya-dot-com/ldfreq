@@ -5,10 +5,12 @@
 ^LICENSE\.md$
 ^CONTRIBUTING\.md$
 ^_pkgdown\.yml$
+^pkgdown$
 ^docs$
 ^experiments$
 ^development$
 ^legal$
 ^LIFECYCLE\.md$
 ^inst/examples/__pycache__$
+^inst/python/__pycache__$
 ^CITATION\.cff$

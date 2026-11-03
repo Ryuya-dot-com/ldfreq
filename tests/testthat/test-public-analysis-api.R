@@ -12,7 +12,9 @@ expect_legacy_metrics <- function(actual, expected, metrics) {
 }
 
 expect_legacy_dispersion <- function(actual, expected) {
+  expect_s3_class(actual, "lexdiv_dispersion")
   expect_legacy_metrics(actual$documents, expected$documents, "DP")
+  actual <- unclass(actual)
   actual$documents <- expected$documents
   expect_identical(actual, expected)
 }
@@ -22,22 +24,25 @@ test_that("public study calls retain the frozen 9005 table and selection", {
   before <- serialize(old, NULL)
   expect_identical(do.call(lexdiv_study_table, old$inputs), old$table)
   expect_identical(do.call(lexdiv_study_table, unname(old$inputs)), old$table)
-  expect_identical(lexdiv_study_model_data(old$table, "surface-all", "ttr"), old$selected)
+  mod <- lexdiv_study_model_data(old$table, "surface-all", "ttr")
+  expect_s3_class(mod, "lexdiv_study_model_data")
+  expect_identical(unclass(mod), old$selected)
   expect_identical(serialize(old, NULL), before)
   legacy <- new.env(parent = baseenv())
   sys.source(system.file("examples", "study-table.R", package = "ldfreq", mustWork = TRUE), legacy)
   expect_identical(formals(legacy$study_long_table), formals(lexdiv_study_table))
   expect_identical(do.call(legacy$study_long_table, old$inputs), old$table)
-  expect_identical(legacy$study_model_data(old$table, "surface-all", "ttr"), old$selected)
+  expect_identical(unclass(legacy$study_model_data(old$table, "surface-all", "ttr")), old$selected)
 })
 
 test_that("saved legacy concordances support public operations without rewriting", {
   old <- public_analysis_fixture()
   x <- old$concordance$search
   before <- serialize(x, NULL)
-  expect_identical(lexdiv_concordance_sort(x, "right", 2L), old$concordance$sorted)
+  expect_identical(lexdiv_sort_concordance(x, "right", 2L), old$concordance$sorted)
   expect_legacy_dispersion(lexdiv_concordance_dispersion(x, "word", 3L), old$concordance$dispersion)
   current <- lexdiv_collocations(old$collocation$search, "a")
+  expect_s3_class(current, "lexdiv_collocations")
   expect_legacy_metrics(current$results, old$collocation$adjacent$results,
     c("expected", "MI", "t_score"))
   for (name in c("pairs", "documents", "search", "settings"))
@@ -45,7 +50,7 @@ test_that("saved legacy concordances support public operations without rewriting
   expect_identical(serialize(x, NULL), before)
   altered <- x
   altered$counts$occurrences[1] <- altered$counts$occurrences[1] + 1L
-  expect_error(lexdiv_concordance_sort(altered), "changed")
+  expect_error(lexdiv_sort_concordance(altered), "changed")
   expect_error(lexdiv_concordance_dispersion(x, "phrase"), "single-token")
   expect_error(lexdiv_collocations(x, "phrase"), "single-token")
 })
@@ -81,7 +86,7 @@ test_that("new concordance class adds dispatch without changing occurrences", {
   for (name in c("occurrences", "counts", "documents", "source", "queries", "settings"))
     expect_identical(current[[name]], x[[name]])
   expect_identical(do.call(lexdiv_concordance, unname(args)), current)
-  expect_identical(lexdiv_concordance_sort(current, "right", 2), old$concordance$sorted)
+  expect_identical(lexdiv_sort_concordance(current, "right", 2), old$concordance$sorted)
   expect_legacy_dispersion(lexdiv_concordance_dispersion(current, "word", 3), old$concordance$dispersion)
   legacy <- new.env(parent = baseenv())
   sys.source(system.file("examples", "concordance.R", package = "ldfreq", mustWork = TRUE), legacy)
@@ -104,7 +109,6 @@ test_that("new concordance class adds dispatch without changing occurrences", {
 
 test_that("public position plots retain all documents and return selected data invisibly", {
   skip_if_not_installed("quanteda", "4.5.0")
-  skip_if_not_installed("ggplot2")
   old <- public_analysis_fixture()$concordance$search
   x <- lexdiv_concordance(old$source, old$queries, term_col = old$settings$term_col,
     keep = old$settings$keep, window = old$settings$window)

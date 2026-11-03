@@ -21,9 +21,10 @@
 #' difficulty. The source profile remains the occurrence-level audit trail.
 #'
 #' @param x An unmodified result of [nj8_profile()] or [nj8_profile_batch()].
-#' @return A plain list of `unmatched_terms`, `unit_mappings`, `coverage`,
-#'   `exclusion_reasons`, `provenance`, and `document_provenance`. See the help
-#'   topic for grouping keys, flag definitions, and the single-document ID.
+#' @return A `nj8_diagnostics` list of `unmatched_terms`, `unit_mappings`,
+#'   `coverage`, `exclusion_reasons`, `provenance`, and `document_provenance`.
+#'   See the help topic for grouping keys, flag definitions, and the
+#'   single-document ID.
 #' @export
 nj8_diagnostics <- function(x) {
   batch <- inherits(x, "nj8_profile_batch")
@@ -77,7 +78,33 @@ nj8_diagnostics <- function(x) {
   has_space <- function(v) stringi::stri_detect_regex(v, "\\p{White_Space}")
   mappings$numeric_introduced <- numeric_label(mappings$term) & !numeric_label(mappings$surface_term)
   mappings$whitespace_introduced <- has_space(mappings$term) & !has_space(mappings$surface_term)
-  list(unmatched_terms = unmatched, unit_mappings = mappings,
-    coverage = coverage, exclusion_reasons = exclusions,
-    provenance = x$provenance, document_provenance = document_provenance)
+  structure(
+    list(unmatched_terms = unmatched, unit_mappings = mappings,
+      coverage = coverage, exclusion_reasons = exclusions,
+      provenance = x$provenance, document_provenance = document_provenance),
+    class = "nj8_diagnostics"
+  )
+}
+
+#' @export
+print.nj8_diagnostics <- function(x, ...) {
+  if (!inherits(x, "nj8_diagnostics") || !is.list(x) || !is.data.frame(x$coverage)) {
+    stop("x must be an nj8_diagnostics object.", call. = FALSE)
+  }
+  cat(sprintf(
+    "<nj8_diagnostics: %d document%s; %d unmatched term%s; %d mapping%s>\n",
+    nrow(x$coverage), if (nrow(x$coverage) == 1L) "" else "s",
+    nrow(x$unmatched_terms), if (nrow(x$unmatched_terms) == 1L) "" else "s",
+    nrow(x$unit_mappings), if (nrow(x$unit_mappings) == 1L) "" else "s"
+  ))
+  cols <- intersect(
+    c("document_id", "eligible_tokens", "matched_tokens", "off_list_tokens", "token_coverage"),
+    names(x$coverage)
+  )
+  shown <- utils::head(x$coverage[cols], 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$coverage) > nrow(shown)) {
+    cat("... additional document rows omitted\n")
+  }
+  invisible(x)
 }

@@ -54,12 +54,12 @@ test_that("counting and lookup equivalence are independent source-linked choices
 
 test_that("number and symbol flags are lexical rules rather than semantic labels", {
   text <- "Two 2 2nd COVID-19 3.14 75%"
-  keep <- lexdiv_tokenize(text, tokenizer = "english", keep_numbers = TRUE)
-  drop <- lexdiv_tokenize(text, tokenizer = "english", keep_numbers = FALSE)
+  keep <- lexdiv_tokenize(text, tokenizer = "english", case = "preserve", keep_numbers = TRUE)
+  drop <- lexdiv_tokenize(text, tokenizer = "english", case = "preserve", keep_numbers = FALSE)
   expect_identical(keep$tokens$is_number, c(FALSE, TRUE, FALSE, FALSE, TRUE, TRUE))
   expect_identical(drop$tokens$surface, c("Two", "2nd", "COVID-19"))
   expect_identical(drop$provenance$excluded_spans$surface, c("2", "3.14", "75%"))
-  expect_identical(lexdiv_tokenize("C++ R&D #topic @user", tokenizer = "english")$tokens$surface,
+  expect_identical(lexdiv_tokenize("C++ R&D #topic @user", tokenizer = "english", case = "preserve")$tokens$surface,
     c("C", "R", "D", "topic", "user"))
   expect_identical(lexdiv_tokenize("can't well-known word\u2014word",
     tokenizer = "english")$tokens$surface, c("can't", "well-known", "word", "word"))

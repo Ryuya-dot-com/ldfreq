@@ -1,5 +1,6 @@
 \name{lexdiv_import_contextual}
 \alias{lexdiv_import_contextual}
+\alias{print.lexdiv_contextual}
 \title{Attach external model outputs to verified contextual occurrences}
 \description{
 Imports caller-computed embeddings or lexical-candidate scores into a complete

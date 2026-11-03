@@ -1,8 +1,14 @@
-# Shared implementation for the public API and legacy installed examples.
+# Shared implementation for the public API and installed examples.
 # Pair opportunities use original positions, not a compressed token stream.
-collocation_profile <- function(search, query_id, span = c(left = 0L, right = 1L),
+collocation_profile <- function(search, query_id = NULL, span = c(left = 0L, right = 1L),
     min_count = 1L, max_pairs = 1e6) {
   .concordance_check(search)
+  if (is.null(query_id)) {
+    if (length(search$queries) != 1L) {
+      stop("query_id must select one saved query.", call. = FALSE)
+    }
+    query_id <- names(search$queries)[[1L]]
+  }
   if (!is.character(query_id) || is.object(query_id) || !is.null(dim(query_id)) ||
       length(query_id) != 1L || is.na(query_id) ||
       !query_id %in% names(search$queries))
@@ -115,15 +121,36 @@ collocation_profile <- function(search, query_id, span = c(left = 0L, right = 1L
       ldfreq_version = as.character(utils::packageVersion("ldfreq")),
       search_id = search$provenance$search_id))
   result$integrity_sha256 <- .concordance_hash(result)
+  class(result) <- "lexdiv_collocations"
   result
 }
 
 collocation_validate <- function(x) {
   if (!is.list(x) || !identical(x$provenance$recipe_version, "1") ||
-      !identical(x$integrity_sha256, .concordance_hash(x[names(x) != "integrity_sha256"])))
+      !identical(x$integrity_sha256,
+        .concordance_hash(unclass(x[names(x) != "integrity_sha256"]))))
     stop("The saved collocation record changed; repeat collocation_profile().", call. = FALSE)
   .concordance_check(x$search)
   invisible(x)
 }
 
 lexdiv_collocations <- collocation_profile
+
+#' @export
+print.lexdiv_collocations <- function(x, ...) {
+  collocation_validate(x)
+  cat(sprintf(
+    "<lexdiv_collocations: query_id=%s; %d context term%s; %d pair%s>\n",
+    x$settings$query_id,
+    nrow(x$results), if (nrow(x$results) == 1L) "" else "s",
+    nrow(x$pairs), if (nrow(x$pairs) == 1L) "" else "s"
+  ))
+  shown <- utils::head(x$results, 12L)
+  print.data.frame(shown, row.names = FALSE, ...)
+  if (nrow(x$results) > nrow(shown)) {
+    cat(sprintf("... %d additional context row%s omitted\n",
+      nrow(x$results) - nrow(shown),
+      if (nrow(x$results) - nrow(shown) == 1L) "" else "s"))
+  }
+  invisible(x)
+}

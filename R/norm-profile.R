@@ -1,7 +1,7 @@
 # Profiles from caller-supplied lexical norm tables.
 
 .lexnorm_contract_id <- "ldfreq-generic-norm-profile"
-.lexnorm_contract_version <- "0.1.0"
+.lexnorm_contract_version <- "0.2.0"
 .lexnorm_result_schema_id <- "generic-norm-profile-result"
 .lexnorm_result_schema_version <- "0.1.0"
 .lexnorm_statistic_id <- "arithmetic_mean_observed_matched_only_v1"
@@ -21,11 +21,21 @@
   "resource_key_normalization_id"
 )
 
+.lex_strip_names <- function(value) {
+  if (!is.object(value) && is.null(dim(value)) &&
+      identical(names(attributes(value)), "names")) {
+    unname(value)
+  } else {
+    value
+  }
+}
+
 .lexnorm_stop <- function(...) {
   stop(sprintf(...), call. = FALSE)
 }
 
-.lexnorm_plain_character <- function(value, argument, allow_zero = FALSE) {
+.lexnorm_plain_character <- function(value, argument, allow_zero = FALSE, strip_names = TRUE) {
+  if (strip_names) value <- .lex_strip_names(value)
   if (
     !is.character(value) || is.object(value) || !is.null(dim(value)) ||
       !is.null(attributes(value)) || (!allow_zero && length(value) == 0L) ||
@@ -47,7 +57,7 @@
 }
 
 .lexnorm_scalar_string <- function(value, argument) {
-  value <- .lexnorm_plain_character(value, argument)
+  value <- .lexnorm_plain_character(value, argument, strip_names = FALSE)
   if (length(value) != 1L) {
     .lexnorm_stop("%s must contain exactly one value.", argument)
   }
@@ -83,11 +93,8 @@
 }
 
 .lexnorm_plain_data_frame <- function(value, argument) {
-  if (!is.data.frame(value) || !identical(class(value), "data.frame")) {
-    .lexnorm_stop(
-      "%s must be an ordinary data.frame without subclasses.",
-      argument
-    )
+  if (!is.data.frame(value)) {
+    .lexnorm_stop("%s must be a data frame.", argument)
   }
   column_names <- names(value)
   if (
@@ -96,6 +103,14 @@
   ) {
     .lexnorm_stop("%s must have unique non-empty column names.", argument)
   }
+  value <- base::as.data.frame(
+    value,
+    stringsAsFactors = FALSE,
+    check.names = FALSE,
+    optional = TRUE
+  )
+  names(value) <- column_names
+  rownames(value) <- NULL
   value
 }
 
@@ -111,17 +126,18 @@
 }
 
 .lexnorm_terms <- function(terms) {
-  .lexnorm_plain_character(terms, "terms", allow_zero = TRUE)
+  .lexnorm_plain_character(terms, "terms", allow_zero = TRUE, strip_names = TRUE)
 }
 
 .lexnorm_resource <- function(resource) {
   resource <- .lexnorm_plain_list(resource, "resource")
-  if (!identical(names(resource), .lexnorm_resource_fields)) {
+  if (!setequal(names(resource), .lexnorm_resource_fields)) {
     .lexnorm_stop(
-      "resource must contain the exact ordered fields: %s.",
+      "resource must contain the fields: %s.",
       paste(.lexnorm_resource_fields, collapse = ", ")
     )
   }
+  resource <- resource[.lexnorm_resource_fields]
   for (field in .lexnorm_resource_fields) {
     resource[[field]] <- .lexnorm_scalar_string(
       resource[[field]],
@@ -137,12 +153,13 @@
 
 .lexnorm_measure_specs <- function(measure_specs) {
   measure_specs <- .lexnorm_plain_data_frame(measure_specs, "measure_specs")
-  if (!identical(names(measure_specs), .lexnorm_measure_fields)) {
+  if (!setequal(names(measure_specs), .lexnorm_measure_fields)) {
     .lexnorm_stop(
-      "measure_specs must contain the exact ordered columns: %s.",
+      "measure_specs must contain the columns: %s.",
       paste(.lexnorm_measure_fields, collapse = ", ")
     )
   }
+  measure_specs <- measure_specs[.lexnorm_measure_fields]
   if (
     nrow(measure_specs) == 0L ||
       nrow(measure_specs) > .lexnorm_maximum_measures
@@ -541,12 +558,97 @@
 #'   compare unlike scales, form composite scores, or approve a data license.
 #'
 #' @export
+#' Construct a measure-specification table for lexical-norm profiles
+#'
+#' Creates a normalized eleven-column `measure_specs` data frame for
+#' [lexdiv_norm_profile()] and [lexdiv_norm_profile_batch()], filling omitted
+#' descriptive fields with explicit `"unspecified"` labels rather than silent
+#' assumptions.
+#'
+#' @param value_column Non-empty character vector of numeric column names in `norms`.
+#' @param measure_id Unique ASCII identifiers; defaults to `value_column`.
+#' @param construct_id Construct identifiers; defaults to `measure_id`.
+#' @param value_unit Scale/unit labels; scalar values recycle across measures.
+#' @param direction Score direction(s): `"higher"`, `"lower"`, or `"descriptive"`.
+#' @param language,variety,population_id,collection_year Provenance strings;
+#'   scalars recycle across measures.
+#' @param valid_min,valid_max Optional numeric bounds (`NA_real_` when unbounded).
+#' @return A validated `data.frame` accepted by `measure_specs`.
+#' @export
+lexdiv_norm_spec <- function(
+    value_column,
+    measure_id = value_column,
+    construct_id = measure_id,
+    value_unit = "unspecified",
+    direction = "descriptive",
+    language = "unspecified",
+    variety = "unspecified",
+    population_id = "unspecified",
+    collection_year = "unspecified",
+    valid_min = NA_real_,
+    valid_max = NA_real_) {
+  value_column <- .lexnorm_plain_character(value_column, "value_column")
+  n <- length(value_column)
+  recycle <- function(x, name) {
+    if (length(x) == 1L) rep(x, n) else if (length(x) == n) x else
+      .lexnorm_stop("%s must have length 1 or %d.", name, n)
+  }
+  specs <- data.frame(
+    measure_id = recycle(measure_id, "measure_id"),
+    value_column = value_column,
+    construct_id = recycle(construct_id, "construct_id"),
+    value_unit = recycle(value_unit, "value_unit"),
+    direction = recycle(direction, "direction"),
+    language = recycle(language, "language"),
+    variety = recycle(variety, "variety"),
+    population_id = recycle(population_id, "population_id"),
+    collection_year = recycle(collection_year, "collection_year"),
+    valid_min = as.double(recycle(valid_min, "valid_min")),
+    valid_max = as.double(recycle(valid_max, "valid_max")),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+  .lexnorm_measure_specs(specs)
+}
+
+#' Construct resource provenance metadata for lexical-norm profiles
+#'
+#' Creates a normalized eight-field `resource` list for [lexdiv_norm_profile()],
+#' [lexdiv_norm_profile_batch()], [lexdiv_ngram_reference()], and
+#' [lexdiv_build_ngram_reference()].
+#'
+#' @param resource_id ASCII identifier beginning with a letter.
+#' @param resource_version,creator,source_reference,data_license,transformation_id,lookup_unit,resource_key_normalization_id
+#'   Explicit provenance declarations.
+#' @return A validated named `list` accepted by `resource`.
+#' @export
+lexdiv_resource_meta <- function(
+    resource_id = "caller_resource",
+    resource_version = "unspecified",
+    creator = "unspecified",
+    source_reference = "unspecified",
+    data_license = "unspecified",
+    transformation_id = "none",
+    lookup_unit = "exact_term",
+    resource_key_normalization_id = "caller-prepared-v1") {
+  .lexnorm_resource(list(
+    resource_id = resource_id,
+    resource_version = resource_version,
+    creator = creator,
+    source_reference = source_reference,
+    data_license = data_license,
+    transformation_id = transformation_id,
+    lookup_unit = lookup_unit,
+    resource_key_normalization_id = resource_key_normalization_id
+  ))
+}
+
 lexdiv_norm_profile <- function(
     terms,
     norms,
     key,
-    measure_specs,
-    resource,
+    measure_specs = lexdiv_norm_spec(setdiff(names(norms), key)),
+    resource = lexdiv_resource_meta("caller_norms"),
     weightings = c("token", "type"),
     max_rows = 1e6) {
   terms <- .lexnorm_terms(terms)

@@ -1,83 +1,41 @@
 # API and measurement lifecycle
 
-## Current distributions
+## Current distribution
 
-The current development release is **0.5.0.9001**. It includes all current guide
-workflows. Stable **0.4.0** remains available as a separate fixed release.
-Pin the package archive used in an analysis and use `citation("ldfreq")` to
-cite that exact version. New releases do not replace earlier fixed archives.
+The current stable release is **1.0.0**. Pin the package version used in an
+analysis and run `citation("ldfreq")` to cite that exact release alongside the
+measurement methods and reference datasets used in your study.
 
-The [release-scope guide](https://ryuya-dot-com.github.io/ldfreq/articles/release-scope.html)
-explains supported inputs, optional integrations and compatibility. The
-[NEWS](https://ryuya-dot-com.github.io/ldfreq/news/index.html) records changes by version.
+The public development snapshot 1.0.0.9001 contains incompatible changes
+relative to 1.0.0, including changed raw-text defaults and retired entry points.
+It is not a stable 1.x release. See the migration instructions in the README
+and NEWS before using it. A future stable release containing incompatible
+changes requires a major version increment and migration notes.
 
-## Reference data in 0.5.0.9001
+## Stability and reproducibility commitments
 
-Third-party reference data are optional downloads with their own licenses.
-Use `lexdiv_resource_info()` to inspect the terms, source, version and hash,
-then explicitly use `lexdiv_download_resources(..., accept_license = TRUE)`.
-Ordinary computation and installation never download resources. The MIT code
-can be installed and used without obtaining MorphoLex or any other reference
-snapshot. Existing resource-based analyses need this one-time setup; the
-reference data bytes and measurement definitions are unchanged.
+`ldfreq` treats lexical measures as auditable measurement specifications rather
+than opaque numbers:
 
-Rendered guides are published on the website. The compact package archive
-contains guide sources and installed example scripts; it does not include
-rendered outputs from the separately licensed reference data.
+- **Explicit method and parameter identities**: Every metric row records its
+  versioned `method_id`, requested and effective parameters, token and type
+  counts (`N`, `V`), calculation `status`, and `missing_reason`.
+- **Recorded preprocessing choices**: Raw-text analyses (`lexdiv_tokenize*()`,
+  `lexdiv_metrics_text*()`) default to `case = "lower"`,
+  `tokenizer = "english"`, `normalization = "NFC"`, and `keep_numbers = FALSE`,
+  and record every setting and SHA-256 text fingerprint in `$preprocessing`.
+- **Saved-result integrity**: Exported corpus, annotation, and profile objects
+  carry explicit S3 classes and integrity checks so accidental post-hoc edits
+  cannot silently alter downstream tables or plots.
+- **Deprecation policy**: In the stable 1.x release series, public functions, argument
+  names, and documented result columns are maintained compatibly; any future
+  breaking change requires a major version increment and migration notes in
+  `NEWS.md`.
 
-## Metric identities and saved results
+## Optional reference data
 
-Package version, metric method ID, metric-contract version, result schema,
-preprocessing and reference-resource identity are separate. Preserve them with
-the original inputs and complete results. Changes in a package version do not
-relabel the methods or values inside an earlier saved result.
-
-The current catalog has thirteen metrics: eleven defaults, opt-in `mtld_ma`,
-and experimental `expected_ttr_d`. MTLD-MA adds a separate method definition;
-it does not change ordinary MTLD or existing presets. Core contract 0.2.0
-continues to describe the unchanged existing definitions and result schema.
-Adding an opt-in method does not invalidate plans for unchanged definitions.
-
-For historical analyses, package 0.3.0 changed ordinary MTLD from a minimum-ten
-factor rule to no minimum and advanced the core contract from 0.1.0 to 0.2.0.
-The old rule remains an explicit variant. Do not mix old and new MTLD values
-under one method label. Plans from the old contract must be recreated; reading
-old RDS results does not require rewriting their identities or values.
-
-Expected-TTR D remains an experimental curve estimator, not CLAN VOCD. Formula
-agreement, length sensitivity, sampling reliability and proficiency validity
-are distinct claims. The [selection guide](https://ryuya-dot-com.github.io/ldfreq/articles/choosing-metrics.html)
-provides evidence and conditions for choosing among the implemented measures.
-
-## Naming and compatibility
-
-General analysis functions use `lexdiv_`; resource-specific operations retain
-resource prefixes. Operation names put the action before its object. `_text`
-identifies raw text and `_batch` identifies separately named documents.
-
-| Current name | Earlier compatible name |
-|---|---|
-| `lexdiv_compare_ngrams()` | `lexdiv_ngram_compare()` |
-| `lexdiv_build_ngram_reference()` | `lexdiv_ngram_reference_build()` |
-| `lexdiv_screen_lengths()` | `lexdiv_screen()` |
-| `lexdiv_sort_concordance()` | `lexdiv_concordance_sort()` |
-
-These four pairs are exact aliases, with the same arguments and results.
-Study-table, concordance, collocation and keyness functions are public APIs;
-their earlier installed source helpers remain compatibility wrappers. Saved
-old records remain accepted by the corresponding operations. No implicit
-migration overwrites a saved record.
-
-Ordination, readability, L2SCA import and teaching workflows remain explicitly
-sourced recipes. Their guides define the required inputs and external tools.
-Pin the package archive when using these scripts. Their availability does not
-imply automatic linguistic annotation or educational interpretation.
-
-## Change policy
-
-A change to a formula, threshold rule, token selection or missingness meaning
-requires an identifiable method or contract change and migration documentation.
-An added optional operation should preserve existing defaults and result shapes.
-Document public renamings with compatibility aliases before removing old names.
-Errors in input types must be reported rather than silently coerced to scores;
-intended categorical metadata and legitimate missing results retain their roles.
+Third-party reference datasets are **not** bundled in the MIT-licensed package
+archive. Use `lexdiv_resource_info()` to inspect each dataset's source, pinned
+version, SHA-256 digest, and license terms, then download selected resources
+explicitly with `lexdiv_download_resources(..., accept_license = TRUE)`.
+Package installation and ordinary calculations never perform network requests.

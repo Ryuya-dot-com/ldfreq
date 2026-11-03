@@ -189,7 +189,7 @@ lexdiv_metric_ids <- function() {
 #'   `status` and `missing_reason` before interpreting `value`: `ok` means a
 #'   value was computed, `missing` means the valid input did not meet a method
 #'   domain, and `invalid_input` means the token document was invalid.
-#'   With `plan`, returns the complete [lexdiv_profile()] result, including
+#'   With `plan`, returns the complete `lexdiv_profile_results` table, including
 #'   request identities, plan fingerprint, profile class and attributes.
 #' @export
 lexdiv_metrics <- function(
@@ -207,7 +207,7 @@ lexdiv_metrics <- function(
         !missing(sample_size) || !missing(expected_ttr_sample_sizes)) {
       stop("With plan, omit metrics and individual metric parameters.", call. = FALSE)
     }
-    return(lexdiv_profile(tokens, plan = plan))
+    return(.lexdiv_profile(tokens, plan = plan))
   }
 
   if (
