@@ -86,11 +86,20 @@ with patch.object(reuse, "git", return_value=attributes):
         with patch.object(Path, "read_text", return_value=bad):
             rejects(lambda: reuse.verify_ci(windows_state, [".gitattributes"], workflow,
                                             workflow, builder_run, "owner/repo", windows_jobs))
+resource_repaired = repaired + "\ninst/licenses/resources/** -text"
+with patch.object(reuse, "git", return_value=repaired):
+    with patch.object(Path, "read_text", return_value=resource_repaired):
+        reuse.verify_ci(windows_state, [".gitattributes"], workflow, workflow,
+                        builder_run, "owner/repo", windows_jobs)
+    for bad in (repaired, resource_repaired + "\nR/* -text", resource_repaired.replace("/**", "/*")):
+        with patch.object(Path, "read_text", return_value=bad):
+            rejects(lambda: reuse.verify_ci(windows_state, [".gitattributes"], workflow,
+                                            workflow, builder_run, "owner/repo", windows_jobs))
 rejects(lambda: reuse.verify_ci(builder_state, [".gitattributes"], workflow,
                                 workflow, builder_run, "owner/repo", builder_jobs))
 rejects(lambda: reuse.verify_ci(windows_state, [], workflow, workflow,
                                 builder_run, "owner/repo", windows_jobs[:-1]))
-print("Windows recheck permits only the exact LICENSE attribute repair and retains five successful jobs.")
+print("Windows recheck permits only the exact pinned license attribute repairs and retains five successful jobs.")
 
 report_before = 'stopifnot(identical(saved$inference$tables, record$inference$tables),'
 report_after = 'stopifnot(identical(saved$inference$settings$df_method, "kenward-roger"),'

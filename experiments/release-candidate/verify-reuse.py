@@ -119,10 +119,15 @@ def verify_ci(state, changed, old, new, run, repo, jobs=None):
             "validate-tubelex-release-unit.R"))
         if windows_recheck and ".gitattributes" in changed:
             previous = git("show", state["Validation-Commit"] + ":.gitattributes")
-            anchor = "inst/licenses/tubelex/NOTICE.md -text"
-            expected = previous.replace(anchor, anchor + "\ninst/licenses/tubelex/LICENSE -text")
-            if previous.count(anchor) != 1 or Path(".gitattributes").read_text().strip() != expected:
-                raise ValueError("Attributes change exceeds the byte-pinned LICENSE repair")
+            repairs = (
+                ("inst/licenses/tubelex/NOTICE.md -text", "inst/licenses/tubelex/LICENSE -text"),
+                ("inst/licenses/tubelex/LICENSE -text", "inst/licenses/resources/** -text"),
+            )
+            expected = [previous.replace(anchor, anchor + "\n" + addition)
+                        for anchor, addition in repairs
+                        if previous.count(anchor) == 1 and addition not in previous.splitlines()]
+            if Path(".gitattributes").read_text().strip() not in expected:
+                raise ValueError("Attributes change exceeds the byte-pinned license repair")
             allowed_files.add(".gitattributes")
         if set(changed) - allowed_files:
             raise ValueError("Builder recheck requires identical package and test inputs")

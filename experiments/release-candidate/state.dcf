@@ -2,3 +2,7 @@ Record-Scope: repository-release-evidence
 Package: ldfreq
 Version: 1.0.0.9001
 Status: development
+Validation-Run: 41569403818
+Validation-Commit: e3544394373c0027ae2bac1f53df02f5017ce781
+Recheck-TUBELEX-Builder: true
+Recheck-Windows: true
