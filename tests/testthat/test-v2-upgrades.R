@@ -398,10 +398,10 @@ test_that("recipes support nj8_unit = lemma, cross-engine mismatch controls, and
     cli <- system.file("exec", "ldfreq.R", package = "ldfreq")
     if (!nzchar(cli)) cli <- normalizePath("../../exec/ldfreq.R", mustWork = FALSE)
     if (nzchar(cli) && file.exists(cli)) {
+      withr::local_envvar(R_LIBS = paste(.libPaths(), collapse = .Platform$path.sep))
       status <- system2(
         file.path(R.home("bin"), "Rscript"),
-        c(cli, "--recipe", rec_file, "--input", in_dir, "--output", out_dir, "--recursive"),
-        env = sprintf("R_LIBS=%s", paste(.libPaths(), collapse = .Platform$path.sep))
+        shQuote(c("--vanilla", cli, "--recipe", rec_file, "--input", in_dir, "--output", out_dir, "--recursive"))
       )
       expect_identical(status, 0L)
       csv_df <- utils::read.csv(file.path(out_dir, "results.csv"), stringsAsFactors = FALSE)
