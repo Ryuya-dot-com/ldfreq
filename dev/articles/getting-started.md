@@ -1,0 +1,1315 @@
+# Getting started with ldfreq
+
+This guide takes a small English document table through analysis,
+reading results, making a table and plot, and saving and reopening the
+complete record. The first workflow uses the [documented
+installation](https://ryuya-dot-com.github.io/ldfreq/#installation) and
+requires no optional package, model or download. Run the examples in
+order through **Save and resume**; the later sections cover optional
+analysis choices.
+
+## Your first document table
+
+Use one row per document and a unique character ID. Here two short
+authored sentences and an empty document make the counts easy to check.
+Replace `texts` with your own ID/text table when using this workflow for
+research.
+
+``` r
+
+library(ldfreq)
+
+texts <- data.frame(
+  document_id = c("essay_a", "essay_b", "empty"),
+  text = c("Cats chase cats and dogs.", "The reader reads a story.", "")
+)
+analysis <- lexdiv_metrics_text(texts, metrics = "ttr")
+analysis$results
+#> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
+#>   document_id metric_id value  status missing_reason N V below_quality_floor
+#> 1     essay_a       ttr   0.8      ok           <NA> 5 4               FALSE
+#> 2     essay_b       ttr   1.0      ok           <NA> 5 5               FALSE
+#> 3       empty       ttr    NA missing    empty_input 0 0                TRUE
+```
+
+By default, `tokenizer = "english"` applies the English word rules,
+`normalization = "NFC"` canonicalizes Unicode accents, and
+`case = "lower"` counts `Cats` and `cats` as the same form. This example
+counts surface forms, without lemmatization or part-of-speech filtering.
+These are measurement choices, not automatic corrections of the source
+text.
+
+A single sentence can instead go directly to
+[`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md);
+see [raw text](#raw-text-without-hidden-preprocessing). For Japanese
+text, follow the [separate annotation
+workflow](https://ryuya-dot-com.github.io/ldfreq/dev/articles/japanese-annotations.md).
+
+## Reading results
+
+Read `analysis$results` first. It has one row per document and requested
+metric. In the example, `N` counts word occurrences (tokens), `V` counts
+distinct lowercase forms (types), and TTR is `V / N`:
+
+| Document | `N` | `V` | TTR | Meaning |
+|----|---:|---:|---:|----|
+| `essay_a` | 5 | 4 | 0.8 | `cats` occurs twice. |
+| `essay_b` | 5 | 5 | 1.0 | All five forms are different. |
+| `empty` | 0 | 0 | `NA` | No words were supplied; `missing_reason` is `empty_input`. |
+
+The empty document stays in the results. It has no token-audit rows, so
+use the result table or original input to count documents, not the token
+table. Inspect the counted words when a result differs from what you
+expected. Select the position, form and inclusion columns for a compact
+view; the complete token audit also retains annotations and exclusion
+reasons:
+
+``` r
+
+analysis$token_audit[c("document_id", "token_index", "surface", "eligible")]
+#>    document_id token_index surface eligible
+#> 1      essay_a           1    cats     TRUE
+#> 2      essay_a           2   chase     TRUE
+#> 3      essay_a           3    cats     TRUE
+#> 4      essay_a           4     and     TRUE
+#> 5      essay_a           5    dogs     TRUE
+#> 6      essay_b           1     the     TRUE
+#> 7      essay_b           2  reader     TRUE
+#> 8      essay_b           3   reads     TRUE
+#> 9      essay_b           4       a     TRUE
+#> 10     essay_b           5   story     TRUE
+```
+
+`status` describes calculation availability, not writing quality or
+measurement precision. The core metric results use these states:
+
+| `status` | Meaning |
+|----|----|
+| `ok` | The requested method produced a value. |
+| `missing` | The document was valid, but the method’s domain or requested setting did not permit a value. |
+| `invalid_input` | Invalid tokens made a core token input invalid; they were not silently deleted. |
+
+An `NA` is not a zero. Read `missing_reason` to distinguish an empty
+document from a text too short for a requested window, segment or
+sample, a zero denominator, or an unavailable MTLD factor. Malformed
+raw-text tables and unknown metric IDs stop the call rather than
+producing score rows.
+
+For example, neither five-word sentence has a complete 50-token MATTR
+window:
+
+``` r
+
+short_window <- lexdiv_metrics_text(
+  texts, tokenizer = "english", normalization = "NFC",
+  case = "lower", metrics = "mattr", window_length = 50
+)
+short_window$results
+#> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
+#>   document_id metric_id value  status                    missing_reason N V
+#> 1     essay_a     mattr    NA missing too_short_for_requested_parameter 5 4
+#> 2     essay_b     mattr    NA missing too_short_for_requested_parameter 5 5
+#> 3       empty     mattr    NA missing                       empty_input 0 0
+#>   below_quality_floor
+#> 1                TRUE
+#> 2                TRUE
+#> 3                TRUE
+```
+
+The requested window is retained and the scores are unavailable. Choose
+a window from your research design and report it consistently; do not
+shorten it separately for each document just to obtain a number. The
+`below_quality_floor` flag is an advisory token-count screen, not an
+automatic exclusion rule or an estimate of precision.
+
+## Interpreting values
+
+TTR is the proportion of distinct forms among all counted words. Here
+0.8 means four distinct forms among five occurrences; 1.0 means no form
+repeats in the five-word sentence. TTR depends on text length, so the
+larger value does not establish better writing or greater proficiency.
+These short authored sentences demonstrate the calculation, not a
+population difference.
+
+When comparing research documents, keep the counting unit and relevant
+settings and sampling conditions comparable. Different metrics have
+different scales and length sensitivities; their numbers are not
+interchangeable. See [comparison
+design](https://ryuya-dot-com.github.io/ldfreq/dev/articles/designing-comparisons.md)
+before selecting measures or interpreting group differences.
+
+## Make a table and plot
+
+Use
+[`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_widen.md)
+to put metrics in columns without recalculating them. Select scalar
+fields for CSV, keeping availability and word counts beside values. The
+complete `analysis` object still holds the settings and token audit.
+
+``` r
+
+report <- lexdiv_widen(analysis,
+  values_from = c("value", "status", "missing_reason", "N", "V"))
+report
+#> <lexdiv_wide_results: 3 rows; 6 columns>
+#>   document_id ttr__value ttr__status ttr__missing_reason ttr__N ttr__V
+#> 1     essay_a        0.8          ok                <NA>      5      4
+#> 2     essay_b        1.0          ok                <NA>      5      5
+#> 3       empty         NA     missing         empty_input      0      0
+```
+
+``` r
+
+plot(analysis, metric_id = "ttr")
+```
+
+![](getting-started_files/figure-html/first-report-plot-1.png)
+
+The plot shows the two available scores; the empty document remains in
+`report` and `analysis$results`. These are tiny calculation examples,
+not a comparison of writing ability. Use `monochrome = TRUE` for black
+and gray. Both modes distinguish advisory status by shape as well as
+color. Put figure numbers, titles and notes outside the image; see the
+[report
+guide](https://ryuya-dot-com.github.io/ldfreq/dev/articles/from-text-to-report.html#prepare-the-figure-at-its-publication-size)
+for final-size export.
+
+## Save and resume
+
+Save the original input and complete analysis in RDS, together with the
+reporting table and session information. CSV is useful for viewing or
+sharing selected columns; it cannot preserve the complete analysis
+record.
+
+The example writes into a temporary directory. **For your own project,
+change `output_dir` to a lasting folder**, such as
+`file.path("results", "ldfreq")`, before running this block. Temporary
+files may disappear when R closes. Paths are relative to
+[`getwd()`](https://rdrr.io/r/base/getwd.html) unless you supply an
+absolute path; choose filenames that do not overwrite results you want
+to keep.
+
+``` r
+
+output_dir <- file.path(tempdir(), "ldfreq-start")
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+rds_path <- file.path(output_dir, "analysis.rds")
+record <- list(input = texts, analysis = analysis, report = report,
+  session = sessionInfo())
+saveRDS(record, rds_path)
+write.csv(report, file.path(output_dir, "scores.csv"),
+  row.names = FALSE, na = "NA")
+
+restored <- readRDS(rds_path)
+restored$analysis$results
+#> <lexdiv_batch_results: 3 documents; 3 metric records; schema 0.1.0>
+#>   document_id metric_id value  status missing_reason N V below_quality_floor
+#> 1     essay_a       ttr   0.8      ok           <NA> 5 4               FALSE
+#> 2     essay_b       ttr   1.0      ok           <NA> 5 5               FALSE
+#> 3       empty       ttr    NA missing    empty_input 0 0                TRUE
+identical(restored$analysis, analysis)  # TRUE: the complete result is retained.
+#> [1] TRUE
+```
+
+In a later R session, read the saved RDS from the lasting path you
+chose. For example, if you used `results/ldfreq`:
+
+``` r
+
+library(ldfreq)
+restored <- readRDS(file.path("results", "ldfreq", "analysis.rds"))
+restored$report
+plot(restored$analysis, metric_id = "ttr")
+```
+
+You can also check `restored$analysis$preprocessing` without calculating
+scores again. The saved `input` supplies the text; the preprocessing
+record alone stores hashes rather than a copy of the original prose.
+
+For reporting, state the counted unit, tokenizer, case and exclusion
+choices, metric and parameters, document lengths, and unavailable
+results. The short sentences here illustrate calculations only. When you
+add reference vocabulary, report its version and coverage too; matching
+a list does not establish what a writer knows. See [comparison
+design](https://ryuya-dot-com.github.io/ldfreq/dev/articles/designing-comparisons.md)
+and the [worked research
+report](https://ryuya-dot-com.github.io/ldfreq/dev/articles/from-text-to-report.md)
+for the next steps.
+
+## Use your own files or another input
+
+| Starting material or next task | Continue here |
+|----|----|
+| One TXT file, a folder, or a CSV containing texts | [File input](https://ryuya-dot-com.github.io/ldfreq/dev/articles/english-tokenization.html#import-text-files), with supplied samples and path substitutions |
+| Different ID/text column names | [`?lexdiv_metrics_text`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md): use `id_col` and `text_col`; IDs must be unique character values |
+| Writer, task or occasion information | [Retain study metadata](https://ryuya-dot-com.github.io/ldfreq/dev/articles/english-tokenization.html#retain-study-metadata) with `metadata = study`; match every document by ID, including empty documents |
+| Prepared tokens or a one-token-per-row table | [Multiple documents](#multiple-documents); the core does not tokenize whole sentences |
+| Japanese text and morphological annotations | [Japanese annotations](https://ryuya-dot-com.github.io/ldfreq/dev/articles/japanese-annotations.md); imported annotation tables have their own workflow |
+| Saved results, condition comparisons and methods text | [From text to a report](https://ryuya-dot-com.github.io/ldfreq/dev/articles/from-text-to-report.md) |
+
+Your first analysis is complete. Choose your next route from the
+[research-question
+map](https://ryuya-dot-com.github.io/ldfreq/#choose-your-workflow), or
+the [API connection
+map](https://ryuya-dot-com.github.io/ldfreq/dev/articles/from-text-to-report.html#connect-the-analysis-steps).
+Both connect required inputs to the result tables and source records you
+should inspect. In particular, reference-frequency profiles describe
+document words; keyness compares corpora, and a mixed-model table has
+one selected response per observation.
+
+The sections below describe optional lexical units, reference resources
+and method variants. Use them when those choices are part of your
+question; they are not prerequisites for the workflow above.
+
+## Raw text without hidden preprocessing
+
+The shortest raw-text workflow is a direct call to
+[`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md).
+Normalization, case, and number handling are explicit arguments rather
+than global options.
+
+``` r
+
+raw_result <- lexdiv_metrics_text(
+  "Cats and cat ran run.",
+  tokenizer = "english", normalization = "NFC",
+  case = "preserve",
+  metrics = "ttr"
+)
+raw_result
+#> <lexdiv_text_results> 5/5 eligible tokens | unit=surface | inclusion=all
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr     1     ok           <NA> 5 5               FALSE
+```
+
+Call
+[`lexdiv_tokenize()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md)
+separately when you want to inspect or annotate the tokens first. Its
+offsets refer to the processed text, and its provenance keeps source and
+processed text hashes without storing the source text itself.
+
+``` r
+
+tokenization <- lexdiv_tokenize(
+  "Cats and cat ran run.",
+  tokenizer = "english", normalization = "NFC",
+  case = "preserve"
+)
+tokenization
+#> <lexdiv_tokenization> 5 tokens | NFC | preserve | numbers=removed | ldfreq-english-word-tokenizer 0.2.0
+#>  token_index start end surface is_number
+#>            1     1   4    Cats     FALSE
+#>            2     6   8     and     FALSE
+#>            3    10  12     cat     FALSE
+#>            4    14  16     ran     FALSE
+#>            5    18  20     run     FALSE
+```
+
+Lemma and content-word analyses require an explicit annotation source.
+The example annotations are project-authored fixtures, not a recommended
+universal lemmatizer. Missing annotations would be excluded and counted
+in `unit_coverage` rather than imputed.
+
+UPOS backend ID and version are always explicit and separate from lemma
+backend ID and version, even if one documented pipeline generated both
+layers.
+
+``` r
+
+annotated <- lexdiv_lemmatize(
+  tokenization,
+  lemmas = c("cat", "and", "cat", "run", "run"),
+  upos = c("NOUN", "CCONJ", "NOUN", "VERB", "VERB"),
+  backend_id = "vignette-fixture",
+  backend_version = "1",
+  upos_backend_id = "vignette-upos-fixture",
+  upos_backend_version = "1"
+)
+
+lemma_content <- lexdiv_metrics_text(
+  annotated,
+  unit = "lemma",
+  word_inclusion = "content",
+  metrics = "ttr"
+)
+lemma_content$results
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>   metric_id value status missing_reason N V below_quality_floor
+#> 1       ttr   0.5     ok           <NA> 4 2               FALSE
+lemma_content$token_audit
+#>   token_index surface selected_unit unit_match_rule  upos eligible
+#> 1           1    Cats           cat            <NA>  NOUN     TRUE
+#> 2           2     and           and            <NA> CCONJ    FALSE
+#> 3           3     cat           cat            <NA>  NOUN     TRUE
+#> 4           4     ran           run            <NA>  VERB     TRUE
+#> 5           5     run           run            <NA>  VERB     TRUE
+#>   exclusion_reason
+#> 1             <NA>
+#> 2 non_content_upos
+#> 3             <NA>
+#> 4             <NA>
+#> 5             <NA>
+lemma_content$preprocessing
+#> $contract_id
+#> [1] "ldfreq-preprocessing"
+#> 
+#> $contract_version
+#> [1] "1.0.0"
+#> 
+#> $tokenization
+#> $tokenization$contract_id
+#> [1] "ldfreq-preprocessing"
+#> 
+#> $tokenization$contract_version
+#> [1] "1.0.0"
+#> 
+#> $tokenization$tokenizer_id
+#> [1] "ldfreq-english-word-tokenizer"
+#> 
+#> $tokenization$tokenizer_version
+#> [1] "0.2.0"
+#> 
+#> $tokenization$normalization
+#> [1] "NFC"
+#> 
+#> $tokenization$case
+#> [1] "preserve"
+#> 
+#> $tokenization$keep_numbers
+#> [1] FALSE
+#> 
+#> $tokenization$token_pattern
+#> [1] "(?:[A-Za-z]\\.){2,}(?![\\p{L}\\p{M}\\p{N}])|(?:[A-Za-z]\\.)+[A-Za-z](?![\\p{L}\\p{M}\\p{N}])|[+\\-\\x{2212}]?(?:\\p{N}++(?:[.,:/\\-]\\p{N}++)*+|[.,]\\p{N}++)(?:[eE][+\\-]?\\p{N}++)?+[%\\x{2030}]?+(?![\\p{L}\\p{M}\\p{N}'\\-])|\\p{N}++(?:[.,:/\\-]\\p{N}++)*+[\\p{L}][\\p{L}\\p{M}\\p{N}]*(?:[:'\\-][\\p{L}\\p{N}][\\p{L}\\p{M}\\p{N}]*)*|(?=[\\p{L}\\p{M}\\p{N}'\\-]*\\p{L})[\\p{L}\\p{N}][\\p{L}\\p{M}\\p{N}]*(?:['\\-][\\p{L}\\p{N}][\\p{L}\\p{M}\\p{N}]*)*"
+#> 
+#> $tokenization$source_text_sha256
+#> [1] "5d33ea4730a56cb3c2ac4bd306ac925d31afc67a9daeb5abf5c7ce718ce1d544"
+#> 
+#> $tokenization$processed_text_sha256
+#> [1] "5d33ea4730a56cb3c2ac4bd306ac925d31afc67a9daeb5abf5c7ce718ce1d544"
+#> 
+#> $tokenization$token_table_sha256
+#> [1] "46c007ee7a36efea8e8f48b4edf0ca7a44d4aac4c1a9fbce075d851525ad29e7"
+#> 
+#> $tokenization$input_characters
+#> [1] 21
+#> 
+#> $tokenization$processed_characters
+#> [1] 21
+#> 
+#> $tokenization$output_tokens
+#> [1] 5
+#> 
+#> $tokenization$annotation
+#> $tokenization$annotation$method
+#> [1] "supplied"
+#> 
+#> $tokenization$annotation$backend_id
+#> [1] "vignette-fixture"
+#> 
+#> $tokenization$annotation$backend_version
+#> [1] "1"
+#> 
+#> $tokenization$annotation$dictionary
+#> NULL
+#> 
+#> $tokenization$annotation$upos_backend_id
+#> [1] "vignette-upos-fixture"
+#> 
+#> $tokenization$annotation$upos_backend_version
+#> [1] "1"
+#> 
+#> $tokenization$annotation$lemma_tokens
+#> [1] 5
+#> 
+#> $tokenization$annotation$lemma_coverage
+#> [1] 1
+#> 
+#> $tokenization$annotation$upos_tokens
+#> [1] 5
+#> 
+#> $tokenization$annotation$upos_coverage
+#> [1] 1
+#> 
+#> 
+#> $tokenization$excluded_spans
+#> [1] start   end     surface reason 
+#> <0 rows> (or 0-length row.names)
+#> 
+#> $tokenization$excluded_spans_sha256
+#> [1] "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+#> 
+#> 
+#> $selected_unit
+#> [1] "lemma"
+#> 
+#> $word_inclusion
+#> [1] "content"
+#> 
+#> $content_upos
+#> [1] "ADJ"   "ADV"   "NOUN"  "PROPN" "VERB" 
+#> 
+#> $input_tokens
+#> [1] 5
+#> 
+#> $eligible_tokens
+#> [1] 4
+#> 
+#> $excluded_tokens
+#> [1] 1
+#> 
+#> $unit_coverage
+#> [1] 0.8
+```
+
+For a quick English lemma baseline, the optional `textstem` backend can
+be selected explicitly. It supplies lemmas only; it does not infer UPOS
+tags, so a content-word analysis still needs tags from a separately
+identified source.
+
+``` r
+
+if (requireNamespace("textstem", quietly = TRUE)) {
+  automatic_lemmas <- lexdiv_lemmatize(
+    lexdiv_tokenize("The cats were running and studies.",
+      tokenizer = "english", case = "lower"),
+    method = "textstem"
+  )
+  automatic_lemmas$tokens[, c("surface", "lemma")]
+  automatic_lemmas$provenance$annotation
+}
+#> $method
+#> [1] "textstem"
+#> 
+#> $backend_id
+#> [1] "textstem::lemmatize_words"
+#> 
+#> $backend_version
+#> [1] "0.1.4"
+#> 
+#> $dictionary
+#> $dictionary$source
+#> [1] "lexicon"
+#> 
+#> $dictionary$id
+#> [1] "lexicon::hash_lemmas"
+#> 
+#> $dictionary$version
+#> [1] "1.3.2"
+#> 
+#> $dictionary$sha256
+#> [1] "d46e415a53f4f5133ee3e567902d2b51ce1f4928061eb35f84cf5bcfc7fc993d"
+#> 
+#> $dictionary$hash_method
+#> [1] "sha256-utf8-byte-length-pairs-v1"
+#> 
+#> $dictionary$entries
+#> [1] 41531
+#> 
+#> $dictionary$query_casefold
+#> [1] "base-tolower"
+#> 
+#> $dictionary$query_locale
+#> [1] "C.UTF-8"
+#> 
+#> $dictionary$unknown_form_policy
+#> [1] "surface"
+#> 
+#> 
+#> $upos_backend_id
+#> NULL
+#> 
+#> $upos_backend_version
+#> NULL
+#> 
+#> $lemma_tokens
+#> [1] 6
+#> 
+#> $lemma_coverage
+#> [1] 1
+#> 
+#> $upos_tokens
+#> [1] 0
+#> 
+#> $upos_coverage
+#> [1] 0
+```
+
+This separation is deliberate: changing forms to lemmas or restricting
+the denominator to content words changes the measurement. It is not
+merely a file cleaning step.
+
+Flemma is a separate lexical unit because it groups forms without
+preserving POS distinctions.
+[`lexdiv_flemmatize()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_flemmatize.md)
+accepts a caller-supplied local AntBNC file; it neither bundles nor
+downloads that resource. Unknown forms retain a normalized identity
+value, while token rows record AntBNC, override, or identity matching.
+
+The flemma adapter and parser identities are supplied by `ldfreq`.
+`resource_version` and any `override_version` are caller-declared,
+path-free labels; they are not file-content checks. Because the labels
+are returned in provenance and overlap comparability output, they must
+not contain paths, secrets, private hashes, or machine-specific details.
+Local file names and content hashes are not retained in public flemma
+provenance.
+
+``` r
+
+flemmas <- lexdiv_flemmatize(
+  tokenization,
+  "/path/to/antbnc_lemmas_ver_004.txt",
+  resource_version = "004"
+)
+lexdiv_metrics_text(flemmas, unit = "flemma", metrics = "ttr")
+```
+
+The raw AntBNC mapping approximates, but does not reproduce, New Word
+Level Checker. NWLC documents manual word-list alignment. New JACET
+profiles therefore expose AntBNC-versus-headword conflicts and accept
+explicit upstream overrides.
+
+## Custom lexical norms
+
+[`lexdiv_norm_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_norm_profile.md)
+exact-matches prepared terms against your own norm table (`data.frame`
+or `tibble`). You can run a quick exploratory profile directly, or
+attach explicit scale and citation metadata with
+[`lexdiv_norm_spec()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_norm_profile.md)
+and
+[`lexdiv_resource_meta()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_norm_profile.md):
+
+``` r
+
+synthetic_norms <- data.frame(
+  term = c("cat", "run", "other"),
+  familiarity = c(6, 5, NA_real_),
+  concreteness = c(5, 3, 4),
+  stringsAsFactors = FALSE
+)
+norm_specs <- lexdiv_norm_spec(
+  c("familiarity", "concreteness"),
+  construct_id = c("subjective_familiarity", "concreteness"),
+  value_unit = "seven_point_rating",
+  direction = c("higher", "descriptive"),
+  language = "English",
+  population_id = "example_adults",
+  collection_year = "2025",
+  valid_min = 1,
+  valid_max = 7
+)
+norm_resource <- lexdiv_resource_meta(
+  resource_id = "synthetic_norms",
+  resource_version = "1",
+  creator = "Project-authored example",
+  source_reference = "Getting-started synthetic example",
+  data_license = "synthetic-example-only",
+  lookup_unit = "lowercase_lemma"
+)
+
+norm_profile <- lexdiv_norm_profile(
+  c("cat", "cat", "other", "outside"),
+  synthetic_norms,
+  key = "term",
+  measure_specs = norm_specs,
+  resource = norm_resource
+)
+norm_profile$summary[, c(
+  "measure_id", "weighting", "estimate", "resource_coverage",
+  "value_coverage", "annotation_coverage", "status"
+)]
+#>     measure_id weighting estimate resource_coverage value_coverage
+#> 1  familiarity     token 6.000000         0.7500000      0.5000000
+#> 2  familiarity      type 6.000000         0.6666667      0.3333333
+#> 3 concreteness     token 4.666667         0.7500000      0.7500000
+#> 4 concreteness      type 4.500000         0.6666667      0.6666667
+#>   annotation_coverage status
+#> 1           0.6666667     ok
+#> 2           0.5000000     ok
+#> 3           1.0000000     ok
+#> 4           1.0000000     ok
+norm_profile$lookup
+#>   input_index    term   measure_id       lookup_status value       value_status
+#> 1           1     cat  familiarity    matched_resource     6           observed
+#> 2           1     cat concreteness    matched_resource     5           observed
+#> 3           2     cat  familiarity    matched_resource     6           observed
+#> 4           2     cat concreteness    matched_resource     5           observed
+#> 5           3   other  familiarity    matched_resource    NA missing_annotation
+#> 6           3   other concreteness    matched_resource     4           observed
+#> 7           4 outside  familiarity unknown_to_resource    NA not_applicable_oov
+#> 8           4 outside concreteness unknown_to_resource    NA not_applicable_oov
+```
+
+Summary means are conditional on observed values among matched keys. OOV
+terms and matched keys with missing values have different lookup states
+and neither is imputed. Report the resource-, value-, and
+annotation-coverage columns with the estimate. Caller metadata is
+recorded as provenance; it is not a license decision or evidence that a
+measure is valid for a new population. The lookup table retains the
+supplied lexical terms, so apply the same data-handling care as for the
+input.
+
+## Optional reference-data setup
+
+The reference-dependent sections use separately licensed data. Review
+[the resource terms and cache
+instructions](https://ryuya-dot-com.github.io/ldfreq/dev/articles/reference-data.md),
+then obtain only the resources needed for the sections you will run.
+Core calculations and examples using your own tables do not require
+these downloads.
+
+``` r
+
+lexdiv_resource_info(c("tubelex", "nj8"))
+# After reviewing each resource's license and notice:
+lexdiv_download_resources(c("tubelex", "nj8"), accept_license = TRUE)
+```
+
+``` r
+
+has_tubelex <- ldfreq::lexdiv_resource_info("tubelex")$available
+has_nj8 <- ldfreq::lexdiv_resource_info("nj8")$available
+has_morpholex <- ldfreq::lexdiv_resource_info("morpholex")$available
+has_bnccoca <- ldfreq::lexdiv_resource_info("bnccoca")$available
+has_morphynet <- ldfreq::lexdiv_resource_info("morphynet")$available
+```
+
+Resource-dependent examples below run only when their verified data are
+already in the cache. The other examples run without downloading
+reference data.
+
+## Corpus-relative frequency with coverage
+
+[`tubelex_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/tubelex_profile.md)
+applies explicit query normalization or identity matching. The resource
+uses Treebank segmentation, which differs from
+[`lexdiv_tokenize()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md);
+character-vector alignment is the caller’s responsibility. It returns
+original terms, lookup terms, unmatched rows, token/type coverage, and
+matched-only conditional summaries.
+
+``` r
+
+# Manually prepared terms illustrate this sentence, not a general tokenizer.
+frequency <- tubelex_profile(c("I", "do", "n't", "think", "it", "'s", "a", "book"))
+frequency$summary
+frequency$coverage
+frequency$lookup
+```
+
+TUBELEX is a general YouTube subtitle frequency space. Its values
+describe frequency and prevalence relative to that corpus; they are not
+direct measures of proficiency, writing quality, academic register, or
+context-independent lexical sophistication.
+
+Passing a `lexdiv_tokenization` object requires
+`tokenization_mismatch = "allow"` for an explicit sensitivity analysis.
+High coverage alone cannot validate segmentation. For multiple
+documents, When given multiple documents,
+[`tubelex_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/tubelex_profile.md)
+returns a structured `tubelex_profile_batch` object (`$summary`,
+`$lookup`, `$coverage`, and `$profiles`) while loading one verified
+resource snapshot per call. See [designing comparisons
+guide](https://ryuya-dot-com.github.io/ldfreq/dev/articles/designing-comparisons.md)
+for a worked design.
+
+## New JACET 8000 lexical levels
+
+[`nj8_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/nj8_profile.md)
+maps New JACET 8000 ranks to eight 1,000-rank levels. After downloading
+`nj8`, omit `wordlist` to use the cached table, redistributed with JACET
+permission and source attribution. Exact and cumulative token/type rates
+keep off-list items in the denominator. An explicit data frame, CSV, or
+official-layout XLSX remains supported. The next example deliberately
+supplies a small synthetic table so that each level can be checked by
+hand.
+
+``` r
+
+synthetic_nj8 <- data.frame(
+  NJ8 = c(1L, 1001L, 6001L, 8000L),
+  Word = c("the", "develop", "rare", "extreme")
+)
+levels <- nj8_profile(annotated, synthetic_nj8, unit = "lemma")
+levels$summary
+#>    weighting level level_label items proportion cumulative_items
+#> 1      token     1     Level 1     0          0                0
+#> 2      token     2     Level 2     0          0                0
+#> 3      token     3     Level 3     0          0                0
+#> 4      token     4     Level 4     0          0                0
+#> 5      token     5     Level 5     0          0                0
+#> 6      token     6     Level 6     0          0                0
+#> 7      token     7     Level 7     0          0                0
+#> 8      token     8     Level 8     0          0                0
+#> 9      token    NA    Off-list     5          1               NA
+#> 10      type     1     Level 1     0          0                0
+#> 11      type     2     Level 2     0          0                0
+#> 12      type     3     Level 3     0          0                0
+#> 13      type     4     Level 4     0          0                0
+#> 14      type     5     Level 5     0          0                0
+#> 15      type     6     Level 6     0          0                0
+#> 16      type     7     Level 7     0          0                0
+#> 17      type     8     Level 8     0          0                0
+#> 18      type    NA    Off-list     3          1               NA
+#>    cumulative_proportion
+#> 1                      0
+#> 2                      0
+#> 3                      0
+#> 4                      0
+#> 5                      0
+#> 6                      0
+#> 7                      0
+#> 8                      0
+#> 9                     NA
+#> 10                     0
+#> 11                     0
+#> 12                     0
+#> 13                     0
+#> 14                     0
+#> 15                     0
+#> 16                     0
+#> 17                     0
+#> 18                    NA
+levels$coverage
+#> $input_tokens
+#> [1] 5
+#> 
+#> $eligible_tokens
+#> [1] 5
+#> 
+#> $excluded_tokens
+#> [1] 0
+#> 
+#> $selection_coverage
+#> [1] 1
+#> 
+#> $matched_tokens
+#> [1] 0
+#> 
+#> $off_list_tokens
+#> [1] 5
+#> 
+#> $token_coverage
+#> [1] 0
+#> 
+#> $eligible_types
+#> [1] 3
+#> 
+#> $matched_types
+#> [1] 0
+#> 
+#> $off_list_types
+#> [1] 3
+#> 
+#> $type_coverage
+#> [1] 0
+```
+
+Use `plot(levels)` for token proportions and their cumulative curve, or
+`plot(levels, weighting = "type")` for normalized types.
+
+For an object created by
+[`lexdiv_flemmatize()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_flemmatize.md),
+set `unit = "flemma"` and use `flemma_conflict = "antbnc"`,
+`"wordlist"`, or `"error"`. The lossless lookup retains the chosen
+resolution and the alternative surface-headword rank/level.
+
+## Multiple documents
+
+If your data are already tokenized, each character value must be one
+token, not a whole sentence. The core preserves their order and
+spelling:
+
+``` r
+
+tokens <- c("the", "cat", "saw", "the", "other", "cat")
+result <- lexdiv_metrics(tokens, metrics = c("ttr", "rttr", "yule_k"))
+result
+#> <lexdiv_results: 3 metrics; contract 0.2.0>
+#>   metric_id        value status missing_reason N V below_quality_floor
+#> 1       ttr    0.6666667     ok           <NA> 6 4               FALSE
+#> 2      rttr    1.6329932     ok           <NA> 6 4               FALSE
+#> 3    yule_k 1111.1111111     ok           <NA> 6 4                TRUE
+```
+
+Batch input must carry explicit, unique document identifiers.
+
+``` r
+
+documents <- list(
+  document_a = c("one", "two", "one"),
+  document_b = c("alpha", "beta", "gamma", "delta")
+)
+
+lexdiv_metrics(documents, metrics = c("ttr", "hdd"))
+#> <lexdiv_batch_results: 2 documents; 4 metric records; schema 0.1.0>
+#>   document_id metric_id     value  status                    missing_reason N V
+#> 1  document_a       ttr 0.6666667      ok                              <NA> 3 2
+#> 2  document_a       hdd        NA missing too_short_for_requested_parameter 3 2
+#> 3  document_b       ttr 1.0000000      ok                              <NA> 4 4
+#> 4  document_b       hdd        NA missing too_short_for_requested_parameter 4 4
+#>   below_quality_floor
+#> 1               FALSE
+#> 2                TRUE
+#> 3               FALSE
+#> 4                TRUE
+```
+
+To compare the same documents with one explicit reference vocabulary,
+use the directional reference-coverage API. It returns token- and
+type-weighted rows separately, with the numerator and denominator
+retained for downstream models.
+
+``` r
+
+reference_coverage <- lexdiv_reference_coverage(
+  documents,
+  reference = c("one", "two", "alpha"),
+  reference_id = "study_list"
+)
+reference_coverage$summary[, c(
+  "document_id", "weighting", "value", "numerator", "denominator", "status"
+)]
+#>   document_id weighting value numerator denominator status
+#> 1  document_a     token  1.00         3           3     ok
+#> 2  document_a      type  1.00         2           2     ok
+#> 3  document_b     token  0.25         1           4     ok
+#> 4  document_b      type  0.25         1           4     ok
+```
+
+This call performs exact matching only. Document repetition changes
+token coverage but not type coverage, and an empty document remains a
+structured missing result. Use `details = "terms"` only when exact
+lexical strings may be retained in the result. This is coverage by the
+supplied list, not a claim that the list or its matches measure
+proficiency or writing quality.
+
+For a tidy one-token-per-row table, make the document boundary explicit
+before calling the batch API. The same adapter accepts `quanteda` tokens
+objects through their registered
+[`as.list()`](https://rdrr.io/r/base/list.html) method.
+
+``` r
+
+tidy_tokens <- data.frame(
+  document_id = c("a", "a", "b", "b"),
+  token = c("one", "two", "three", "three")
+)
+tidy_documents <- lexdiv_as_documents(tidy_tokens)
+tidy_long <- lexdiv_metrics(
+  tidy_documents,
+  metrics = c("ttr", "maas")
+)
+lexdiv_widen(tidy_long, values_from = "value")
+#> <lexdiv_wide_results: 2 rows; 3 columns>
+#>   document_id ttr     maas
+#> 1           a 1.0 0.000000
+#> 2           b 0.5 1.442695
+```
+
+Base-R plot methods require one metric selection when several
+incompatible metric scales are present.
+
+``` r
+
+plot(tidy_long, metric_id = "ttr")
+```
+
+![](getting-started_files/figure-html/unnamed-chunk-13-1.png)
+
+Plots use color by default. Set `monochrome = TRUE` for black and gray
+output, for example
+`plot(tidy_long, metric_id = "ttr", monochrome = TRUE)`. In both color
+modes, metric and screening plots use triangles for points below the
+advisory threshold and circles for other points. Explicit `pch` values
+are retained. No title or subtitle is added automatically: put figure
+numbers, titles and notes outside the image in the manuscript. This
+option changes presentation only; the selected rows and invisible return
+are the same in both modes. The default font is sans serif, tick labels
+are horizontal and the frame is open. Explicit `family`, `las` and `bty`
+arguments override these defaults. See the report guide for exporting at
+the final publication size.
+
+## Explicit method profiles
+
+A profile plan records parameter variants before computation. The
+`length_50_100` preset adds MSTTR and MATTR settings without duplicating
+MTLD or turning descriptive token floors into alternative metric values.
+
+``` r
+
+plan <- lexdiv_plan(presets = "length_50_100")
+profile <- lexdiv_metrics(tokens, plan = plan)
+head(profile)
+#> <lexdiv_profile_results: 6 specifications; schema 0.1.0>
+#>   request_id metric_id     value  status                    missing_reason N V
+#> 1        ttr       ttr 0.6666667      ok                              <NA> 6 4
+#> 2       rttr      rttr 1.6329932      ok                              <NA> 6 4
+#> 3       cttr      cttr 1.1547005      ok                              <NA> 6 4
+#> 4     herdan    herdan 0.7737056      ok                              <NA> 6 4
+#> 5       maas      maas 0.1262973      ok                              <NA> 6 4
+#> 6      msttr     msttr        NA missing too_short_for_requested_parameter 6 4
+#>   below_quality_floor
+#> 1               FALSE
+#> 2               FALSE
+#> 3               FALSE
+#> 4               FALSE
+#> 5               FALSE
+#> 6                TRUE
+
+screen <- lexdiv_screen_lengths(profile)
+head(screen)
+#>         screen_schema_id screen_schema_version       profile_schema_id
+#> 1 lexdiv-r-screen-result                 0.1.0 lexdiv-r-profile-result
+#> 2 lexdiv-r-screen-result                 0.1.0 lexdiv-r-profile-result
+#> 3 lexdiv-r-screen-result                 0.1.0 lexdiv-r-profile-result
+#> 4 lexdiv-r-screen-result                 0.1.0 lexdiv-r-profile-result
+#> 5 lexdiv-r-screen-result                 0.1.0 lexdiv-r-profile-result
+#> 6 lexdiv-r-screen-result                 0.1.0 lexdiv-r-profile-result
+#>   profile_schema_version                         plan_md5 request_index
+#> 1                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             1
+#> 2                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             1
+#> 3                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             2
+#> 4                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             2
+#> 5                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             3
+#> 6                  0.1.0 b814e7fd802afac816d4a516fa1f4c4b             3
+#>   request_id                      specification_id metric_id
+#> 1        ttr  ttr-4fb55d484c9910369ed7bfb8e1bb1631       ttr
+#> 2        ttr  ttr-4fb55d484c9910369ed7bfb8e1bb1631       ttr
+#> 3       rttr rttr-625d1c2f87613e36d94824f3d4ccd257      rttr
+#> 4       rttr rttr-625d1c2f87613e36d94824f3d4ccd257      rttr
+#> 5       cttr cttr-0541216b812c575de688815847d80352      cttr
+#> 6       cttr cttr-0541216b812c575de688815847d80352      cttr
+#>                       method_id N mtld_tail_only  screen_id minimum_tokens
+#> 1               ttr_v_over_n_v1 6             NA  tokens_50             50
+#> 2               ttr_v_over_n_v1 6             NA tokens_100            100
+#> 3 rttr_guiraud_v_over_sqrt_n_v1 6             NA  tokens_50             50
+#> 4 rttr_guiraud_v_over_sqrt_n_v1 6             NA tokens_100            100
+#> 5        cttr_v_over_sqrt_2n_v1 6             NA  tokens_50             50
+#> 6        cttr_v_over_sqrt_2n_v1 6             NA tokens_100            100
+#>   passes_screen
+#> 1         FALSE
+#> 2         FALSE
+#> 3         FALSE
+#> 4         FALSE
+#> 5         FALSE
+#> 6         FALSE
+
+# The same plan can be applied to named documents, including an empty document.
+planned_batch <- lexdiv_metrics(
+  list(document_a = tokens, empty = character()), plan = plan
+)
+head(planned_batch[, c("document_id", "request_id", "value", "missing_reason")])
+#> <lexdiv_profile_batch_results: 1 document; 6 specification results; schema unknown>
+#>   document_id request_id     value                    missing_reason
+#> 1  document_a        ttr 0.6666667                              <NA>
+#> 2  document_a       rttr 1.6329932                              <NA>
+#> 3  document_a       cttr 1.1547005                              <NA>
+#> 4  document_a     herdan 0.7737056                              <NA>
+#> 5  document_a       maas 0.1262973                              <NA>
+#> 6  document_a      msttr        NA too_short_for_requested_parameter
+```
+
+The plan supplies all method parameters: omit `metrics`, `window_length`
+and other individual metric arguments when `plan` is set. The returned
+data frame keeps the plan fingerprint, request IDs and specification
+IDs. Save the plan and complete result together with
+[`saveRDS()`](https://rdrr.io/r/base/readRDS.html) as in the earlier
+saving example.
+
+Use
+[`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+for methods accepted by plans. To inspect Maas and MTLD comparison
+definitions, select a different catalog:
+
+``` r
+
+comparison_methods <- lexdiv_methods(scope = "variants")
+comparison_methods[, c("family", "method_id", "scale")]
+#>   family                                               method_id
+#> 1   maas                                           maas_a2_ln_v1
+#> 2   maas                                            maas_a_ln_v1
+#> 3   maas                                        maas_a2_log10_v1
+#> 4   maas                                         maas_a_log10_v1
+#> 5   mtld          mtld_seq_bidir_dirmean_le_nomin_linear_tail_v1
+#> 6   mtld          mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1
+#> 7   mtld     mtld_seq_bidir_dirmean_lt_min10_finaltail_linear_v1
+#> 8   mtld mtld_seq_bidir_mfl_dirmean_lt_min10_finaltail_linear_v1
+#> 9   mtld  mtld_seq_bidir_mfl_pooled_lt_min10_finaltail_linear_v1
+#>                    scale
+#> 1              a-squared
+#> 2                      a
+#> 3              a-squared
+#> 4                      a
+#> 5      tokens-per-factor
+#> 6      tokens-per-factor
+#> 7      tokens-per-factor
+#> 8 adjusted-factor-length
+#> 9 adjusted-factor-length
+```
+
+Pass those method IDs to `lexdiv_variant_metrics(variants = ...)`; they
+are not all accepted by
+[`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md).
+The two scopes retain their own descriptive columns.
+
+MATTR has an additional local diagnostic surface. It accepts a
+MATTR-only canonical plan and returns each complete moving-window value
+plus the number and nominal weight of windows containing each token
+position.
+
+``` r
+
+mattr_plan <- lexdiv_plan(
+  presets = character(),
+  grids = lexdiv_grid(
+    "mattr",
+    "window_length",
+    c(10, 20),
+    request_id_prefix = "mattr"
+  )
+)
+local_mattr <- lexdiv_mattr_profile(rep(tokens, 10), mattr_plan)
+local_mattr$summary
+#> <lexdiv_profile_results: 2 specifications; schema 0.1.0>
+#>   request_id metric_id value status missing_reason  N V below_quality_floor
+#> 1    mattr_1     mattr   0.4     ok           <NA> 60 4               FALSE
+#> 2    mattr_2     mattr   0.2     ok           <NA> 60 4               FALSE
+head(local_mattr$windows)
+#>                           plan_md5 request_index request_id
+#> 1 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 2 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 3 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 4 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 5 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 6 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#>                         specification_id metric_id              method_id
+#> 1 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 2 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 3 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 4 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 5 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 6 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#>   window_index window_start window_end window_midpoint window_length
+#> 1            1            1         10             5.5            10
+#> 2            2            2         11             6.5            10
+#> 3            3            3         12             7.5            10
+#> 4            4            4         13             8.5            10
+#> 5            5            5         14             9.5            10
+#> 6            6            6         15            10.5            10
+#>   distinct_types value
+#> 1              4   0.4
+#> 2              4   0.4
+#> 3              4   0.4
+#> 4              4   0.4
+#> 5              4   0.4
+#> 6              4   0.4
+head(local_mattr$exposure)
+#>                           plan_md5 request_index request_id
+#> 1 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 2 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 3 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 4 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 5 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#> 6 054deeb3bbc8ad065e56423650c6d90a             1    mattr_1
+#>                         specification_id metric_id              method_id
+#> 1 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 2 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 3 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 4 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 5 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#> 6 mattr-49df2cfded9c0b1739bab49c65494921     mattr mattr_sliding_step1_v1
+#>   position exposure_count window_inclusion_rate nominal_observation_weight
+#> 1        1              1            0.01960784                0.001960784
+#> 2        2              2            0.03921569                0.003921569
+#> 3        3              3            0.05882353                0.005882353
+#> 4        4              4            0.07843137                0.007843137
+#> 5        5              5            0.09803922                0.009803922
+#> 6        6              6            0.11764706                0.011764706
+plot(local_mattr, request_id = "mattr_1")
+```
+
+![](getting-started_files/figure-html/unnamed-chunk-16-1.png)
+
+The plotted trajectory is descriptive. The package does not select an
+optimal window, infer a universal adequate text length, or interpret
+exposure weights as token-level causal contributions.
+
+The versioned `below_quality_floor` field and requested screens are
+advisory token-count evidence checks. Here, `quality` does not mean
+writing quality, measurement validity, or reliability. The screens do
+not change values or parameters or censor documents. Read them together
+with `status`, `missing_reason`, `N`, `V`, and the method and parameter
+identities.
+
+Within the same exact method and design, Maas a-squared and Yule’s K
+conventionally decrease as repetition decreases. TTR, RTTR, CTTR,
+Herdan’s C, MSTTR, MATTR, MTLD, HD-D, expected-TTR D, and Yule’s I
+conventionally increase with observed lexical variety or lower
+repetition. These methods primarily operationalize lexical variety and
+repetition rather than the full multidimensional lexical-diversity
+construct. Direction is meaningful only within the same method,
+parameters, tokenization, normalization, sampling design, and comparable
+texts. Scores from different metric IDs are not interchangeable because
+their scales and length sensitivities differ.
+
+The metrics describe lexical-distribution properties of the supplied
+tokens. They are not direct measures of language proficiency, writing
+quality, reader response, or communicative effectiveness. A separate
+validated study design is needed to make claims about those constructs.
+
+The canonical preset contains eleven methods; moving-average MTLD and
+experimental expected-TTR D require explicit selection. Use
+[`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+and
+[`lexdiv_presets()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+to inspect the thirteen supported methods and their bounded presets.
+
+Expected-TTR D fits an explicit D curve to exact finite-population
+expected TTR values. It uses no random sampling or arbitrary D cap and
+is not CLAN VOCD.
+
+``` r
+
+lexdiv_metrics(
+  rep(c("a", "b", "a", "c"), 20),
+  metrics = "expected_ttr_d"
+)
+#> <lexdiv_results: 1 metric; contract 0.2.0>
+#>        metric_id     value status missing_reason  N V below_quality_floor
+#> 1 expected_ttr_d 0.1164681     ok           <NA> 80 3               FALSE
+```
+
+## Definition sensitivity outside the versioned core
+
+Maas and sequential MTLD have same-name formula and aggregation
+variants. The separate variant surface makes those choices comparable
+without changing the canonical registry or silently replacing a method.
+
+``` r
+
+variant_catalog <- lexdiv_methods(scope = "variants")
+variant_catalog
+#>   family                                               method_id direction
+#> 1   maas                                           maas_a2_ln_v1     lower
+#> 2   maas                                            maas_a_ln_v1     lower
+#> 3   maas                                        maas_a2_log10_v1     lower
+#> 4   maas                                         maas_a_log10_v1     lower
+#> 5   mtld          mtld_seq_bidir_dirmean_le_nomin_linear_tail_v1    higher
+#> 6   mtld          mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1    higher
+#> 7   mtld     mtld_seq_bidir_dirmean_lt_min10_finaltail_linear_v1    higher
+#> 8   mtld mtld_seq_bidir_mfl_dirmean_lt_min10_finaltail_linear_v1    higher
+#> 9   mtld  mtld_seq_bidir_mfl_pooled_lt_min10_finaltail_linear_v1    higher
+#>                    scale              reference_label
+#> 1              a-squared             ldfreq-core:maas
+#> 2                      a     common-formula:maas-a-ln
+#> 3              a-squared             TAALED-0.32:maas
+#> 4                      a  common-formula:maas-a-log10
+#> 5      tokens-per-factor McCarthy-Jarvis-2010:mtld-le
+#> 6      tokens-per-factor       ldfreq-core-0.1.0:mtld
+#> 7      tokens-per-factor            TAALED-0.32:mtldo
+#> 8 adjusted-factor-length           TAALED-0.32:mtldav
+#> 9 adjusted-factor-length             TAALED-0.32:mtld
+#>                                                                      comparison_scope
+#> 1                                                                  ldfreq-core-method
+#> 2                                                             formula-comparison-only
+#> 3               formula-aligned-with-taaled-0.32-maas-not-full-pipeline-compatibility
+#> 4                                                             formula-comparison-only
+#> 5                                           threshold-comparator-le-no-minimum-length
+#> 6                                                           legacy-ldfreq-core-method
+#> 7 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility
+#> 8 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility
+#> 9 factorization-and-aggregation-comparator-for-taaled-0.32-not-official-compatibility
+
+variant_results <- lexdiv_variant_metrics(
+  rep(tokens, 10),
+  mtld_thresholds = c(0.72, 0.92)
+)
+variant_results[, c(
+  "family", "method_id", "reference_label", "value", "status"
+)]
+#> <lexdiv_variant_results: 14 rows; contract 0.2.0>
+#>    family                                               method_id
+#> 1    maas                                           maas_a2_ln_v1
+#> 2    maas                                            maas_a_ln_v1
+#> 3    maas                                        maas_a2_log10_v1
+#> 4    maas                                         maas_a_log10_v1
+#> 5    mtld          mtld_seq_bidir_dirmean_le_nomin_linear_tail_v1
+#> 6    mtld          mtld_seq_bidir_dirmean_le_nomin_linear_tail_v1
+#> 7    mtld          mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1
+#> 8    mtld          mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1
+#> 9    mtld     mtld_seq_bidir_dirmean_lt_min10_finaltail_linear_v1
+#> 10   mtld     mtld_seq_bidir_dirmean_lt_min10_finaltail_linear_v1
+#> 11   mtld mtld_seq_bidir_mfl_dirmean_lt_min10_finaltail_linear_v1
+#> 12   mtld mtld_seq_bidir_mfl_dirmean_lt_min10_finaltail_linear_v1
+#> 13   mtld  mtld_seq_bidir_mfl_pooled_lt_min10_finaltail_linear_v1
+#> 14   mtld  mtld_seq_bidir_mfl_pooled_lt_min10_finaltail_linear_v1
+#>                 reference_label      value status
+#> 1              ldfreq-core:maas  0.1615429     ok
+#> 2      common-formula:maas-a-ln  0.4019240     ok
+#> 3              TAALED-0.32:maas  0.3719663     ok
+#> 4   common-formula:maas-a-log10  0.6098904     ok
+#> 5  McCarthy-Jarvis-2010:mtld-le  6.0000000     ok
+#> 6  McCarthy-Jarvis-2010:mtld-le  4.6153846     ok
+#> 7        ldfreq-core-0.1.0:mtld 10.0000000     ok
+#> 8        ldfreq-core-0.1.0:mtld 10.0000000     ok
+#> 9             TAALED-0.32:mtldo  8.4000000     ok
+#> 10            TAALED-0.32:mtldo  4.8000000     ok
+#> 11           TAALED-0.32:mtldav  9.1111111     ok
+#> 12           TAALED-0.32:mtldav  8.5555556     ok
+#> 13             TAALED-0.32:mtld  9.1111111     ok
+#> 14             TAALED-0.32:mtld  8.5555556     ok
+```
+
+The comparison-scope column is part of interpretation. A formula-level
+TAALED-relevant row is not an official preprocessing or full-pipeline
+compatibility claim.
+
+## Auditing the formal contracts
+
+The help pages explain ordinary use. Exact formulas, domains,
+normalization rules, result schemas, and resource boundaries are
+installed as JSON contracts:
+
+``` r
+
+contract_files <- c(
+  "lexical-diversity-contract.json",
+  "ldfreq-preprocessing-contract.json",
+  "lexical-overlap-contract.json",
+  "reference-coverage-contract.json",
+  "norm-profile-contract.json",
+  "lexical-diversity-variant-contract.json",
+  "lexical-level-profile-contract.json",
+  "tubelex-frequency-profile-contract.json"
+)
+contract_paths <- system.file("spec", contract_files, package = "ldfreq")
+stopifnot(all(nzchar(contract_paths)))
+basename(contract_paths)
+#> [1] "lexical-diversity-contract.json"        
+#> [2] "ldfreq-preprocessing-contract.json"     
+#> [3] "lexical-overlap-contract.json"          
+#> [4] "reference-coverage-contract.json"       
+#> [5] "norm-profile-contract.json"             
+#> [6] "lexical-diversity-variant-contract.json"
+#> [7] "lexical-level-profile-contract.json"    
+#> [8] "tubelex-frequency-profile-contract.json"
+```
+
+Use `jsonlite::read_json(contract_paths[[1]], simplifyVector = FALSE)`
+when an R list representation is convenient. Reading the files does not
+run a metric, download a resource, or expose caller file paths.
+
+## Self-contained offline workflow script
+
+An installed example script exercises the public workflows without
+network access or an external runtime. This integration example requires
+all five reference resources to have been explicitly downloaded
+beforehand. The core examples earlier in this guide do not require them:
+
+``` r
+
+smoke_path <- system.file("examples", "offline-smoke.R", package = "ldfreq")
+stopifnot(nzchar(smoke_path))
+source(smoke_path, local = TRUE)
+```

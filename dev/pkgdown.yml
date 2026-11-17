@@ -1,0 +1,43 @@
+pandoc: 3.8.3
+pkgdown: 2.2.1
+pkgdown_sha: ~
+articles:
+  ambiguity-review: ambiguity-review.html
+  annotated-corpora: annotated-corpora.html
+  annotation-alignment: annotation-alignment.html
+  annotation-evaluation: annotation-evaluation.html
+  auditing-vocabulary-profiles: auditing-vocabulary-profiles.html
+  choosing-metrics: choosing-metrics.html
+  collocation-association: collocation-association.html
+  concordance-and-dispersion: concordance-and-dispersion.html
+  contextual-models: contextual-models.html
+  corpus-reference-profiles: corpus-reference-profiles.html
+  ddl-materials: ddl-materials.html
+  dependency-pairs: dependency-pairs.html
+  designing-comparisons: designing-comparisons.html
+  english-readability: english-readability.html
+  english-tokenization: english-tokenization.html
+  from-text-to-report: from-text-to-report.html
+  getting-started: getting-started.html
+  japanese-annotations: japanese-annotations.html
+  japanese-norms: japanese-norms.html
+  japanese-polysemy: japanese-polysemy.html
+  japanese-stimuli: japanese-stimuli.html
+  keyness-comparison: keyness-comparison.html
+  lexical-ordination: lexical-ordination.html
+  ngram-profiles: ngram-profiles.html
+  open-access-papers: open-access-papers.html
+  preprocessing-and-frequency: preprocessing-and-frequency.html
+  recipes-and-exports: recipes-and-exports.html
+  reference-data: reference-data.html
+  release-scope: release-scope.html
+  repeated-observations: repeated-observations.html
+  syntactic-complexity: syntactic-complexity.html
+  textbook-progression: textbook-progression.html
+  tubelex-input: tubelex-input.html
+  vocabulary-knowledge-and-use: vocabulary-knowledge-and-use.html
+  word-families-and-affixes: word-families-and-affixes.html
+last_built: 2026-11-17T13:34Z
+urls:
+  reference: https://ryuya-dot-com.github.io/ldfreq/reference
+  article: https://ryuya-dot-com.github.io/ldfreq/articles

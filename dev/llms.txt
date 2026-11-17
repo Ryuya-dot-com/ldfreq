@@ -1,0 +1,581 @@
+# ldfreq
+
+**Reproducible lexical diversity, vocabulary profiles, and source-linked
+corpus analysis in R.**
+
+`ldfreq` measures lexical diversity and reference-vocabulary coverage
+while keeping every score connected to the exact words counted,
+preprocessing choices, coverage rates, and reasons for unavailable
+values.
+
+[2.0-dev site](https://ryuya-dot-com.github.io/ldfreq/dev/) · [Stable
+1.0.0 site](https://ryuya-dot-com.github.io/ldfreq/) · [Get
+started](https://ryuya-dot-com.github.io/ldfreq/dev/articles/getting-started.html)
+· [Function
+reference](https://ryuya-dot-com.github.io/ldfreq/dev/reference/index.html)
+· [Choosing
+metrics](https://ryuya-dot-com.github.io/ldfreq/dev/articles/choosing-metrics.html)
+· [Report an issue](https://github.com/Ryuya-dot-com/ldfreq/issues)
+
+## Why ldfreq?
+
+- **Auditable from raw text to model table**: Every result retains
+  counted tokens (`$token_audit`), parameter settings, and explicit
+  `status` / `missing_reason` fields—short or empty documents are never
+  silently dropped or turned into zeros.
+- **Unified single- and multi-document API**: Pass one document or a
+  corpus table (`data.frame`, `tibble`, `data.table`, or named list) to
+  the same entry points
+  ([`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md),
+  [`lexdiv_metrics()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_metrics.md),
+  [`lexdiv_tokenize()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md),
+  [`tubelex_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/tubelex_profile.md),
+  [`nj8_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/nj8_profile.md),
+  [`lexdiv_norm_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_norm_profile.md)).
+- **One cohesive workflow**: Compute 13 lexical-diversity measures and
+  cross-definition variants, profile vocabulary against
+  frequency/level/norm/word-family lists (`TUBELEX`, `New JACET 8000`,
+  `BNC/COCA` 1k–25k bands, `MorphoLex`, or custom tables), extract 2- to
+  12-word lexical bundles, and inspect source contexts with KWIC
+  concordances, dispersion, collocations, and keyness.
+- **Lightweight and R-native**: Requires only **2 runtime packages**
+  (`digest` and `stringi`), runs offline out of the box, and produces
+  publication-ready Base-R figures (`monochrome = TRUE` supported).
+
+## Installation
+
+The `main` branch hosts the **2.0.0 development series (`1.99.0.9000`)**
+(R 4.1 or later), distributed directly via GitHub. It consolidates
+single-document and batch functions into unified entry points and
+standardizes argument names; review the migration notes in
+[NEWS.md](https://github.com/Ryuya-dot-com/ldfreq/blob/main/NEWS.md)
+before upgrading an existing 1.x analysis.
+
+``` r
+
+# 2.0.0 development series from GitHub main
+install.packages("pak")
+pak::pak("Ryuya-dot-com/ldfreq@main")
+
+# Or use remotes
+install.packages("remotes")
+remotes::install_github("Ryuya-dot-com/ldfreq@main")
+```
+
+To install the **stable 1.0.0 release** instead:
+
+``` r
+
+remotes::install_github("Ryuya-dot-com/ldfreq@v1.0.0")
+```
+
+To install the 2.0.0 development build from a local source archive:
+
+``` r
+
+install.packages(c("digest", "stringi"))
+install.packages("ldfreq_1.99.0.9000.tar.gz", repos = NULL, type = "source")
+```
+
+### Migrating from 1.0.0 to 2.0.0-dev
+
+- **Unified polymorphic entry points**:
+  [`lexdiv_tokenize()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md),
+  [`lexdiv_lemmatize()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md),
+  [`lexdiv_flemmatize()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_flemmatize.md),
+  [`lexdiv_metrics()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_metrics.md),
+  [`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md),
+  [`nj8_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/nj8_profile.md),
+  [`tubelex_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/tubelex_profile.md),
+  and
+  [`lexdiv_norm_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_norm_profile.md)
+  accept both single-document inputs and multi-document tables or named
+  lists directly. Former separate batch-suffixed exports are retired.
+- **Standardized column and cache arguments**: Token/term column
+  selectors across multi-document functions use `term_col` (paired with
+  `id_col = "document_id"`), and resource-backed profilers accept
+  `cache_dir = NULL`.
+- **Recorded English defaults**: Raw-text tokenization defaults to
+  `case = "lower", tokenizer = "english"`. Pass
+  `case = "preserve", tokenizer = "unicode"` to reproduce 1.0.0 raw-text
+  settings. See
+  [NEWS.md](https://github.com/Ryuya-dot-com/ldfreq/blob/main/NEWS.md)
+  for the complete migration table.
+
+## Quick start
+
+Pass one text or a document table (`data.frame` or `tibble`) to
+[`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md).
+English tokenization (`tokenizer = "english"`) and lowercasing
+(`case = "lower"`) are used by default and recorded alongside the
+results:
+
+``` r
+
+library(ldfreq)
+
+essays <- data.frame(
+  document_id = c("essay_01", "essay_02", "empty_doc"),
+  text = c(
+    paste(
+      "Students compared two versions of a short story in their writing class.",
+      "They marked repeated words and discussed how each writer introduced new ideas.",
+      "One group revised the opening while another group examined the ending.",
+      "After reading the stories again, the students explained their choices and",
+      "saved both the original texts and their revised versions for later comparison."
+    ),
+    "A short draft with too few words for a 50-token moving window.",
+    ""
+  )
+)
+
+batch <- lexdiv_metrics_text(essays, metrics = c("ttr", "mattr", "hdd", "mtld"))
+batch
+#> <lexdiv_text_batch_results: 3 documents; 70 audited tokens>
+#> <lexdiv_batch_results: 3 documents; 12 metric records; schema 0.1.0>
+#>    document_id metric_id      value  status                    missing_reason  N  V
+#> 1     essay_01       ttr  0.7931034      ok                              <NA> 58 46
+#> 2     essay_01     mattr  0.8177778      ok                              <NA> 58 46
+#> 3     essay_01       hdd  0.8312797      ok                              <NA> 58 46
+#> 4     essay_01      mtld 78.4933333      ok                              <NA> 58 46
+#> 5     essay_02       ttr  0.9166667      ok                              <NA> 12 11
+#> 6     essay_02     mattr         NA missing too_short_for_requested_parameter 12 11
+#> 7     essay_02       hdd         NA missing too_short_for_requested_parameter 12 11
+#> 8     essay_02      mtld 40.3200000      ok                              <NA> 12 11
+#> 9    empty_doc       ttr         NA missing                       empty_input  0  0
+#> ...
+
+# Reshape directly to a wide reporting table and plot available scores:
+wide <- lexdiv_widen(batch, values_from = c("value", "status", "missing_reason", "N"))
+plot(batch, metric_id = "mtld")
+```
+
+Note that `essay_02` (12 tokens) is computable algebraically under
+partial-factor MTLD (`mtld_tail_only = TRUE`), whereas empirical
+stability floors (typically `N >= 100` for MTLD) are evaluated
+explicitly without altering scores via
+[`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_screen_lengths.md).
+
+Inspect `batch$token_audit` to verify every counted word, or bridge raw
+texts straight into corpus search and keyness with
+[`lexdiv_as_annotations()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_import_annotations.md)
+(preserving original casing and character offsets alongside normalized
+`term` and `is_word`):
+
+``` r
+
+ann <- lexdiv_as_annotations(essays)
+kwic <- lexdiv_concordance(ann, queries = list(story = "stor*"), valuetype = "glob")
+plot(kwic, "story")
+```
+
+## Choose your workflow
+
+Start with
+[`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md)
+for raw texts or
+[`lexdiv_metrics()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_metrics.md)
+for pre-tokenized words. Add the workflow tools below when your research
+design or reporting task needs them.
+
+| Research question | Main functions | Worked guide |
+|----|----|----|
+| How do lexical-diversity scores vary across texts or counting rules? | [`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md) → [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_widen.md) / [`plot()`](https://rdrr.io/r/graphics/plot.default.html) | [From text to report](https://ryuya-dot-com.github.io/ldfreq/dev/articles/from-text-to-report.html) |
+| How do writers, tasks, or occasions compare in longitudinal designs? | [`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md) → `lexdiv_metrics_text(..., plan = plan)` → [`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_screen_lengths.md) → [`lexdiv_study_table()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_study_table.md) → [`lexdiv_study_model_data()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_study_table.md) | [Repeated observations](https://ryuya-dot-com.github.io/ldfreq/dev/articles/repeated-observations.html) |
+| How frequent, familiar, or morphologically varied is the vocabulary? | [`tubelex_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/tubelex_profile.md), [`nj8_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/nj8_profile.md), [`lexdiv_norm_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_norm_profile.md), [`lexdiv_family_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_family_profile.md) | [Corpus reference profiles](https://ryuya-dot-com.github.io/ldfreq/dev/articles/corpus-reference-profiles.html) |
+| Which words, bundles, and contexts explain a corpus pattern? | [`lexdiv_as_annotations()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_import_annotations.md) → [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_concordance.md) / [`lexdiv_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_ngrams.md) / [`lexdiv_collocations()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_collocations.md) / [`lexdiv_keyness()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_keyness.md) | [Concordance & dispersion](https://ryuya-dot-com.github.io/ldfreq/dev/articles/concordance-and-dispersion.html) · [Keyness](https://ryuya-dot-com.github.io/ldfreq/dev/articles/keyness-comparison.html) |
+| How do I analyze Japanese texts with morphological annotations? | [`lexdiv_import_annotations()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_import_annotations.md) → explicit unit/POS selection → diversity or norm profiles | [Japanese annotations](https://ryuya-dot-com.github.io/ldfreq/dev/articles/japanese-annotations.html) |
+
+For repeated runs and portable reporting, `ldfreq` also provides
+reusable recipes and exports
+([`lexdiv_recipe()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_recipe.md)
+→
+[`lexdiv_run_recipe()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_run_recipe.md)
+→
+[`lexdiv_write()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_write.md)),
+saved-analysis comparison
+([`lexdiv_compare_analyses()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_compare_analyses.md)),
+English/Japanese calculation descriptions
+([`lexdiv_methods_text()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_methods_text.md)),
+an installed CLI (`exec/ldfreq.R`), and a standard-library Python bridge
+(`inst/python/ldfreq_r.py`).
+
+## Optional reference data
+
+`ldfreq` code is MIT licensed and installs **without** third-party
+datasets. Core diversity metrics, custom norm/reference tables, and
+corpus tools work completely offline. To use optional external resources
+(`tubelex`, `nj8`, `morpholex`, `bnccoca`, `morphynet`), inspect their
+license terms first and download only what you need:
+
+``` r
+
+info <- lexdiv_resource_info("tubelex")
+file.show(info$notice_path)  # installed terms; no data download or internet needed
+lexdiv_download_resources("tubelex", accept_license = TRUE)
+```
+
+## Citation
+
+Cite the exact `ldfreq` version used in your analysis alongside the
+relevant measurement methods and reference datasets:
+
+``` r
+
+citation("ldfreq")
+```
+
+The citation reports the installed version. Cite the stable 1.0.0
+release and 2.0.0 development snapshots separately when both were used.
+
+# Package index
+
+## Package overview
+
+High-level map of unified inputs, workflows, measurement boundaries, and
+citations.
+
+- [`ldfreq`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/ldfreq-package.md)
+  [`ldfreq-package`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/ldfreq-package.md)
+  : Reproducible Lexical Diversity and Frequency Profiles
+
+## Lexical-diversity metrics and cross-definition variants
+
+Compute eleven default lexical-diversity measures, moving-average MTLD,
+experimental expected-TTR D, and cross-definition Maas/MTLD variants
+from single documents or multi-document containers.
+
+- [`lexdiv_metric_ids()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_metrics.md)
+  [`lexdiv_metrics()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_metrics.md)
+  [`` `[`( ``*`<lexdiv_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_metrics.md)
+  [`print(`*`<lexdiv_batch_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_metrics.md)
+  [`print(`*`<lexdiv_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_metrics.md)
+  : Compute Versioned Lexical-Diversity Metric Variants
+- [`lexdiv_variant_metrics()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_variant_metrics.md)
+  [`print(`*`<lexdiv_variant_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_variant_metrics.md)
+  : Explicit Maas and Sequential-MTLD Comparison Variants
+
+## Raw text, tokenization, and external annotations
+
+Tokenize single texts or document tables, attach lemma or AntBNC flemma
+layers, bridge raw texts into source-aligned corpus annotations, or
+import Japanese and Penn MASC annotations.
+
+- [`lexdiv_tokenize()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md)
+  [`lexdiv_lemmatize()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md)
+  [`lexdiv_metrics_text()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md)
+  [`print(`*`<lexdiv_tokenization>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md)
+  [`print(`*`<lexdiv_text_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md)
+  [`print(`*`<lexdiv_text_batch_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_preprocessing.md)
+  : Versioned Raw-Text Preprocessing for Lexical-Diversity Metrics
+- [`lexdiv_flemmatize()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_flemmatize.md)
+  : Add Flemmas from a Caller-Supplied AntBNC Lemma List
+- [`lexdiv_import_annotations()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_import_annotations.md)
+  [`lexdiv_as_annotations()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_import_annotations.md)
+  [`print(`*`<lexdiv_annotations>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_import_annotations.md)
+  : Import External Annotations or Bridge Raw Texts to Corpus
+  Annotations
+- [`lexdiv_read_masc()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_read_masc.md)
+  [`lexdiv_as_quanteda()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_read_masc.md)
+  : Read local MASC Penn annotations and retain positions in quanteda
+
+## Plans, local MATTR trajectories, and token-floor screens
+
+Define multi-parameter measurement plans, inspect window-by-window MATTR
+profiles, and evaluate empirical token-count and MTLD-factor screens.
+
+- [`lexdiv_spec()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+  [`lexdiv_grid()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+  [`lexdiv_plan()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+  [`lexdiv_methods()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+  [`lexdiv_presets()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+  [`print(`*`<lexdiv_spec>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+  [`print(`*`<lexdiv_grid>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+  [`print(`*`<lexdiv_plan>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+  [`print(`*`<lexdiv_profile_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+  [`print(`*`<lexdiv_profile_batch_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_plan.md)
+  : Build Explicit Lexical-Diversity Method Plans
+- [`lexdiv_mattr_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_mattr_profile.md)
+  [`print(`*`<lexdiv_mattr_profile>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_mattr_profile.md)
+  : Inspect the local MATTR trajectory and positional exposure
+- [`plot(`*`<lexdiv_mattr_profile>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/plot.lexdiv_mattr_profile.md)
+  : Plot one local MATTR trajectory
+- [`lexdiv_screen_lengths()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_screen_lengths.md)
+  : Evaluate Independent Token-Count Screens Without Modifying Metric
+  Values
+- [`lexdiv_length_evidence()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_length_evidence.md)
+  : Inspect Context-Specific Token-Length Evidence
+
+## Reference-vocabulary, level, and word-family profiles
+
+Inspect license terms, download SHA-256-verified optional datasets, and
+profile single documents or corpora with TUBELEX, New JACET 8000,
+BNC/COCA 1k–25k word-family bands, MorphoLex, or MorphyNet.
+
+- [`lexdiv_resource_info()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_resources.md)
+  [`lexdiv_download_resources()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_resources.md)
+  : Inspect and explicitly download optional reference data
+- [`tubelex_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/tubelex_profile.md)
+  [`print(`*`<tubelex_profile>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/tubelex_profile.md)
+  [`print(`*`<tubelex_profile_batch>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/tubelex_profile.md)
+  [`plot(`*`<tubelex_profile_batch>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/tubelex_profile.md)
+  : Coverage-Aware TUBELEX Frequency and Prevalence Profile
+- [`tubelex_diagnostics()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/tubelex_diagnostics.md)
+  : Tabulate TUBELEX profiles while retaining coverage and input
+  conditions
+- [`nj8_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/nj8_profile.md)
+  [`print(`*`<lexical_level_profile>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/nj8_profile.md)
+  [`print(`*`<nj8_profile_batch>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/nj8_profile.md)
+  [`plot(`*`<lexical_level_profile>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/nj8_profile.md)
+  : Profile lexical coverage by New JACET 8000 frequency level
+- [`nj8_diagnostics()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/nj8_diagnostics.md)
+  : Diagnose NJ8 non-matches and lexical-unit transformations
+- [`bnccoca_data()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/bnccoca_data.md)
+  : Read Nation's BNC/COCA Level 6 Word-Family Lists
+- [`lexdiv_family_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_family_profile.md)
+  : Count resource-defined word families while retaining source
+  occurrences
+- [`morpholex_data()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/morpholex_data.md)
+  : Read the Cached MorphoLex English Database
+- [`morphynet_read_derivations()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/morphynet_read_derivations.md)
+  : Read MorphyNet Derivational Relations from a Local File
+
+## Custom lexical norms, overlap, and n-gram bundles
+
+Apply custom familiarity/AoA/frequency tables, measure exact lexical
+overlap or set coverage, and extract or compare 2- to 12-word n-grams.
+
+- [`lexdiv_norm_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_norm_profile.md)
+  [`lexdiv_norm_spec()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_norm_profile.md)
+  [`lexdiv_resource_meta()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_norm_profile.md)
+  [`print(`*`<lexdiv_norm_profile>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_norm_profile.md)
+  [`print(`*`<lexdiv_norm_profile_batch>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_norm_profile.md)
+  : Profile One or More Documents with Caller-Supplied Lexical Norms
+- [`lexdiv_overlap_ids()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_overlap.md)
+  [`lexdiv_term_overlap()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_overlap.md)
+  [`lexdiv_content_overlap()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_overlap.md)
+  [`print(`*`<lexdiv_overlap>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_overlap.md)
+  : Compute Exact Type Overlap Between Two Texts
+- [`lexdiv_reference_coverage()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_reference_coverage.md)
+  [`print(`*`<lexdiv_reference_coverage>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_reference_coverage.md)
+  [`plot(`*`<lexdiv_reference_coverage>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_reference_coverage.md)
+  : Compute Coverage of Multiple Documents by One Reference Term Set
+- [`lexdiv_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_ngrams.md)
+  [`lexdiv_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_ngrams.md)
+  [`lexdiv_ngram_profile()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_ngrams.md)
+  [`print(`*`<lexdiv_ngrams>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_ngrams.md)
+  [`print(`*`<lexdiv_ngram_reference>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_ngrams.md)
+  [`print(`*`<lexdiv_ngram_profile>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_ngrams.md)
+  : Adjacent Bigrams and Trigrams with Local Reference Frequencies
+- [`lexdiv_build_ngram_reference()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_build_ngram_reference.md)
+  [`print(`*`<lexdiv_ngram_build>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_build_ngram_reference.md)
+  : Build an N-gram Reference from Whole-Document Chunks
+- [`lexdiv_compare_ngrams()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_compare_ngrams.md)
+  [`print(`*`<lexdiv_ngram_comparison>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_compare_ngrams.md)
+  : Compare N-gram References on the Same Target Items
+
+## Study tables and source-linked corpus exploration
+
+Prepare longitudinal mixed-model tables, search KWIC concordances, and
+compute within-document dispersion, collocations, keyness, or response
+pairs.
+
+- [`lexdiv_study_table()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_study_table.md)
+  [`lexdiv_study_model_data()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_study_table.md)
+  [`print(`*`<lexdiv_study_model_data>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_study_table.md)
+  : Join Planned Observations to Saved Measurements and Select Model
+  Rows
+- [`lexdiv_concordance()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_concordance.md)
+  [`lexdiv_sort_concordance()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_concordance.md)
+  [`lexdiv_concordance_dispersion()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_concordance.md)
+  [`print(`*`<lexdiv_concordance>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_concordance.md)
+  [`print(`*`<lexdiv_dispersion>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_concordance.md)
+  [`plot(`*`<lexdiv_concordance>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_concordance.md)
+  : Search Source-Aligned Words and Phrases and Inspect Their
+  Distribution
+- [`lexdiv_collocations()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_collocations.md)
+  : Count collocation opportunities and descriptive association scores
+- [`lexdiv_keyness()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_keyness.md)
+  [`lexdiv_keyness_concordance()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_keyness.md)
+  : Compare word frequencies in explicit target and reference corpora
+- [`lexdiv_compare_responses()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_compare_responses.md)
+  : Compare paired binary vocabulary responses with an explicit
+  criterion
+
+## Annotation review, alignment, and contextual models
+
+Audit changed tags, align different segmentations, record human KWIC
+disambiguation decisions, and evaluate external contextual model
+proposals.
+
+- [`lexdiv_compare_annotations()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_compare_annotations.md)
+  : Compare annotation versions on identical tokenized documents
+- [`lexdiv_evaluate_annotations()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_evaluate_annotations.md)
+  : Evaluate external annotation labels against an explicit reference
+- [`lexdiv_align_annotations()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_align_annotations.md)
+  : Align different token segmentations using original source positions
+- [`lexdiv_ambiguity_review()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_ambiguity_review.md)
+  : Review lexical candidates in their original contexts
+- [`lexdiv_compare_ambiguity()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_compare_ambiguity.md)
+  : Compare two contextual lexical-candidate reviews
+- [`lexdiv_import_contextual()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_import_contextual.md)
+  : Attach external model outputs to verified contextual occurrences
+- [`lexdiv_evaluate_contextual()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_evaluate_contextual.md)
+  : Compare contextual candidate scores with an explicit reference
+  review
+- [`lexdiv_score_contextual()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_score_contextual.md)
+  : Score contextual candidates using separate labeled training examples
+- [`lexdiv_amod_pairs()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_amod_pairs.md)
+  : Extract source-linked adjective and common-noun dependency pairs
+
+## Recipes, portable records, and reporting
+
+Reuse resolved settings, inspect cross-run differences, and export
+JSON/CSV records or English/Japanese calculation descriptions.
+
+- [`lexdiv_recipe()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_recipe.md)
+  [`print(`*`<lexdiv_recipe>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_recipe.md)
+  : Reusable raw-text analysis recipes
+- [`lexdiv_run_recipe()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_run_recipe.md)
+  [`print(`*`<lexdiv_analysis>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_run_recipe.md)
+  : Run a saved recipe through the R calculation APIs
+- [`lexdiv_write()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_write.md)
+  [`lexdiv_read()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_write.md)
+  : Save and read portable recipes and analysis records
+- [`lexdiv_compare_analyses()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_compare_analyses.md)
+  : Inspect differences between saved analysis conditions
+- [`lexdiv_methods_text()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_methods_text.md)
+  : Describe saved calculations in English or Japanese
+
+## Reshaping, container conversion, and plotting
+
+Convert tidy or quanteda token containers, reshape long results to wide
+reporting tables, and draw publication-ready Base-R figures.
+
+- [`lexdiv_as_documents()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_as_documents.md)
+  : Convert Token Containers to Named Documents
+- [`lexdiv_widen()`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_widen.md)
+  [`print(`*`<lexdiv_wide_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_widen.md)
+  : Reshape metric results without recomputing values
+- [`plot(`*`<lexdiv_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/plot.lexdiv_results.md)
+  [`plot(`*`<lexdiv_batch_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/plot.lexdiv_results.md)
+  [`plot(`*`<lexdiv_profile_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/plot.lexdiv_results.md)
+  [`plot(`*`<lexdiv_profile_batch_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/plot.lexdiv_results.md)
+  [`plot(`*`<lexdiv_text_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/plot.lexdiv_results.md)
+  [`plot(`*`<lexdiv_text_batch_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/plot.lexdiv_results.md)
+  [`plot(`*`<lexdiv_screen_results>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/plot.lexdiv_results.md)
+  [`plot(`*`<tubelex_profile>`*`)`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/plot.lexdiv_results.md)
+  : Plot one metric, a length screen or TUBELEX coverage
+- [`lexdiv_convenience`](https://ryuya-dot-com.github.io/ldfreq/dev/reference/lexdiv_convenience.md)
+  : Prepare and display lexical-diversity results
+
+# Articles
+
+### Start here
+
+First steps from a raw text table to metrics, figures, saved RDS
+records, and empirical guidance on choosing measures.
+
+- [Getting started with
+  ldfreq](https://ryuya-dot-com.github.io/ldfreq/dev/articles/getting-started.md):
+- [Choosing a lexical-diversity
+  measure](https://ryuya-dot-com.github.io/ldfreq/dev/articles/choosing-metrics.md):
+- [From files to a diagnostic
+  report](https://ryuya-dot-com.github.io/ldfreq/dev/articles/from-text-to-report.md):
+- [Reuse settings and export an auditable
+  analysis](https://ryuya-dot-com.github.io/ldfreq/dev/articles/recipes-and-exports.md):
+- [Release scope and
+  compatibility](https://ryuya-dot-com.github.io/ldfreq/dev/articles/release-scope.md):
+
+### Prepare and check your input
+
+Read TXT/CSV files, configure English tokenization, import Japanese
+morphological annotations, and review ambiguous forms in context.
+
+- [English tokenization and document
+  input](https://ryuya-dot-com.github.io/ldfreq/dev/articles/english-tokenization.md):
+- [Japanese annotations: from original text to lexical
+  measures](https://ryuya-dot-com.github.io/ldfreq/dev/articles/japanese-annotations.md):
+- [From corpus annotations to quanteda and lexical
+  profiles](https://ryuya-dot-com.github.io/ldfreq/dev/articles/annotated-corpora.md):
+- [Evaluate annotations and their effect on document
+  scores](https://ryuya-dot-com.github.io/ldfreq/dev/articles/annotation-evaluation.md):
+- [Compare token boundaries before comparing labels and document
+  scores](https://ryuya-dot-com.github.io/ldfreq/dev/articles/annotation-alignment.md):
+- [Review lexical ambiguity with KWIC and original
+  context](https://ryuya-dot-com.github.io/ldfreq/dev/articles/ambiguity-review.md):
+- [Connect contextual model outputs to research
+  occurrences](https://ryuya-dot-com.github.io/ldfreq/dev/articles/contextual-models.md):
+- [Analyze open-access academic
+  papers](https://ryuya-dot-com.github.io/ldfreq/dev/articles/open-access-papers.md):
+
+### Describe words and reference coverage
+
+Set up optional reference data and profile frequency, lexical levels,
+word families, roots/affixes, n-grams, and Japanese psycholinguistic
+norms.
+
+- [Optional reference data and
+  licenses](https://ryuya-dot-com.github.io/ldfreq/dev/articles/reference-data.md):
+- [Using your own lexical reference data across a
+  corpus](https://ryuya-dot-com.github.io/ldfreq/dev/articles/corpus-reference-profiles.md):
+- [Understanding unmatched words and lexical-unit
+  choices](https://ryuya-dot-com.github.io/ldfreq/dev/articles/auditing-vocabulary-profiles.md):
+- [Word families, roots, and affixes: from texts to interpretable
+  profiles](https://ryuya-dot-com.github.io/ldfreq/dev/articles/word-families-and-affixes.md):
+- [Preprocessing, parameter sensitivity, and frequency
+  coverage](https://ryuya-dot-com.github.io/ldfreq/dev/articles/preprocessing-and-frequency.md):
+- [Preparing English input for
+  TUBELEX](https://ryuya-dot-com.github.io/ldfreq/dev/articles/tubelex-input.md):
+- [N-gram frequencies without bundling a
+  corpus](https://ryuya-dot-com.github.io/ldfreq/dev/articles/ngram-profiles.md):
+- [Japanese lexical norms: from stimulus items to documented
+  matches](https://ryuya-dot-com.github.io/ldfreq/dev/articles/japanese-norms.md):
+- [Japanese polysemy: reviewed resource records and contextual
+  choices](https://ryuya-dot-com.github.io/ldfreq/dev/articles/japanese-polysemy.md):
+- [Japanese stimulus selection: frequency, familiarity, AoA and
+  BOI](https://ryuya-dot-com.github.io/ldfreq/dev/articles/japanese-stimuli.md):
+
+### Explain patterns with source contexts
+
+Connect corpus statistics back to exact source occurrences via KWIC
+concordances, dispersion, collocations, keyness, ordination, and
+dependencies.
+
+- [Search words and phrases, then inspect their
+  distribution](https://ryuya-dot-com.github.io/ldfreq/dev/articles/concordance-and-dispersion.md):
+- [Count nearby words and explain their
+  association](https://ryuya-dot-com.github.io/ldfreq/dev/articles/collocation-association.md):
+- [Compare word use against an explicit reference
+  corpus](https://ryuya-dot-com.github.io/ldfreq/dev/articles/keyness-comparison.md):
+- [Explore lexical composition and categories with CA, MCA and
+  MDS](https://ryuya-dot-com.github.io/ldfreq/dev/articles/lexical-ordination.md):
+- [Trace adjective–noun dependencies from source context to document
+  counts](https://ryuya-dot-com.github.io/ldfreq/dev/articles/dependency-pairs.md):
+
+### Design comparisons and report results
+
+Plan longitudinal writer/task/occasion studies, mixed-effects model
+tables, vocabulary test comparisons, readability, and syntactic
+complexity.
+
+- [Designing comparable lexical-diversity
+  analyses](https://ryuya-dot-com.github.io/ldfreq/dev/articles/designing-comparisons.md):
+- [From planned observations to a mixed
+  model](https://ryuya-dot-com.github.io/ldfreq/dev/articles/repeated-observations.md):
+- [Connecting corpus frequency with evidence of vocabulary
+  use](https://ryuya-dot-com.github.io/ldfreq/dev/articles/vocabulary-knowledge-and-use.md):
+- [Calculate English readability with visible counting
+  decisions](https://ryuya-dot-com.github.io/ldfreq/dev/articles/english-readability.md):
+- [Trace English syntactic complexity from source to study
+  table](https://ryuya-dot-com.github.io/ldfreq/dev/articles/syntactic-complexity.md):
+
+### Prepare teaching materials
+
+Track vocabulary recurrence across textbook units and build data-driven
+learning (DDL) handouts from reviewed corpus examples.
+
+- [Trace target vocabulary through textbook pages and
+  units](https://ryuya-dot-com.github.io/ldfreq/dev/articles/textbook-progression.md):
+- [Prepare teaching materials from reviewed
+  examples](https://ryuya-dot-com.github.io/ldfreq/dev/articles/ddl-materials.md):
