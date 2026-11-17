@@ -4,7 +4,7 @@ source(system.file("examples", "annotation-sensitivity.R", package = "ldfreq",
   mustWork = TRUE), local = TRUE)
 texts <- c(lemma = "cats saw cat.", pos = "we can run and jump.",
   missing = "birds fly.", unknown = "glorp.", excluded = "and the.", empty = "")
-prepared <- lexdiv_tokenize_batch(texts, normalization = "none", case = "preserve",
+prepared <- lexdiv_tokenize(texts, normalization = "none", case = "preserve",
   tokenizer = "english")
 lemmas_before <- list(lemma = c("cats", "saw", "cat"),
   pos = c("we", "can", "run", "and", "jump"), missing = c("bird", NA_character_),

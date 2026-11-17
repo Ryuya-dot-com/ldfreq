@@ -15,7 +15,8 @@ lexdiv_family_profile(annotations, dictionary, resource,
   unit = c("surface", "lemma", "flemma"),
   normalization = c("identity", "nfkc_lower"),
   exclude_pos = character(), context_chars = 30L,
-  max_tokens = 1e6, max_candidates = 1e6, review = NULL)
+  max_tokens = 1e6, max_candidates = 1e6, review = NULL,
+  supplementary = NULL)
 }
 \arguments{
 \item{annotations}{Unmodified \code{\link{lexdiv_import_annotations}} result,
@@ -53,9 +54,11 @@ Neither ceiling is a total memory or source-text size limit.}
 created using this profile's \code{annotations} and \code{review_input}.
 Decisions select dictionary \code{record_id} values, not family IDs.
 Source, complete table, resource declarations and counting policy must agree.
-Creating the single-token, whitespace-free surface review uses optional
-\pkg{quanteda}; applying an already saved
-review requires no quanteda calls. Default \code{NULL} uses lookup alone.}
+Default \code{NULL} uses lookup alone.}
+\item{supplementary}{Optional supplementary data frame (such as
+\code{bnccoca_data()$supplementary}) merged into \code{dictionary} before lookup
+so proper nouns, marginal words, transparent compounds, and abbreviations
+receive explicit \code{supplementary} band accounting.}
 }
 \details{
 The first example is self-contained and needs no optional package or download.
@@ -154,10 +157,11 @@ surface and normalized query. Repeated tokens are not collapsed in occurrences.
 unknown-selection, selected, matched and unresolved token counts; separate
 unlisted, ambiguous, missing-unit, missing-POS and \code{withheld_tokens}
 (previous matches withheld by explicit unresolved judgments); both coverage measures;
-observed and complete family types; family TTR and status. Status is
-\code{empty}, \code{no_selected_tokens}, \code{incomplete} or \code{complete}.
-\code{review_selected_tokens} and \code{review_unresolved_tokens} count
-explicit judgments; the latter may also include already ambiguous occurrences.
+observed and complete family types; \code{matched_family_ttr}; \code{family_ttr}; and status.
+\item \code{bands} and \code{band_summary} (present when \code{dictionary} has an
+integer \code{frequency_band} column): per-document 1k--25k band token/family
+counts, cumulative proportions, and \code{band_95} / \code{band_98} threshold
+levels.
 \item \code{review_input}: \code{targets}, \code{candidates} and
 \code{resource} arguments for \code{lexdiv_ambiguity_review()}. Candidate IDs
 are record IDs; labels/family IDs and optional POS remain in the display.

@@ -126,7 +126,7 @@ test_that("TUBELEX batch retains full profiles and document-local failures", {
   skip_optional_resources(c("tubelex"))
   documents <- list(b = c("Apple", "apple", "missing-word"),
     a = c("the", "book"), empty = character(), bad = c("the", NA_character_))
-  batch <- tubelex_profile_batch(documents)
+  batch <- tubelex_profile(documents)
   expect_s3_class(batch, "tubelex_profile_batch")
   expect_identical(names(batch$profiles), names(documents))
   individual <- lapply(documents, tubelex_profile)
@@ -135,22 +135,22 @@ test_that("TUBELEX batch retains full profiles and document-local failures", {
     c("ok", "ok", "empty", "invalid_input"))
   tidy <- data.frame(id = names(documents), stringsAsFactors = FALSE)
   tidy$words <- unname(documents)
-  expect_identical(tubelex_profile_batch(tidy, id_col = "id", terms_col = "words"), batch)
+  expect_identical(tubelex_profile(tidy, id_col = "id", term_col = "words"), batch)
   empty_documents <- stats::setNames(list(), character())
-  empty_batch <- tubelex_profile_batch(empty_documents)
+  empty_batch <- tubelex_profile(empty_documents)
   expect_s3_class(empty_batch, "tubelex_profile_batch")
   expect_identical(empty_batch$status, "empty")
   expect_identical(empty_batch$profiles, empty_documents)
-  expect_error(tubelex_profile_batch(list()), "plain named list")
-  expect_error(tubelex_profile_batch(documents, max_rows = 3), "max_rows")
-  expect_error(tubelex_profile_batch(list(x = "a", x = "b")), "unique")
-  expect_error(tubelex_profile_batch(list(x = "a"), id_col = "id", terms_col = "id"),
+  expect_error(tubelex_profile(list()), "plain named list")
+  expect_error(tubelex_profile(documents, max_rows = 3), "max_rows")
+  expect_error(tubelex_profile(list(x = "a", x = "b")), "unique")
+  expect_error(tubelex_profile(list(x = "a"), id_col = "id", term_col = "id"),
     "different columns")
-  expect_error(tubelex_profile_batch(list(x = lexdiv_tokenize("don't"))),
+  expect_error(tubelex_profile(list(x = lexdiv_tokenize("don't"))),
     "Treebank segmentation")
-  expect_error(tubelex_profile_batch(documents, normalization = "unknown"),
+  expect_error(tubelex_profile(documents, normalization = "unknown"),
     "normalization")
-  allowed <- tubelex_profile_batch(list(x = lexdiv_tokenize("apple")),
+  allowed <- tubelex_profile(list(x = lexdiv_tokenize("apple")),
     tokenization_mismatch = "allow")
   expect_identical(allowed$profiles$x$provenance$tokenization_alignment,
     "known_different_tokenizer_explicitly_allowed")

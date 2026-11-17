@@ -116,7 +116,7 @@ documents <- list(
   interleaved = rep(vocabulary, 30),
   interleaved_long = rep(vocabulary, 60)
 )
-primary <- lexdiv_metrics_batch(documents,
+primary <- lexdiv_metrics(documents,
   metrics = c("ttr", "mattr"), window_length = 20)
 primary[, c("document_id", "metric_id", "N", "V", "value", "status")]
 ```
@@ -146,7 +146,7 @@ mattr_method <- lexdiv_methods()$method_id[
   lexdiv_methods()$metric_id == "mattr"]
 plan <- lexdiv_plan(presets = character(), grids = lexdiv_grid(
   mattr_method, "window_length", c(20, 40), request_id_prefix = "window"))
-sensitivity <- lexdiv_metrics_batch(documents, plan = plan)
+sensitivity <- lexdiv_metrics(documents, plan = plan)
 sensitivity[, c("document_id", "request_id", "value", "requested_parameters")]
 wide <- lexdiv_widen(sensitivity)
 ```
@@ -209,10 +209,10 @@ texts <- vapply(files, function(path) {
   paste(readLines(path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
 }, character(1))
 names(texts) <- tools::file_path_sans_ext(basename(files))
-prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english",
+prepared <- lexdiv_tokenize(texts, tokenizer = "english",
   normalization = "NFC", case = "lower")
 tokens <- lapply(prepared, function(x) x$tokens$surface)
-current <- lexdiv_metrics_batch(tokens, metrics = "mtld")
+current <- lexdiv_metrics(tokens, metrics = "mtld")
 legacy <- lapply(tokens, lexdiv_variant_metrics,
   variants = "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1")
 migration <- data.frame(document_id = names(tokens), N = lengths(tokens),
@@ -322,7 +322,7 @@ length_associations <- function(results) {
       spearman = if (estimable) cor(n, value, method = "spearman") else NA_real_)
   }))
 }
-length_results <- lexdiv_metrics_batch(tokens,
+length_results <- lexdiv_metrics(tokens,
   metrics = c("ttr", "mattr", "mtld"), window_length = 50)
 length_associations(length_results)
 ```

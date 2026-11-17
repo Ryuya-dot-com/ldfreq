@@ -35,12 +35,14 @@ lexdiv_study_model_data(
 \code{document_id}, plus \code{input_characters} (automatically populated from
 preprocessing provenance if omitted when \code{results} is a
 \code{lexdiv_text_batch_results} object).}
-\item{results}{Complete result from \code{\link{lexdiv_metrics_batch}} or
-\code{\link{lexdiv_metrics_text_batch}}, computed with \code{plan = plan}.}
+\item{results}{Complete multi-document result from \code{\link{lexdiv_metrics}}
+or \code{\link{lexdiv_metrics_text}}, computed with \code{plan = plan}.}
 \item{plan}{The explicit \code{\link{lexdiv_plan}} used for \code{results}.}
 \item{condition_id}{Nonblank character label for the selected analysis condition.}
 \item{reporting}{Optional data frame/tibble with \code{document_id},
-\code{request_id}, \code{reporting_status}, and \code{reporting_reason}.}
+\code{request_id}, \code{reporting_status}, and \code{reporting_reason}, a
+single-floor \code{\link{lexdiv_screen_lengths}} result, or shorthand
+\code{"quality_floor"} / \code{"all_computable"}.}
 \item{max_rows}{Positive whole-number row limit.}
 \item{study}{Complete study table returned by \code{lexdiv_study_table()}.}
 \item{request_id}{One request ID in the saved plan.}
@@ -66,7 +68,7 @@ planned <- data.frame(
   occasion = 1
 )
 submissions <- data.frame(observation_id = "o1", document_id = "d1")
-results <- lexdiv_metrics_text_batch(c(d1 = "Cats chase cats."), plan = plan)
+results <- lexdiv_metrics_text(c(d1 = "Cats chase cats."), plan = plan)
 reporting <- data.frame(
   document_id = "d1", request_id = "ttr",
   reporting_status = "report", reporting_reason = "Planned specification"
@@ -77,4 +79,4 @@ study <- lexdiv_study_table(
 selected <- lexdiv_study_model_data(study, "surface-all", "ttr")
 selected
 }
-\seealso{\code{\link{lexdiv_metrics_text_batch}}, \code{\link{lexdiv_plan}}}
+\seealso{\code{\link{lexdiv_metrics_text}}, \code{\link{lexdiv_plan}}}

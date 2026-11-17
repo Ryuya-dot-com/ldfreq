@@ -137,16 +137,11 @@
 }
 
 .lexres_plain_unique <- function(value) {
-  output <- character()
-  for (item in value) {
-    already_seen <- any(vapply(
-      output,
-      function(previous) identical(previous, item),
-      logical(1L)
-    ))
-    if (!already_seen) output <- c(output, item)
-  }
-  output
+  if (!length(value)) return(character())
+  normalized <- value
+  non_na <- !is.na(normalized)
+  if (any(non_na)) Encoding(normalized[non_na]) <- "UTF-8"
+  value[!duplicated(normalized)]
 }
 
 .lexres_has_duplicate <- function(value) {
@@ -231,9 +226,9 @@
   )
 }
 
-.lexres_tubelex_paths <- function() {
+.lexres_tubelex_paths <- function(cache_dir = NULL) {
   # Let the structured loader report missing files and hash failures alike.
-  bundle_dir <- file.path(.lex_resource_cache(), "tubelex",
+  bundle_dir <- file.path(.lex_resource_cache(cache_dir), "tubelex",
     .lex_resource_catalog$tubelex$version, "extdata", "tubelex", "7cb5fb36")
   list(
     manifest_path = file.path(bundle_dir, "resource.manifest.dcf"),
@@ -1544,11 +1539,31 @@
   )
 }
 
-.lexres_load_tubelex <- function() {
-  paths <- .lexres_tubelex_paths()
-  .lexres_load_resource(
+.lexres_load_tubelex <- function(cache_dir = NULL) {
+  paths <- .lexres_tubelex_paths(cache_dir = cache_dir)
+  expectation <- .lexres_tubelex_expectation()
+  m_read <- .lexres_read_raw_once(paths$manifest_path, expectation$max_manifest_bytes)
+  a_read <- if (isTRUE(m_read$ok)) {
+    .lexres_read_raw_once(paths$artifact_paths[[1L]], expectation$max_artifact_bytes)
+  } else {
+    list(ok = FALSE)
+  }
+  cache_key <- NULL
+  if (isTRUE(m_read$ok) && isTRUE(a_read$ok)) {
+    m_sha <- digest::digest(m_read$bytes, algo = "sha256", serialize = FALSE)
+    a_sha <- digest::digest(a_read$bytes, algo = "sha256", serialize = FALSE)
+    cache_key <- paste0("tubelex:", m_sha, ":", a_sha)
+    if (exists(cache_key, envir = .lex_resource_session_cache, inherits = FALSE)) {
+      return(get(cache_key, envir = .lex_resource_session_cache, inherits = FALSE))
+    }
+  }
+  loaded <- .lexres_load_resource(
     paths$manifest_path,
-    .lexres_tubelex_expectation(),
+    expectation,
     paths$artifact_paths
   )
+  if (!is.null(cache_key) && identical(loaded$status, "ok")) {
+    assign(cache_key, loaded, envir = .lex_resource_session_cache)
+  }
+  loaded
 }

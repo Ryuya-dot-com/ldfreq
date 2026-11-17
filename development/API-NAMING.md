@@ -1,4 +1,4 @@
-# API naming conventions (v1.0.0)
+# API naming conventions (2.0.0 development)
 
 General analysis functions use `lexdiv_`. Resource-specific operations use the
 resource name (`nj8_`, `tubelex_`, `morpholex_`, `bnccoca_`, `morphynet_`).
@@ -12,32 +12,38 @@ This distinction identifies a resource dependency, not a different code license.
   `as_documents`.
 - Every `lexdiv_*` export contains at most three semantic words after the
   `lexdiv_` prefix.
-- `_text` means raw text; `_batch` means separately identified documents
-  (`lexdiv_tokenize_batch`, `lexdiv_lemmatize_batch`, `lexdiv_flemmatize_batch`,
-  `lexdiv_metrics_batch`, `lexdiv_metrics_text_batch`, `nj8_profile_batch`,
-  `tubelex_profile_batch`, `lexdiv_norm_profile_batch`).
-- `_ids` returns character identifiers (`lexdiv_metric_ids`,
-  `lexdiv_overlap_ids`). Multi-column catalog tables use `methods`, `presets`,
+- `_text` means raw text (`lexdiv_metrics_text()`). Single-document and
+  multi-document inputs share a single polymorphic entry point without `_batch`
+  duplicate exports (`lexdiv_tokenize()`, `lexdiv_lemmatize()`,
+  `lexdiv_flemmatize()`, `lexdiv_metrics()`, `lexdiv_metrics_text()`,
+  `nj8_profile()`, `tubelex_profile()`, `lexdiv_norm_profile()`).
+- `_ids` returns character identifiers (`lexdiv_metric_ids()`,
+  `lexdiv_overlap_ids()`). Multi-column catalog tables use `methods`, `presets`,
   or `resource_info`.
 - Parameter names are unified across functions:
   - Document ID column selector: always `id_col = "document_id"`.
+  - Token/term column selector: always `term_col` (with domain default `"tokens"`, `"terms"`, `"token"`, or `"term"`).
+  - Optional resource cache directory override: always `cache_dir = NULL`.
   - Case-insensitive matching/sorting flag: always `case_insensitive = FALSE`.
   - Raw-text preprocessing defaults: `normalization = "NFC"`,
     `case = "lower"`, `keep_numbers = FALSE`, `tokenizer = "english"`.
 
-## Unified entry points in 1.0.0
+## Unified entry points in 2.0.0-dev
 
-Version 1.0.0 removes all duplicate entry points and pre-1.0 legacy aliases:
+Version 2.0.0-dev retires the 8 duplicate `*_batch` exports in favor of polymorphic single/multi-document entry points (67 exports total):
 
-| Canonical v1.0.0 API | Retired pre-1.0 name |
+| Canonical 2.0.0-dev API | Retired 1.0.x duplicate |
 |---|---|
-| `lexdiv_compare_ngrams()` | (retired pre-1.0 alias) |
-| `lexdiv_build_ngram_reference()` | (retired pre-1.0 alias) |
-| `lexdiv_sort_concordance()` | (retired pre-1.0 alias) |
-| `lexdiv_screen_lengths()` | (retired pre-1.0 alias) |
-| `lexdiv_methods(scope = "variants")` | (retired data-frame `_ids` export) |
-| `lexdiv_metrics(tokens, plan = plan)` | (retired separate single-doc plan runner) |
-| `lexdiv_metrics_batch(docs, plan = plan)` | (retired separate batch plan runner) |
+| `lexdiv_tokenize(x, ...)` | `lexdiv_tokenize_batch()` |
+| `lexdiv_lemmatize(x, ...)` | `lexdiv_lemmatize_batch()` |
+| `lexdiv_flemmatize(x, ...)` | `lexdiv_flemmatize_batch()` |
+| `lexdiv_metrics(x, ...)` | `lexdiv_metrics_batch()` |
+| `lexdiv_metrics_text(x, ...)` | `lexdiv_metrics_text_batch()` |
+| `nj8_profile(x, ...)` | `nj8_profile_batch()` |
+| `tubelex_profile(x, ...)` | `tubelex_profile_batch()` |
+| `lexdiv_norm_profile(x, ...)` | `lexdiv_norm_profile_batch()` |
+
+Note: `nj8_profile_batch`, `tubelex_profile_batch`, and `lexdiv_norm_profile_batch` remain the S3 result classes returned by multi-document calls for downstream `print()` and `plot()` dispatch.
 
 ## Plot conventions
 

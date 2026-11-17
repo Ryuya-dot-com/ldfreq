@@ -3,7 +3,7 @@ test_that("basic help examples compute and save results without reference data",
   grDevices::pdf(NULL)
   on.exit(grDevices::dev.off(), add = TRUE)
   for (topic in c("lexdiv_as_documents", "lexdiv_widen", "plot.lexdiv_results",
-                  "lexdiv_metrics_text_batch")) {
+                  "lexdiv_metrics_text")) {
     env <- new.env(parent = globalenv())
     suppressMessages(utils::example(topic, package = "ldfreq", local = env,
       character.only = TRUE, ask = FALSE, echo = FALSE))

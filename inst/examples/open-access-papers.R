@@ -83,11 +83,11 @@ run_open_paper_example <- function(directory, download = FALSE) {
       algo = "sha256", serialize = FALSE)
   }
   texts <- unlist(texts, use.names = TRUE)
-  prepared <- ldfreq::lexdiv_tokenize_batch(texts, tokenizer = "english",
+  prepared <- ldfreq::lexdiv_tokenize(texts, tokenizer = "english",
     normalization = "NFC", case = "lower", keep_numbers = FALSE)
-  metrics <- ldfreq::lexdiv_metrics_text_batch(prepared,
+  metrics <- ldfreq::lexdiv_metrics_text(prepared,
     metrics = c("ttr", "mattr", "hdd"), window_length = 50L, sample_size = 42L)
-  levels <- ldfreq::nj8_profile_batch(prepared, unit = "surface")
+  levels <- ldfreq::nj8_profile(prepared, unit = "surface")
   diagnostics <- ldfreq::nj8_diagnostics(levels)
   # Join only a unique metadata table; retain every metric's status and reason.
   stopifnot(!anyDuplicated(sources$document_id))

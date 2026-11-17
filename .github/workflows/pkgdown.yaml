@@ -70,8 +70,14 @@ jobs:
           else
             git worktree add --orphan -b gh-pages "${worktree_dir}"
           fi
-          find "${worktree_dir}" -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
-          cp -R docs/. "${worktree_dir}/"
+          if [ -d "docs/dev" ]; then
+            rm -rf "${worktree_dir}/dev"
+            mkdir -p "${worktree_dir}/dev"
+            cp -R docs/dev/. "${worktree_dir}/dev/"
+          else
+            find "${worktree_dir}" -mindepth 1 -maxdepth 1 ! -name '.git' ! -name 'dev' -exec rm -rf {} +
+            cp -R docs/. "${worktree_dir}/"
+          fi
           touch "${worktree_dir}/.nojekyll"
           cd "${worktree_dir}"
           git config user.name "github-actions[bot]"

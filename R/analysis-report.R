@@ -167,9 +167,20 @@ lexdiv_methods_text <- function(x, language = c("en", "ja")) {
   refs <- vapply(x$recipe$resources, function(r) {
     base <- if (ja) sprintf("\u53c2\u7167\u8cc7\u6e90 %s\uff08\u7248 %s\u3001\u7167\u5408\u6b63\u898f\u5316 %s\uff09\u3092\u4f7f\u7528\u3057\u305f\u3002", r$id, r$version, r$normalization) else
       sprintf("The %s reference (version %s) was used with %s lookup normalization.", r$id, r$version, r$normalization)
-    if (r$id == "nj8") paste(base, if (ja)
-      "\u8868\u5c64\u5f62\u3092\u7167\u5408\u3057\u3001\u62ec\u5f27\u4ed8\u304d\u306e\u5225\u8868\u8a18\u3092\u5c55\u958b\u3057\u305f\u3002\u30ea\u30b9\u30c8\u5916\u8a9e\u3082\u30ab\u30d0\u30ec\u30c3\u30b8\u306e\u5206\u6bcd\u306b\u542b\u3081\u305f\u3002" else
-      "Surface forms were matched with parenthetical aliases expanded; off-list forms remained in the coverage denominator.") else
+    if (r$id == "nj8") {
+      is_lemma <- identical(r$unit, "lemma")
+      paste(base, if (ja) {
+        if (is_lemma) {
+          "\u898b\u51fa\u3057\u8a9e\uff08textstem / hash_lemmas\uff09\u3092\u7167\u5408\u3057\u3001\u62ec\u5f27\u4ed8\u304d\u306e\u5225\u8868\u8a18\u3092\u5c55\u958b\u3057\u305f\u3002\u30ea\u30b9\u30c8\u5916\u8a9e\u3082\u30ab\u30d0\u30ec\u30c3\u30b8\u306e\u5206\u6bcd\u306b\u542b\u3081\u305f\u3002"
+        } else {
+          "\u8868\u5c64\u5f62\u3092\u7167\u5408\u3057\u3001\u62ec\u5f27\u4ed8\u304d\u306e\u5225\u8868\u8a18\u3092\u5c55\u958b\u3057\u305f\u3002\u30ea\u30b9\u30c8\u5916\u8a9e\u3082\u30ab\u30d0\u30ec\u30c3\u30b8\u306e\u5206\u6bcd\u306b\u542b\u3081\u305f\u3002"
+        }
+      } else if (is_lemma) {
+        "Lemma forms (textstem / hash_lemmas) were matched with parenthetical aliases expanded; off-list forms remained in the coverage denominator."
+      } else {
+        "Surface forms were matched with parenthetical aliases expanded; off-list forms remained in the coverage denominator."
+      })
+    } else
       paste(base, if (ja)
         "\u7d44\u8fbc\u307f\u30c8\u30fc\u30af\u30ca\u30a4\u30b6\u30fc\u3068\u53c2\u7167\u8cc7\u6e90\u306e\u5206\u5272\u65b9\u6cd5\u306e\u76f8\u9055\u3092\u660e\u793a\u7684\u306b\u8a31\u5bb9\u3057\u305f\u3002\u983b\u5ea6\u7b49\u306e\u5e73\u5747\u306f\u7167\u5408\u3067\u304d\u305f\u8a9e\u306b\u6761\u4ef6\u4ed8\u3051\u3089\u308c\u3001\u30ab\u30d0\u30ec\u30c3\u30b8\u3068\u4f75\u8a18\u3057\u305f\u3002" else
         "The known segmentation mismatch was explicitly allowed. Frequency/prevalence means were conditional on matched terms and retained alongside coverage.")

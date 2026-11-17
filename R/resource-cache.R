@@ -1,4 +1,6 @@
 # Reference downloads are explicit; readers only inspect the selected cache.
+.lex_resource_session_cache <- new.env(parent = emptyenv())
+
 .lex_resource_cache <- function(cache_dir = NULL) {
   if (is.null(cache_dir)) cache_dir <- getOption("ldfreq.resource_dir",
     Sys.getenv("LDFREQ_RESOURCE_DIR", unset = tools::R_user_dir("ldfreq", "cache")))
@@ -84,13 +86,13 @@ lexdiv_download_resources <- function(resources, accept_license = FALSE, cache_d
   invisible(lexdiv_resource_info(resources, cache_dir))
 }
 
-.lex_resource_file <- function(resource, ...) {
+.lex_resource_file <- function(resource, ..., cache_dir = NULL) {
   item <- .lex_resource_catalog[[resource]]
   relative <- file.path(...)
   key <- gsub("\\\\", "/", relative)
   if (is.null(item) || !key %in% names(item$files))
     stop("Unknown resource file.", call. = FALSE)
-  path <- file.path(.lex_resource_cache(), resource, item$version)
+  path <- file.path(.lex_resource_cache(cache_dir), resource, item$version)
   if (!.lex_resource_verified(path, item$files[key]))
     stop("Reference data '" , resource, "' are unavailable or modified. Review lexdiv_resource_info('",
       resource, "') and its license, then run lexdiv_download_resources('", resource,

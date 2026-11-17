@@ -149,20 +149,24 @@ lexdiv_score_contextual <- function(x, training, reference, training_info) {
 #' @export
 print.lexdiv_contextual_scores <- function(x, ...) {
   if (!inherits(x, "lexdiv_contextual_scores") || !is.list(x) ||
-      !is.data.frame(x$prototypes)) {
+      !is.matrix(x$prototypes) || !is.data.frame(x$candidates)) {
     stop("x must be a lexdiv_contextual_scores object.", call. = FALSE)
   }
   cat(sprintf(
-    "<lexdiv_contextual_scores: %d prototype%s; %d query occurrence%s>\n",
-    nrow(x$prototypes), if (nrow(x$prototypes) == 1L) "" else "s",
+    "<lexdiv_contextual_scores: %d candidate%s (%d available prototype%s); %d query occurrence%s>\n",
+    nrow(x$candidates), if (nrow(x$candidates) == 1L) "" else "s",
+    sum(x$candidates$prototype_status == "available", na.rm = TRUE),
+    if (sum(x$candidates$prototype_status == "available", na.rm = TRUE) == 1L) "" else "s",
     nrow(x$query_occurrences), if (nrow(x$query_occurrences) == 1L) "" else "s"
   ))
-  cols <- intersect(c("surface", "candidate_id", "label", "training_n"),
-    names(x$prototypes))
-  shown <- utils::head(x$prototypes[cols], 12L)
+  cols <- intersect(
+    c("term", "candidate_id", "label", "n_selected", "n_vectors", "prototype_status"),
+    names(x$candidates)
+  )
+  shown <- utils::head(x$candidates[cols], 12L)
   print.data.frame(shown, row.names = FALSE, ...)
-  if (nrow(x$prototypes) > nrow(shown)) {
-    cat("... additional prototype rows omitted\n")
+  if (nrow(x$candidates) > nrow(shown)) {
+    cat("... additional candidate rows omitted\n")
   }
   invisible(x)
 }

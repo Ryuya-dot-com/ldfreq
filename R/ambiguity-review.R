@@ -42,23 +42,67 @@ lexdiv_ambiguity_review <- function(x, targets, candidates, resource,
       paste(intersect(reserved, names(x$tokens)), collapse = ", "), call. = FALSE)
   # Whitespace-only annotations occupy their original slots as padding.
   data <- x$tokens[!stringi::stri_detect_regex(x$tokens$surface, "^\\p{White_Space}+$"), ]
-  q <- lexdiv_as_quanteda(data, x$segments, max_tokens = max_tokens)
-  kw <- as.data.frame(quanteda::kwic(q$tokens, targets, window = window,
-    valuetype = "fixed", case_insensitive = FALSE))
-  hit_key <- .lexng_key(kw[c("docname", "from")])
-  row <- match(hit_key, .lexng_key(q$positions[c("quanteda_docname", "token_index")]))
-  if (anyNA(row) || any(kw$from != kw$to))
-    stop("KWIC hits did not preserve the expected single-token source positions.", call. = FALSE)
-  # quanteda fixed matching may identify canonically equivalent Unicode forms.
-  # Keep only hits whose original surface equals the unnormalized query.
-  exact <- q$positions$surface[row] == as.character(kw$pattern)
-  row <- row[exact]; kw <- kw[exact, , drop = FALSE]
-  if (anyDuplicated(row) || any(kw$keyword != q$positions$surface[row]) ||
-      !setequal(row, which(q$positions$surface %in% targets)))
-    stop("KWIC hits did not preserve the expected single-token source positions.", call. = FALSE)
-  hit_order <- order(row)
-  row <- row[hit_order]; kw <- kw[hit_order, , drop = FALSE]
-  occurrences <- q$positions[row, setdiff(names(q$positions), "quanteda_docname"), drop = FALSE]
+  if (requireNamespace("quanteda", quietly = TRUE)) {
+    q <- lexdiv_as_quanteda(data, x$segments, max_tokens = max_tokens)
+    kw <- as.data.frame(quanteda::kwic(q$tokens, targets, window = window,
+      valuetype = "fixed", case_insensitive = FALSE))
+    hit_key <- .lexng_key(kw[c("docname", "from")])
+    row <- match(hit_key, .lexng_key(q$positions[c("quanteda_docname", "token_index")]))
+    if (anyNA(row) || any(kw$from != kw$to))
+      stop("KWIC hits did not preserve the expected single-token source positions.", call. = FALSE)
+    # quanteda fixed matching may identify canonically equivalent Unicode forms.
+    # Keep only hits whose original surface equals the unnormalized query.
+    exact <- q$positions$surface[row] == as.character(kw$pattern)
+    row <- row[exact]; kw <- kw[exact, , drop = FALSE]
+    if (anyDuplicated(row) || any(kw$keyword != q$positions$surface[row]) ||
+        !setequal(row, which(q$positions$surface %in% targets)))
+      stop("KWIC hits did not preserve the expected single-token source positions.", call. = FALSE)
+    hit_order <- order(row)
+    row <- row[hit_order]; kw <- kw[hit_order, , drop = FALSE]
+    occurrences <- q$positions[row, setdiff(names(q$positions), "quanteda_docname"), drop = FALSE]
+    kwic_provenance <- q$provenance
+  } else {
+    if (any(stringi::stri_detect_regex(data$surface, "\\p{White_Space}")))
+      stop("Terms must be non-empty single tokens without whitespace.", call. = FALSE)
+    seg_key <- .lexng_key(x$segments[c("document_id", "segment_id")])
+    data_seg <- match(.lexng_key(data[c("document_id", "segment_id")]), seg_key)
+    hit_rows <- which(data$surface %in% targets)
+    occurrences <- data[hit_rows, , drop = FALSE]
+    pre_vec <- character(length(hit_rows))
+    post_vec <- character(length(hit_rows))
+    if (length(hit_rows) && window > 0L) {
+      by_seg <- split(seq_len(nrow(data)), factor(data_seg, levels = seq_len(nrow(x$segments))))
+      for (h in seq_along(hit_rows)) {
+        r_idx <- hit_rows[[h]]
+        s_idx <- data_seg[[r_idx]]
+        seg_rows <- by_seg[[s_idx]]
+        pos <- data$token_index[[r_idx]]
+        left_rows <- seg_rows[data$token_index[seg_rows] >= max(1L, pos - window) &
+                              data$token_index[seg_rows] < pos]
+        right_rows <- seg_rows[data$token_index[seg_rows] > pos &
+                               data$token_index[seg_rows] <= min(x$segments$token_count[[s_idx]], pos + window)]
+        pre_vec[[h]] <- if (length(left_rows)) paste(data$surface[left_rows], collapse = " ") else ""
+        post_vec[[h]] <- if (length(right_rows)) paste(data$surface[right_rows], collapse = " ") else ""
+      }
+    }
+    kw <- data.frame(
+      pre = pre_vec,
+      keyword = occurrences$surface,
+      post = post_vec,
+      stringsAsFactors = FALSE
+    )
+    kwic_provenance <- list(
+      adapter = "ldfreq-stringi-kwic",
+      adapter_version = "0.1.0",
+      quanteda_version = NA_character_,
+      term_col = "surface",
+      retokenized = FALSE,
+      padding = TRUE,
+      source_token_slots = sum(x$segments$token_count),
+      retained_tokens = nrow(data),
+      input_sha256 = digest::digest(list(data, x$segments), algo = "sha256", serializeVersion = 2L)
+    )
+  }
   group <- match(.lexng_key(occurrences[c("document_id", "segment_id")]),
     .lexng_key(x$segments[c("document_id", "segment_id")]))
   identities <- .lexng_key(data.frame(occurrences[c("document_id", "segment_id", "token_index",
@@ -115,7 +159,7 @@ lexdiv_ambiguity_review <- function(x, targets, candidates, resource,
       nbins = length(targets))
   out <- list(occurrences = occurrences, candidates = candidates, decisions = decisions, summary = summary,
     source = x, provenance = list(review = "ldfreq-ambiguity-review", review_version = "0.1.0",
-      review_id = review_id, resource = resource, kwic = q$provenance, window = window,
+      review_id = review_id, resource = resource, kwic = kwic_provenance, window = window,
       matching = "exact case-sensitive surface; no normalization",
       context = "quanteda token window within segment; original segment text retained",
       selection_validation = "source identity and candidate membership only; no sense inference"))

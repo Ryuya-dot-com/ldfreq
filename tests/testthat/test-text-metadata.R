@@ -8,12 +8,12 @@ test_that("study metadata align by document ID without changing the analysis", {
     observed = c(TRUE, NA, FALSE), date = as.Date(c("2026-01-01", NA, "2026-02-01")),
     value = c(99, 98, 97), stringsAsFactors = FALSE)
   before <- serialize(list(texts, metadata), NULL)
-  default <- lexdiv_metrics_text_batch(texts, id_col = "essay", text_col = "response",
+  default <- lexdiv_metrics_text(texts, id_col = "essay", text_col = "response",
     tokenizer = "english", metrics = c("ttr", "mtld"))
-  expect_identical(default, lexdiv_metrics_text_batch(texts,
+  expect_identical(default, lexdiv_metrics_text(texts,
     id_col = "essay", text_col = "response", tokenizer = "english",
     metrics = c("ttr", "mtld"), metadata = NULL))
-  result <- lexdiv_metrics_text_batch(texts, id_col = "essay", text_col = "response",
+  result <- lexdiv_metrics_text(texts, id_col = "essay", text_col = "response",
     tokenizer = "english", metrics = c("ttr", "mtld"), metadata = metadata)
   expect_identical(names(result), c(names(default), "metadata"))
   for (field in names(default)) expect_identical(result[[field]], default[[field]])
@@ -28,12 +28,12 @@ test_that("study metadata align by document ID without changing the analysis", {
   expect_false(returned$visible)
   expect_false(any(grepl("Metadata:", capture.output(print(default)), fixed = TRUE)))
 
-  prepared <- lexdiv_tokenize_batch(texts, id_col = "essay", text_col = "response",
+  prepared <- lexdiv_tokenize(texts, id_col = "essay", text_col = "response",
     tokenizer = "english")
-  expect_identical(lexdiv_metrics_text_batch(prepared, metrics = c("ttr", "mtld"),
+  expect_identical(lexdiv_metrics_text(prepared, metrics = c("ttr", "mtld"),
     metadata = metadata), result)
   named <- stats::setNames(texts$response, texts$essay)
-  expect_identical(lexdiv_metrics_text_batch(named, tokenizer = "english",
+  expect_identical(lexdiv_metrics_text(named, tokenizer = "english",
     metrics = c("ttr", "mtld"), metadata = metadata), result)
   path <- tempfile(fileext = ".rds")
   on.exit(unlink(path))
@@ -44,7 +44,7 @@ test_that("study metadata align by document ID without changing the analysis", {
 test_that("metadata validation rejects ambiguous rosters and non-scalar columns", {
   texts <- c("001" = "a a", "002" = "b")
   metadata <- data.frame(document_id = c("001", "002"), writer = c("same", "same"))
-  run <- function(m) lexdiv_metrics_text_batch(texts, metrics = "ttr", metadata = m)
+  run <- function(m) lexdiv_metrics_text(texts, metrics = "ttr", metadata = m)
   expect_error(run(list(document_id = names(texts))), "data frame")
   expect_error(run(metadata["writer"]), "including document_id")
   expect_error(run(metadata[c(1, 1), ]), "unique")
@@ -74,13 +74,13 @@ test_that("zero documents retain declared metadata types and validation", {
   texts <- stats::setNames(character(), character())
   metadata <- data.frame(document_id = character(), task = factor(levels = c("A", "B")),
     occasion = integer(), date = as.Date(character()))
-  result <- lexdiv_metrics_text_batch(texts, metrics = "ttr", metadata = metadata)
+  result <- lexdiv_metrics_text(texts, metrics = "ttr", metadata = metadata)
   expect_identical(result$metadata, metadata)
   expect_equal(nrow(result$results), 0)
   expect_output(print(result), "0 documents; 3 study fields")
-  expect_error(lexdiv_metrics_text_batch(texts, metrics = "ttr",
+  expect_error(lexdiv_metrics_text(texts, metrics = "ttr",
     metadata = data.frame(document_id = "extra")), "1 extra")
-  expect_error(lexdiv_metrics_text_batch(texts, metrics = "ttr",
+  expect_error(lexdiv_metrics_text(texts, metrics = "ttr",
     metadata = data.frame(id = character())), "including document_id")
 })
 
@@ -97,7 +97,7 @@ test_that("UTF-8 metadata IDs match without changing labels or token selections"
   metadata <- data.frame(document_id = c("empty", unknown_id),
     writer = c(NA_character_, "\u8457\u8005A"), stringsAsFactors = FALSE)
   before <- serialize(metadata, NULL)
-  result <- lexdiv_metrics_text_batch(inputs, unit = "lemma", word_inclusion = "content",
+  result <- lexdiv_metrics_text(inputs, unit = "lemma", word_inclusion = "content",
     metrics = "ttr", metadata = metadata)
   expect_identical(result$metadata$document_id, c(id, "empty"))
   expect_identical(result$metadata$writer, c("\u8457\u8005A", NA_character_))
@@ -105,5 +105,5 @@ test_that("UTF-8 metadata IDs match without changing labels or token selections"
   expect_equal(result$results$value, c(.5, NA))
   expect_identical(serialize(metadata, NULL), before)
   metadata$document_id <- c(id, unknown_id)
-  expect_error(lexdiv_metrics_text_batch(inputs, metrics = "ttr", metadata = metadata), "unique")
+  expect_error(lexdiv_metrics_text(inputs, metrics = "ttr", metadata = metadata), "unique")
 })

@@ -149,50 +149,39 @@ lexdiv_metric_ids <- function() {
   )
 }
 
-#' Compute versioned lexical-diversity metrics from pre-tokenized input
-#'
-#' Computes one or more explicitly versioned lexical-diversity variants from an
-#' ordered character vector. The core performs no case conversion, Unicode
-#' normalization, token deletion, or lemmatization.
-#'
-#' @param tokens Plain, unclassed, one-dimensional character vector of ordered,
-#'   already-tokenized strings. `NA`, empty strings, invalid UTF-8, and strings
-#'   marked `bytes` or `latin1` make the whole document invalid. A zero-length
-#'   character vector is an empty document. Valid non-ASCII strings whose
-#'   encoding marker is unknown are interpreted as UTF-8 on a local copy.
-#'   Each vector element is counted as exactly one token; a single string that
-#'   contains whitespace triggers a warning because it may be un-tokenized
-#'   prose. Use [lexdiv_metrics_text()] for raw text.
-#' @param metrics Plain, non-empty, duplicate-free character vector selected
-#'   from [lexdiv_metric_ids()]. The default excludes experimental `expected_ttr_d` and opt-in `mtld_ma`.
-#' @param segment_length Requested complete non-overlapping segment length for
-#'   MSTTR. It is never reduced to the document length.
-#' @param window_length Requested step-one window length for MATTR. It is never
-#'   reduced to the document length.
-#' @param mtld_threshold MTLD TTR threshold strictly between zero and one. The
-#'   defined comparator is strict `<`, with no minimum complete-factor length.
-#' @param sample_size Requested without-replacement sample size for HD-D. It is
-#'   never reduced to the document length.
-#' @param expected_ttr_sample_sizes Strictly increasing sample sizes used by
-#'   the deterministic expected-TTR D curve fit. They are never reduced to the
-#'   document length. This experimental estimator uses no random sampling and
-#'   is not CLAN VOCD; empirical equivalence to published vocd-D is untested.
-#' @param plan Optional normalized plan from [lexdiv_plan()]. When supplied,
-#'   do not also supply `metrics` or individual metric parameters. The plan
-#'   fixes all method requests and their order.
-#'
-#' @return A `lexdiv_results` data frame with one row per requested metric and
-#'   list-columns for requested/effective parameters and diagnostics. Metric
-#'   contract identity and result-schema version are explicit columns as well
-#'   as convenience attributes. Invalid and empty documents return structured
-#'   rows rather than throwing; structural API errors still throw. Read
-#'   `status` and `missing_reason` before interpreting `value`: `ok` means a
-#'   value was computed, `missing` means the valid input did not meet a method
-#'   domain, and `invalid_input` means the token document was invalid.
-#'   With `plan`, returns the complete `lexdiv_profile_results` table, including
-#'   request identities, plan fingerprint, profile class and attributes.
-#' @export
-lexdiv_metrics <- function(
+.lex_is_tokenization_batch <- function(x) {
+  inherits(x, "lexdiv_tokenization_batch") ||
+    (is.list(x) && !is.data.frame(x) && length(x) > 0L &&
+      !is.null(names(x)) &&
+      all(vapply(x, inherits, logical(1L), "lexdiv_tokenization")))
+}
+
+.lexdiv_extract_tokenization_terms <- function(tokenization, term_col) {
+  .lexprep_validate_tokenization(tokenization)
+  columns <- .lex_batch_column_names(names(tokenization$tokens))
+  matches <- which(columns == term_col)
+  if (length(matches) != 1L) {
+    stop(
+      sprintf("term_col (%s) was not found in tokenization$tokens.", term_col),
+      call. = FALSE
+    )
+  }
+  values <- .subset2(tokenization$tokens, matches)
+  if (!is.character(values) || is.object(values) || !is.null(dim(values))) {
+    stop(
+      sprintf("Selected tokenization column %s must be a plain character vector.", term_col),
+      call. = FALSE
+    )
+  }
+  keep <- if ("is_word" %in% names(tokenization$tokens)) {
+    tokenization$tokens$is_word %in% TRUE
+  } else {
+    !is.na(values)
+  }
+  unname(values[keep])
+}
+
+.lexdiv_metrics_single <- function(
     tokens,
     metrics = setdiff(lexdiv_metric_ids(), c("expected_ttr_d", "mtld_ma")),
     segment_length = 50L,
@@ -200,11 +189,16 @@ lexdiv_metrics <- function(
     mtld_threshold = 0.72,
     sample_size = 42L,
     expected_ttr_sample_sizes = 35:50,
-    plan = NULL) {
+    plan = NULL,
+    metrics_supplied = !missing(metrics),
+    segment_supplied = !missing(segment_length),
+    window_supplied = !missing(window_length),
+    mtld_supplied = !missing(mtld_threshold),
+    sample_supplied = !missing(sample_size),
+    expected_supplied = !missing(expected_ttr_sample_sizes)) {
   if (!is.null(plan)) {
-    if (!missing(metrics) || !missing(segment_length) ||
-        !missing(window_length) || !missing(mtld_threshold) ||
-        !missing(sample_size) || !missing(expected_ttr_sample_sizes)) {
+    if (metrics_supplied || segment_supplied || window_supplied ||
+        mtld_supplied || sample_supplied || expected_supplied) {
       stop("With plan, omit metrics and individual metric parameters.", call. = FALSE)
     }
     return(.lexdiv_profile(tokens, plan = plan))
@@ -256,7 +250,7 @@ lexdiv_metrics <- function(
 
   .lex_warn_likely_raw_text(
     tokens,
-    "tokens",
+    "x",
     "lexdiv_metrics",
     "use lexdiv_metrics_text() instead"
   )
@@ -300,4 +294,145 @@ lexdiv_metrics <- function(
   })
 
   .lex_records_data_frame(records)
+}
+
+#' Compute versioned lexical-diversity metrics for one or more tokenized documents
+#'
+#' Computes one or more explicitly versioned lexical-diversity variants from a
+#' single document (an ordered character vector or `lexdiv_tokenization` object)
+#' or multiple documents (a plain named list of token vectors, a
+#' `lexdiv_tokenization_batch` object, or a data frame with `id_col` and a
+#' list-column selected by `term_col`). The core performs no case conversion,
+#' Unicode normalization, token deletion, or lemmatization.
+#'
+#' @param x For a single document, a plain one-dimensional character vector of
+#'   ordered, already-tokenized strings (or a `lexdiv_tokenization` object).
+#'   For multiple documents, a plain named list of token vectors, a
+#'   `lexdiv_tokenization_batch` object, or a data frame with the columns
+#'   selected by `id_col` and `term_col`. `NA`, empty strings, invalid UTF-8,
+#'   and strings marked `bytes` or `latin1` make a document invalid. A
+#'   zero-length character vector is an empty document. Use
+#'   [lexdiv_metrics_text()] for raw text.
+#' @param metrics Plain, non-empty, duplicate-free character vector selected
+#'   from [lexdiv_metric_ids()]. The default excludes experimental `expected_ttr_d` and opt-in `mtld_ma`.
+#' @param segment_length Requested complete non-overlapping segment length for
+#'   MSTTR. It is never reduced to the document length.
+#' @param window_length Requested step-one window length for MATTR. It is never
+#'   reduced to the document length.
+#' @param mtld_threshold MTLD TTR threshold strictly between zero and one. The
+#'   defined comparator is strict `<`, with no minimum complete-factor length.
+#' @param sample_size Requested without-replacement sample size for HD-D. It is
+#'   never reduced to the document length.
+#' @param expected_ttr_sample_sizes Strictly increasing sample sizes used by
+#'   the deterministic expected-TTR D curve fit. They are never reduced to the
+#'   document length. This experimental estimator uses no random sampling and
+#'   is not CLAN VOCD; empirical equivalence to published vocd-D is untested.
+#' @param plan Optional normalized plan from [lexdiv_plan()]. When supplied,
+#'   do not also supply `metrics` or individual metric parameters. The plan
+#'   fixes all method requests and their order.
+#' @param id_col Name of the explicit document-ID column for multi-document
+#'   data-frame input.
+#' @param term_col Name of the token list-column for multi-document data-frame
+#'   input (default `"tokens"`), or the word-token column to extract when `x` is
+#'   a `lexdiv_tokenization` or `lexdiv_tokenization_batch` object (defaults to
+#'   `"term"` when omitted).
+#' @param max_rows Maximum document-by-specification rows when `plan` is
+#'   supplied for multi-document input.
+#'
+#' @return For a single document, a `lexdiv_results` data frame (or
+#'   `lexdiv_profile_results` with `plan`). For multiple documents, a long-form
+#'   `lexdiv_batch_results` data frame (or `lexdiv_profile_batch_results` with
+#'   `plan`) ordered by document and then requested metric. Invalid and empty
+#'   documents return structured rows rather than throwing; structural API
+#'   errors still throw. Read `status` and `missing_reason` before interpreting
+#'   `value`.
+#' @export
+lexdiv_metrics <- function(
+    x,
+    metrics = setdiff(lexdiv_metric_ids(), c("expected_ttr_d", "mtld_ma")),
+    segment_length = 50L,
+    window_length = 50L,
+    mtld_threshold = 0.72,
+    sample_size = 42L,
+    expected_ttr_sample_sizes = 35:50,
+    plan = NULL,
+    id_col = "document_id",
+    term_col = "tokens",
+    max_rows = 1e6) {
+  metrics_supplied <- !missing(metrics)
+  segment_supplied <- !missing(segment_length)
+  window_supplied <- !missing(window_length)
+  mtld_supplied <- !missing(mtld_threshold)
+  sample_supplied <- !missing(sample_size)
+  expected_supplied <- !missing(expected_ttr_sample_sizes)
+  any_metric_arg <- metrics_supplied || segment_supplied || window_supplied ||
+    mtld_supplied || sample_supplied || expected_supplied
+
+  if (inherits(x, "lexdiv_tokenization")) {
+    if (!missing(id_col) || !missing(max_rows)) {
+      stop("id_col and max_rows apply only to multi-document inputs.", call. = FALSE)
+    }
+    tok_col <- if (missing(term_col)) "surface" else .lex_batch_scalar_name(term_col, "term_col")
+    tokens <- .lexdiv_extract_tokenization_terms(x, tok_col)
+    return(.lexdiv_metrics_single(
+      tokens = tokens,
+      metrics = metrics,
+      segment_length = segment_length,
+      window_length = window_length,
+      mtld_threshold = mtld_threshold,
+      sample_size = sample_size,
+      expected_ttr_sample_sizes = expected_ttr_sample_sizes,
+      plan = plan,
+      metrics_supplied = metrics_supplied,
+      segment_supplied = segment_supplied,
+      window_supplied = window_supplied,
+      mtld_supplied = mtld_supplied,
+      sample_supplied = sample_supplied,
+      expected_supplied = expected_supplied
+    ))
+  }
+
+  if (.lex_is_tokenization_batch(x) || is.data.frame(x) || is.list(x)) {
+    batch_call <- list(
+      documents = x,
+      id_col = id_col,
+      term_col = if (.lex_is_tokenization_batch(x) && missing(term_col)) "surface" else term_col,
+      plan = plan
+    )
+    if (!missing(max_rows)) {
+      batch_call$max_rows <- max_rows
+    }
+    if (is.null(plan)) {
+      if (metrics_supplied) batch_call$metrics <- metrics
+      if (segment_supplied) batch_call$segment_length <- segment_length
+      if (window_supplied) batch_call$window_length <- window_length
+      if (mtld_supplied) batch_call$mtld_threshold <- mtld_threshold
+      if (sample_supplied) batch_call$sample_size <- sample_size
+      if (expected_supplied) batch_call$expected_ttr_sample_sizes <- expected_ttr_sample_sizes
+    } else if (any_metric_arg) {
+      stop("With plan, omit metrics and individual metric parameters.", call. = FALSE)
+    }
+    return(do.call(.lexdiv_metrics_batch, batch_call))
+  }
+
+  if (!missing(id_col) || !missing(term_col) || !missing(max_rows)) {
+    stop("id_col, term_col, and max_rows apply only to multi-document inputs.", call. = FALSE)
+  }
+
+  .lexdiv_metrics_single(
+    tokens = x,
+    metrics = metrics,
+    segment_length = segment_length,
+    window_length = window_length,
+    mtld_threshold = mtld_threshold,
+    sample_size = sample_size,
+    expected_ttr_sample_sizes = expected_ttr_sample_sizes,
+    plan = plan,
+    metrics_supplied = metrics_supplied,
+    segment_supplied = segment_supplied,
+    window_supplied = window_supplied,
+    mtld_supplied = mtld_supplied,
+    sample_supplied = sample_supplied,
+    expected_supplied = expected_supplied
+  )
 }

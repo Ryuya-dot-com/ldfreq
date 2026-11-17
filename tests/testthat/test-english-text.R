@@ -74,22 +74,22 @@ test_that("raw-text batches support plan execution and reject unsupported argume
   inputs <- list(stats::setNames(character(), character()), c(doc = "a a b"),
     stats::setNames(list(), character()), list(doc = lexdiv_tokenize("a a b")))
   for (input in inputs) {
-    planned <- lexdiv_metrics_text_batch(input, plan = plan)
+    planned <- lexdiv_metrics_text(input, plan = plan)
     expect_s3_class(planned$results, "lexdiv_profile_batch_results")
-    expect_error(lexdiv_metrics_text_batch(input, max_rows = 10), "max_rows requires")
-    expect_error(lexdiv_metrics_text_batch(input, tokens_col = "tokens"), "unused argument.*tokens_col")
+    expect_error(lexdiv_metrics_text(input, max_rows = 10), "max_rows requires")
+    expect_error(lexdiv_metrics_text(input, tokens_col = "tokens"), "unused argument.*tokens_col")
   }
 })
 
 test_that("Raw-text batch calls retain IDs, empty documents and complete results", {
   docs <- data.frame(id = c("second", "first", "empty"),
     essay = c("The cat can\u2019t run. 3.14", "Cat cat.", ""))
-  prepared <- lexdiv_tokenize_batch(docs, id_col = "id", text_col = "essay",
+  prepared <- lexdiv_tokenize(docs, id_col = "id", text_col = "essay",
     tokenizer = "english", case = "lower")
   expect_identical(names(prepared), docs$id)
-  direct <- lexdiv_metrics_text_batch(docs, id_col = "id", text_col = "essay",
+  direct <- lexdiv_metrics_text(docs, id_col = "id", text_col = "essay",
     tokenizer = "english", case = "lower", metrics = c("ttr", "mattr"), window_length = 3)
-  result <- lexdiv_metrics_text_batch(prepared, metrics = c("ttr", "mattr"), window_length = 3)
+  result <- lexdiv_metrics_text(prepared, metrics = c("ttr", "mattr"), window_length = 3)
   expect_identical(result, direct)
   expect_identical(names(result), c("results", "token_audit", "preprocessing"))
   expect_identical(names(result$preprocessing), docs$id)
@@ -98,7 +98,7 @@ test_that("Raw-text batch calls retain IDs, empty documents and complete results
   expect_identical(result$results$status, c("ok", "ok", "ok", "missing", "missing", "missing"))
   expect_identical(unique(result$token_audit$document_id), docs$id[1:2])
   if (lexdiv_resource_info("nj8")$available)
-    expect_identical(nj8_profile_batch(prepared, unit = "surface")$coverage$document_id, docs$id)
+    expect_identical(nj8_profile(prepared, unit = "surface")$coverage$document_id, docs$id)
   for (i in seq_along(prepared)) {
     single <- lexdiv_metrics_text(prepared[[i]], metrics = c("ttr", "mattr"), window_length = 3)
     expect_identical(result$preprocessing[[i]], single$preprocessing)
@@ -109,24 +109,24 @@ test_that("Raw-text batch calls retain IDs, empty documents and complete results
 })
 
 test_that("Batch input errors identify missing text and never invent document IDs", {
-  expect_error(lexdiv_tokenize_batch(c("text", "text")), "named character")
-  expect_error(lexdiv_tokenize_batch(c(a = "x", a = "y")), "unique")
-  expect_error(lexdiv_tokenize_batch(c(a = "x", bad = NA_character_)), 'Document "bad"')
-  expect_error(lexdiv_tokenize_batch(data.frame(document_id = "a", text = factor("text"))), "character")
-  expect_error(lexdiv_tokenize_batch(data.frame(document_id = "a", text = "text"), text_col = "document_id"), "different")
-  expect_error(lexdiv_metrics_text_batch(list(a = "text")), 'Document "a"')
-  prepared <- lexdiv_tokenize_batch(c(a = "text"))
-  expect_error(lexdiv_metrics_text_batch(prepared, case = "lower"), "raw text")
-  expect_error(lexdiv_metrics_text_batch(prepared, text_col = "text"), "data-frame")
-  expect_error(lexdiv_metrics_text_batch(prepared, unit = "lemma"), 'Document "a"')
+  expect_error(lexdiv_tokenize(c("text", "text")), "named character")
+  expect_error(lexdiv_tokenize(c(a = "x", a = "y")), "unique")
+  expect_error(lexdiv_tokenize(c(a = "x", bad = NA_character_)), 'Document "bad"')
+  expect_error(lexdiv_tokenize(data.frame(document_id = "a", text = factor("text"))), "character")
+  expect_error(lexdiv_tokenize(data.frame(document_id = "a", text = "text"), text_col = "document_id"), "different")
+  expect_error(lexdiv_metrics_text(list(a = "text")), 'Document "a"')
+  prepared <- lexdiv_tokenize(c(a = "text"))
+  expect_error(lexdiv_metrics_text(prepared, case = "lower"), "raw text")
+  expect_error(lexdiv_metrics_text(prepared, text_col = "text"), "data-frame")
+  expect_error(lexdiv_metrics_text(prepared, unit = "lemma"), 'Document "a"')
   empty <- stats::setNames(character(), character())
-  expect_identical(lexdiv_tokenize_batch(empty), stats::setNames(list(), character()))
-  result <- lexdiv_metrics_text_batch(empty, metrics = "ttr", tokenizer = "english")
+  expect_identical(lexdiv_tokenize(empty), stats::setNames(list(), character()))
+  result <- lexdiv_metrics_text(empty, metrics = "ttr", tokenizer = "english")
   expect_equal(nrow(result$results), 0)
   expect_equal(nrow(result$token_audit), 0)
   expect_length(result$preprocessing, 0)
-  expect_error(lexdiv_tokenize_batch(empty, tokenizer = "guess"), "tokenizer")
-  expect_error(lexdiv_metrics_text_batch(empty, metrics = "mattr", window_length = 0), "window_length")
+  expect_error(lexdiv_tokenize(empty, tokenizer = "guess"), "tokenizer")
+  expect_error(lexdiv_metrics_text(empty, metrics = "mattr", window_length = 0), "window_length")
 })
 
 test_that("Annotated English batches preserve exclusions and comparison boundaries", {
@@ -138,7 +138,7 @@ test_that("Annotated English batches preserve exclusions and comparison boundari
     upos_backend_id = "example-upos", upos_backend_version = "1"
   )
   english <- annotate("english")
-  result <- lexdiv_metrics_text_batch(list(a = english, b = english),
+  result <- lexdiv_metrics_text(list(a = english, b = english),
     unit = "lemma", word_inclusion = "content", metrics = c("ttr", "mattr"),
     window_length = 2)
   expect_equal(result$results$N, rep(2, 4))
@@ -167,6 +167,6 @@ test_that("English contract and batch schemas describe live outputs", {
   expect_identical(english$tokenizer_id, prepared$provenance$tokenizer_id)
   expect_identical(english$tokenizer_version, prepared$provenance$tokenizer_version)
   expect_identical(english$excluded_spans_columns, names(prepared$provenance$excluded_spans))
-  result <- lexdiv_metrics_text_batch(list(a = prepared), metrics = "ttr")
+  result <- lexdiv_metrics_text(list(a = prepared), metrics = "ttr")
   expect_identical(contract$result_boundary$raw_text_batch$metrics_return_components, names(result))
 })

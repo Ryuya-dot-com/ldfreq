@@ -13,9 +13,8 @@ tokenization, annotation, model download, or learner scoring is performed.
 tubelex_diagnostics(x, max_rows = 1e6)
 }
 \arguments{
-\item{x}{One unmodified \code{tubelex_profile()} result, a
-\code{tubelex_profile_batch()} result, or a plain named list of
-\code{tubelex_profile} objects.}
+\item{x}{One unmodified single-document or batch \code{tubelex_profile()}
+result, or a plain named list of \code{tubelex_profile} objects.}
 \item{max_rows}{Positive whole-number limit on total input lookup rows plus
 two summary rows per document, checked before constructing aggregate tables.}
 }
@@ -73,7 +72,7 @@ Keep the original profiles for occurrence positions and complete lookup values.
 \examples{
 # Optional data: review and explicitly download these resources first.
 if (all(lexdiv_resource_info(c("tubelex"))$available)) {
-profiles <- tubelex_profile_batch(list(
+profiles <- tubelex_profile(list(
   first = c("Apple", "apple", "zzunmatchedxyz"),
   second = c("the", "zzunmatchedxyz"), blank = character(),
   invalid = c("the", NA_character_)

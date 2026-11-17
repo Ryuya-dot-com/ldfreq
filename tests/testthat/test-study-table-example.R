@@ -50,7 +50,11 @@ test_that("joins use explicit IDs and preserve submitted results without recalcu
   joined <- e$helper$study_long_table(planned, e$submissions, e$results, e$plan, e$condition$id)
   expect_identical(joined$observation_id, rep(planned$observation_id, each = 2))
   expect_identical(joined$reporting_status, rep("not_screened", 216))
-  expect_equal(nrow(e$helper$study_model_data(joined, e$condition$id, "ttr")$data), 0)
+  expect_warning(
+    unscreened_mod <- e$helper$study_model_data(joined, e$condition$id, "ttr"),
+    "not_screened"
+  )
+  expect_equal(nrow(unscreened_mod$data), 0)
   sub <- e$submissions; sub$input_characters[1] <- NA_integer_
   joined <- e$helper$study_long_table(e$planned, sub, e$results, e$plan, e$condition$id)
   expect_identical(joined$input_status[3:4], rep("unknown", 2))
@@ -58,7 +62,7 @@ test_that("joins use explicit IDs and preserve submitted results without recalcu
 
 test_that("all unsubmitted and all missing studies keep a complete roster", {
   e <- study_example()
-  empty_results <- lexdiv_metrics_batch(setNames(list(), character()), plan = e$plan)
+  empty_results <- lexdiv_metrics(setNames(list(), character()), plan = e$plan)
   x <- e$helper$study_long_table(e$planned, e$submissions[FALSE, ], empty_results,
     e$plan, e$condition$id)
   expect_equal(nrow(x), 216)
@@ -74,7 +78,7 @@ test_that("all unsubmitted and all missing studies keep a complete roster", {
   tokens <- setNames(rep(list(character()), 107), e$submissions$document_id)
   sub <- e$submissions; sub$input_characters[] <- 0L
   x <- e$helper$study_long_table(e$planned, sub,
-    lexdiv_metrics_batch(tokens, plan = e$plan), e$plan, e$condition$id, e$reporting)
+    lexdiv_metrics(tokens, plan = e$plan), e$plan, e$condition$id, e$reporting)
   expect_true(all(is.na(x$value)))
   expect_equal(nrow(e$helper$study_model_data(x, e$condition$id, "ttr")$data), 0)
   zero <- e$helper$study_long_table(e$planned[FALSE, ], sub[FALSE, ], empty_results,
@@ -264,7 +268,7 @@ test_that("compound IDs cannot collide across document and request fields", {
     writer_id = c("01", "02"), task = c("a.b", "a"), occasion = c(0, 0))
   sub <- data.frame(observation_id = planned$observation_id,
     document_id = c("a.b", "a"), input_characters = c(5L, 7L))
-  result <- lexdiv_metrics_batch(list("a.b" = c("a", "b", "a"),
+  result <- lexdiv_metrics(list("a.b" = c("a", "b", "a"),
     a = c("a", "a", "a", "a")), plan = p)
   joined <- e$helper$study_long_table(planned, sub, result, p, "surface")
   expect_equal(joined$value, c(2/3, 1, 1/4, 1/2))

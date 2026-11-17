@@ -2,7 +2,7 @@ test_that("TUBELEX diagnostic tables preserve documents and conditional summarie
   skip_optional_resources(c("tubelex"))
   documents <- list(b = c("Apple", "apple", "zzunmatchedxyz", "zzunmatchedxyz"),
     a = c("the", "zzunmatchedxyz"), blank = character(), bad = c("the", NA_character_))
-  profiles <- tubelex_profile_batch(documents)
+  profiles <- tubelex_profile(documents)
   per_document <- profiles$profiles
   copy <- unserialize(serialize(profiles, NULL))
   report <- tubelex_diagnostics(profiles)

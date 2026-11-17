@@ -25,15 +25,15 @@ test_that("D remains accurate near saturation and agrees with hypergeometric tar
 
 test_that("widening cannot conceal different parameter or contract identities", {
   tokens <- c("a", "b", "a", "b")
-  a <- lexdiv_metrics_batch(list(a = tokens), metrics = "mattr", window_length = 2)
-  b <- lexdiv_metrics_batch(list(b = tokens), metrics = "mattr", window_length = 4)
+  a <- lexdiv_metrics(list(a = tokens), metrics = "mattr", window_length = 2)
+  b <- lexdiv_metrics(list(b = tokens), metrics = "mattr", window_length = 4)
   expect_error(lexdiv_widen(rbind(a, b)), "different measurement specifications")
   b$requested_parameters <- a$requested_parameters
   b$effective_parameters <- a$effective_parameters
   b$metric_contract_version <- "another-version"
   expect_error(lexdiv_widen(rbind(a, b)), "different measurement specifications")
 
-  mixed_domain <- lexdiv_metrics_batch(list(a = tokens, b = "a"),
+  mixed_domain <- lexdiv_metrics(list(a = tokens, b = "a"),
     metrics = "mattr", window_length = 2)
   wide <- lexdiv_widen(mixed_domain)
   expect_equal(wide$mattr__value, c(1, NA_real_))
@@ -45,8 +45,8 @@ test_that("widening cannot conceal different parameter or contract identities", 
     list(window_length = 2), request_id = "mattr"))
   p4 <- lexdiv_plan(presets = character(), specs = lexdiv_spec(method,
     list(window_length = 4), request_id = "mattr"))
-  combined <- rbind(lexdiv_metrics_batch(list(a = tokens), plan = p2),
-    lexdiv_metrics_batch(list(b = tokens), plan = p4))
+  combined <- rbind(lexdiv_metrics(list(a = tokens), plan = p2),
+    lexdiv_metrics(list(b = tokens), plan = p4))
   expect_error(lexdiv_widen(combined), "different measurement specifications")
   expect_equal(ncol(lexdiv_widen(combined, names_from = "specification_id",
     values_from = "value")), 3L)
@@ -56,7 +56,7 @@ test_that("metric plots require one specification and retain its identity", {
   method <- lexdiv_methods()$method_id[lexdiv_methods()$metric_id == "mattr"]
   plan <- lexdiv_plan(presets = character(), grids = lexdiv_grid(
     method, "window_length", c(2, 4), request_id_prefix = "window"))
-  x <- lexdiv_metrics_batch(list(essay = c("a", "b", "a", "b")), plan = plan)
+  x <- lexdiv_metrics(list(essay = c("a", "b", "a", "b")), plan = plan)
   path <- tempfile(fileext = ".pdf")
   grDevices::pdf(path)
   on.exit({grDevices::dev.off(); unlink(path)}, add = TRUE)

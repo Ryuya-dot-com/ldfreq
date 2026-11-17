@@ -13,7 +13,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 
 This guide takes a small English document table through analysis, reading
 results, making a table and plot, and saving and reopening the complete record.
-The first workflow uses the [documented installation](https://ryuya-dot-com.github.io/ldfreq/index.html#install)
+The first workflow uses the [documented installation](https://ryuya-dot-com.github.io/ldfreq/#installation)
 and requires no optional package, model or download. Run the examples in order through
 **Save and resume**; the later sections cover optional analysis choices.
 
@@ -30,7 +30,7 @@ texts <- data.frame(
   document_id = c("essay_a", "essay_b", "empty"),
   text = c("Cats chase cats and dogs.", "The reader reads a story.", "")
 )
-analysis <- lexdiv_metrics_text_batch(texts, metrics = "ttr")
+analysis <- lexdiv_metrics_text(texts, metrics = "ttr")
 analysis$results
 ```
 
@@ -83,7 +83,7 @@ unknown metric IDs stop the call rather than producing score rows.
 For example, neither five-word sentence has a complete 50-token MATTR window:
 
 ```{r short-window-result}
-short_window <- lexdiv_metrics_text_batch(
+short_window <- lexdiv_metrics_text(
   texts, tokenizer = "english", normalization = "NFC",
   case = "lower", metrics = "mattr", window_length = 50
 )
@@ -187,14 +187,14 @@ writer knows. See [comparison design](designing-comparisons.html) and the
 | Starting material or next task | Continue here |
 | --- | --- |
 | One TXT file, a folder, or a CSV containing texts | [File input](english-tokenization.html#import-text-files), with supplied samples and path substitutions |
-| Different ID/text column names | `?lexdiv_metrics_text_batch`: use `id_col` and `text_col`; IDs must be unique character values |
+| Different ID/text column names | `?lexdiv_metrics_text`: use `id_col` and `text_col`; IDs must be unique character values |
 | Writer, task or occasion information | [Retain study metadata](english-tokenization.html#retain-study-metadata) with `metadata = study`; match every document by ID, including empty documents |
 | Prepared tokens or a one-token-per-row table | [Multiple documents](#multiple-documents); the core does not tokenize whole sentences |
 | Japanese text and morphological annotations | [Japanese annotations](japanese-annotations.html); imported annotation tables have their own workflow |
 | Saved results, condition comparisons and methods text | [From text to a report](from-text-to-report.html) |
 
 Your first analysis is complete. Choose your next route from the
-[research-question map](https://ryuya-dot-com.github.io/ldfreq/index.html#choose-a-research-question), or the
+[research-question map](https://ryuya-dot-com.github.io/ldfreq/#choose-your-workflow), or the
 [API connection map](from-text-to-report.html#connect-the-analysis-steps). Both connect required
 inputs to the result tables and source records you should inspect. In particular,
 reference-frequency profiles describe document words; keyness compares corpora,
@@ -414,7 +414,7 @@ lexical sophistication.
 Passing a `lexdiv_tokenization` object requires
 `tokenization_mismatch = "allow"` for an explicit sensitivity analysis.
 High coverage alone cannot validate segmentation. For multiple documents,
-`tubelex_profile_batch()` returns a structured `tubelex_profile_batch` object
+When given multiple documents, `tubelex_profile()` returns a structured `tubelex_profile_batch` object
 (`$summary`, `$lookup`, `$coverage`, and `$profiles`) while
 loading one verified resource snapshot per call. See
 [designing comparisons guide](designing-comparisons.html) for a worked design.
@@ -463,7 +463,7 @@ documents <- list(
   document_b = c("alpha", "beta", "gamma", "delta")
 )
 
-lexdiv_metrics_batch(documents, metrics = c("ttr", "hdd"))
+lexdiv_metrics(documents, metrics = c("ttr", "hdd"))
 ```
 
 To compare the same documents with one explicit reference vocabulary, use the
@@ -497,7 +497,7 @@ tidy_tokens <- data.frame(
   token = c("one", "two", "three", "three")
 )
 tidy_documents <- lexdiv_as_documents(tidy_tokens)
-tidy_long <- lexdiv_metrics_batch(
+tidy_long <- lexdiv_metrics(
   tidy_documents,
   metrics = c("ttr", "maas")
 )
@@ -537,7 +537,7 @@ screen <- lexdiv_screen_lengths(profile)
 head(screen)
 
 # The same plan can be applied to named documents, including an empty document.
-planned_batch <- lexdiv_metrics_batch(
+planned_batch <- lexdiv_metrics(
   list(document_a = tokens, empty = character()), plan = plan
 )
 head(planned_batch[, c("document_id", "request_id", "value", "missing_reason")])

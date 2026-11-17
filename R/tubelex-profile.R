@@ -213,42 +213,61 @@
   )
 }
 
-#' Compute a coverage-aware TUBELEX frequency profile
+#' Compute a coverage-aware TUBELEX frequency profile for one or more documents
 #'
 #' Looks up token or type frequency, video prevalence, and channel prevalence
-#' in the byte-pinned TUBELEX-EN Treebank aggregate downloaded separately for `ldfreq`.
-#' Token- and type-weighted summaries are calculated from matched terms only;
-#' coverage is returned beside those conditional means. Unmatched terms remain
-#' missing and are never converted to artificial zero-frequency observations.
+#' in the byte-pinned TUBELEX-EN Treebank aggregate downloaded separately for
+#' `ldfreq`, for a single document or a multi-document collection. Token- and
+#' type-weighted summaries are calculated from matched terms only; coverage is
+#' returned beside those conditional means. Unmatched terms remain missing and
+#' are never converted to artificial zero-frequency observations.
 #'
-#' The lookup table retains raw token, video, and channel counts. Derived
-#' values are base-10 log scores: `zipf` is a smoothed per-billion token score,
-#' while video and channel prevalence are smoothed log proportions and can
-#' therefore be negative. Exact formulas and denominators are returned in
-#' provenance and in the installed lexical-resource lookup contract.
-#'
-#' @param terms A character vector of source-prepared ordered terms, or an object returned
-#'   by [lexdiv_tokenize()] with explicit mismatch opt-in. Order and duplicates are retained in the lookup
-#'   table. Each character-vector element is one complete lookup term; a single
-#'   string containing whitespace triggers a warning because it may be raw
-#'   prose. General word segmentation is not the resource's Treebank segmentation.
+#' @param x For a single document, a character vector of source-prepared ordered
+#'   terms, or a `lexdiv_tokenization` object with explicit mismatch opt-in. For
+#'   multiple documents, a plain named list, a `lexdiv_tokenization_batch`
+#'   object, or a data frame with the columns selected by `id_col` and
+#'   `term_col`.
 #' @param normalization `"tubelex"` applies the documented NFKC, trim, and
 #'   locale-fixed English lowercase query transform. `"identity"` performs an
-#'   exact case- and normalization-sensitive lookup. The selected transform is
-#'   recorded in provenance. `"tubelex_apostrophe"` additionally converts internal
-#'   typographic apostrophes and clitic starts, without splitting contractions.
+#'   exact case- and normalization-sensitive lookup. `"tubelex_apostrophe"`
+#'   additionally converts internal typographic apostrophes and clitic starts,
+#'   without splitting contractions.
 #' @param tokenization_mismatch `"error"` rejects general tokenization objects;
-#'   `"allow"` records their explicit use for segmentation sensitivity. Character
-#'   vectors remain caller-prepared terms whose segmentation is not verified.
+#'   `"allow"` records their explicit use for segmentation sensitivity.
+#' @param id_col,term_col Column names for multi-document data-frame input.
+#' @param max_rows Maximum combined lookup and summary rows across documents for
+#'   multi-document input.
+#' @param cache_dir Optional directory containing verified downloaded resources;
+#'   defaults to the configured or user resource cache.
 #'
-#' @return A `tubelex_profile` list containing matched-only token- and
-#'   type-weighted summaries, the lossless lookup table, token/type coverage,
-#'   resource and formula provenance, and diagnostics.
+#' @return For a single document, a `tubelex_profile` object. For multiple
+#'   documents, a `tubelex_profile_batch` object containing document-major
+#'   `summary`, `lookup`, and `coverage` tables, `profiles`, `provenance`, and
+#'   `diagnostics`.
 #' @export
 tubelex_profile <- function(
-    terms,
+    x,
     normalization = "tubelex",
-    tokenization_mismatch = "error") {
+    tokenization_mismatch = "error",
+    id_col = "document_id",
+    term_col = "terms",
+    max_rows = 1e6,
+    cache_dir = NULL) {
+  if (!.lexprep_is_tokenization(x) &&
+      (inherits(x, "lexdiv_tokenization_batch") || is.data.frame(x) || is.list(x))) {
+    return(.tubelex_profile_batch(
+      documents = x,
+      normalization = normalization,
+      tokenization_mismatch = tokenization_mismatch,
+      id_col = id_col,
+      term_col = term_col,
+      max_rows = max_rows,
+      cache_dir = cache_dir
+    ))
+  }
+  if (!missing(id_col) || !missing(term_col) || !missing(max_rows)) {
+    stop("id_col, term_col, and max_rows apply only to multi-document inputs.", call. = FALSE)
+  }
   normalization <- .lexprep_scalar_choice(
     normalization,
     names(.tubelex_normalization_ids),
@@ -257,32 +276,27 @@ tubelex_profile <- function(
   tokenization_mismatch <- .lexprep_scalar_choice(
     tokenization_mismatch, c("error", "allow"), "tokenization_mismatch"
   )
+  loader <- if (is.null(cache_dir)) {
+    .lexres_load_tubelex
+  } else {
+    function() .lexres_load_tubelex(cache_dir = cache_dir)
+  }
   .tubelex_profile(
-    terms = terms,
+    terms = x,
     normalization = normalization,
-    loader = .lexres_load_tubelex,
+    loader = loader,
     tokenization_mismatch = tokenization_mismatch
   )
 }
 
-#' Profile several documents with one validated TUBELEX resource load
-#'
-#' @param documents An explicitly named list, or an ID/list-column data frame or tibble.
-#' @inheritParams tubelex_profile
-#' @param id_col,terms_col Column names for data-frame input.
-#' @param max_rows Maximum combined lookup and summary rows across documents.
-#' @return A `tubelex_profile_batch` S3 object containing document-major
-#'   `summary`, `lookup`, and `coverage` tables, `profiles` (the input-ordered
-#'   named list of per-document `tubelex_profile` objects), `provenance`, and
-#'   `diagnostics`.
-#' @export
-tubelex_profile_batch <- function(
+.tubelex_profile_batch <- function(
     documents,
     normalization = "tubelex",
     tokenization_mismatch = "error",
     id_col = "document_id",
-    terms_col = "terms",
-    max_rows = 1e6) {
+    term_col = "terms",
+    max_rows = 1e6,
+    cache_dir = NULL) {
   normalization <- .lexprep_scalar_choice(
     normalization, names(.tubelex_normalization_ids), "normalization"
   )
@@ -290,12 +304,12 @@ tubelex_profile_batch <- function(
     tokenization_mismatch, c("error", "allow"), "tokenization_mismatch"
   )
   id_col <- .lex_batch_scalar_name(id_col, "id_col")
-  terms_col <- .lex_batch_scalar_name(terms_col, "terms_col")
-  if (identical(id_col, terms_col)) {
-    stop("id_col and terms_col must select different columns.", call. = FALSE)
+  term_col <- .lex_batch_scalar_name(term_col, "term_col")
+  if (!inherits(documents, "lexdiv_tokenization_batch") && identical(id_col, term_col)) {
+    stop("id_col and term_col must select different columns.", call. = FALSE)
   }
   max_rows <- .profile_positive_integer(max_rows, "max_rows")
-  batch <- .lex_batch_documents(documents, id_col, terms_col)
+  batch <- .lex_batch_documents(documents, id_col, term_col, extract_tokenization = FALSE)
   # Fail on known tokenizer mismatches and row limits before touching resources.
   inputs <- lapply(batch$tokens, .tubelex_profile_terms,
     tokenization_mismatch = tokenization_mismatch)
@@ -307,7 +321,7 @@ tubelex_profile_batch <- function(
   }
   loaded <- NULL
   loader <- function() {
-    if (is.null(loaded)) loaded <<- .lexres_load_tubelex()
+    if (is.null(loaded)) loaded <<- .lexres_load_tubelex(cache_dir = cache_dir)
     loaded
   }
   profiles <- lapply(batch$tokens, .tubelex_profile,

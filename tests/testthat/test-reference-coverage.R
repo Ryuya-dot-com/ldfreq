@@ -66,7 +66,7 @@ test_that("named-list and explicit data-frame inputs are identical", {
     frame,
     c("a", "b"),
     id_col = "id",
-    terms_col = "units"
+    term_col = "units"
   )
   expect_identical(from_frame, from_list)
 })
@@ -223,7 +223,7 @@ test_that("structural requests and identifiers fail closed", {
       data.frame(document_id = "a"),
       "a",
       id_col = "document_id",
-      terms_col = "document_id"
+      term_col = "document_id"
     ),
     "different columns"
   )

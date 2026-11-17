@@ -92,7 +92,7 @@ test_that("malformed token tables fail without sorting or guessing", {
   expect_error(ngram_extract(y), "plain")
   expect_error(ngram_extract(documents = "r1"), "include every")
   expect_error(ngram_extract(documents = c("r1", "r2", "r1")), "unique")
-  for (n in list(integer(), c(2, 2), 1, 4, NA, "2")) expect_error(ngram_extract(n = n))
+  for (n in list(integer(), c(2, 2), 1, 13, NA, "2")) expect_error(ngram_extract(n = n))
   expect_error(ngram_extract(id_col = c("a", "b")))
   expect_error(ngram_extract(position_col = "document_id"), "distinct")
   expect_error(lexdiv_ngrams(x, ""), "empty")

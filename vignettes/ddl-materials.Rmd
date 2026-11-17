@@ -22,7 +22,7 @@ An R user prepares the search and runs the input/output steps; a teacher can
 edit the selection and activity tables.
 
 For package setup, see the
-[installation instructions](https://ryuya-dot-com.github.io/ldfreq/index.html#install).
+[installation instructions](https://ryuya-dot-com.github.io/ldfreq/#installation).
 `ddl_material()` and `ddl_material_write()` are installed examples to source
 explicitly, not exported functions. Construction revalidates the existing
 phrase review and requires optional **quanteda >= 4.5.0**. Japanese input also

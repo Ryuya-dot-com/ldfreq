@@ -21,19 +21,26 @@ tryCatch({
     if (!dir.exists(input)) stop("Input must be a directory.")
     if (file.exists(output)) stop("Output already exists: ", output)
     if (!dir.exists(dirname(output))) stop("Output parent directory does not exist.")
-    paths <- sort(list.files(input, pattern = "[.]txt$", recursive = recursive,
-      ignore.case = TRUE, full.names = FALSE), method = "radix")
+    paths <- list.files(input, pattern = "[.]txt$", recursive = recursive,
+      ignore.case = TRUE, full.names = FALSE)
     paths <- paths[!dir.exists(file.path(input, paths))]
+    doc_ids <- gsub("\\\\", "/", paths)
+    ord <- order(doc_ids, method = "radix")
+    paths <- paths[ord]
+    doc_ids <- doc_ids[ord]
     if (!length(paths)) stop("No .txt files found.")
-    texts <- vapply(paths, function(path) {
+    texts <- stats::setNames(vapply(paths, function(path) {
       file <- file.path(input, path)
       bytes <- readBin(file, "raw", n = file.info(file)$size)
       if (any(bytes == as.raw(0))) stop("NUL byte in input: ", path)
+      if (length(bytes) >= 3L && identical(bytes[1:3], as.raw(c(0xef, 0xbb, 0xbf)))) {
+        bytes <- bytes[-(1:3)]
+      }
       text <- rawToChar(bytes)
       if (!validUTF8(text)) stop("Input is not UTF-8: ", path)
       Encoding(text) <- "UTF-8"
       text
-    }, character(1))
+    }, character(1), USE.NAMES = FALSE), doc_ids)
     record <- lexdiv_run_recipe(texts, lexdiv_read(opts[["--recipe"]]))
     stage <- tempfile("ldfreq-output-", tmpdir = dirname(output))
     if (!dir.create(stage)) stop("Cannot create output staging directory.")

@@ -115,11 +115,11 @@
   bytes
 }
 
-.nj8_read_wordlist <- function(wordlist, sheet) {
+.nj8_read_wordlist <- function(wordlist, sheet, cache_dir = NULL) {
   cached <- is.null(wordlist)
   if (cached) {
-    wordlist <- .lex_resource_file("nj8", "extdata", "nj8", "2016", "NJ8.csv")
-    manifest_path <- .lex_resource_file("nj8", "extdata", "nj8", "2016", "resource.manifest.dcf")
+    wordlist <- .lex_resource_file("nj8", "extdata", "nj8", "2016", "NJ8.csv", cache_dir = cache_dir)
+    manifest_path <- .lex_resource_file("nj8", "extdata", "nj8", "2016", "resource.manifest.dcf", cache_dir = cache_dir)
     manifest <- read.dcf(manifest_path)
     if (nrow(manifest) != 1L ||
         !all(c("Resource-ID", "Resource-Version", "Artifact-SHA256", "Citation") %in% colnames(manifest)) ||
@@ -144,29 +144,37 @@
     if (cached && !identical(source_sha256, unname(manifest[1L, "Artifact-SHA256"]))) {
       stop("The cached New JACET 8000 checksum does not match; download a fresh verified nj8 cache.", call. = FALSE)
     }
+    csv_cache_key <- paste0("nj8_table:", source_sha256)
     extension <- tolower(tools::file_ext(path))
     if (identical(extension, "csv")) {
-      csv_text <- rawToChar(bytes)
-      Encoding(csv_text) <- "UTF-8"
-      table <- tryCatch(
-        suppressWarnings(
-          utils::read.csv(
-            text = sub("^\ufeff", "", csv_text),
-            stringsAsFactors = FALSE,
-            check.names = FALSE,
-            na.strings = character()
-          )
-        ),
-        error = function(error) {
-          stop(
-            sprintf(
-              "wordlist CSV file '%s' could not be read.",
-              basename(path)
-            ),
-            call. = FALSE
-          )
+      if (exists(csv_cache_key, envir = .lex_resource_session_cache, inherits = FALSE)) {
+        table <- get(csv_cache_key, envir = .lex_resource_session_cache, inherits = FALSE)
+      } else {
+        csv_text <- rawToChar(bytes)
+        Encoding(csv_text) <- "UTF-8"
+        table <- tryCatch(
+          suppressWarnings(
+            utils::read.csv(
+              text = sub("^\ufeff", "", csv_text),
+              stringsAsFactors = FALSE,
+              check.names = FALSE,
+              na.strings = character()
+            )
+          ),
+          error = function(error) {
+            stop(
+              sprintf(
+                "wordlist CSV file '%s' could not be read.",
+                basename(path)
+              ),
+              call. = FALSE
+            )
+          }
+        )
+        if (cached) {
+          assign(csv_cache_key, table, envir = .lex_resource_session_cache)
         }
-      )
+      }
       source_type <- if (cached) "cached_csv" else "local_csv"
       source_sheet <- NA_character_
     } else if (identical(extension, "xlsx")) {
@@ -256,17 +264,47 @@
 
 .nj8_aliases <- function(word, expand_parenthetical) {
   if (!expand_parenthetical) return(word)
-  matched <- stringi::stri_match_first_regex(
+  split_slashes <- function(items) {
+    pieces <- unlist(
+      stringi::stri_split_fixed(items, "/", omit_empty = TRUE),
+      use.names = FALSE
+    )
+    pieces <- stringi::stri_trim_both(pieces)
+    unique(pieces[nzchar(pieces)])
+  }
+
+  # Spaced parenthetical alias list: e.g. "mom (mum, mummy)", "airplane (aeroplane)"
+  spaced <- stringi::stri_match_first_regex(
     word,
-    "^\\s*(.+?)\\s*\\(([^()]*)\\)\\s*$"
+    "^\\s*([^()]+?)\\s+\\(([^()]*)\\)\\s*$"
   )
-  if (is.na(matched[[1L, 1L]])) return(word)
-  variants <- stringi::stri_split_fixed(
-    matched[[1L, 3L]],
-    ",",
-    omit_empty = TRUE
-  )[[1L]]
-  c(matched[[1L, 2L]], stringi::stri_trim_both(variants))
+  if (!is.na(spaced[[1L, 1L]])) {
+    variants <- stringi::stri_split_fixed(
+      spaced[[1L, 3L]],
+      ",",
+      omit_empty = TRUE
+    )[[1L]]
+    return(split_slashes(c(spaced[[1L, 2L]], variants)))
+  }
+
+  # Unspaced optional letters/suffixes inside a word:
+  # e.g. "program(me)" -> c("program", "programme"),
+  #      "analytic(s)" -> c("analytic", "analytics"),
+  #      "colo(u)r" -> c("color", "colour")
+  inline <- stringi::stri_match_first_regex(
+    word,
+    "^\\s*([^()\\s]+)\\(([^()\\s]+)\\)([^()\\s]*)\\s*$"
+  )
+  if (!is.na(inline[[1L, 1L]])) {
+    without_opt <- paste0(inline[[1L, 2L]], inline[[1L, 4L]])
+    with_opt <- paste0(inline[[1L, 2L]], inline[[1L, 3L]], inline[[1L, 4L]])
+    return(split_slashes(c(without_opt, with_opt)))
+  }
+
+  if (grepl("/", word, fixed = TRUE)) {
+    return(split_slashes(word))
+  }
+  word
 }
 
 .nj8_missing_rank_examples <- function(ranks, limit = 20L) {
@@ -284,8 +322,18 @@
     word_column,
     sheet,
     normalization,
-    expand_parenthetical) {
-  source <- .nj8_read_wordlist(wordlist, sheet)
+    expand_parenthetical,
+    cache_dir = NULL) {
+  source <- .nj8_read_wordlist(wordlist, sheet, cache_dir = cache_dir)
+  prep_key <- if (identical(source$source_type, "cached_csv") &&
+      is.null(rank_column) && is.null(word_column)) {
+    paste0("nj8_prep:", source$source_sha256, ":", normalization, ":", expand_parenthetical)
+  } else {
+    NULL
+  }
+  if (!is.null(prep_key) && exists(prep_key, envir = .lex_resource_session_cache, inherits = FALSE)) {
+    return(get(prep_key, envir = .lex_resource_session_cache, inherits = FALSE))
+  }
   rank_column <- .nj8_wordlist_column(
     source$table,
     rank_column,
@@ -346,7 +394,7 @@
     serialize = FALSE
   )
   missing <- .nj8_missing_rank_examples(ranks)
-  list(
+  prepared_out <- list(
     aliases = alias_table,
     source = source,
     diagnostics = list(
@@ -364,6 +412,10 @@
       canonical_sha256 = canonical_sha256
     )
   )
+  if (!is.null(prep_key)) {
+    assign(prep_key, prepared_out, envir = .lex_resource_session_cache)
+  }
+  prepared_out
 }
 
 .level_profile_summary_one <- function(level, matched, weighting) {
@@ -693,20 +745,20 @@
   output
 }
 
-#' Profile lexical coverage by New JACET 8000 frequency level
+#' Profile lexical coverage by New JACET 8000 frequency level for one or more documents
 #'
 #' Creates token- and type-weighted exact and cumulative lexical profiles from
-#' the cached New JACET 8000 table, or an explicit caller-supplied copy.
-#' The table is redistributed with permission from JACET and source attribution.
-#' No list is downloaded or copied in full into the returned object.
-#' Ranks 1--8000 are mapped to eight 1,000-rank levels. Off-list items retain a
-#' separate denominator-visible row rather than being discarded.
+#' the cached New JACET 8000 table, or an explicit caller-supplied copy, for a
+#' single document or a multi-document collection. Ranks 1--8000 are mapped to
+#' eight 1,000-rank levels. Off-list items retain a separate denominator-visible
+#' row rather than being discarded. For multi-document inputs, the word list is
+#' read, validated, normalized, and hashed once for the whole batch.
 #'
-#' @param terms A plain character vector of ordered lexical units, or an object
-#'   returned by [lexdiv_tokenize()]. For an annotated tokenization, `unit` may
-#'   select lemmas or flemmas. Each character-vector element is one complete
-#'   lexical unit; a single value containing whitespace triggers a warning
-#'   because it may be raw prose.
+#' @param x For a single document, a plain character vector of ordered lexical
+#'   units or a `lexdiv_tokenization` object. For multiple documents, a plain
+#'   named list of character vectors or tokenization objects, a
+#'   `lexdiv_tokenization_batch` object, or a data frame with the columns
+#'   selected by `id_col` and `term_col`.
 #' @param wordlist `NULL` uses the cached, versioned New JACET 8000 table.
 #'   Alternatively, a data frame containing ranks and entries, or the path to
 #'   a local XLSX or CSV file. No resource is downloaded.
@@ -726,21 +778,27 @@
 #' @param normalization `"nfkc_lower"` applies NFKC, trimming, and
 #'   locale-fixed English lowercasing to both queries and list entries;
 #'   `"identity"` performs an exact lookup.
-#' @param expand_parenthetical Whether an entry such as `"mom (mum, mummy)"`
-#'   contributes its parenthetical comma-separated aliases at the same rank.
+#' @param expand_parenthetical Whether an entry such as `"mom (mum, mummy)"` or
+#'   `"program(me)"` contributes its parenthetical variants at the same rank.
 #' @param resource_version Optional version label for an external table. If
 #'   `NULL`, its canonical rank-entry SHA-256 supplies the label. The cached
 #'   table has a fixed version and cannot be relabelled.
+#' @param id_col Name of the explicit document-ID column for multi-document
+#'   data-frame input.
+#' @param term_col Name of the list-column containing character vectors or
+#'   tokenization objects for multi-document data-frame input.
+#' @param max_rows Maximum combined number of summary and token-lookup rows for
+#'   multi-document input.
+#' @param cache_dir Optional directory containing verified downloaded resources;
+#'   defaults to the configured or user resource cache.
 #'
-#' @return A `nj8_profile` object containing `summary`, lossless query
-#'   `lookup`, token/type `coverage`, resource provenance, and validation
-#'   diagnostics. `summary$proportion` uses all eligible items as its
-#'   denominator; `cumulative_proportion` is the rate at or below each level.
-#'   The installed `lexical-level-profile-contract.json` records the exact
-#'   denominator, normalization, conflict, and resource-boundary rules.
+#' @return For a single document, an `nj8_profile` object. For multiple
+#'   documents, an `nj8_profile_batch` object with document-major summary and
+#'   lookup tables, one coverage and diagnostic row per document, explicit
+#'   exclusions, and shared resource provenance.
 #' @export
 nj8_profile <- function(
-    terms,
+    x,
     wordlist = NULL,
     rank_column = NULL,
     word_column = NULL,
@@ -749,7 +807,33 @@ nj8_profile <- function(
     flemma_conflict = "antbnc",
     normalization = "nfkc_lower",
     expand_parenthetical = TRUE,
-    resource_version = NULL) {
+    resource_version = NULL,
+    id_col = "document_id",
+    term_col = "terms",
+    max_rows = 1e6,
+    cache_dir = NULL) {
+  if (!.lexprep_is_tokenization(x) &&
+      (inherits(x, "lexdiv_tokenization_batch") || is.data.frame(x) || is.list(x))) {
+    return(.nj8_profile_batch(
+      documents = x,
+      wordlist = wordlist,
+      rank_column = rank_column,
+      word_column = word_column,
+      sheet = sheet,
+      unit = unit,
+      flemma_conflict = flemma_conflict,
+      normalization = normalization,
+      expand_parenthetical = expand_parenthetical,
+      resource_version = resource_version,
+      id_col = id_col,
+      term_col = term_col,
+      max_rows = max_rows,
+      cache_dir = cache_dir
+    ))
+  }
+  if (!missing(id_col) || !missing(term_col) || !missing(max_rows)) {
+    stop("id_col, term_col, and max_rows apply only to multi-document inputs.", call. = FALSE)
+  }
   options <- .nj8_profile_options(
     unit,
     flemma_conflict,
@@ -758,39 +842,20 @@ nj8_profile <- function(
     sheet,
     resource_version
   )
-  input <- .level_profile_terms(terms, options$unit)
+  input <- .level_profile_terms(x, options$unit)
   prepared <- .nj8_prepare_wordlist(
     wordlist,
     rank_column,
     word_column,
     options$sheet,
     options$normalization,
-    options$expand_parenthetical
+    options$expand_parenthetical,
+    cache_dir = cache_dir
   )
   .nj8_profile_from_prepared(input, prepared, options)
 }
 
-#' Profile New JACET 8000 levels for multiple documents
-#'
-#' Applies the same lexical-level profile contract to a plain named list or an
-#' explicit ID/list-column data frame. The selected word list is read,
-#' validated, normalized, and hashed once for the whole batch.
-#'
-#' @inheritParams nj8_profile
-#' @param documents A plain named list of character vectors or tokenization
-#'   objects, or a data frame with the columns selected by `id_col` and
-#'   `terms_col`.
-#' @param id_col Name of the explicit document-ID column for data-frame input.
-#' @param terms_col Name of the list-column containing character vectors or
-#'   tokenization objects for data-frame input.
-#' @param max_rows Maximum combined number of summary and token-lookup rows.
-#'
-#' @return A `nj8_profile_batch` object with document-major summary
-#'   and lookup tables, one coverage and diagnostic row per document, explicit
-#'   exclusions, shared resource provenance, and document preprocessing
-#'   provenance.
-#' @export
-nj8_profile_batch <- function(
+.nj8_profile_batch <- function(
     documents,
     wordlist = NULL,
     rank_column = NULL,
@@ -802,12 +867,13 @@ nj8_profile_batch <- function(
     expand_parenthetical = TRUE,
     resource_version = NULL,
     id_col = "document_id",
-    terms_col = "terms",
-    max_rows = 1e6) {
+    term_col = "terms",
+    max_rows = 1e6,
+    cache_dir = NULL) {
   id_col <- .lex_batch_scalar_name(id_col, "id_col")
-  terms_col <- .lex_batch_scalar_name(terms_col, "terms_col")
-  if (identical(id_col, terms_col)) {
-    stop("id_col and terms_col must select different columns.", call. = FALSE)
+  term_col <- .lex_batch_scalar_name(term_col, "term_col")
+  if (!inherits(documents, "lexdiv_tokenization_batch") && identical(id_col, term_col)) {
+    stop("id_col and term_col must select different columns.", call. = FALSE)
   }
   max_rows <- .nj8_positive_integer(max_rows, "max_rows")
   options <- .nj8_profile_options(
@@ -818,7 +884,7 @@ nj8_profile_batch <- function(
     sheet,
     resource_version
   )
-  batch <- .lex_batch_documents(documents, id_col, terms_col)
+  batch <- .lex_batch_documents(documents, id_col, term_col, extract_tokenization = FALSE)
   # Validate every document and enforce the combined summary/lookup bound
   # before reading or transforming the external resource.
   inputs <- lapply(batch$tokens, .level_profile_terms, unit = options$unit)
@@ -840,7 +906,8 @@ nj8_profile_batch <- function(
     word_column,
     options$sheet,
     options$normalization,
-    options$expand_parenthetical
+    options$expand_parenthetical,
+    cache_dir = cache_dir
   )
   prototype <- .nj8_profile_from_prepared(
     .level_profile_terms(character(), options$unit),

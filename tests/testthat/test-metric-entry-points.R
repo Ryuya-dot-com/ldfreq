@@ -28,7 +28,7 @@ test_that("metric plans preserve complete results for every token state", {
                    lexdiv_metrics(c("a", "b"), metrics = "ttr", plan = NULL))
   for (argument in c("metrics", "segment_length", "window_length",
                      "mtld_threshold", "sample_size", "expected_ttr_sample_sizes")) {
-    arguments <- list(tokens = "a", plan = plan)
+    arguments <- list(x = "a", plan = plan)
     arguments[[argument]] <- eval(formals(lexdiv_metrics)[[argument]])
     expect_error(do.call(lexdiv_metrics, arguments), "With plan, omit")
   }
@@ -42,7 +42,7 @@ test_that("batch plans keep IDs, empty cases, classes and allocation limits", {
   plan <- lexdiv_plan("length_50_100")
   documents <- list(second = rep(c("a", "b"), 60), empty = character(),
                     invalid = c("a", NA_character_))
-  result <- lexdiv_metrics_batch(documents, plan = plan)
+  result <- lexdiv_metrics(documents, plan = plan)
   expect_s3_class(result, "lexdiv_profile_batch_results")
   expect_identical(unique(result$document_id), names(documents))
   expect_identical(result$missing_reason[result$document_id == "empty"],
@@ -52,26 +52,26 @@ test_that("batch plans keep IDs, empty cases, classes and allocation limits", {
 
   frame <- data.frame(id = names(documents))
   frame$words <- unname(documents)
-  expect_identical(lexdiv_metrics_batch(frame, "id", "words", plan = plan), result)
+  expect_identical(lexdiv_metrics(frame, id_col = "id", term_col = "words", plan = plan), result)
   expect_identical(
-    lexdiv_metrics_batch(frame, "id", "words", "ttr"),
-    lexdiv_metrics_batch(documents, metrics = "ttr", plan = NULL)
+    lexdiv_metrics(frame, metrics = "ttr", id_col = "id", term_col = "words"),
+    lexdiv_metrics(documents, metrics = "ttr", plan = NULL)
   )
   empty <- setNames(list(), character())
-  empty_res <- lexdiv_metrics_batch(empty, plan = plan)
+  empty_res <- lexdiv_metrics(empty, plan = plan)
   expect_s3_class(empty_res, "lexdiv_profile_batch_results")
   expect_identical(nrow(empty_res), 0L)
-  expect_identical(lexdiv_metrics_batch(frame[FALSE, ], "id", "words", plan = plan),
+  expect_identical(lexdiv_metrics(frame[FALSE, ], id_col = "id", term_col = "words", plan = plan),
                    empty_res)
-  expect_identical(lexdiv_metrics_batch(documents, plan = plan, max_rows = 39), result)
-  expect_error(lexdiv_metrics_batch(documents, plan = plan, max_rows = 38), "max_rows")
-  expect_error(lexdiv_metrics_batch(empty, plan = plan, max_rows = 0), "max_rows")
-  expect_error(lexdiv_metrics_batch(empty, plan = plan, metrics = "ttr"), "With plan, omit")
-  expect_error(lexdiv_metrics_batch(empty, "document_id", "tokens", "ttr", plan = plan),
+  expect_identical(lexdiv_metrics(documents, plan = plan, max_rows = 39), result)
+  expect_error(lexdiv_metrics(documents, plan = plan, max_rows = 38), "max_rows")
+  expect_error(lexdiv_metrics(empty, plan = plan, max_rows = 0), "max_rows")
+  expect_error(lexdiv_metrics(empty, plan = plan, metrics = "ttr"), "With plan, omit")
+  expect_error(lexdiv_metrics(empty, "ttr", id_col = "document_id", term_col = "tokens", plan = plan),
                "With plan, omit")
-  expect_error(lexdiv_metrics_batch(empty, plan = plan, window_length = 50), "With plan, omit")
-  expect_error(lexdiv_metrics_batch(empty, max_rows = 10), "requires a non-NULL plan")
-  expect_error(lexdiv_metrics_batch(list(a = "x", a = "y"), plan = plan), "unique")
+  expect_error(lexdiv_metrics(empty, plan = plan, window_length = 50), "With plan, omit")
+  expect_error(lexdiv_metrics(empty, max_rows = 10), "requires a non-NULL plan")
+  expect_error(lexdiv_metrics(list(a = "x", a = "y"), plan = plan), "unique")
 
   # Stored plans and full results continue to feed existing reporting methods.
   path <- tempfile(fileext = ".rds")
@@ -79,6 +79,6 @@ test_that("batch plans keep IDs, empty cases, classes and allocation limits", {
   saveRDS(list(plan = plan, result = result), path)
   restored <- readRDS(path)
   expect_identical(restored$result, result)
-  expect_identical(lexdiv_metrics_batch(documents, plan = restored$plan), result)
+  expect_identical(lexdiv_metrics(documents, plan = restored$plan), result)
   expect_identical(lexdiv_widen(restored$result), lexdiv_widen(result))
 })

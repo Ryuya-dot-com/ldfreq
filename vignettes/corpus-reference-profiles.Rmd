@@ -18,7 +18,7 @@ words in a collection of texts. The authors may be native speakers or language
 learners; the same computation applies. Its interpretation depends on the
 reference population, text sampling and word unit, not the author's L1 label.
 
-`lexdiv_norm_profile_batch()` applies one caller-supplied reference table to
+`lexdiv_norm_profile()` applies one caller-supplied reference table to
 multiple documents. It retains each document and each variable, rather than
 pooling all texts or combining different scales. This guide uses authored
 texts and numbers, not observed norms or a finding about register differences.
@@ -43,7 +43,7 @@ texts <- data.frame(
            "I read the book. I read it again.", "")
 )
 stopifnot(!anyNA(texts$document_id), !anyDuplicated(texts$document_id))
-prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english",
+prepared <- lexdiv_tokenize(texts, tokenizer = "english",
   normalization = "NFC", case = "lower")
 terms <- lapply(prepared, function(x) x$tokens$surface)
 ```
@@ -81,7 +81,7 @@ resource <- list(resource_id = "authored_norms", resource_version = "1",
   transformation_id = "none", lookup_unit = "lowercase_surface",
   resource_key_normalization_id = "caller-prepared-v1")
 
-profiles <- lexdiv_norm_profile_batch(terms, norms, "term", specs, resource)
+profiles <- lexdiv_norm_profile(terms, norms, "term", specs, resource)
 profiles$summary[, c("document_id", "measure_id", "weighting", "estimate",
   "value_unit", "status", "missing_reason")]
 ```
@@ -223,7 +223,7 @@ saveRDS(list(texts = texts, prepared = prepared, terms = terms,
   norms = norms, specs = specs, resource = resource, profiles = profiles,
   analysis = analysis, session = sessionInfo()), saved)
 restored <- readRDS(saved)
-replayed <- lexdiv_norm_profile_batch(restored$terms, restored$norms, "term",
+replayed <- lexdiv_norm_profile(restored$terms, restored$norms, "term",
   restored$specs, restored$resource)
 stopifnot(identical(replayed, restored$profiles),
   identical(restored$analysis, analysis))

@@ -47,9 +47,9 @@ submissions <- data.frame(observation_id = planned$observation_id[submitted_rows
   stringsAsFactors = FALSE, row.names = NULL)
 condition <- list(id = "english-surface-lower", tokenizer = "english",
   normalization = "NFC", case = "lower", keep_numbers = FALSE,
-  unit = "surface", inclusion = "all tokens returned by lexdiv_tokenize_batch",
+  unit = "surface", inclusion = "all tokens returned by lexdiv_tokenize",
   resources = "No external annotation model or lexical reference resource")
-prepared <- ldfreq::lexdiv_tokenize_batch(texts, tokenizer = condition$tokenizer,
+prepared <- ldfreq::lexdiv_tokenize(texts, tokenizer = condition$tokenizer,
   normalization = condition$normalization, case = condition$case,
   keep_numbers = condition$keep_numbers)
 tokens <- lapply(prepared, function(x) x$tokens$surface)
@@ -57,7 +57,7 @@ plan <- ldfreq::lexdiv_plan(presets = character(), specs = list(
   ldfreq::lexdiv_spec("ttr_v_over_n_v1", request_id = "ttr"),
   ldfreq::lexdiv_spec("mattr_sliding_step1_v1", list(window_length = 10),
     request_id = "mattr10")))
-results <- ldfreq::lexdiv_metrics_batch(tokens, plan = plan)
+results <- ldfreq::lexdiv_metrics(tokens, plan = plan)
 reporting <- as.data.frame(results)[c("document_id", "request_id")]
 reporting$reporting_status <- "report"
 reporting$reporting_reason <- "No additional reporting restriction in this illustration"

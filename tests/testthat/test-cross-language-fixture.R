@@ -31,7 +31,7 @@ test_that("the cross-language semantic fixture holds for the R API", {
       unlist(case$tokens, use.names = FALSE)
     }
     for (assertion in case$assertions) {
-      call <- list(tokens = tokens, metrics = assertion$metric_id)
+      call <- list(x = tokens, metrics = assertion$metric_id)
       if (!is.null(case$parameters$segment_length)) {
         call$segment_length <- as.integer(case$parameters$segment_length)
       }

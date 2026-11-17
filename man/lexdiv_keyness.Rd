@@ -11,8 +11,7 @@ to a source-aligned concordance without redefining the counted vocabulary.
 }
 \usage{
 lexdiv_keyness(x, target, reference, preprocessing_id = "default",
-    term_col = "surface", keep = rep(TRUE, nrow(x$tokens)), min_count = 1L,
-    max_tokens = 1e6)
+    term_col = NULL, keep = NULL, min_count = 1L, max_tokens = 1e6)
 lexdiv_keyness_concordance(x, term, window = 5L, max_cells = 1e6)
 }
 \arguments{
@@ -23,9 +22,13 @@ unchanged keyness result, including a legacy \code{keyness_compare()} record.}
 ID shared between the two corpora. Other documents remain explicitly excluded.}
 \item{preprocessing_id}{Nonblank caller label for the chosen preprocessing and
 selection policy. It does not execute preprocessing or prove comparability.}
-\item{term_col}{Character token column to count using exact UTF-8 keys.}
-\item{keep}{One nonmissing logical value per original token. Missing/blank
-selected terms are unavailable and retained in coverage accounting.}
+\item{term_col}{Character token column to count using exact UTF-8 keys. When
+\code{NULL}, defaults to \code{"term"} on bridged raw-text annotations and
+\code{"surface"} otherwise.}
+\item{keep}{One nonmissing logical value per original token. When \code{NULL},
+defaults to \code{x$tokens$is_word} when present and all tokens otherwise.
+Missing/blank selected terms are unavailable and retained in coverage
+accounting.}
 \item{min_count}{Positive whole pooled-count threshold, returned as a flag only.
 It does not change the vocabulary, background counts or denominator.}
 \item{max_tokens}{Positive whole-number bound on original input token rows.}

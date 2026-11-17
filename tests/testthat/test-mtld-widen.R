@@ -1,5 +1,5 @@
 test_that("optional MTLD columns expose support and directional sensitivity", {
-  x <- lexdiv_metrics_batch(list(
+  x <- lexdiv_metrics(list(
     asymmetric = c(letters[1:8], "a", "a"),
     tails = c(letters[1:8], "a", "b"), closed = rep("a", 50),
     unique = letters, empty = character(), invalid = NA_character_
@@ -63,7 +63,7 @@ test_that("MTLD diagnostics preserve specification and name guards", {
     lexdiv_spec(method, parameters = list(threshold = .72), request_id = "standard"),
     lexdiv_spec(method, parameters = list(threshold = .5), request_id = "lower")
   ))
-  x <- lexdiv_metrics_batch(list(a = rep(c("a", "b"), 25)), plan = plan)
+  x <- lexdiv_metrics(list(a = rep(c("a", "b"), 25)), plan = plan)
   wide <- lexdiv_widen(x, values_from = "value", mtld_diagnostics = TRUE)
   expect_equal(wide$standard__forward_complete_factors, 16)
   expect_equal(wide$lower__forward_complete_factors, 10)
@@ -88,7 +88,7 @@ test_that("MTLD diagnostics preserve specification and name guards", {
 })
 
 test_that("scalar diagnostic tables survive CSV and complete RDS round trips", {
-  x <- lexdiv_metrics_batch(list("001" = rep("a", 50), "002" = character()), metrics = "mtld")
+  x <- lexdiv_metrics(list("001" = rep("a", 50), "002" = character()), metrics = "mtld")
   wide <- lexdiv_widen(x, values_from = c("value", "status"), mtld_diagnostics = TRUE)
   path <- tempfile()
   on.exit(unlink(path))

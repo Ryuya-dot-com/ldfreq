@@ -13,9 +13,8 @@
 \description{
 Builds bounded, reproducible plans for computing multiple parameter settings of
 the versioned lexical-diversity methods. Execute a plan by passing
-\code{plan = plan} to \code{\link{lexdiv_metrics}},
-\code{\link{lexdiv_metrics_batch}}, \code{\link{lexdiv_metrics_text}}, or
-\code{\link{lexdiv_metrics_text_batch}}.
+\code{plan = plan} to \code{\link{lexdiv_metrics}} or
+\code{\link{lexdiv_metrics_text}}.
 }
 \usage{
 lexdiv_spec(method_id, parameters = list(), request_id = NULL)

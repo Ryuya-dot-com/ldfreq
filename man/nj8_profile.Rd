@@ -1,6 +1,5 @@
 \name{nj8_profile}
 \alias{nj8_profile}
-\alias{nj8_profile_batch}
 \alias{print.lexical_level_profile}
 \alias{print.nj8_profile_batch}
 \alias{plot.lexical_level_profile}
@@ -8,39 +7,28 @@
 \description{
 Reference snapshots require a prior explicit download; see \code{\link{lexdiv_download_resources}} for terms and cache setup.
 
-Creates exact and cumulative token- and type-weighted lexical profiles from a
-cached New JACET 8000 table or an explicit caller-supplied copy. The cached
-table is redistributed with permission from JACET and source attribution.
-No resource is downloaded at runtime.
+Creates exact and cumulative token- and type-weighted lexical profiles for one
+document or a multi-document corpus from a cached New JACET 8000 table or an
+explicit caller-supplied copy. The cached table is redistributed with
+permission from JACET and source attribution. No resource is downloaded at
+runtime.
 }
 \usage{
 nj8_profile(
-  terms,
+  x,
   wordlist = NULL,
   rank_column = NULL,
   word_column = NULL,
-  sheet = "\\u65b0J8",
-  unit = "lemma",
-  flemma_conflict = "antbnc",
-  normalization = "nfkc_lower",
-  expand_parenthetical = TRUE,
-  resource_version = NULL
-)
-
-nj8_profile_batch(
-  documents,
-  wordlist = NULL,
-  rank_column = NULL,
-  word_column = NULL,
-  sheet = "\\u65b0J8",
+  sheet = "\u65b0J8",
   unit = "lemma",
   flemma_conflict = "antbnc",
   normalization = "nfkc_lower",
   expand_parenthetical = TRUE,
   resource_version = NULL,
   id_col = "document_id",
-  terms_col = "terms",
-  max_rows = 1e+06
+  term_col = "terms",
+  max_rows = 1e+06,
+  cache_dir = NULL
 )
 
 \method{print}{lexical_level_profile}(x, ...)
@@ -64,24 +52,23 @@ nj8_profile_batch(
 )
 }
 \arguments{
-  \item{terms}{A plain character vector of ordered lexical units, or an object
-  returned by \code{lexdiv_tokenize()}. Each character-vector element is one
-  complete lexical unit; a single value containing whitespace triggers a
-  warning because it may be raw prose.}
-  \item{documents}{A plain named list of character vectors or tokenization
-  objects, or a data frame containing an explicit ID column and a list-column
-  of those inputs.}
+  \item{x}{For a single document, a plain character vector of ordered lexical
+  units or a \code{lexdiv_tokenization} object. For multiple documents, a plain
+  named list of character vectors or tokenizations, a
+  \code{lexdiv_tokenization_batch} object, or a data frame containing
+  \code{id_col} and \code{term_col}. For \code{print()} and \code{plot()}, a
+  profile result returned by \code{nj8_profile()}.}
   \item{wordlist}{\code{NULL} selects the cached, versioned table. Alternatively,
   a data frame containing New JACET 8000 ranks and entries, or
   a path to the official local XLSX file or a local CSV file. Direct XLSX input
   requires the suggested \pkg{readxl} package.}
   \item{rank_column, word_column}{Optional names of the rank and entry columns.
   \code{NULL} detects the official XLSX headers
-  \code{"\\u65b0J8\\u9806\\u4f4d"} and
-  \code{"\\u4ee3\\u8868\\u30ec\\u30de"}, or compatible CSV headers \code{"NJ8"} and
+  \code{"\u65b0J8\u9806\u4f4d"} and
+  \code{"\u4ee3\u8868\u30ec\u30de"}, or compatible CSV headers \code{"NJ8"} and
   \code{"Word"}.}
   \item{sheet}{XLSX sheet containing the list. The official workbook uses
-  \code{"\\u65b0J8"}. Ignored for data-frame and CSV input.}
+  \code{"\u65b0J8"}. Ignored for data-frame and CSV input.}
   \item{unit}{One of \code{"lemma"} (the default because the official table
   contains representative lemmas), \code{"surface"}, or \code{"flemma"}.
   For a plain character vector, this labels the units already selected by the
@@ -93,17 +80,18 @@ nj8_profile_batch(
   \item{normalization}{\code{"nfkc_lower"} applies NFKC, trimming, and
   locale-fixed English lowercasing to both queries and entries.
   \code{"identity"} performs an exact lookup.}
-  \item{expand_parenthetical}{Whether a terminal parenthetical list such as
-  \code{"mom (mum, mummy)"} contributes comma-separated aliases at the same
-  rank.}
+  \item{expand_parenthetical}{Whether inline spelling variants (such as
+  \code{"program(me)"}, \code{"colo(u)r"}, \code{"color/colour"}) and terminal
+  parenthetical lists (such as \code{"mom (mum, mummy)"}) contribute aliases at
+  the same rank.}
   \item{resource_version}{An optional version label for an external table. If
   \code{NULL}, its canonical rank-entry SHA-256 supplies the identity. The
   cached table has a fixed version and cannot be relabelled.}
-  \item{id_col, terms_col}{Names of the explicit document-ID and lexical-input
-  list-columns for data-frame batch input.}
+  \item{id_col, term_col}{Names of the explicit document-ID and lexical-input
+  list-columns for multi-document data-frame input.}
   \item{max_rows}{A positive integer bounding the combined number of returned
   batch summary and token-lookup rows. The default is 1,000,000.}
-  \item{x}{A result returned by \code{nj8_profile()}.}
+  \item{cache_dir}{Optional directory containing downloaded optional resources.}
   \item{weighting}{Either token- or type-weighted output. Types are unique
   normalized lookup terms.}
   \item{scale}{Plot proportions or counts.}
@@ -208,7 +196,7 @@ verify that it is the official edition. Provenance distinguishes cached from
 external input and records the source hash and selected version.
 }
 \section{Batch output}{
-\code{nj8_profile_batch()} returns document-major \code{summary} and
+When given multi-document input, \code{nj8_profile()} returns document-major \code{summary} and
 \code{lookup} tables with an explicit \code{document_id}. Its \code{coverage}
 and \code{document_diagnostics} components contain one row per input document;
 \code{exclusion_reasons} retains non-empty preprocessing exclusions;
@@ -245,7 +233,7 @@ input. The adapter's measurement contract is normative for version 0.2.0.
 }
 The plot method invisibly returns the summary rows and exact values drawn.
 
-\code{nj8_profile_batch()} returns a list of class
+For multi-document input, \code{nj8_profile()} returns a list of class
 \code{nj8_profile_batch} and
 \code{lexical_level_profile_batch}. The profile information is separated into
 document-major tables while the external resource provenance is stored once.
@@ -264,7 +252,7 @@ profile <- nj8_profile(
 profile$summary
 profile$coverage
 
-batch <- nj8_profile_batch(
+batch <- nj8_profile(
   list(doc_a = c("The", "develop"), doc_b = c("rare", "outside")),
   wordlist = wordlist,
   unit = "surface"

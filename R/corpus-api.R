@@ -4,9 +4,15 @@
   x
 }
 
-lexdiv_concordance <- function(x, queries, term_col = "surface",
-    valuetype = c("fixed", "glob", "regex"), case_insensitive = FALSE,
-    keep = rep(TRUE, nrow(x$tokens)), window = 5L, max_cells = 1e6) {
+lexdiv_concordance <- function(
+    x,
+    queries,
+    term_col = NULL,
+    valuetype = c("fixed", "glob", "regex"),
+    case_insensitive = FALSE,
+    keep = NULL,
+    window = 5L,
+    max_cells = 1e6) {
   .lexdiv_concordance_result(concordance_search(x, queries, term_col,
     valuetype, case_insensitive, keep, window, max_cells))
 }

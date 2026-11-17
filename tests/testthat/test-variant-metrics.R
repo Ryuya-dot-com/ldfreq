@@ -1,11 +1,11 @@
 test_that("the variant catalog is explicit and duplicate-free", {
   catalog <- lexdiv_methods(scope = "variants")
 
-  expect_identical(nrow(catalog), 8L)
+  expect_identical(nrow(catalog), 9L)
   expect_identical(anyDuplicated(catalog$method_id), 0L)
   expect_identical(
     as.integer(table(catalog$family)),
-    c(4L, 4L)
+    c(4L, 5L)
   )
   expect_true(all(catalog$direction %in% c("higher", "lower")))
   expect_identical(
@@ -172,7 +172,7 @@ test_that("the installed variant contract matches the public catalog", {
   )
 
   expect_identical(contract$contract_id, "ldfreq-lexical-diversity-variants")
-  expect_identical(contract$contract_version, "0.1.0")
+  expect_identical(contract$contract_version, "0.2.0")
   expect_identical(contract$status, "normative")
   expect_identical(contract$core_contract_changed, FALSE)
   expect_identical(contract_ids, lexdiv_methods(scope = "variants")$method_id)

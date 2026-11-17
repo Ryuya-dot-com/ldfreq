@@ -31,8 +31,10 @@ actual segmentation, tokenization, exclusion, lexical-unit and normalization
 rules. Target and reference labels must agree. The label is a caller assertion,
 not verification of the preparation. Inherit it from an extraction when
 constructing a reference from that result.}
-\item{n}{A nonempty unique selection of \code{2L} and \code{3L}, in the
-desired output order. Overlapping occurrences are counted.}
+\item{n}{A nonempty unique selection of integers in \code{2L:12L}, in the
+desired output order. Overlapping occurrences are counted. Columns
+\code{term1..term3} are retained for \code{max(n) <= 3} and extended to
+\code{term1..termK} when \code{max(n) > 3}.}
 \item{documents}{Optional unique character document-ID roster, including
 all IDs in \code{data}. It preserves zero-token documents and sets summary
 order. Defaults to IDs in first-seen input order.}
@@ -196,7 +198,7 @@ lexdiv_ngram_profile(lexdiv_ngrams(target,
 \item \code{\link{lexdiv_compare_ngrams}} for multiple references
 \item \code{\link{lexdiv_build_ngram_reference}} to combine corpus chunks
 \item \href{https://ryuya-dot-com.github.io/ldfreq/articles/ngram-profiles.html}{The extraction-to-reference-profile workflow}
-\item \code{\link{lexdiv_norm_profile_batch}}
+\item \code{\link{lexdiv_norm_profile}}
 \item \code{\link{lexdiv_reference_coverage}}
 \item \code{\link{tubelex_profile}}
 }

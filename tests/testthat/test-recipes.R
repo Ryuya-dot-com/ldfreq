@@ -7,7 +7,7 @@ test_that("recipes reuse core calculations and round-trip complete records", {
   recipe <- lexdiv_recipe(recipe_test_plan())
   run <- lexdiv_run_recipe(texts, recipe, metadata = data.frame(
     document_id = rev(names(texts)), writer_id = c("03", NA, "01")))
-  original <- lexdiv_metrics_text_batch(texts, plan = recipe_test_plan())
+  original <- lexdiv_metrics_text(texts, plan = recipe_test_plan())
   expect_equal(run$analysis$results$value, original$results$value)
   expect_identical(run$analysis$results, original$results)
   expect_identical(run$analysis$preprocessing, original$preprocessing)
@@ -34,7 +34,7 @@ test_that("restored records connect to planned observations without dropping mis
   submissions <- data.frame(observation_id = paste0("o", 1:3), document_id = names(texts))
   study <- lexdiv_study_table(planned, submissions, restored$analysis, plan, "primary")
   direct <- lexdiv_study_table(planned, submissions,
-    lexdiv_metrics_text_batch(texts, plan = plan), plan, "primary")
+    lexdiv_metrics_text(texts, plan = plan), plan, "primary")
   expect_identical(study, direct)
   expect_equal(nrow(study), 8L)
   expect_identical(study$input_status[study$observation_id == "o3"], rep("empty_text", 2))
@@ -138,13 +138,13 @@ test_that("resource adapters preserve profiles, exact identities and coverage", 
   skip_if_not_installed("jsonlite")
   # Only resource acquisition is replaced with authored fixtures. The real
   # batch/profile calculations and the recipe/JSON/report path still execute.
-  real_nj8 <- nj8_profile_batch
+  real_nj8 <- ldfreq:::.nj8_profile_batch
   local_mocked_bindings(
     lexdiv_resource_info = function(...) data.frame(available = TRUE),
-    nj8_profile_batch = function(documents, ...) real_nj8(documents,
+    .nj8_profile_batch = function(documents, wordlist = NULL, ..., resource_version = NULL) real_nj8(documents,
       wordlist = data.frame(NJ8 = c(1L, 1001L), Word = c("the", "apple")),
       resource_version = "jacet2016-8000-v1", ...),
-    .lexres_load_tubelex = function() list(status = "ok", failure_reason = NA_character_,
+    .lexres_load_tubelex = function(cache_dir = NULL) list(status = "ok", failure_reason = NA_character_,
       resource_ref = ldfreq:::.lexres_resource_ref(ldfreq:::.lexres_tubelex_expectation()),
       diagnostics = list(fallback_attempted = FALSE, download_attempted = FALSE),
       manifest = list(lookup_unit = "surface-form", normalization_id = "nfkc-trim-root-lower-filtered-source-keys-v1"),
@@ -161,9 +161,9 @@ test_that("resource adapters preserve profiles, exact identities and coverage", 
   lexdiv_write(a, file)
   restored <- lexdiv_read(file)
   expect_identical(restored, a)
-  prepared <- lexdiv_tokenize_batch(c(doc = "The apple missing.", empty = ""))
-  direct_nj8 <- nj8_profile_batch(prepared, unit = "surface")
-  direct_tubelex <- tubelex_profile_batch(prepared, tokenization_mismatch = "allow")
+  prepared <- lexdiv_tokenize(c(doc = "The apple missing.", empty = ""))
+  direct_nj8 <- nj8_profile(prepared, unit = "surface")
+  direct_tubelex <- tubelex_profile(prepared, tokenization_mismatch = "allow")
   expect_identical(a$profiles$nj8, direct_nj8)
   expect_identical(a$profiles$tubelex, direct_tubelex)
   plot_file <- tempfile(fileext = ".pdf")

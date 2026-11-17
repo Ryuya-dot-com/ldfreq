@@ -9,7 +9,7 @@ test_that("tidy token rows become ordered named documents", {
   expect_identical(documents$b, c("first-b", "second-b"))
   expect_identical(documents$a, c("first-a", "second-a"))
 
-  batch <- lexdiv_metrics_batch(documents, metrics = "ttr")
+  batch <- lexdiv_metrics(documents, metrics = "ttr")
   expect_identical(batch$document_id, c("b", "a"))
   expect_identical(batch$value, c(1, 1))
 })
@@ -42,10 +42,10 @@ test_that("tidy adapters reject ambiguous selected columns and invalid selectors
   expect_error(lexdiv_as_documents(tidy["document_id"]), "exactly one selected")
   for (bad in list(factor("token"), matrix("token"), I("token"),
     setNames("token", "name"))) {
-    expect_error(lexdiv_as_documents(tidy, token_col = bad), "token_col")
+    expect_error(lexdiv_as_documents(tidy, term_col = bad), "term_col")
     expect_error(lexdiv_as_documents(tidy, id_col = bad), "id_col")
   }
-  expect_equal(lexdiv_metrics_batch(lexdiv_as_documents(tidy), metrics = "ttr")$value, 0.5)
+  expect_equal(lexdiv_metrics(lexdiv_as_documents(tidy), metrics = "ttr")$value, 0.5)
 })
 
 test_that("empty document adapters compose with both batch interfaces", {
@@ -55,10 +55,10 @@ test_that("empty document adapters compose with both batch interfaces", {
   for (input in list(list(), empty, tidy)) {
     documents <- lexdiv_as_documents(input)
     expect_identical(documents, empty)
-    expect_identical(lexdiv_metrics_batch(documents, metrics = "ttr"),
-      lexdiv_metrics_batch(empty, metrics = "ttr"))
-    expect_identical(lexdiv_metrics_batch(documents, plan = plan),
-      lexdiv_metrics_batch(empty, plan = plan))
+    expect_identical(lexdiv_metrics(documents, metrics = "ttr"),
+      lexdiv_metrics(empty, metrics = "ttr"))
+    expect_identical(lexdiv_metrics(documents, plan = plan),
+      lexdiv_metrics(empty, plan = plan))
   }
 })
 
@@ -70,7 +70,7 @@ test_that("real quanteda tokens retain document boundaries", {
 
 test_that("long results widen without recomputation", {
   documents <- list(a = c("a", "a", "b"), b = c("x", "y", "z"))
-  long <- lexdiv_metrics_batch(documents, metrics = c("ttr", "maas"))
+  long <- lexdiv_metrics(documents, metrics = c("ttr", "maas"))
   wide <- lexdiv_widen(long, values_from = "value")
 
   expect_s3_class(wide, "lexdiv_wide_results")
@@ -89,7 +89,7 @@ test_that("long results widen without recomputation", {
 
 test_that("profile request IDs remain distinct in wide output", {
   plan <- lexdiv_plan("length_50_100")
-  profile <- lexdiv_metrics_batch(
+  profile <- lexdiv_metrics(
     list(a = rep(c("a", "b"), 60L)),
     plan = plan
   )
@@ -101,7 +101,7 @@ test_that("profile request IDs remain distinct in wide output", {
 })
 
 test_that("base plots return their plotted data invisibly", {
-  batch <- lexdiv_metrics_batch(
+  batch <- lexdiv_metrics(
     list(a = c("a", "a", "b"), b = c("x", "y", "z")),
     metrics = c("ttr", "maas")
   )

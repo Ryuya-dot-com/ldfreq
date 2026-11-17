@@ -148,7 +148,7 @@ status <- system2("python3", c(shQuote(script), "open-paper-texts.json",
 stopifnot(status == 0L)
 input <- jsonlite::read_json("open-paper-tokens.json", simplifyVector = TRUE)
 terms <- lapply(input$documents, function(x) as.character(unlist(x, use.names = FALSE)))
-frequency <- tubelex_profile_batch(terms, normalization = "identity")
+frequency <- tubelex_profile(terms, normalization = "identity")
 frequency_audit <- tubelex_diagnostics(frequency)
 frequency_audit$summary
 frequency_audit$unmatched_terms

@@ -10,12 +10,12 @@ profile_batch_function <- function(
     documents,
     plan = lexdiv_plan(),
     id_col = "document_id",
-    tokens_col = "tokens",
+    term_col = "tokens",
     max_rows = 1e6) {
-  lexdiv_metrics_batch(
+  lexdiv_metrics(
     documents,
     id_col = id_col,
-    tokens_col = tokens_col,
+    term_col = term_col,
     plan = plan,
     max_rows = max_rows
   )

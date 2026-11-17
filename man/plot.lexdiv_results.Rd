@@ -4,6 +4,7 @@
 \alias{plot.lexdiv_profile_results}
 \alias{plot.lexdiv_profile_batch_results}
 \alias{plot.lexdiv_text_results}
+\alias{plot.lexdiv_text_batch_results}
 \alias{plot.lexdiv_screen_results}
 \alias{plot.tubelex_profile}
 \title{Plot one metric, a length screen or TUBELEX coverage}
@@ -25,6 +26,8 @@
   ylab = NULL, ..., monochrome = FALSE)
 
 \method{plot}{lexdiv_text_results}(x, ..., monochrome = FALSE)
+
+\method{plot}{lexdiv_text_batch_results}(x, ..., monochrome = FALSE)
 
 \method{plot}{lexdiv_screen_results}(x, screen_id = NULL, col = NULL,
   pch = 19, main = NULL, xlab = "document / request", ylab = "tokens",
@@ -92,7 +95,7 @@ only the horizontal axis, including manually drawn document labels.
 labels. Graphics settings are restored after drawing or an error.
 }
 \examples{
-long <- lexdiv_metrics_batch(list(a = c("one", "two", "one"),
+long <- lexdiv_metrics(list(a = c("one", "two", "one"),
   empty = character(), b = c("one", "two", "three")),
   metrics = c("ttr", "maas"))
 plot(long, metric_id = "ttr")

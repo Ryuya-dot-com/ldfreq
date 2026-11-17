@@ -23,7 +23,7 @@ knitr::read_chunk(system.file("examples", "japanese-frequency-demo.R",
 
 Japanese text needs an explicit word-unit decision. For example, counting
 `国際連合` as one item or `国際 / 連合` as two changes both vocabulary diversity
-and the available bigrams. The default Unicode tokenizer in ldfreq does not
+and the available bigrams. The built-in English and Unicode tokenizers in ldfreq do not
 perform Japanese morphological analysis. Instead, use a Japanese analyzer and
 bring its complete annotations into `lexdiv_import_annotations()`.
 
@@ -228,7 +228,7 @@ count_units <- function(x) {
   tokens <- setNames(lapply(x$documents$document_id, function(id) {
     t$surface[t$document_id == id & retained]
   }), x$documents$document_id)
-  lexdiv_metrics_batch(tokens, metrics = "ttr")
+  lexdiv_metrics(tokens, metrics = "ttr")
 }
 count_units(imported)
 count_units(coarse)
@@ -611,7 +611,7 @@ ja_file_output  # Temporary folder; choose a persistent output for your study.
 A frequency mean can change because the selected words changed, because lookup
 keys changed, or because some words could not be scored. Keep the original
 occurrences and all three denominators visible. This recipe connects the document
-profile above to the existing `lexdiv_norm_profile_batch()` calculation.
+profile above to the existing `lexdiv_norm_profile()` calculation.
 
 The following reference has **fictional teaching numbers, not TUBELEX data or
 Japanese norms**. Its zero and missing value are deliberate examples. No download,
@@ -873,7 +873,7 @@ selected <- t[keep, ]
 selected$term <- selected$orthBase
 by_document <- setNames(lapply(ja$documents$document_id,
   function(id) selected$term[selected$document_id == id]), ja$documents$document_id)
-results <- lexdiv_metrics_batch(by_document, metrics = "ttr")
+results <- lexdiv_metrics(by_document, metrics = "ttr")
 grams <- lexdiv_ngrams(selected, "ja-unidic-lite-1.0.8-orthBase-selection-v1",
   documents = ja$documents$document_id)
 results
@@ -916,7 +916,7 @@ candidates. Keep the coverage table beside it.
 surface_by_document <- setNames(lapply(ja$documents$document_id,
   function(id) selected$surface[selected$document_id == id]),
   ja$documents$document_id)
-surface_results <- lexdiv_metrics_batch(surface_by_document, metrics = "ttr")
+surface_results <- lexdiv_metrics(surface_by_document, metrics = "ttr")
 common_results <- rbind(
   data.frame(unit = "surface", as.data.frame(surface_results)),
   data.frame(unit = "orthBase", as.data.frame(results)))

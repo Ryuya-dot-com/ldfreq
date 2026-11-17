@@ -258,10 +258,7 @@
   if (!is.character(value) || length(value) != 1L || is.na(value)) {
     stop("Internal error: MD5 input must be one character string.", call. = FALSE)
   }
-  path <- tempfile(pattern = "lexdiv-plan-md5-")
-  on.exit(unlink(path, force = TRUE), add = TRUE)
-  writeBin(charToRaw(enc2utf8(value)), path)
-  unname(as.character(tools::md5sum(path)[[1L]]))
+  digest::digest(charToRaw(enc2utf8(value)), algo = "md5", serialize = FALSE)
 }
 
 .profile_specification_key <- function(method_id, parameters) {
@@ -804,7 +801,7 @@ lexdiv_presets <- function() {
     hdd = arguments$sample_size <- parameters$sample_size,
     expected_ttr_d = arguments$expected_ttr_sample_sizes <- parameters$sample_sizes
   )
-  result <- do.call(lexdiv_metrics, arguments)
+  result <- do.call(.lexdiv_metrics_single, arguments)
   if (!identical(result$method_id, specification$method_id)) {
     stop("Internal error: method dispatch did not preserve method identity.", call. = FALSE)
   }
@@ -935,16 +932,16 @@ print.lexdiv_profile_batch_results <- function(x, ...) {
     documents,
     plan = lexdiv_plan(),
     id_col = "document_id",
-    tokens_col = "tokens",
+    term_col = "tokens",
     max_rows = 1e6) {
   id_col <- .lex_batch_scalar_name(id_col, "id_col")
-  tokens_col <- .lex_batch_scalar_name(tokens_col, "tokens_col")
-  if (identical(id_col, tokens_col)) {
-    stop("id_col and tokens_col must select different columns.", call. = FALSE)
+  term_col <- .lex_batch_scalar_name(term_col, "term_col")
+  if (!inherits(documents, "lexdiv_tokenization_batch") && identical(id_col, term_col)) {
+    stop("id_col and term_col must select different columns.", call. = FALSE)
   }
   max_rows <- .profile_positive_integer(max_rows, "max_rows")
   plan <- .profile_validate_plan(plan)
-  batch <- .lex_batch_documents(documents, id_col, tokens_col)
+  batch <- .lex_batch_documents(documents, id_col, term_col, extract_tokenization = TRUE)
   document_count <- length(batch$tokens)
   specification_count <- length(plan$specifications)
   if (
@@ -1191,21 +1188,66 @@ print.lexdiv_profile_batch_results <- function(x, ...) {
   invisible(TRUE)
 }
 
-#' Evaluate independent token-count screens without duplicating metric values
+.profile_mtld_screen_status <- function(x) {
+  n_rows <- nrow(x)
+  tail_only <- rep(NA, n_rows)
+  has_factors <- rep(TRUE, n_rows)
+  has_diagnostics <- "diagnostics" %in% names(x) && is.list(x$diagnostics)
+  for (i in seq_len(n_rows)) {
+    if (is.na(x$N[[i]])) {
+      has_factors[[i]] <- NA
+      next
+    }
+    metric <- x$metric_id[[i]]
+    if (identical(metric, "mtld")) {
+      d <- if (has_diagnostics) x$diagnostics[[i]] else NULL
+      fwd <- if (is.list(d)) d[["forward_complete_factors"]] else NULL
+      rev_f <- if (is.list(d)) d[["reverse_complete_factors"]] else NULL
+      if (is.numeric(fwd) && length(fwd) == 1L && is.finite(fwd) &&
+          is.numeric(rev_f) && length(rev_f) == 1L && is.finite(rev_f)) {
+        fwd_s <- d[["forward_score"]]
+        rev_s <- d[["reverse_score"]]
+        if (is.numeric(fwd_s) && length(fwd_s) == 1L && is.finite(fwd_s) &&
+            is.numeric(rev_s) && length(rev_s) == 1L && is.finite(rev_s)) {
+          tail_only[[i]] <- min(fwd, rev_f) == 0
+        }
+        has_factors[[i]] <- min(fwd, rev_f) >= 1
+      } else {
+        has_factors[[i]] <- FALSE
+      }
+    } else if (identical(metric, "mtld_ma")) {
+      d <- if (has_diagnostics) x$diagnostics[[i]] else NULL
+      ret <- if (is.list(d)) d[["retained_factors"]] else NULL
+      has_factors[[i]] <- is.numeric(ret) && length(ret) == 1L && is.finite(ret) && ret >= 1
+    }
+  }
+  list(tail_only = tail_only, has_factors = has_factors)
+}
+
+#' Evaluate independent token-count and MTLD factor screens without duplicating metric values
 #'
-#' @param x A plan-based result returned by [lexdiv_metrics()],
-#'   [lexdiv_metrics_batch()], [lexdiv_metrics_text()], or
-#'   [lexdiv_metrics_text_batch()].
+#' @param x A plan-based result returned by [lexdiv_metrics()] or
+#'   [lexdiv_metrics_text()].
 #' @param floors Named positive integer screening floors.
+#' @param require_mtld_factors One `TRUE` or `FALSE`. When `TRUE`, MTLD rows
+#'   must also achieve at least one complete factor in both forward and reverse
+#'   directions (`mtld_tail_only == FALSE`), and `mtld_ma` rows must retain at
+#'   least one complete factor, in order for `passes_screen` to be `TRUE`.
 #' @param max_rows Maximum source-row-by-floor output rows, checked before
 #'   allocation.
 #'
-#' @return A `lexdiv_screen_results` table without a metric-value column.
+#' @return A `lexdiv_screen_results` table without a metric-value column,
+#'   including `mtld_tail_only` for sequential MTLD rows.
 #' @export
 lexdiv_screen_lengths <- function(
     x,
     floors = c(tokens_50 = 50L, tokens_100 = 100L),
+    require_mtld_factors = FALSE,
     max_rows = 2e6) {
+  require_mtld_factors <- .lexprep_scalar_flag(
+    require_mtld_factors,
+    "require_mtld_factors"
+  )
   if (inherits(x, c("lexdiv_text_results", "lexdiv_text_batch_results")) &&
       is.list(x) && is.data.frame(x$results)) {
     x <- x$results
@@ -1228,6 +1270,7 @@ lexdiv_screen_lengths <- function(
       call. = FALSE
     )
   }
+  mtld_info <- .profile_mtld_screen_status(x)
   row_index <- rep(seq_len(nrow(x)), each = length(floors))
   floor_index <- rep(seq_along(floors), times = nrow(x))
   output <- data.frame(
@@ -1245,6 +1288,7 @@ lexdiv_screen_lengths <- function(
     metric_id = x$metric_id[row_index],
     method_id = x$method_id[row_index],
     N = x$N[row_index],
+    mtld_tail_only = mtld_info$tail_only[row_index],
     screen_id = names(floors)[floor_index],
     minimum_tokens = unname(floors[floor_index]),
     stringsAsFactors = FALSE,
@@ -1254,15 +1298,21 @@ lexdiv_screen_lengths <- function(
     output[["document_id"]] <- x$document_id[row_index]
     output <- output[c("document_id", setdiff(names(output), "document_id"))]
   }
-  output$passes_screen <- ifelse(
+  length_ok <- ifelse(
     is.na(output$N),
     NA,
     output$N >= output$minimum_tokens
   )
+  output$passes_screen <- if (require_mtld_factors) {
+    ifelse(is.na(length_ok), NA, length_ok & mtld_info$has_factors[row_index])
+  } else {
+    length_ok
+  }
   row.names(output) <- NULL
   class(output) <- c("lexdiv_screen_results", "data.frame")
   attr(output, "screen_schema_id") <- .lex_screen_schema_id
   attr(output, "screen_schema_version") <- .lex_screen_schema_version
   attr(output, "plan_md5") <- attr(x, "plan_md5", exact = TRUE)
+  attr(output, "require_mtld_factors") <- require_mtld_factors
   output
 }

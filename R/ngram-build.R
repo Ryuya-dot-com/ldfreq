@@ -37,7 +37,7 @@ lexdiv_build_ngram_reference <- function(
     if (nrow(chunk$counts) > max_types)
       stop("Distinct n-gram types exceed max_types.", call. = FALSE)
     combined <- rbind(counts, chunk$counts)
-    key <- .lexng_key(combined[.lexng_columns])
+    key <- .lexng_key(combined[.lexng_key_columns(combined)])
     first <- !duplicated(key)
     if (sum(first) > max_types)
       stop("Distinct n-gram types exceed max_types.", call. = FALSE)

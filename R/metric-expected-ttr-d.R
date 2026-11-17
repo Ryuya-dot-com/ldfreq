@@ -55,7 +55,7 @@
     sample_sizes = integer(),
     expected_ttr = numeric(),
     fitted_ttr = numeric(),
-    optimizer_iterations = 100L,
+    optimizer_iterations = NA_integer_,
     derivative_residual = NA_real_,
     near_saturation = NA
   )
@@ -132,7 +132,6 @@
       method_id = "expected_ttr_d_hypergeom_fit_v1",
       missing_reason = "unbounded_high",
       requested_parameters = requested,
-      effective_parameters = requested,
       counts = counts,
       quality_floor_tokens = 50L,
       diagnostics = diagnostics
@@ -185,6 +184,7 @@
 
   if (identical(lower, upper)) {
     D <- point_solutions[[1L]]
+    diagnostics$optimizer_iterations <- 0L
   } else {
     lower_gradient <- gradient(lower)
     upper_gradient <- gradient(upper)
@@ -205,8 +205,10 @@
     }
     if (lower_gradient == 0) {
       D <- exp(lower)
+      diagnostics$optimizer_iterations <- 0L
     } else if (upper_gradient == 0) {
       D <- exp(upper)
+      diagnostics$optimizer_iterations <- 0L
     } else {
       for (iteration in seq_len(100L)) {
         midpoint <- lower + (upper - lower) / 2
@@ -217,6 +219,7 @@
         }
       }
       D <- exp(lower + (upper - lower) / 2)
+      diagnostics$optimizer_iterations <- 100L
     }
   }
 

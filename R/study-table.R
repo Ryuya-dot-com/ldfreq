@@ -17,7 +17,14 @@ study_long_table <- function(planned, submissions, results, plan, condition_id,
 
   planned <- as_plain_df(planned)
   submissions <- as_plain_df(submissions)
-  if (!is.null(reporting)) reporting <- as_plain_df(reporting)
+  reporting_raw <- reporting
+  reporting_is_screen <- inherits(reporting_raw, "lexdiv_screen_results")
+  reporting_is_policy <- is.character(reporting_raw) && !is.object(reporting_raw) &&
+    is.null(dim(reporting_raw)) && length(reporting_raw) == 1L && !is.na(reporting_raw) &&
+    reporting_raw %in% c("all_computable", "quality_floor")
+  if (!is.null(reporting) && !reporting_is_screen && !reporting_is_policy) {
+    reporting <- as_plain_df(reporting)
+  }
 
   text_batch_chars <- NULL
   if (inherits(results, "lexdiv_text_batch_results") && is.list(results)) {
@@ -74,11 +81,11 @@ study_long_table <- function(planned, submissions, results, plan, condition_id,
   if (!is.data.frame(results) || anyDuplicated(names(results)) ||
       !all(nzchar(names(results))) || anyNA(names(results)) ||
       !inherits(results, "lexdiv_profile_batch_results"))
-    fail("results must be the complete plan-based result of lexdiv_metrics_batch() or lexdiv_metrics_text_batch().")
+    fail("results must be the complete plan-based multi-document result of lexdiv_metrics() or lexdiv_metrics_text().")
 
   # Empty tokens validate the public plan and supply request metadata, even
   # when no document was submitted. No submitted document is recalculated.
-  template <- ldfreq::lexdiv_metrics(character(), plan = plan)
+  template <- lexdiv_metrics(character(), plan = plan)
   class(template) <- "data.frame"
   n_requests <- nrow(template)
   if (nrow(planned) * n_requests > max_rows)
@@ -145,6 +152,46 @@ study_long_table <- function(planned, submissions, results, plan, condition_id,
   rows$computation_status <- as.character(ifelse(is.na(submitted), "not_submitted", rows$status))
   rows$reporting_status <- rep("not_screened", nrow(rows))
   rows$reporting_reason <- rep(NA_character_, nrow(rows))
+  if (reporting_is_screen) {
+    scr <- as_plain_df(reporting_raw)
+    if (!all(c("document_id", "request_id", "screen_id", "passes_screen") %in% names(scr))) {
+      fail("A lexdiv_screen_results reporting input must contain document_id, request_id, screen_id, and passes_screen.")
+    }
+    screen_ids <- unique(scr$screen_id)
+    if (nrow(scr) > 0L && length(screen_ids) != 1L) {
+      fail("Select exactly one screen_id in lexdiv_screen_results before passing it to reporting.")
+    }
+    reporting <- data.frame(
+      document_id = scr$document_id,
+      request_id = scr$request_id,
+      reporting_status = ifelse(scr$passes_screen %in% TRUE, "report", "withhold"),
+      reporting_reason = ifelse(
+        scr$passes_screen %in% TRUE,
+        paste0("passes_screen:", scr$screen_id),
+        paste0("fails_screen:", scr$screen_id)
+      ),
+      stringsAsFactors = FALSE
+    )
+  } else if (reporting_is_policy) {
+    if (identical(reporting_raw, "all_computable")) {
+      reporting <- data.frame(
+        document_id = results$document_id,
+        request_id = results$request_id,
+        reporting_status = rep.int("report", nrow(results)),
+        reporting_reason = rep.int("all_computable", nrow(results)),
+        stringsAsFactors = FALSE
+      )
+    } else {
+      below <- results$below_quality_floor %in% TRUE
+      reporting <- data.frame(
+        document_id = results$document_id,
+        request_id = results$request_id,
+        reporting_status = ifelse(below, "withhold", "report"),
+        reporting_reason = ifelse(below, "below_quality_floor", "meets_quality_floor"),
+        stringsAsFactors = FALSE
+      )
+    }
+  }
   if (!is.null(reporting)) {
     required <- c("document_id", "request_id", "reporting_status", "reporting_reason")
     if (!table_ok(reporting) || !setequal(names(reporting), required) ||
@@ -239,6 +286,18 @@ study_model_data <- function(study, condition_id, request_id,
   audit$included <- !audit$not_submitted & !audit$not_computable &
     !audit$not_reportable & !nzchar(missing_metadata)
   data <- rows[audit$included, , drop = FALSE]
+  if (nrow(data) == 0L &&
+      any(!audit$not_submitted & !audit$not_computable &
+          rows$reporting_status == "not_screened" & !nzchar(missing_metadata))) {
+    warning(
+      paste0(
+        "All computable observations were excluded because reporting_status == \"not_screened\". ",
+        "Supply reporting (a decision table, a lexdiv_screen_lengths() result, ",
+        "\"quality_floor\", or \"all_computable\") in lexdiv_study_table()."
+      ),
+      call. = FALSE
+    )
+  }
   if (anyNA(data$document_id) || anyDuplicated(data$document_id))
     fail("A selected document cannot represent multiple model observations.")
   rownames(data) <- data$observation_id
@@ -252,6 +311,10 @@ print.lexdiv_study_model_data <- function(x, ...) {
     "<lexdiv_study_model_data: %d/%d observations included>\n",
     nrow(x$data), nrow(x$audit)
   ))
+  if (nrow(x$data) == 0L && is.data.frame(x$audit) &&
+      any(!x$audit$not_submitted & !x$audit$not_computable & x$audit$not_reportable)) {
+    cat("Note: Computable observations were withheld by reporting_status; inspect $audit.\n")
+  }
   visible <- intersect(
     c("observation_id", "writer_id", "task", "occasion", "document_id", "request_id", "value", "N"),
     names(x$data)

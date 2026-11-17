@@ -198,14 +198,14 @@ l2sca_import <- function(trace, documents, max_nodes = 1e6) {
       if (used_nodes > max_nodes) stop("Parse exceeds max_nodes; no parse was truncated.")
       tokens <- .l2sca_surfaces(tree$tokens, d$text)
       tokens$document_id <- rep(d$document_id, nrow(tokens)); tokens$segment_id <- rep("document", nrow(tokens))
+      tokens$counted_word <- grepl("^[A-Z]+\\$?$", tokens$xpos) &
+        !grepl("[()\\-]", tokens$parser_surface)
       imported <- ldfreq::lexdiv_import_annotations(tokens,
         data.frame(document_id = d$document_id, segment_id = "document", text = d$text),
         list(language = "en", analyzer = p$kind, analyzer_version = "trace-1",
           dictionary = "declared in full trace", dictionary_version = .l2sca_hash(p),
           unit = "parser leaf", normalization = "exact source; explicit PTB brackets only"))
       tokens <- imported$tokens
-      tokens$counted_word <- grepl("^[A-Z]+\\$?$", tokens$xpos) &
-        !grepl("[()\\-]", tokens$parser_surface)
       nodes <- tree$nodes
       found <- lapply(patterns, function(name) {
         lines <- strsplit(trimws(d$queries[[name]]$stdout), "\n", fixed = TRUE)[[1L]]
@@ -228,7 +228,6 @@ l2sca_import <- function(trace, documents, max_nodes = 1e6) {
       hits$start <- tokens$start[hits$first_token]; hits$end <- tokens$end[hits$last_token]
       hits$source_span <- stringi::stri_sub(rep(d$text, nrow(hits)), hits$start, hits$end)
       hits$span_kind <- rep("query_matched_subtree", nrow(hits))
-      imported$tokens <- tokens
       list(source = imported, nodes = nodes, matches = hits)
     }, error = function(e) list(error = conditionMessage(e)))
     if (!is.null(part$error)) {

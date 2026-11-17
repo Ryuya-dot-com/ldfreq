@@ -5,16 +5,19 @@
 #' for the sheet formats, interpretation limits, and CC BY-NC-SA 4.0 terms.
 #' @param sheets NULL for all sheets, or a nonempty character vector of unique
 #'   worksheet names in the desired order.
+#' @param cache_dir Optional directory containing verified downloaded resources;
+#'   defaults to the configured or user resource cache.
 #' @return A list with sheets (named data frames) and provenance.
 #' @export
-morpholex_data <- function(sheets = NULL) {
+morpholex_data <- function(sheets = NULL, cache_dir = NULL) {
   if (!is.null(sheets) && (!is.character(sheets) || is.object(sheets) ||
       !is.null(dim(sheets)) || !length(sheets) ||
       anyNA(sheets) || any(!nzchar(sheets)) || anyDuplicated(sheets))) {
     stop("sheets must be NULL or a nonempty character vector of unique sheet names.", call. = FALSE)
   }
-  result <- readRDS(.lex_resource_file("morpholex", "extdata", "morpholex",
-    "5bc425fb", "morpholex_en.rds"))
+  rds_path <- .lex_resource_file("morpholex", "extdata", "morpholex",
+    "5bc425fb", "morpholex_en.rds", cache_dir = cache_dir)
+  result <- readRDS(rds_path)
   if (is.null(sheets)) sheets <- names(result$sheets)
   unknown <- setdiff(sheets, names(result$sheets))
   if (length(unknown)) {

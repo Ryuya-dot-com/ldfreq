@@ -73,17 +73,17 @@ response with \code{\link{lexdiv_study_model_data}}. The wide display table
 does not replace that function's full measurement input or observation roster.
 }
 \examples{
-long <- lexdiv_metrics_batch(list(a = c("one", "two", "one"),
+long <- lexdiv_metrics(list(a = c("one", "two", "one"),
   b = c("one", "two", "three")), metrics = c("ttr", "maas"))
 lexdiv_widen(long)
 lexdiv_widen(long, values_from = "value")
 
 # Constructed short input illustrates support, not score reliability.
-supported <- lexdiv_metrics_batch(list(
+supported <- lexdiv_metrics(list(
   one_tail = c(letters[1:8], "a", "a"), empty = character()), metrics = "mtld")
 wide <- lexdiv_widen(supported, values_from = c("value", "status", "N"),
   mtld_diagnostics = TRUE)
 wide[c("document_id", "mtld__value", "mtld__status",
   "mtld__tail_only", "mtld__gap_pct")]
 }
-\seealso{\code{\link{lexdiv_metrics_batch}}, \code{\link{lexdiv_study_table}}.}
+\seealso{\code{\link{lexdiv_metrics}}, \code{\link{lexdiv_study_table}}.}

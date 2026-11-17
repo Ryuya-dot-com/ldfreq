@@ -1032,7 +1032,7 @@ than a claim of compatibility. Inspect contraction and punctuation handling
 in the caller's preparation pipeline even when lookup coverage is 100%.
 The optional `normalization = "tubelex_apostrophe"` only harmonizes term-level
 apostrophe typography; it is not a segmentation adapter. For several documents,
-`tubelex_profile_batch()` shares the verified resource snapshot within the call.
+`tubelex_profile()` shares the verified resource snapshot within the call.
 
 The lookup values are deliberately inspectable. `count`, `videos`, and
 `channels` are raw resource counts. Derived scores use the following base-10
@@ -1091,7 +1091,7 @@ list once. The following synthetic example uses surface units so both documents
 share the same input contract without inventing lemma annotations.
 
 ```{r}
-level_batch <- nj8_profile_batch(
+level_batch <- nj8_profile(
   list(
     document_a = c("The", "develop", "rare"),
     document_b = c("extreme", "outside")

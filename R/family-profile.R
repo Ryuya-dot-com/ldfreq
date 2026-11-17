@@ -4,7 +4,7 @@ lexdiv_family_profile <- function(annotations, dictionary, resource,
                                   normalization = c("identity", "nfkc_lower"),
                                   exclude_pos = character(), context_chars = 30L,
                                   max_tokens = 1e6, max_candidates = 1e6,
-                                  review = NULL) {
+                                  review = NULL, supplementary = NULL) {
   unit <- match.arg(unit)
   normalization <- match.arg(normalization)
   context_chars <- .lexann_context(context_chars)
@@ -15,6 +15,22 @@ lexdiv_family_profile <- function(annotations, dictionary, resource,
   fields <- c("record_id", "form", "family_id")
   if (!all(fields %in% names(dictionary)))
     stop("dictionary requires record_id, form and family_id columns.", call. = FALSE)
+  if (!is.null(supplementary)) {
+    supplementary <- .lexnorm_plain_data_frame(supplementary, "supplementary")
+    if (!all(fields %in% names(supplementary)))
+      stop("supplementary requires record_id, form and family_id columns.", call. = FALSE)
+    if (("upos" %in% names(dictionary)) != ("upos" %in% names(supplementary)))
+      stop("dictionary and supplementary must agree on whether upos is present.", call. = FALSE)
+    all_cols <- union(names(dictionary), names(supplementary))
+    for (col in setdiff(all_cols, names(dictionary))) {
+      dictionary[[col]] <- supplementary[[col]][rep.int(NA_integer_, nrow(dictionary))]
+    }
+    for (col in setdiff(all_cols, names(supplementary))) {
+      supplementary[[col]] <- dictionary[[col]][rep.int(NA_integer_, nrow(supplementary))]
+    }
+    dictionary <- rbind(dictionary[all_cols], supplementary[all_cols])
+    rownames(dictionary) <- NULL
+  }
   if (nrow(dictionary) > max_candidates)
     stop("Dictionary rows exceed max_candidates.", call. = FALSE)
   pos_match <- "upos" %in% names(dictionary)
@@ -107,8 +123,15 @@ lexdiv_family_profile <- function(annotations, dictionary, resource,
   occurrences$candidate_records <- candidate_count
   occurrences$candidate_families <- family_count
   occurrences$family_id <- family_id
-  source <- annotations$segments$text[match(.lexng_key(tokens[c("document_id", "segment_id")]),
-    .lexng_key(annotations$segments[c("document_id", "segment_id")]))]
+  seg_index <- match(.lexng_key(tokens[c("document_id", "segment_id")]),
+    .lexng_key(annotations$segments[c("document_id", "segment_id")]))
+  source <- annotations$segments$text[seg_index]
+  occ_identities <- .lexng_key(data.frame(
+    tokens[c("document_id", "segment_id", "token_index", "start", "end")],
+    text_sha256 = annotations$segments$text_sha256[seg_index]
+  ))
+  occurrences$occurrence_id <- vapply(occ_identities, digest::digest, character(1),
+    algo = "sha256", serialize = FALSE, USE.NAMES = FALSE)
   occurrences$pre <- stringi::stri_sub(source, pmax(1, tokens$start - context_chars), tokens$start - 1L)
   occurrences$keyword <- tokens$surface
   occurrences$post <- stringi::stri_sub(source, tokens$end + 1L,
@@ -175,6 +198,101 @@ lexdiv_family_profile <- function(annotations, dictionary, resource,
     occurrences$family_id <- family_id
   }
 
+  has_bands <- "frequency_band" %in% names(dictionary) &&
+    is.numeric(dictionary$frequency_band) && !is.object(dictionary$frequency_band) &&
+    is.null(dim(dictionary$frequency_band)) &&
+    any(!is.na(dictionary$frequency_band) & dictionary$frequency_band >= 1)
+  has_list_type <- "list_type" %in% names(dictionary) &&
+    is.character(dictionary$list_type) && !is.object(dictionary$list_type)
+
+  if (has_bands) {
+    fam_groups <- split(seq_len(nrow(dictionary)), dictionary$family_id)
+    fam_band <- vapply(fam_groups, function(g) {
+      vals <- unique(dictionary$frequency_band[g])
+      if (length(vals) == 1L && !is.na(vals)) as.integer(vals) else NA_integer_
+    }, integer(1L))
+    fam_type <- if (has_list_type) {
+      vapply(fam_groups, function(g) {
+        vals <- unique(dictionary$list_type[g])
+        if (length(vals) == 1L && !is.na(vals)) vals else NA_character_
+      }, character(1L))
+    } else {
+      stats::setNames(
+        ifelse(is.na(fam_band), "supplementary", "frequency"),
+        names(fam_band)
+      )
+    }
+    occ_band <- rep.int(NA_integer_, nrow(tokens))
+    occ_list_type <- rep.int(NA_character_, nrow(tokens))
+    is_matched <- status == "matched" & !is.na(family_id)
+    if (any(is_matched)) {
+      occ_band[is_matched] <- unname(fam_band[family_id[is_matched]])
+      occ_list_type[is_matched] <- unname(fam_type[family_id[is_matched]])
+    }
+    occurrences$frequency_band <- occ_band
+    occurrences$list_type <- occ_list_type
+    max_band <- max(as.integer(dictionary$frequency_band), na.rm = TRUE)
+    supp_types <- unique(fam_type[is.na(fam_band) & !is.na(fam_type)])
+  }
+
+  band_table_for <- function(idx) {
+    s <- status[idx]
+    chosen <- selected[idx]
+    n <- sum(chosen %in% TRUE)
+    unknown <- sum(is.na(chosen))
+    matched_idx <- idx[s == "matched"]
+    matched_bands <- occ_band[matched_idx]
+    matched_fams <- family_id[matched_idx]
+    matched_types <- occ_list_type[matched_idx]
+
+    band_seq <- seq_len(max_band)
+    band_tok <- tabulate(matched_bands[!is.na(matched_bands)], nbins = max_band)
+    band_fam <- vapply(band_seq, function(b) {
+      length(unique(matched_fams[!is.na(matched_bands) & matched_bands == b]))
+    }, integer(1L))
+
+    supp_tok <- vapply(supp_types, function(lt) {
+      sum(is.na(matched_bands) & matched_types == lt, na.rm = TRUE)
+    }, integer(1L))
+    supp_fam <- vapply(supp_types, function(lt) {
+      length(unique(matched_fams[is.na(matched_bands) & matched_types == lt]))
+    }, integer(1L))
+
+    unresolved_tok <- sum(!s %in% c("matched", "excluded"))
+    items <- c(band_tok, supp_tok, unresolved_tok)
+    fams <- c(band_fam, supp_fam, NA_integer_)
+    labels <- c(paste0(band_seq, "k"), supp_types, "unresolved")
+    categories <- c(
+      rep.int("frequency", length(band_seq)),
+      rep.int("supplementary", length(supp_types)),
+      "unresolved"
+    )
+    prop <- if (n > 0L && unknown == 0L) items / n else rep.int(NA_real_, length(items))
+    cum_freq <- cumsum(band_tok)
+    cum_cov <- if (n > 0L && unknown == 0L) {
+      c(cum_freq / n, rep.int(NA_real_, length(supp_types) + 1L))
+    } else {
+      rep.int(NA_real_, length(items))
+    }
+    cum_with_supp <- if (n > 0L && unknown == 0L) {
+      c((cum_freq + sum(supp_tok)) / n, rep.int(NA_real_, length(supp_types) + 1L))
+    } else {
+      rep.int(NA_real_, length(items))
+    }
+    data.frame(
+      band = c(band_seq, rep.int(NA_integer_, length(supp_types) + 1L)),
+      band_label = labels,
+      category = categories,
+      tokens = as.integer(items),
+      families = as.integer(fams),
+      proportion = as.double(prop),
+      cumulative_coverage = as.double(cum_cov),
+      cumulative_coverage_with_supplementary = as.double(cum_with_supp),
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+  }
+
   summarize <- function(idx) {
     s <- status[idx]
     chosen <- selected[idx]
@@ -184,7 +302,7 @@ lexdiv_family_profile <- function(annotations, dictionary, resource,
     unresolved <- sum(!s %in% c("matched", "excluded"))
     types <- length(unique(family_id[idx][s == "matched"]))
     complete <- unresolved == 0L
-    data.frame(tokens = length(idx), excluded_tokens = sum(s == "excluded"),
+    row <- data.frame(tokens = length(idx), excluded_tokens = sum(s == "excluded"),
       known_selected_tokens = n, unknown_selection_tokens = unknown,
       selected_tokens = if (unknown) NA_integer_ else n,
       matched_tokens = found, unlisted_tokens = sum(s == "unlisted"),
@@ -195,10 +313,21 @@ lexdiv_family_profile <- function(annotations, dictionary, resource,
       review_unresolved_tokens = sum(occurrences$review_status[idx] == "unresolved", na.rm = TRUE),
       conditional_token_coverage = if (n) found / n else NA_real_,
       token_coverage = if (n && !unknown) found / n else NA_real_,
-      observed_family_types = types, family_types = if (complete) types else NA_integer_,
+      observed_family_types = types,
+      matched_family_ttr = if (found) types / found else NA_real_,
+      family_types = if (complete) types else NA_integer_,
       family_ttr = if (complete && n) types / n else NA_real_,
       status = if (!length(idx)) "empty" else if (!complete) "incomplete" else
         if (!n) "no_selected_tokens" else "complete")
+    if (has_bands) {
+      bt <- band_table_for(idx)
+      freq_cov <- bt$cumulative_coverage_with_supplementary[!is.na(bt$band)]
+      reach_95 <- which(!is.na(freq_cov) & freq_cov >= (0.95 - 1e-12))
+      reach_98 <- which(!is.na(freq_cov) & freq_cov >= (0.98 - 1e-12))
+      row$band_95 <- if (length(reach_95)) bt$band[[reach_95[[1L]]]] else NA_integer_
+      row$band_98 <- if (length(reach_98)) bt$band[[reach_98[[1L]]]] else NA_integer_
+    }
+    row
   }
   documents <- annotations$documents
   rows <- split(seq_len(nrow(tokens)), factor(tokens$document_id, levels = documents$document_id))
@@ -212,14 +341,30 @@ lexdiv_family_profile <- function(annotations, dictionary, resource,
   rownames(members) <- NULL
   out <- list(occurrences = occurrences, candidates = candidates, members = members,
     documents = documents, summary = summarize(seq_len(nrow(tokens))),
-    annotations = annotations, dictionary = dictionary, review_input = review_input, review = review,
-    provenance = list(method = "ldfreq-family-profile", method_version = "0.2.0",
+    annotations = annotations, dictionary = dictionary, review_input = review_input, review = review)
+  if (has_bands) {
+    doc_bands <- lapply(names(rows), function(doc_id) {
+      bt <- band_table_for(rows[[doc_id]])
+      cbind(
+        data.frame(document_id = rep.int(doc_id, nrow(bt)), stringsAsFactors = FALSE),
+        bt
+      )
+    })
+    bands <- if (length(doc_bands)) do.call(rbind, doc_bands) else {
+      bt <- band_table_for(integer())[FALSE, , drop = FALSE]
+      cbind(data.frame(document_id = character(), stringsAsFactors = FALSE), bt)
+    }
+    rownames(bands) <- NULL
+    out$bands <- bands
+    out$band_summary <- band_table_for(seq_len(nrow(tokens)))
+  }
+  out$provenance <- list(method = "ldfreq-family-profile", method_version = "0.3.0",
       unit = unit, normalization = normalization, pos_matching = pos_match,
       exclude_pos = exclude_pos, context_chars = context_chars, resource = resource,
       resource_sha256 = digest::digest(dictionary, algo = "sha256", serializeVersion = 2L),
       coordinates = annotations$provenance$coordinates,
       assignment = "exact unique-family lookup; optional source/policy-bound record review; explicit unresolved vetoes assignment; no fallback",
-      scope = "counts relative to the supplied family definition; not affix analysis or learner knowledge"))
+      scope = "counts relative to the supplied family definition; not affix analysis or learner knowledge")
   .lexng_seal(out, "lexdiv_family_profile")
 }
 
