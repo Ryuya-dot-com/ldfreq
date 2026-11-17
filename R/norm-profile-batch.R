@@ -114,23 +114,26 @@
   output
 }
 
-lexdiv_norm_profile_batch <- function(
+.lexdiv_norm_profile_batch <- function(
     documents,
     norms,
     key,
-    measure_specs = lexdiv_norm_spec(setdiff(names(norms), key)),
+    measure_specs = NULL,
     resource = lexdiv_resource_meta("caller_norms"),
     weightings = c("token", "type"),
     id_col = "document_id",
-    terms_col = "terms",
+    term_col = "terms",
     max_rows = 1e6) {
+  if (is.null(measure_specs)) {
+    measure_specs <- .lexnorm_default_specs(norms, key)
+  }
   id_col <- .lex_batch_scalar_name(id_col, "id_col")
-  terms_col <- .lex_batch_scalar_name(terms_col, "terms_col")
-  if (identical(id_col, terms_col)) {
-    stop("id_col and terms_col must select different columns.", call. = FALSE)
+  term_col <- .lex_batch_scalar_name(term_col, "term_col")
+  if (!inherits(documents, "lexdiv_tokenization_batch") && identical(id_col, term_col)) {
+    stop("id_col and term_col must select different columns.", call. = FALSE)
   }
   max_rows <- .lexnorm_positive_whole(max_rows, "max_rows")
-  batch <- .lex_batch_documents(documents, id_col, terms_col)
+  batch <- .lex_batch_documents(documents, id_col, term_col, extract_tokenization = TRUE)
   batch$terms <- lapply(seq_along(batch$tokens), function(i) {
     terms <- tryCatch(.lexnorm_terms(batch$tokens[[i]]), error = function(e) {
       stop(sprintf("Document %s: %s", encodeString(batch$ids[[i]], quote = '"'),
@@ -138,7 +141,7 @@ lexdiv_norm_profile_batch <- function(
     })
     .lex_warn_likely_raw_text(terms,
       sprintf("document %s", encodeString(batch$ids[[i]], quote = '"')),
-      "lexdiv_norm_profile_batch",
+      "lexdiv_norm_profile",
       "tokenize and apply the resource's documented preprocessing first")
     terms
   })
@@ -238,6 +241,7 @@ lexdiv_norm_profile_batch <- function(
   )
 }
 
+#' @export
 print.lexdiv_norm_profile_batch <- function(x, ...) {
   if (!inherits(x, "lexdiv_norm_profile_batch") || !is.list(x)) {
     stop("x must be a lexdiv_norm_profile_batch object.", call. = FALSE)

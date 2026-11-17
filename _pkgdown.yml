@@ -1,5 +1,8 @@
 url: https://ryuya-dot-com.github.io/ldfreq/
 
+development:
+  mode: auto
+
 template:
   bootstrap: 5
   bslib:
@@ -32,36 +35,34 @@ navbar:
 reference:
   - title: Package overview
     desc: >
-      High-level map of inputs, workflows, measurement boundaries, and citations.
+      High-level map of unified inputs, workflows, measurement boundaries, and citations.
     contents:
       - ldfreq-package
 
-  - title: Core lexical-diversity metrics
+  - title: Lexical-diversity metrics and cross-definition variants
     desc: >
       Compute eleven default lexical-diversity measures, moving-average MTLD,
-      and experimental expected-TTR D from pre-tokenized word vectors.
+      experimental expected-TTR D, and cross-definition Maas/MTLD variants from
+      single documents or multi-document containers.
     contents:
       - lexdiv_metrics
-      - lexdiv_metrics_batch
-      - lexdiv_metric_ids
       - lexdiv_variant_metrics
 
-  - title: Raw text, tokenization, and word units
+  - title: Raw text, tokenization, and external annotations
     desc: >
-      Tokenize raw English texts, attach lemma or AntBNC flemma layers, bridge
-      raw texts into corpus annotations, or import Japanese/external annotations.
+      Tokenize single texts or document tables, attach lemma or AntBNC flemma
+      layers, bridge raw texts into source-aligned corpus annotations, or import
+      Japanese and Penn MASC annotations.
     contents:
       - lexdiv_preprocessing
-      - lexdiv_text_batch
       - lexdiv_flemmatize
       - lexdiv_import_annotations
-      - lexdiv_family_profile
       - lexdiv_read_masc
 
   - title: Plans, local MATTR trajectories, and token-floor screens
     desc: >
       Define multi-parameter measurement plans, inspect window-by-window MATTR
-      profiles, and evaluate empirical token-count floors without altering scores.
+      profiles, and evaluate empirical token-count and MTLD-factor screens.
     contents:
       - lexdiv_plan
       - lexdiv_mattr_profile
@@ -69,21 +70,11 @@ reference:
       - lexdiv_screen_lengths
       - lexdiv_length_evidence
 
-  - title: Recipes, portable records, and reporting
-    desc: >
-      Reuse resolved settings, inspect differences, and export results or
-      calculation descriptions without changing the measurement engine.
-    contents:
-      - lexdiv_recipe
-      - lexdiv_run_recipe
-      - lexdiv_write
-      - lexdiv_compare_analyses
-      - lexdiv_methods_text
-
-  - title: Reference-vocabulary and morphology profiles
+  - title: Reference-vocabulary, level, and word-family profiles
     desc: >
       Inspect license terms, download SHA-256-verified optional datasets, and
-      profile vocabulary with TUBELEX, New JACET 8000, BNC/COCA, MorphoLex, or MorphyNet.
+      profile single documents or corpora with TUBELEX, New JACET 8000,
+      BNC/COCA 1k–25k word-family bands, MorphoLex, or MorphyNet.
     contents:
       - lexdiv_resources
       - tubelex_profile
@@ -91,16 +82,16 @@ reference:
       - nj8_profile
       - nj8_diagnostics
       - bnccoca_data
+      - lexdiv_family_profile
       - morpholex_data
       - morphynet_read_derivations
 
-  - title: Custom lexical norms, overlap, and n-grams
+  - title: Custom lexical norms, overlap, and n-gram bundles
     desc: >
-      Apply your own familiarity/AoA/frequency tables, measure exact lexical
-      overlap or set coverage, and build or compare adjacent n-gram references.
+      Apply custom familiarity/AoA/frequency tables, measure exact lexical
+      overlap or set coverage, and extract or compare 2- to 12-word n-grams.
     contents:
       - lexdiv_norm_profile
-      - lexdiv_norm_profile_batch
       - lexdiv_overlap
       - lexdiv_reference_coverage
       - lexdiv_ngrams
@@ -132,6 +123,17 @@ reference:
       - lexdiv_evaluate_contextual
       - lexdiv_score_contextual
       - lexdiv_amod_pairs
+
+  - title: Recipes, portable records, and reporting
+    desc: >
+      Reuse resolved settings, inspect cross-run differences, and export JSON/CSV
+      records or English/Japanese calculation descriptions.
+    contents:
+      - lexdiv_recipe
+      - lexdiv_run_recipe
+      - lexdiv_write
+      - lexdiv_compare_analyses
+      - lexdiv_methods_text
 
   - title: Reshaping, container conversion, and plotting
     desc: >

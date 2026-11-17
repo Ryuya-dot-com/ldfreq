@@ -33,12 +33,12 @@ test_that("the cached NJ8 table contains every verified rank and remains optiona
   expect_error(nj8_profile("nan", resource_version = "another-list"), "cannot relabel")
   restored <- unserialize(serialize(result, NULL))
   expect_identical(restored, result)
-  batch <- nj8_profile_batch(list(a = terms, b = character()), normalization = "identity")
+  batch <- nj8_profile(list(a = terms, b = character()), normalization = "identity")
   expect_false(batch$provenance$resource_bundled)
   expect_true(batch$provenance$resource_cached)
   expect_identical(batch$lookup$rank, result$lookup$rank)
   expect_identical(batch$coverage$token_coverage, c(3 / 4, NA_real_))
-  expect_identical(nj8_profile_batch(setNames(list(), character()))$status, "empty")
+  expect_identical(nj8_profile(setNames(list(), character()))$status, "empty")
 })
 
 test_that("a damaged cached NJ8 table fails without an external fallback", {
@@ -48,7 +48,7 @@ test_that("a damaged cached NJ8 table fails without an external fallback", {
   bytes[length(bytes) - 2L] <- as.raw(88L)
   local_mocked_bindings(.nj8_read_file_bytes = function(path) bytes, .package = "ldfreq")
   expect_error(nj8_profile("the"), "checksum does not match")
-  expect_error(nj8_profile_batch(list(a = "the")), "checksum does not match")
+  expect_error(nj8_profile(list(a = "the")), "checksum does not match")
 })
 
 test_that("New JACET profiles expose exact and cumulative token/type rates", {
@@ -371,7 +371,7 @@ test_that("New JACET batch output is document-major and lossless", {
     first = c("The", "develop", "unknown"),
     second = character()
   )
-  result <- nj8_profile_batch(
+  result <- nj8_profile(
     documents,
     nj8_fixture(),
     unit = "surface"
@@ -415,11 +415,11 @@ test_that("New JACET batch accepts explicit data-frame IDs and lemma objects", {
     Word = c("cat", "rare"),
     stringsAsFactors = FALSE
   )
-  result <- nj8_profile_batch(
+  result <- nj8_profile(
     frame,
     wordlist,
     id_col = "doc",
-    terms_col = "units",
+    term_col = "units",
     unit = "lemma"
   )
 
@@ -450,13 +450,13 @@ test_that("New JACET batch preserves flemma conflict policies", {
     Word = c("interest", "see", "interesting", "saw"),
     stringsAsFactors = FALSE
   )
-  antbnc <- nj8_profile_batch(
+  antbnc <- nj8_profile(
     list(doc = annotated),
     wordlist,
     unit = "flemma",
     flemma_conflict = "antbnc"
   )
-  wordlist_first <- nj8_profile_batch(
+  wordlist_first <- nj8_profile(
     list(doc = annotated),
     wordlist,
     unit = "flemma",
@@ -468,7 +468,7 @@ test_that("New JACET batch preserves flemma conflict policies", {
   expect_identical(antbnc$document_diagnostics$flemma_headword_conflicts, 2)
   expect_identical(antbnc$document_diagnostics$flemma_cross_level_conflicts, 2)
   expect_error(
-    nj8_profile_batch(
+    nj8_profile(
       list(doc = annotated),
       wordlist,
       unit = "flemma",
@@ -479,7 +479,7 @@ test_that("New JACET batch preserves flemma conflict policies", {
 })
 
 test_that("empty and oversized New JACET batches are explicit", {
-  empty <- nj8_profile_batch(
+  empty <- nj8_profile(
     setNames(list(), character()),
     nj8_fixture(),
     unit = "surface"
@@ -491,7 +491,7 @@ test_that("empty and oversized New JACET batches are explicit", {
   expect_identical(empty$provenance$document_count, 0)
 
   expect_error(
-    nj8_profile_batch(
+    nj8_profile(
       list(a = c("the", "develop")),
       nj8_fixture(),
       unit = "surface",
@@ -500,7 +500,7 @@ test_that("empty and oversized New JACET batches are explicit", {
     "exceeds max_rows"
   )
   expect_error(
-    nj8_profile_batch(
+    nj8_profile(
       list(a = "the"),
       nj8_fixture(),
       unit = "surface",
@@ -517,7 +517,7 @@ test_that("New JACET batch results do not retain absolute resource paths", {
   on.exit(unlink(file.path(tempdir(), "ldfreq-private-batch"), recursive = TRUE), add = TRUE)
   utils::write.csv(nj8_fixture(), path, row.names = FALSE, fileEncoding = "UTF-8")
 
-  result <- nj8_profile_batch(
+  result <- nj8_profile(
     list(document = "the"),
     path,
     unit = "surface"

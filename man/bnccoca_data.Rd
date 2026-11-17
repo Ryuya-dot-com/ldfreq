@@ -1,7 +1,15 @@
 \name{bnccoca_data}
 \alias{bnccoca_data}
 \title{Read Nation's BNC/COCA Level 6 Word-Family Lists}
-\usage{bnccoca_data()}
+\usage{
+bnccoca_data(include_supplementary = FALSE, cache_dir = NULL)
+}
+\arguments{
+\item{include_supplementary}{Logical; if \code{TRUE}, also returns
+\code{combined} (merging \code{dictionary} and \code{supplementary} lists 31--34
+with explicit \code{list_type} tags) and \code{combined_resource} metadata.}
+\item{cache_dir}{Optional directory containing downloaded optional resources.}
+}
 \description{
 Reference snapshots require a prior explicit download; see \code{\link{lexdiv_download_resources}} for terms and cache setup.
 

@@ -210,15 +210,18 @@
 #' no tokenization, normalization, case conversion, lemmatization, stemming,
 #' synonym expansion, or fuzzy matching.
 #'
-#' @param documents A plain named list of term vectors, or a data frame with
-#'   the columns selected by `id_col` and `terms_col`.
+#' @param documents A plain named list of term vectors, a
+#'   `lexdiv_tokenization_batch` object, or a data frame with the columns
+#'   selected by `id_col` and `term_col`.
 #' @param reference A plain character vector containing the reference terms.
 #'   Repetition is retained in reference diagnostics but does not change set
 #'   membership.
 #' @param reference_id One path-free identifier for the reference. It must not
 #'   duplicate a document ID.
 #' @param id_col Name of the document-ID column for data-frame input.
-#' @param terms_col Name of the term list-column for data-frame input.
+#' @param term_col Name of the term list-column for data-frame input (default
+#'   `"terms"`), or the word-token column to extract from a
+#'   `lexdiv_tokenization_batch` object (defaults to `"term"` when omitted).
 #' @param details Either `"counts"` (the default) or `"terms"`. The latter
 #'   retains exact document terms, counts, and match indicators.
 #' @param max_rows Maximum combined number of rows across all returned data
@@ -234,18 +237,22 @@ lexdiv_reference_coverage <- function(
     reference,
     reference_id = "reference",
     id_col = "document_id",
-    terms_col = "terms",
+    term_col = "terms",
     details = "counts",
     max_rows = 1e6) {
   id_col <- .lex_batch_scalar_name(id_col, "id_col")
-  terms_col <- .lex_batch_scalar_name(terms_col, "terms_col")
-  if (identical(id_col, terms_col)) {
-    stop("id_col and terms_col must select different columns.", call. = FALSE)
+  tok_col <- if (inherits(documents, "lexdiv_tokenization_batch") && missing(term_col)) {
+    "term"
+  } else {
+    .lex_batch_scalar_name(term_col, "term_col")
+  }
+  if (!inherits(documents, "lexdiv_tokenization_batch") && identical(id_col, tok_col)) {
+    stop("id_col and term_col must select different columns.", call. = FALSE)
   }
   reference_id <- .lex_batch_scalar_name(reference_id, "reference_id")
   details <- .lexprep_scalar_choice(details, c("counts", "terms"), "details")
   max_rows <- .profile_positive_integer(max_rows, "max_rows")
-  batch <- .lex_batch_documents(documents, id_col, terms_col)
+  batch <- .lex_batch_documents(documents, id_col, tok_col, extract_tokenization = TRUE)
   ids <- .lexref_validate_ids(batch$ids, reference_id)
   batch$ids <- ids$document_ids
   reference_id <- ids$reference_id

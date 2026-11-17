@@ -26,7 +26,7 @@
   } else {
     if (!is.character(documents) || is.object(documents) ||
         !identical(names(attributes(documents)), "names")) {
-      stop("documents must be a named character vector or a data frame with explicit ID and text columns.",
+      stop("x must be one plain valid-UTF-8 string, a named character vector, or a data frame with explicit ID and text columns.",
         call. = FALSE)
     }
     ids <- .lex_batch_validate_ids(names(documents), length(documents))
@@ -78,67 +78,63 @@
   metadata
 }
 
-#' Tokenize multiple raw texts with explicit document IDs
-#'
-#' The tokenizer and settings are shared across documents. Missing text is an
-#' error identifying the document; empty text is a valid zero-token document.
-#' @param documents A named character vector or a data frame with explicit
-#'   character ID and text columns. IDs must be unique and non-empty.
-#' @param id_col,text_col Column names for data-frame input.
-#' @inheritParams lexdiv_tokenize
-#' @return An input-ordered named list of complete `lexdiv_tokenization` objects.
-#' @export
-lexdiv_tokenize_batch <- function(
+.lexdiv_tokenize_batch <- function(
     documents, id_col = "document_id", text_col = "text",
     normalization = "NFC", case = "lower", keep_numbers = FALSE,
     tokenizer = "english") {
   texts <- .lextext_documents(documents, id_col, text_col)
   # Validate settings even for a zero-document corpus.
-  lexdiv_tokenize("", normalization, case, keep_numbers, tokenizer)
-  lapply(texts, lexdiv_tokenize, normalization = normalization, case = case,
-    keep_numbers = keep_numbers, tokenizer = tokenizer)
+  .lexdiv_tokenize_single("", normalization, case, keep_numbers, tokenizer, warn_cjk = FALSE)
+  out <- lapply(texts, .lexdiv_tokenize_single,
+    normalization = normalization, case = case,
+    keep_numbers = keep_numbers, tokenizer = tokenizer, warn_cjk = FALSE)
+  if (identical(tokenizer, "english") && length(texts)) {
+    cjk_hits <- names(texts)[vapply(texts, function(txt) {
+      nzchar(txt) && stringi::stri_detect_regex(txt, .lexprep_cjk_pattern)
+    }, logical(1L))]
+    if (length(cjk_hits)) {
+      shown <- paste(encodeString(utils::head(cjk_hits, 3L), quote = '"'), collapse = ", ")
+      more <- if (length(cjk_hits) > 3L) sprintf(" (and %d more)", length(cjk_hits) - 3L) else ""
+      warning(
+        sprintf(
+          "%d document(s) contain CJK (Han/Hiragana/Katakana) characters (%s%s); tokenizer = \"english\" does not segment unspaced CJK text into words. Use lexdiv_import_annotations() with a morphological analyzer for Japanese or Chinese text.",
+          length(cjk_hits), shown, more
+        ),
+        call. = FALSE
+      )
+    }
+  }
+  out
 }
 
-#' Compute lexical diversity for multiple raw or annotated texts
-#'
-#' Retains document IDs, token audits, and complete preprocessing records beside
-#' the long metric table. Existing tokenization objects keep their own settings;
-#' explicit tokenizer arguments are rejected for that input form.
-#' @param documents Raw texts as for [lexdiv_tokenize_batch()], or a plain named
-#'   list of `lexdiv_tokenization` objects. Mixed raw/prepared lists are errors.
-#' @inheritParams lexdiv_tokenize_batch
-#' @inheritParams lexdiv_metrics_text
-#' @param ... Metric requests forwarded to [lexdiv_metrics_text()], validated
-#'   even with zero documents. Must be empty when `plan` is supplied.
-#' @param plan Optional normalized plan from [lexdiv_plan()]. When supplied,
-#'   `$results` is a `lexdiv_profile_batch_results` table accepted directly by
-#'   [lexdiv_study_table()] and [lexdiv_screen_lengths()].
-#' @param max_rows Maximum document-by-specification rows when `plan` is supplied.
-#' @param metadata Optional data frame with a unique plain character
-#'   `document_id` for every input document and atomic study-information columns.
-#'   Rows are matched by ID and retained separately in `$metadata`. Specify by name.
-#' @return A `lexdiv_text_batch_results` list containing `results`, `token_audit`,
-#'   and a named `preprocessing` list. Zero-token documents retain metric rows
-#'   and preprocessing but contribute no token-audit rows. When supplied,
-#'   `metadata` is a fourth component ordered by input document ID.
-#' @export
-lexdiv_metrics_text_batch <- function(
+.lexdiv_metrics_text_batch <- function(
     documents, id_col = "document_id", text_col = "text",
     unit = "surface", word_inclusion = "all",
     normalization = "NFC", case = "lower", keep_numbers = FALSE,
-    tokenizer = "english", ..., plan = NULL, max_rows = 1e6, metadata = NULL) {
-  supplied <- c(normalization = !missing(normalization), case = !missing(case),
-    keep_numbers = !missing(keep_numbers), tokenizer = !missing(tokenizer))
+    tokenizer = "english",
+    metrics = setdiff(lexdiv_metric_ids(), c("expected_ttr_d", "mtld_ma")),
+    segment_length = 50L, window_length = 50L, mtld_threshold = 0.72,
+    sample_size = 42L, expected_ttr_sample_sizes = 35:50,
+    plan = NULL, max_rows = 1e6, metadata = NULL,
+    retain_token_audit = TRUE,
+    supplied_tokenizer = c(normalization = !missing(normalization), case = !missing(case),
+      keep_numbers = !missing(keep_numbers), tokenizer = !missing(tokenizer)),
+    supplied_id_text = c(id_col = !missing(id_col), text_col = !missing(text_col)),
+    supplied_metrics = c(metrics = !missing(metrics), segment_length = !missing(segment_length),
+      window_length = !missing(window_length), mtld_threshold = !missing(mtld_threshold),
+      sample_size = !missing(sample_size), expected_ttr_sample_sizes = !missing(expected_ttr_sample_sizes)),
+    supplied_max_rows = !missing(max_rows)) {
+  retain_token_audit <- .lexprep_scalar_flag(retain_token_audit, "retain_token_audit")
   if (is.list(documents) && !is.data.frame(documents)) {
     if (is.object(documents) || !identical(names(attributes(documents)), "names")) {
       stop("Prepared documents must be a plain named list of tokenization objects.", call. = FALSE)
     }
     names(documents) <- .lex_batch_validate_ids(names(documents), length(documents))
-    if (any(supplied)) {
+    if (any(supplied_tokenizer)) {
       stop("Tokenizer arguments apply only to raw text; prepared documents already record these choices.",
         call. = FALSE)
     }
-    if (!missing(id_col) || !missing(text_col)) {
+    if (any(supplied_id_text)) {
       stop("id_col and text_col apply only to data-frame input.", call. = FALSE)
     }
     prepared <- documents
@@ -147,7 +143,7 @@ lexdiv_metrics_text_batch <- function(
         sprintf("Document %s", encodeString(names(prepared)[[i]], quote = '"')))
     }
   } else {
-    prepared <- lexdiv_tokenize_batch(documents, id_col, text_col,
+    prepared <- .lexdiv_tokenize_batch(documents, id_col, text_col,
       normalization, case, keep_numbers, tokenizer)
   }
   metadata <- .lextext_metadata(metadata, names(prepared))
@@ -155,14 +151,15 @@ lexdiv_metrics_text_batch <- function(
   word_inclusion <- .lexprep_scalar_choice(word_inclusion, c("all", "content"), "word_inclusion")
 
   if (!is.null(plan)) {
-    if (...length() > 0L) {
-      stop("With plan, omit all metric arguments in ...; put requests in the plan.", call. = FALSE)
+    if (any(supplied_metrics)) {
+      stop("With plan, omit metrics and individual metric parameters; put requests in the plan.", call. = FALSE)
     }
     max_rows <- .profile_positive_integer(max_rows, "max_rows")
     plan <- .profile_validate_plan(plan)
     pieces <- lapply(seq_along(prepared), function(i) {
-      tryCatch(lexdiv_metrics_text(prepared[[i]], unit = unit,
-        word_inclusion = word_inclusion, plan = plan), error = function(e) {
+      tryCatch(.lexdiv_metrics_text_single(prepared[[i]], unit = unit,
+        word_inclusion = word_inclusion, plan = plan,
+        retain_token_audit = retain_token_audit), error = function(e) {
           stop(sprintf("Document %s: %s", encodeString(names(prepared)[[i]], quote = '"'),
             conditionMessage(e)), call. = FALSE)
         })
@@ -173,19 +170,34 @@ lexdiv_metrics_text_batch <- function(
     )
     results <- .lexdiv_profile_batch(selected_units, plan = plan, max_rows = max_rows)
   } else {
-    if (!missing(max_rows)) {
+    if (isTRUE(supplied_max_rows)) {
       stop("max_rows requires a non-NULL plan.", call. = FALSE)
     }
-    match.call(lexdiv_metrics_text,
-      quote(lexdiv_metrics_text(NULL, unit = unit, word_inclusion = word_inclusion, ...)),
-      envir = environment())
-    prototype <- lexdiv_metrics_batch(stats::setNames(list(), character()), ...)
+    prototype <- .lexdiv_metrics_batch(
+      stats::setNames(list(), character()),
+      metrics = metrics,
+      segment_length = segment_length,
+      window_length = window_length,
+      mtld_threshold = mtld_threshold,
+      sample_size = sample_size,
+      expected_ttr_sample_sizes = expected_ttr_sample_sizes
+    )
     pieces <- lapply(seq_along(prepared), function(i) {
-      tryCatch(lexdiv_metrics_text(prepared[[i]], unit = unit,
-        word_inclusion = word_inclusion, ...), error = function(e) {
-          stop(sprintf("Document %s: %s", encodeString(names(prepared)[[i]], quote = '"'),
-            conditionMessage(e)), call. = FALSE)
-        })
+      tryCatch(.lexdiv_metrics_text_single(
+        prepared[[i]],
+        unit = unit,
+        word_inclusion = word_inclusion,
+        metrics = metrics,
+        segment_length = segment_length,
+        window_length = window_length,
+        mtld_threshold = mtld_threshold,
+        sample_size = sample_size,
+        expected_ttr_sample_sizes = expected_ttr_sample_sizes,
+        retain_token_audit = retain_token_audit
+      ), error = function(e) {
+        stop(sprintf("Document %s: %s", encodeString(names(prepared)[[i]], quote = '"'),
+          conditionMessage(e)), call. = FALSE)
+      })
     })
     if (length(pieces)) {
       results <- do.call(base::rbind.data.frame, lapply(seq_along(pieces), function(i) {
@@ -197,16 +209,19 @@ lexdiv_metrics_text_batch <- function(
     }
   }
 
-  if (length(pieces)) {
+  empty_audit <- data.frame(
+    document_id = character(),
+    .lexprep_selected_units(.lexdiv_tokenize_single("", warn_cjk = FALSE), "surface", "all")$audit,
+    stringsAsFactors = FALSE
+  )
+  if (retain_token_audit && length(pieces)) {
     audits <- lapply(seq_along(pieces), function(i) {
       data.frame(document_id = rep.int(names(prepared)[[i]], nrow(pieces[[i]]$token_audit)),
         pieces[[i]]$token_audit, stringsAsFactors = FALSE)
     })
     token_audit <- do.call(base::rbind.data.frame, audits)
   } else {
-    token_audit <- data.frame(document_id = character(),
-      .lexprep_selected_units(lexdiv_tokenize(""), "surface", "all")$audit,
-      stringsAsFactors = FALSE)
+    token_audit <- empty_audit
   }
   row.names(results) <- NULL
   row.names(token_audit) <- NULL

@@ -88,7 +88,7 @@ This illustrates the denominator, not a finding about writers.
 ```{r ttr-length-diagnostic, fig.width=7, fig.height=3.8}
 documents <- list(short = rep(letters[1:4], 5), empty = character(),
   long = rep(letters[1:4], 20))
-ttr <- lexdiv_metrics_batch(documents, metrics = "ttr")
+ttr <- lexdiv_metrics(documents, metrics = "ttr")
 local({
   old <- par(mfrow = c(1, 2), mar = c(4.5, 4.3, 1, .5))
   on.exit(par(old))

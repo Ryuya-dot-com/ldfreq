@@ -70,5 +70,5 @@ test_that("saved Japanese file records replay without re-reading original files"
   t <- x$imported$tokens[x$selection$retained, ]
   parts <- setNames(lapply(x$imported$documents$document_id,
     function(id) t$surface[t$document_id == id]), x$imported$documents$document_id)
-  expect_identical(lexdiv_metrics_batch(parts, metrics = "ttr"), x$metrics)
+  expect_identical(lexdiv_metrics(parts, metrics = "ttr"), x$metrics)
 })

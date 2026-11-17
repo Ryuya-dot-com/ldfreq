@@ -27,13 +27,18 @@
   )
 }
 
-.mtld_direction <- function(token_ids, threshold, minimum_factor_length = 1L) {
+.mtld_direction <- function(
+    token_ids,
+    threshold,
+    minimum_factor_length = 1L,
+    comparator = "<") {
   n <- length(token_ids)
   complete_factors <- 0L
   factor_length <- 0L
   factor_type_count <- 0L
   seen_generation <- integer(if (n == 0L) 0L else max(token_ids))
   generation <- 1L
+  use_le <- identical(comparator, "<=")
 
   for (token_id in token_ids) {
     factor_length <- factor_length + 1L
@@ -43,7 +48,8 @@
     }
 
     running_ttr <- factor_type_count / factor_length
-    if (factor_length >= minimum_factor_length && running_ttr < threshold) {
+    closes <- if (use_le) running_ttr <= threshold else running_ttr < threshold
+    if (factor_length >= minimum_factor_length && closes) {
       complete_factors <- complete_factors + 1L
       factor_length <- 0L
       factor_type_count <- 0L
@@ -169,8 +175,14 @@
 }
 
 .metric_mtld <- function(
-    tokens, counts = NULL, parameters = list(), minimum_factor_length = 1L) {
-  method_id <- if (minimum_factor_length == 10L) {
+    tokens,
+    counts = NULL,
+    parameters = list(),
+    minimum_factor_length = 1L,
+    comparator = "<") {
+  method_id <- if (identical(comparator, "<=")) {
+    "mtld_seq_bidir_dirmean_le_nomin_linear_tail_v1"
+  } else if (minimum_factor_length == 10L) {
     "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1"
   } else {
     "mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1"
@@ -206,8 +218,8 @@
   }
 
   token_ids <- match(tokens, unique(tokens))
-  forward <- .mtld_direction(token_ids, threshold, minimum_factor_length)
-  reverse <- .mtld_direction(rev(token_ids), threshold, minimum_factor_length)
+  forward <- .mtld_direction(token_ids, threshold, minimum_factor_length, comparator = comparator)
+  reverse <- .mtld_direction(rev(token_ids), threshold, minimum_factor_length, comparator = comparator)
   diagnostics <- .mtld_diagnostics(forward, reverse)
 
   if (!is.finite(forward$score) || !is.finite(reverse$score)) {

@@ -49,17 +49,20 @@
 #' Convert common R token containers to named documents
 #'
 #' Creates the explicit named-list boundary accepted by
-#' [lexdiv_metrics_batch()]. A tidy token table
+#' [lexdiv_metrics()]. A tidy token table
 #' is grouped in first-document-appearance and row order. A `quanteda` tokens
 #' object is converted through its registered `as.list()` method; no `quanteda`
 #' runtime dependency is added to `ldfreq`.
-#' Each selected column must occur exactly once. Empty lists and zero-row
-#' token tables return the same named empty list accepted by both batch APIs.
+#' `lexdiv_tokenization` and `lexdiv_tokenization_batch` objects extract word
+#' tokens (`is_word == TRUE`) from `term_col` (defaulting to `"term"` when
+#' omitted). Each selected column must occur exactly once. Empty lists and
+#' zero-row token tables return a named empty list.
 #'
 #' @param x A named list of token vectors, a data frame with one token per row,
-#'   or a `quanteda` tokens object.
+#'   a `quanteda` tokens object, a `lexdiv_tokenization` object, or a
+#'   `lexdiv_tokenization_batch` object.
 #' @param id_col Name of the document-ID column for data-frame input.
-#' @param token_col Name of the token column for data-frame input.
+#' @param term_col Name of the token column for data-frame or tokenization input.
 #'
 #' @return A plain named list of plain character vectors, preserving document
 #'   and token order.
@@ -67,11 +70,29 @@
 lexdiv_as_documents <- function(
     x,
     id_col = "document_id",
-    token_col = "token") {
+    term_col = "token") {
+  term_col_missing <- missing(term_col)
   id_col <- .lex_batch_scalar_name(id_col, "id_col")
-  token_col <- .lex_batch_scalar_name(token_col, "token_col")
-  if (identical(id_col, token_col)) {
-    stop("id_col and token_col must differ.", call. = FALSE)
+  term_col <- .lex_batch_scalar_name(term_col, "term_col")
+  if (!inherits(x, "lexdiv_tokenization") && !.lex_is_tokenization_batch(x) &&
+      identical(id_col, term_col)) {
+    stop("id_col and term_col must differ.", call. = FALSE)
+  }
+
+  if (inherits(x, "lexdiv_tokenization")) {
+    tok_col <- if (term_col_missing) "surface" else term_col
+    return(list(document_1 = .lexdiv_extract_tokenization_terms(x, tok_col)))
+  }
+
+  if (.lex_is_tokenization_batch(x)) {
+    tok_col <- if (term_col_missing) "surface" else term_col
+    batch <- .lex_batch_documents(
+      x,
+      id_col = id_col,
+      term_col = tok_col,
+      extract_tokenization = TRUE
+    )
+    return(.lex_named_documents(stats::setNames(batch$tokens, batch$ids)))
   }
 
   if (inherits(x, "tokens")) {
@@ -91,21 +112,23 @@ lexdiv_as_documents <- function(
   if (is.data.frame(x)) {
     x <- base::as.data.frame(x, stringsAsFactors = FALSE, check.names = FALSE, optional = TRUE)
     columns <- .lex_batch_column_names(names(x))
-    if (sum(columns == id_col) != 1L || sum(columns == token_col) != 1L) {
+    if (sum(columns == id_col) != 1L || sum(columns == term_col) != 1L) {
       stop(
-        "A data-frame input must contain exactly one selected ID column and one selected token column.",
+        "A data-frame input must contain exactly one selected ID column and one selected term column.",
         call. = FALSE
       )
     }
     ids <- .lex_document_ids(.lex_strip_names(x[[which(columns == id_col)]]), id_col)
-    tokens <- x[[which(columns == token_col)]]
+    tokens <- x[[which(columns == term_col)]]
     if (!is.character(tokens) || is.object(tokens) || !is.null(dim(tokens))) {
-      stop(sprintf("%s must be a plain character token column.", token_col), call. = FALSE)
+      stop(sprintf("%s must be a plain character token column.", term_col), call. = FALSE)
+    }
+    if (length(ids) == 0L) {
+      return(stats::setNames(list(), character()))
     }
     ordered_ids <- unique(ids)
-    documents <- lapply(ordered_ids, function(document_id) {
-      unname(tokens[ids == document_id])
-    })
+    grouped <- split(unname(tokens), factor(ids, levels = ordered_ids))
+    documents <- lapply(grouped, unname)
     names(documents) <- ordered_ids
     return(.lex_named_documents(documents))
   }
@@ -230,7 +253,11 @@ lexdiv_widen <- function(
   }
 
   if (nrow(x) == 0L) {
-    output <- x[id_cols]
+    output <- base::as.data.frame(
+      as.list(x)[id_cols],
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
     row.names(output) <- NULL
     class(output) <- c("lexdiv_wide_results", "data.frame")
     return(output)
@@ -290,7 +317,8 @@ lexdiv_widen <- function(
   if (mtld_diagnostics) {
     supported <- x$method_id %in% c(
       "mtld_seq_bidir_dirmean_lt_nomin_linear_tail_v1",
-      "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1"
+      "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
+      "mtld_seq_bidir_dirmean_le_nomin_linear_tail_v1"
     )
     diagnostics <- .lex_mtld_diagnostic_table(
       if ("diagnostics" %in% names(x)) x$diagnostics else vector("list", nrow(x)))

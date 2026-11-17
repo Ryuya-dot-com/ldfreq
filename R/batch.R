@@ -75,7 +75,27 @@
   column_names
 }
 
-.lex_batch_documents <- function(documents, id_col, tokens_col) {
+.lex_batch_documents <- function(
+    documents,
+    id_col,
+    term_col,
+    extract_tokenization = FALSE) {
+  if (.lex_is_tokenization_batch(documents)) {
+    if (!is.list(documents) || is.null(names(documents))) {
+      stop("A lexdiv_tokenization_batch object must be a named list.", call. = FALSE)
+    }
+    ids <- .lex_batch_validate_ids(names(documents), length(documents))
+    tokens <- lapply(seq_along(documents), function(index) {
+      element <- .subset2(documents, index)
+      if (extract_tokenization) {
+        .lexdiv_extract_tokenization_terms(element, term_col)
+      } else {
+        element
+      }
+    })
+    return(list(ids = ids, tokens = tokens))
+  }
+
   if (is.data.frame(documents)) {
     documents <- base::as.data.frame(
       documents,
@@ -85,10 +105,10 @@
     )
     column_names <- .lex_batch_column_names(names(documents))
     id_matches <- which(column_names == id_col)
-    tokens_matches <- which(column_names == tokens_col)
+    tokens_matches <- which(column_names == term_col)
     if (length(id_matches) != 1L || length(tokens_matches) != 1L) {
       stop(
-        "A data-frame input must contain exactly one selected ID column and one selected tokens column.",
+        "A data-frame input must contain exactly one selected ID column and one selected term column.",
         call. = FALSE
       )
     }
@@ -103,7 +123,7 @@
         !is.null(dim(token_column)) ||
         length(token_column) != document_count
     ) {
-      stop("The selected tokens column must be a list-column with one element per document.", call. = FALSE)
+      stop("The selected term column must be a list-column with one element per document.", call. = FALSE)
     }
 
     tokens <- lapply(seq_len(document_count), function(index) {
@@ -120,7 +140,7 @@
       is.null(names(documents))
   ) {
     stop(
-      "documents must be either a plain named list or a data frame with selected ID and tokens columns.",
+      "documents must be either a plain named list or a data frame with selected ID and term columns.",
       call. = FALSE
     )
   }
@@ -166,33 +186,10 @@
   result
 }
 
-#' Compute versioned lexical-diversity metrics for multiple tokenized documents
-#'
-#' This narrow adapter accepts either a plain named list of token vectors or a
-#' data frame containing an explicit character ID column and a list-column of
-#' token vectors. It performs no tokenization or normalization. Structurally
-#' invalid containers stop; invalid token vectors are represented by the same
-#' per-metric `invalid_input` records as [lexdiv_metrics()].
-#'
-#' @param documents A plain named list, or a data frame with the columns selected
-#'   by `id_col` and `tokens_col`.
-#' @param id_col Name of the explicit document-ID column for data-frame input.
-#' @param tokens_col Name of the token list-column for data-frame input.
-#' @param ... Arguments forwarded unchanged to [lexdiv_metrics()].
-#'   Must be empty when `plan` is supplied.
-#' @param plan Optional normalized plan from [lexdiv_plan()].
-#' @param max_rows Maximum document-by-specification rows when `plan` is supplied.
-#'   Omit this argument for ordinary metric requests.
-#'
-#' @return A long-form `lexdiv_batch_results` data frame ordered by document and
-#'   then requested metric. The explicit document/batch envelope is followed by
-#'   all single-document result columns, whose schema identity is preserved.
-#'   With `plan`, returns the complete `lexdiv_profile_batch_results` table.
-#' @export
-lexdiv_metrics_batch <- function(
+.lexdiv_metrics_batch <- function(
     documents,
     id_col = "document_id",
-    tokens_col = "tokens",
+    term_col = "tokens",
     ...,
     plan = NULL,
     max_rows = 1e6) {
@@ -201,7 +198,7 @@ lexdiv_metrics_batch <- function(
       stop("With plan, omit all metric arguments in ...; put requests in the plan.", call. = FALSE)
     }
     return(.lexdiv_profile_batch(
-      documents, plan = plan, id_col = id_col, tokens_col = tokens_col,
+      documents, plan = plan, id_col = id_col, term_col = term_col,
       max_rows = max_rows
     ))
   }
@@ -209,19 +206,19 @@ lexdiv_metrics_batch <- function(
     stop("max_rows requires a non-NULL plan.", call. = FALSE)
   }
   id_col <- .lex_batch_scalar_name(id_col, "id_col")
-  tokens_col <- .lex_batch_scalar_name(tokens_col, "tokens_col")
-  if (identical(id_col, tokens_col)) {
-    stop("id_col and tokens_col must select different columns.", call. = FALSE)
+  term_col <- .lex_batch_scalar_name(term_col, "term_col")
+  if (!.lex_is_tokenization_batch(documents) && identical(id_col, term_col)) {
+    stop("id_col and term_col must select different columns.", call. = FALSE)
   }
 
-  batch <- .lex_batch_documents(documents, id_col, tokens_col)
+  batch <- .lex_batch_documents(documents, id_col, term_col, extract_tokenization = TRUE)
   document_count <- length(batch$tokens)
 
   # Validate the selected metric set and every selected metric-local parameter
   # independently of both document count and per-document token validity. Ten
   # repeated valid tokens reach every current parameter validator without
   # requiring allocation proportional to a requested window or sample size.
-  prototype <- lexdiv_metrics(
+  prototype <- .lexdiv_metrics_single(
     tokens = rep.int("lexdiv_batch_parameter_probe", 10L),
     ...
   )
@@ -234,7 +231,7 @@ lexdiv_metrics_batch <- function(
   }
 
   pieces <- lapply(seq_len(document_count), function(index) {
-    result <- lexdiv_metrics(tokens = batch$tokens[[index]], ...)
+    result <- .lexdiv_metrics_single(tokens = batch$tokens[[index]], ...)
     .lex_batch_prepend_id(result, batch$ids[[index]])
   })
   prototype <- pieces[[1L]]

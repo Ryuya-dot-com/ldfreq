@@ -1,12 +1,12 @@
 {
   "$schema": "lexical-diversity-variant-contract.schema.json",
   "contract_id": "ldfreq-lexical-diversity-variants",
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "status": "normative",
   "core_contract_changed": false,
   "default_expansion": {
     "maas_methods": 4,
-    "mtld_methods": 4,
+    "mtld_methods": 5,
     "mtld_thresholds": [
       0.72
     ],
@@ -43,12 +43,19 @@
     }
   ],
   "mtld_shared_rules": {
-    "threshold_comparison": "strict-less-than",
-    "minimum_complete_factor_length": 10,
+    "threshold_comparison": "method-specific (< or <=)",
+    "minimum_complete_factor_length": "method-specific (1 or 10)",
     "partial_factor_credit": "(1-tail_TTR)/(1-threshold)-unclamped",
     "directions": ["forward", "reverse"]
   },
   "mtld_methods": [
+    {
+      "method_id": "mtld_seq_bidir_dirmean_le_nomin_linear_tail_v1",
+      "aggregation": "mean(N/forward_factor_sum,N/reverse_factor_sum)",
+      "final_token_rule": "evaluate-closure-before-tail",
+      "reference_label": "McCarthy-Jarvis-2010:mtld-le",
+      "scope": "threshold-comparator-le-no-minimum-length"
+    },
     {
       "method_id": "mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1",
       "aggregation": "mean(N/forward_factor_sum,N/reverse_factor_sum)",

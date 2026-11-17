@@ -12,7 +12,8 @@ lexdiv_recipe(
   keep_numbers = FALSE,
   tokenizer = "english",
   resources = character(),
-  tubelex_tokenization_mismatch = "error"
+  tubelex_tokenization_mismatch = "error",
+  nj8_unit = "surface"
 )
 \method{print}{lexdiv_recipe}(x, ...)
 }
@@ -27,6 +28,9 @@ Only the package's pinned, already downloaded resources are supported.}
 \item{tubelex_tokenization_mismatch}{\code{"error"} or \code{"allow"}. The built-in
 tokenizer differs from TUBELEX segmentation; including TUBELEX requires
 explicit \code{"allow"}, recorded as a segmentation-sensitivity analysis.}
+\item{nj8_unit}{\code{"surface"} (default, schema 1.0.0) or \code{"lemma"}
+(schema 1.1.0, using \pkg{textstem} lemmatization for NJ8 lookup when
+\code{"nj8"} is in \code{resources}).}
 \item{x}{A recipe or analysis record for compact display.}
 \item{...}{Unused additional arguments.}
 }

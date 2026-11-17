@@ -104,7 +104,7 @@ prepared <- lapply(c("unicode", "english"), function(rule) {
   lexdiv_tokenize(comparison_text, tokenizer = rule, case = "lower")
 })
 names(prepared) <- c("unicode", "english")
-comparison <- lexdiv_metrics_text_batch(prepared, metrics = "ttr")
+comparison <- lexdiv_metrics_text(prepared, metrics = "ttr")
 print(comparison$results[, c("document_id", "N", "V", "value")], row.names = FALSE)
 lapply(prepared, function(x) x$tokens$surface)
 ```
@@ -295,25 +295,25 @@ essays <- data.frame(
   response = c("The student reads a book and discusses the book.",
                "A reader explores a story with a friend.", "")
 )
-tokens <- lexdiv_tokenize_batch(
+tokens <- lexdiv_tokenize(
   essays, id_col = "essay_id", text_col = "response",
   tokenizer = "english", case = "lower"
 )
-analysis <- lexdiv_metrics_text_batch(
+analysis <- lexdiv_metrics_text(
   tokens, metrics = c("ttr", "mattr"), window_length = 5
 )
 analysis$results
 ```
 
 ```{r, eval=has_nj8}
-levels <- nj8_profile_batch(tokens, unit = "surface")
+levels <- nj8_profile(tokens, unit = "surface")
 levels$coverage
 ```
 
 The output keeps the input document order. Empty documents retain metric rows
 with missing values and reasons, plus a preprocessing record. They have no token
 audit rows. Short documents never reduce another document's requested window.
-For raw text alone, `lexdiv_metrics_text_batch(essays, id_col = "essay_id",
+For raw text alone, `lexdiv_metrics_text(essays, id_col = "essay_id",
 text_col = "response", tokenizer = "english", case = "lower", ...)` combines
 the two steps. For existing tokenizations, omit tokenizer arguments: their
 recorded settings are authoritative. Annotated tokenizations can be analyzed
@@ -467,7 +467,7 @@ justify the window for your task and length distribution; keep it common across
 comparable texts rather than shrinking it for short documents.
 
 ```{r file-input-analysis}
-file_tokens <- lexdiv_tokenize_batch(file_documents,
+file_tokens <- lexdiv_tokenize(file_documents,
   id_col = "document_id", text_col = "text", tokenizer = "english",
   normalization = "NFC", case = "lower")
 metadata_input <- input_helpers$read_text_file(file.path(input_dir, "metadata.csv"))
@@ -475,7 +475,7 @@ metadata_connection <- textConnection(metadata_input$text, encoding = "UTF-8")
 file_metadata <- read.csv(metadata_connection, encoding = "UTF-8",
   colClasses = "character", na.strings = "<MISSING>", check.names = FALSE)
 close(metadata_connection)
-file_analysis <- lexdiv_metrics_text_batch(file_tokens,
+file_analysis <- lexdiv_metrics_text(file_tokens,
   metrics = c("ttr", "mattr"), window_length = 50, metadata = file_metadata)
 file_results <- file_analysis$results[c("document_id", "metric_id", "N", "V", "value",
   "status", "missing_reason")]

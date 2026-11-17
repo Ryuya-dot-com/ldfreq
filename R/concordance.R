@@ -20,13 +20,84 @@
   as.integer(x)
 }
 
-concordance_search <- function(x, queries, term_col = "surface",
-    valuetype = c("fixed", "glob", "regex"), case_insensitive = FALSE,
-    keep = rep(TRUE, nrow(x$tokens)), window = 5L, max_cells = 1e6) {
+.concordance_match_one <- function(tokens, pattern_elem, valuetype, case_insensitive) {
+  if (!length(tokens)) return(logical())
+  if (identical(valuetype, "fixed")) {
+    if (case_insensitive) {
+      return(stringi::stri_trans_tolower(tokens) == stringi::stri_trans_tolower(pattern_elem))
+    }
+    return(tokens == pattern_elem)
+  }
+  rx <- if (identical(valuetype, "glob")) utils::glob2rx(pattern_elem) else pattern_elem
+  stringi::stri_detect_regex(tokens, rx, case_insensitive = case_insensitive)
+}
+
+.concordance_fallback_kwic <- function(seg, tokens_df, term, searchable, pattern,
+                                       valuetype, case_insensitive) {
+  k <- length(pattern)
+  n_seg <- nrow(seg)
+  seg_key <- .lexng_key(seg[c("document_id", "segment_id")])
+  tok_group <- match(.lexng_key(tokens_df[c("document_id", "segment_id")]), seg_key)
+  rows_by_seg <- split(seq_len(nrow(tokens_df)), factor(tok_group, levels = seq_len(n_seg)))
+  docnames <- character()
+  froms <- integer()
+  tos <- integer()
+  for (s in seq_len(n_seg)) {
+    slot_count <- seg$token_count[[s]]
+    if (slot_count < k) next
+    r <- rows_by_seg[[s]]
+    if (length(r) < k) next
+    # r is in 1..slot_count consecutive order from lexdiv_import_annotations
+    step_matches <- lapply(seq_len(k), function(step) {
+      ok <- searchable[r]
+      m <- rep(FALSE, length(r))
+      if (any(ok)) {
+        m[ok] <- .concordance_match_one(
+          term[r[ok]], pattern[[step]], valuetype, case_insensitive
+        )
+      }
+      m
+    })
+    max_start <- slot_count - k + 1L
+    hit <- rep(TRUE, max_start)
+    for (step in seq_len(k)) {
+      hit <- hit & step_matches[[step]][seq.int(step, step + max_start - 1L)]
+      if (!any(hit)) break
+    }
+    starts <- which(hit)
+    if (length(starts)) {
+      docnames <- c(docnames, rep.int(paste0("segment_", s), length(starts)))
+      froms <- c(froms, starts)
+      tos <- c(tos, starts + k - 1L)
+    }
+  }
+  data.frame(
+    docname = docnames,
+    from = froms,
+    to = tos,
+    stringsAsFactors = FALSE
+  )
+}
+
+concordance_search <- function(
+    x,
+    queries,
+    term_col = NULL,
+    valuetype = c("fixed", "glob", "regex"),
+    case_insensitive = FALSE,
+    keep = NULL,
+    window = 5L,
+    max_cells = 1e6) {
   valuetype <- match.arg(valuetype)
   window <- .concordance_whole(window, "window", 0)
   max_cells <- .concordance_whole(max_cells, "max_cells")
   x <- .lexann_check(x, "x", max_cells)
+  if (is.null(term_col)) {
+    term_col <- if (all(c("term", "is_word") %in% names(x$tokens))) "term" else "surface"
+  }
+  if (is.null(keep)) {
+    keep <- if ("is_word" %in% names(x$tokens)) x$tokens$is_word else rep(TRUE, nrow(x$tokens))
+  }
   strings <- function(z) is.character(z) && length(z) > 0L && !anyNA(z) &&
     all(validUTF8(z)) && all(nzchar(stringi::stri_trim_both(z)))
   if (!is.list(queries) || !length(queries) || !strings(names(queries)) ||
@@ -45,8 +116,17 @@ concordance_search <- function(x, queries, term_col = "surface",
     stop("Search terms must be valid UTF-8.", call. = FALSE)
   available <- !is.na(term) & nzchar(stringi::stri_trim_both(term))
   searchable <- keep & available
-  q <- lexdiv_as_quanteda(x$tokens[searchable, , drop = FALSE],
-    x$segments, term_col = term_col, max_tokens = max_cells)
+  has_quanteda <- requireNamespace("quanteda", quietly = TRUE)
+  q <- if (has_quanteda) {
+    lexdiv_as_quanteda(x$tokens[searchable, , drop = FALSE],
+      x$segments, term_col = term_col, max_tokens = max_cells)
+  } else {
+    if (any(stringi::stri_detect_regex(term[searchable], "\\p{White_Space}")))
+      stop("Terms must be non-empty single tokens without whitespace.", call. = FALSE)
+    seg_tmp <- x$segments
+    seg_tmp$quanteda_docname <- paste0("segment_", seq_len(nrow(seg_tmp)))
+    list(segments = seg_tmp)
+  }
   ids <- x$documents$document_id
   if (as.double(length(ids)) * length(queries) > max_cells)
     stop("Document-query count cells exceed max_cells.", call. = FALSE)
@@ -61,8 +141,20 @@ concordance_search <- function(x, queries, term_col = "surface",
   pieces <- vector("list", length(queries))
   total <- 0
   for (i in seq_along(queries)) {
-    kw <- as.data.frame(quanteda::kwic(q$tokens, unname(queries[i]),
-      window = 0L, valuetype = valuetype, case_insensitive = case_insensitive))
+    kw <- if (has_quanteda) {
+      as.data.frame(quanteda::kwic(q$tokens, unname(queries[i]),
+        window = 0L, valuetype = valuetype, case_insensitive = case_insensitive))
+    } else {
+      .concordance_fallback_kwic(
+        seg = seg,
+        tokens_df = x$tokens,
+        term = term,
+        searchable = searchable,
+        pattern = queries[[i]],
+        valuetype = valuetype,
+        case_insensitive = case_insensitive
+      )
+    }
     group <- match(kw$docname, q$segments$quanteda_docname)
     if (anyNA(group) || any(kw$from < 1 | kw$to > seg$token_count[group]) ||
         any(kw$to - kw$from + 1L != length(queries[[i]])))
@@ -121,7 +213,7 @@ concordance_search <- function(x, queries, term_col = "surface",
     source_coordinates = "segment-local-1-based-inclusive-Unicode-codepoints")
   provenance <- list(recipe_version = "1",
     ldfreq_version = as.character(utils::packageVersion("ldfreq")),
-    quanteda_version = as.character(utils::packageVersion("quanteda")),
+    quanteda_version = if (has_quanteda) as.character(utils::packageVersion("quanteda")) else NA_character_,
     stringi_version = as.character(utils::packageVersion("stringi")),
     unicode = stringi::stri_info()[c("ICU.version", "Unicode.version")],
     search_id = .concordance_hash(list(x$provenance, queries, settings)))
@@ -251,10 +343,16 @@ concordance_positions <- function(
   invisible(list(occurrences = hits, documents = docs, counts = count))
 }
 
-concordance_dispersion <- function(x, query_id = NULL, parts = 10L, max_cells = 1e6) {
+concordance_dispersion <- function(
+    x,
+    query_id = NULL,
+    parts = 10L,
+    max_cells = 1e6,
+    include_normalized = FALSE) {
   .concordance_check(x)
   parts <- .concordance_whole(parts, "parts", 2)
   max_cells <- .concordance_whole(max_cells, "max_cells")
+  include_normalized <- .lexprep_scalar_flag(include_normalized, "include_normalized")
   if (is.null(query_id)) {
     if (length(x$queries) != 1L) stop("Choose one saved query_id.", call. = FALSE)
     query_id <- names(x$queries)[[1L]]
@@ -268,14 +366,24 @@ concordance_dispersion <- function(x, query_id = NULL, parts = 10L, max_cells = 
   if (as.double(nrow(docs)) * parts > max_cells)
     stop("Document-part cells exceed max_cells.", call. = FALSE)
   hits <- x$occurrences[x$occurrences$query_id == query_id, , drop = FALSE]
+  n_docs <- nrow(docs)
   token_doc <- match(x$source$tokens$document_id, docs$document_id)
-  tables <- vector("list", nrow(docs)); summary <- vector("list", nrow(docs))
-  for (i in seq_len(nrow(docs))) {
+  searchable_by_doc <- split(
+    x$settings$searchable,
+    factor(token_doc, levels = seq_len(n_docs))
+  )
+  hit_doc <- match(hits$document_id, docs$document_id)
+  pos_by_doc <- split(
+    hits$document_from,
+    factor(hit_doc, levels = seq_len(n_docs))
+  )
+  tables <- vector("list", n_docs); summary <- vector("list", n_docs)
+  for (i in seq_len(n_docs)) {
     n <- docs$source_tokens[i]
     # The same original slots define the graph and the fixed within-document bins.
     bins <- if (n) as.integer(floor((seq_len(n) - 1) * as.double(parts) / n) + 1L) else integer()
-    selected <- x$settings$searchable[token_doc == i]
-    position <- hits$document_from[hits$document_id == docs$document_id[i]]
+    selected <- searchable_by_doc[[i]]
+    position <- pos_by_doc[[i]]
     count <- tabulate(bins[position], parts)
     exposure <- tabulate(bins[selected], parts)
     total <- sum(count); denominator <- sum(exposure)
@@ -291,15 +399,25 @@ concordance_dispersion <- function(x, query_id = NULL, parts = 10L, max_cells = 
       source_to = ifelse(size > 0, cumsum(size), NA_real_), source_tokens = size,
       searchable_tokens = exposure, occurrences = count,
       expected_share = expected, observed_share = observed)
-    summary[[i]] <- data.frame(document_id = docs$document_id[i], query_id = query_id,
+    doc_row <- data.frame(document_id = docs$document_id[i], query_id = query_id,
       source_tokens = n, searchable_tokens = denominator, occurrences = total,
       parts = parts, nonempty_parts = sum(exposure > 0),
       DP = dp, status = if (is.na(reason)) "ok" else "missing", missing_reason = reason)
+    if (include_normalized) {
+      min_exp <- if (is.na(reason)) min(expected[exposure > 0]) else NA_real_
+      doc_row$DP_norm <- if (is.na(reason) && is.finite(min_exp) && min_exp < 1) {
+        dp / (1 - min_exp)
+      } else {
+        NA_real_
+      }
+    }
+    summary[[i]] <- doc_row
   }
   structure(
     list(documents = do.call(rbind, summary), parts = do.call(rbind, tables),
       occurrence_ids = hits$occurrence_id,
-      settings = list(measure = "DP", normalization = "none",
+      settings = list(measure = "DP",
+        normalization = if (include_normalized) "min-nonzero-expected-share" else "none",
         partition = "floor((original_position-1)*parts/source_tokens)+1",
         parts = parts, expected = "searchable-token-share-in-each-part",
         scope = "within-document; single-token-query",

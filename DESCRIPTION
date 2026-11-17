@@ -1,7 +1,7 @@
 Package: ldfreq
 Type: Package
 Title: Reproducible Lexical Diversity and Frequency Profiles
-Version: 1.0.0.9001
+Version: 1.99.0.9000
 Authors@R:
     c(person(
         given = "Ryuya",

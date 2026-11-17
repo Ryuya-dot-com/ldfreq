@@ -35,7 +35,7 @@ japanese_frequency_documents <- function(profile, keys, reference) {
     t$lookup_term[t$document_id == id & t$retained & !is.na(t$lookup_term)]), ids)
   # Reuse the public implementation for validation, means, token/type weighting
   # and all measure-level missingness; no independent frequency formula here.
-  norms <- ldfreq::lexdiv_norm_profile_batch(terms, reference$norms, reference$key,
+  norms <- ldfreq::lexdiv_norm_profile(terms, reference$norms, reference$key,
     reference$measure_specs, reference$resource)
   # Validate even excluded keys, which never enter the document summaries.
   all_keys <- t$lookup_term[!is.na(t$lookup_term)]

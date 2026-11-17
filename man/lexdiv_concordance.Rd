@@ -16,10 +16,10 @@ positional barcode plots, or compute single-token within-document dispersion.
 lexdiv_concordance(
   x,
   queries,
-  term_col = "surface",
+  term_col = NULL,
   valuetype = c("fixed", "glob", "regex"),
   case_insensitive = FALSE,
-  keep = rep(TRUE, nrow(x$tokens)),
+  keep = NULL,
   window = 5L,
   max_cells = 1e6
 )
@@ -35,7 +35,8 @@ lexdiv_concordance_dispersion(
   x,
   query_id = NULL,
   parts = 10L,
-  max_cells = 1e6
+  max_cells = 1e6,
+  include_normalized = FALSE
 )
 
 \method{print}{lexdiv_concordance}(x, ...)
@@ -60,11 +61,13 @@ lexdiv_concordance_dispersion(
 unmodified \code{lexdiv_concordance} object. For \code{print.lexdiv_dispersion},
 a \code{lexdiv_dispersion} object.}
 \item{queries}{Named list with unique nonblank query IDs.}
-\item{term_col}{Character token column to search, such as \code{"surface"},
-\code{"term"} (from \code{lexdiv_as_annotations()}), or \code{"lemma"}.}
-\item{valuetype}{Fixed, glob or regex matching through optional \pkg{quanteda}.}
+\item{term_col}{Character token column to search. When \code{NULL}, defaults to
+\code{"term"} on bridged raw-text annotations and \code{"surface"} otherwise.}
+\item{valuetype}{Fixed, glob or regex matching (uses \pkg{quanteda} when
+installed, with a pure-R \pkg{stringi} fallback).}
 \item{case_insensitive}{Logical switch for case-insensitive matching or sorting.}
-\item{keep}{One nonmissing logical value per original token.}
+\item{keep}{One nonmissing logical value per original token. When \code{NULL},
+defaults to \code{x$tokens$is_word} when present and all tokens otherwise.}
 \item{window}{Nonnegative number of context surface-token slots on each side.}
 \item{max_cells}{Positive whole-number allocation bound.}
 \item{side}{Context side to sort, nearest token first.}
@@ -72,6 +75,8 @@ a \code{lexdiv_dispersion} object.}
 \item{query_id}{Saved query ID to inspect. Defaults to the sole query when
 \code{x} contains exactly one query.}
 \item{parts}{Number of within-document parts (integer >= 2).}
+\item{include_normalized}{Logical; if \code{TRUE}, appends Gries's normalized
+\code{DP_norm} (\code{DP / (1 - min_expected_share)}) to \code{documents}.}
 \item{relative}{Plot relative positions in \code{[0, 1]} (\code{TRUE}) or raw
 token positions (\code{FALSE}).}
 \item{monochrome}{Use black rather than default color.}
@@ -87,13 +92,11 @@ positional plot and invisibly returns \code{list(occurrences, documents, counts)
 }
 \examples{
 ann <- lexdiv_as_annotations(c(d1 = "Cats chase cats and dogs.", empty = ""))
-if (requireNamespace("quanteda", quietly = TRUE)) {
-  search <- lexdiv_concordance(ann, list(cat = "cats"), term_col = "term")
-  print(search)
-  lexdiv_sort_concordance(search, case_insensitive = TRUE)
-  lexdiv_concordance_dispersion(search, parts = 3)
-  plot(search)
-}
+search <- lexdiv_concordance(ann, list(cat = "cats"))
+print(search)
+lexdiv_sort_concordance(search, case_insensitive = TRUE)
+lexdiv_concordance_dispersion(search, parts = 3, include_normalized = TRUE)
+plot(search)
 }
 \seealso{\code{\link{lexdiv_as_annotations}}, \code{\link{lexdiv_collocations}},
 \code{\link{lexdiv_keyness}}}

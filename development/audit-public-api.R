@@ -39,7 +39,7 @@ s3_lines <- grep(
   value = TRUE
 )
 s3_methods <- sub(
-  "^S3method\\(([^,]+),([^)]+)\\)$",
+  '^S3method\\("?([^",]+)"?,[[:space:]]*"?([^")]+)"?\\)$',
   "\\1.\\2",
   s3_lines
 )
@@ -166,7 +166,13 @@ retired_names <- c(
   "tubelex_frequency_profile", "lexdiv_overlap_measure_ids",
   "lexdiv_ngram_compare", "lexdiv_ngram_reference_build",
   "lexdiv_concordance_sort", "lexdiv_screen",
-  "lexdiv_variant_ids", "lexdiv_profile", "lexdiv_profile_batch"
+  "lexdiv_variant_ids", "lexdiv_profile", "lexdiv_profile_batch",
+  "lexdiv_tokenize_batch", "lexdiv_lemmatize_batch",
+  "lexdiv_flemmatize_batch", "lexdiv_metrics_batch",
+  "lexdiv_metrics_text_batch"
+)
+retired_call_names <- c(
+  "nj8_profile_batch", "tubelex_profile_batch", "lexdiv_norm_profile_batch"
 )
 public_paths <- c(
   "DESCRIPTION", "NAMESPACE", "README.md", "R", "man",
@@ -193,6 +199,20 @@ for (retired in retired_names) {
     relative <- substring(public_files[hits], nchar(package_root) + 2L)
     fail(
       "Retired public name %s remains in: %s",
+      retired,
+      paste(relative, collapse = ", ")
+    )
+  }
+}
+for (retired in retired_call_names) {
+  pattern <- paste0("(?<![.A-Za-z0-9_])", retired, "\\(")
+  hits <- vapply(public_files, function(path) {
+    any(grepl(pattern, readLines(path, warn = FALSE), perl = TRUE))
+  }, logical(1L))
+  if (any(hits)) {
+    relative <- substring(public_files[hits], nchar(package_root) + 2L)
+    fail(
+      "Retired public function call %s() remains in: %s",
       retired,
       paste(relative, collapse = ", ")
     )

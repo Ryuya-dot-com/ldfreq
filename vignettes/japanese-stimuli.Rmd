@@ -219,7 +219,7 @@ joined[!complete, c("item_id", "condition", "tubelex_status", "wlsp_status",
 
 # Show the individual observations, not just condition means.
 pdf("japanese-stimulus-distributions.pdf", width = 8, height = 7)
-par(mfrow = c(2, 2))
+old_par <- par(mfrow = c(2, 2))
 for (measure in names(measure_columns)) {
   value <- joined[[measure_columns[[measure]]]]
   if (measure == "frequency") value <- log10(value) # matched positive counts only
@@ -228,6 +228,7 @@ for (measure in names(measure_columns)) {
       xlab = "Condition", ylab = if (measure == "frequency") "log10(per million)" else measure)
   } else { plot.new(); message(measure, " has no observed values; see the coverage table.") }
 }
+par(old_par)
 dev.off()
 ```
 

@@ -1,3 +1,42 @@
+# ldfreq 2.0.0 (development)
+
+## Separation of 2.0.0-dev and API consolidation
+
+`main` now tracks the **2.0.0 development series (`1.99.0.9000`)**, distributed via GitHub and documented separately under `/dev/` on the package website while preserving stable `v1.0.0` at the root site.
+
+### Migration from 1.0.x
+
+| 1.0.x call or argument | 2.0.0-dev unified replacement |
+|---|---|
+| `lexdiv_tokenize_batch(docs, ...)` | `lexdiv_tokenize(docs, ...)` |
+| `lexdiv_lemmatize_batch(toks, ...)` | `lexdiv_lemmatize(toks, ...)` |
+| `lexdiv_flemmatize_batch(toks, ...)` | `lexdiv_flemmatize(toks, ...)` |
+| `lexdiv_metrics_batch(docs, ...)` | `lexdiv_metrics(docs, ..., id_col = "document_id", term_col = "tokens")` |
+| `lexdiv_metrics_text_batch(docs, ...)` | `lexdiv_metrics_text(docs, ..., retain_token_audit = TRUE)` |
+| `nj8_profile_batch(docs, ...)` | `nj8_profile(docs, ..., id_col = "document_id", term_col = "terms", cache_dir = NULL)` |
+| `tubelex_profile_batch(docs, ...)` | `tubelex_profile(docs, ..., id_col = "document_id", term_col = "terms", cache_dir = NULL)` |
+| `lexdiv_norm_profile_batch(docs, ...)` | `lexdiv_norm_profile(docs, norms, key, ..., id_col = "document_id", term_col = "terms")` |
+| `token_col` in `lexdiv_as_documents()` | `term_col = "token"` |
+| `terms_col` in `lexdiv_reference_coverage()` | `term_col = "terms"` |
+
+- All eight unified functions dispatch polymorphically on single-document inputs (1D character vectors or single `lexdiv_tokenization` objects) and multi-document containers (`data.frame`, `tibble`, `data.table`, named lists, or batch tokenizations), preserving existing S3 result classes (`lexdiv_batch_results`, `lexdiv_text_batch_results`, `nj8_profile_batch`, `tubelex_profile_batch`, `lexdiv_norm_profile_batch`) for downstream tables and `plot()` methods.
+- Resource-backed profilers and recipe runners (`nj8_profile()`, `tubelex_profile()`, `bnccoca_data()`, `morpholex_data()`, `lexdiv_run_recipe()`) accept `cache_dir = NULL` consistently and reuse a SHA-256-verified in-memory session cache within an R session.
+
+### Bug fixes
+
+- **English word tokenizer (`0.2.0`)**: Prevent regex backtracking from splitting numbers attached to letters (`"1,000km"` and `"10:30am"` stay single tokens instead of `"000km"` / `"30am"`), support undotted trailing initialisms (`"U.S.A"`), strip sentence-final punctuation from URLs, and warn when `tokenizer = "english"` receives predominantly CJK characters without spaces.
+- **New JACET 8000 headword expansion**: Expand inline parenthetical and slash spelling variants (`"program(me)"` -> `"program"`, `"programme"`; `"colo(u)r"` -> `"color"`, `"colour"`; `"color/colour"` -> `"color"`, `"colour"`) alongside spaced parenthetical variants while preserving all 8,000 base ranks.
+- **`lexdiv_norm_profile()` defaults**: Auto-select plain numeric columns when `measure_specs = NULL` (ignoring metadata columns instead of failing on character/factor columns) and sanitize non-identifier column names such as `"%_known"` -> `"pct_known"`.
+- **`lexdiv_as_annotations()` raw-text fidelity**: Retain original cased/curly-quote raw text and exact codepoint offsets (including length-changing Unicode casefolds such as `"İstanbul"`) when bridging raw texts or `lexdiv_tokenization` objects, and default `lexdiv_concordance()` and `lexdiv_keyness()` to `term` + `is_word` when present on bridged annotations.
+- **Zero-dependency corpus fallbacks and UTF-8 handling**: Add pure-R `stringi` KWIC matching to `lexdiv_concordance()` and `lexdiv_ambiguity_review()` when `quanteda` is not installed; replace `substr()` with codepoint-accurate `stringi::stri_sub()` in `lexdiv_read_masc()`; fix `print.lexdiv_contextual_scores()` on matrix components; preserve contract/plan attributes when subsetting `lexdiv_results` (`[.lexdiv_results`); record accurate `optimizer_iterations` and `unbounded_high` `effective_parameters` in `expected_ttr_d`; fix `counted_word` column ordering before sealing in `inst/examples/l2sca.R`; normalize recursive file IDs and strip UTF-8 BOMs in `exec/ldfreq.R` and `.lexprep_antbnc_parse()`; and cache R runtime discovery in `inst/python/ldfreq_r.py`.
+
+### Methodological and workflow upgrades
+
+- **MTLD `<=` comparator variant and factor screening**: Add `mtld_seq_bidir_dirmean_le_nomin_linear_tail_v1` (`TTR <= 0.720`, variant contract `0.2.0`) to `lexdiv_variant_metrics()`, record `mtld_tail_only` in `lexdiv_metrics(..., diagnostics = TRUE)` and `lexdiv_widen(..., mtld_diagnostics = TRUE)`, pre-allocate MTLD factorization buffers, and add `require_mtld_factors` to `lexdiv_screen_lengths()`.
+- **BNC/COCA frequency-band profiling**: `bnccoca_data(include_supplementary = TRUE)` exposes supplementary lists (`proper_nouns`, `marginal_words`, `transparent_compounds`, `abbreviations`), and `lexdiv_family_profile()` computes 1k–25k band token/family/cumulative coverage (`$bands`), `band_95` / `band_98` vocabulary thresholds (`$band_summary`), `matched_family_ttr`, and occurrence-level `occurrence_id` links.
+- **Lexical bundles ($n$-grams up to 12)**: `lexdiv_ngrams()`, `lexdiv_ngram_reference()`, `lexdiv_ngram_profile()`, `lexdiv_build_ngram_reference()`, and `lexdiv_compare_ngrams()` now support $n \in 2..12$ (including 4-gram and 5-gram lexical bundles) while keeping `term1..term3` columns for $n \le 3$.
+- **Dispersion, study tables, and recipes**: Add optional normalized Gries's $DP_{\text{norm}}$ (`include_normalized = TRUE`) and $O(N)$ `split()` indexing in `lexdiv_concordance_dispersion()`; accept `lexdiv_screen_results` or `"quality_floor"` / `"all_computable"` shorthands in `lexdiv_study_table(..., reporting = ...)` and warn on `not_screened` rows in `lexdiv_study_model_data()`; and add `nj8_unit = c("surface", "lemma")`, cross-OS `stringi`/`ICU` mismatch warnings, and `allow_engine_mismatch` to `lexdiv_recipe()` and `lexdiv_run_recipe()`.
+
 # ldfreq 1.0.0.9001 (development)
 
 ## Migration from stable 1.0.0

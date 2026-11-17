@@ -141,7 +141,7 @@ lexdiv_read_masc <- function(files, resource_version, document_ids = NULL,
     tokens <- data.frame(document_id = rep(id, length(node_ids)),
       segment_id = seg$region_id[group], token_index = sequence(counts),
       document_token_index = seq_along(node_ids), annotation_id = node_ids,
-      surface = if (length(node_ids)) substring(text, spans[, "start"], spans[, "end"]) else character(),
+      surface = if (length(node_ids)) stringi::stri_sub(text, spans[, "start"], spans[, "end"]) else character(),
       lemma = feature("base"), pos = feature("msd"), affix = feature("affix"),
       spans, stringsAsFactors = FALSE)
     # Keep other supplied feature values too; no Penn-to-UPOS mapping is inferred.

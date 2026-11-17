@@ -20,7 +20,7 @@
 #' observable string changes, not judgements about annotation accuracy or word
 #' difficulty. The source profile remains the occurrence-level audit trail.
 #'
-#' @param x An unmodified result of [nj8_profile()] or [nj8_profile_batch()].
+#' @param x An unmodified single-document or multi-document result of [nj8_profile()].
 #' @return A `nj8_diagnostics` list of `unmatched_terms`, `unit_mappings`,
 #'   `coverage`, `exclusion_reasons`, `provenance`, and `document_provenance`.
 #'   See the help topic for grouping keys, flag definitions, and the
@@ -29,7 +29,7 @@
 nj8_diagnostics <- function(x) {
   batch <- inherits(x, "nj8_profile_batch")
   if (!is.list(x) || (!batch && !inherits(x, "nj8_profile"))) {
-    stop("x must be a result of nj8_profile() or nj8_profile_batch().", call. = FALSE)
+    stop("x must be a result of nj8_profile().", call. = FALSE)
   }
   lookup <- x$lookup
   fields <- c("surface_term", "term", "lookup_term", "matched")

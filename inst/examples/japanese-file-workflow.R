@@ -96,7 +96,7 @@ ja_file_after <- ldfreq::lexdiv_ambiguity_review(ja_file_import, ja_file_targets
 ja_file_words <- ja_file_import$tokens[ja_file_selection$retained, ]
 ja_file_sequences <- stats::setNames(lapply(ja_document_ids, function(id)
   ja_file_words$surface[ja_file_words$document_id == id]), ja_document_ids)
-ja_file_metrics <- ldfreq::lexdiv_metrics_batch(ja_file_sequences, metrics = "ttr")
+ja_file_metrics <- ldfreq::lexdiv_metrics(ja_file_sequences, metrics = "ttr")
 # Keep all documents. Target identity counts do not describe all body words.
 ja_file_occurrences <- ja_file_after$occurrences
 ja_file_occurrences$in_body <- ja_file_context$in_body[

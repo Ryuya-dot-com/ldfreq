@@ -11,21 +11,27 @@ lexdiv_run_recipe(
   id_col = "document_id",
   text_col = "text",
   metadata = NULL,
-  condition_id = "analysis"
+  condition_id = "analysis",
+  allow_engine_mismatch = FALSE,
+  cache_dir = NULL
 )
 \method{print}{lexdiv_analysis}(x, ...)
 }
 \arguments{
 \item{documents}{Named character vector or ID/text data frame, as for
-\code{\link[=lexdiv_metrics_text_batch]{lexdiv_metrics_text_batch()}}.}
+\code{\link[=lexdiv_metrics_text]{lexdiv_metrics_text()}}.}
 
 \item{recipe}{A recipe from \code{\link[=lexdiv_recipe]{lexdiv_recipe()}} or \code{\link[=lexdiv_read]{lexdiv_read()}}.}
 
 \item{id_col, text_col}{Input column names.}
 
-\item{metadata}{Optional document metadata, as for \code{\link[=lexdiv_metrics_text_batch]{lexdiv_metrics_text_batch()}}.}
+\item{metadata}{Optional document metadata, as for \code{\link[=lexdiv_metrics_text]{lexdiv_metrics_text()}}.}
 
 \item{condition_id}{A label for this analysis condition, not measurement identity.}
+\item{allow_engine_mismatch}{Logical; if \code{TRUE}, allows executing a recipe
+saved under an older package/contract version while recording actual runtime
+versions and issuing a cross-engine warning when \code{stringi}/ICU differs.}
+\item{cache_dir}{Optional directory containing downloaded optional resources.}
 \item{x}{An analysis record for compact display.}
 \item{...}{Unused additional arguments.}
 }

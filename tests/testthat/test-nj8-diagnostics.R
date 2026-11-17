@@ -1,6 +1,6 @@
 test_that("diagnostic counts distinguish occurrences, documents and normalization", {
   words <- data.frame(NJ8 = 1L, Word = "known")
-  p <- nj8_profile_batch(list(a = c("UNKNOWN", "unknown", "known", "x"),
+  p <- nj8_profile(list(a = c("UNKNOWN", "unknown", "known", "x"),
     b = c("unknown", "x", "x"), empty = character()), words, unit = "surface")
   saved <- serialize(p, NULL)
   d <- nj8_diagnostics(p)
@@ -37,7 +37,7 @@ test_that("mapping flags are descriptive and missing lemmas stay excluded", {
 test_that("empty, all-matched and wholly excluded profiles retain typed tables", {
   skip_optional_resources(c("nj8"))
   empty <- nj8_diagnostics(nj8_profile(character()))
-  zero <- nj8_diagnostics(nj8_profile_batch(setNames(list(), character())))
+  zero <- nj8_diagnostics(nj8_profile(setNames(list(), character())))
   expect_identical(empty$unmatched_terms, zero$unmatched_terms)
   expect_identical(empty$unit_mappings, zero$unit_mappings)
   expect_equal(nrow(empty$coverage), 1)
@@ -49,7 +49,7 @@ test_that("empty, all-matched and wholly excluded profiles retain typed tables",
   expect_equal(nrow(matched$unit_mappings), 1)
   p <- lexdiv_lemmatize(lexdiv_tokenize("word"), lemmas = NA_character_,
     backend_id = "missing-example", backend_version = "1")
-  excluded <- nj8_diagnostics(nj8_profile_batch(list(a = p)))
+  excluded <- nj8_diagnostics(nj8_profile(list(a = p)))
   expect_equal(nrow(excluded$unit_mappings), 0)
   expect_identical(excluded$coverage$excluded_tokens, 1)
   expect_identical(excluded$exclusion_reasons$reason, "missing_lemma")
@@ -58,7 +58,7 @@ test_that("empty, all-matched and wholly excluded profiles retain typed tables",
 })
 
 test_that("grouping does not collide on user punctuation and uses literal IDs", {
-  p <- nj8_profile_batch(list("a:b" = c("x:y", "x", "x:y"),
+  p <- nj8_profile(list("a:b" = c("x:y", "x", "x:y"),
     "a" = c("x:y", "x")), data.frame(NJ8 = 1L, Word = "other"), normalization = "identity")
   d <- nj8_diagnostics(p)
   expect_identical(d$unmatched_terms$lookup_term, c("x:y", "x"))
@@ -69,7 +69,7 @@ test_that("grouping does not collide on user punctuation and uses literal IDs", 
   for (i in 1:25) {
     docs <- setNames(lapply(1:4, function(j) sample(c("known", "a:b", "A", "a", "\u00e9"),
       sample(0:25, 1), replace = TRUE)), paste0("d", 1:4))
-    x <- nj8_profile_batch(docs, data.frame(NJ8 = 1L, Word = "known"), normalization = "identity")
+    x <- nj8_profile(docs, data.frame(NJ8 = 1L, Word = "known"), normalization = "identity")
     y <- nj8_diagnostics(x)
     expect_equal(sum(y$unmatched_terms$token_count), sum(x$coverage$off_list_tokens))
     for (k in seq_len(nrow(y$unmatched_terms))) {
@@ -84,13 +84,13 @@ test_that("diagnostics reject wrong inputs and inconsistent profile counts", {
   skip_optional_resources(c("nj8"))
   expect_error(nj8_diagnostics(c("the", "word")), "must be a result")
   expect_error(nj8_diagnostics(list()), "must be a result")
-  x <- nj8_profile_batch(list(a = "the"))
+  x <- nj8_profile(list(a = "the"))
   x$lookup$matched[1] <- NA
   expect_error(nj8_diagnostics(x), "invalid NJ8 lookup")
-  x <- nj8_profile_batch(list(a = "the"))
+  x <- nj8_profile(list(a = "the"))
   x$coverage$eligible_tokens <- 2
   expect_error(nj8_diagnostics(x), "inconsistent lookup")
-  x <- nj8_profile_batch(list(a = "the"))
+  x <- nj8_profile(list(a = "the"))
   x$lookup$document_id <- "other"
   expect_error(nj8_diagnostics(x), "invalid document IDs")
 })

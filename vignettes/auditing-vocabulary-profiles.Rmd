@@ -38,18 +38,18 @@ New JACET 8000. Several frequent words fail to match. Before interpreting this
 as advanced vocabulary, check which lexical units were compared with the list.
 NJ8 contains representative headwords; surface forms and dictionary lemmas can
 produce different coverage. These authored sentences make that choice visible.
-Run the examples in order after the [documented installation](https://ryuya-dot-com.github.io/ldfreq/index.html#install).
+Run the examples in order after the [documented installation](https://ryuya-dot-com.github.io/ldfreq/#installation).
 The authored annotation examples need no optional package or external model.
 
 ```{r}
 library(ldfreq)
 
 texts <- c(a = "Students have jobs.", b = "Students enjoy jobs.", blank = "")
-prepared <- lexdiv_tokenize_batch(texts, tokenizer = "english", case = "lower")
+prepared <- lexdiv_tokenize(texts, tokenizer = "english", case = "lower")
 ```
 
 ```{r, eval=has_nj8}
-surface <- nj8_profile_batch(prepared, unit = "surface")
+surface <- nj8_profile(prepared, unit = "surface")
 audit <- nj8_diagnostics(surface)
 audit$unmatched_terms
 audit$coverage[, c("document_id", "eligible_tokens", "off_list_tokens", "token_coverage")]
@@ -75,7 +75,7 @@ annotated <- Map(function(x, lemma) lexdiv_lemmatize(x, lemmas = lemma,
 ```
 
 ```{r, eval=has_nj8}
-lemma <- nj8_profile_batch(annotated, unit = "lemma")
+lemma <- nj8_profile(annotated, unit = "lemma")
 comparison <- data.frame(document_id = surface$coverage$document_id,
   surface_coverage = surface$coverage$token_coverage,
   lemma_coverage = lemma$coverage$token_coverage)
@@ -105,7 +105,7 @@ conditions <- expand.grid(unit = c("surface", "lemma"),
 conditions$condition_id <- paste0(conditions$unit, "_w", conditions$window_length)
 
 condition_runs <- lapply(seq_len(nrow(conditions)), function(i) {
-  lexdiv_metrics_text_batch(annotated, unit = conditions$unit[i],
+  lexdiv_metrics_text(annotated, unit = conditions$unit[i],
     word_inclusion = "all", metrics = "mattr",
     window_length = conditions$window_length[i])
 })
@@ -172,7 +172,7 @@ schemes <- list(base = base_scheme, refined = refined_scheme)
 scheme_conditions <- expand.grid(scheme = names(schemes),
   inclusion = c("all", "content"), stringsAsFactors = FALSE)
 scheme_runs <- lapply(seq_len(nrow(scheme_conditions)), function(i) {
-  lexdiv_metrics_text_batch(list(essay = schemes[[scheme_conditions$scheme[i]]]),
+  lexdiv_metrics_text(list(essay = schemes[[scheme_conditions$scheme[i]]]),
     unit = "lemma", word_inclusion = scheme_conditions$inclusion[i],
     metrics = "mattr", window_length = 3)
 })
@@ -602,8 +602,8 @@ deletion. These edit spans are not a complete token alignment between versions.
 The return value keeps both document tables, all proposals with original KWIC,
 applied/rejected/unresolved counts, policy and source/revised SHA-256 hashes.
 These counts describe submitted proposals, not the prevalence of all learner
-errors. The example reuses `lexdiv_tokenize_batch()`,
-`lexdiv_metrics_text_batch()` and `nj8_profile_batch()` on **every complete
+errors. The example reuses `lexdiv_tokenize()`,
+`lexdiv_metrics_text()` and `nj8_profile()` on **every complete
 version**, retaining N, V, non-computable requests and reference coverage in
 `text_review$metrics`, `$coverage` and `$runs`. Join document results by
 `document_id` and version, preserving writer/task identifiers from the source
@@ -658,7 +658,7 @@ documents <- list(clustered = rep(c("river", "stone", "cloud"), each = 20),
 method <- lexdiv_methods()$method_id[lexdiv_methods()$metric_id == "mattr"]
 plan <- lexdiv_plan(presets = character(), grids = lexdiv_grid(
   method, "window_length", c(10, 20), request_id_prefix = "window"))
-results <- lexdiv_metrics_batch(documents, plan = plan)
+results <- lexdiv_metrics(documents, plan = plan)
 results[, c("document_id", "request_id", "value", "status")]
 ```
 
@@ -681,7 +681,7 @@ unique token from an endpoint to the middle.
 ```{r}
 positions <- list(endpoint = c("x", rep("a", 6)),
   middle = c(rep("a", 3), "x", rep("a", 3)))
-position_scores <- lexdiv_metrics_batch(positions,
+position_scores <- lexdiv_metrics(positions,
   metrics = c("ttr", "mattr", "hdd"), window_length = 3, sample_size = 3)
 position_scores[, c("document_id", "metric_id", "N", "V", "value")]
 

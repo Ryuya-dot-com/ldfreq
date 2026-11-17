@@ -1,7 +1,7 @@
 \name{lexdiv_metrics}
 \alias{lexdiv_metrics}
 \alias{lexdiv_metric_ids}
-\alias{lexdiv_metrics_batch}
+\alias{[.lexdiv_results}
 \alias{print.lexdiv_batch_results}
 \alias{print.lexdiv_results}
 \title{Compute Versioned Lexical-Diversity Metric Variants}
@@ -9,38 +9,34 @@
 lexdiv_metric_ids()
 
 lexdiv_metrics(
-  tokens,
+  x,
   metrics = setdiff(lexdiv_metric_ids(), c("expected_ttr_d", "mtld_ma")),
   segment_length = 50L,
   window_length = 50L,
   mtld_threshold = 0.72,
   sample_size = 42L,
   expected_ttr_sample_sizes = 35:50,
-  plan = NULL
+  plan = NULL,
+  id_col = "document_id",
+  term_col = "tokens",
+  max_rows = 1e+06
 )
 
-lexdiv_metrics_batch(
-  documents,
-  id_col = "document_id",
-  tokens_col = "tokens",
-  ...,
-  plan = NULL,
-  max_rows = 1e6
-)
+\method{[}{lexdiv_results}(x, ...)
 
 \method{print}{lexdiv_batch_results}(x, ...)
 
 \method{print}{lexdiv_results}(x, ...)
 }
 \arguments{
-  \item{tokens}{A plain, unclassed, one-dimensional character vector of ordered,
-  already-tokenized strings. Missing and empty tokens, invalid UTF-8, and
-  \code{bytes}- or \code{latin1}-marked strings invalidate the document. A
-  zero-length character vector denotes an empty document. Valid non-ASCII
-  strings with an unknown encoding marker are interpreted as UTF-8 on a local
-  copy before equality and counting. Each vector element is exactly one token;
-  a single string containing whitespace triggers a warning because it may be
-  raw prose. Use \code{lexdiv_metrics_text()} for raw text.}
+  \item{x}{For a single document, a plain one-dimensional character vector of
+  ordered tokens or a \code{lexdiv_tokenization} object. For multiple
+  documents, a plain named list of token vectors, a
+  \code{lexdiv_tokenization_batch} object, or a data frame with an explicit ID
+  column (\code{id_col}) and token list-column (\code{term_col}). For
+  \code{[} and \code{print} methods, a \code{lexdiv_results} or
+  \code{lexdiv_batch_results} object. Use \code{\link{lexdiv_metrics_text}} for
+  raw text.}
   \item{metrics}{A plain, non-empty, duplicate-free character vector selected
   from \code{lexdiv_metric_ids()}. The default excludes experimental
   \code{expected_ttr_d} and opt-in \code{mtld_ma}; the catalog still lists every supported metric.}
@@ -55,44 +51,38 @@ lexdiv_metrics_batch(
   \item{expected_ttr_sample_sizes}{A non-empty, strictly increasing plain
   integer vector with values at least two. It fixes the sample-size curve used
   by deterministic expected-TTR D and is never resized to the document.}
-  \item{documents}{Either a plain list with unique, non-empty document IDs as
-  names, or a data frame with an explicit plain character ID column and a
-  token-vector list-column. Zero-document inputs are accepted only when they
-  retain the required structure.}
-  \item{id_col}{One plain, non-empty character string selecting the document-ID
-  column of data-frame input. IDs must be unique, non-missing, valid UTF-8 and
-  may not be marked \code{bytes} or \code{latin1}.}
-  \item{tokens_col}{One plain, non-empty character string selecting the token
-  list-column of data-frame input.}
   \item{plan}{Optional normalized plan from \code{\link{lexdiv_plan}}. With a
-  non-\code{NULL} plan, omit \code{metrics} and all individual metric parameters,
-  including arguments in the batch function's \code{...}. The plan specifies
-  every method, parameter and request order. \code{NULL} keeps ordinary metric
-  selection. Name this argument explicitly in batch calls.}
+  non-\code{NULL} plan, omit \code{metrics} and all individual metric parameters.
+  The plan specifies every method, parameter and request order.}
+  \item{id_col}{One plain, non-empty character string selecting the document-ID
+  column of multi-document data-frame input.}
+  \item{term_col}{One plain, non-empty character string selecting the token
+  list-column of data-frame input (default \code{"tokens"}) or the token
+  column of a tokenization object (defaults to \code{"surface"} when omitted).}
   \item{max_rows}{Positive integer bound on document-by-specification rows
-  for batch plan execution, checked before computation. Omit it when
-  \code{plan = NULL}; it is not a limit for ordinary metric requests.}
-  \item{x}{A \code{lexdiv_results} or \code{lexdiv_batch_results} object.}
-  \item{...}{For \code{lexdiv_metrics_batch()}, arguments forwarded to
-  \code{lexdiv_metrics()} when no plan is supplied; for print methods, arguments passed to
+  for multi-document execution, checked before computation.}
+  \item{...}{Subsetting indices passed to \code{[.data.frame} (preserving
+  contract and plan attributes on data-frame subsets) or arguments passed to
   \code{print.data.frame()}.}
 }
 \value{
 \code{lexdiv_metric_ids()} returns the versioned metric IDs in default order.
-\code{lexdiv_metrics()} returns a \code{lexdiv_results} data frame with one row
-per metric. Its columns are \code{metric_id}, \code{method_id},
-\code{metric_contract_id}, \code{metric_contract_version},
-\code{result_schema_id}, \code{result_schema_version}, \code{value}, \code{status},
-\code{missing_reason}, requested and effective parameter list-columns,
-\code{N}, \code{V}, \code{below_quality_floor}, and a diagnostics list-column.
-The print method returns its input invisibly.
+For a single document, \code{lexdiv_metrics()} returns a \code{lexdiv_results}
+data frame with one row per metric. Its columns are \code{metric_id},
+\code{method_id}, \code{metric_contract_id}, \code{metric_contract_version},
+\code{result_schema_id}, \code{result_schema_version}, \code{value},
+\code{status}, \code{missing_reason}, requested and effective parameter
+list-columns, \code{N}, \code{V}, \code{below_quality_floor}, and a diagnostics
+list-column. Subsetting rows/columns preserves contract and plan attributes.
+The print methods return their input invisibly.
 
-\code{lexdiv_metrics_batch()} returns a \code{lexdiv_batch_results} object in
-document-major, requested-metric-minor long form. Its first three columns are
-\code{document_id}, \code{batch_schema_id}, and
-\code{batch_schema_version}; all single-document record columns follow.
+For multiple documents, \code{lexdiv_metrics()} returns a
+\code{lexdiv_batch_results} object in document-major, requested-metric-minor
+long form. Its first three columns are \code{document_id},
+\code{batch_schema_id}, and \code{batch_schema_version}; all single-document
+record columns follow.
 
-With a non-\code{NULL} \code{plan}, the functions return a
+With a non-\code{NULL} \code{plan}, \code{lexdiv_metrics()} returns a
 \code{lexdiv_profile_results} or \code{lexdiv_profile_batch_results} data
 frame, including the plan fingerprint, request and specification IDs, profile
 schema columns, classes and attributes. No plan metadata is discarded.
@@ -309,14 +299,14 @@ lexdiv_metrics(c("a", "b"), metrics = "mattr", window_length = 3)
 
 # Named lists keep each document separate, including the empty document.
 documents <- list(doc_a = c("a", "a", "b"), doc_b = character())
-batch <- lexdiv_metrics_batch(documents, metrics = "ttr")
+batch <- lexdiv_metrics(documents, metrics = "ttr")
 batch  # doc_a: N = 3, V = 2, TTR = 2/3; doc_b: missing / empty_input
 
 # Record several parameter settings before computation.
 plan <- lexdiv_plan("length_50_100")
 planned <- lexdiv_metrics(tokens, plan = plan)
 planned[, c("request_id", "metric_id", "value", "status", "missing_reason")]
-planned_batch <- lexdiv_metrics_batch(documents, plan = plan)
+planned_batch <- lexdiv_metrics(documents, plan = plan)
 planned_batch[, c("document_id", "request_id", "value", "status")]
 
 # Further methods. Sample size 2 is for this tiny illustration only.
@@ -352,11 +342,11 @@ metric and specification. Keep the original tokens and complete results with
 their preprocessing and parameter records when saving the analysis.
 
 To retain planned writer/task/occasion observations, pass the complete
-\code{lexdiv_metrics_batch(documents, plan = plan)} result and the same plan
+\code{lexdiv_metrics(documents, plan = plan)} result and the same plan
 to \code{\link{lexdiv_study_table}}, together with the schedule, submissions
 and reporting decisions. An ordinary result without a plan is a different input.
 For variation within a document, use \code{\link{lexdiv_mattr_profile}} on the
 same ordered tokens and an explicitly chosen MATTR plan.
 }
-\seealso{\code{\link{lexdiv_metrics_text}}, \code{\link{lexdiv_text_batch}},
+\seealso{\code{\link{lexdiv_metrics_text}}, \code{\link{lexdiv_plan}},
 \href{https://ryuya-dot-com.github.io/ldfreq/articles/getting-started.html}{Getting started}}

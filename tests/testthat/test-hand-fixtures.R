@@ -99,7 +99,7 @@ test_that("all frozen hand assertions pass through the package API", {
     }
     for (assertion in case$assertions) {
       assertion_count <- assertion_count + 1L
-      call <- list(tokens = tokens, metrics = assertion$metric_id)
+      call <- list(x = tokens, metrics = assertion$metric_id)
       parameters <- assertion$parameters
       if (!is.null(parameters$segment_length)) {
         call$segment_length <- parameters$segment_length

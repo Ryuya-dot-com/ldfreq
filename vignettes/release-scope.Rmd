@@ -8,7 +8,7 @@ vignette: >
 ---
 
 Install the fixed release linked in the
-[README](https://ryuya-dot-com.github.io/ldfreq/index.html#install). Open guides
+[README](https://ryuya-dot-com.github.io/ldfreq/#installation). Open guides
 matching that installation with `browseVignettes("ldfreq")`; individual workflows
 do not require separate development releases. NEWS labels unreleased changes
 separately. Earlier releases are retained for reproducing earlier analyses.
@@ -61,9 +61,11 @@ the matrix does not execute every externally supplied model or corpus.
 `ldfreq 1.0.0` separates core formula identities, raw-text preprocessing, and
 reference-dataset versions so that each choice remains auditable over time:
 
-1. **Unified entry points**: Execute multi-parameter plans by passing
-   `plan = plan` to `lexdiv_metrics()`, `lexdiv_metrics_batch()`,
-   `lexdiv_metrics_text()`, or `lexdiv_metrics_text_batch()`. Inspect Maas and
+1. **Unified entry points**: Single-document and multi-document inputs share
+   the same polymorphic functions (`lexdiv_metrics()`, `lexdiv_metrics_text()`,
+   `lexdiv_tokenize()`, `nj8_profile()`, `tubelex_profile()`, and
+   `lexdiv_norm_profile()`). Execute multi-parameter plans by passing
+   `plan = plan` to `lexdiv_metrics()` or `lexdiv_metrics_text()`. Inspect Maas and
    MTLD comparison definitions via `lexdiv_methods(scope = "variants")` and
    `lexdiv_variant_metrics()`.
 2. **Explicit defaults and opt-in measures**: Raw-text helpers default to

@@ -27,11 +27,11 @@ for (version in names(policies)) {
     c(list(documents = documents, edits = edits), policies[[version]]))
   # Tokenize each complete version afresh. Token IDs/offsets cannot be paired
   # across revised strings; preserve these objects and their own provenance.
-  prepared <- lexdiv_tokenize_batch(versions[[version]]$revised,
+  prepared <- lexdiv_tokenize(versions[[version]]$revised,
     tokenizer = "english", normalization = "NFC", case = "lower")
-  diversity <- lexdiv_metrics_text_batch(prepared, unit = "surface",
+  diversity <- lexdiv_metrics_text(prepared, unit = "surface",
     metrics = c("ttr", "mattr"), window_length = 4L)
-  reference <- nj8_profile_batch(prepared, unit = "surface")
+  reference <- nj8_profile(prepared, unit = "surface")
   runs[[version]] <- list(prepared = prepared, diversity = diversity, reference = reference)
   metric_rows[[version]] <- cbind(version = version, as.data.frame(diversity$results))
   coverage_rows[[version]] <- cbind(version = version, reference$coverage)

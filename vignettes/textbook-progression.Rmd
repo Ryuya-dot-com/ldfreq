@@ -21,7 +21,7 @@ teaching unit**. It connects saved concordance matches to a book's section
 roster, then displays counts without losing absent targets or unobserved parts.
 
 Use optional **quanteda >= 4.5.0** for searching, and **ggplot2** for drawing. See the
-[installation instructions](https://ryuya-dot-com.github.io/ldfreq/index.html#install).
+[installation instructions](https://ryuya-dot-com.github.io/ldfreq/#installation).
 The two helpers in
 `examples/textbook-progression.R` are explicitly sourced installed examples,
 not exported functions. The script also loads the unchanged concordance helpers.

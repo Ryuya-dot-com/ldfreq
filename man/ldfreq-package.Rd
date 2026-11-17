@@ -6,7 +6,7 @@
 \description{
 Analyze lexical diversity in one or many texts, and describe vocabulary using
 explicit reference lists. Start with \code{lexdiv_metrics_text()} for one
-English text or \code{lexdiv_metrics_text_batch()} for several. Results retain
+English text or a multi-document table. Results retain
 the words counted, analysis settings and reasons for unavailable scores.
 }
 \section{Your first analysis}{
@@ -43,8 +43,8 @@ For ordinary text analyses, inspect \code{result$results} and
 Save the original text and complete result together as RDS.
 
 For planned observations, create a \code{\link{lexdiv_plan}} and run either
-\code{\link{lexdiv_metrics_batch}(tokens, plan = plan)} or
-\code{\link{lexdiv_metrics_text_batch}(texts, plan = plan)}, then pass the
+\code{\link{lexdiv_metrics}(tokens, plan = plan)} or
+\code{\link{lexdiv_metrics_text}(texts, plan = plan)}, then pass the
 result together with the schedule, submissions and reporting decisions to
 \code{\link{lexdiv_study_table}}. Use \code{\link{lexdiv_study_model_data}} to
 select one response per observation for a modelling package.
@@ -147,7 +147,7 @@ Choose the entry point from the form of data you already have:
   the explicit tokenizer and returns its preprocessing audit beside the metric
   rows.}
   \item{Several raw texts or a document/text table}{Use
-  \code{\link{lexdiv_metrics_text_batch}}. Inspect \code{result$results} and
+  \code{\link{lexdiv_metrics_text}}. Inspect \code{result$results} and
   keep the complete object when saving. The examples show both ID/text input
   and a prepared-token workflow.}
   \item{Word families}{Use \code{\link{lexdiv_family_profile}} with complete
@@ -155,7 +155,7 @@ Choose the entry point from the form of data you already have:
   uses \code{\link{bnccoca_data}} and explains unlisted words and coverage.}
   \item{One ordered token vector}{Use \code{lexdiv_metrics()}. The core will
   not change case, remove tokens, or lemmatize.}
-  \item{Several tokenized documents}{Use \code{lexdiv_metrics_batch()} with a
+  \item{Several tokenized documents}{Use \code{lexdiv_metrics()} with a
   named list or an explicit ID and token-list-column data frame.}
   \item{Several documents and one reference set}{Use
   \code{lexdiv_reference_coverage()} for separate token- and type-weighted
@@ -165,7 +165,7 @@ Choose the entry point from the form of data you already have:
   \item{A local MATTR trajectory}{Use \code{lexdiv_mattr_profile()} with a
   MATTR-only plan to retain each window value and position's exposure.}
   \item{A caller-supplied lexical-norm table}{Use
-  \code{lexdiv_norm_profile()} or \code{lexdiv_norm_profile_batch()} for
+  \code{lexdiv_norm_profile()} for single-document or multi-document
   conditional observed matched-only means and separate resource, value,
   and annotation coverage.}
   \item{Two texts or term sets}{Use \code{lexdiv_term_overlap()} for explicit
@@ -418,7 +418,6 @@ without a network connection or external runtime.
 \code{\link{lexdiv_overlap}},
 \code{\link{lexdiv_reference_coverage}},
 \code{\link{lexdiv_norm_profile}},
-\code{\link{lexdiv_norm_profile_batch}},
 \code{\link{lexdiv_plan}}, \code{\link{lexdiv_mattr_profile}},
 \code{\link{lexdiv_variant_metrics}},
 \code{\link{nj8_profile}},
@@ -435,7 +434,7 @@ result$token_audit
 # Several texts: names identify documents, including the empty one.
 texts <- c(essay_a = "Cats chase cats and dogs.", essay_b = "The reader reads a story.",
   empty = "")
-batch <- lexdiv_metrics_text_batch(texts, metrics = "ttr")
+batch <- lexdiv_metrics_text(texts, metrics = "ttr")
 batch$results  # TTR = 0.8, 1, NA; the empty text has reason "empty_input".
 
 # Other entry points: ?lexdiv_metrics for pre-tokenized words;

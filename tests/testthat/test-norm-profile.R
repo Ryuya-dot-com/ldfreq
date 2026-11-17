@@ -260,7 +260,7 @@ test_that("row budget covers all reusable result tables", {
 test_that("public signature has no implicit normalization control", {
   expect_identical(
     names(formals(lexdiv_norm_profile)),
-    c("terms", "norms", "key", "measure_specs", "resource", "weightings", "max_rows")
+    c("x", "norms", "key", "measure_specs", "resource", "weightings", "id_col", "term_col", "max_rows")
   )
   expect_warning(
     lexdiv_norm_profile(

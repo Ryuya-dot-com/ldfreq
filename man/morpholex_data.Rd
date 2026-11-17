@@ -2,11 +2,12 @@
 \alias{morpholex_data}
 \title{Read the Cached MorphoLex English Database}
 \usage{
-morpholex_data(sheets = NULL)
+morpholex_data(sheets = NULL, cache_dir = NULL)
 }
 \arguments{
 \item{sheets}{\code{NULL} for all 34 worksheets, or a nonempty character vector
 of unique worksheet names in the desired order. Unknown names are errors.}
+\item{cache_dir}{Optional directory containing downloaded optional resources.}
 }
 \description{
 Reference snapshots require a prior explicit download; see \code{\link{lexdiv_download_resources}} for terms and cache setup.

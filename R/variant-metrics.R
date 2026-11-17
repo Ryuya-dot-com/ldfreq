@@ -5,7 +5,7 @@
 # or its result contract.
 
 .lexvariant_contract_id <- "ldfreq-lexical-diversity-variants"
-.lexvariant_contract_version <- "0.1.0"
+.lexvariant_contract_version <- "0.2.0"
 .lexvariant_max_thresholds <- 16L
 
 .lexvariant_catalog <- list(
@@ -41,6 +41,15 @@
     log_base = "10",
     reference_label = "common-formula:maas-a-log10",
     comparison_scope = "formula-comparison-only"
+  ),
+  mtld_seq_bidir_dirmean_le_nomin_linear_tail_v1 = list(
+    family = "mtld",
+    direction = "higher",
+    scale = "tokens-per-factor",
+    aggregation = "directional-score-mean",
+    final_token_rule = "evaluate-closure-before-tail",
+    reference_label = "McCarthy-Jarvis-2010:mtld-le",
+    comparison_scope = "threshold-comparator-le-no-minimum-length"
   ),
   mtld_seq_bidir_dirmean_lt_min10_linear_tail_v1 = list(
     family = "mtld",
@@ -151,12 +160,13 @@
 
 .lexvariant_mtld_factorize <- function(token_ids, threshold) {
   token_count <- length(token_ids)
-  lengths <- integer()
-  proportions <- numeric()
-  is_tail <- logical()
+  lengths <- integer(token_count)
+  proportions <- numeric(token_count)
+  is_tail <- logical(token_count)
+  recorded <- 0L
   factor_length <- 0L
   factor_type_count <- 0L
-  seen_generation <- integer(max(token_ids))
+  seen_generation <- integer(if (token_count == 0L) 0L else max(token_ids))
   generation <- 1L
 
   for (position in seq_len(token_count)) {
@@ -170,25 +180,30 @@
     final_token <- position == token_count
 
     if (final_token) {
-      lengths <- c(lengths, factor_length)
-      proportions <- c(
-        proportions,
-        (1 - factor_ttr) / (1 - threshold)
-      )
-      is_tail <- c(is_tail, TRUE)
+      recorded <- recorded + 1L
+      lengths[[recorded]] <- factor_length
+      proportions[[recorded]] <- (1 - factor_ttr) / (1 - threshold)
+      is_tail[[recorded]] <- TRUE
     } else if (factor_length >= 10L && factor_ttr < threshold) {
-      lengths <- c(lengths, factor_length)
-      proportions <- c(proportions, 1)
-      is_tail <- c(is_tail, FALSE)
+      recorded <- recorded + 1L
+      lengths[[recorded]] <- factor_length
+      proportions[[recorded]] <- 1
+      is_tail[[recorded]] <- FALSE
       factor_length <- 0L
       factor_type_count <- 0L
-      generation <- generation + 1L
+      if (generation == .Machine$integer.max) {
+        seen_generation[] <- 0L
+        generation <- 1L
+      } else {
+        generation <- generation + 1L
+      }
     }
   }
+  keep <- seq_len(recorded)
   list(
-    lengths = lengths,
-    proportions = proportions,
-    is_tail = is_tail
+    lengths = lengths[keep],
+    proportions = proportions[keep],
+    is_tail = is_tail[keep]
   )
 }
 
@@ -288,6 +303,21 @@
   } else if (identical(family, "maas") && counts$N <= 1L) {
     status <- "missing"
     missing_reason <- "insufficient_tokens_for_formula"
+  } else if (identical(
+    method_id,
+    "mtld_seq_bidir_dirmean_le_nomin_linear_tail_v1"
+  )) {
+    core <- .metric_mtld(
+      tokens,
+      counts,
+      parameters,
+      minimum_factor_length = 1L,
+      comparator = "<="
+    )
+    value <- core$value
+    status <- core$status
+    missing_reason <- core$missing_reason
+    diagnostics <- core$diagnostics
   } else if (identical(family, "mtld") && counts$N < 10L) {
     status <- "missing"
     missing_reason <- "insufficient_tokens_for_formula"

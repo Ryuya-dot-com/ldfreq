@@ -1,7 +1,19 @@
 # Adjacent word sequences from explicit segments and original token positions.
 # No corpus, sentence splitter, normalization or network access is implicit.
 .lexng_columns <- c("n", "term1", "term2", "term3")
+.lexng_max_order <- 12L
 .lexng_contract <- "ldfreq-adjacent-ngrams"
+
+.lexng_term_columns <- function(max_n) {
+  paste0("term", seq_len(max(3L, as.integer(max_n))))
+}
+
+.lexng_key_columns <- function(table) {
+  term_cols <- grep("^term[0-9]+$", names(table), value = TRUE)
+  if (!length(term_cols)) return(.lexng_columns)
+  ord <- order(as.integer(substring(term_cols, 5L)))
+  c("n", term_cols[ord])
+}
 
 .lexng_key <- function(x) {
   # Length-prefixed UTF-8 components keep underscores, colons and separators
@@ -44,7 +56,8 @@
 }
 
 .lexng_tally <- function(occurrences, by_document = FALSE) {
-  columns <- c(if (by_document) "document_id", .lexng_columns)
+  key_cols <- .lexng_key_columns(occurrences)
+  columns <- c(if (by_document) "document_id", key_cols)
   key <- .lexng_key(occurrences[columns])
   first <- !duplicated(key)
   group <- match(key, key[first])
@@ -69,9 +82,11 @@ lexdiv_ngrams <- function(data, preprocessing_id, n = c(2L, 3L),
     stop("Select four distinct existing input columns.", call. = FALSE)
   preprocessing_id <- .lexnorm_scalar_string(preprocessing_id, "preprocessing_id")
   n <- .lexng_count(n, "n", 2)
-  if (!length(n) || any(!n %in% c(2, 3)) || anyDuplicated(n))
-    stop("n must be a non-empty, unique selection of 2 and 3.", call. = FALSE)
+  if (!length(n) || any(n > .lexng_max_order) || anyDuplicated(n))
+    stop(sprintf("n must be a non-empty, unique selection of integers from 2 through %d.",
+      .lexng_max_order), call. = FALSE)
   n <- as.integer(n)
+  max_k <- max(3L, max(n))
   max_ngrams <- .lexnorm_positive_whole(max_ngrams, "max_ngrams")
   id <- .lexnorm_plain_character(data[[id_col]], id_col, allow_zero = TRUE)
   segment <- .lexnorm_plain_character(data[[segment_col]], segment_col, allow_zero = TRUE)
@@ -100,11 +115,22 @@ lexdiv_ngrams <- function(data, preprocessing_id, n = c(2L, 3L),
     stop("Planned n-gram occurrences exceed max_ngrams.", call. = FALSE)
   pieces <- lapply(seq_along(n), function(j) {
     i <- starts[[j]]; k <- n[j]
-    data.frame(document_id = id[i], segment_id = segment[i], n = rep.int(k, length(i)),
-      start_index = position[i], end_index = position[i + k - 1L],
-      term1 = term[i], term2 = term[i + 1L],
-      term3 = if (k == 3L) term[i + 2L] else rep.int(NA_character_, length(i)),
-      stringsAsFactors = FALSE)
+    base_df <- data.frame(
+      document_id = id[i],
+      segment_id = segment[i],
+      n = rep.int(k, length(i)),
+      start_index = position[i],
+      end_index = position[i + k - 1L],
+      stringsAsFactors = FALSE
+    )
+    for (slot in seq_len(max_k)) {
+      base_df[[paste0("term", slot)]] <- if (slot <= k) {
+        term[i + slot - 1L]
+      } else {
+        rep.int(NA_character_, length(i))
+      }
+    }
+    base_df
   })
   occurrences <- do.call(rbind, pieces)
   rownames(occurrences) <- NULL
@@ -155,28 +181,42 @@ lexdiv_ngram_reference <- function(x, resource, totals = NULL,
   preprocessing_id <- .lexnorm_scalar_string(preprocessing_id, "preprocessing_id")
   x <- .lexnorm_plain_data_frame(x, "x")
   totals <- .lexnorm_plain_data_frame(totals, "totals")
-  count_columns <- c(.lexng_columns, "count", "document_count")
-  if (!all(count_columns %in% names(x)) ||
-      !all(c("n", "opportunities", "documents") %in% names(totals)))
+  if (!all(c("n", "opportunities", "documents") %in% names(totals)))
     stop("Reference counts or totals are missing required columns; see help.", call. = FALSE)
-  x <- x[count_columns]
   totals <- totals[c("n", "opportunities", "documents")]
   x$n <- .lexng_count(x$n, "x$n", 2)
   totals$n <- .lexng_count(totals$n, "totals$n", 2)
-  if (!nrow(totals) || any(!totals$n %in% c(2, 3)) || anyDuplicated(totals$n) ||
+  if (!nrow(totals) || any(totals$n > .lexng_max_order) || anyDuplicated(totals$n) ||
       !all(x$n %in% totals$n)) stop("Invalid n values in reference counts/totals.", call. = FALSE)
   x$n <- as.integer(x$n); totals$n <- as.integer(totals$n)
+  term_cols <- .lexng_term_columns(max(totals$n))
+  key_cols <- c("n", term_cols)
+  count_columns <- c(key_cols, "count", "document_count")
+  if (!all(count_columns %in% names(x)))
+    stop("Reference counts or totals are missing required columns; see help.", call. = FALSE)
+  x <- x[count_columns]
   for (column in c("term1", "term2"))
     x[[column]] <- .lexnorm_plain_character(x[[column]], column, allow_zero = TRUE)
-  if (!is.character(x$term3) || is.object(x$term3) || !is.null(dim(x$term3)) ||
-      any(!is.na(x$term3[x$n == 2L])))
-    stop("term3 must be character and NA for bigrams.", call. = FALSE)
-  x$term3[x$n == 3L] <- .lexnorm_plain_character(x$term3[x$n == 3L],
-    "trigram term3", allow_zero = TRUE)
-  terms <- c(x$term1, x$term2, x$term3[x$n == 3L])
-  if (any(stringi::stri_detect_regex(terms, "\\p{White_Space}")))
+  all_terms <- c(x$term1, x$term2)
+  for (slot in seq.int(3L, length(term_cols))) {
+    col_name <- term_cols[[slot]]
+    col_val <- x[[col_name]]
+    if (!is.character(col_val) || is.object(col_val) || !is.null(dim(col_val)) ||
+        any(!is.na(col_val[x$n < slot]))) {
+      stop(sprintf("%s must be character and NA when n < %d.", col_name, slot), call. = FALSE)
+    }
+    needed <- x$n >= slot
+    slot_label <- if (slot == 3L) sprintf("trigram %s", col_name) else sprintf("%d-gram %s", slot, col_name)
+    x[[col_name]][needed] <- .lexnorm_plain_character(
+      col_val[needed],
+      slot_label,
+      allow_zero = TRUE
+    )
+    all_terms <- c(all_terms, x[[col_name]][needed])
+  }
+  if (any(stringi::stri_detect_regex(all_terms, "\\p{White_Space}")))
     stop("Reference terms must not contain whitespace.", call. = FALSE)
-  if (anyDuplicated(.lexng_key(x[.lexng_columns])))
+  if (anyDuplicated(.lexng_key(x[key_cols])))
     stop("Reference n-gram keys must be unique.", call. = FALSE)
   x$count <- .lexng_count(x$count, "count", 1)
   x$document_count <- .lexng_count(x$document_count, "document_count", 1)
@@ -211,8 +251,24 @@ lexdiv_ngram_profile <- function(x, reference) {
   if (!all(x$totals$n %in% reference$totals$n))
     stop("The reference must declare totals for every requested n.", call. = FALSE)
   lookup <- x$occurrences
-  key <- .lexng_key(lookup[.lexng_columns])
-  j <- match(key, .lexng_key(reference$counts[.lexng_columns]))
+  target_key_cols <- .lexng_key_columns(lookup)
+  ref_counts <- reference$counts
+  lookup_tmp <- lookup
+  ref_tmp <- ref_counts
+  all_term_cols <- union(
+    setdiff(target_key_cols, "n"),
+    setdiff(.lexng_key_columns(ref_counts), "n")
+  )
+  all_term_cols <- all_term_cols[order(as.integer(substring(all_term_cols, 5L)))]
+  for (col_name in setdiff(all_term_cols, names(lookup_tmp))) {
+    lookup_tmp[[col_name]] <- rep.int(NA_character_, nrow(lookup_tmp))
+  }
+  for (col_name in setdiff(all_term_cols, names(ref_tmp))) {
+    ref_tmp[[col_name]] <- rep.int(NA_character_, nrow(ref_tmp))
+  }
+  shared_key_cols <- c("n", all_term_cols)
+  j <- match(.lexng_key(lookup_tmp[shared_key_cols]), .lexng_key(ref_tmp[shared_key_cols]))
+  key <- .lexng_key(lookup[target_key_cols])
   listed <- !is.na(j)
   total <- reference$totals$opportunities[match(lookup$n, reference$totals$n)]
   lookup$reference_status <- as.character(ifelse(listed, "listed",

@@ -1,10 +1,8 @@
-test_that("the v1.0.0 API exposes one canonical vocabulary without retired aliases", {
+test_that("the v2.0.0-dev API exposes one canonical vocabulary without retired aliases", {
   exports <- getNamespaceExports("ldfreq")
   canonical <- c(
     "nj8_profile",
-    "nj8_profile_batch",
     "tubelex_profile",
-    "tubelex_profile_batch",
     "lexdiv_overlap_ids",
     "lexdiv_compare_ngrams",
     "lexdiv_build_ngram_reference",
@@ -12,8 +10,12 @@ test_that("the v1.0.0 API exposes one canonical vocabulary without retired alias
     "lexdiv_screen_lengths",
     "lexdiv_norm_spec",
     "lexdiv_resource_meta",
-    "lexdiv_lemmatize_batch",
-    "lexdiv_flemmatize_batch",
+    "lexdiv_tokenize",
+    "lexdiv_lemmatize",
+    "lexdiv_flemmatize",
+    "lexdiv_metrics",
+    "lexdiv_metrics_text",
+    "lexdiv_norm_profile",
     "lexdiv_as_annotations"
   )
   retired <- c(
@@ -27,7 +29,15 @@ test_that("the v1.0.0 API exposes one canonical vocabulary without retired alias
     "lexdiv_screen",
     "lexdiv_variant_ids",
     "lexdiv_profile",
-    "lexdiv_profile_batch"
+    "lexdiv_profile_batch",
+    "lexdiv_tokenize_batch",
+    "lexdiv_lemmatize_batch",
+    "lexdiv_flemmatize_batch",
+    "lexdiv_metrics_batch",
+    "lexdiv_metrics_text_batch",
+    "nj8_profile_batch",
+    "tubelex_profile_batch",
+    "lexdiv_norm_profile_batch"
   )
 
   expect_true(all(canonical %in% exports))

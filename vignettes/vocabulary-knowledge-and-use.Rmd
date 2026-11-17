@@ -282,7 +282,7 @@ their preparation is explicit, and the package still records vector alignment
 as unverified. See the [TUBELEX input guide](tubelex-input.html) for connected text.
 
 ```{r, eval=has_tubelex}
-profiles <- tubelex_profile_batch(list(
+profiles <- tubelex_profile(list(
   a = c("the", "bank", "bank", "ldfreq"),
   b = c("an", "accurate", "description"), blank = character(),
   invalid = c("bank", NA_character_)))

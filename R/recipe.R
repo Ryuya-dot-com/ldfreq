@@ -55,6 +55,9 @@
 #' @param tubelex_tokenization_mismatch `"error"` or `"allow"`. The built-in
 #'   tokenizer differs from TUBELEX segmentation; including TUBELEX requires
 #'   explicit `"allow"`, recorded as a segmentation-sensitivity analysis.
+#' @param nj8_unit `"surface"` (schema 1.0.0 default) or `"lemma"` (schema 1.1.0,
+#'   lemmatizing tokens via `textstem` + `lexicon::hash_lemmas` before New JACET
+#'   8000 lookup when `"nj8"` is in `resources`).
 #' @return A `lexdiv_recipe` list with resolved requests and environment/resource
 #'   requirements. Save with [lexdiv_write()] and restore with [lexdiv_read()].
 #' @examples
@@ -71,8 +74,10 @@
 #' @export
 lexdiv_recipe <- function(plan = lexdiv_plan(), normalization = "NFC",
     case = "lower", keep_numbers = FALSE, tokenizer = "english",
-    resources = character(), tubelex_tokenization_mismatch = "error") {
+    resources = character(), tubelex_tokenization_mismatch = "error",
+    nj8_unit = "surface") {
   plan <- .profile_validate_plan(plan)
+  nj8_unit <- .lexprep_scalar_choice(nj8_unit, c("surface", "lemma"), "nj8_unit")
   p <- lexdiv_tokenize("", normalization, case, keep_numbers, tokenizer)$provenance
   if (!is.character(resources) || anyNA(resources) || anyDuplicated(resources) ||
       any(!resources %in% c("nj8", "tubelex")))
@@ -82,18 +87,24 @@ lexdiv_recipe <- function(plan = lexdiv_plan(), normalization = "NFC",
   if ("tubelex" %in% resources && mismatch != "allow")
     stop("TUBELEX requires explicit tubelex_tokenization_mismatch = 'allow'.",
       call. = FALSE)
+  use_v11 <- identical(nj8_unit, "lemma") && ("nj8" %in% resources)
   refs <- lapply(sort(resources), function(id) {
     item <- .lex_resource_catalog[[id]]
-    list(id = id, version = if (id == "nj8") "jacet2016-8000-v1" else
+    entry <- list(id = id, version = if (id == "nj8") "jacet2016-8000-v1" else
       .lexres_tubelex_expectation()$resource_version, sha256 = item$sha256,
       citation = item$citation,
       normalization = if (id == "nj8") "nfkc_lower" else "tubelex",
       expand_parenthetical = id == "nj8",
       tokenization_mismatch = if (id == "tubelex") mismatch else "not_applicable")
+    if (use_v11 && id == "nj8") {
+      entry$unit <- "lemma"
+    }
+    entry
   })
   specs <- lapply(plan$specifications, function(s)
     unclass(s)[c("request_id", "method_id", "parameters")])
-  structure(list(schema = "ldfreq-recipe", schema_version = "1.0.0",
+  structure(list(schema = "ldfreq-recipe",
+    schema_version = if (use_v11) "1.1.0" else "1.0.0",
     engine = .recipe_engine(tokenizer),
     preprocessing = list(normalization = p$normalization, case = p$case,
       keep_numbers = p$keep_numbers, tokenizer = tokenizer,
@@ -118,10 +129,12 @@ lexdiv_recipe <- function(plan = lexdiv_plan(), normalization = "NFC",
   plan
 }
 
-.recipe_validate <- function(x, execute = FALSE) {
+.recipe_validate <- function(x, execute = FALSE, allow_engine_mismatch = FALSE) {
   .record_fields(x, c("schema", "schema_version", "engine", "preprocessing",
     "specifications", "resources"), "Recipe")
-  if (!identical(x$schema, "ldfreq-recipe") || !identical(x$schema_version, "1.0.0"))
+  if (!identical(x$schema, "ldfreq-recipe") ||
+      !is.character(x$schema_version) || length(x$schema_version) != 1L ||
+      !x$schema_version %in% c("1.0.0", "1.1.0"))
     stop("Unsupported recipe schema.", call. = FALSE)
   .record_fields(x$preprocessing, c("normalization", "case", "keep_numbers",
     "tokenizer", "unit", "word_inclusion"), "Preprocessing")
@@ -138,8 +151,10 @@ lexdiv_recipe <- function(plan = lexdiv_plan(), normalization = "NFC",
     stop("Invalid recipe requests or resources.", call. = FALSE)
   .recipe_plan(x)
   ids <- vapply(x$resources, function(r) {
-    .record_fields(r, c("id", "version", "sha256", "citation", "normalization",
-      "expand_parenthetical", "tokenization_mismatch"), "Resource")
+    base_res_fields <- c("id", "version", "sha256", "citation", "normalization",
+      "expand_parenthetical", "tokenization_mismatch")
+    has_unit <- identical(x$schema_version, "1.1.0") && "unit" %in% names(r)
+    .record_fields(r, c(base_res_fields, if (has_unit) "unit"), "Resource")
     if (!is.character(r$id) || length(r$id) != 1L || is.na(r$id) ||
         !r$id %in% c("nj8", "tubelex")) stop("Unknown recipe resource.", call. = FALSE)
     text_fields <- setdiff(names(r), "expand_parenthetical")
@@ -147,31 +162,62 @@ lexdiv_recipe <- function(plan = lexdiv_plan(), normalization = "NFC",
         !is.na(v) && nzchar(v), logical(1))) || !is.logical(r$expand_parenthetical) ||
         length(r$expand_parenthetical) != 1L || is.na(r$expand_parenthetical))
       stop("Invalid resource identity or settings.", call. = FALSE)
+    nj8_u <- if (has_unit && r$id == "nj8") r$unit else "surface"
+    if (!nj8_u %in% c("surface", "lemma")) stop("Invalid NJ8 unit in recipe.", call. = FALSE)
     expected <- lexdiv_recipe(resources = r$id,
-      tubelex_tokenization_mismatch = "allow")$resources[[1L]]
+      tubelex_tokenization_mismatch = "allow", nj8_unit = nj8_u)$resources[[1L]]
     if (execute && !identical(r, expected))
       stop("Resource requirements differ from the installed catalog: ", r$id, call. = FALSE)
     r$id
   }, character(1))
   if (anyDuplicated(ids)) stop("Duplicated recipe resources.", call. = FALSE)
-  if (execute && !identical(x$engine, engine))
-    stop("Recipe engine requirements differ from this environment; recreate the recipe explicitly to change environments.",
-      call. = FALSE)
+  if (execute) {
+    contract_fields <- c(
+      "package_version", "metric_contract_version",
+      "preprocessing_contract_version", "tokenizer_id", "tokenizer_version"
+    )
+    runtime_fields <- c("stringi_version", "icu_version")
+    if (!identical(x$engine[contract_fields], engine[contract_fields])) {
+      if (!allow_engine_mismatch) {
+        stop(
+          "Recipe engine requirements differ from this environment; recreate the recipe explicitly or pass allow_engine_mismatch = TRUE.",
+          call. = FALSE
+        )
+      }
+      warning(
+        "Recipe engine requirements differ from this environment; executing under current engine.",
+        call. = FALSE
+      )
+      x$engine <- engine
+    } else if (!identical(x$engine[runtime_fields], engine[runtime_fields])) {
+      warning(
+        "Recipe stringi/ICU runtime versions differ from this environment; proceeding under current ICU runtime.",
+        call. = FALSE
+      )
+    }
+  }
   class(x) <- "lexdiv_recipe"
   x
 }
 
 #' Run a saved recipe through the R calculation APIs
 #'
-#' No references are downloaded. Requested reference files and engine versions
-#' must match the recipe. The record contains source texts, tokens and optional
+#' No references are downloaded. Requested reference files must match the
+#' recipe. Package/contract engine versions must match unless
+#' `allow_engine_mismatch = TRUE`; cross-platform `stringi`/ICU runtime differences
+#' emit a warning. The record contains source texts, tokens and optional
 #' document metadata; save it according to the study's access rules.
 #' @param documents Named character vector or ID/text data frame, as for
-#'   [lexdiv_metrics_text_batch()].
+#'   [lexdiv_metrics_text()].
 #' @param recipe A recipe from [lexdiv_recipe()] or [lexdiv_read()].
 #' @param id_col,text_col Input column names.
-#' @param metadata Optional document metadata, as for [lexdiv_metrics_text_batch()].
+#' @param metadata Optional document metadata, as for [lexdiv_metrics_text()].
 #' @param condition_id A label for this analysis condition, not measurement identity.
+#' @param allow_engine_mismatch One `TRUE` or `FALSE`. When `TRUE`, warns and
+#'   updates the executed engine snapshot instead of stopping when package or
+#'   tokenizer versions differ.
+#' @param cache_dir Optional directory containing verified downloaded resources;
+#'   defaults to the configured or user resource cache.
 #' @return A `lexdiv_analysis` containing the recipe, calculation environment,
 #'   source texts, complete metric results, preprocessing, resource profiles and
 #'   saved method descriptions/citations. Its `$analysis` can be passed to
@@ -186,22 +232,59 @@ lexdiv_recipe <- function(plan = lexdiv_plan(), normalization = "NFC",
 #' @md
 #' @export
 lexdiv_run_recipe <- function(documents, recipe, id_col = "document_id",
-    text_col = "text", metadata = NULL, condition_id = "analysis") {
-  recipe <- .recipe_validate(recipe, execute = TRUE)
+    text_col = "text", metadata = NULL, condition_id = "analysis",
+    allow_engine_mismatch = FALSE, cache_dir = NULL) {
+  allow_engine_mismatch <- .lexprep_scalar_flag(
+    allow_engine_mismatch, "allow_engine_mismatch"
+  )
+  recipe <- .recipe_validate(
+    recipe,
+    execute = TRUE,
+    allow_engine_mismatch = allow_engine_mismatch
+  )
   condition_id <- .profile_scalar_identifier(condition_id, "condition_id")
   texts <- .lextext_documents(documents, id_col, text_col)
   p <- recipe$preprocessing
   ids <- vapply(recipe$resources, `[[`, character(1), "id")
-  if (length(ids) && !all(lexdiv_resource_info(ids)$available))
+  if (length(ids) && !all(lexdiv_resource_info(ids, cache_dir = cache_dir)$available))
     stop("Recipe reference data are unavailable or modified; obtain the pinned resources explicitly.", call. = FALSE)
-  prepared <- lexdiv_tokenize_batch(stats::setNames(as.character(unlist(texts, use.names = FALSE)),
+  prepared <- .lexdiv_tokenize_batch(stats::setNames(as.character(unlist(texts, use.names = FALSE)),
     names(texts)), normalization = p$normalization, case = p$case,
     keep_numbers = p$keep_numbers, tokenizer = p$tokenizer)
-  analysis <- lexdiv_metrics_text_batch(prepared, plan = .recipe_plan(recipe), metadata = metadata)
-  profiles <- lapply(ids, function(id) {
-    if (id == "nj8") nj8_profile_batch(prepared, unit = "surface",
-      normalization = "nfkc_lower", expand_parenthetical = TRUE) else
-      tubelex_profile_batch(prepared, normalization = "tubelex", tokenization_mismatch = "allow")
+  analysis <- .lexdiv_metrics_text_batch(prepared, plan = .recipe_plan(recipe), metadata = metadata)
+  profiles <- lapply(seq_along(ids), function(idx) {
+    id <- ids[[idx]]
+    ref_spec <- recipe$resources[[idx]]
+    if (id == "nj8") {
+      nj8_u <- if (!is.null(ref_spec$unit)) ref_spec$unit else "surface"
+      nj8_docs <- prepared
+      if (identical(nj8_u, "lemma")) {
+        if (!requireNamespace("textstem", quietly = TRUE) ||
+            !requireNamespace("lexicon", quietly = TRUE)) {
+          stop("NJ8 lemma recipes require the suggested textstem and lexicon packages.", call. = FALSE)
+        }
+        lem_list <- lapply(prepared, function(tk) {
+          if (!nrow(tk$tokens)) character() else
+            as.character(textstem::lemmatize_words(tk$tokens$surface, dictionary = lexicon::hash_lemmas))
+        })
+        nj8_docs <- if (length(prepared)) {
+          .lexdiv_lemmatize_batch(
+            prepared,
+            lemmas = lem_list,
+            backend_id = "textstem-hash-lemmas",
+            backend_version = as.character(utils::packageVersion("textstem"))
+          )
+        } else {
+          prepared
+        }
+      }
+      .nj8_profile_batch(nj8_docs, unit = nj8_u,
+        normalization = "nfkc_lower", expand_parenthetical = TRUE,
+        cache_dir = cache_dir)
+    } else {
+      .tubelex_profile_batch(prepared, normalization = "tubelex",
+        tokenization_mismatch = "allow", cache_dir = cache_dir)
+    }
   })
   names(profiles) <- ids
   if (any(vapply(profiles, function(p) !p$status %in% c("ok", "empty"), logical(1))))
@@ -229,7 +312,7 @@ lexdiv_run_recipe <- function(documents, recipe, id_col = "document_id",
 
 # Restore only the package's known result classes; JSON cannot supply R classes.
 .analysis_restore <- function(x) {
-  template <- lexdiv_metrics_batch(stats::setNames(list(), character()),
+  template <- .lexdiv_metrics_batch(stats::setNames(list(), character()),
     plan = .recipe_plan(x$recipe))
   rows <- x$analysis$results
   for (n in names(template)[vapply(template, is.list, logical(1))])

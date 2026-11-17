@@ -19,7 +19,7 @@ or CSV, use the [file-input walkthrough](english-tokenization.html#import-text-f
 ## Connect the analysis steps
 
 Start from the question and the input you actually have. For an English
-text table, `analysis <- lexdiv_metrics_text_batch(texts, tokenizer = "english", ...)` retains both
+text table, `analysis <- lexdiv_metrics_text(texts, tokenizer = "english", ...)` retains both
 calculated rows and the token audit. Inspect `analysis$results` and
 `analysis$token_audit`, use `lexdiv_widen(analysis$results)` for a report table
 or `plot(analysis, metric_id = "mattr")` for document values, then save the
@@ -32,17 +32,16 @@ packages; the arrows below show which result feeds the next step.
 
 | Question and starting input | Function connection | Read before reporting |
 | --- | --- | --- |
-| How do counting choices affect the same texts? Document IDs and source text | `lexdiv_metrics_text_batch()` → `$results` → `lexdiv_widen()` / `plot()`. [English file comparison](#compare-english-case-from-files); [Japanese selections](#compare-japanese-pos-from-files) start from annotations instead. | Counts, unavailable scores, token audit and original text. [Join study metadata](#study-metadata) without dropping documents. |
-| Which planned observations enter a model? Selected token vectors, measurement plan, schedule, submissions and reporting decisions | `lexdiv_metrics_batch(..., plan = plan)` → `lexdiv_study_table()` → `lexdiv_study_model_data()`. [Study example](repeated-observations.html). | One response specification per observation, plus included IDs and exclusion reasons. The selected data can go to an existing modelling package. |
-| How frequent or familiar are a document's words? Prepared terms and an identified norm table | `lexdiv_norm_profile_batch()` → `$lookup`, `$coverage` and `$summary`. [Own reference table](corpus-reference-profiles.html); [TUBELEX / NJ8](getting-started.html#corpus-relative-frequency-with-coverage). | Matching words, unmatched words, weighting and the population behind the reference. Coverage accompanies each summary. |
+| How do counting choices affect the same texts? Document IDs and source text | `lexdiv_metrics_text()` → `$results` → `lexdiv_widen()` / `plot()`. [English file comparison](#compare-english-case-from-files); [Japanese selections](#compare-japanese-pos-from-files) start from annotations instead. | Counts, unavailable scores, token audit and original text. [Join study metadata](#study-metadata) without dropping documents. |
+| Which planned observations enter a model? Selected token vectors, measurement plan, schedule, submissions and reporting decisions | `lexdiv_metrics(..., plan = plan)` → `lexdiv_study_table()` → `lexdiv_study_model_data()`. [Study example](repeated-observations.html). | One response specification per observation, plus included IDs and exclusion reasons. The selected data can go to an existing modelling package. |
+| How frequent or familiar are a document's words? Prepared terms and an identified norm table | `lexdiv_norm_profile()` → `$lookup`, `$coverage` and `$summary`. [Own reference table](corpus-reference-profiles.html); [TUBELEX / NJ8](getting-started.html#corpus-relative-frequency-with-coverage). | Matching words, unmatched words, weighting and the population behind the reference. Coverage accompanies each summary. |
 | How does word formation change the counts? Complete annotations and a declared inventory | `lexdiv_family_profile()` → `$documents`, `$members` and `$occurrences`. [Families, roots and affixes](word-families-and-affixes.html). | Resolved and unresolved occurrences; distinguish whole-document values from counts on the resolved subset. |
 | Where and with which words does a phrase occur? Complete source-aligned annotations | `lexdiv_concordance()` → `lexdiv_sort_concordance()`, `lexdiv_concordance_dispersion()`, `plot()` or `lexdiv_collocations()`. [Search and positions](concordance-and-dispersion.html); [collocation](collocation-association.html). | The same saved occurrences, zero-match documents and search or pair-opportunity denominators. |
 | Which words distinguish two corpora? Complete annotations and explicit target/reference document IDs | `lexdiv_keyness()` → `lexdiv_keyness_concordance()`. [Corpus comparison](keyness-comparison.html). | Corpus counts and denominators, then the original uses of a selected word. |
 
-The model route specifically needs the complete **plan-based batch result**.
-`lexdiv_metrics_text_batch()` does not accept `plan`, and its `$results` is not
-a substitute for that input. Prepare the token vectors first and follow the
-study example. Norm summaries and corpus-level keyness statistics also have
+The model route specifically needs a **plan-based multi-document result** from
+`lexdiv_metrics(..., plan = plan)` or `lexdiv_metrics_text(..., plan = plan)`.
+Norm summaries and corpus-level keyness statistics also have
 different meanings: do not copy a corpus score into writer rows as independent
 observations. A shared document ID does not establish a shared denominator.
 
@@ -110,7 +109,7 @@ sys.source(system.file("examples", "text-file-input.R",
   package = "ldfreq", mustWork = TRUE), reader)
 settings <- list(metrics = c("ttr", "mattr", "mtld"),
   window_length = 50, mtld_threshold = 0.72)
-calculate <- function(tokens) do.call(lexdiv_metrics_batch, c(list(tokens), settings))
+calculate <- function(tokens) do.call(lexdiv_metrics, c(list(tokens), settings))
 diagnostic_rows <- function(result) {
   out <- as.data.frame(result)[c("document_id", "metric_id", "method_id",
     "value", "status", "missing_reason", "N", "V", "below_quality_floor")]
@@ -160,7 +159,7 @@ en_sources <- do.call(rbind, lapply(en_files, `[[`, "source"))
 en_sources$document_id <- en_ids
 en_sources$source_file <- basename(en_paths)
 en_prepared <- lapply(c("preserve", "lower"), function(case) {
-  lexdiv_tokenize_batch(en_texts, tokenizer = "english",
+  lexdiv_tokenize(en_texts, tokenizer = "english",
     normalization = "NFC", case = case, keep_numbers = FALSE)
 })
 names(en_prepared) <- c("preserve", "lower")
@@ -505,7 +504,7 @@ writeLines(enc2utf8(record$methods), file.path(output_dir, "methods.txt"), useBy
 restored <- readRDS(file.path(output_dir, "analysis.rds"))
 stopifnot(identical(restored, record))
 replayed <- lapply(restored$inputs, function(tokens)
-  do.call(lexdiv_metrics_batch, c(list(tokens), restored$settings)))
+  do.call(lexdiv_metrics, c(list(tokens), restored$settings)))
 stopifnot(identical(replayed, restored$results))
 cat(record$methods, sep = "\n\n")
 ```
@@ -536,7 +535,7 @@ source-author IDs when their role is explicitly declared. Unknown writers or
 tasks remain `NA`, rather than being invented from filenames. Keep task, group,
 time and corpus information in separate columns when the study needs them.
 
-If an analysis was created with `lexdiv_metrics_text_batch(..., metadata = study)`,
+If an analysis was created with `lexdiv_metrics_text(..., metadata = study)`,
 its `$metadata` component already contains the ID-checked, input-ordered study
 table. Use that table below; see the
 [metadata input example](english-tokenization.html#retain-study-metadata). The Japanese imported-token path above has a different
@@ -645,7 +644,7 @@ Select language-appropriate references and matching units for other studies.
 study_references <- NULL
 study_coverage <- NULL
 if (use_nj8) {
-  study_references <- lapply(study_record$inputs, nj8_profile_batch, unit = "surface")
+  study_references <- lapply(study_record$inputs, nj8_profile, unit = "surface")
   study_coverage <- do.call(rbind, lapply(names(study_references), function(condition) {
     out <- study_references[[condition]]$coverage
     out$condition <- condition
@@ -924,10 +923,10 @@ texts <- c(
   first = "The student reads a book and discusses the book with a friend.",
   second = "The student explores a story and shares several ideas with a friend."
 )
-prepared <- lexdiv_tokenize_batch(
+prepared <- lexdiv_tokenize(
   texts, tokenizer = "english", normalization = "NFC", case = "lower"
 )
-diversity <- lexdiv_metrics_text_batch(
+diversity <- lexdiv_metrics_text(
   prepared, metrics = c("ttr", "mattr"), window_length = 10
 )
 metrics <- diversity$results
@@ -953,7 +952,7 @@ coverage, and select `unit = "lemma"`. Do not switch units only for documents
 with poor matching.
 
 ```{r, eval=has_nj8}
-levels <- nj8_profile_batch(prepared, unit = "surface")
+levels <- nj8_profile(prepared, unit = "surface")
 print(levels$coverage[, c(
   "document_id", "eligible_tokens", "matched_tokens", "token_coverage", "type_coverage"
 )])

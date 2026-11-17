@@ -12,7 +12,7 @@
   "properties": {
     "$schema": {"const": "lexical-diversity-variant-contract.schema.json"},
     "contract_id": {"const": "ldfreq-lexical-diversity-variants"},
-    "contract_version": {"const": "0.1.0"},
+    "contract_version": {"const": "0.2.0"},
     "status": {"const": "normative"},
     "core_contract_changed": {"const": false},
     "default_expansion": {
@@ -24,7 +24,7 @@
       ],
       "properties": {
         "maas_methods": {"const": 4},
-        "mtld_methods": {"const": 4},
+        "mtld_methods": {"const": 5},
         "mtld_thresholds": {
           "type": "array", "prefixItems": [{"const": 0.72}],
           "items": false, "minItems": 1, "maxItems": 1
@@ -44,8 +44,8 @@
         "partial_factor_credit", "directions"
       ],
       "properties": {
-        "threshold_comparison": {"const": "strict-less-than"},
-        "minimum_complete_factor_length": {"const": 10},
+        "threshold_comparison": {"type": "string", "minLength": 1},
+        "minimum_complete_factor_length": {"type": "string", "minLength": 1},
         "partial_factor_credit": {"type": "string", "minLength": 1},
         "directions": {
           "type": "array",
@@ -55,7 +55,7 @@
       }
     },
     "mtld_methods": {
-      "type": "array", "minItems": 4, "maxItems": 4,
+      "type": "array", "minItems": 5, "maxItems": 5,
       "items": {"$ref": "#/$defs/mtldMethod"}
     },
     "compatibility_boundary": {

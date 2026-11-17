@@ -341,7 +341,7 @@
   tokenizer <- if (identical(provenance$tokenizer_id, "ldfreq-english-word-tokenizer")) {
     "english"
   } else "unicode"
-  specification <- .lexprep_tokenizer_spec(tokenizer)
+  specification <- .lexprep_tokenizer_spec(tokenizer, version = provenance$tokenizer_version)
   positions_are_valid <-
     is.integer(value$tokens$start) &&
       length(value$tokens$start) == row_count &&
@@ -635,12 +635,13 @@
 #'   versioned preprocessing provenance record. The `surface` column can be
 #'   supplied directly to [lexdiv_metrics()].
 #' @export
-lexdiv_tokenize <- function(
+.lexdiv_tokenize_single <- function(
     text,
     normalization = "NFC",
     case = "lower",
     keep_numbers = FALSE,
-    tokenizer = "english") {
+    tokenizer = "english",
+    warn_cjk = TRUE) {
   text <- .lexprep_text(text)
   normalization <- .lexprep_scalar_choice(
     normalization,
@@ -654,6 +655,9 @@ lexdiv_tokenize <- function(
   processed <- .lexprep_prepare_text(text, normalization, case, tokenizer)
 
   if (identical(tokenizer, "english")) {
+    if (isTRUE(warn_cjk)) {
+      .lexprep_warn_cjk_in_english(processed)
+    }
     extracted <- .lexprep_english_extract(processed, keep_numbers)
     locations <- extracted$locations
     surfaces <- extracted$surfaces
@@ -730,6 +734,40 @@ lexdiv_tokenize <- function(
   )
 }
 
+lexdiv_tokenize <- function(
+    x,
+    normalization = "NFC",
+    case = "lower",
+    keep_numbers = FALSE,
+    tokenizer = "english",
+    id_col = "document_id",
+    text_col = "text") {
+  is_batch <- is.data.frame(x) ||
+    (is.character(x) && !is.object(x) && is.null(dim(x)) &&
+      (!is.null(names(x)) || length(x) > 1L))
+  if (is_batch) {
+    return(.lexdiv_tokenize_batch(
+      documents = x,
+      id_col = id_col,
+      text_col = text_col,
+      normalization = normalization,
+      case = case,
+      keep_numbers = keep_numbers,
+      tokenizer = tokenizer
+    ))
+  }
+  if (!missing(id_col) || !missing(text_col)) {
+    stop("id_col and text_col apply only to data-frame input.", call. = FALSE)
+  }
+  .lexdiv_tokenize_single(
+    text = x,
+    normalization = normalization,
+    case = case,
+    keep_numbers = keep_numbers,
+    tokenizer = tokenizer
+  )
+}
+
 #' Add explicit lemmas and optional universal POS tags
 #'
 #' Adds a lemma layer to an object created by [lexdiv_tokenize()]. Lemmas may be
@@ -776,6 +814,21 @@ lexdiv_lemmatize <- function(
     dictionary = NULL,
     dictionary_id = NULL,
     dictionary_version = NULL) {
+  if (is.list(x) && !is.data.frame(x) && !.lexprep_is_tokenization(x)) {
+    return(.lexdiv_lemmatize_batch(
+      documents = x,
+      method = method,
+      lemmas = lemmas,
+      upos = upos,
+      backend_id = backend_id,
+      backend_version = backend_version,
+      upos_backend_id = upos_backend_id,
+      upos_backend_version = upos_backend_version,
+      dictionary = dictionary,
+      dictionary_id = dictionary_id,
+      dictionary_version = dictionary_version
+    ))
+  }
   x <- .lexprep_validate_tokenization(x)
   method <- .lexprep_scalar_choice(
     method,
@@ -982,23 +1035,29 @@ lexdiv_lemmatize <- function(
   if (any(!validUTF8(lines))) {
     stop("AntBNC resource is not valid UTF-8 text.", call. = FALSE)
   }
-  if (!length(lines) || any(!nzchar(lines))) {
+  if (length(lines)) {
+    lines[[1L]] <- sub("^\ufeff", "", lines[[1L]])
+    lines <- sub("\t+$", "", lines)
+    lines <- lines[nzchar(stringi::stri_trim_both(lines)) & !grepl("^\\s*[;#]", lines)]
+  }
+  if (!length(lines)) {
     stop("AntBNC resource contains an empty or invalid record.", call. = FALSE)
   }
   fields <- strsplit(lines, "\t", fixed = TRUE)
-  valid <- lengths(fields) >= 3L & vapply(
-    fields,
-    function(value) identical(value[[2L]], "->"),
-    logical(1)
-  )
-  if (!all(valid)) {
+  arrow_pos <- vapply(fields, function(value) {
+    if (length(value) >= 3L && identical(value[[2L]], "->")) return(2L)
+    if (length(value) >= 5L && identical(value[[4L]], "->") &&
+        grepl("^[0-9]+$", value[[1L]]) && grepl("^[0-9]+$", value[[2L]])) return(4L)
+    0L
+  }, integer(1L))
+  if (any(arrow_pos == 0L)) {
     stop(
-      "AntBNC resource records must use 'headword<TAB>-><TAB>form...' format.",
+      "AntBNC resource records must use 'headword<TAB>-><TAB>form...' (or 'rank<TAB>freq<TAB>headword<TAB>-><TAB>form...') format.",
       call. = FALSE
     )
   }
-  headwords <- vapply(fields, `[[`, character(1), 1L)
-  forms <- lapply(fields, function(value) value[-c(1L, 2L)])
+  headwords <- vapply(seq_along(fields), function(i) fields[[i]][[arrow_pos[[i]] - 1L]], character(1L))
+  forms <- lapply(seq_along(fields), function(i) fields[[i]][-seq_len(arrow_pos[[i]])])
   if (
     any(!nzchar(headwords)) || any(lengths(forms) < 1L) ||
       any(!nzchar(unlist(forms, use.names = FALSE)))
@@ -1140,6 +1199,16 @@ lexdiv_flemmatize <- function(
     normalization = "nfkc_lower",
     resource_version = NULL,
     override_version = NULL) {
+  if (is.list(x) && !is.data.frame(x) && !.lexprep_is_tokenization(x)) {
+    return(.lexdiv_flemmatize_batch(
+      documents = x,
+      resource = resource,
+      overrides = overrides,
+      normalization = normalization,
+      resource_version = resource_version,
+      override_version = override_version
+    ))
+  }
   x <- .lexprep_validate_tokenization(x)
   normalization <- .lexprep_scalar_choice(
     normalization,
@@ -1227,16 +1296,7 @@ lexdiv_flemmatize <- function(
   x
 }
 
-#' Lemmatize a named batch of tokenization objects
-#'
-#' @param documents A plain named list of `lexdiv_tokenization` objects as
-#'   returned by [lexdiv_tokenize_batch()].
-#' @inheritParams lexdiv_lemmatize
-#' @param lemmas,upos For `method = "supplied"` (or supplied UPOS), named lists
-#'   aligned with `documents`.
-#' @return An input-ordered named list of lemmatized `lexdiv_tokenization` objects.
-#' @export
-lexdiv_lemmatize_batch <- function(
+.lexdiv_lemmatize_batch <- function(
     documents,
     method = "supplied",
     lemmas = NULL,
@@ -1284,13 +1344,7 @@ lexdiv_lemmatize_batch <- function(
   stats::setNames(out, ids)
 }
 
-#' Flemmatize a named batch of tokenization objects
-#'
-#' @param documents A plain named list of `lexdiv_tokenization` objects.
-#' @inheritParams lexdiv_flemmatize
-#' @return An input-ordered named list of flemmatized `lexdiv_tokenization` objects.
-#' @export
-lexdiv_flemmatize_batch <- function(
+.lexdiv_flemmatize_batch <- function(
     documents,
     resource,
     overrides = NULL,
@@ -1397,7 +1451,7 @@ lexdiv_flemmatize_batch <- function(
 #' @return A `lexdiv_text_results` list with `results`, `token_audit`, and
 #'   `preprocessing` components.
 #' @export
-lexdiv_metrics_text <- function(
+.lexdiv_metrics_text_single <- function(
     x,
     unit = "surface",
     word_inclusion = "all",
@@ -1411,25 +1465,18 @@ lexdiv_metrics_text <- function(
     sample_size = 42L,
     expected_ttr_sample_sizes = 35:50,
     tokenizer = "english",
-    plan = NULL) {
+    plan = NULL,
+    supplied_tokenizer_arguments = NULL,
+    supplied_metric_arguments = NULL,
+    retain_token_audit = TRUE) {
+  retain_token_audit <- .lexprep_scalar_flag(retain_token_audit, "retain_token_audit")
   if (!is.null(plan)) {
-    if (!missing(metrics) || !missing(segment_length) ||
-        !missing(window_length) || !missing(mtld_threshold) ||
-        !missing(sample_size) || !missing(expected_ttr_sample_sizes)) {
+    if (isTRUE(any(supplied_metric_arguments))) {
       stop("With plan, omit metrics and individual metric parameters.", call. = FALSE)
     }
     plan <- .profile_validate_plan(plan)
   }
-  supplied_tokenizer_arguments <- c(
-    normalization = !missing(normalization),
-    case = !missing(case),
-    keep_numbers = !missing(keep_numbers),
-    tokenizer = !missing(tokenizer)
-  )
-  if (
-    .lexprep_is_tokenization(x) &&
-      any(supplied_tokenizer_arguments)
-  ) {
+  if (.lexprep_is_tokenization(x) && isTRUE(any(supplied_tokenizer_arguments))) {
     stop(
       paste0(
         paste(names(supplied_tokenizer_arguments)[supplied_tokenizer_arguments],
@@ -1454,7 +1501,7 @@ lexdiv_metrics_text <- function(
   tokenization <- if (.lexprep_is_tokenization(x)) {
     .lexprep_validate_tokenization(x)
   } else {
-    lexdiv_tokenize(
+    .lexdiv_tokenize_single(
       text = x,
       normalization = normalization,
       case = case,
@@ -1464,9 +1511,9 @@ lexdiv_metrics_text <- function(
   }
   selected <- .lexprep_selected_units(tokenization, unit, word_inclusion)
   results <- if (!is.null(plan)) {
-    lexdiv_metrics(tokens = selected$units, plan = plan)
+    .lexdiv_metrics_single(tokens = selected$units, plan = plan)
   } else {
-    lexdiv_metrics(
+    .lexdiv_metrics_single(
       tokens = selected$units,
       metrics = metrics,
       segment_length = segment_length,
@@ -1497,10 +1544,105 @@ lexdiv_metrics_text <- function(
   structure(
     list(
       results = results,
-      token_audit = selected$audit,
+      token_audit = if (retain_token_audit) selected$audit else selected$audit[FALSE, , drop = FALSE],
       preprocessing = preprocessing
     ),
     class = "lexdiv_text_results"
+  )
+}
+
+lexdiv_metrics_text <- function(
+    x,
+    unit = "surface",
+    word_inclusion = "all",
+    normalization = "NFC",
+    case = "lower",
+    keep_numbers = FALSE,
+    metrics = setdiff(lexdiv_metric_ids(), c("expected_ttr_d", "mtld_ma")),
+    segment_length = 50L,
+    window_length = 50L,
+    mtld_threshold = 0.72,
+    sample_size = 42L,
+    expected_ttr_sample_sizes = 35:50,
+    tokenizer = "english",
+    plan = NULL,
+    id_col = "document_id",
+    text_col = "text",
+    max_rows = 1e6,
+    metadata = NULL,
+    retain_token_audit = TRUE) {
+  supplied_tokenizer <- c(
+    normalization = !missing(normalization),
+    case = !missing(case),
+    keep_numbers = !missing(keep_numbers),
+    tokenizer = !missing(tokenizer)
+  )
+  supplied_metrics <- c(
+    metrics = !missing(metrics),
+    segment_length = !missing(segment_length),
+    window_length = !missing(window_length),
+    mtld_threshold = !missing(mtld_threshold),
+    sample_size = !missing(sample_size),
+    expected_ttr_sample_sizes = !missing(expected_ttr_sample_sizes)
+  )
+  is_batch <- is.data.frame(x) ||
+    (is.character(x) && !is.object(x) && is.null(dim(x)) &&
+      (!is.null(names(x)) || length(x) > 1L)) ||
+    (is.list(x) && !is.data.frame(x) && !.lexprep_is_tokenization(x))
+  if (is_batch) {
+    return(.lexdiv_metrics_text_batch(
+      documents = x,
+      id_col = id_col,
+      text_col = text_col,
+      unit = unit,
+      word_inclusion = word_inclusion,
+      normalization = normalization,
+      case = case,
+      keep_numbers = keep_numbers,
+      tokenizer = tokenizer,
+      metrics = metrics,
+      segment_length = segment_length,
+      window_length = window_length,
+      mtld_threshold = mtld_threshold,
+      sample_size = sample_size,
+      expected_ttr_sample_sizes = expected_ttr_sample_sizes,
+      plan = plan,
+      max_rows = max_rows,
+      metadata = metadata,
+      retain_token_audit = retain_token_audit,
+      supplied_tokenizer = supplied_tokenizer,
+      supplied_id_text = c(id_col = !missing(id_col), text_col = !missing(text_col)),
+      supplied_metrics = supplied_metrics,
+      supplied_max_rows = !missing(max_rows)
+    ))
+  }
+  if (!missing(id_col) || !missing(text_col)) {
+    stop("id_col and text_col apply only to multi-document data-frame input.", call. = FALSE)
+  }
+  if (!missing(max_rows)) {
+    stop("max_rows applies only to multi-document plan execution.", call. = FALSE)
+  }
+  if (!is.null(metadata)) {
+    stop("metadata applies only to multi-document inputs.", call. = FALSE)
+  }
+  .lexdiv_metrics_text_single(
+    x = x,
+    unit = unit,
+    word_inclusion = word_inclusion,
+    normalization = normalization,
+    case = case,
+    keep_numbers = keep_numbers,
+    metrics = metrics,
+    segment_length = segment_length,
+    window_length = window_length,
+    mtld_threshold = mtld_threshold,
+    sample_size = sample_size,
+    expected_ttr_sample_sizes = expected_ttr_sample_sizes,
+    tokenizer = tokenizer,
+    plan = plan,
+    supplied_tokenizer_arguments = supplied_tokenizer,
+    supplied_metric_arguments = supplied_metrics,
+    retain_token_audit = retain_token_audit
   )
 }
 

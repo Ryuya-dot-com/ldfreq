@@ -1,15 +1,18 @@
 test_that("wrong token containers cannot silently produce lexical scores", {
-  wrong <- list(factor(c("a","b")),data.frame(token=c("a","b")),matrix(c("a","b")),
-    I(c("a","b")),1:3,list("a","b"))
-  for(tokens in wrong) {
+  wrong_single <- list(factor(c("a","b")), matrix(c("a","b")), I(c("a","b")), 1:3)
+  for(tokens in wrong_single) {
     result <- lexdiv_metrics(tokens,metrics=c("ttr","mattr","mtld_ma"))
     expect_true(all(result$status=="invalid_input"))
     expect_true(all(is.na(result$value)))
     expect_true(all(result$missing_reason=="invalid_token"))
   }
+  wrong_containers <- list(data.frame(token=c("a","b")), list("a","b"))
+  for(container in wrong_containers) {
+    expect_error(lexdiv_metrics(container, metrics=c("ttr","mattr","mtld_ma")))
+  }
   expect_identical(lexdiv_metrics(character(),metrics="ttr")$missing_reason,"empty_input")
   expect_identical(lexdiv_metrics(c("a",NA_character_),metrics="ttr")$status,"invalid_input")
-  for(text in wrong) expect_error(lexdiv_tokenize(text))
+  for(text in c(wrong_single, wrong_containers)) expect_error(lexdiv_tokenize(text))
 })
 
 test_that("numeric settings and sheet selectors retain their declared types", {

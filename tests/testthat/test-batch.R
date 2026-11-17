@@ -1,4 +1,4 @@
-batch_function <- getFromNamespace("lexdiv_metrics_batch", "ldfreq")
+batch_function <- getFromNamespace(".lexdiv_metrics_batch", "ldfreq")
 single_function <- getFromNamespace("lexdiv_metrics", "ldfreq")
 
 test_that("named-list batches preserve document and metric order", {
@@ -77,7 +77,7 @@ test_that("named-list batches preserve document and metric order", {
 })
 
 test_that("printing a batch column subset remains safe", {
-  result <- lexdiv_metrics_batch(
+  result <- lexdiv_metrics(
     list(doc_a = c("a", "a")),
     metrics = "ttr"
   )
@@ -108,7 +108,7 @@ test_that("named-list and data-frame inputs are identical", {
   from_selected_columns <- batch_function(
     frame,
     id_col = "explicit_id",
-    tokens_col = "token_vectors",
+    term_col = "token_vectors",
     metrics = c("ttr", "mtld")
   )
   expect_identical(from_selected_columns, from_list)
@@ -159,7 +159,7 @@ test_that("metric subsets, order, and parameters are forwarded unchanged", {
   for (index in seq_along(documents)) {
     single <- do.call(
       single_function,
-      c(list(tokens = documents[[index]]), arguments)
+      c(list(x = documents[[index]]), arguments)
     )
     rows <- result$document_id == names(documents)[[index]]
     expect_identical(result$value[rows], single$value)
@@ -333,7 +333,7 @@ test_that("data-frame IDs and structural columns are strict", {
   expect_error(batch_function(duplicate_columns), "exactly one selected")
 
   expect_error(
-    batch_function(make_frame(), id_col = "document_id", tokens_col = "document_id"),
+    batch_function(make_frame(), id_col = "document_id", term_col = "document_id"),
     "different columns"
   )
   expect_error(
@@ -391,7 +391,7 @@ test_that("ID duplicate detection is independent of the C locale encoding trap",
   selected <- batch_function(
     unicode_columns,
     id_col = utf8_id,
-    tokens_col = tokens_name_utf8,
+    term_col = tokens_name_utf8,
     metrics = "ttr"
   )
   expect_identical(Encoding(names(unicode_columns)), original_column_encodings)

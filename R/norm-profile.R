@@ -512,61 +512,48 @@
   summary[fields]
 }
 
-#' Profile terms with caller-supplied lexical norms
-#'
-#' Computes token- and/or type-weighted arithmetic means for one or more
-#' lexical-norm variables. Matching is exact: the function neither tokenizes
-#' nor normalizes the supplied terms. Means use observed values from matched
-#' keys only. Resource coverage and annotation coverage are therefore returned
-#' separately and should accompany every interpretation of an estimate.
-#'
-#' @param terms A plain character vector with one caller-prepared lookup term
-#'   per element. Zero length is allowed. Terms are retained in `lookup`.
-#' @param norms An ordinary data frame containing one unique key column and the
-#'   numeric norm columns named by `measure_specs`. Other columns are ignored
-#'   and are not copied into the result.
-#' @param key One string naming the exact-match key column in `norms`.
-#' @param measure_specs An ordinary data frame with the exact ordered columns
-#'   `measure_id`, `value_column`, `construct_id`, `value_unit`, `direction`,
-#'   `language`, `variety`, `population_id`, `collection_year`, `valid_min`,
-#'   and `valid_max`. IDs must be unique; `direction` is `"higher"`,
-#'   `"lower"`, or `"descriptive"`; numeric bounds may be `NA`.
-#' @param resource A plain named list with the exact ordered fields
-#'   `resource_id`, `resource_version`, `creator`, `source_reference`,
-#'   `data_license`, `transformation_id`, `lookup_unit`, and
-#'   `resource_key_normalization_id`. These are caller assertions recorded for
-#'   provenance; they do not establish redistribution rights.
-#' @param weightings A non-empty subset of `c("token", "type")`, without
-#'   duplicates. Type identity is the exact lookup term after no package-side
-#'   transformation.
-#' @param max_rows A positive whole-number bound on the combined rows planned
-#'   for `lookup`, `summary`, and `coverage`, checked before result allocation.
-#'
-#' @return A `lexdiv_norm_profile` list with `status`, `summary`, `lookup`,
-#'   `coverage`, `provenance`, and `diagnostics`. `summary` contains conditional
-#'   observed matched-only means and their denominators. `lookup` contains one
-#'   input-major, measure-minor row per term and measure. `coverage` is the
-#'   analysis-ready denominator projection of `summary`. No missing value is
-#'   imputed and no automatic coverage threshold is applied.
-#'
-#' @details The three coverage rates have different denominators:
-#'   `resource_coverage = matched_units / input_units`,
-#'   `value_coverage = observed_value_units / input_units`, and
-#'   `annotation_coverage = observed_value_units / matched_units`. A matched
-#'   key with an `NA` norm is `missing_annotation`; an unmatched key is
-#'   `not_applicable_oov`. The function does not infer a universal direction,
-#'   compare unlike scales, form composite scores, or approve a data license.
-#'
-#' @export
+.lexnorm_default_measure_id <- function(value_column) {
+  value_column <- .lexnorm_plain_character(value_column, "value_column")
+  ids <- gsub("%", "pct", value_column, fixed = TRUE)
+  ids <- gsub("[^A-Za-z0-9._-]+", "_", ids)
+  ids <- sub("^_+", "", ids)
+  ids <- sub("_+$", "", ids)
+  needs_prefix <- !nzchar(ids) | !grepl("^[A-Za-z]", ids)
+  ids[needs_prefix] <- paste0(
+    "m_",
+    ifelse(nzchar(ids[needs_prefix]), ids[needs_prefix], seq_len(sum(needs_prefix)))
+  )
+  make.unique(ids, sep = "_")
+}
+
+.lexnorm_default_specs <- function(norms, key) {
+  norms <- .lexnorm_plain_data_frame(norms, "norms")
+  key <- .lexnorm_scalar_string(key, "key")
+  if (!(key %in% names(norms))) {
+    .lexnorm_stop("key must name one column in norms.")
+  }
+  candidates <- setdiff(names(norms), key)
+  numeric_cols <- candidates[vapply(candidates, function(col) {
+    val <- norms[[col]]
+    is.numeric(val) && !is.object(val) && is.null(dim(val))
+  }, logical(1L))]
+  if (!length(numeric_cols)) {
+    .lexnorm_stop(
+      "norms contains no plain numeric columns outside key; supply numeric norm columns or explicit measure_specs."
+    )
+  }
+  lexdiv_norm_spec(numeric_cols)
+}
+
 #' Construct a measure-specification table for lexical-norm profiles
 #'
 #' Creates a normalized eleven-column `measure_specs` data frame for
-#' [lexdiv_norm_profile()] and [lexdiv_norm_profile_batch()], filling omitted
-#' descriptive fields with explicit `"unspecified"` labels rather than silent
-#' assumptions.
+#' [lexdiv_norm_profile()], filling omitted descriptive fields with explicit
+#' `"unspecified"` labels rather than silent assumptions.
 #'
 #' @param value_column Non-empty character vector of numeric column names in `norms`.
-#' @param measure_id Unique ASCII identifiers; defaults to `value_column`.
+#' @param measure_id Unique ASCII identifiers; defaults to sanitized `value_column`
+#'   identifiers (for example `"%_known"` becomes `"pct_known"`).
 #' @param construct_id Construct identifiers; defaults to `measure_id`.
 #' @param value_unit Scale/unit labels; scalar values recycle across measures.
 #' @param direction Score direction(s): `"higher"`, `"lower"`, or `"descriptive"`.
@@ -577,7 +564,7 @@
 #' @export
 lexdiv_norm_spec <- function(
     value_column,
-    measure_id = value_column,
+    measure_id = NULL,
     construct_id = measure_id,
     value_unit = "unspecified",
     direction = "descriptive",
@@ -588,6 +575,9 @@ lexdiv_norm_spec <- function(
     valid_min = NA_real_,
     valid_max = NA_real_) {
   value_column <- .lexnorm_plain_character(value_column, "value_column")
+  if (is.null(measure_id)) {
+    measure_id <- .lexnorm_default_measure_id(value_column)
+  }
   n <- length(value_column)
   recycle <- function(x, name) {
     if (length(x) == 1L) rep(x, n) else if (length(x) == n) x else
@@ -614,8 +604,7 @@ lexdiv_norm_spec <- function(
 #' Construct resource provenance metadata for lexical-norm profiles
 #'
 #' Creates a normalized eight-field `resource` list for [lexdiv_norm_profile()],
-#' [lexdiv_norm_profile_batch()], [lexdiv_ngram_reference()], and
-#' [lexdiv_build_ngram_reference()].
+#' [lexdiv_ngram_reference()], and [lexdiv_build_ngram_reference()].
 #'
 #' @param resource_id ASCII identifier beginning with a letter.
 #' @param resource_version,creator,source_reference,data_license,transformation_id,lookup_unit,resource_key_normalization_id
@@ -643,21 +632,84 @@ lexdiv_resource_meta <- function(
   ))
 }
 
+#' Profile one or more documents with caller-supplied lexical norms
+#'
+#' Computes token- and/or type-weighted arithmetic means for one or more
+#' lexical-norm variables on a single document or multiple documents. Matching is
+#' exact: the function neither tokenizes nor normalizes supplied character terms.
+#' Means use observed values from matched keys only. Resource coverage and
+#' annotation coverage are returned separately alongside every estimate.
+#'
+#' @param x For a single document, a plain character vector of lookup terms or a
+#'   `lexdiv_tokenization` object. For multiple documents, a plain named list of
+#'   term vectors, a `lexdiv_tokenization_batch` object, or a data frame with
+#'   the columns selected by `id_col` and `term_col`.
+#' @param norms An ordinary data frame containing one unique key column and the
+#'   numeric norm columns named by `measure_specs`. Non-numeric metadata columns
+#'   are ignored automatically when `measure_specs` uses its default.
+#' @param key One string naming the exact-match key column in `norms`.
+#' @param measure_specs An eleven-column data frame produced by
+#'   [lexdiv_norm_spec()]. Defaults to all plain numeric columns in `norms`
+#'   other than `key`.
+#' @param resource A plain named list produced by [lexdiv_resource_meta()].
+#' @param weightings A non-empty subset of `c("token", "type")`, without
+#'   duplicates.
+#' @param id_col Name of the document-ID column for multi-document data-frame
+#'   input.
+#' @param term_col Name of the term list-column for multi-document data-frame
+#'   input (default `"terms"`), or the word-token column to extract from a
+#'   `lexdiv_tokenization` or `lexdiv_tokenization_batch` object (defaults to
+#'   `"term"` when omitted).
+#' @param max_rows Positive whole-number bound on combined rows planned for
+#'   `lookup`, `summary`, and `coverage`.
+#'
+#' @return For a single document, a `lexdiv_norm_profile` object. For multiple
+#'   documents, a `lexdiv_norm_profile_batch` object.
+#' @export
 lexdiv_norm_profile <- function(
-    terms,
+    x,
     norms,
     key,
-    measure_specs = lexdiv_norm_spec(setdiff(names(norms), key)),
+    measure_specs = NULL,
     resource = lexdiv_resource_meta("caller_norms"),
     weightings = c("token", "type"),
+    id_col = "document_id",
+    term_col = "terms",
     max_rows = 1e6) {
-  terms <- .lexnorm_terms(terms)
+  if (inherits(x, "lexdiv_tokenization")) {
+    if (!missing(id_col)) {
+      .lexnorm_stop("id_col applies only to multi-document inputs.")
+    }
+    tok_col <- if (missing(term_col)) "surface" else .lex_batch_scalar_name(term_col, "term_col")
+    terms <- .lexdiv_extract_tokenization_terms(x, tok_col)
+  } else if (.lex_is_tokenization_batch(x) || is.data.frame(x) || is.list(x)) {
+    tok_col <- if (.lex_is_tokenization_batch(x) && missing(term_col)) "surface" else term_col
+    return(.lexdiv_norm_profile_batch(
+      documents = x,
+      norms = norms,
+      key = key,
+      measure_specs = measure_specs,
+      resource = resource,
+      weightings = weightings,
+      id_col = id_col,
+      term_col = tok_col,
+      max_rows = max_rows
+    ))
+  } else {
+    if (!missing(id_col) || !missing(term_col)) {
+      .lexnorm_stop("id_col and term_col apply only to multi-document inputs.")
+    }
+    terms <- .lexnorm_terms(x)
+  }
   .lex_warn_likely_raw_text(
     terms,
     "terms",
     "lexdiv_norm_profile",
     "tokenize and apply the resource's documented preprocessing first"
   )
+  if (is.null(measure_specs)) {
+    measure_specs <- .lexnorm_default_specs(norms, key)
+  }
   measure_specs <- .lexnorm_measure_specs(measure_specs)
   norm_input <- .lexnorm_norms(norms, key, measure_specs)
   norms <- norm_input$norms

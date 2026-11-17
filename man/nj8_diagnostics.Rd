@@ -9,8 +9,8 @@ provenance without running tokenization, annotation or lookup again.
 }
 \usage{nj8_diagnostics(x)}
 \arguments{
-  \item{x}{An unmodified result of \code{nj8_profile()} or
-  \code{nj8_profile_batch()}. A single profile receives the local document ID
+  \item{x}{An unmodified single-document or batch result of
+  \code{nj8_profile()}. A single profile receives the local document ID
   \code{"document_1"}; batch document IDs are preserved.}
 }
 \value{
@@ -65,11 +65,11 @@ for the full profile or a standalone analysis of all annotation failures.
 \examples{
 # Optional data: review and explicitly download these resources first.
 if (all(lexdiv_resource_info(c("nj8"))$available)) {
-prepared <- lexdiv_tokenize_batch(c(
+prepared <- lexdiv_tokenize(c(
   essay_a = "Students have part-time jobs.",
   essay_b = "Students learn from jobs."
 ), tokenizer = "english", case = "lower")
-profile <- nj8_profile_batch(prepared, unit = "surface")
+profile <- nj8_profile(prepared, unit = "surface")
 audit <- nj8_diagnostics(profile)
 audit$unmatched_terms
 audit$coverage

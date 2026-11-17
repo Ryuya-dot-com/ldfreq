@@ -103,7 +103,7 @@ flemma_text <- lexdiv_metrics_text(
 )
 frequency_terms <- c("the", "cat", "saw", "the", "other", "cat")
 frequency <- tubelex_profile(frequency_terms)
-frequency_batch <- tubelex_profile_batch(list(a = frequency_terms, b = frequency_terms))
+frequency_batch <- tubelex_profile(list(a = frequency_terms, b = frequency_terms))
 stopifnot(inherits(frequency_batch, "tubelex_profile_batch"),
           identical(frequency, frequency_batch$profiles$a),
           identical(names(frequency_batch$profiles), c("a", "b")))
@@ -118,7 +118,7 @@ level_profile <- nj8_profile(
   unit = "flemma",
   flemma_conflict = "antbnc"
 )
-level_profile_batch <- nj8_profile_batch(
+level_profile_batch <- nj8_profile(
   list(document_a = flemma_annotation, document_b = flemma_annotation),
   synthetic_levels,
   unit = "flemma",
@@ -128,14 +128,14 @@ variants <- lexdiv_variant_metrics(
   rep(tokens, 10L),
   mtld_thresholds = c(0.72, 0.92)
 )
-batch <- lexdiv_metrics_batch(documents, metrics = c("ttr", "hdd"), sample_size = 2)
+batch <- lexdiv_metrics(documents, metrics = c("ttr", "hdd"), sample_size = 2)
 tidy_documents <- lexdiv_as_documents(data.frame(
   document_id = c("a", "a", "b"),
   token = c("one", "two", "three"),
   stringsAsFactors = FALSE
 ))
 wide <- lexdiv_widen(
-  lexdiv_metrics_batch(tidy_documents, metrics = c("ttr", "maas")),
+  lexdiv_metrics(tidy_documents, metrics = c("ttr", "maas")),
   values_from = "value"
 )
 
@@ -149,7 +149,7 @@ mattr_4 <- lexdiv_spec(
 plan <- lexdiv_plan(presets = character(), specs = mattr_4)
 profile <- lexdiv_metrics(tokens, plan = plan)
 mattr_profile <- lexdiv_mattr_profile(tokens, plan)
-profile_batch <- lexdiv_metrics_batch(documents, plan = plan)
+profile_batch <- lexdiv_metrics(documents, plan = plan)
 screen <- lexdiv_screen_lengths(profile_batch, floors = c(tokens_4 = 4L))
 
 check_print_contract <- function(value) {
@@ -233,7 +233,7 @@ stopifnot(
   identical(nrow(level_profile_batch$coverage), 2L),
   identical(nrow(level_profile_batch$summary), 36L),
   identical(level_profile_batch$provenance$resource_bundled, FALSE),
-  identical(nrow(variants), 12L),
+  identical(nrow(variants), 14L),
   all(variants$status == "ok"),
   nrow(batch) == 4L,
   all(batch$status == "ok"),
@@ -261,10 +261,10 @@ stopifnot(
 # English text input requires no Python, network or model download.
 english_texts <- data.frame(document_id = c("essay", "empty"),
   text = c("The cat can't read. 3.14 https://example.org", ""))
-english_tokens <- lexdiv_tokenize_batch(english_texts, tokenizer = "english", case = "lower")
+english_tokens <- lexdiv_tokenize(english_texts, tokenizer = "english", case = "lower")
 english_study <- data.frame(document_id = c("empty", "essay"),
   writer_id = c(NA_character_, "authored-example"))
-english_batch <- lexdiv_metrics_text_batch(english_tokens, metrics = "ttr",
+english_batch <- lexdiv_metrics_text(english_tokens, metrics = "ttr",
   metadata = english_study)
 stopifnot(identical(english_batch$metadata$document_id, c("essay", "empty")),
   identical(english_batch$metadata$writer_id, c("authored-example", NA_character_)))
@@ -374,7 +374,7 @@ public_planned <- data.frame(observation_id = "o1", writer_id = "001",
   task = "essay", occasion = 1)
 public_submissions <- data.frame(observation_id = "o1", document_id = "d1",
   input_characters = 5)
-public_results <- lexdiv_metrics_batch(list(d1 = c("a", "b", "a")), plan = public_plan)
+public_results <- lexdiv_metrics(list(d1 = c("a", "b", "a")), plan = public_plan)
 public_reporting <- data.frame(document_id = "d1", request_id = "ttr",
   reporting_status = "report", reporting_reason = "Planned specification")
 public_study <- lexdiv_study_table(public_planned, public_submissions,

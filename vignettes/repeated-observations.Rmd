@@ -32,7 +32,7 @@ model; it supplies no evidence of development, proficiency or causation.
 
 The public functions
 `lexdiv_study_table()` and `lexdiv_study_model_data()` use saved results from
-`lexdiv_metrics_batch(..., plan = plan)`
+`lexdiv_metrics(..., plan = plan)`
 and do not fit or choose a model. The table workflow needs no additional package.
 Only the model section uses optional [lme4](https://lme4.github.io/lme4/).
 
@@ -60,7 +60,7 @@ Replace these two tables with your own scheduled rows and actual document map:
 | --- | --- | --- |
 | `planned` | One scheduled observation | Unique character `observation_id`, `writer_id`, `task`, `occasion` |
 | `submissions` | One selected document for a scheduled observation | `observation_id`, unique character `document_id`, `input_characters` |
-| `results` | One submitted document and plan request | Complete output of `lexdiv_metrics_batch(..., plan = plan)` |
+| `results` | One submitted document and plan request | Complete output of `lexdiv_metrics(..., plan = plan)` |
 | `reporting` | One decision for a submitted document and request | `document_id`, `request_id`, `reporting_status`, `reporting_reason` |
 
 Do not infer the schedule by taking every writer-by-task-by-occasion combination
@@ -99,9 +99,9 @@ record$prepared[[1]]$provenance[c("tokenizer_id", "tokenizer_version",
 ```
 
 In your own analysis, calculate the complete batch with
-`lexdiv_metrics_batch(tokens, plan = plan)`. For raw text, prepare `tokens`
-with `lexdiv_tokenize_batch()` first, as the installed example does.
-`lexdiv_metrics_text_batch()` does not accept `plan` in this workflow.
+`lexdiv_metrics(tokens, plan = plan)` (or directly from raw texts with
+`lexdiv_metrics_text(texts, plan = plan)`). For raw text, you can also prepare
+`tokens` with `lexdiv_tokenize()` first, as the installed example does.
 For imported annotations, explicitly select the unit and inclusion policy and
 retain the original annotation/model/dictionary records beside the selected
 tokens; see [Japanese annotations](japanese-annotations.html) and

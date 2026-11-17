@@ -22,7 +22,7 @@ lexdiv_compare_ngrams <- function(x, references, baseline = NULL, max_rows = 1e6
   # Reuse the established per-reference arithmetic, statuses and validation.
   profiles <- lapply(references, function(ref) lexdiv_ngram_profile(x, ref))
   common <- Reduce(`&`, lapply(profiles, function(p) !is.na(p$lookup$frequency_per_million)))
-  key <- .lexng_key(x$occurrences[.lexng_columns])
+  key <- .lexng_key(x$occurrences[.lexng_key_columns(x$occurrences)])
   group <- match(.lexng_key(x$occurrences[c("document_id", "n")]),
     .lexng_key(x$documents[c("document_id", "n")]))
   rows <- split(seq_len(nrow(x$occurrences)), factor(group, levels = seq_len(nrow(x$documents))))

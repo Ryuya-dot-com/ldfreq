@@ -14,7 +14,7 @@ norm_batch_fixture <- function() {
 }
 
 norm_batch_call <- function(documents, fixture = norm_batch_fixture(), ...) {
-  lexdiv_norm_profile_batch(documents, fixture$norms, "term", fixture$specs,
+  lexdiv_norm_profile(documents, fixture$norms, "term", fixture$specs,
     fixture$resource, ...)
 }
 
@@ -53,11 +53,11 @@ test_that("data-frame adapters, custom columns and empty batches retain types", 
   docs <- list(second = c("beta", "alpha"), first = character())
   table <- data.frame(id = names(docs), register = c("speech", "writing"))
   table$words <- unname(docs)
-  expect_identical(norm_batch_call(table, id_col = "id", terms_col = "words"),
+  expect_identical(norm_batch_call(table, id_col = "id", term_col = "words"),
     norm_batch_call(docs))
   empty <- norm_batch_call(setNames(list(), character()))
   expect_identical(empty$status, "empty")
-  expect_identical(empty, norm_batch_call(table[FALSE, ], id_col = "id", terms_col = "words"))
+  expect_identical(empty, norm_batch_call(table[FALSE, ], id_col = "id", term_col = "words"))
   for (name in c("summary", "lookup", "coverage")) {
     expect_identical(empty[[name]], norm_batch_call(docs)[[name]][FALSE, ])
   }
@@ -84,7 +84,7 @@ test_that("invalid batches fail clearly and whitespace terms are not silently sp
   }
   expect_error(norm_batch_call(list("alpha")), "plain named list")
   expect_error(norm_batch_call(setNames(list("alpha", "beta"), c("d", "d"))), "unique")
-  expect_error(norm_batch_call(list(a = "alpha"), id_col = "same", terms_col = "same"), "different")
+  expect_error(norm_batch_call(list(a = "alpha"), id_col = "same", term_col = "same"), "different")
   expect_error(norm_batch_call(list(a = "alpha"), max_rows = Inf), "positive finite whole")
   fixture <- norm_batch_fixture()
   fixture$norms$term[2] <- "alpha"

@@ -94,7 +94,7 @@ prepared$documents <- lapply(prepared$documents, function(x) {
 prepared$documents
 prepared$preprocessing
 
-profiles <- tubelex_profile_batch(prepared$documents, normalization = "identity")
+profiles <- tubelex_profile(prepared$documents, normalization = "identity")
 audit <- tubelex_diagnostics(profiles)
 audit$summary
 audit$unmatched_terms

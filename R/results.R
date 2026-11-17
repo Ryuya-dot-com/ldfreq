@@ -355,6 +355,22 @@
 }
 
 #' @export
+`[.lexdiv_results` <- function(x, ...) {
+  output <- NextMethod("[")
+  required_cols <- c("metric_id", "method_id", "value", "status", "missing_reason")
+  if (is.data.frame(output) && all(required_cols %in% names(output))) {
+    custom_attributes <- setdiff(
+      names(attributes(x)),
+      c("names", "row.names", "class")
+    )
+    for (attribute_name in custom_attributes) {
+      attr(output, attribute_name) <- attr(x, attribute_name, exact = TRUE)
+    }
+  }
+  output
+}
+
+#' @export
 print.lexdiv_results <- function(x, ...) {
   contract_version <- attr(x, "contract_version", exact = TRUE)
   if (!is.character(contract_version) || length(contract_version) != 1L) {

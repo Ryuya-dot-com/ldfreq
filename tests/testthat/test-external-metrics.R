@@ -90,7 +90,7 @@ test_that("saved old results retain their identity and legacy values", {
     if (saved$status == "ok") expect_identical(replay$diagnostics, saved$diagnostics)
   }
   expect_error(lexdiv_metrics(inputs[[1]], plan = old$plan), "contract|integrity|Unknown method")
-  current <- lexdiv_metrics_batch(inputs, metrics = "mtld")
+  current <- lexdiv_metrics(inputs, metrics = "mtld")
   expect_error(lexdiv_widen(rbind(old$results, current)), "different measurement")
   path <- tempfile(fileext = ".rds")
   on.exit(unlink(path))
@@ -101,7 +101,7 @@ test_that("saved old results retain their identity and legacy values", {
 test_that("experimental D requires explicit selection across entry points", {
   tokens <- rep(c("a", "b", "a", "c"), 20)
   expect_false("expected_ttr_d" %in% lexdiv_metrics(tokens)$metric_id)
-  expect_false("expected_ttr_d" %in% lexdiv_metrics_batch(list(a = tokens))$metric_id)
+  expect_false("expected_ttr_d" %in% lexdiv_metrics(list(a = tokens))$metric_id)
   expect_false("expected_ttr_d" %in% lexdiv_metrics_text(paste(tokens, collapse = " "))$results$metric_id)
   expect_false("expected_ttr_d" %in% lexdiv_metrics(tokens, plan = lexdiv_plan())$metric_id)
   expect_true("expected_ttr_d" %in% lexdiv_metric_ids())

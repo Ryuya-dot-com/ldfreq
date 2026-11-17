@@ -14,7 +14,7 @@ lexdiv_reference_coverage(
   reference,
   reference_id = "reference",
   id_col = "document_id",
-  terms_col = "terms",
+  term_col = "terms",
   details = "counts",
   max_rows = 1e6
 )
@@ -37,14 +37,14 @@ lexdiv_reference_coverage(
 \arguments{
 \item{documents}{Either a plain named list whose elements are term vectors, or
 a data frame containing the columns selected by \code{id_col} and
-\code{terms_col}. The selected ID column must contain unique character IDs;
+\code{term_col}. The selected ID column must contain unique character IDs;
 the selected terms column must be a list-column with one element per row.}
 \item{reference}{A plain character vector containing one complete reference
 term per element.}
 \item{reference_id}{One path-free, non-empty valid-UTF-8 reference identifier.
 It must differ from every document ID.}
 \item{id_col}{Name of the document-ID column for data-frame input.}
-\item{terms_col}{Name of the term list-column for data-frame input.}
+\item{term_col}{Name of the term list-column for data-frame input.}
 \item{details}{Either \code{"counts"}, which does not retain lexical strings,
 or \code{"terms"}, which retains document types, document and reference
 counts, and exact-match indicators in \code{$terms}.}
@@ -170,6 +170,6 @@ document_frame$terms <- list(c("a", "a", "b"), c("b", "c"))
 lexdiv_reference_coverage(document_frame, c("a", "b"))$summary
 }
 \seealso{
-\code{\link{lexdiv_overlap}}, \code{\link{lexdiv_metrics_batch}}
+\code{\link{lexdiv_overlap}}, \code{\link{lexdiv_metrics}}
 }
 \keyword{text}

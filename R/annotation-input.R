@@ -289,10 +289,37 @@ lexdiv_as_annotations <- function(
         stop(sprintf("Supplied text for document %s does not match source_text_sha256.",
           encodeString(ids[[i]], quote = '"')), call. = FALSE)
       }
+      seg_i <- switch(
+        p$normalization,
+        none = raw_i,
+        NFC = stringi::stri_trans_nfc(raw_i),
+        NFKC = stringi::stri_trans_nfkc(raw_i)
+      )
+      Encoding(seg_i) <- "UTF-8"
       proc_i <- .lexprep_prepare_text(raw_i, p$normalization, p$case, tok_kind)
-      seg_texts[[i]] <- proc_i
+      seg_texts[[i]] <- seg_i
+      w_start <- tk$tokens$start
+      w_end <- tk$tokens$end
+      if (length(w_start) && stringi::stri_length(seg_i) != stringi::stri_length(proc_i)) {
+        n_cp <- stringi::stri_length(seg_i)
+        cps <- stringi::stri_sub(seg_i, seq_len(n_cp), seq_len(n_cp))
+        cp_lens <- stringi::stri_length(
+          .lexprep_prepare_text(cps, "none", p$case, tok_kind)
+        )
+        proc_end_cp <- cumsum(cp_lens)
+        proc_start_cp <- c(1L, utils::head(proc_end_cp, -1L) + 1L)
+        mapped_start <- match(w_start, proc_start_cp)
+        mapped_end <- match(w_end, proc_end_cp)
+        if (anyNA(mapped_start) || anyNA(mapped_end)) {
+          # Fallback to processed text only if a boundary fell mid-expansion
+          seg_texts[[i]] <- proc_i
+        } else {
+          w_start <- mapped_start
+          w_end <- mapped_end
+        }
+      }
       spans <- .lexann_complete_spans(
-        proc_i, tk$tokens$start, tk$tokens$end, tk$tokens$is_number
+        seg_texts[[i]], w_start, w_end, tk$tokens$is_number
       )
       running <- running + nrow(spans)
       if (running > max_tokens) {

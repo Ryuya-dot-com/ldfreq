@@ -34,7 +34,7 @@ test_that("MTLD-MA is opt-in and preserves plan, batch and raw-text dispatch", {
   a <- lexdiv_metrics(x, metrics = "mtld_ma", mtld_threshold = .7)
   plan <- lexdiv_plan(presets = character(), specs = lexdiv_spec(a$method_id, list(threshold = .7)))
   expect_equal(lexdiv_metrics(x, plan = plan)$value, a$value)
-  expect_equal(lexdiv_metrics_batch(list(doc = x), metrics = "mtld_ma", mtld_threshold = .7)$value, a$value)
+  expect_equal(lexdiv_metrics(list(doc = x), metrics = "mtld_ma", mtld_threshold = .7)$value, a$value)
   expect_equal(lexdiv_metrics_text(paste(x, collapse = " "), metrics = "mtld_ma",
     mtld_threshold = .7)$results$value, a$value)
 })

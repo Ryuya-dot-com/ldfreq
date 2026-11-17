@@ -129,7 +129,7 @@ collocation_validate <- function(x) {
   if (!is.list(x) || !identical(x$provenance$recipe_version, "1") ||
       !identical(x$integrity_sha256,
         .concordance_hash(unclass(x[names(x) != "integrity_sha256"]))))
-    stop("The saved collocation record changed; repeat collocation_profile().", call. = FALSE)
+    stop("The saved collocation record changed; repeat lexdiv_collocations().", call. = FALSE)
   .concordance_check(x$search)
   invisible(x)
 }

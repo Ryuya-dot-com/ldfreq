@@ -71,7 +71,7 @@
 #' frequency summaries, and counts unmatched terms and normalization mappings.
 #' No tokenization, resource lookup or network access is performed.
 #'
-#' @param x One [tubelex_profile()] result, a [tubelex_profile_batch()] result,
+#' @param x One single-document or multi-document [tubelex_profile()] result,
 #'   or a plain named list of `tubelex_profile` objects. A zero-document batch
 #'   or named list is allowed.
 #' @param max_rows Maximum number of input lookup rows plus two summary rows

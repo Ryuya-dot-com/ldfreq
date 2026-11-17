@@ -26,16 +26,16 @@ test_that("tibble-like subclassed data frames and named vectors work across v1.0
     word = c("alpha", "beta", "alpha"),
     stringsAsFactors = FALSE
   ))
-  docs <- lexdiv_as_documents(tidy_tbl, id_col = "essay_id", token_col = "word")
+  docs <- lexdiv_as_documents(tidy_tbl, id_col = "essay_id", term_col = "word")
   expect_identical(docs, list(d1 = c("alpha", "beta"), d2 = "alpha"))
 
-  # Raw-text tibble -> lexdiv_metrics_text_batch -> lexdiv_widen
+  # Raw-text tibble -> lexdiv_metrics_text -> lexdiv_widen
   raw_tbl <- as_tbl(data.frame(
     document_id = c("d1", "d2"),
     text = c("Cats chase cats and dogs!", "A dog barked."),
     stringsAsFactors = FALSE
   ))
-  tb_res <- lexdiv_metrics_text_batch(raw_tbl, metrics = "ttr")
+  tb_res <- lexdiv_metrics_text(raw_tbl, metrics = "ttr")
   wide <- tb_res |> lexdiv_widen(values_from = c("value", "N"))
   expect_s3_class(wide, "lexdiv_wide_results")
   expect_equal(wide$ttr__N, c(5, 3))
@@ -55,7 +55,7 @@ test_that("ergonomic norm specs, resource metadata, and metric_id shorthands wor
   expect_identical(p1$provenance$contract_version, "0.2.0")
   expect_equal(nrow(p1$summary), 4L)
 
-  pb <- lexdiv_norm_profile_batch(
+  pb <- lexdiv_norm_profile(
     list(d1 = c("cat", "dog"), d2 = c("rare", "unknown")),
     norms,
     key = "word"
@@ -89,7 +89,7 @@ test_that("unified raw-text plan workflow connects directly to screen and study_
   expect_equal(nrow(lexdiv_screen_lengths(single, floors = c(f4 = 4L))), 2L)
 
   texts <- c(d1 = "Cats chase cats and dogs.", d2 = "Short.")
-  batch_res <- lexdiv_metrics_text_batch(texts, plan = plan)
+  batch_res <- lexdiv_metrics_text(texts, plan = plan)
   expect_s3_class(batch_res$results, "lexdiv_profile_batch_results")
 
   screens <- lexdiv_screen_lengths(batch_res, floors = c(f4 = 4L))
@@ -133,8 +133,8 @@ test_that("batch lemmatization, batch flemmatization, and lexdiv_as_annotations 
     d1 = "Hello, world! The cats ran quickly in 2026.",
     d2 = "Dogs barked loudly; cats slept."
   )
-  toks <- lexdiv_tokenize_batch(texts)
-  lem_toks <- lexdiv_lemmatize_batch(
+  toks <- lexdiv_tokenize(texts)
+  lem_toks <- lexdiv_lemmatize(
     toks,
     lemmas = list(
       d1 = c("hello", "world", "the", "cat", "run", "quickly", "in"),
@@ -148,7 +148,7 @@ test_that("batch lemmatization, batch flemmatization, and lexdiv_as_annotations 
   ant_file <- tempfile(fileext = ".txt")
   on.exit(unlink(ant_file), add = TRUE)
   writeLines(c("cat\t->\tcat\tcats", "dog\t->\tdog\tdogs"), ant_file, useBytes = TRUE)
-  flem_toks <- lexdiv_flemmatize_batch(toks, ant_file, resource_version = "v1")
+  flem_toks <- lexdiv_flemmatize(toks, ant_file, resource_version = "v1")
   expect_identical(flem_toks$d1$tokens$flemma[4], "cat")
 
   # Direct raw-text -> lexdiv_as_annotations() bridge

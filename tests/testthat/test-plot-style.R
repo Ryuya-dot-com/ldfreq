@@ -3,14 +3,14 @@ plot_style_examples <- function() {
   plan <- lexdiv_plan(presets = character(), grids = lexdiv_grid(
     "mattr_sliding_step1_v1", parameter = "window_length", values = 3
   ))
-  batch <- lexdiv_metrics_batch(documents, plan = plan)
+  batch <- lexdiv_metrics(documents, plan = plan)
   list(
     metric = lexdiv_metrics(documents$short, metrics = "mattr", window_length = 3),
-    batch = lexdiv_metrics_batch(documents, metrics = "mattr", window_length = 3),
+    batch = lexdiv_metrics(documents, metrics = "mattr", window_length = 3),
     profile = lexdiv_metrics(documents$short, plan = plan),
     profile_batch = batch,
     text = lexdiv_metrics_text("a b a", metrics = "mattr", window_length = 3),
-    text_batch = lexdiv_metrics_text_batch(c(short = "a b a", long = "a b c a"),
+    text_batch = lexdiv_metrics_text(c(short = "a b a", long = "a b c a"),
       metrics = "mattr", window_length = 3),
     screen = lexdiv_screen_lengths(batch, floors = c(tokens_50 = 50L)),
     tubelex = structure(list(summary = data.frame(weighting = c("token", "type"),
@@ -55,7 +55,7 @@ test_that("TTR shows its denominator and metric plots retain missing positions",
   )
   docs <- list(short = rep(letters[1:4], 5), empty = character(),
     invalid = factor("a"), long = rep(letters[1:4], 20))
-  result <- lexdiv_metrics_batch(docs, metrics = "ttr")
+  result <- lexdiv_metrics(docs, metrics = "ttr")
   original <- result
   returned <- withVisible(plot(result))
   expect_false(returned$visible)
@@ -79,7 +79,7 @@ test_that("TTR shows its denominator and metric plots retain missing positions",
   expect_null(drawn_axis)
   expect_error(plot(result[2:3, ]), "no finite ok values")
 
-  other <- lexdiv_metrics_batch(docs[c(1, 2, 4)], metrics = "mattr",
+  other <- lexdiv_metrics(docs[c(1, 2, 4)], metrics = "mattr",
     window_length = 50)
   plot(other)
   expect_identical(drawn$x, 1:3)

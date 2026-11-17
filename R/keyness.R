@@ -1,10 +1,22 @@
 # Shared implementation for the public API and installed examples.
-keyness_compare <- function(x, target, reference, preprocessing_id = "default",
-    term_col = "surface", keep = rep(TRUE, nrow(x$tokens)), min_count = 1L,
+keyness_compare <- function(
+    x,
+    target,
+    reference,
+    preprocessing_id = "default",
+    term_col = NULL,
+    keep = NULL,
+    min_count = 1L,
     max_tokens = 1e6) {
   min_count <- .concordance_whole(min_count, "min_count")
   max_tokens <- .concordance_whole(max_tokens, "max_tokens")
   x <- .lexann_check(x, "x", max_tokens)
+  if (is.null(term_col)) {
+    term_col <- if (all(c("term", "is_word") %in% names(x$tokens))) "term" else "surface"
+  }
+  if (is.null(keep)) {
+    keep <- if ("is_word" %in% names(x$tokens)) x$tokens$is_word else rep(TRUE, nrow(x$tokens))
+  }
   strings <- function(z) is.character(z) && length(z) > 0L && !anyNA(z) &&
     all(validUTF8(z)) && all(nzchar(stringi::stri_trim_both(z)))
   ids <- x$documents$document_id
