@@ -169,13 +169,27 @@ test_that("bridged annotations retain cased text/offsets, default to term+is_wor
   expect_identical(ann$tokens$term[ann$tokens$document_id == "d1" & ann$tokens$is_word], c("don't", "shout", "in", ist_lower))
 
   # Default term_col = NULL -> "term" and keep = NULL -> is_word
-  conc <- lexdiv_concordance(ann, list(ist = ist_lower))
-  expect_equal(nrow(conc$occurrences), 2L)
-  expect_identical(conc$occurrences$keyword, c("\u0130stanbul", "\u0130stanbul"))
+  if (isTRUE(l10n_info()[["UTF-8"]])) {
+    conc <- lexdiv_concordance(ann, list(ist = ist_lower))
+    expect_equal(nrow(conc$occurrences), 2L)
+    expect_identical(conc$occurrences$keyword, c("\u0130stanbul", "\u0130stanbul"))
 
-  disp <- lexdiv_concordance_dispersion(conc, "ist", parts = 2L, include_normalized = TRUE)
-  expect_true("DP_norm" %in% names(disp$documents))
-  expect_true(all(disp$documents$DP_norm >= 0 & disp$documents$DP_norm <= 1))
+    disp <- lexdiv_concordance_dispersion(conc, "ist", parts = 2L, include_normalized = TRUE)
+    expect_true("DP_norm" %in% names(disp$documents))
+    expect_true(all(disp$documents$DP_norm >= 0 & disp$documents$DP_norm <= 1))
+  } else {
+    ann_ascii <- lexdiv_as_annotations(c(
+      d1 = "Don\u2019t shout in London!",
+      d2 = "Quiet streets in London."
+    ))
+    conc <- lexdiv_concordance(ann_ascii, list(lon = "london"))
+    expect_equal(nrow(conc$occurrences), 2L)
+    expect_identical(conc$occurrences$keyword, c("London", "London"))
+
+    disp <- lexdiv_concordance_dispersion(conc, "lon", parts = 2L, include_normalized = TRUE)
+    expect_true("DP_norm" %in% names(disp$documents))
+    expect_true(all(disp$documents$DP_norm >= 0 & disp$documents$DP_norm <= 1))
+  }
 
   key <- lexdiv_keyness(ann, target = "d1", reference = "d2")
   expect_false("!" %in% key$results$term)

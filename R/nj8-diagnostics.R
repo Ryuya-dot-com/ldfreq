@@ -29,7 +29,7 @@
 nj8_diagnostics <- function(x) {
   batch <- inherits(x, "nj8_profile_batch")
   if (!is.list(x) || (!batch && !inherits(x, "nj8_profile"))) {
-    stop("x must be a single-document or multi-document result of nj8_profile().", call. = FALSE)
+    stop("x must be a result of nj8_profile().", call. = FALSE)
   }
   lookup <- x$lookup
   fields <- c("surface_term", "term", "lookup_term", "matched")
